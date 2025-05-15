@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 
 import { cn } from '../../lib/utils';
 import { Dialog, DialogOverlay, DialogPortal, DialogTrigger } from '../../primitives/dialog';
-import { LazyPDFViewerNoLoader } from '../../primitives/lazy-pdf-viewer';
+import PDFViewer from '../../primitives/pdf-viewer';
 
 export type DocumentDialogProps = {
   trigger?: React.ReactNode;
@@ -43,7 +43,7 @@ export default function DocumentDialog({ trigger, documentData, ...props }: Docu
           )}
           onClick={() => props.onOpenChange?.(false)}
         >
-          <LazyPDFViewerNoLoader
+          <PDFViewer
             className="mx-auto w-full max-w-3xl xl:max-w-5xl"
             documentData={documentData}
             onClick={(e) => e.stopPropagation()}

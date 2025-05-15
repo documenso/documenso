@@ -122,7 +122,7 @@ export const PasswordForm = ({ className }: PasswordFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  <Trans>Password</Trans>
+                  <Trans>New Password</Trans>
                 </FormLabel>
                 <FormControl>
                   <PasswordInput autoComplete="new-password" {...field} />

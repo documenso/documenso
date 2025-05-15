@@ -1,4 +1,4 @@
-import DocumentEditPage, { loader } from '~/routes/_authenticated+/documents+/$id.edit';
+import DocumentEditPage, { loader } from '~/routes/_authenticated+/documents.$id.edit';
 
 export { loader };
 

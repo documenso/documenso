@@ -35,6 +35,14 @@ export const searchDocumentsWithKeyword = async ({
           deletedAt: null,
         },
         {
+          externalId: {
+            contains: query,
+            mode: 'insensitive',
+          },
+          userId: userId,
+          deletedAt: null,
+        },
+        {
           recipients: {
             some: {
               email: {
@@ -73,6 +81,23 @@ export const searchDocumentsWithKeyword = async ({
         },
         {
           title: {
+            contains: query,
+            mode: 'insensitive',
+          },
+          teamId: {
+            not: null,
+          },
+          team: {
+            members: {
+              some: {
+                userId: userId,
+              },
+            },
+          },
+          deletedAt: null,
+        },
+        {
+          externalId: {
             contains: query,
             mode: 'insensitive',
           },

@@ -38,7 +38,7 @@ export type GenericErrorLayoutProps = {
 
 export const defaultErrorCodeMap: ErrorCodeMap = {
   404: {
-    subHeading: msg`404 Page not found`,
+    subHeading: msg`404 not found`,
     heading: msg`Oops! Something went wrong.`,
     message: msg`The page you are looking for was moved, removed, renamed or might never have existed.`,
   },
@@ -62,7 +62,7 @@ export const GenericErrorLayout = ({
   const team = useOptionalCurrentTeam();
 
   const { subHeading, heading, message } =
-    errorCodeMap[errorCode || 404] ?? defaultErrorCodeMap[500];
+    errorCodeMap[errorCode || 500] ?? defaultErrorCodeMap[500];
 
   return (
     <div className="fixed inset-0 z-0 flex h-screen w-screen items-center justify-center">

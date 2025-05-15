@@ -30,7 +30,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
+import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { UserProfileSkeleton } from '~/components/general/user-profile-skeleton';
@@ -353,16 +353,15 @@ export const SignUpForm = ({
                 <FormField
                   control={form.control}
                   name="signature"
-                  render={({ field: { onChange } }) => (
+                  render={({ field: { onChange, value } }) => (
                     <FormItem>
                       <FormLabel>
                         <Trans>Sign Here</Trans>
                       </FormLabel>
                       <FormControl>
-                        <SignaturePad
-                          className="h-36 w-full"
+                        <SignaturePadDialog
                           disabled={isSubmitting}
-                          containerClassName="mt-2 rounded-lg border bg-background"
+                          value={value}
                           onChange={(v) => onChange(v ?? '')}
                         />
                       </FormControl>
@@ -531,6 +530,27 @@ export const SignUpForm = ({
             </div>
           </form>
         </Form>
+        <p className="text-muted-foreground mt-6 text-xs">
+          <Trans>
+            By proceeding, you agree to our{' '}
+            <Link
+              to="https://documen.so/terms"
+              target="_blank"
+              className="text-documenso-700 duration-200 hover:opacity-70"
+            >
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link
+              to="https://documen.so/privacy"
+              target="_blank"
+              className="text-documenso-700 duration-200 hover:opacity-70"
+            >
+              Privacy Policy
+            </Link>
+            .
+          </Trans>
+        </p>
       </div>
     </div>
   );

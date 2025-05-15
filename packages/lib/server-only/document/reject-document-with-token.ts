@@ -1,18 +1,12 @@
 import { SigningStatus } from '@prisma/client';
-import { WebhookTriggerEvents } from '@prisma/client';
 
 import { jobs } from '@documenso/lib/jobs/client';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
-import {
-  ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
-} from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type RejectDocumentWithTokenOptions = {
   token: string;
@@ -84,7 +78,16 @@ export async function rejectDocumentWithToken({
     }),
   ]);
 
-  // Send email notifications
+  // Trigger the seal document job to process the document asynchronously
+  await jobs.triggerJob({
+    name: 'internal.seal-document',
+    payload: {
+      documentId,
+      requestMetadata,
+    },
+  });
+
+  // Send email notifications to the rejecting recipient
   await jobs.triggerJob({
     name: 'send.signing.rejected.emails',
     payload: {
@@ -93,27 +96,14 @@ export async function rejectDocumentWithToken({
     },
   });
 
-  // Get the updated document with all recipients
-  const updatedDocument = await prisma.document.findFirst({
-    where: {
-      id: document.id,
+  // Send cancellation emails to other recipients
+  await jobs.triggerJob({
+    name: 'send.document.cancelled.emails',
+    payload: {
+      documentId,
+      cancellationReason: reason,
+      requestMetadata,
     },
-    include: {
-      recipients: true,
-      documentMeta: true,
-    },
-  });
-
-  if (!updatedDocument) {
-    throw new Error('Document not found after update');
-  }
-
-  // Trigger webhook for document rejection
-  await triggerWebhook({
-    event: WebhookTriggerEvents.DOCUMENT_REJECTED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
-    userId: document.userId,
-    teamId: document.teamId ?? undefined,
   });
 
   return updatedRecipient;

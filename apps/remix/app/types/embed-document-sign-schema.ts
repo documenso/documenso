@@ -13,4 +13,5 @@ export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
     .optional()
     .transform((value) => value || undefined),
   lockName: z.boolean().optional().default(false),
+  allowDocumentRejection: z.boolean().optional(),
 });

@@ -1,4 +1,4 @@
-import { fetchRequestHandler } from '@ts-rest/serverless/fetch';
+import { TsRestHttpError, fetchRequestHandler } from '@ts-rest/serverless/fetch';
 import { Hono } from 'hono';
 
 import { ApiContractV1 } from '@documenso/api/v1/contract';
@@ -18,8 +18,7 @@ tsRestHonoApp
   .get('/openapi.json', (c) => c.json(OpenAPIV1))
   .get('/me', async (c) => testCredentialsHandler(c.req.raw));
 
-// Zapier. Todo: Check methods. Are these get/post/update requests?
-// Todo: Is there really no validations?
+// Zapier. Todo: (RR7) Check methods. Are these get/post/update requests?
 tsRestHonoApp
   .all('/zapier/list-documents', async (c) => listDocumentsHandler(c.req.raw))
   .all('/zapier/subscribe', async (c) => subscribeHandler(c.req.raw))
@@ -30,6 +29,12 @@ tsRestHonoApp.mount('/', async (request) => {
     request,
     contract: ApiContractV1,
     router: ApiContractV1Implementation,
-    options: {},
+    options: {
+      errorHandler: (err) => {
+        if (err instanceof TsRestHttpError && err.statusCode === 500) {
+          console.error(err);
+        }
+      },
+    },
   });
 });

@@ -6,9 +6,6 @@ export const APP_DOCUMENT_UPLOAD_SIZE_LIMIT =
 export const NEXT_PUBLIC_WEBAPP_URL = () =>
   env('NEXT_PUBLIC_WEBAPP_URL') ?? 'http://localhost:3000';
 
-export const NEXT_PUBLIC_MARKETING_URL = () =>
-  env('NEXT_PUBLIC_MARKETING_URL') ?? 'http://localhost:3001';
-
 export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL =
   env('NEXT_PRIVATE_INTERNAL_WEBAPP_URL') ?? NEXT_PUBLIC_WEBAPP_URL();
 

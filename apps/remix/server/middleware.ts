@@ -1,5 +1,5 @@
 import type { Context, Next } from 'hono';
-import { getCookie } from 'hono/cookie';
+import { deleteCookie, setCookie } from 'hono/cookie';
 
 import { AppDebugger } from '@documenso/lib/utils/debugger';
 
@@ -18,49 +18,58 @@ export const appMiddleware = async (c: Context, next: Next) => {
   const { req } = c;
   const { path } = req;
 
-  // Basic paths to ignore.
-  if (path.startsWith('/api') || path.endsWith('.data') || path.startsWith('/__manifest')) {
+  // Paths to ignore.
+  if (nonPagePathRegex.test(path)) {
     return next();
   }
 
+  // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
+
+  await next();
+
+  // POST-HANDLER CODE: Place code here to execute AFTER the route handler completes.
+  // This is useful for:
+  // - Setting cookies
+  // - Any operations that should happen after all route handlers but before sending the response
+
   debug.log('Path', path);
 
-  const preferredTeamUrl = getCookie(c, 'preferred-team-url');
-
+  const pathname = path.replace('.data', '');
   const referrer = c.req.header('referer');
   const referrerUrl = referrer ? new URL(referrer) : null;
   const referrerPathname = referrerUrl ? referrerUrl.pathname : null;
 
-  // // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
-  // const resetPreferredTeamUrl =
-  //   referrerPathname &&
-  //   referrerPathname.startsWith('/t/') &&
-  //   (!path.startsWith('/t/') || path === '/');
+  // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
+  const resetPreferredTeamUrl =
+    referrerPathname &&
+    referrerPathname.startsWith('/t/') &&
+    (!pathname.startsWith('/t/') || pathname === '/');
 
-  // // Redirect root page to `/documents` or `/t/{preferredTeamUrl}/documents`.
-  // if (path === '/') {
-  //   debug.log('Redirecting from root to documents');
+  // Set the preferred team url cookie if user accesses a team page.
+  if (pathname.startsWith('/t/')) {
+    debug.log('Setting preferred team url cookie');
 
-  //   const redirectUrlPath = formatDocumentsPath(
-  //     resetPreferredTeamUrl ? undefined : preferredTeamUrl,
-  //   );
+    setCookie(c, 'preferred-team-url', pathname.split('/')[2], {
+      sameSite: 'lax',
+    });
 
-  //   const redirectUrl = new URL(redirectUrlPath, req.url);
+    return;
+  }
 
-  //   return c.redirect(redirectUrl);
-  // }
+  // Clear preferred team url cookie if user accesses a non team page from a team page.
+  if (resetPreferredTeamUrl || pathname === '/documents') {
+    debug.log('Deleting preferred team url cookie');
 
-  // // Set the preferred team url cookie if user accesses a team page.
-  // if (path.startsWith('/t/')) {
-  //   setCookie(c, 'preferred-team-url', path.split('/')[2]);
-  //   return next();
-  // }
+    deleteCookie(c, 'preferred-team-url');
 
-  // // Clear preferred team url cookie if user accesses a non team page from a team page.
-  // if (resetPreferredTeamUrl || path === '/documents') {
-  //   debug.log('Resetting preferred team url');
-
-  //   deleteCookie(c, 'preferred-team-url');
-  //   return next();
-  // }
+    return;
+  }
 };
+
+// This regex matches any path that:
+// 1. Starts with /api/, /ingest/, /__manifest/, or /assets/
+// 2. Starts with /apple- (like /apple-touch-icon.png)
+// 3. Starts with /favicon (like /favicon.ico)
+// The ^ ensures matching from the beginning of the string
+// The | acts as OR operator between different patterns
+const nonPagePathRegex = /^(\/api\/|\/ingest\/|\/__manifest|\/assets\/|\/apple-.*|\/favicon.*)/;

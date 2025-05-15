@@ -14,6 +14,7 @@ export const DocumentCancelTemplate = ({
   inviterEmail = 'lucas@documenso.com',
   documentName = 'Open Source Pledge.pdf',
   assetBaseUrl = 'http://localhost:3002',
+  cancellationReason,
 }: DocumentCancelEmailTemplateProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
@@ -48,6 +49,7 @@ export const DocumentCancelTemplate = ({
                 inviterEmail={inviterEmail}
                 documentName={documentName}
                 assetBaseUrl={assetBaseUrl}
+                cancellationReason={cancellationReason}
               />
             </Section>
           </Container>

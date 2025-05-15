@@ -5,6 +5,8 @@ import { type Session, type User, UserSecurityAuditLogType } from '@prisma/clien
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
+import { AUTH_SESSION_LIFETIME } from '../../config';
+
 /**
  * The user object to pass around the app.
  *
@@ -21,6 +23,7 @@ export type SessionUser = Pick<
   | 'roles'
   | 'signature'
   | 'url'
+  | 'customerId'
 >;
 
 export type SessionValidationResult =
@@ -54,7 +57,7 @@ export const createSession = async (
     userId,
     updatedAt: new Date(),
     createdAt: new Date(),
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+    expiresAt: new Date(Date.now() + AUTH_SESSION_LIFETIME),
     ipAddress: metadata.ipAddress ?? null,
     userAgent: metadata.userAgent ?? null,
   };
@@ -97,6 +100,7 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
           roles: true,
           signature: true,
           url: true,
+          customerId: true,
         },
       },
     },

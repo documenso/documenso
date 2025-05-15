@@ -27,6 +27,8 @@ export const subscribeHandler = async (req: Request) => {
 
     return Response.json(createdWebhook);
   } catch (err) {
+    console.error(err);
+
     return Response.json(
       {
         message: 'Internal Server Error',

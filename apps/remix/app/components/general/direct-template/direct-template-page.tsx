@@ -12,7 +12,7 @@ import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -136,7 +136,7 @@ export const DirectTemplatePageView = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer
+          <PDFViewer
             key={template.id}
             documentData={template.templateDocumentData}
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}

@@ -52,18 +52,18 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
       data: {
         name,
         email: email.toLowerCase(),
-        password: hashedPassword, // Todo: Drop password.
+        password: hashedPassword, // Todo: (RR7) Drop password.
         signature,
         url,
       },
     });
 
-    // Todo: Migrate to use this after RR7.
+    // Todo: (RR7) Migrate to use this after RR7.
     // await tx.account.create({
     //   data: {
     //     userId: user.id,
-    //     type: 'emailPassword', // Todo
-    //     provider: 'DOCUMENSO', // Todo: Enums
+    //     type: 'emailPassword', // Todo: (RR7)
+    //     provider: 'DOCUMENSO', // Todo: (RR7) Enums
     //     providerAccountId: user.id.toString(),
     //     password: hashedPassword,
     //   },
@@ -73,7 +73,7 @@ export const createUser = async ({ name, email, password, signature, url }: Crea
   });
 
   await onCreateUserHook(user).catch((err) => {
-    // Todo: Add logging.
+    // Todo: (RR7) Add logging.
     console.error(err);
   });
 

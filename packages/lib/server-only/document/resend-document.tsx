@@ -20,6 +20,7 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { isDocumentCompleted } from '../../utils/document';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { getDocumentWhereInput } from './get-document-by-id';
@@ -88,7 +89,7 @@ export const resendDocument = async ({
     throw new Error('Can not send draft document');
   }
 
-  if (document.status === DocumentStatus.COMPLETED) {
+  if (isDocumentCompleted(document.status)) {
     throw new Error('Can not send completed document');
   }
 

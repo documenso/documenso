@@ -1,11 +1,12 @@
+import { UserSecurityAuditLogType } from '@prisma/client';
 import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
+import { nanoid } from 'nanoid';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
 import { prisma } from '@documenso/prisma';
-import { UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';
@@ -144,7 +145,8 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
           },
           data: {
             emailVerified: new Date(),
-            password: null, // Todo: Check this
+            password: null,
+            // Todo: (RR7) Will need to update the "password" account after the migration.
           },
         });
       }
@@ -162,6 +164,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         email: email,
         name: name,
         emailVerified: new Date(),
+        url: nanoid(17),
       },
     });
 
@@ -182,7 +185,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   });
 
   await onCreateUserHook(createdUser).catch((err) => {
-    // Todo: Add logging.
+    // Todo: (RR7) Add logging.
     console.error(err);
   });
 

@@ -2,11 +2,16 @@ import { useCallback, useEffect } from 'react';
 
 import { useRevalidator } from 'react-router';
 
+/**
+ * Not really used anymore, this causes random 500s when the user refreshes while this occurs.
+ */
 export const RefreshOnFocus = () => {
-  const { revalidate } = useRevalidator();
+  const { revalidate, state } = useRevalidator();
 
   const onFocus = useCallback(() => {
-    void revalidate();
+    if (state === 'idle') {
+      void revalidate();
+    }
   }, [revalidate]);
 
   useEffect(() => {

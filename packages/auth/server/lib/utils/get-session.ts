@@ -38,7 +38,7 @@ export const getOptionalSession = async (
 };
 
 /**
- * Todo: Rethink, this is pretty sketchy.
+ * Todo: (RR7) Rethink, this is pretty sketchy.
  */
 const mapRequestToContextForCookie = (c: Context | Request) => {
   if (c instanceof Request) {

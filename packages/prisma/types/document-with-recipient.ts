@@ -1,4 +1,4 @@
-import type { Document, DocumentData, Recipient } from '@documenso/prisma/client';
+import type { Document, DocumentData, Recipient } from '@prisma/client';
 
 export type DocumentWithRecipients = Document & {
   recipients: Recipient[];

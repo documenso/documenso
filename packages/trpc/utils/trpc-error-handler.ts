@@ -1,7 +1,6 @@
 import type { ErrorHandlerOptions } from '@trpc/server/unstable-core-do-not-import';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { env } from '@documenso/lib/utils/env';
 import { buildLogger } from '@documenso/lib/utils/logger';
 
 const logger = buildLogger();
@@ -11,11 +10,6 @@ export const handleTrpcRouterError = (
   { error, path }: Pick<ErrorHandlerOptions<undefined>, 'error' | 'path'>,
   source: 'trpc' | 'apiV1' | 'apiV2',
 ) => {
-  // Always log the error on production for now.
-  if (env('NODE_ENV') !== 'development') {
-    console.error(error);
-  }
-
   const appError = AppError.parseError(error.cause || error);
 
   const isAppError = error.cause instanceof AppError;
@@ -30,6 +24,8 @@ export const handleTrpcRouterError = (
   const isLoggableTrpcError = !isAppError && errorCodesToAlertOn.includes(error.code);
 
   if (isLoggableAppError || isLoggableTrpcError) {
+    console.error(error);
+
     logger.error(error, {
       method: path,
       context: {

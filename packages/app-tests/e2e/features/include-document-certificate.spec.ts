@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
+import { DocumentStatus, FieldType } from '@prisma/client';
 import { PDFDocument } from 'pdf-lib';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFile } from '@documenso/lib/universal/upload/get-file';
 import { prisma } from '@documenso/prisma';
-import { DocumentStatus, FieldType } from '@documenso/prisma/client';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -222,7 +222,10 @@ test.describe('Signing Certificate Tests', () => {
 
     // Toggle signing certificate setting
     await page.getByLabel('Include the Signing Certificate in the Document').click();
-    await page.getByRole('button', { name: /Save/ }).first().click();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
 
     await page.waitForTimeout(1000);
 
@@ -236,7 +239,10 @@ test.describe('Signing Certificate Tests', () => {
 
     // Toggle the setting back to true
     await page.getByLabel('Include the Signing Certificate in the Document').click();
-    await page.getByRole('button', { name: /Save/ }).first().click();
+    await page
+      .getByRole('button', { name: /Update/ })
+      .first()
+      .click();
 
     await page.waitForTimeout(1000);
 

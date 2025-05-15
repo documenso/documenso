@@ -3,8 +3,8 @@ import React from 'react';
 import { cn } from '@documenso/ui/lib/utils';
 
 export type SettingsHeaderProps = {
-  title: string;
-  subtitle: string;
+  title: string | React.ReactNode;
+  subtitle: string | React.ReactNode;
   hideDivider?: boolean;
   children?: React.ReactNode;
   className?: string;

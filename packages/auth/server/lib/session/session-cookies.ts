@@ -9,6 +9,8 @@ import {
 import { appLog } from '@documenso/lib/utils/debugger';
 import { env } from '@documenso/lib/utils/env';
 
+import { AUTH_SESSION_LIFETIME } from '../../config';
+import { extractCookieFromHeaders } from '../utils/cookies';
 import { generateSessionToken } from './session';
 
 export const sessionCookieName = formatSecureCookieName('sessionId');
@@ -30,22 +32,14 @@ const getAuthSecret = () => {
 export const sessionCookieOptions = {
   httpOnly: true,
   path: '/',
-  sameSite: useSecureCookies ? 'none' : 'lax', // Todo: This feels wrong?
+  sameSite: useSecureCookies ? 'none' : 'lax',
   secure: useSecureCookies,
   domain: getCookieDomain(),
-  // Todo: Max age for specific auth cookies.
+  expires: new Date(Date.now() + AUTH_SESSION_LIFETIME),
 } as const;
 
 export const extractSessionCookieFromHeaders = (headers: Headers): string | null => {
-  const cookieHeader = headers.get('cookie') || '';
-  const cookiePairs = cookieHeader.split(';');
-  const sessionCookie = cookiePairs.find((pair) => pair.trim().startsWith(sessionCookieName));
-
-  if (!sessionCookie) {
-    return null;
-  }
-
-  return sessionCookie.split('=')[1].trim();
+  return extractCookieFromHeaders(sessionCookieName, headers);
 };
 
 /**

@@ -1,10 +1,9 @@
-import { DocumentDataType, DocumentStatus } from '@prisma/client';
+import { DocumentDataType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
@@ -26,8 +25,8 @@ import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
@@ -55,12 +54,14 @@ import {
   ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
-  ZSetPasswordForDocumentMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
+} from './schema';
+import { updateDocumentRoute } from './update-document';
+import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
-} from './schema';
+} from './update-document.types';
 
 export const documentRouter = router({
   /**
@@ -337,20 +338,12 @@ export const documentRouter = router({
       });
     }),
 
+  updateDocument: updateDocumentRoute,
+
   /**
-   * @public
-   *
-   * Todo: Refactor to updateDocument.
+   * @deprecated Delete this after updateDocument endpoint is deployed
    */
   setSettingsForDocument: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/update',
-        summary: 'Update document',
-        tags: ['Document'],
-      },
-    })
     .input(ZUpdateDocumentRequestSchema)
     .output(ZUpdateDocumentResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -370,6 +363,8 @@ export const documentRouter = router({
           dateFormat: meta.dateFormat,
           language: meta.language,
           typedSignatureEnabled: meta.typedSignatureEnabled,
+          uploadSignatureEnabled: meta.uploadSignatureEnabled,
+          drawSignatureEnabled: meta.drawSignatureEnabled,
           redirectUrl: meta.redirectUrl,
           distributionMethod: meta.distributionMethod,
           signingOrder: meta.signingOrder,
@@ -440,35 +435,6 @@ export const documentRouter = router({
         documentId,
         teamId,
         userId,
-        requestMetadata: ctx.metadata,
-      });
-    }),
-
-  /**
-   * @private
-   */
-  setPasswordForDocument: authenticatedProcedure
-    .input(ZSetPasswordForDocumentMutationSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, password } = input;
-
-      const key = DOCUMENSO_ENCRYPTION_KEY;
-
-      if (!key) {
-        throw new Error('Missing encryption key');
-      }
-
-      const securePassword = symmetricEncrypt({
-        data: password,
-        key,
-      });
-
-      await upsertDocumentMeta({
-        userId: ctx.user.id,
-        teamId,
-        documentId,
-        password: securePassword,
         requestMetadata: ctx.metadata,
       });
     }),
@@ -691,7 +657,7 @@ export const documentRouter = router({
         teamId,
       });
 
-      if (document.status !== DocumentStatus.COMPLETED) {
+      if (!isDocumentCompleted(document.status)) {
         throw new AppError('DOCUMENT_NOT_COMPLETE');
       }
 

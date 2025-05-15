@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { DocumentDataType, TeamMemberRole } from '@prisma/client';
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { DocumentDataType, TeamMemberRole } from '@documenso/prisma/client';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -15,7 +15,7 @@ import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel' });
 
-const enterprisePriceId = process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_PLAN_MONTHLY_PRICE_ID || '';
+const enterprisePriceId = '';
 
 // Create a temporary PDF file for testing
 function createTempPdfFile() {

@@ -160,7 +160,7 @@ export default function SigningPage() {
     recipientWithFields,
   } = data;
 
-  if (document.deletedAt) {
+  if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
     return (
       <div className="-mx-4 flex max-w-[100vw] flex-col items-center overflow-x-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-16 xl:pt-24">
         <SigningCard3D
@@ -215,6 +215,9 @@ export default function SigningPage() {
       email={recipient.email}
       fullName={user?.email === recipient.email ? user?.name : recipient.name}
       signature={user?.email === recipient.email ? user?.signature : undefined}
+      typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
+      uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
+      drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
     >
       <DocumentSigningAuthProvider
         documentAuthOptions={document.authOptions}

@@ -24,6 +24,8 @@ export const unsubscribeHandler = async (req: Request) => {
 
     return Response.json(deletedWebhook);
   } catch (err) {
+    console.error(err);
+
     return Response.json(
       {
         message: 'Internal Server Error',

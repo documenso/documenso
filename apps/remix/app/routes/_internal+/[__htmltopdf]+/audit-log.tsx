@@ -9,7 +9,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
-import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
@@ -49,10 +49,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     perPage: 100_000,
   });
 
+  const messages = await getTranslations(documentLanguage);
+
   return {
     auditLogs,
     document,
     documentLanguage,
+    messages,
   };
 }
 
@@ -61,16 +64,15 @@ export async function loader({ request }: Route.LoaderArgs) {
  *
  * Cannot use dynamicActivate by itself to translate this specific page and all
  * children components because `not-found.tsx` page runs and overrides the i18n.
+ *
+ * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function AuditLog({ loaderData }: Route.ComponentProps) {
-  const { auditLogs, document, documentLanguage } = loaderData;
+  const { auditLogs, document, documentLanguage, messages } = loaderData;
 
-  const { i18n } = useLingui();
+  const { i18n, _ } = useLingui();
 
-  // Todo
-  void dynamicActivate(documentLanguage);
-
-  const { _ } = useLingui();
+  i18n.loadAndActivate({ locale: documentLanguage, messages });
 
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">

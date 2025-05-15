@@ -1,5 +1,7 @@
 import { generateOpenApi } from '@ts-rest/open-api';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+
 import { ApiContractV1 } from './contract';
 
 export const OpenAPIV1 = Object.assign(
@@ -11,6 +13,11 @@ export const OpenAPIV1 = Object.assign(
         version: '1.0.0',
         description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
       },
+      servers: [
+        {
+          url: NEXT_PUBLIC_WEBAPP_URL(),
+        },
+      ],
     },
     {
       setOperationId: true,

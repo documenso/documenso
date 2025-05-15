@@ -1,9 +1,9 @@
+import type { Prisma } from '@prisma/client';
+import { SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import type { Stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
-import type { Prisma } from '@documenso/prisma/client';
-import { SubscriptionStatus } from '@documenso/prisma/client';
 
 export type OnSubscriptionUpdatedOptions = {
   userId?: number;

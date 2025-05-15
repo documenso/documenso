@@ -64,6 +64,8 @@ export const listDocumentsHandler = async (req: Request) => {
 
     return Response.json([]);
   } catch (err) {
+    console.error(err);
+
     return Response.json(
       {
         message: 'Internal Server Error',

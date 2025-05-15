@@ -30,21 +30,19 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
 export type TokenDeleteDialogProps = {
-  teamId?: number;
   token: Pick<ApiToken, 'id' | 'name'>;
   onDelete?: () => void;
   children?: React.ReactNode;
 };
 
-export default function TokenDeleteDialog({
-  teamId,
-  token,
-  onDelete,
-  children,
-}: TokenDeleteDialogProps) {
+export default function TokenDeleteDialog({ token, onDelete, children }: TokenDeleteDialogProps) {
   const { _ } = useLingui();
   const { toast } = useToast();
+
+  const team = useOptionalCurrentTeam();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -75,7 +73,7 @@ export default function TokenDeleteDialog({
     try {
       await deleteTokenMutation({
         id: token.id,
-        teamId,
+        teamId: team?.id,
       });
 
       toast({

@@ -1,4 +1,4 @@
-import TemplatePage, { loader } from '~/routes/_authenticated+/templates+/$id._index';
+import TemplatePage, { loader } from '~/routes/_authenticated+/templates.$id._index';
 
 export { loader };
 

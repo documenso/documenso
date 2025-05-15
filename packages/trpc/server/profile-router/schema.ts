@@ -15,6 +15,10 @@ export const ZRetrieveUserByIdQuerySchema = z.object({
 
 export type TRetrieveUserByIdQuerySchema = z.infer<typeof ZRetrieveUserByIdQuerySchema>;
 
+export const ZCreateCheckoutSessionRequestSchema = z.object({
+  priceId: z.string().min(1),
+});
+
 export const ZUpdateProfileMutationSchema = z.object({
   name: z.string().min(1),
   signature: z.string(),

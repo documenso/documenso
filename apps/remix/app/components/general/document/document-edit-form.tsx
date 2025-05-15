@@ -5,6 +5,7 @@ import { useLingui } from '@lingui/react';
 import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
 
+import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -24,7 +25,7 @@ import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { LazyPDFViewer } from '@documenso/ui/primitives/lazy-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -71,7 +72,7 @@ export const DocumentEditForm = ({
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.setSettingsForDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.updateDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.document.getDocumentWithDetailsById.setData(
@@ -132,9 +133,6 @@ export const DocumentEditForm = ({
     },
   });
 
-  const { mutateAsync: setPasswordForDocument } =
-    trpc.document.setPasswordForDocument.useMutation();
-
   const documentFlow: Record<EditDocumentStep, DocumentFlowStep> = {
     settings: {
       title: msg`General`,
@@ -177,7 +175,7 @@ export const DocumentEditForm = ({
 
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl, language } = data.meta;
+      const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
       await updateDocument({
         documentId: document.id,
@@ -193,6 +191,9 @@ export const DocumentEditForm = ({
           dateFormat,
           redirectUrl,
           language: isValidLanguageCode(language) ? language : undefined,
+          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -243,14 +244,6 @@ export const DocumentEditForm = ({
       await addFields({
         documentId: document.id,
         fields: data.fields,
-      });
-
-      await updateDocument({
-        documentId: document.id,
-
-        meta: {
-          typedSignatureEnabled: data.typedSignatureEnabled,
-        },
       });
 
       // Clear all field data from localStorage
@@ -315,13 +308,6 @@ export const DocumentEditForm = ({
     }
   };
 
-  const onPasswordSubmit = async (password: string) => {
-    await setPasswordForDocument({
-      documentId: document.id,
-      password,
-    });
-  };
-
   const currentDocumentFlow = documentFlow[step];
 
   /**
@@ -340,12 +326,10 @@ export const DocumentEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <LazyPDFViewer
+          <PDFViewer
             key={document.documentData.id}
             documentData={document.documentData}
             document={document}
-            password={document.documentMeta?.password}
-            onPasswordSubmit={onPasswordSubmit}
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>
@@ -390,7 +374,6 @@ export const DocumentEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
               teamId={team?.id}
             />
 

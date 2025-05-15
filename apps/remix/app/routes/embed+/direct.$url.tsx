@@ -1,7 +1,8 @@
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -49,15 +50,19 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const { user } = await getSession(request);
+  const { user } = await getOptionalSession(request);
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(template),
     isUserEnterprise({
+      userId: template.userId,
+      teamId: template.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: template.userId,
       teamId: template.teamId ?? undefined,
     }),
@@ -108,6 +113,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   });
 }
 
@@ -121,10 +127,18 @@ export default function EmbedDirectTemplatePage() {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   } = useSuperLoaderData<typeof loader>();
 
   return (
-    <DocumentSigningProvider email={user?.email} fullName={user?.name} signature={user?.signature}>
+    <DocumentSigningProvider
+      email={user?.email}
+      fullName={user?.name}
+      signature={user?.signature}
+      typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
+      uploadSignatureEnabled={template.templateMeta?.uploadSignatureEnabled}
+      drawSignatureEnabled={template.templateMeta?.drawSignatureEnabled}
+    >
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={recipient}
@@ -138,8 +152,10 @@ export default function EmbedDirectTemplatePage() {
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
-            hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-            isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+            hidePoweredBy={
+              isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
+            }
+            allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           />
         </DocumentSigningRecipientProvider>
       </DocumentSigningAuthProvider>

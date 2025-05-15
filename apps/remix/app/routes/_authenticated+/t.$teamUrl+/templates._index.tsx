@@ -1,4 +1,4 @@
-import TemplatesPage, { meta } from '~/routes/_authenticated+/templates+/_index';
+import TemplatesPage, { meta } from '~/routes/_authenticated+/templates._index';
 
 export { meta };
 

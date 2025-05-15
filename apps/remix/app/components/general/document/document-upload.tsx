@@ -85,7 +85,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
         timestamp: new Date().toISOString(),
       });
 
-      void navigate(`${formatDocumentsPath(team?.url)}/${id}/edit`);
+      await navigate(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (err) {
       const error = AppError.parseError(err);
 

@@ -4,10 +4,10 @@ import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { PlusIcon } from 'lucide-react';
 import { ChevronLeft } from 'lucide-react';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, isRouteErrorResponse } from 'react-router';
 
 import LogoIcon from '@documenso/assets/logo_icon.png';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -16,12 +16,14 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
 
+import type { Route } from './+types/_layout';
+
 export function meta() {
   return appMetaTags('Profile');
 }
 
 export default function PublicProfileLayout() {
-  const session = useSession();
+  const { sessionData } = useOptionalSession();
 
   const [scrollY, setScrollY] = useState(0);
 
@@ -37,8 +39,8 @@ export default function PublicProfileLayout() {
 
   return (
     <div className="min-h-screen">
-      {session ? (
-        <AuthenticatedHeader user={session.user} teams={session.teams} />
+      {sessionData ? (
+        <AuthenticatedHeader user={sessionData.user} teams={sessionData.teams} />
       ) : (
         <header
           className={cn(
@@ -96,7 +98,9 @@ export default function PublicProfileLayout() {
   );
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  const errorCode = isRouteErrorResponse(error) ? error.status : 500;
+
   const errorCodeMap = {
     404: {
       subHeading: msg`404 Profile not found`,
@@ -107,6 +111,7 @@ export function ErrorBoundary() {
 
   return (
     <GenericErrorLayout
+      errorCode={errorCode}
       errorCodeMap={errorCodeMap}
       secondaryButton={null}
       primaryButton={

@@ -9,6 +9,7 @@ import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { filesRoute } from './api/files';
 import { type AppContext, appContext } from './context';
+import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
@@ -27,9 +28,9 @@ app.use(contextStorage());
 app.use(appContext);
 
 /**
- * Middleware for initial page loads.
+ * RR7 app middleware.
  */
-// app.use('*', appMiddleware);
+app.use('*', appMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
@@ -37,13 +38,13 @@ app.route('/api/auth', auth);
 // Files route.
 app.route('/api/files', filesRoute);
 
-// API servers. Todo: Configure max durations, etc?
+// API servers.
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c)); // Todo: Add next()?
+app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
 
 export default app;

@@ -1,8 +1,9 @@
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
@@ -13,6 +14,7 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 
 import { EmbedSignDocumentClientPage } from '~/components/embed/embed-document-signing-page';
@@ -29,7 +31,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const token = params.url;
 
-  const { user } = await getSession(request);
+  const { user } = await getOptionalSession(request);
 
   const [document, fields, recipient] = await Promise.all([
     getDocumentAndSenderByToken({
@@ -61,9 +63,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     );
   }
 
-  const [isPlatformDocument, isEnterpriseDocument] = await Promise.all([
+  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
     isDocumentPlatform(document),
     isUserEnterprise({
+      userId: document.userId,
+      teamId: document.teamId ?? undefined,
+    }),
+    isUserCommunityPlan({
       userId: document.userId,
       teamId: document.teamId ?? undefined,
     }),
@@ -127,6 +133,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   });
 }
 
@@ -141,6 +148,7 @@ export default function EmbedSignDocumentPage() {
     hidePoweredBy,
     isPlatformDocument,
     isEnterpriseDocument,
+    isCommunityPlan,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -148,6 +156,9 @@ export default function EmbedSignDocumentPage() {
       email={recipient.email}
       fullName={user?.email === recipient.email ? user?.name : recipient.name}
       signature={user?.email === recipient.email ? user?.signature : undefined}
+      typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
+      uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
+      drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
     >
       <DocumentSigningAuthProvider
         documentAuthOptions={document.authOptions}
@@ -161,9 +172,11 @@ export default function EmbedSignDocumentPage() {
           recipient={recipient}
           fields={fields}
           metadata={document.documentMeta}
-          isCompleted={document.status === DocumentStatus.COMPLETED}
-          hidePoweredBy={isPlatformDocument || isEnterpriseDocument || hidePoweredBy}
-          isPlatformOrEnterprise={isPlatformDocument || isEnterpriseDocument}
+          isCompleted={isDocumentCompleted(document.status)}
+          hidePoweredBy={
+            isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
+          }
+          allowWhitelabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
           allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>

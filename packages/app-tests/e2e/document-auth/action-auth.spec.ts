@@ -1,11 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { FieldType } from '@prisma/client';
 
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import {
   createDocumentAuthOptions,
   createRecipientAuthOptions,
 } from '@documenso/lib/utils/document-auth';
-import { FieldType } from '@documenso/prisma/client';
 import {
   seedPendingDocumentNoFields,
   seedPendingDocumentWithFullFields,
@@ -246,7 +246,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
       });
     }
 
-    await signSignaturePad(page);
+    if (fields.some((field) => field.type === FieldType.SIGNATURE)) {
+      await signSignaturePad(page);
+    }
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();
@@ -349,7 +351,9 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
       });
     }
 
-    await signSignaturePad(page);
+    if (fields.some((field) => field.type === FieldType.SIGNATURE)) {
+      await signSignaturePad(page);
+    }
 
     for (const field of fields) {
       await page.locator(`#field-${field.id}`).getByRole('button').click();

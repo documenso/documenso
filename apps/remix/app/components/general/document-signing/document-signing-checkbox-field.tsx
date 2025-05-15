@@ -45,7 +45,12 @@ export const DocumentSigningCheckboxField = ({
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
-  const parsedFieldMeta = ZCheckboxFieldMeta.parse(field.fieldMeta);
+  const parsedFieldMeta = ZCheckboxFieldMeta.parse(
+    field.fieldMeta ?? {
+      type: 'checkbox',
+      values: [{ id: 1, checked: false, value: '' }],
+    },
+  );
 
   const values = parsedFieldMeta.values?.map((item) => ({
     ...item,
@@ -92,6 +97,10 @@ export const DocumentSigningCheckboxField = ({
 
   const onSign = async (authOptions?: TRecipientActionAuth) => {
     try {
+      if (!isLengthConditionMet) {
+        return;
+      }
+
       const payload: TSignFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
@@ -189,18 +198,30 @@ export const DocumentSigningCheckboxField = ({
 
       setCheckedValues(updatedValues);
 
-      await removeSignedFieldWithToken({
+      const removePayload: TRemovedSignedFieldWithTokenMutationSchema = {
         token: recipient.token,
         fieldId: field.id,
-      });
+      };
 
-      if (updatedValues.length > 0) {
-        await signFieldWithToken({
+      if (onUnsignField) {
+        await onUnsignField(removePayload);
+      } else {
+        await removeSignedFieldWithToken(removePayload);
+      }
+
+      if (updatedValues.length > 0 && shouldAutoSignField) {
+        const signPayload: TSignFieldWithTokenMutationSchema = {
           token: recipient.token,
           fieldId: field.id,
           value: toCheckboxValue(updatedValues),
           isBase64: true,
-        });
+        };
+
+        if (onSignField) {
+          await onSignField(signPayload);
+        } else {
+          await signFieldWithToken(signPayload);
+        }
       }
     } catch (err) {
       console.error(err);

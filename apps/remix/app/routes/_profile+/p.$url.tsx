@@ -44,7 +44,6 @@ export async function loader({ params }: Route.LoaderArgs) {
     profileUrl,
   }).catch(() => null);
 
-  // Todo: Test
   if (!publicProfile || !publicProfile.profile.enabled) {
     throw new Response('Not Found', { status: 404 });
   }

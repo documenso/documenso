@@ -1,12 +1,12 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import React from 'react';
 
+import type { Session } from '@prisma/client';
 import { useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { type TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
-import type { Session } from '@documenso/prisma/client';
 import { trpc } from '@documenso/trpc/client';
 
 export type AppSession = {
@@ -22,7 +22,7 @@ interface SessionProviderProps {
 
 interface SessionContextValue {
   sessionData: AppSession | null;
-  refresh: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const SessionContext = createContext<SessionContextValue | null>(null);
@@ -40,7 +40,7 @@ export const useSession = () => {
 
   return {
     ...context.sessionData,
-    refresh: context.refresh,
+    refreshSession: context.refreshSession,
   };
 };
 
@@ -68,7 +68,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     }
 
     const teams = await trpc.team.getTeams.query().catch(() => {
-      // Todo: Log
+      // Todo: (RR7) Log
       return [];
     });
 
@@ -102,7 +102,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     <SessionContext.Provider
       value={{
         sessionData: session,
-        refresh: refreshSession,
+        refreshSession,
       }}
     >
       {children}

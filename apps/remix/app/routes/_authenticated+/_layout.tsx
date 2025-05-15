@@ -20,13 +20,13 @@ import type { Route } from './+types/_layout';
  */
 export const shouldRevalidate = () => false;
 
-export const loader = async ({ request }: Route.LoaderArgs) => {
+export async function loader({ request }: Route.LoaderArgs) {
   const requestHeaders = Object.fromEntries(request.headers.entries());
 
   const session = await getOptionalSession(request);
 
   if (!session.isAuthenticated) {
-    return redirect('/signin');
+    throw redirect('/signin');
   }
 
   const [limits, banner] = await Promise.all([
@@ -40,7 +40,7 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
     banner,
     limits,
   };
-};
+}
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { user, teams } = useSession();

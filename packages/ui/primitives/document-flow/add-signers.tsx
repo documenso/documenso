@@ -201,10 +201,12 @@ export const AddSignersFormPartial = ({
       return;
     }
 
-    removeSigner(index);
-
-    const updatedSigners = signers.filter((_, idx) => idx !== index);
-    form.setValue('signers', normalizeSigningOrders(updatedSigners));
+    const formStateIndex = form.getValues('signers').findIndex((s) => s.formId === signer.formId);
+    if (formStateIndex !== -1) {
+      removeSigner(formStateIndex);
+      const updatedSigners = form.getValues('signers').filter((s) => s.formId !== signer.formId);
+      form.setValue('signers', normalizeSigningOrders(updatedSigners));
+    }
   };
 
   const onAddSelfSigner = () => {

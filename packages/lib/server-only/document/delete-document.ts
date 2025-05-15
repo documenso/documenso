@@ -26,6 +26,7 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
@@ -161,7 +162,7 @@ const handleDocumentOwnerDelete = async ({
   }
 
   // Soft delete completed documents.
-  if (document.status === DocumentStatus.COMPLETED) {
+  if (isDocumentCompleted(document.status)) {
     return await prisma.$transaction(async (tx) => {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({

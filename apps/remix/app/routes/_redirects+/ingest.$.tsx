@@ -19,16 +19,30 @@ const posthogProxy = async (request: Request) => {
   const headers = new Headers(request.headers);
   headers.set('host', hostname);
 
-  const response = await fetch(newUrl, {
+  const fetchOptions: RequestInit = {
     method: request.method,
     headers,
-    body: request.body,
-  });
+    redirect: 'follow',
+  };
+
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    fetchOptions.body = request.body;
+    // @ts-expect-error - It should exist
+    fetchOptions.duplex = 'half';
+  }
+
+  const response = await fetch(newUrl, fetchOptions);
+
+  const responseHeaders = new Headers(response.headers);
+  responseHeaders.delete('content-encoding');
+  responseHeaders.delete('content-length');
+  responseHeaders.delete('transfer-encoding');
+  responseHeaders.delete('cookie');
 
   return new Response(response.body, {
     status: response.status,
     statusText: response.statusText,
-    headers: response.headers,
+    headers: responseHeaders,
   });
 };
 

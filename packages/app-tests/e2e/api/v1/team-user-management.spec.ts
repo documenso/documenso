@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { TeamMemberRole } from '@prisma/client';
 
 import {
   ZFindTeamMembersResponseSchema,
@@ -10,7 +11,6 @@ import {
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/client';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 

@@ -8,6 +8,7 @@ import { Link, redirect, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { authClient } from '@documenso/auth/client';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -29,6 +30,7 @@ export const loader = ({ params }: Route.LoaderArgs) => {
 export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   const { token } = loaderData;
 
+  const { refreshSession } = useOptionalSession();
   const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -43,6 +45,8 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
       const response = await authClient.emailPassword.verifyEmail({
         token,
       });
+
+      await refreshSession();
 
       setState(response.state);
     } catch (err) {
