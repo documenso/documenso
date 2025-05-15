@@ -32,16 +32,49 @@ export const run = async ({
 }) => {
   const { userId, documentId, recipientId, requestMetadata } = payload;
 
-  const [user, document, recipient] = await Promise.all([
-    prisma.user.findFirstOrThrow({
-      where: {
-        id: userId,
-      },
-    }),
-    prisma.document.findFirstOrThrow({
+  try {
+    // First, check if the document exists directly before performing the multi-promise
+    const documentExists = await prisma.document.findFirst({
       where: {
         id: documentId,
-        status: DocumentStatus.PENDING,
+      },
+      select: { id: true },
+    });
+
+    if (!documentExists) {
+      throw new Error(`No Document found with ID ${documentId}`);
+    }
+
+    // Add a small delay to allow any pending transactions to complete
+    await new Promise<void>((resolve) => {
+      setTimeout(() => {
+        resolve();
+      }, 100);
+    });
+
+    const [user, recipient] = await Promise.all([
+      prisma.user.findFirstOrThrow({
+        where: {
+          id: userId,
+        },
+      }),
+
+      prisma.recipient.findFirstOrThrow({
+        where: {
+          id: recipientId,
+        },
+      }),
+    ]);
+
+    // Get the document without restricting to PENDING status
+    const document = await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+        // Don't restrict to PENDING status, as it might still be in DRAFT status
+        // if the transaction hasn't fully completed yet
+        status: {
+          in: [DocumentStatus.DRAFT, DocumentStatus.PENDING],
+        },
       },
       include: {
         documentMeta: true,
@@ -53,160 +86,158 @@ export const run = async ({
           },
         },
       },
-    }),
-    prisma.recipient.findFirstOrThrow({
-      where: {
-        id: recipientId,
-      },
-    }),
-  ]);
+    });
 
-  const { documentMeta, team } = document;
+    const { documentMeta, team } = document;
 
-  if (recipient.role === RecipientRole.CC) {
-    return;
-  }
+    if (recipient.role === RecipientRole.CC) {
+      return;
+    }
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
-  ).recipientSigningRequest;
+    const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+      document.documentMeta,
+    ).recipientSigningRequest;
 
-  if (!isRecipientSigningRequestEmailEnabled) {
-    return;
-  }
+    if (!isRecipientSigningRequestEmailEnabled) {
+      return;
+    }
 
-  const customEmail = document?.documentMeta;
-  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
-  const isTeamDocument = document.teamId !== null;
+    const customEmail = document?.documentMeta;
+    const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+    const isTeamDocument = document.teamId !== null;
 
-  const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
+    const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
-  const { email, name } = recipient;
-  const selfSigner = email === user.email;
+    const { email, name } = recipient;
+    const selfSigner = email === user.email;
 
-  const i18n = await getI18nInstance(documentMeta?.language);
+    const i18n = await getI18nInstance(documentMeta?.language);
 
-  const recipientActionVerb = i18n
-    ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
-    .toLowerCase();
+    const recipientActionVerb = i18n
+      ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
+      .toLowerCase();
 
-  let emailMessage = customEmail?.message || '';
-  let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
+    let emailMessage = customEmail?.message || '';
+    let emailSubject = i18n._(msg`Please ${recipientActionVerb} this document`);
 
-  if (selfSigner) {
-    emailMessage = i18n._(
-      msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
-    );
-    emailSubject = i18n._(msg`Please ${recipientActionVerb} your document`);
-  }
-
-  if (isDirectTemplate) {
-    emailMessage = i18n._(
-      msg`A document was created by your direct template that requires you to ${recipientActionVerb} it.`,
-    );
-    emailSubject = i18n._(
-      msg`Please ${recipientActionVerb} this document created by your direct template`,
-    );
-  }
-
-  if (isTeamDocument && team) {
-    emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
-    emailMessage = customEmail?.message ?? '';
-
-    if (!emailMessage) {
-      const inviterName = user.name || '';
-
+    if (selfSigner) {
       emailMessage = i18n._(
-        team.teamGlobalSettings?.includeSenderDetails
-          ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
-          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+        msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+      );
+      emailSubject = i18n._(msg`Please ${recipientActionVerb} your document`);
+    }
+
+    if (isDirectTemplate) {
+      emailMessage = i18n._(
+        msg`A document was created by your direct template that requires you to ${recipientActionVerb} it.`,
+      );
+      emailSubject = i18n._(
+        msg`Please ${recipientActionVerb} this document created by your direct template`,
       );
     }
-  }
 
-  const customEmailTemplate = {
-    'signer.name': name,
-    'signer.email': email,
-    'document.name': document.title,
-  };
+    if (isTeamDocument && team) {
+      emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
+      emailMessage = customEmail?.message ?? '';
 
-  const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
-  const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
+      if (!emailMessage) {
+        const inviterName = user.name || '';
 
-  const template = createElement(DocumentInviteEmailTemplate, {
-    documentName: document.title,
-    inviterName: user.name || undefined,
-    inviterEmail: isTeamDocument ? team?.teamEmail?.email || user.email : user.email,
-    assetBaseUrl,
-    signDocumentLink,
-    customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
-    role: recipient.role,
-    selfSigner,
-    isTeamInvite: isTeamDocument,
-    teamName: team?.name,
-    teamEmail: team?.teamEmail?.email,
-    includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
-  });
+        emailMessage = i18n._(
+          team.teamGlobalSettings?.includeSenderDetails
+            ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
+            : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+        );
+      }
+    }
 
-  await io.runTask('send-signing-email', async () => {
-    const branding = document.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-      : undefined;
+    const customEmailTemplate = {
+      'signer.name': name,
+      'signer.email': email,
+      'document.name': document.title,
+    };
 
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
-      renderEmailWithI18N(template, {
-        lang: documentMeta?.language,
-        branding,
-        plainText: true,
-      }),
-    ]);
+    const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
+    const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
-    await mailer.sendMail({
-      to: {
-        name: recipient.name,
-        address: recipient.email,
-      },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
-      subject: renderCustomEmailTemplate(
-        documentMeta?.subject || emailSubject,
-        customEmailTemplate,
-      ),
-      html,
-      text,
+    const template = createElement(DocumentInviteEmailTemplate, {
+      documentName: document.title,
+      inviterName: user.name || undefined,
+      inviterEmail: isTeamDocument ? team?.teamEmail?.email || user.email : user.email,
+      assetBaseUrl,
+      signDocumentLink,
+      customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
+      role: recipient.role,
+      selfSigner,
+      isTeamInvite: isTeamDocument,
+      teamName: team?.name,
+      teamEmail: team?.teamEmail?.email,
+      includeSenderDetails: team?.teamGlobalSettings?.includeSenderDetails,
     });
-  });
 
-  await io.runTask('update-recipient', async () => {
-    await prisma.recipient.update({
-      where: {
-        id: recipient.id,
-      },
-      data: {
-        sendStatus: SendStatus.SENT,
-      },
-    });
-  });
+    await io.runTask('send-signing-email', async () => {
+      const branding = document.team?.teamGlobalSettings
+        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
+        : undefined;
 
-  await io.runTask('store-audit-log', async () => {
-    await prisma.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-        documentId: document.id,
-        user,
-        requestMetadata,
-        data: {
-          emailType: recipientEmailType,
-          recipientId: recipient.id,
-          recipientName: recipient.name,
-          recipientEmail: recipient.email,
-          recipientRole: recipient.role,
-          isResending: false,
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
+        renderEmailWithI18N(template, {
+          lang: documentMeta?.language,
+          branding,
+          plainText: true,
+        }),
+      ]);
+
+      await mailer.sendMail({
+        to: {
+          name: recipient.name,
+          address: recipient.email,
         },
-      }),
+        from: {
+          name: FROM_NAME,
+          address: FROM_ADDRESS,
+        },
+        subject: renderCustomEmailTemplate(
+          documentMeta?.subject || emailSubject,
+          customEmailTemplate,
+        ),
+        html,
+        text,
+      });
     });
-  });
+
+    await io.runTask('update-recipient', async () => {
+      await prisma.recipient.update({
+        where: {
+          id: recipient.id,
+        },
+        data: {
+          sendStatus: SendStatus.SENT,
+        },
+      });
+    });
+
+    await io.runTask('store-audit-log', async () => {
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
+          documentId: document.id,
+          user,
+          requestMetadata,
+          data: {
+            emailType: recipientEmailType,
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            recipientEmail: recipient.email,
+            recipientRole: recipient.role,
+            isResending: false,
+          },
+        }),
+      });
+    });
+  } catch (error) {
+    console.error(`Job failed with error:`, error);
+    throw error;
+  }
 };

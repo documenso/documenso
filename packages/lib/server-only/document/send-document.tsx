@@ -133,31 +133,6 @@ export const sendDocument = async ({
     Object.assign(document, result);
   }
 
-  // Commented out server side checks for minimum 1 signature per signer now since we need to
-  // decide if we want to enforce this for API & templates.
-  // const fields = await getFieldsForDocument({
-  //   documentId: documentId,
-  //   userId: userId,
-  // });
-
-  // const fieldsWithSignerEmail = fields.map((field) => ({
-  //   ...field,
-  //   signerEmail:
-  //     document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-  // }));
-
-  // const everySignerHasSignature = document?.Recipient.every(
-  //   (recipient) =>
-  //     recipient.role !== RecipientRole.SIGNER ||
-  //     fieldsWithSignerEmail.some(
-  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
-  //     ),
-  // );
-
-  // if (!everySignerHasSignature) {
-  //   throw new Error('Some signers have not been assigned a signature field.');
-  // }
-
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
   ).recipientSigningRequest;
@@ -165,51 +140,13 @@ export const sendDocument = async ({
   // Only send email if one of the following is true:
   // - It is explicitly set
   // - The email is enabled for signing requests AND sendEmail is undefined
-  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
-    await Promise.all(
-      recipientsToNotify.map(async (recipient) => {
-        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
-          return;
-        }
-
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId,
-            documentId,
-            recipientId: recipient.id,
-            requestMetadata: requestMetadata?.requestMetadata,
-          },
-        });
-      }),
-    );
-  }
+  const shouldSendEmail =
+    sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined);
 
   const allRecipientsHaveNoActionToTake = document.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
-
-  if (allRecipientsHaveNoActionToTake) {
-    await jobs.triggerJob({
-      name: 'internal.seal-document',
-      payload: {
-        documentId,
-        requestMetadata: requestMetadata?.requestMetadata,
-      },
-    });
-
-    // Keep the return type the same for the `sendDocument` method
-    return await prisma.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-      },
-      include: {
-        documentMeta: true,
-        recipients: true,
-      },
-    });
-  }
 
   const updatedDocument = await prisma.$transaction(async (tx) => {
     if (document.status === DocumentStatus.DRAFT) {
@@ -243,6 +180,48 @@ export const sendDocument = async ({
     userId,
     teamId,
   });
+
+  // Now that the transaction is complete and document status is updated, trigger email jobs
+  if (shouldSendEmail) {
+    await Promise.all(
+      recipientsToNotify.map(async (recipient) => {
+        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
+          return;
+        }
+
+        await jobs.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId,
+            documentId,
+            recipientId: recipient.id,
+            requestMetadata: requestMetadata?.requestMetadata,
+          },
+        });
+      }),
+    );
+  }
+
+  if (allRecipientsHaveNoActionToTake) {
+    await jobs.triggerJob({
+      name: 'internal.seal-document',
+      payload: {
+        documentId,
+        requestMetadata: requestMetadata?.requestMetadata,
+      },
+    });
+
+    // Keep the return type the same for the `sendDocument` method
+    return await prisma.document.findFirstOrThrow({
+      where: {
+        id: documentId,
+      },
+      include: {
+        documentMeta: true,
+        recipients: true,
+      },
+    });
+  }
 
   return updatedDocument;
 };
