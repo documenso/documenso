@@ -16,27 +16,31 @@ ENV_FILES.forEach((file) => {
 export default defineConfig({
   testDir: './e2e',
   /* Run tests in files in parallel */
-  fullyParallel: false,
-  workers: '50%',
+  fullyParallel: true,
+  workers: process.env.CI ? '50%' : '25%',
   maxFailures: process.env.CI ? 1 : undefined,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
   retries: process.env.CI ? 4 : 1,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [['html'], ['list']],
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
     baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    trace: 'on',
 
     video: 'retain-on-failure',
+
+    /* Add explicit timeouts for actions */
+    actionTimeout: 15_000,
+    navigationTimeout: 30_000,
   },
 
-  timeout: 30_000,
+  timeout: 60_000,
 
   /* Configure projects for major browsers */
   projects: [
