@@ -1,7 +1,9 @@
 import { useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { HomeIcon, Loader2 } from 'lucide-react';
+import { HomeIcon, Loader2, Search } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { FolderType } from '@documenso/lib/types/folder-type';
@@ -9,6 +11,7 @@ import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
+import { Input } from '@documenso/ui/primitives/input';
 
 import { TemplateFolderCreateDialog } from '~/components/dialogs/template-folder-create-dialog';
 import { TemplateFolderDeleteDialog } from '~/components/dialogs/template-folder-delete-dialog';
@@ -22,6 +25,7 @@ export function meta() {
 }
 
 export default function TemplatesFoldersPage() {
+  const { _ } = useLingui();
   const navigate = useNavigate();
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
@@ -29,6 +33,7 @@ export default function TemplatesFoldersPage() {
   const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data: foldersData, isLoading: isFoldersLoading } = trpc.folder.getFolders.useQuery({
     type: FolderType.TEMPLATE,
@@ -47,6 +52,9 @@ export default function TemplatesFoldersPage() {
       void navigate(templatesPath);
     }
   };
+
+  const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
+    folder.name.toLowerCase().includes(searchTerm.toLowerCase());
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
@@ -68,51 +76,33 @@ export default function TemplatesFoldersPage() {
         </div>
       </div>
 
-      <div className="mt-6">
-        {isFoldersLoading ? (
-          <div className="mt- flex justify-center">
-            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          <>
-            {foldersData?.folders?.some((folder) => folder.pinned) && (
-              <div className="mt-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {foldersData.folders
-                    .filter((folder) => folder.pinned)
-                    .map((folder) => (
-                      <FolderCard
-                        key={folder.id}
-                        folder={folder}
-                        onNavigate={navigateToFolder}
-                        onMove={(folder) => {
-                          setFolderToMove(folder);
-                          setIsMovingFolder(true);
-                        }}
-                        onPin={(folderId) => void pinFolder({ folderId })}
-                        onUnpin={(folderId) => void unpinFolder({ folderId })}
-                        onSettings={(folder) => {
-                          setFolderToSettings(folder);
-                          setIsSettingsFolderOpen(true);
-                        }}
-                        onDelete={(folder) => {
-                          setFolderToDelete(folder);
-                          setIsDeletingFolder(true);
-                        }}
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
+      <div className="relative w-full max-w-md py-6">
+        <Search className="text-muted-foreground absolute left-2 top-9 h-4 w-4" />
+        <Input
+          placeholder={_(msg`Search folders...`)}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-8"
+        />
+      </div>
 
-            <div className="mt-12">
-              <h1 className="truncate text-2xl font-semibold md:text-3xl">
-                <Trans>All Folders</Trans>
-              </h1>
+      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl">
+        <Trans>All Folders</Trans>
+      </h1>
 
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {foldersData?.folders
-                  .filter((folder) => !folder.pinned)
+      {isFoldersLoading ? (
+        <div className="mt-6 flex justify-center">
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <>
+          {foldersData?.folders?.some(
+            (folder) => folder.pinned && isFolderMatchingSearch(folder),
+          ) && (
+            <div className="mt-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {foldersData.folders
+                  .filter((folder) => folder.pinned && isFolderMatchingSearch(folder))
                   .map((folder) => (
                     <FolderCard
                       key={folder.id}
@@ -136,9 +126,43 @@ export default function TemplatesFoldersPage() {
                   ))}
               </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
+
+          <div className="">
+            {searchTerm && foldersData?.folders.filter(isFolderMatchingSearch).length === 0 && (
+              <div className="text-muted-foreground mt-6 text-center">
+                <Trans>No folders found matching "{searchTerm}"</Trans>
+              </div>
+            )}
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {foldersData?.folders
+                .filter((folder) => !folder.pinned && isFolderMatchingSearch(folder))
+                .map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onNavigate={navigateToFolder}
+                    onMove={(folder) => {
+                      setFolderToMove(folder);
+                      setIsMovingFolder(true);
+                    }}
+                    onPin={(folderId) => void pinFolder({ folderId })}
+                    onUnpin={(folderId) => void unpinFolder({ folderId })}
+                    onSettings={(folder) => {
+                      setFolderToSettings(folder);
+                      setIsSettingsFolderOpen(true);
+                    }}
+                    onDelete={(folder) => {
+                      setFolderToDelete(folder);
+                      setIsDeletingFolder(true);
+                    }}
+                  />
+                ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <TemplateFolderMoveDialog
         foldersData={foldersData?.folders}

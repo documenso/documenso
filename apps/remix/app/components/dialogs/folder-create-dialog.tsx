@@ -6,12 +6,11 @@ import { useLingui } from '@lingui/react';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { FolderPlusIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { z } from 'zod';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { FolderType } from '@documenso/lib/types/folder-type';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -34,8 +33,6 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 const ZCreateFolderFormSchema = z.object({
   name: z.string().min(1, { message: 'Folder name is required' }),
 });
@@ -51,9 +48,6 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
   const { toast } = useToast();
   const { folderId } = useParams();
 
-  const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
-
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
   const { mutateAsync: createFolder } = trpc.folder.createFolder.useMutation();
@@ -67,7 +61,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
 
   const onSubmit = async (data: TCreateFolderFormSchema) => {
     try {
-      const newFolder = await createFolder({
+      await createFolder({
         name: data.name,
         parentId: folderId,
         type: FolderType.DOCUMENT,
@@ -78,10 +72,6 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
       toast({
         description: 'Folder created successfully',
       });
-
-      const documentsPath = formatDocumentsPath(team?.url);
-
-      void navigate(`${documentsPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);
 
