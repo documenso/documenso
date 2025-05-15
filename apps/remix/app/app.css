@@ -2,18 +2,34 @@
 
 @font-face {
   font-family: 'Inter';
-  src: url('/public/fonts/inter-regular.ttf') format('ttf');
-  /* font-weight: 400;
   font-style: normal;
-  font-display: swap; */
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/inter-regular.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('/fonts/inter-semibold.ttf') format('truetype');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/inter-bold.ttf') format('truetype');
 }
 
 @font-face {
   font-family: 'Caveat';
-  src: url('/public/fonts/caveat.ttf') format('ttf');
-  /* font-weight: 400;
   font-style: normal;
-  font-display: swap; */
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/caveat-regular.ttf') format('truetype');
 }
 
 @layer base {
