@@ -482,10 +482,11 @@ test('user can create a template inside a template folder', async ({ page }) => 
     .filter({ hasText: /^Upload Template DocumentDrag & drop your PDF here\.$/ })
     .nth(2)
     .click();
-  await page.locator('input[type="file"]').waitFor({ state: 'attached' });
+  await page.locator('input[type="file"]').nth(0).waitFor({ state: 'attached' });
 
   await page
     .locator('input[type="file"]')
+    .nth(0)
     .setInputFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
