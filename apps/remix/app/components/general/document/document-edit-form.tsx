@@ -209,30 +209,48 @@ export const DocumentEditForm = ({
     }
   };
 
+  const saveSignersData = async (data: TAddSignersFormSchema) => {
+    return Promise.all([
+      setSigningOrderForDocument({
+        documentId: document.id,
+        signingOrder: data.signingOrder,
+      }),
+
+      updateDocument({
+        documentId: document.id,
+        meta: {
+          allowDictateNextSigner: data.allowDictateNextSigner,
+        },
+      }),
+
+      setRecipients({
+        documentId: document.id,
+        recipients: data.signers.map((signer) => ({
+          ...signer,
+          // Explicitly set to null to indicate we want to remove auth if required.
+          actionAuth: signer.actionAuth || null,
+        })),
+      }),
+    ]);
+  };
+
+  const onAddSignersFormAutoSave = async (data: TAddSignersFormSchema) => {
+    try {
+      await saveSignersData(data);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while adding signers.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
-      await Promise.all([
-        setSigningOrderForDocument({
-          documentId: document.id,
-          signingOrder: data.signingOrder,
-        }),
-
-        updateDocument({
-          documentId: document.id,
-          meta: {
-            allowDictateNextSigner: data.allowDictateNextSigner,
-          },
-        }),
-
-        setRecipients({
-          documentId: document.id,
-          recipients: data.signers.map((signer) => ({
-            ...signer,
-            // Explicitly set to null to indicate we want to remove auth if required.
-            actionAuth: signer.actionAuth || null,
-          })),
-        }),
-      ]);
+      await saveSignersData(data);
 
       setStep('fields');
     } catch (err) {
@@ -372,6 +390,7 @@ export const DocumentEditForm = ({
               fields={fields}
               isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
+              onAutoSave={onAddSignersFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
