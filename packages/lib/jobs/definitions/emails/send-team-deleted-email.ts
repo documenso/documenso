@@ -16,6 +16,7 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
         documentLanguage: z.string(),
         includeSenderDetails: z.boolean(),
         includeSigningCertificate: z.boolean(),
+        includeAuditLog: z.boolean(),
         brandingEnabled: z.boolean(),
         brandingLogo: z.string(),
         brandingUrl: z.string(),

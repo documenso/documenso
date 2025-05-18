@@ -14,6 +14,7 @@ export const ZUpdateTeamDocumentSettingsRequestSchema = z.object({
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).optional().default('en'),
     includeSenderDetails: z.boolean().optional().default(false),
     includeSigningCertificate: z.boolean().optional().default(true),
+    includeAuditLog: z.boolean().optional().default(false),
     typedSignatureEnabled: z.boolean().optional().default(true),
     uploadSignatureEnabled: z.boolean().optional().default(true),
     drawSignatureEnabled: z.boolean().optional().default(true),

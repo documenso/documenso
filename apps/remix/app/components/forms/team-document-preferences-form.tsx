@@ -44,6 +44,7 @@ const ZTeamDocumentPreferencesFormSchema = z.object({
   documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES),
   includeSenderDetails: z.boolean(),
   includeSigningCertificate: z.boolean(),
+  includeAuditLog: z.boolean(),
   signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
     message: msg`At least one signature type must be enabled`.id,
   }),
@@ -77,6 +78,7 @@ export const TeamDocumentPreferencesForm = ({
         : 'en',
       includeSenderDetails: settings?.includeSenderDetails ?? false,
       includeSigningCertificate: settings?.includeSigningCertificate ?? true,
+      includeAuditLog: settings?.includeAuditLog ?? false,
       signatureTypes: extractTeamSignatureSettings(settings),
     },
     resolver: zodResolver(ZTeamDocumentPreferencesFormSchema),
@@ -91,6 +93,7 @@ export const TeamDocumentPreferencesForm = ({
         documentLanguage,
         includeSenderDetails,
         includeSigningCertificate,
+        includeAuditLog,
         signatureTypes,
       } = data;
 
@@ -101,6 +104,7 @@ export const TeamDocumentPreferencesForm = ({
           documentLanguage,
           includeSenderDetails,
           includeSigningCertificate,
+          includeAuditLog,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
@@ -307,9 +311,39 @@ export const TeamDocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls whether the signing certificate will be included in the document when
+                    Controls whether the signing certificate will be included with the document when
                     it is downloaded. The signing certificate can still be downloaded from the logs
                     page separately.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="includeAuditLog"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Include the Audit Log in the Document</Trans>
+                </FormLabel>
+
+                <div>
+                  <FormControl className="block">
+                    <Switch
+                      ref={field.ref}
+                      name={field.name}
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </div>
+
+                <FormDescription>
+                  <Trans>
+                    Controls whether the audit log will be included with the document when it is
+                    downloaded. The audit log can still be downloaded from the logs page separately.
                   </Trans>
                 </FormDescription>
               </FormItem>

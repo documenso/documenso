@@ -17,6 +17,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
+import { getAuditLogPdf } from '../htmltopdf/get-audit-log-pdf';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
@@ -53,6 +54,7 @@ export const sealDocument = async ({
           teamGlobalSettings: {
             select: {
               includeSigningCertificate: true,
+              includeAuditLog: true,
             },
           },
         },
@@ -124,6 +126,13 @@ export const sealDocument = async ({
         }).catch(() => null)
       : null;
 
+  const auditLogData =
+    (document.team?.teamGlobalSettings?.includeAuditLog ?? false)
+      ? await getAuditLogPdf({
+          documentId,
+        }).catch(() => null)
+      : null;
+
   const doc = await PDFDocument.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
@@ -142,6 +151,16 @@ export const sealDocument = async ({
     const certificatePages = await doc.copyPages(certificate, certificate.getPageIndices());
 
     certificatePages.forEach((page) => {
+      doc.addPage(page);
+    });
+  }
+
+  if (auditLogData) {
+    const auditLog = await PDFDocument.load(auditLogData);
+
+    const auditLogPages = await doc.copyPages(auditLog, auditLog.getPageIndices());
+
+    auditLogPages.forEach((page) => {
       doc.addPage(page);
     });
   }
