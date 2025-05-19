@@ -24,7 +24,7 @@ export const SigningCard = ({
   signingCelebrationImage,
 }: SigningCardProps) => {
   return (
-    <div className={cn('relative w-full max-w-xs md:max-w-sm', className)}>
+    <div className={cn('relative w-full max-w-sm md:max-w-md', className)}>
       <SigningCardContent name={name} signature={signature} />
 
       {signingCelebrationImage && (
@@ -48,7 +48,7 @@ export const SigningCard3D = ({
 
   const [trackMouse, setTrackMouse] = useState(false);
 
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const timeoutRef = useRef<number | undefined>();
 
   const cardX = useMotionValue(0);
   const cardY = useMotionValue(0);
@@ -103,7 +103,7 @@ export const SigningCard3D = ({
       clearTimeout(timeoutRef.current);
 
       // Revert the card back to the center position after the mouse stops moving.
-      timeoutRef.current = setTimeout(() => {
+      timeoutRef.current = window.setTimeout(() => {
         void animate(cardX, 0, { duration: 2, ease: 'backInOut' });
         void animate(cardY, 0, { duration: 2, ease: 'backInOut' });
 
@@ -120,12 +120,15 @@ export const SigningCard3D = ({
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
+      if (timeoutRef.current) {
+        window.clearTimeout(timeoutRef.current);
+      }
     };
   }, [onMouseMove]);
 
   return (
     <div
-      className={cn('relative w-full max-w-xs md:max-w-sm', className)}
+      className={cn('relative w-full max-w-sm md:max-w-md', className)}
       style={{ perspective: 800 }}
     >
       <motion.div

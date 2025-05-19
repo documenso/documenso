@@ -142,6 +142,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
   downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
     const { id: documentId } = args.params;
+    const { downloadOriginalDocument } = args.query;
 
     try {
       if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
@@ -177,7 +178,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (!isDocumentCompleted(document.status)) {
+      if (!downloadOriginalDocument && !isDocumentCompleted(document.status)) {
         return {
           status: 400,
           body: {
@@ -186,7 +187,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { url } = await getPresignGetUrl(document.documentData.data);
+      const { url } = await getPresignGetUrl(
+        downloadOriginalDocument ? document.documentData.data : document.documentData.initialData,
+      );
 
       return {
         status: 200,
