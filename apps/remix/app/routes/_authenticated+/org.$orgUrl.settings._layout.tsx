@@ -4,13 +4,13 @@ import { Building2Icon, CreditCardIcon, GroupIcon, Settings2Icon, Users2Icon } f
 import { FaUsers } from 'react-icons/fa6';
 import { Link, NavLink, Outlet } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { useCurrentOrganisation } from '~/providers/organisation';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
@@ -75,7 +75,7 @@ export default function SettingsLayout() {
           </Button>
         }
         secondaryButton={null}
-      ></GenericErrorLayout>
+      />
     );
   }
 

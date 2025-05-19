@@ -4,7 +4,7 @@ import { useLingui } from '@lingui/react';
 import { OrganisationCreateDialog } from '~/components/dialogs/organisation-create-dialog';
 import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { UserSettingsOrganisationsTable } from '~/components/tables/user-settings-organisations-table';
+import { UserOrganisationsTable } from '~/components/tables/user-organisations-table';
 
 export default function TeamsSettingsPage() {
   const { _ } = useLingui();
@@ -18,7 +18,7 @@ export default function TeamsSettingsPage() {
         <OrganisationCreateDialog />
       </SettingsHeader>
 
-      <UserSettingsOrganisationsTable />
+      <UserOrganisationsTable />
 
       <div className="mt-8 space-y-8">
         <OrganisationInvitations />

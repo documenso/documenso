@@ -35,7 +35,6 @@ export type DocumentEditFormProps = {
   className?: string;
   initialDocument: TDocument;
   documentRootPath: string;
-  isDocumentEnterprise: boolean;
 };
 
 type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
@@ -45,7 +44,6 @@ export const DocumentEditForm = ({
   className,
   initialDocument,
   documentRootPath,
-  isDocumentEnterprise,
 }: DocumentEditFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -358,7 +356,6 @@ export const DocumentEditForm = ({
               currentTeamMemberRole={team.currentTeamRole}
               recipients={recipients}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               onSubmit={onAddSettingsFormSubmit}
             />
@@ -370,7 +367,6 @@ export const DocumentEditForm = ({
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />

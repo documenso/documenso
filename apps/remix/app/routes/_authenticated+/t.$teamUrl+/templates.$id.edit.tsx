@@ -3,7 +3,6 @@ import { ChevronLeft } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
@@ -43,20 +42,14 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(templateRootPath);
   }
 
-  const isTemplateEnterprise = await isUserEnterprise({
-    userId: user.id,
-    teamId: team?.id,
-  });
-
   return superLoaderJson({
     template,
-    isTemplateEnterprise,
     templateRootPath,
   });
 }
 
 export default function TemplateEditPage() {
-  const { template, isTemplateEnterprise, templateRootPath } = useSuperLoaderData<typeof loader>();
+  const { template, templateRootPath } = useSuperLoaderData<typeof loader>();
 
   return (
     <div className="mx-auto -mt-4 max-w-screen-xl px-4 md:px-8">
@@ -99,7 +92,6 @@ export default function TemplateEditPage() {
         className="mt-6"
         initialTemplate={template}
         templateRootPath={templateRootPath}
-        isEnterprise={isTemplateEnterprise}
       />
     </div>
   );

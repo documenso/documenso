@@ -7,6 +7,7 @@ import { OrganisationGroupType } from '@prisma/client';
 import { Link, useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
@@ -16,8 +17,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 import { OrganisationGroupDeleteDialog } from '../dialogs/organisation-group-delete-dialog';
 

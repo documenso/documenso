@@ -1,5 +1,7 @@
+import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { validateIfSubscriptionIsRequired } from '@documenso/lib/utils/billing';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 
@@ -23,10 +25,40 @@ export const deleteOrganisationMemberInvitesRoute = authenticatedProcedure
         userId,
         ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
       ),
+      include: {
+        organisationClaim: true,
+        subscription: true,
+        members: {
+          select: {
+            id: true,
+          },
+        },
+        invites: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
 
     if (!organisation) {
       throw new AppError(AppErrorCode.NOT_FOUND);
+    }
+
+    const { organisationClaim } = organisation;
+
+    const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
+
+    const numberOfCurrentMembers = organisation.members.length;
+    const numberOfCurrentInvites = organisation.invites.length;
+    const totalMemberCountWithInvites = numberOfCurrentMembers + numberOfCurrentInvites - 1;
+
+    if (subscription) {
+      await syncMemberCountWithStripeSeatPlan(
+        subscription,
+        organisationClaim,
+        totalMemberCountWithInvites,
+      );
     }
 
     await prisma.organisationMemberInvite.deleteMany({

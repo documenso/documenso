@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 import { useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
@@ -9,10 +8,10 @@ import { Input } from '@documenso/ui/primitives/input';
 
 import { TeamMemberCreateDialog } from '~/components/dialogs/team-member-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { TeamMembersDataTable } from '~/components/tables/team-members-table';
+import { TeamMembersTable } from '~/components/tables/team-members-table';
 
 export default function TeamsSettingsMembersPage() {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const { pathname } = useLocation();
@@ -43,21 +42,18 @@ export default function TeamsSettingsMembersPage() {
 
   return (
     <div>
-      <SettingsHeader
-        title={_(msg`Team Members`)}
-        subtitle={_(msg`Manage the members of your team.`)}
-      >
+      <SettingsHeader title={t`Team Members`} subtitle={t`Manage the members of your team.`}>
         <TeamMemberCreateDialog />
       </SettingsHeader>
 
       <Input
         defaultValue={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        placeholder={_(msg`Search`)}
+        placeholder={t`Search`}
         className="mb-4"
       />
 
-      <TeamMembersDataTable />
+      <TeamMembersTable />
     </div>
   );
 }

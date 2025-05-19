@@ -39,7 +39,7 @@ export const updateOrganisationRoute = authenticatedProcedure
       },
       data: {
         name: data.name,
-        url: data.url, // Todo: (orgs) check url unique
+        url: data.url, // Todo: orgs check url unique
       },
     });
   });

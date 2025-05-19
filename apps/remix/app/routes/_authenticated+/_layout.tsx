@@ -3,18 +3,14 @@ import { Trans } from '@lingui/react/macro';
 import { Link, Outlet, redirect } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getLimits } from '@documenso/ee/server-only/limits/client';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
+import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
-import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
 import { Button } from '@documenso/ui/primitives/button';
 
-import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { VerifyEmailBanner } from '~/components/general/verify-email-banner';
-import { OrganisationProvider } from '~/providers/organisation';
 import { TeamProvider } from '~/providers/team';
 
 import type { Route } from './+types/_layout';
@@ -35,23 +31,23 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/signin');
   }
 
-  const [limits, banner] = await Promise.all([
-    getLimits({ headers: requestHeaders }),
-    getSiteSettings().then((settings) =>
-      settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
-    ),
-  ]);
+  // const [limits, banner] = await Promise.all([
+  //   getLimits({ headers: requestHeaders }),
+  //   getSiteSettings().then((settings) =>
+  //     settings.find((setting) => setting.id === SITE_SETTINGS_BANNER_ID),
+  //   ),
+  // ]);
 
   return {
-    banner,
-    limits,
+    // banner,
+    // limits,
   };
 }
 
 export default function Layout({ loaderData, params }: Route.ComponentProps) {
   const { user, organisations } = useSession();
 
-  const { banner, limits } = loaderData;
+  // const { banner, limits } = loaderData;
 
   const teamUrl = params.teamUrl;
   const orgUrl = params.orgUrl;
@@ -140,12 +136,12 @@ export default function Layout({ loaderData, params }: Route.ComponentProps) {
   return (
     <OrganisationProvider organisation={currentOrganisation}>
       <TeamProvider team={currentTeam || null}>
-        <LimitsProvider initialValue={limits}>
+        <LimitsProvider>
           <div id="portal-header"></div>
 
           {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
-          {banner && <AppBanner banner={banner} />}
+          {/* {banner && <AppBanner banner={banner} />} */}
 
           <Header />
 

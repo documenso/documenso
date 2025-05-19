@@ -2,6 +2,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
@@ -14,7 +15,6 @@ import {
   type TDocumentPreferencesFormSchema,
 } from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { useCurrentOrganisation } from '~/providers/organisation';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsPage() {

@@ -14,6 +14,7 @@ import {
 import { Link, useLocation } from 'react-router';
 
 import { authClient } from '@documenso/auth/client';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations';
 import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
@@ -34,7 +35,6 @@ import {
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
-import { useOptionalCurrentOrganisation } from '~/providers/organisation';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export const MenuSwitcher = () => {
@@ -152,10 +152,7 @@ export const MenuSwitcher = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className={cn(
-          'divide-border z-[60] ml-6 flex w-full min-w-[40rem] divide-x p-0 md:ml-0',
-          // organisations ? 'min-w-[24rem]' : 'min-w-[12rem]', // Todo: orgs
-        )}
+        className={cn('divide-border z-[60] ml-6 flex w-full min-w-[40rem] divide-x p-0 md:ml-0')}
         align="end"
         forceMount
       >
@@ -211,9 +208,9 @@ export const MenuSwitcher = () => {
               ))}
 
               <Button variant="ghost" className="w-full justify-start" asChild>
-                <Link to="/settings/organisations?action=add-organization">
+                <Link to="/settings/organisations?action=add-organisation">
                   <Plus className="mr-2 h-4 w-4" />
-                  <Trans>Create Organization</Trans>
+                  <Trans>Create Organisation</Trans>
                 </Link>
               </Button>
             </div>

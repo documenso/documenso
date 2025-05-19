@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZTeamUrlSchema } from '../team-router/schema';
 import { ZCreateOrganisationRequestSchema } from './create-organisation.types';
 
 // export const updateOrganisationMeta: TrpcOpenApiMeta = {
@@ -15,7 +16,8 @@ import { ZCreateOrganisationRequestSchema } from './create-organisation.types';
 export const ZUpdateOrganisationRequestSchema = z.object({
   data: ZCreateOrganisationRequestSchema.pick({
     name: true,
-    url: true,
+  }).extend({
+    url: ZTeamUrlSchema,
   }),
   organisationId: z.string(),
 });

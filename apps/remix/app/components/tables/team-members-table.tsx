@@ -7,6 +7,7 @@ import { EditIcon, MoreHorizontal, Trash2Icon } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -26,14 +27,13 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-import { useCurrentOrganisation } from '~/providers/organisation';
 import { useCurrentTeam } from '~/providers/team';
 
 import { TeamMemberDeleteDialog } from '../dialogs/team-member-delete-dialog';
 import { TeamMemberUpdateDialog } from '../dialogs/team-member-update-dialog';
 
-export const TeamMembersDataTable = () => {
-  const { _, i18n } = useLingui();
+export const TeamMembersTable = () => {
+  const { _ } = useLingui();
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();

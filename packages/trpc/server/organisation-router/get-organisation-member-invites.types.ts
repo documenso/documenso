@@ -19,6 +19,7 @@ export const ZGetOrganisationMemberInvitesResponseSchema = OrganisationMemberInv
     organisation: OrganisationSchema.pick({
       id: true,
       name: true,
+      url: true,
       avatarImageId: true,
     }),
   })

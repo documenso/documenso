@@ -25,7 +25,7 @@ export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
   const { toast } = useToast();
 
   const { mutateAsync: resendEmailVerification, isPending: isResendingEmailVerification } =
-    trpc.team.resendTeamEmailVerification.useMutation({
+    trpc.team.email.verification.resend.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),

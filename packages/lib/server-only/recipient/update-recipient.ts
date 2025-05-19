@@ -1,6 +1,5 @@
-import type { RecipientRole, Team } from '@prisma/client';
+import type { RecipientRole } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -12,6 +11,7 @@ import {
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData, diffRecipientChanges } from '../../utils/document-audit-logs';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type UpdateRecipientOptions = {
   documentId: number;
@@ -44,35 +44,25 @@ export const updateRecipient = async ({
       document: {
         id: documentId,
         userId,
-        team: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
+        team: buildTeamWhereQuery(teamId, userId), // Todo: orgs i know i messed the orders of some of these up somewhere
+      },
+    },
+    include: {
+      document: {
+        include: {
+          team: {
+            include: {
+              organisation: {
+                select: {
+                  organisationClaim: true,
+                },
+              },
             },
           },
         },
       },
     },
-    include: {
-      document: true,
-    },
   });
-
-  let team: Team | null = null;
-
-  if (teamId) {
-    team = await prisma.team.findFirst({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-    });
-  }
 
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -80,21 +70,17 @@ export const updateRecipient = async ({
     },
   });
 
-  if (!recipient) {
+  // Todo: orgs check if this is supposed to only be documents
+  if (!recipient || !recipient.document) {
     throw new Error('Recipient not found');
   }
 
-  if (actionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
-    });
+  const team = recipient.document.team;
 
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
+  if (actionAuth && !recipient.document.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
+    });
   }
 
   const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);

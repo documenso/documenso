@@ -98,13 +98,6 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
     };
   }, [previewUrl]);
 
-  // Todo: orgs remove
-  useEffect(() => {
-    console.log({
-      errors: form.formState.errors,
-    });
-  }, [form.formState.errors]);
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onFormSubmit)}>

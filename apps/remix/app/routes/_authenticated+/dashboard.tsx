@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ScrollArea, ScrollBar } from '@documenso/ui/primitives/scroll-area';
 
+import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
 import { InboxTable } from '~/components/tables/inbox-table';
 import { appMetaTags } from '~/utils/meta';
 
@@ -51,6 +52,8 @@ export default function DashboardPage() {
           <p className="text-muted-foreground mt-1">
             <Trans>Welcome back! Here's an overview of your account.</Trans>
           </p>
+
+          <OrganisationInvitations className="mt-4" />
         </div>
 
         {/* Organisations Section */}

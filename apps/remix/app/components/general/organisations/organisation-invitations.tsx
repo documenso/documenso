@@ -5,6 +5,7 @@ import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
@@ -21,7 +22,7 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export const OrganisationInvitations = () => {
+export const OrganisationInvitations = ({ className }: { className?: string }) => {
   const { data, isLoading } = trpc.organisation.member.invite.getMany.useQuery({
     status: OrganisationMemberInviteStatus.PENDING,
   });
@@ -30,7 +31,7 @@ export const OrganisationInvitations = () => {
     <AnimatePresence>
       {data && data.length > 0 && !isLoading && (
         <AnimateGenericFadeInOut>
-          <Alert variant="secondary">
+          <Alert variant="secondary" className={className}>
             <div className="flex h-full flex-row items-center p-2">
               <BellIcon className="mr-4 h-5 w-5 text-blue-800" />
 
@@ -83,23 +84,25 @@ export const OrganisationInvitations = () => {
                   <ul className="-mx-6 -mb-6 max-h-[80vh] divide-y overflow-auto px-6 pb-6 xl:max-h-[70vh]">
                     {data.map((invitation) => (
                       <li key={invitation.id}>
-                        <AvatarWithText
-                          avatarSrc={formatAvatarUrl(invitation.organisation.avatarImageId)}
-                          className="w-full max-w-none py-4"
-                          avatarFallback={invitation.organisation.name.slice(0, 1)}
-                          primaryText={
-                            <span className="text-foreground/80 font-semibold">
-                              {invitation.organisation.name}
-                            </span>
-                          }
-                          // secondaryText={formatOrganisationUrl(invitation.team.url)}
-                          rightSideComponent={
-                            <div className="ml-auto space-x-2">
-                              <DeclineOrganisationInvitationButton token={invitation.token} />
-                              <AcceptOrganisationInvitationButton token={invitation.token} />
-                            </div>
-                          }
-                        />
+                        <Alert variant="neutral" className="p-0 px-4">
+                          <AvatarWithText
+                            avatarSrc={formatAvatarUrl(invitation.organisation.avatarImageId)}
+                            className="w-full max-w-none py-4"
+                            avatarFallback={invitation.organisation.name.slice(0, 1)}
+                            primaryText={
+                              <span className="text-foreground/80 font-semibold">
+                                {invitation.organisation.name}
+                              </span>
+                            }
+                            secondaryText={`/orgs/${invitation.organisation.url}`}
+                            rightSideComponent={
+                              <div className="ml-auto space-x-2">
+                                <DeclineOrganisationInvitationButton token={invitation.token} />
+                                <AcceptOrganisationInvitationButton token={invitation.token} />
+                              </div>
+                            }
+                          />
+                        </Alert>
                       </li>
                     ))}
                   </ul>
@@ -116,13 +119,16 @@ export const OrganisationInvitations = () => {
 const AcceptOrganisationInvitationButton = ({ token }: { token: string }) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { refreshSession } = useSession();
 
   const {
     mutateAsync: acceptOrganisationInvitation,
     isPending,
     isSuccess,
   } = trpc.organisation.member.invite.accept.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshSession();
+
       toast({
         title: _(msg`Success`),
         description: _(msg`Invitation accepted`),
@@ -153,13 +159,16 @@ const AcceptOrganisationInvitationButton = ({ token }: { token: string }) => {
 const DeclineOrganisationInvitationButton = ({ token }: { token: string }) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { refreshSession } = useSession();
 
   const {
     mutateAsync: declineOrganisationInvitation,
     isPending,
     isSuccess,
   } = trpc.organisation.member.invite.decline.useMutation({
-    onSuccess: () => {
+    onSuccess: async () => {
+      await refreshSession();
+
       toast({
         title: _(msg`Success`),
         description: _(msg`Invitation declined`),

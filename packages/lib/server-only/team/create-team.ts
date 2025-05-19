@@ -1,19 +1,7 @@
-import {
-  OrganisationGroupType,
-  OrganisationMemberRole,
-  Prisma,
-  TeamMemberRole,
-} from '@prisma/client';
-import type Stripe from 'stripe';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
-import { z } from 'zod';
 
-import { createOrganisationCustomer } from '@documenso/ee/server-only/stripe/create-team-customer';
-import { getTeamRelatedPrices } from '@documenso/ee/server-only/stripe/get-team-related-prices';
-import { mapStripeSubscriptionToPrismaUpsertAction } from '@documenso/ee/server-only/stripe/webhook/on-subscription-updated';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { subscriptionsContainsActivePlan } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 
 import {
@@ -23,7 +11,6 @@ import {
 import { TEAM_INTERNAL_GROUPS } from '../../constants/teams';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { generateDefaultTeamSettings } from '../../utils/teams';
-import { stripe } from '../stripe';
 
 export type CreateTeamOptions = {
   /**
@@ -41,7 +28,7 @@ export type CreateTeamOptions = {
    *
    * Used as the URL path, example: https://documenso.com/t/{teamUrl}/settings
    */
-  teamUrl: string;
+  teamUrl: string; // Todo: orgs make unique
 
   /**
    * ID of the organisation the team belongs to.
@@ -62,28 +49,13 @@ export type CreateTeamOptions = {
   }[];
 };
 
-export const ZCreateTeamResponseSchema = z.union([
-  z.object({
-    paymentRequired: z.literal(false),
-  }),
-  z.object({
-    paymentRequired: z.literal(true),
-    pendingTeamId: z.number(),
-  }),
-]);
-
-export type TCreateTeamResponse = z.infer<typeof ZCreateTeamResponseSchema>;
-
-/**
- * Create a team or pending team depending on the user's subscription or application's billing settings.
- */
 export const createTeam = async ({
   userId,
   teamName,
   teamUrl,
   organisationId,
   inheritMembers,
-}: CreateTeamOptions): Promise<TCreateTeamResponse> => {
+}: CreateTeamOptions) => {
   const organisation = await prisma.organisation.findFirst({
     where: buildOrganisationWhereQuery(
       organisationId,
@@ -91,8 +63,9 @@ export const createTeam = async ({
       ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
     ),
     include: {
-      groups: true, // Todo: (orgs)
-      subscriptions: true,
+      groups: true,
+      subscription: true,
+      organisationClaim: true,
       owner: {
         select: {
           id: true,
@@ -107,6 +80,21 @@ export const createTeam = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Organisation not found.',
     });
+  }
+
+  // Validate they have enough team slots. 0 means they can create unlimited teams.
+  if (organisation.organisationClaim.teamCount !== 0) {
+    const teamCount = await prisma.team.count({
+      where: {
+        organisationId,
+      },
+    });
+
+    if (teamCount >= organisation.organisationClaim.teamCount) {
+      throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
+        message: 'You have reached the maximum number of teams for your plan.',
+      });
+    }
   }
 
   // Inherit internal organisation groups to the team.
@@ -141,254 +129,46 @@ export const createTeam = async ({
         .exhaustive(),
     );
 
-  console.log({
-    internalOrganisationGroups,
-  });
-
-  if (Date.now() > 0) {
-    await prisma.$transaction(async (tx) => {
-      const teamSettings = await tx.teamGlobalSettings.create({
-        data: generateDefaultTeamSettings(),
-      });
-
-      const team = await tx.team.create({
-        data: {
-          name: teamName,
-          url: teamUrl,
-          organisationId,
-          teamGlobalSettingsId: teamSettings.id,
-          teamGroups: {
-            createMany: {
-              // Attach the internal organisation groups to the team.
-              data: internalOrganisationGroups,
-            },
-          },
-        },
-        include: {
-          teamGroups: true,
-        },
-      });
-
-      // Create the internal team groups.
-      await Promise.all(
-        TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
-          tx.organisationGroup.create({
-            data: {
-              type: teamGroup.type,
-              organisationRole: LOWEST_ORGANISATION_ROLE,
-              organisationId,
-              teamGroups: {
-                create: {
-                  teamId: team.id,
-                  teamRole: teamGroup.teamRole,
-                },
-              },
-            },
-          }),
-        ),
-      );
-    });
-
-    return {
-      paymentRequired: false,
-    };
-  }
-
-  if (Date.now() > 0) {
-    throw new Error('Todo: Orgs');
-  }
-
-  let isPaymentRequired = IS_BILLING_ENABLED();
-  let customerId: string | null = null;
-
-  if (IS_BILLING_ENABLED()) {
-    const teamRelatedPriceIds = await getTeamRelatedPrices().then((prices) =>
-      prices.map((price) => price.id),
-    );
-
-    isPaymentRequired = !subscriptionsContainsActivePlan(
-      organisation.subscriptions,
-      teamRelatedPriceIds, // Todo: (orgs)
-    );
-
-    customerId = await createOrganisationCustomer({
-      name: organisation.owner.name ?? teamName,
-      email: organisation.owner.email,
-    }).then((customer) => customer.id);
-
-    await prisma.organisation.update({
-      where: {
-        id: organisationId,
-      },
-      data: {
-        customerId,
-      },
-    });
-  }
-
-  try {
-    // Create the team directly if no payment is required.
-    if (!isPaymentRequired) {
-      await prisma.team.create({
-        data: {
-          name: teamName,
-          url: teamUrl,
-          organisationId,
-          members: {
-            create: [
-              {
-                userId,
-                role: TeamMemberRole.ADMIN, // Todo: (orgs)
-              },
-            ],
-          },
-          teamGlobalSettings: {
-            create: {},
-          },
-        },
-      });
-
-      return {
-        paymentRequired: false,
-      };
-    }
-
-    // Create a pending team if payment is required.
-    const pendingTeam = await prisma.$transaction(async (tx) => {
-      const existingTeamWithUrl = await tx.team.findUnique({
-        where: {
-          url: teamUrl,
-        },
-      });
-
-      const existingUserProfileWithUrl = await tx.user.findUnique({
-        where: {
-          url: teamUrl,
-        },
-        select: {
-          id: true,
-        },
-      });
-
-      if (existingUserProfileWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-          message: 'URL already taken.',
-        });
-      }
-
-      if (existingTeamWithUrl) {
-        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-          message: 'Team URL already exists.',
-        });
-      }
-
-      if (!customerId) {
-        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-          message: 'Missing customer ID for pending teams.',
-        });
-      }
-
-      return await tx.teamPending.create({
-        data: {
-          name: teamName,
-          url: teamUrl,
-          ownerUserId: user.id,
-          customerId,
-        },
-      });
-    });
-
-    return {
-      paymentRequired: true,
-      pendingTeamId: pendingTeam.id,
-    };
-  } catch (err) {
-    console.error(err);
-
-    if (!(err instanceof Prisma.PrismaClientKnownRequestError)) {
-      throw err;
-    }
-
-    const target = z.array(z.string()).safeParse(err.meta?.target);
-
-    if (err.code === 'P2002' && target.success && target.data.includes('url')) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-        message: 'Team URL already exists.',
-      });
-    }
-
-    throw err;
-  }
-};
-
-export type CreateTeamFromPendingTeamOptions = {
-  pendingTeamId: number;
-  subscription: Stripe.Subscription;
-};
-
-export const createTeamFromPendingTeam = async ({
-  pendingTeamId,
-  subscription,
-}: CreateTeamFromPendingTeamOptions) => {
-  const createdTeam = await prisma.$transaction(async (tx) => {
-    const pendingTeam = await tx.teamPending.findUniqueOrThrow({
-      where: {
-        id: pendingTeamId,
-      },
-    });
-
-    await tx.teamPending.delete({
-      where: {
-        id: pendingTeamId,
-      },
+  await prisma.$transaction(async (tx) => {
+    const teamSettings = await tx.teamGlobalSettings.create({
+      data: generateDefaultTeamSettings(),
     });
 
     const team = await tx.team.create({
       data: {
-        name: pendingTeam.name,
-        url: pendingTeam.url,
-        ownerUserId: pendingTeam.ownerUserId,
-        customerId: pendingTeam.customerId,
-        members: {
-          create: [
-            {
-              userId: pendingTeam.ownerUserId,
-              role: TeamMemberRole.ADMIN,
-            },
-          ],
+        name: teamName,
+        url: teamUrl,
+        organisationId,
+        teamGlobalSettingsId: teamSettings.id,
+        teamGroups: {
+          createMany: {
+            // Attach the internal organisation groups to the team.
+            data: internalOrganisationGroups,
+          },
         },
       },
-    });
-
-    await tx.teamGlobalSettings.upsert({
-      where: {
-        teamId: team.id,
-      },
-      update: {},
-      create: {
-        teamId: team.id,
+      include: {
+        teamGroups: true,
       },
     });
 
-    await tx.subscription.upsert(
-      mapStripeSubscriptionToPrismaUpsertAction(subscription, undefined, team.id),
+    // Create the internal team groups.
+    await Promise.all(
+      TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
+        tx.organisationGroup.create({
+          data: {
+            type: teamGroup.type,
+            organisationRole: LOWEST_ORGANISATION_ROLE,
+            organisationId,
+            teamGroups: {
+              create: {
+                teamId: team.id,
+                teamRole: teamGroup.teamRole,
+              },
+            },
+          },
+        }),
+      ),
     );
-
-    return team;
   });
-
-  // Attach the team ID to the subscription metadata for sanity reasons.
-  await stripe.subscriptions
-    .update(subscription.id, {
-      metadata: {
-        teamId: createdTeam.id.toString(),
-      },
-    })
-    .catch((e) => {
-      console.error(e);
-      // Non-critical error, but we want to log it so we can rectify it.
-      // Todo: Teams - Alert us.
-    });
-
-  return createdTeam;
 };

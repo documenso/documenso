@@ -5,6 +5,7 @@ import type { Organisation, OrganisationGlobalSettings, Prisma } from '@prisma/c
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
+import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
 import { mailer } from '@documenso/email/mailer';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -16,12 +17,11 @@ import { prisma } from '@documenso/prisma';
 import type { TCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import {
-  buildOrganisationWhereQuery,
-  getHighestOrganisationRoleInGroup,
-} from '../../utils/organisations';
+import { validateIfSubscriptionIsRequired } from '../../utils/billing';
+import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { organisationGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getMemberOrganisationRole } from '../team/get-member-roles';
 
 export type CreateOrganisationMemberInvitesOptions = {
   userId: number;
@@ -56,8 +56,14 @@ export const createOrganisationMemberInvites = async ({
           },
         },
       },
-      invites: true,
+      invites: {
+        where: {
+          status: OrganisationMemberInviteStatus.PENDING,
+        },
+      },
       organisationGlobalSettings: true,
+      organisationClaim: true,
+      subscription: true,
     },
   });
 
@@ -65,38 +71,20 @@ export const createOrganisationMemberInvites = async ({
     throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
-  const currentOrganisationMember = await prisma.organisationMember.findFirst({
-    where: {
-      userId,
-      organisationId,
-    },
-    include: {
-      organisationGroupMembers: {
-        include: {
-          group: true,
-        },
-      },
+  const { organisationClaim } = organisation;
+
+  const subscription = validateIfSubscriptionIsRequired(organisation.subscription);
+
+  const currentOrganisationMemberRole = await getMemberOrganisationRole({
+    organisationId: organisation.id,
+    reference: {
+      type: 'User',
+      id: userId,
     },
   });
 
-  if (!currentOrganisationMember) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED);
-  }
-
-  const currentOrganisationMemberRole = getHighestOrganisationRoleInGroup(
-    currentOrganisationMember.organisationGroupMembers.map((member) => member.group),
-  );
-
   const organisationMemberEmails = organisation.members.map((member) => member.user.email);
-  const organisationMemberInviteEmails = organisation.invites
-    .filter((invite) => invite.status === OrganisationMemberInviteStatus.PENDING)
-    .map((invite) => invite.email);
-
-  if (!currentOrganisationMember) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'User not part of organisation.',
-    });
-  }
+  const organisationMemberInviteEmails = organisation.invites.map((invite) => invite.email);
 
   const usersToInvite = invitations.filter((invitation) => {
     // Filter out users that are already members of the organisation.
@@ -123,7 +111,6 @@ export const createOrganisationMemberInvites = async ({
     });
   }
 
-  // Todo: (orgs)
   const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] =
     usersToInvite.map(({ email, organisationRole }) => ({
       email,
@@ -132,9 +119,21 @@ export const createOrganisationMemberInvites = async ({
       token: nanoid(32),
     }));
 
-  console.log({
-    organisationMemberInvites,
-  });
+  const numberOfCurrentMembers = organisation.members.length;
+  const numberOfCurrentInvites = organisation.invites.length;
+  const numberOfNewInvites = organisationMemberInvites.length;
+
+  const totalMemberCountWithInvites =
+    numberOfCurrentMembers + numberOfCurrentInvites + numberOfNewInvites;
+
+  // Handle billing for seat based plans.
+  if (subscription) {
+    await syncMemberCountWithStripeSeatPlan(
+      subscription,
+      organisationClaim,
+      totalMemberCountWithInvites,
+    );
+  }
 
   await prisma.organisationMemberInvite.createMany({
     data: organisationMemberInvites,

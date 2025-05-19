@@ -19,7 +19,7 @@ export type UpdateTeamOptions = {
 export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): Promise<void> => {
   try {
     await prisma.$transaction(async (tx) => {
-      const foundPendingTeamWithUrl = await tx.teamPending.findFirst({
+      const foundTeamWithUrl = await tx.team.findFirst({
         where: {
           url: data.url,
         },
@@ -31,21 +31,19 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): P
         },
       });
 
-      if (foundPendingTeamWithUrl || foundOrganisationWithUrl) {
+      if (foundTeamWithUrl || foundOrganisationWithUrl) {
         throw new AppError(AppErrorCode.ALREADY_EXISTS, {
           message: 'Team URL already exists.',
         });
       }
 
-      const team = await tx.team.update({
+      return await tx.team.update({
         where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
         data: {
           url: data.url,
           name: data.name,
         },
       });
-
-      return team;
     });
   } catch (err) {
     console.error(err);

@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -50,6 +51,7 @@ export const TeamDeleteDialog = ({
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { refreshSession } = useSession();
 
   const deleteMessage = _(msg`delete ${teamName}`);
 
@@ -71,6 +73,8 @@ export const TeamDeleteDialog = ({
   const onFormSubmit = async () => {
     try {
       await deleteTeam({ teamId });
+
+      await refreshSession();
 
       toast({
         title: _(msg`Success`),

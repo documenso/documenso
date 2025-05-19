@@ -2,7 +2,6 @@ import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
-import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
 export const MAX_PROFILE_BIO_LENGTH = 256;
 
@@ -49,11 +48,6 @@ export const ZCreateTeamEmailVerificationMutationSchema = z.object({
   email: z.string().trim().email().toLowerCase().min(1, 'Please enter a valid email.'),
 });
 
-export const ZCreateTeamPendingCheckoutMutationSchema = z.object({
-  interval: z.union([z.literal('monthly'), z.literal('yearly')]),
-  pendingTeamId: z.number(),
-});
-
 export const ZDeleteTeamEmailMutationSchema = z.object({
   teamId: z.number(),
 });
@@ -61,16 +55,6 @@ export const ZDeleteTeamEmailMutationSchema = z.object({
 export const ZDeleteTeamEmailVerificationMutationSchema = z.object({
   teamId: z.number(),
 });
-
-export const ZDeleteTeamMutationSchema = z.object({
-  teamId: z.number(),
-});
-
-export const ZDeleteTeamPendingMutationSchema = z.object({
-  pendingTeamId: z.number(),
-});
-
-export const ZFindTeamsPendingQuerySchema = ZFindSearchParamsSchema;
 
 export const ZGetTeamMembersQuerySchema = z.object({
   teamId: z.number(),
@@ -119,13 +103,7 @@ export type TCreateTeamEmailVerificationMutationSchema = z.infer<
   typeof ZCreateTeamEmailVerificationMutationSchema
 >;
 
-export type TCreateTeamPendingCheckoutMutationSchema = z.infer<
-  typeof ZCreateTeamPendingCheckoutMutationSchema
->;
 export type TDeleteTeamEmailMutationSchema = z.infer<typeof ZDeleteTeamEmailMutationSchema>;
-export type TDeleteTeamMutationSchema = z.infer<typeof ZDeleteTeamMutationSchema>;
-export type TDeleteTeamPendingMutationSchema = z.infer<typeof ZDeleteTeamPendingMutationSchema>;
-export type TFindTeamsPendingQuerySchema = z.infer<typeof ZFindTeamsPendingQuerySchema>;
 export type TGetTeamMembersQuerySchema = z.infer<typeof ZGetTeamMembersQuerySchema>;
 export type TUpdateTeamEmailMutationSchema = z.infer<typeof ZUpdateTeamEmailMutationSchema>;
 export type TResendTeamEmailVerificationMutationSchema = z.infer<

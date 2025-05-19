@@ -11,6 +11,7 @@ import {
 import { useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
@@ -30,7 +31,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { TeamGroupCreateDialog } from '~/components/dialogs/team-group-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamGroupsTable } from '~/components/tables/team-groups-table';
-import { useCurrentOrganisation } from '~/providers/organisation';
 import { useCurrentTeam } from '~/providers/team';
 
 export default function TeamsSettingsGroupsPage() {

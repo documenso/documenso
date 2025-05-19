@@ -1,7 +1,6 @@
 import { useState } from 'react';
 
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { OrganisationMemberRole } from '@prisma/client';
 
@@ -26,7 +25,6 @@ export type OrganisationLeaveDialogProps = {
   organisationId: string;
   organisationName: string;
   organisationAvatarImageId?: string | null;
-  organisationMemberId: string;
   role: OrganisationMemberRole;
   trigger?: React.ReactNode;
 };
@@ -36,20 +34,19 @@ export const OrganisationLeaveDialog = ({
   organisationId,
   organisationName,
   organisationAvatarImageId,
-  organisationMemberId,
   role,
 }: OrganisationLeaveDialogProps) => {
   const [open, setOpen] = useState(false);
 
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
 
   const { mutateAsync: leaveOrganisation, isPending: isLeavingOrganisation } =
-    trpc.organisation.member.delete.useMutation({
+    trpc.organisation.leave.useMutation({
       onSuccess: () => {
         toast({
-          title: _(msg`Success`),
-          description: _(msg`You have successfully left this organisation.`),
+          title: t`Success`,
+          description: t`You have successfully left this organisation.`,
           duration: 5000,
         });
 
@@ -57,10 +54,8 @@ export const OrganisationLeaveDialog = ({
       },
       onError: () => {
         toast({
-          title: _(msg`An unknown error occurred`),
-          description: _(
-            msg`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
-          ),
+          title: t`An unknown error occurred`,
+          description: t`We encountered an unknown error while attempting to leave this organisation. Please try again later.`,
           variant: 'destructive',
           duration: 10000,
         });
@@ -94,7 +89,7 @@ export const OrganisationLeaveDialog = ({
             avatarSrc={formatAvatarUrl(organisationAvatarImageId)}
             avatarFallback={organisationName.slice(0, 1).toUpperCase()}
             primaryText={organisationName}
-            secondaryText={_(ORGANISATION_MEMBER_ROLE_MAP[role])}
+            secondaryText={t(ORGANISATION_MEMBER_ROLE_MAP[role])}
           />
         </Alert>
 
@@ -108,7 +103,7 @@ export const OrganisationLeaveDialog = ({
               type="submit"
               variant="destructive"
               loading={isLeavingOrganisation}
-              onClick={async () => leaveOrganisation({ organisationId, organisationMemberId })}
+              onClick={async () => leaveOrganisation({ organisationId })}
             >
               <Trans>Leave</Trans>
             </Button>

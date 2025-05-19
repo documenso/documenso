@@ -23,7 +23,6 @@ export type OrganisationInviteEmailProps = {
   baseUrl: string;
   senderName: string;
   organisationName: string;
-  teamName?: string;
   token: string;
 };
 
@@ -32,13 +31,12 @@ export const OrganisationInviteEmailTemplate = ({
   baseUrl = 'https://documenso.com',
   senderName = 'John Doe',
   organisationName = 'Organisation Name',
-  teamName = 'Team Name',
   token = '',
 }: OrganisationInviteEmailProps) => {
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`Accept invitation to join a team on Documenso`;
+  const previewText = msg`Accept invitation to join an organisation on Documenso`;
 
   return (
     <Html>
@@ -72,15 +70,11 @@ export const OrganisationInviteEmailTemplate = ({
               </Text>
 
               <Text className="my-1 text-center text-base">
-                {teamName ? (
-                  <Trans>You have been invited to join the following team</Trans>
-                ) : (
-                  <Trans>You have been invited to join the following organisation</Trans>
-                )}
+                <Trans>You have been invited to join the following organisation</Trans>
               </Text>
 
               <div className="mx-auto my-2 w-fit rounded-lg bg-gray-50 px-4 py-2 text-base font-medium text-slate-600">
-                {teamName || organisationName}
+                {organisationName}
               </div>
 
               <Text className="my-1 text-center text-base">
@@ -92,13 +86,13 @@ export const OrganisationInviteEmailTemplate = ({
               <Section className="mb-6 mt-6 text-center">
                 <Button
                   className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
-                  href={`${baseUrl}/team/invite/${token}`}
+                  href={`${baseUrl}/organisation/invite/${token}`}
                 >
                   <Trans>Accept</Trans>
                 </Button>
                 <Button
                   className="ml-4 inline-flex items-center justify-center rounded-lg bg-gray-50 px-6 py-3 text-center text-sm font-medium text-slate-600 no-underline"
-                  href={`${baseUrl}/team/decline/${token}`}
+                  href={`${baseUrl}/organisation/decline/${token}`}
                 >
                   <Trans>Decline</Trans>
                 </Button>

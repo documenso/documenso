@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -30,8 +31,6 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 export type OrganisationDeleteDialogProps = {
   trigger?: React.ReactNode;

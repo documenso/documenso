@@ -1,5 +1,4 @@
 import { Trans } from '@lingui/react/macro';
-import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { Link } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -51,19 +50,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   // Directly convert the team member invite to a team member if they already have an account.
   if (user) {
     await acceptOrganisationInvitation({ token: organisationMemberInvite.token });
-  }
-
-  // For users who do not exist yet, set the team invite status to accepted, which is checked during
-  // user creation to determine if we should add the user to the team at that time.
-  if (!user && organisationMemberInvite.status !== OrganisationMemberInviteStatus.ACCEPTED) {
-    await prisma.organisationMemberInvite.update({
-      where: {
-        id: organisationMemberInvite.id,
-      },
-      data: {
-        status: OrganisationMemberInviteStatus.ACCEPTED,
-      },
-    });
   }
 
   if (!user) {

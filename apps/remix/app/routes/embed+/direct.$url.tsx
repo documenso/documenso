@@ -2,10 +2,8 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
@@ -36,10 +34,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not found', { status: 404 });
   }
 
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: template.teamId });
+
+  const allowCustomBranding = organisationClaim.flags.branding;
+  const allowEmbedSigningWhitelabel = organisationClaim.flags.embedSigningWhiteLabel;
+
   // TODO: Make this more robust, we need to ensure the owner is either
   // TODO: the member of a team that has an active subscription, is an early
   // TODO: adopter or is an enterprise user.
-  if (IS_BILLING_ENABLED() && !template.teamId) {
+  if (IS_BILLING_ENABLED() && !organisationClaim.flags.embedSigning) {
     throw data(
       {
         type: 'embed-paywall',
@@ -55,18 +58,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
-
-  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
-    isDocumentPlatform(template),
-    isUserEnterprise({
-      userId: template.userId,
-      teamId: template.teamId ?? undefined,
-    }),
-    isUserCommunityPlan({
-      userId: template.userId,
-      teamId: template.teamId ?? undefined,
-    }),
-  ]);
 
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
     .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
@@ -102,7 +93,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     teamId: template.teamId,
   });
 
-  const hidePoweredBy = settings.brandingHidePoweredBy;
+  // Todo: orgs - figure out
+  // const hidePoweredBy = settings.brandingHidePoweredBy;
 
   return superLoaderJson({
     token,
@@ -110,10 +102,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     template,
     recipient,
     fields,
-    hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
+    allowCustomBranding,
+    allowEmbedSigningWhitelabel,
   });
 }
 
@@ -124,10 +114,8 @@ export default function EmbedDirectTemplatePage() {
     template,
     recipient,
     fields,
-    hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
+    allowCustomBranding,
+    allowEmbedSigningWhitelabel,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -152,10 +140,8 @@ export default function EmbedDirectTemplatePage() {
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
-            hidePoweredBy={
-              isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
-            }
-            allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
+            hidePoweredBy={allowCustomBranding}
+            allowWhiteLabelling={allowEmbedSigningWhitelabel}
           />
         </DocumentSigningRecipientProvider>
       </DocumentSigningAuthProvider>

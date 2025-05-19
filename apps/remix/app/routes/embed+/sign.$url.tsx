@@ -3,13 +3,11 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
@@ -51,10 +49,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not found', { status: 404 });
   }
 
+  // Todo: orgs - test
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: document.teamId });
+
+  const allowEmbedSigningWhitelabel = organisationClaim.flags.embedSigningWhiteLabel;
+  const allowCustomBranding = organisationClaim.flags.branding;
+
   // TODO: Make this more robust, we need to ensure the owner is either
   // TODO: the member of a team that has an active subscription, is an early
   // TODO: adopter or is an enterprise user.
-  if (IS_BILLING_ENABLED() && !document.teamId) {
+  if (IS_BILLING_ENABLED() && !organisationClaim.flags.embedSigning) {
     throw data(
       {
         type: 'embed-paywall',
@@ -64,18 +68,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       },
     );
   }
-
-  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
-    isDocumentPlatform(document),
-    isUserEnterprise({
-      userId: document.userId,
-      teamId: document.teamId ?? undefined,
-    }),
-    isUserCommunityPlan({
-      userId: document.userId,
-      teamId: document.teamId ?? undefined,
-    }),
-  ]);
 
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -123,7 +115,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     teamId: document.teamId,
   });
 
-  const hidePoweredBy = settings.brandingHidePoweredBy;
+  // Todo: orgs - figure out
+  // const hidePoweredBy = settings.brandingHidePoweredBy;
 
   return superLoaderJson({
     token,
@@ -133,10 +126,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     recipient,
     fields,
     completedFields,
-    hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
+    allowCustomBranding,
+    allowEmbedSigningWhitelabel,
   });
 }
 
@@ -149,10 +140,8 @@ export default function EmbedSignDocumentPage() {
     recipient,
     fields,
     completedFields,
-    hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
+    allowCustomBranding,
+    allowEmbedSigningWhitelabel,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -178,10 +167,8 @@ export default function EmbedSignDocumentPage() {
           completedFields={completedFields}
           metadata={document.documentMeta}
           isCompleted={isDocumentCompleted(document.status)}
-          hidePoweredBy={
-            isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
-          }
-          allowWhitelabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
+          hidePoweredBy={allowCustomBranding}
+          allowWhitelabelling={allowEmbedSigningWhitelabel}
           allRecipients={allRecipients}
         />
       </DocumentSigningAuthProvider>

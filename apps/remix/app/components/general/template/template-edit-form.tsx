@@ -31,7 +31,6 @@ import { useCurrentTeam } from '~/providers/team';
 export type TemplateEditFormProps = {
   className?: string;
   initialTemplate: TTemplate;
-  isEnterprise: boolean;
   templateRootPath: string;
 };
 
@@ -41,7 +40,6 @@ const EditTemplateSteps: EditTemplateStep[] = ['settings', 'signers', 'fields'];
 export const TemplateEditForm = ({
   initialTemplate,
   className,
-  isEnterprise,
   templateRootPath,
 }: TemplateEditFormProps) => {
   const { _ } = useLingui();
@@ -261,7 +259,6 @@ export const TemplateEditForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSettingsFormSubmit}
-              isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
@@ -274,7 +271,6 @@ export const TemplateEditForm = ({
               allowDictateNextSigner={template.templateMeta?.allowDictateNextSigner}
               templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
-              isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 

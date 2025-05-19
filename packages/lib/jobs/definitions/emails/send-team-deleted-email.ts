@@ -1,4 +1,3 @@
-import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
 import type { JobDefinition } from '../../client/_internal/job';
@@ -9,23 +8,24 @@ const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA = z.object({
   team: z.object({
     name: z.string(),
     url: z.string(),
-    teamGlobalSettings: z
-      .object({
-        documentVisibility: z.nativeEnum(DocumentVisibility),
-        documentLanguage: z.string(),
-        includeSenderDetails: z.boolean(),
-        includeSigningCertificate: z.boolean(),
-        brandingEnabled: z.boolean(),
-        brandingLogo: z.string(),
-        brandingUrl: z.string(),
-        brandingCompanyDetails: z.string(),
-        brandingHidePoweredBy: z.boolean(),
-        teamId: z.number(),
-        typedSignatureEnabled: z.boolean(),
-        uploadSignatureEnabled: z.boolean(),
-        drawSignatureEnabled: z.boolean(),
-      })
-      .nullish(),
+    // This is never passed along for some reason so commenting it out.
+    // teamGlobalSettings: z
+    //   .object({
+    //     documentVisibility: z.nativeEnum(DocumentVisibility),
+    //     documentLanguage: z.string(),
+    //     includeSenderDetails: z.boolean(),
+    //     includeSigningCertificate: z.boolean(),
+    //     brandingEnabled: z.boolean(),
+    //     brandingLogo: z.string(),
+    //     brandingUrl: z.string(),
+    //     brandingCompanyDetails: z.string(),
+    //     brandingHidePoweredBy: z.boolean(),
+    //     teamId: z.number(),
+    //     typedSignatureEnabled: z.boolean(),
+    //     uploadSignatureEnabled: z.boolean(),
+    //     drawSignatureEnabled: z.boolean(),
+    //   })
+    //   .nullish(),
   }),
   members: z.array(
     z.object({

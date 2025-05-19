@@ -7,6 +7,7 @@ import { useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
@@ -18,8 +19,6 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
-
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 import { TeamDeleteDialog } from '../dialogs/team-delete-dialog';
 

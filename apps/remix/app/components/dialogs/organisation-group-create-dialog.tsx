@@ -8,6 +8,7 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import {
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_MAP,
@@ -44,8 +45,6 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 export type OrganisationGroupCreateDialogProps = {
   trigger?: React.ReactNode;

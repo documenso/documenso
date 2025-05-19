@@ -1,6 +1,7 @@
 import { adminRouter } from './admin-router/router';
 import { apiTokenRouter } from './api-token-router/router';
 import { authRouter } from './auth-router/router';
+import { billingRouter } from './billing/router';
 import { documentRouter } from './document-router/router';
 import { fieldRouter } from './field-router/router';
 import { organisationRouter } from './organisation-router/router';
@@ -14,6 +15,7 @@ import { webhookRouter } from './webhook-router/router';
 
 export const appRouter = router({
   auth: authRouter,
+  billing: billingRouter,
   profile: profileRouter,
   document: documentRouter,
   field: fieldRouter,

@@ -2,6 +2,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
@@ -19,7 +20,6 @@ import {
   type TDocumentPreferencesFormSchema,
 } from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 import type { Route } from './+types/org.$orgUrl.settings.preferences';
 

@@ -8,6 +8,7 @@ import { Edit, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
@@ -29,7 +30,6 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { OrganisationMemberDeleteDialog } from '~/components/dialogs/organisation-member-delete-dialog';
 import { OrganisationMemberUpdateDialog } from '~/components/dialogs/organisation-member-update-dialog';
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 export const OrganisationMembersDataTable = () => {
   const { _, i18n } = useLingui();

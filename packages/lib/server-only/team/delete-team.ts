@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { OrganisationGlobalSettings } from '@prisma/client';
 import { OrganisationGroupType, type Team } from '@prisma/client';
+import { uniqueBy } from 'remeda';
 
 import { mailer } from '@documenso/email/mailer';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
@@ -13,8 +13,8 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
+import { jobs } from '../../jobs/client';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from './get-team-settings';
 
@@ -28,6 +28,11 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_TEAM']),
     include: {
+      organisation: {
+        select: {
+          organisationGlobalSettings: true,
+        },
+      },
       teamGroups: {
         include: {
           organisationGroup: {
@@ -65,21 +70,19 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
     teamId,
   });
 
+  const membersToNotify = uniqueBy(
+    team.teamGroups.flatMap((group) =>
+      group.organisationGroup.organisationGroupMembers.map((member) => ({
+        id: member.organisationMember.user.id,
+        name: member.organisationMember.user.name || '',
+        email: member.organisationMember.user.email,
+      })),
+    ),
+    (member) => member.id,
+  );
+
   await prisma.$transaction(
     async (tx) => {
-      // Todo: orgs handle any subs?
-      // if (team.subscription) {
-      //   await stripe.subscriptions
-      //     .cancel(team.subscription.planId, {
-      //       prorate: false,
-      //       invoice_now: true,
-      //     })
-      //     .catch((err) => {
-      //       console.error(err);
-      //       throw AppError.parseError(err);
-      //     });
-      // }
-
       await tx.team.delete({
         where: {
           id: teamId,
@@ -96,25 +99,20 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
         },
       });
 
-      // const members = team.teamGroups.flatMap((group) =>
-      //   group.organisationGroup.organisationMembers.map((member) => ({
-      //     id: member.user.id,
-      //     name: member.user.name || '',
-      //     email: member.user.email,
-      //   })),
-      // );
-
-      // await jobs.triggerJob({
-      //   name: 'send.team-deleted.email',
-      //   payload: {
-      //     team: {
-      //       name: team.name,
-      //       url: team.url,
-      //       teamGlobalSettings: team.teamGlobalSettings, // Todo: orgs
-      //     },
-      //     members,
-      //   },
-      // });
+      await jobs.triggerJob({
+        name: 'send.team-deleted.email',
+        payload: {
+          team: {
+            name: team.name,
+            url: team.url,
+            // teamGlobalSettings: {
+            //   ...settings,
+            //   teamId: team.id,
+            // },
+          },
+          members: membersToNotify,
+        },
+      });
     },
     { timeout: 30_000 },
   );
@@ -122,14 +120,14 @@ export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
 
 type SendTeamDeleteEmailOptions = {
   email: string;
-  team: Pick<Team, 'id' | 'url' | 'name'>;
-  settings: Omit<OrganisationGlobalSettings, 'id'>;
+  team: Pick<Team, 'url' | 'name'>;
+  // settings: Omit<OrganisationGlobalSettings, 'id'>;
 };
 
 export const sendTeamDeleteEmail = async ({
   email,
   team,
-  settings,
+  // settings,
 }: SendTeamDeleteEmailOptions) => {
   const template = createElement(TeamDeleteEmailTemplate, {
     assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
@@ -137,9 +135,12 @@ export const sendTeamDeleteEmail = async ({
     teamUrl: team.url,
   });
 
-  const branding = teamGlobalSettingsToBranding(settings, team.id);
+  // This is never actually passed on so commenting it out.
+  // const branding = teamGlobalSettingsToBranding(settings, team.id);
+  // const lang = settings.documentLanguage;
 
-  const lang = settings.documentLanguage;
+  const branding = undefined;
+  const lang = undefined;
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, { lang, branding }),

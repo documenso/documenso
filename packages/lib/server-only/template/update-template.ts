@@ -1,6 +1,5 @@
 import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -39,6 +38,15 @@ export const updateTemplate = async ({
     },
     include: {
       templateMeta: true,
+      team: {
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -66,17 +74,10 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (newGlobalActionAuth && !template.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const authOptions = createDocumentAuthOptions({

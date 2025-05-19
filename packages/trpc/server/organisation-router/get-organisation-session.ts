@@ -29,6 +29,7 @@ export const getOrganisationSession = async ({
       },
     },
     include: {
+      organisationClaim: true,
       groups: {
         where: {
           organisationGroupMembers: {

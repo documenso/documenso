@@ -24,15 +24,6 @@ export const ZCreateTeamRequestSchema = z.object({
     ),
 });
 
-export const ZCreateTeamResponseSchema = z.union([
-  z.object({
-    paymentRequired: z.literal(false),
-  }),
-  z.object({
-    paymentRequired: z.literal(true),
-    pendingTeamId: z.number(),
-  }),
-]);
+export const ZCreateTeamResponseSchema = z.void();
 
 export type TCreateTeamRequest = z.infer<typeof ZCreateTeamRequestSchema>;
-export type TCreateTeamResponse = z.infer<typeof ZCreateTeamResponseSchema>;

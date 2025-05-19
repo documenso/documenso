@@ -25,6 +25,7 @@ export const getOrganisationMemberInvitesRoute = authenticatedProcedure
           select: {
             id: true,
             name: true,
+            url: true,
             avatarImageId: true,
           },
         },

@@ -2,6 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 
@@ -9,7 +10,6 @@ import { OrganisationDeleteDialog } from '~/components/dialogs/organisation-dele
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { OrganisationUpdateForm } from '~/components/forms/organisation-update-form';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { useCurrentOrganisation } from '~/providers/organisation';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {

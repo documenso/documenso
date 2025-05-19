@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import {
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_MAP,
@@ -44,7 +45,6 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation-group-delete-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 import type { Route } from './+types/org.$orgUrl.settings.groups.$id';
 

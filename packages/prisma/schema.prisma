@@ -1,3 +1,4 @@
+// Todo: orgs remember to add custom migration to apply default claims
 generator kysely {
   provider = "prisma-kysely"
 }
@@ -39,7 +40,6 @@ enum Role {
 model User {
   id               Int              @id @default(autoincrement())
   name             String?
-  customerId       String?          @unique
   email            String           @unique
   emailVerified    DateTime?
   password         String? // Todo: (RR7) Remove after RR7 migration.
@@ -59,8 +59,6 @@ model User {
 
   ownedOrganisations Organisation[]
   organisationMember OrganisationMember[]
-
-  ownedPendingTeams TeamPending[]
 
   twoFactorSecret      String?
   twoFactorEnabled     Boolean @default(false)
@@ -255,10 +253,42 @@ model Subscription {
   updatedAt         DateTime           @updatedAt
   cancelAtPeriodEnd Boolean            @default(false)
 
-  organisationId String
-  organisation   Organisation @relation(fields: [organisationId], references: [id])
+  customerId String? // Todo: orgs
+
+  organisationId String       @unique
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
 
   @@index([organisationId])
+}
+
+/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+model SubscriptionClaim {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  name   String
+  locked Boolean @default(false)
+
+  teamCount   Int
+  memberCount Int
+
+  flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
+}
+
+/// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
+model OrganisationClaim {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  originalSubscriptionClaimId String?
+  organisation                Organisation?
+
+  teamCount   Int
+  memberCount Int
+
+  flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
 
 model Account {
@@ -550,8 +580,11 @@ model Organisation {
   url           String  @unique // todo: constrain
   avatarImageId String?
 
-  customerId    String?        @unique
-  subscriptions Subscription[]
+  customerId   String?       @unique // Todo: orgs
+  subscription Subscription?
+
+  organisationClaimId String            @unique
+  organisationClaim   OrganisationClaim @relation(fields: [organisationClaimId], references: [id], onDelete: Cascade)
 
   members OrganisationMember[]
   invites OrganisationMemberInvite[]
@@ -683,7 +716,7 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
-  brandingHidePoweredBy  Boolean @default(false)
+  brandingHidePoweredBy  Boolean @default(false) // Todo: orgs this doesn't seem to be used?
 }
 
 model TeamGlobalSettings {
@@ -730,17 +763,6 @@ model Team {
 
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
-}
-
-model TeamPending {
-  id          Int      @id @default(autoincrement())
-  name        String
-  url         String   @unique
-  createdAt   DateTime @default(now())
-  customerId  String   @unique
-  ownerUserId Int
-
-  owner User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
 }
 
 model TeamEmail {

@@ -1,7 +1,5 @@
 import { z } from 'zod';
 
-import { ZTeamUrlSchema } from '../team-router/schema';
-
 // export const createOrganisationMeta: TrpcOpenApiMeta = {
 //   openapi: {
 //     method: 'POST',
@@ -19,7 +17,17 @@ export const ZOrganisationNameSchema = z
 
 export const ZCreateOrganisationRequestSchema = z.object({
   name: ZOrganisationNameSchema,
-  url: ZTeamUrlSchema,
+  priceId: z.string().optional(),
 });
 
-export const ZCreateOrganisationResponseSchema = z.void();
+export const ZCreateOrganisationResponseSchema = z.union([
+  z.object({
+    paymentRequired: z.literal(false),
+  }),
+  z.object({
+    paymentRequired: z.literal(true),
+    checkoutUrl: z.string(),
+  }),
+]);
+
+export type TCreateOrganisationResponse = z.infer<typeof ZCreateOrganisationResponseSchema>;

@@ -5,7 +5,6 @@ import { Hono } from 'hono';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -21,7 +20,6 @@ import { getMostRecentVerificationTokenByUserId } from '@documenso/lib/server-on
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
-import { alphaid } from '@documenso/lib/universal/id';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
@@ -149,17 +147,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
       });
     }
 
-    const { name, email, password, signature, url } = c.req.valid('json');
+    const { name, email, password, signature } = c.req.valid('json');
 
-    if (IS_BILLING_ENABLED() && url && url.length < 6) {
-      throw new AppError('PREMIUM_PROFILE_URL', {
-        message: 'Only subscribers can have a username shorter than 6 characters',
-      });
-    }
-
-    const orgUrl = url || alphaid(12);
-
-    const user = await createUser({ name, email, password, signature, orgUrl }).catch((err) => {
+    const user = await createUser({ name, email, password, signature }).catch((err) => {
       console.error(err);
       throw err;
     });

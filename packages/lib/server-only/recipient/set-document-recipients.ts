@@ -5,7 +5,6 @@ import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -60,6 +59,15 @@ export const setDocumentRecipients = async ({
     include: {
       fields: true,
       documentMeta: true,
+      team: {
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -90,17 +98,10 @@ export const setDocumentRecipients = async ({
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({

@@ -16,6 +16,7 @@ import { getOrganisationRoute } from './get-organisation';
 import { getOrganisationMemberInvitesRoute } from './get-organisation-member-invites';
 import { getOrganisationSessionRoute } from './get-organisation-session';
 import { getOrganisationsRoute } from './get-organisations';
+import { leaveOrganisationRoute } from './leave-organisation';
 import { resendOrganisationMemberInviteRoute } from './resend-organisation-member-invite';
 import { updateOrganisationRoute } from './update-organisation';
 import { updateOrganisationGroupRoute } from './update-organisation-group';
@@ -28,6 +29,7 @@ export const organisationRouter = router({
   create: createOrganisationRoute,
   update: updateOrganisationRoute,
   delete: deleteOrganisationRoute,
+  leave: leaveOrganisationRoute,
   member: {
     find: findOrganisationMembersRoute,
     update: updateOrganisationMemberRoute,

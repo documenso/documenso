@@ -12,6 +12,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import {
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_MAP,
@@ -48,8 +49,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
-
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 export type OrganisationMemberInviteDialogProps = {
   trigger?: React.ReactNode;
@@ -321,7 +320,7 @@ export const OrganisationMemberInviteDialog = ({
                             <FormItem className="w-full">
                               {index === 0 && (
                                 <FormLabel required>
-                                  <Trans>Role</Trans>
+                                  <Trans>Organisation Role</Trans>
                                 </FormLabel>
                               )}
                               <FormControl>

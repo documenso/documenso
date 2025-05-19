@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
@@ -29,7 +30,6 @@ import {
 
 import { TeamCreateDialog } from '~/components/dialogs/team-create-dialog';
 import { TeamDeleteDialog } from '~/components/dialogs/team-delete-dialog';
-import { useCurrentOrganisation } from '~/providers/organisation';
 
 export default function OrganisationSettingsTeamsPage() {
   const { t, i18n } = useLingui();

@@ -238,7 +238,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentV2RequestSchema)
     .output(ZCreateDocumentV2ResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
+      const { teamId, user } = ctx;
 
       const {
         title,
@@ -250,7 +250,7 @@ export const documentRouter = router({
         meta,
       } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -307,10 +307,10 @@ export const documentRouter = router({
     // })
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
+      const { teamId, user } = ctx;
       const { title, documentDataId, timezone } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -320,7 +320,7 @@ export const documentRouter = router({
       }
 
       return await createDocument({
-        userId: ctx.user.id,
+        userId: user.id,
         teamId,
         title,
         documentDataId,

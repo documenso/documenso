@@ -5,32 +5,45 @@ import { prisma } from '@documenso/prisma';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppErrorCode } from '../../errors/app-error';
 import { AppError } from '../../errors/app-error';
-import { alphaid } from '../../universal/id';
+import { alphaid, generatePrefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
+import { generateDefaultOrganisationClaims } from '../../utils/organisations-claims';
 import { createTeam } from '../team/create-team';
 
 type CreateOrganisationOptions = {
   userId: number;
   name: string;
-  url: string;
+  url?: string;
+  customerId?: string;
 };
 
-export const createOrganisation = async ({ name, url, userId }: CreateOrganisationOptions) => {
+export const createOrganisation = async ({
+  name,
+  url,
+  userId,
+  customerId,
+}: CreateOrganisationOptions) => {
   return await prisma.$transaction(async (tx) => {
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: generateDefaultOrganisationSettings(),
+    });
+
+    const organisationClaim = await tx.organisationClaim.create({
+      data: generateDefaultOrganisationClaims(),
     });
 
     const organisation = await tx.organisation
       .create({
         data: {
           name,
-          url, // Todo: orgs constraint this
+          url: url || generatePrefixedId('org'),
           ownerUserId: userId,
           organisationGlobalSettingsId: organisationSetting.id,
+          organisationClaimId: organisationClaim.id,
           groups: {
             create: ORGANISATION_INTERNAL_GROUPS,
           },
+          customerId,
         },
         include: {
           groups: true,
@@ -86,7 +99,7 @@ export const createPersonalOrganisation = async ({
   const organisation = await createOrganisation({
     name: 'Personal Organisation',
     userId,
-    url: orgUrl || `org_${alphaid(8)}`,
+    url: orgUrl,
   }).catch((err) => {
     console.error(err);
 
@@ -94,7 +107,7 @@ export const createPersonalOrganisation = async ({
       throw err;
     }
 
-    // Todo: (orgs) Add logging.
+    // Todo: (LOGS)
   });
 
   if (organisation) {
@@ -106,7 +119,8 @@ export const createPersonalOrganisation = async ({
       inheritMembers: true,
     }).catch((err) => {
       console.error(err);
-      // Todo: (orgs) Add logging.
+
+      // Todo: (LOGS)
     });
   }
 

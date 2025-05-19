@@ -255,7 +255,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+      const { remaining } = await getServerLimits({ teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -464,7 +464,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {
@@ -562,7 +562,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {

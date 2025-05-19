@@ -3,6 +3,7 @@ import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/c
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { jobs } from '../../jobs/client';
 
 export type AcceptOrganisationInvitationOptions = {
   token: string;
@@ -21,7 +22,8 @@ export const acceptOrganisationInvitation = async ({
     include: {
       organisation: {
         include: {
-          subscriptions: true,
+          subscription: true,
+          organisationClaim: true,
           groups: {
             include: {
               teamGroups: true,
@@ -46,19 +48,10 @@ export const acceptOrganisationInvitation = async ({
     },
   });
 
-  // If no user exists for the invitation, accept the invitation and create the organisation
-  // user when the user signs up.
   if (!user) {
-    await prisma.organisationMemberInvite.update({
-      where: {
-        id: organisationMemberInvite.id,
-      },
-      data: {
-        status: OrganisationMemberInviteStatus.ACCEPTED,
-      },
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'User must exist to accept an organisation invitation',
     });
-
-    return;
   }
 
   const { organisation } = organisationMemberInvite;
@@ -98,28 +91,13 @@ export const acceptOrganisationInvitation = async ({
         },
       });
 
-      // Todo: Orgs
-      // if (IS_BILLING_ENABLED() && team.subscription) {
-      //   const numberOfSeats = await tx.teamMember.count({
-      //     where: {
-      //       teamId: organisationMemberInvite.teamId,
-      //     },
-      //   });
-
-      //   await updateSubscriptionItemQuantity({
-      //     priceId: team.subscription.priceId,
-      //     subscriptionId: team.subscription.planId,
-      //     quantity: numberOfSeats,
-      //   });
-      // }
-
-      // await jobs.triggerJob({
-      //   name: 'send.team-member-joined.email',
-      //   payload: {
-      //     teamId: teamMember.teamId,
-      //     memberId: teamMember.id,
-      //   },
-      // });
+      await jobs.triggerJob({
+        name: 'send.organisation-member-joined.email',
+        payload: {
+          organisationId: organisation.id,
+          memberUserId: user.id,
+        },
+      });
     },
     { timeout: 30_000 },
   );

@@ -1,6 +1,4 @@
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
-import { createBillingPortal } from '@documenso/lib/server-only/user/create-billing-portal';
-import { createCheckoutSession } from '@documenso/lib/server-only/user/create-checkout-session';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
@@ -8,7 +6,6 @@ import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { adminProcedure, authenticatedProcedure, router } from '../trpc';
 import {
-  ZCreateCheckoutSessionRequestSchema,
   ZFindUserSecurityAuditLogsSchema,
   ZRetrieveUserByIdQuerySchema,
   ZSetProfileImageMutationSchema,
@@ -30,31 +27,6 @@ export const profileRouter = router({
 
     return await getUserById({ id });
   }),
-
-  createBillingPortal: authenticatedProcedure.mutation(async ({ ctx }) => {
-    return await createBillingPortal({
-      user: {
-        id: ctx.user.id,
-        customerId: ctx.user.customerId,
-        email: ctx.user.email,
-        name: ctx.user.name,
-      },
-    });
-  }),
-
-  createCheckoutSession: authenticatedProcedure
-    .input(ZCreateCheckoutSessionRequestSchema)
-    .mutation(async ({ ctx, input }) => {
-      return await createCheckoutSession({
-        user: {
-          id: ctx.user.id,
-          customerId: ctx.user.customerId,
-          email: ctx.user.email,
-          name: ctx.user.name,
-        },
-        priceId: input.priceId,
-      });
-    }),
 
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)

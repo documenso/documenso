@@ -7,7 +7,6 @@ import {
   WebhookTriggerEvents,
 } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -27,6 +26,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getMemberRoles } from '../team/get-member-roles';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -59,6 +59,23 @@ export const createDocumentV2 = async ({
   requestMetadata,
 }: CreateDocumentOptions) => {
   const { title, formValues } = data;
+
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery(userId, teamId),
+    include: {
+      organisation: {
+        select: {
+          organisationClaim: true,
+        },
+      },
+    },
+  });
+
+  if (!team) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
+  }
 
   const settings = await getTeamSettings({
     userId,
@@ -96,17 +113,13 @@ export const createDocumentV2 = async ({
   const recipientsHaveActionAuth = data.recipients?.some((recipient) => recipient.actionAuth);
 
   // Check if user has permission to set the global action auth.
-  if (authOptions.globalActionAuth || recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (
+    (authOptions.globalActionAuth || recipientsHaveActionAuth) &&
+    !team.organisation.organisationClaim.flags.cfr21
+  ) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const { teamRole } = await getMemberRoles({
