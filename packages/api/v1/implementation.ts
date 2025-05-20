@@ -188,7 +188,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       const { url } = await getPresignGetUrl(
-        downloadOriginalDocument ? document.documentData.data : document.documentData.initialData,
+        downloadOriginalDocument ? document.documentData.initialData : document.documentData.data,
       );
 
       return {
