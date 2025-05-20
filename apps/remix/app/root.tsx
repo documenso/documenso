@@ -93,7 +93,7 @@ export async function loader({ request }: Route.LoaderArgs) {
             teams,
           }
         : null,
-      publicEnv: createPublicEnv(),
+      publicEnv: { ...createPublicEnv(), NODE_ENV: env('NODE_ENV') },
     },
     {
       headers: {
