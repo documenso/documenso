@@ -67,6 +67,8 @@ test('[PUBLIC_PROFILE]: create profile', async ({ page }) => {
   await page.getByRole('button', { name: 'Complete' }).click();
   await page.getByRole('button', { name: 'Sign' }).click();
 
+  await page.waitForTimeout(3000);
+
   await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
   await expect(page.getByRole('heading')).toContainText('Document Signed');
 });

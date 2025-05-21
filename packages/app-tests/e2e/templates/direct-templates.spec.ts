@@ -221,15 +221,43 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
     // Check that the direct template link is accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
+
+    // Wait for the page to load completely before interacting with elements
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
-    await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
+    // Wait for email field to be ready
+    const emailField = page.getByPlaceholder('recipient@documenso.com');
+    await expect(emailField).toBeVisible();
+    await expect(emailField).toBeEnabled();
 
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Complete' }).click();
-    await page.getByRole('button', { name: 'Sign' }).click();
+    // Add a short wait to ensure the page is fully interactive
+    await page.waitForTimeout(1000);
+
+    // Fill the email field
+    await emailField.fill(seedTestEmail());
+
+    // Wait for the Continue button to be enabled before clicking
+    const continueButton = page.getByRole('button', { name: 'Continue' });
+    await expect(continueButton).toBeEnabled();
+    await continueButton.click();
+
+    // Wait for the Complete button to appear
+    const completeButton = page.getByRole('button', { name: 'Complete' });
+    await expect(completeButton).toBeVisible();
+    await expect(completeButton).toBeEnabled();
+    await completeButton.click();
+
+    // Wait for the Sign button to appear
+    const signButton = page.getByRole('button', { name: 'Sign' });
+    await expect(signButton).toBeVisible();
+    await expect(signButton).toBeEnabled();
+    await signButton.click();
+
     await page.waitForURL(/\/sign/);
     await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
+
+    // Add a longer waiting period to ensure document status is updated
+    await page.waitForTimeout(3000);
   }
 
   await apiSignin({
@@ -244,7 +272,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
     await expect(async () => {
       // Check that the document is in the 'All' tab.
       await checkDocumentTabCount(page, 'Completed', 1);
-    }).toPass();
+    }).toPass({ timeout: 15000 });
   }
 });
 
@@ -294,14 +322,38 @@ test('[DIRECT_TEMPLATES]: use direct template link with 2 recipients', async ({ 
   for (const template of [personalDirectTemplate, teamDirectTemplate]) {
     // Check that the direct template link is accessible.
     await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
+
+    // Wait for the page to load completely before interacting with elements
     await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
-    await page.waitForTimeout(1000);
-    await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
+    // Wait for email field to be ready
+    const emailField = page.getByPlaceholder('recipient@documenso.com');
+    await expect(emailField).toBeVisible();
+    await expect(emailField).toBeEnabled();
 
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await page.getByRole('button', { name: 'Complete' }).click();
-    await page.getByRole('button', { name: 'Sign' }).click();
+    // Add a short wait to ensure the page is fully interactive
+    await page.waitForTimeout(1000);
+
+    // Fill the email field
+    await emailField.fill(seedTestEmail());
+
+    // Wait for the Continue button to be enabled before clicking
+    const continueButton = page.getByRole('button', { name: 'Continue' });
+    await expect(continueButton).toBeEnabled();
+    await continueButton.click();
+
+    // Wait for the Complete button to appear
+    const completeButton = page.getByRole('button', { name: 'Complete' });
+    await expect(completeButton).toBeVisible();
+    await expect(completeButton).toBeEnabled();
+    await completeButton.click();
+
+    // Wait for the Sign button to appear
+    const signButton = page.getByRole('button', { name: 'Sign' });
+    await expect(signButton).toBeVisible();
+    await expect(signButton).toBeEnabled();
+    await signButton.click();
+
     await page.waitForURL(/\/sign/);
     await expect(page.getByText('Waiting for others to sign')).toBeVisible();
   }

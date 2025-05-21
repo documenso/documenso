@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
-import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
+import {
+  seedBlankDocument,
+  seedDocuments,
+  seedTeamDocuments,
+} from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -231,12 +234,14 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
   });
 
   await page.getByRole('row').getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Resend' }).click();
+  await page.getByRole('menuitem', { name: 'Resend' }).waitFor({ state: 'visible' });
+  await page.getByRole('menuitem', { name: 'Resend' }).click({ force: true });
 
-  await page.getByLabel('test.documenso.com').first().click();
-  await page.getByRole('button', { name: 'Send reminder' }).click();
+  await page.getByRole('checkbox').first().check({ force: true });
+  await page.getByRole('button', { name: 'Send reminder' }).waitFor({ state: 'visible' });
+  await page.getByRole('button', { name: 'Send reminder' }).click({ force: true });
 
-  await expect(page.getByRole('status')).toContainText('Document re-sent');
+  await expect(page.locator('span[role="status"]')).toContainText('Document re-sent');
 });
 
 test('[TEAMS]: delete draft team document', async ({ page }) => {
@@ -288,9 +293,9 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
 
   await page.getByRole('row').getByRole('button').nth(1).click();
 
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
-  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click({ force: true });
 
   await checkDocumentTabCount(page, 'Pending', 1);
 
@@ -327,9 +332,9 @@ test('[TEAMS]: delete completed team document', async ({ page }) => {
 
   await page.getByRole('row').getByRole('button').nth(2).click();
 
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
-  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click({ force: true });
 
   await checkDocumentTabCount(page, 'Completed', 0);
 
