@@ -55,7 +55,7 @@ export type AddSignersFormProps = {
   allowDictateNextSigner?: boolean;
   isDocumentEnterprise: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
-  onAutoSave?: (_data: TAddSignersFormSchema) => Promise<void>;
+  onAutoSave: (_data: TAddSignersFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -117,8 +117,6 @@ export const AddSignersFormPartial = ({
       allowDictateNextSigner: allowDictateNextSigner ?? false,
     },
   });
-
-  const { isValid, isDirty } = form.formState;
 
   // Always show advanced settings if any recipient has auth options.
   const alwaysShowAdvancedSettings = useMemo(() => {
@@ -217,11 +215,15 @@ export const AddSignersFormPartial = ({
     const formStateIndex = form.getValues('signers').findIndex((s) => s.formId === signer.formId);
     if (formStateIndex !== -1) {
       removeSigner(formStateIndex);
+
       const updatedSigners = form.getValues('signers').filter((s) => s.formId !== signer.formId);
+
       form.setValue('signers', normalizeSigningOrders(updatedSigners), {
         shouldValidate: true,
         shouldDirty: true,
       });
+
+      void handleOnBlur();
     }
   };
 
@@ -410,17 +412,26 @@ export const AddSignersFormPartial = ({
     });
   }, [form]);
 
+  const timeoutRef = useRef<NodeJS.Timeout>();
+
   const saveFormData = async (formData: TAddSignersFormSchema) => {
     try {
-      if (onAutoSave) {
-        await onAutoSave(formData);
-      }
-
-      form.reset(formData);
+      await onAutoSave(formData);
     } catch (error) {
       console.error('Error auto-saving form:', error);
     }
   };
+
+  const debouncedSaveFormData = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(() => {
+      const latestFormData = form.getValues();
+      void saveFormData(latestFormData);
+    }, 1000);
+  }, [form, saveFormData]);
 
   const emptySigners = useCallback(
     () => form.getValues('signers').filter((signer) => signer.email === ''),
@@ -429,14 +440,14 @@ export const AddSignersFormPartial = ({
 
   const handleOnBlur = useCallback(async () => {
     // Trigger validation before checking form state
-    await form.trigger();
+    const isFormValid = await form.trigger();
+    const { isDirty } = form.formState;
 
     // Only save if the form is valid and has been modified and there are no empty signers
-    if (isValid && isDirty && emptySigners().length === 0) {
-      const formData = form.getValues();
-      await saveFormData(formData);
+    if (isFormValid && isDirty && emptySigners().length === 0) {
+      debouncedSaveFormData();
     }
-  }, [form, isValid, isDirty, emptySigners]);
+  }, [form, emptySigners, debouncedSaveFormData]);
 
   return (
     <>
@@ -465,6 +476,7 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
+                      onBlurCapture={handleOnBlur}
                       onCheckedChange={(checked) => {
                         if (!checked && hasAssistantRole) {
                           setShowSigningOrderConfirmation(true);
@@ -477,11 +489,13 @@ export const AddSignersFormPartial = ({
 
                         // If sequential signing is turned off, disable dictate next signer
                         if (!checked) {
-                          form.setValue('allowDictateNextSigner', false);
+                          form.setValue('allowDictateNextSigner', false, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
                         }
                       }}
                       disabled={isSubmitting || hasDocumentBeenSent || emptySigners().length !== 0}
-                      onBlur={handleOnBlur}
                     />
                   </FormControl>
 
@@ -520,7 +534,9 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="allowDictateNextSigner"
                       checked={value}
-                      onCheckedChange={field.onChange}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                      }}
                       disabled={isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential}
                       onBlur={handleOnBlur}
                     />
