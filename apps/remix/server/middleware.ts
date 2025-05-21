@@ -18,12 +18,31 @@ export const appMiddleware = async (c: Context, next: Next) => {
   const { req } = c;
   const { path } = req;
 
+  // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
+  const redirectTo = req.query('redirectTo');
+
+  if (redirectTo) {
+    if (redirectTo.startsWith('/') && !redirectTo.startsWith('//') && !redirectTo.includes('..')) {
+      debug.log('Setting redirectTo cookie to:', redirectTo);
+      setCookie(c, 'redirectTo', redirectTo, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'Lax',
+        maxAge: 150,
+        // secure: process.env.NODE_ENV === 'production'
+      });
+
+      debug.log('Redirecting to (from param):', redirectTo);
+      return c.redirect(redirectTo, 307);
+    } else {
+      debug.log('Invalid redirectTo parameter encountered:', redirectTo);
+    }
+  }
+
   // Paths to ignore.
   if (nonPagePathRegex.test(path)) {
     return next();
   }
-
-  // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
 
   await next();
 

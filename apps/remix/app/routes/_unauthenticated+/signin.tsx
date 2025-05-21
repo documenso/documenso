@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
 
+import { extractCookieFromHeaders } from '@documenso/auth/server/lib/utils/cookies';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
   IS_GOOGLE_SSO_ENABLED,
@@ -20,13 +21,18 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { isAuthenticated } = await getOptionalSession(request);
+  const redirectToCookie = extractCookieFromHeaders('redirectTo', request.headers);
+  const redirectToAfterLogin = redirectToCookie ? decodeURIComponent(redirectToCookie) : '';
 
-  // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
   if (isAuthenticated) {
+    if (redirectToAfterLogin) {
+      throw redirect(redirectToAfterLogin);
+    }
+
     throw redirect('/documents');
   }
 
@@ -34,11 +40,13 @@ export async function loader({ request }: Route.LoaderArgs) {
     isGoogleSSOEnabled,
     isOIDCSSOEnabled,
     oidcProviderLabel,
+    redirectToAfterLogin,
   };
 }
 
 export default function SignIn({ loaderData }: Route.ComponentProps) {
-  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData;
+  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel, redirectToAfterLogin } =
+    loaderData;
 
   return (
     <div className="w-screen max-w-lg px-4">
@@ -56,6 +64,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           isGoogleSSOEnabled={isGoogleSSOEnabled}
           isOIDCSSOEnabled={isOIDCSSOEnabled}
           oidcProviderLabel={oidcProviderLabel}
+          returnTo={redirectToAfterLogin ?? undefined}
         />
 
         {env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
