@@ -1,5 +1,4 @@
-import { DocumentVisibility } from '@prisma/client';
-import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
@@ -119,7 +118,6 @@ export const updateDocument = async ({
 
   // If no data just return the document since this function is normally chained after a meta update.
   if (!data || Object.values(data).length === 0) {
-    console.log('no data');
     return document;
   }
 
