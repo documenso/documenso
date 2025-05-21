@@ -29,7 +29,7 @@ export const appMiddleware = async (c: Context, next: Next) => {
         httpOnly: true,
         sameSite: 'Lax',
         maxAge: 150,
-        // secure: process.env.NODE_ENV === 'production'
+        secure: process.env.NODE_ENV === 'production',
       });
 
       debug.log('Redirecting to (from param):', redirectTo);
