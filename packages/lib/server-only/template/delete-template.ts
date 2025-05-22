@@ -1,30 +1,18 @@
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type DeleteTemplateOptions = {
   id: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptions) => {
   return await prisma.template.delete({
     where: {
       id,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
   });
 };

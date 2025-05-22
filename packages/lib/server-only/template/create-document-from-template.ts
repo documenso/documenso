@@ -46,6 +46,8 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type FinalRecipient = Pick<
@@ -60,7 +62,7 @@ export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   externalId?: string | null;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipients: {
     id: number;
     name?: string;
@@ -276,21 +278,7 @@ export const createDocumentFromTemplate = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       recipients: {
@@ -300,11 +288,6 @@ export const createDocumentFromTemplate = async ({
       },
       templateDocumentData: true,
       templateMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -313,6 +296,11 @@ export const createDocumentFromTemplate = async ({
       message: 'Template not found',
     });
   }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
   recipients.forEach((recipient) => {
@@ -386,7 +374,7 @@ export const createDocumentFromTemplate = async ({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
-        visibility: template.visibility || template.team?.teamGlobalSettings?.documentVisibility,
+        visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
           create: {
@@ -406,9 +394,7 @@ export const createDocumentFromTemplate = async ({
               template.templateMeta?.signingOrder ||
               DocumentSigningOrder.PARALLEL,
             language:
-              override?.language ||
-              template.templateMeta?.language ||
-              template.team?.teamGlobalSettings?.documentLanguage,
+              override?.language || template.templateMeta?.language || settings.documentLanguage,
             typedSignatureEnabled:
               override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
             uploadSignatureEnabled:

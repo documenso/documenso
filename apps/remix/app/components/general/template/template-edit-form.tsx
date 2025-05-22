@@ -26,12 +26,11 @@ import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/templat
 import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateEditFormProps = {
   className?: string;
   initialTemplate: TTemplate;
-  isEnterprise: boolean;
   templateRootPath: string;
 };
 
@@ -41,14 +40,13 @@ const EditTemplateSteps: EditTemplateStep[] = ['settings', 'signers', 'fields'];
 export const TemplateEditForm = ({
   initialTemplate,
   className,
-  isEnterprise,
   templateRootPath,
 }: TemplateEditFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [step, setStep] = useState<EditTemplateStep>('settings');
 
@@ -260,12 +258,11 @@ export const TemplateEditForm = ({
             <AddTemplateSettingsFormPartial
               key={recipients.length}
               template={template}
-              currentTeamMemberRole={team?.currentTeamMember?.role}
+              currentTeamMemberRole={team.currentTeamRole}
               documentFlow={documentFlow.settings}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSettingsFormSubmit}
-              isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
@@ -278,7 +275,6 @@ export const TemplateEditForm = ({
               allowDictateNextSigner={template.templateMeta?.allowDictateNextSigner}
               templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
-              isEnterprise={isEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 

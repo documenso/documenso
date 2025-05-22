@@ -7,10 +7,7 @@ import { ChevronLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
 import backgroundPattern from '@documenso/assets/images/background-pattern.png';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
-
-import { useOptionalCurrentTeam } from '~/providers/team';
 
 type ErrorCodeMap = Record<
   number,
@@ -58,8 +55,6 @@ export const GenericErrorLayout = ({
 }: GenericErrorLayoutProps) => {
   const navigate = useNavigate();
   const { _ } = useLingui();
-
-  const team = useOptionalCurrentTeam();
 
   const { subHeading, heading, message } =
     errorCodeMap[errorCode || 500] ?? defaultErrorCodeMap[500];
@@ -110,8 +105,8 @@ export const GenericErrorLayout = ({
             {primaryButton ||
               (primaryButton !== null && (
                 <Button asChild>
-                  <Link to={formatDocumentsPath(team?.url)}>
-                    <Trans>Documents</Trans>
+                  <Link to={'/'}>
+                    <Trans>Home</Trans>
                   </Link>
                 </Button>
               ))}

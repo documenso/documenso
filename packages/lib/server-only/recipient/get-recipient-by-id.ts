@@ -1,11 +1,12 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type GetRecipientByIdOptions = {
   recipientId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 /**
@@ -20,21 +21,9 @@ export const getRecipientById = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       id: recipientId,
-      document: teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          },
+      document: {
+        team: buildTeamWhereQuery(teamId, userId),
+      },
     },
     include: {
       fields: true,

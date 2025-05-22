@@ -38,7 +38,7 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export const EXPIRATION_DATES = {
   ONE_WEEK: msg`7 days`,
@@ -67,7 +67,7 @@ export type ApiTokenFormProps = {
 export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const [, copy] = useCopyToClipboard();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -114,7 +114,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
     try {
       await createTokenMutation({
-        teamId: team?.id,
+        teamId: team.id,
         tokenName,
         expirationDate: noExpirationDate ? null : expirationDate,
       });

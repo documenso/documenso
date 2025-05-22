@@ -47,6 +47,7 @@ export type DocumentSigningPageViewProps = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  includeSenderDetails: boolean;
 };
 
 export const DocumentSigningPageView = ({
@@ -56,18 +57,16 @@ export const DocumentSigningPageView = ({
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
+  includeSenderDetails,
 }: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
 
-  const shouldUseTeamDetails =
-    document.teamId && document.team?.teamGlobalSettings?.includeSenderDetails === false;
-
   let senderName = document.user.name ?? '';
   let senderEmail = `(${document.user.email})`;
 
-  if (shouldUseTeamDetails) {
+  if (includeSenderDetails) {
     senderName = document.team?.name ?? '';
     senderEmail = document.team?.teamEmail?.email ? `(${document.team.teamEmail.email})` : '';
   }
@@ -92,7 +91,7 @@ export const DocumentSigningPageView = ({
             <span className="text-muted-foreground">
               {match(recipient.role)
                 .with(RecipientRole.VIEWER, () =>
-                  document.teamId && !shouldUseTeamDetails ? (
+                  includeSenderDetails ? (
                     <Trans>
                       on behalf of "{document.team?.name}" has invited you to view this document
                     </Trans>
@@ -101,7 +100,7 @@ export const DocumentSigningPageView = ({
                   ),
                 )
                 .with(RecipientRole.SIGNER, () =>
-                  document.teamId && !shouldUseTeamDetails ? (
+                  includeSenderDetails ? (
                     <Trans>
                       on behalf of "{document.team?.name}" has invited you to sign this document
                     </Trans>
@@ -110,7 +109,7 @@ export const DocumentSigningPageView = ({
                   ),
                 )
                 .with(RecipientRole.APPROVER, () =>
-                  document.teamId && !shouldUseTeamDetails ? (
+                  includeSenderDetails ? (
                     <Trans>
                       on behalf of "{document.team?.name}" has invited you to approve this document
                     </Trans>
@@ -119,7 +118,7 @@ export const DocumentSigningPageView = ({
                   ),
                 )
                 .with(RecipientRole.ASSISTANT, () =>
-                  document.teamId && !shouldUseTeamDetails ? (
+                  includeSenderDetails ? (
                     <Trans>
                       on behalf of "{document.team?.name}" has invited you to assist this document
                     </Trans>

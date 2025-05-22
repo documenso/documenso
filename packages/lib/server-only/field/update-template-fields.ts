@@ -5,10 +5,11 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export interface UpdateTemplateFieldsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   fields: {
     id: number;
@@ -31,21 +32,7 @@ export const updateTemplateFields = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       recipients: true,

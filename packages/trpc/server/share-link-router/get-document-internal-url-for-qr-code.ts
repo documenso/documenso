@@ -1,4 +1,5 @@
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { procedure } from '../trpc';
@@ -26,26 +27,12 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
           },
           {
             id: documentId,
-            team: {
-              members: {
-                some: {
-                  userId: ctx.user.id,
-                },
-              },
-            },
+            team: buildTeamWhereQuery(undefined, ctx.user.id),
           },
         ],
       },
       include: {
-        team: {
-          where: {
-            members: {
-              some: {
-                userId: ctx.user.id,
-              },
-            },
-          },
-        },
+        team: true,
       },
     });
 
@@ -53,9 +40,5 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
       return null;
     }
 
-    if (document.team) {
-      return `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${document.id}`;
-    }
-
-    return `${NEXT_PUBLIC_WEBAPP_URL()}/documents/${document.id}`;
+    return `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${document.id}`;
   });

@@ -36,7 +36,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { StackAvatar } from '../general/stack-avatar';
 
@@ -57,7 +57,7 @@ export type TResendDocumentFormSchema = z.infer<typeof ZResendDocumentFormSchema
 
 export const DocumentResendDialog = ({ document, recipients }: DocumentResendDialogProps) => {
   const { user } = useSession();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();

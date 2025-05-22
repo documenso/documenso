@@ -33,7 +33,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentMoveToFolderDialogProps = {
   documentId: number;
@@ -57,8 +57,9 @@ export const DocumentMoveToFolderDialog = ({
 }: DocumentMoveToFolderDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const form = useForm<TMoveDocumentFormSchema>({
     resolver: zodResolver(ZMoveDocumentFormSchema),
@@ -94,6 +95,14 @@ export const DocumentMoveToFolderDialog = ({
         folderId: data.folderId ?? null,
       });
 
+      const documentsPath = formatDocumentsPath(team.url);
+
+      if (data.folderId) {
+        await navigate(`${documentsPath}/f/${data.folderId}`);
+      } else {
+        await navigate(documentsPath);
+      }
+
       toast({
         title: _(msg`Document moved`),
         description: _(msg`The document has been moved successfully.`),
@@ -101,14 +110,6 @@ export const DocumentMoveToFolderDialog = ({
       });
 
       onOpenChange(false);
-
-      const documentsPath = formatDocumentsPath(team?.url);
-
-      if (data.folderId) {
-        void navigate(`${documentsPath}/f/${data.folderId}`);
-      } else {
-        void navigate(documentsPath);
-      }
     } catch (err) {
       const error = AppError.parseError(err);
 

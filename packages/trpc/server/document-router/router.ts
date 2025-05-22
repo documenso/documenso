@@ -19,7 +19,6 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
-import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
@@ -49,8 +48,6 @@ import {
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdRequestSchema,
   ZGetDocumentWithDetailsByIdResponseSchema,
-  ZMoveDocumentToTeamResponseSchema,
-  ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
@@ -174,7 +171,7 @@ export const documentRouter = router({
           teamId: team.id,
           teamEmail: team.teamEmail?.email,
           senderIds,
-          currentTeamMemberRole: team.currentTeamMember?.role,
+          currentTeamMemberRole: team.currentTeamRole,
           currentUserEmail: user.email,
           userId: user.id,
         };
@@ -255,7 +252,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentV2RequestSchema)
     .output(ZCreateDocumentV2ResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
+      const { teamId, user } = ctx;
 
       const {
         title,
@@ -267,7 +264,7 @@ export const documentRouter = router({
         meta,
       } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -325,10 +322,10 @@ export const documentRouter = router({
     // })
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
+      const { user, teamId } = ctx;
       const { title, documentDataId, timezone, folderId } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -338,7 +335,7 @@ export const documentRouter = router({
       }
 
       return await createDocument({
-        userId: ctx.user.id,
+        userId: user.id,
         teamId,
         title,
         documentDataId,
@@ -379,33 +376,6 @@ export const documentRouter = router({
       });
 
       return ZGenericSuccessResponse;
-    }),
-
-  /**
-   * @public
-   */
-  moveDocumentToTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/move',
-        summary: 'Move document',
-        description: 'Move a document from your personal account to a team',
-        tags: ['Document'],
-      },
-    })
-    .input(ZMoveDocumentToTeamSchema)
-    .output(ZMoveDocumentToTeamResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
-      const userId = ctx.user.id;
-
-      return await moveDocumentToTeam({
-        documentId,
-        teamId,
-        userId,
-        requestMetadata: ctx.metadata,
-      });
     }),
 
   /**

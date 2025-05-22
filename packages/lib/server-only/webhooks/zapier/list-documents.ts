@@ -4,7 +4,6 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
-import { getWebhooksByUserId } from '../get-webhooks-by-user-id';
 import { validateApiToken } from './validateApiToken';
 
 export const listDocumentsHandler = async (req: Request) => {
@@ -21,23 +20,17 @@ export const listDocumentsHandler = async (req: Request) => {
 
     const documents = await findDocuments({
       userId: userId ?? user.id,
-      teamId: teamId ?? undefined,
+      teamId,
       perPage: 1,
     });
 
     const recipients = await getRecipientsForDocument({
       documentId: documents.data[0].id,
       userId: userId ?? user.id,
-      teamId: teamId ?? undefined,
+      teamId,
     });
 
-    if (userId) {
-      allWebhooks = await getWebhooksByUserId(userId);
-    }
-
-    if (teamId) {
-      allWebhooks = await getWebhooksByTeamId(teamId, user.id);
-    }
+    allWebhooks = await getWebhooksByTeamId(teamId, user.id);
 
     if (documents && documents.data.length > 0 && allWebhooks.length > 0 && recipients.length > 0) {
       const testWebhook = {

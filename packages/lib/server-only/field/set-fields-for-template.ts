@@ -16,9 +16,11 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type SetFieldsForTemplateOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   fields: {
     id?: number | null;
@@ -42,21 +44,7 @@ export const setFieldsForTemplate = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
   });
 

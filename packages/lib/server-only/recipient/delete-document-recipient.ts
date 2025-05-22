@@ -16,10 +16,12 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEmailContext } from '../email/get-email-context';
 
 export interface DeleteDocumentRecipientOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipientId: number;
   requestMetadata: ApiRequestMetadata;
 }
@@ -37,21 +39,7 @@ export const deleteDocumentRecipient = async ({
           id: recipientId,
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       documentMeta: true,
@@ -137,12 +125,21 @@ export const deleteDocumentRecipient = async ({
       assetBaseUrl,
     });
 
+    const { branding, settings } = await getEmailContext({
+      source: {
+        type: 'team',
+        teamId: document.teamId,
+      },
+    });
+
+    const lang = document.documentMeta?.language ?? settings.documentLanguage;
+
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+      renderEmailWithI18N(template, { lang, branding }),
+      renderEmailWithI18N(template, { lang, branding, plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance(document.documentMeta?.language);
+    const i18n = await getI18nInstance(lang);
 
     await mailer.sendMail({
       to: {

@@ -3,10 +3,13 @@ import { DocumentSource, type RecipientRole } from '@prisma/client';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamSettings } from '../team/get-team-settings';
+
 export type CreateDocumentFromTemplateLegacyOptions = {
   templateId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipients?: {
     name?: string;
     email: string;
@@ -27,38 +30,24 @@ export const createDocumentFromTemplateLegacy = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       recipients: true,
       fields: true,
       templateDocumentData: true,
       templateMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
   if (!template) {
     throw new Error('Template not found.');
   }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -76,7 +65,7 @@ export const createDocumentFromTemplateLegacy = async ({
       userId,
       teamId: template.teamId,
       title: template.title,
-      visibility: template.team?.teamGlobalSettings?.documentVisibility,
+      visibility: settings.documentVisibility,
       documentDataId: documentData.id,
       useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
       recipients: {
@@ -96,8 +85,7 @@ export const createDocumentFromTemplateLegacy = async ({
           dateFormat: template.templateMeta?.dateFormat,
           redirectUrl: template.templateMeta?.redirectUrl,
           signingOrder: template.templateMeta?.signingOrder ?? undefined,
-          language:
-            template.templateMeta?.language || template.team?.teamGlobalSettings?.documentLanguage,
+          language: template.templateMeta?.language || settings.documentLanguage,
           typedSignatureEnabled: template.templateMeta?.typedSignatureEnabled,
           uploadSignatureEnabled: template.templateMeta?.uploadSignatureEnabled,
           drawSignatureEnabled: template.templateMeta?.drawSignatureEnabled,

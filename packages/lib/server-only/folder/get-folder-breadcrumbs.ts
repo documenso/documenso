@@ -5,10 +5,11 @@ import { prisma } from '@documenso/prisma';
 
 import { DocumentVisibility } from '../../types/document-visibility';
 import type { TFolderType } from '../../types/folder-type';
+import { getTeamById } from '../team/get-team';
 
 export interface GetFolderBreadcrumbsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   folderId: string;
   type?: TFolderType;
 }
@@ -19,39 +20,9 @@ export const getFolderBreadcrumbs = async ({
   folderId,
   type,
 }: GetFolderBreadcrumbsOptions) => {
-  let teamMemberRole = null;
+  const team = await getTeamById({ userId, teamId });
 
-  if (teamId !== undefined) {
-    try {
-      const team = await prisma.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
-        },
-        include: {
-          members: {
-            where: {
-              userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-
-      teamMemberRole = team.members[0].role;
-    } catch (error) {
-      console.error('Error finding team:', error);
-      return [];
-    }
-  }
-
-  const visibilityFilters = match(teamMemberRole)
+  const visibilityFilters = match(team.currentTeamRole)
     .with(TeamMemberRole.ADMIN, () => ({
       visibility: {
         in: [

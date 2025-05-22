@@ -5,32 +5,27 @@ import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { Link, Outlet } from 'react-router';
 
-import { TEAM_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
+import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
-import { PortalComponent } from '~/components/general/portal';
-import { TeamLayoutBillingBanner } from '~/components/general/teams/team-layout-billing-banner';
-import { TeamProvider } from '~/providers/team';
+import { useOptionalCurrentTeam } from '~/providers/team';
 
-import type { Route } from './+types/_layout';
-
-export default function Layout({ params }: Route.ComponentProps) {
-  const { teams } = useSession();
-
-  const currentTeam = teams.find((team) => team.url === params.teamUrl);
+export default function Layout() {
+  const team = useOptionalCurrentTeam();
+  const organisation = useOptionalCurrentOrganisation();
 
   const limits = useMemo(() => {
-    if (!currentTeam) {
+    if (!organisation) {
       return undefined;
     }
 
     if (
-      currentTeam?.subscription &&
-      currentTeam.subscription.status === SubscriptionStatus.INACTIVE
+      organisation?.subscription &&
+      organisation.subscription.status === SubscriptionStatus.INACTIVE
     ) {
       return {
         quota: {
@@ -47,12 +42,12 @@ export default function Layout({ params }: Route.ComponentProps) {
     }
 
     return {
-      quota: TEAM_PLAN_LIMITS,
-      remaining: TEAM_PLAN_LIMITS,
+      quota: PAID_PLAN_LIMITS,
+      remaining: PAID_PLAN_LIMITS,
     };
-  }, [currentTeam?.subscription, currentTeam?.id]);
+  }, [organisation?.subscription]);
 
-  if (!currentTeam) {
+  if (!team) {
     return (
       <GenericErrorLayout
         errorCode={404}
@@ -76,29 +71,14 @@ export default function Layout({ params }: Route.ComponentProps) {
   }
 
   const trpcHeaders = {
-    'x-team-Id': currentTeam.id.toString(),
+    'x-team-Id': team.id.toString(),
   };
 
   return (
-    <TeamProvider team={currentTeam}>
-      <LimitsProvider initialValue={limits} teamId={currentTeam.id}>
-        <TrpcProvider headers={trpcHeaders}>
-          {currentTeam?.subscription &&
-            currentTeam.subscription.status !== SubscriptionStatus.ACTIVE && (
-              <PortalComponent target="portal-header">
-                <TeamLayoutBillingBanner
-                  subscriptionStatus={currentTeam.subscription.status}
-                  teamId={currentTeam.id}
-                  userRole={currentTeam.currentTeamMember.role}
-                />
-              </PortalComponent>
-            )}
-
-          <main className="mt-8 pb-8 md:mt-12 md:pb-12">
-            <Outlet />
-          </main>
-        </TrpcProvider>
+    <TrpcProvider headers={trpcHeaders}>
+      <LimitsProvider initialValue={limits} teamId={team.id}>
+        <Outlet />
       </LimitsProvider>
-    </TeamProvider>
+    </TrpcProvider>
   );
 }

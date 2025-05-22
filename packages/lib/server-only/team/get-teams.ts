@@ -1,53 +1,80 @@
-import type { z } from 'zod';
+import type { Prisma } from '@prisma/client';
+import { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { SubscriptionSchema } from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
-import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
+import { TeamMemberRole } from '@documenso/prisma/generated/types';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+
+import { getHighestTeamRoleInGroup } from '../../utils/teams';
 
 export type GetTeamsOptions = {
   userId: number;
+  teamId?: number;
 };
 
 export const ZGetTeamsResponseSchema = TeamSchema.extend({
-  currentTeamMember: TeamMemberSchema.pick({
-    role: true,
-  }),
-  subscription: SubscriptionSchema.pick({
-    status: true,
-  }).nullable(),
+  teamRole: z.nativeEnum(TeamMemberRole),
 }).array();
 
 export type TGetTeamsResponse = z.infer<typeof ZGetTeamsResponseSchema>;
 
-export const getTeams = async ({ userId }: GetTeamsOptions): Promise<TGetTeamsResponse> => {
-  const teams = await prisma.team.findMany({
-    where: {
-      members: {
-        some: {
-          userId,
+export const getTeams = async ({ userId, teamId }: GetTeamsOptions) => {
+  let whereQuery: Prisma.TeamWhereInput = {
+    teamGroups: {
+      some: {
+        organisationGroup: {
+          organisationGroupMembers: {
+            some: {
+              organisationMember: {
+                userId,
+              },
+            },
+          },
         },
       },
     },
-    include: {
-      subscription: {
-        select: {
-          status: true,
+  };
+
+  if (teamId) {
+    whereQuery = {
+      teamGroups: {
+        some: {
+          teamId,
+          organisationGroup: {
+            organisationGroupMembers: {
+              some: {
+                organisationMember: {
+                  userId,
+                },
+              },
+            },
+          },
         },
       },
-      members: {
+    };
+  }
+
+  const teams = await prisma.team.findMany({
+    where: whereQuery,
+    include: {
+      teamGroups: {
         where: {
-          userId,
-        },
-        select: {
-          role: true,
+          organisationGroup: {
+            organisationGroupMembers: {
+              some: {
+                organisationMember: {
+                  userId,
+                },
+              },
+            },
+          },
         },
       },
     },
   });
 
-  return teams.map(({ members, ...team }) => ({
+  return teams.map((team) => ({
     ...team,
-    currentTeamMember: members[0],
+    currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
   }));
 };

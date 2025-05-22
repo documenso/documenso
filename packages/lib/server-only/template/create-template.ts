@@ -5,10 +5,12 @@ import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//Tem
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamSettings } from '../team/get-team-settings';
 
 export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const ZCreateTemplateResponseSchema = TemplateSchema;
@@ -22,47 +24,19 @@ export const createTemplate = async ({
   templateDocumentDataId,
   folderId,
 }: CreateTemplateOptions) => {
-  let team = null;
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery(teamId, userId),
+  });
 
-  if (teamId) {
-    team = await prisma.team.findFirst({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-      include: {
-        teamGlobalSettings: true,
-      },
-    });
-
-    if (!team) {
-      throw new AppError(AppErrorCode.NOT_FOUND);
-    }
+  if (!team) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
   if (folderId) {
     const folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
-              userId,
-              teamId: null,
-            }),
+        teamId: team.id,
       },
     });
 
@@ -73,9 +47,10 @@ export const createTemplate = async ({
     }
   }
 
-  if (teamId && !team) {
-    throw new AppError(AppErrorCode.NOT_FOUND);
-  }
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   return await prisma.template.create({
     data: {
@@ -86,10 +61,10 @@ export const createTemplate = async ({
       folderId: folderId,
       templateMeta: {
         create: {
-          language: team?.teamGlobalSettings?.documentLanguage,
-          typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
-          uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
-          drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
+          language: settings.documentLanguage,
+          typedSignatureEnabled: settings.typedSignatureEnabled,
+          uploadSignatureEnabled: settings.uploadSignatureEnabled,
+          drawSignatureEnabled: settings.drawSignatureEnabled,
         },
       },
     },

@@ -7,6 +7,7 @@ import { AlertTriangle, Plus } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 
@@ -43,6 +44,8 @@ export const DocumentDropzone = ({
   ...props
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
+
+  const organisation = useCurrentOrganisation();
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -158,7 +161,7 @@ export const DocumentDropzone = ({
 
           {disabled && IS_BILLING_ENABLED() && (
             <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
-              <Link to="/settings/billing">
+              <Link to={`/org/${organisation.url}/settings/billing`}>
                 <Trans>Upgrade</Trans>
               </Link>
             </Button>

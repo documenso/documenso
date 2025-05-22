@@ -3,6 +3,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { sendTeamEmailVerificationEmail } from './create-team-email-verification';
 
 export type ResendTeamMemberInvitationOptions = {
@@ -17,32 +18,21 @@ export const resendTeamEmailVerification = async ({
   userId,
   teamId,
 }: ResendTeamMemberInvitationOptions): Promise<void> => {
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+    include: {
+      emailVerification: true,
+    },
+  });
+
+  if (!team) {
+    throw new AppError('TeamNotFound', {
+      message: 'User is not a member of the team.',
+    });
+  }
+
   await prisma.$transaction(
     async (tx) => {
-      const team = await tx.team.findUniqueOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-              role: {
-                in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-              },
-            },
-          },
-        },
-        include: {
-          emailVerification: true,
-          teamGlobalSettings: true,
-        },
-      });
-
-      if (!team) {
-        throw new AppError('TeamNotFound', {
-          message: 'User is not a member of the team.',
-        });
-      }
-
       const { emailVerification } = team;
 
       if (!emailVerification) {

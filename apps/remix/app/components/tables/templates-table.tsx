@@ -8,6 +8,7 @@ import { Link } from 'react-router';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import type { TFindTemplatesResponse } from '@documenso/trpc/server/template-router/schema';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
@@ -19,7 +20,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 import { TemplateType } from '~/components/general/template/template-type';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { TemplateUseDialog } from '../dialogs/template-use-dialog';
 import { TemplateDirectLinkBadge } from '../general/template/template-direct-link-badge';
@@ -45,7 +46,8 @@ export const TemplatesTable = ({
   const { _, i18n } = useLingui();
   const { remaining } = useLimits();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
+  const organisation = useCurrentOrganisation();
 
   const [isPending, startTransition] = useTransition();
 
@@ -54,10 +56,6 @@ export const TemplatesTable = ({
   const formatTemplateLink = (row: TemplatesTableRow) => {
     const isCurrentTeamTemplate = team?.url && row.team?.url === team?.url;
     const path = formatTemplatesPath(isCurrentTeamTemplate ? team?.url : undefined);
-
-    if (row.folderId) {
-      return `${path}/f/${row.folderId}/${row.id}`;
-    }
 
     return `${path}/${row.id}`;
   };
@@ -208,7 +206,10 @@ export const TemplatesTable = ({
           <AlertDescription className="mt-2">
             <Trans>
               You have reached your document limit.{' '}
-              <Link className="underline underline-offset-4" to="/settings/billing">
+              <Link
+                className="underline underline-offset-4"
+                to={`/org/${organisation.url}/settings/billing`}
+              >
                 Upgrade your account to continue!
               </Link>
             </Trans>

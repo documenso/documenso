@@ -1,9 +1,11 @@
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export interface GetFieldsForDocumentOptions {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }
 
 export type DocumentField = Awaited<ReturnType<typeof getFieldsForDocument>>[number];
@@ -15,22 +17,10 @@ export const getFieldsForDocument = async ({
 }: GetFieldsForDocumentOptions) => {
   const fields = await prisma.field.findMany({
     where: {
-      documentId,
-      document: teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          },
+      document: {
+        id: documentId,
+        team: buildTeamWhereQuery(teamId, userId),
+      },
     },
     include: {
       signature: true,

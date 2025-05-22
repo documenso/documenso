@@ -12,7 +12,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getEmailContext } from '../email/get-email-context';
 
 export interface SendDeleteEmailOptions {
   documentId: number;
@@ -27,11 +27,6 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     include: {
       user: true,
       documentMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -49,6 +44,13 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     return;
   }
 
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: document.teamId,
+    },
+  });
+
   const { email, name } = document.user;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
@@ -59,20 +61,18 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     assetBaseUrl,
   });
 
-  const branding = document.team?.teamGlobalSettings
-    ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-    : undefined;
+  const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+    renderEmailWithI18N(template, { lang, branding }),
     renderEmailWithI18N(template, {
-      lang: document.documentMeta?.language,
+      lang,
       branding,
       plainText: true,
     }),
   ]);
 
-  const i18n = await getI18nInstance();
+  const i18n = await getI18nInstance(lang);
 
   await mailer.sendMail({
     to: {
