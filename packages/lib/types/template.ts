@@ -1,5 +1,6 @@
 import type { z } from 'zod';
 
+import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
@@ -64,6 +65,14 @@ export const ZTemplateSchema = TemplateSchema.pick({
   }),
   recipients: ZRecipientLiteSchema.array(),
   fields: ZFieldSchema.array(),
+  attachments: AttachmentSchema.pick({
+    id: true,
+    label: true,
+    url: true,
+    type: true,
+  })
+    .array()
+    .optional(),
   folder: FolderSchema.pick({
     id: true,
     name: true,
