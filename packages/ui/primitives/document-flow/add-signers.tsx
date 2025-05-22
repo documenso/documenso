@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -57,6 +57,36 @@ export type AddSignersFormProps = {
   onSubmit: (_data: TAddSignersFormSchema) => void;
   onAutoSave: (_data: TAddSignersFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
+};
+
+// TODO: move this hook to a separate file
+const useAutoSave = (saveFn: (data: TAddSignersFormSchema) => Promise<void>) => {
+  const saveTimeoutRef = useRef<NodeJS.Timeout>();
+
+  const saveFormData = async (data: TAddSignersFormSchema) => {
+    try {
+      await saveFn(data);
+    } catch (error) {
+      console.error('Auto-save failed:', error);
+    }
+  };
+
+  const scheduleSave = useCallback((data: TAddSignersFormSchema) => {
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
+    saveTimeoutRef.current = setTimeout(() => void saveFormData(data), 2000);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  return { scheduleSave };
 };
 
 export const AddSignersFormPartial = ({
@@ -398,56 +428,27 @@ export const AddSignersFormPartial = ({
       role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
     }));
 
-    form.setValue('signers', updatedSigners, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
-    form.setValue('allowDictateNextSigner', false, {
-      shouldValidate: true,
-      shouldDirty: true,
-    });
+    form.setValue('signers', updatedSigners);
+    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
+    form.setValue('allowDictateNextSigner', false);
   }, [form]);
-
-  const timeoutRef = useRef<NodeJS.Timeout>();
-
-  const saveFormData = async (formData: TAddSignersFormSchema) => {
-    try {
-      await onAutoSave(formData);
-    } catch (error) {
-      console.error('Error auto-saving form:', error);
-    }
-  };
-
-  const debouncedSaveFormData = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-
-    timeoutRef.current = setTimeout(() => {
-      const latestFormData = form.getValues();
-      void saveFormData(latestFormData);
-    }, 1000);
-  }, [form, saveFormData]);
 
   const emptySigners = useCallback(
     () => form.getValues('signers').filter((signer) => signer.email === ''),
     [form],
   );
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
   const handleOnBlur = useCallback(async () => {
-    // Trigger validation before checking form state
     const isFormValid = await form.trigger();
     const { isDirty } = form.formState;
+    const formData = form.getValues();
 
-    // Only save if the form is valid and has been modified and there are no empty signers
     if (isFormValid && isDirty && emptySigners().length === 0) {
-      debouncedSaveFormData();
+      scheduleSave(formData);
     }
-  }, [form, emptySigners, debouncedSaveFormData]);
+  }, [form, emptySigners, scheduleSave]);
 
   return (
     <>
@@ -476,7 +477,7 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                      onBlurCapture={handleOnBlur}
+                      onBlur={handleOnBlur}
                       onCheckedChange={(checked) => {
                         if (!checked && hasAssistantRole) {
                           setShowSigningOrderConfirmation(true);
