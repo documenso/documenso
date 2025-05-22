@@ -230,13 +230,21 @@ test('[TEAMS]: resend pending team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=PENDING`,
   });
 
-  await page.getByRole('row').getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Resend' }).click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
 
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Resend' })).toBeVisible();
+  }).toPass();
+
+  await page.getByRole('menuitem').filter({ hasText: 'Resend' }).click();
   await page.getByLabel('test.documenso.com').first().click();
   await page.getByRole('button', { name: 'Send reminder' }).click();
 
-  await expect(page.getByRole('status')).toContainText('Document re-sent');
+  await expect(
+    page.getByRole('status').filter({ hasText: 'Document re-sent' }).first(),
+  ).toBeVisible();
 });
 
 test('[TEAMS]: delete draft team document', async ({ page }) => {
@@ -248,7 +256,13 @@ test('[TEAMS]: delete draft team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=DRAFT`,
   });
 
-  await page.getByRole('row').getByRole('button').nth(1).click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
+
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  }).toPass();
 
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByRole('button', { name: 'Delete' }).click();
@@ -286,7 +300,13 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=PENDING`,
   });
 
-  await page.getByRole('row').getByRole('button').nth(1).click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
+
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  }).toPass();
 
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
@@ -325,7 +345,13 @@ test('[TEAMS]: delete completed team document', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents?status=COMPLETED`,
   });
 
-  await page.getByRole('row').getByRole('button').nth(2).click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
+
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
+  }).toPass();
 
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
