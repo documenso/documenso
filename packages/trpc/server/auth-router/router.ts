@@ -6,6 +6,7 @@ import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/aut
 import { createPasskeySigninOptions } from '@documenso/lib/server-only/auth/create-passkey-signin-options';
 import { deletePasskey } from '@documenso/lib/server-only/auth/delete-passkey';
 import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
+import { getActiveUserSessions } from '@documenso/lib/server-only/auth/get-active-user-sessions';
 import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
 import { nanoid } from '@documenso/lib/universal/id';
 
@@ -98,4 +99,10 @@ export const authRouter = router({
         requestMetadata: ctx.metadata.requestMetadata,
       });
     }),
+
+  getActiveSessions: authenticatedProcedure.query(async ({ ctx }) => {
+    return await getActiveUserSessions({
+      id: ctx.user.id,
+    });
+  }),
 });
