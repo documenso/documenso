@@ -1,17 +1,17 @@
 import { expect, test } from '@playwright/test';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { seedTeam, seedTeamEmailVerification } from '@documenso/prisma/seed/teams';
+import { seedTeamEmailVerification } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test('[TEAMS]: send team email request', async ({ page }) => {
-  const team = await seedTeam();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: user.email,
     password: 'password',
     redirectPath: `/t/${team.url}/settings`,
   });
@@ -32,9 +32,7 @@ test('[TEAMS]: send team email request', async ({ page }) => {
 });
 
 test('[TEAMS]: accept team email request', async ({ page }) => {
-  const team = await seedTeam({
-    createTeamMembers: 1,
-  });
+  const { team } = await seedUser();
 
   const teamEmailVerification = await seedTeamEmailVerification({
     email: `team-email-verification--${team.url}@test.documenso.com`,
@@ -46,14 +44,13 @@ test('[TEAMS]: accept team email request', async ({ page }) => {
 });
 
 test('[TEAMS]: delete team email', async ({ page }) => {
-  const team = await seedTeam({
-    createTeamMembers: 1,
-    createTeamEmail: true,
+  const { user, team } = await seedUser({
+    setTeamEmailAsOwner: true,
   });
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: user.email,
     redirectPath: `/t/${team.url}/settings`,
   });
 
@@ -66,23 +63,16 @@ test('[TEAMS]: delete team email', async ({ page }) => {
 });
 
 test('[TEAMS]: team email owner removes access', async ({ page }) => {
-  const team = await seedTeam({
-    createTeamMembers: 1,
-    createTeamEmail: true,
-  });
+  const teamEmailOwner = await seedUser();
 
-  if (!team.teamEmail) {
-    throw new Error('Not possible');
-  }
-
-  const teamEmailOwner = await seedUser({
-    email: team.teamEmail.email,
+  await seedUser({
+    teamEmail: teamEmailOwner.user.email,
   });
 
   await apiSignin({
     page,
-    email: teamEmailOwner.email,
-    redirectPath: `/settings/teams`,
+    email: teamEmailOwner.user.email,
+    redirectPath: `/settings/profile`,
   });
 
   await page.getByRole('button', { name: 'Revoke access' }).click();

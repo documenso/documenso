@@ -14,13 +14,9 @@ import { Input } from '@documenso/ui/primitives/input';
 export type SigningVolume = {
   id: number;
   name: string;
-  email: string;
   signingVolume: number;
   createdAt: Date;
   planId: string;
-  userId?: number | null;
-  teamId?: number | null;
-  isTeam: boolean;
 };
 
 type LeaderboardTableProps = {

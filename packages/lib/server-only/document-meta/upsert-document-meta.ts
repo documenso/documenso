@@ -11,10 +11,11 @@ import { prisma } from '@documenso/prisma';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export type CreateDocumentMetaOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   subject?: string;
   message?: string;
@@ -53,25 +54,14 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       documentMeta: true,
     },

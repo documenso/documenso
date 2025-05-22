@@ -48,7 +48,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
   const { revalidate } = useRevalidator();
 
   const { mutateAsync: deleteTeamEmail, isPending: isDeletingTeamEmail } =
-    trpc.team.deleteTeamEmail.useMutation({
+    trpc.team.email.delete.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),
@@ -67,7 +67,7 @@ export const TeamEmailDeleteDialog = ({ trigger, teamName, team }: TeamEmailDele
     });
 
   const { mutateAsync: deleteTeamEmailVerification, isPending: isDeletingTeamEmailVerification } =
-    trpc.team.deleteTeamEmailVerification.useMutation({
+    trpc.team.email.verification.delete.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),

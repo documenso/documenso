@@ -2,11 +2,8 @@ import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -36,10 +33,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not found', { status: 404 });
   }
 
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: template.teamId });
+
+  const allowEmbedSigningWhitelabel = organisationClaim.flags.embedSigningWhiteLabel;
+  const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
+
   // TODO: Make this more robust, we need to ensure the owner is either
   // TODO: the member of a team that has an active subscription, is an early
   // TODO: adopter or is an enterprise user.
-  if (IS_BILLING_ENABLED() && !template.teamId) {
+  if (IS_BILLING_ENABLED() && !organisationClaim.flags.embedSigning) {
     throw data(
       {
         type: 'embed-paywall',
@@ -55,18 +57,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
   });
-
-  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
-    isDocumentPlatform(template),
-    isUserEnterprise({
-      userId: template.userId,
-      teamId: template.teamId ?? undefined,
-    }),
-    isUserCommunityPlan({
-      userId: template.userId,
-      teamId: template.teamId ?? undefined,
-    }),
-  ]);
 
   const isAccessAuthValid = match(derivedRecipientAccessAuth)
     .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
@@ -98,12 +88,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
 
-  const team = template.teamId
-    ? await getTeamById({ teamId: template.teamId, userId: template.userId }).catch(() => null)
-    : null;
-
-  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
-
   return superLoaderJson({
     token,
     user,
@@ -111,24 +95,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     recipient,
     fields,
     hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
+    allowEmbedSigningWhitelabel,
   });
 }
 
 export default function EmbedDirectTemplatePage() {
-  const {
-    token,
-    user,
-    template,
-    recipient,
-    fields,
-    hidePoweredBy,
-    isPlatformDocument,
-    isEnterpriseDocument,
-    isCommunityPlan,
-  } = useSuperLoaderData<typeof loader>();
+  const { token, user, template, recipient, fields, hidePoweredBy, allowEmbedSigningWhitelabel } =
+    useSuperLoaderData<typeof loader>();
 
   return (
     <DocumentSigningProvider
@@ -152,10 +125,8 @@ export default function EmbedDirectTemplatePage() {
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
-            hidePoweredBy={
-              isCommunityPlan || isPlatformDocument || isEnterpriseDocument || hidePoweredBy
-            }
-            allowWhiteLabelling={isCommunityPlan || isPlatformDocument || isEnterpriseDocument}
+            hidePoweredBy={hidePoweredBy}
+            allowWhiteLabelling={allowEmbedSigningWhitelabel}
           />
         </DocumentSigningRecipientProvider>
       </DocumentSigningAuthProvider>

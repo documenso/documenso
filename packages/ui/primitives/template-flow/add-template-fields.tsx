@@ -71,7 +71,7 @@ export type AddTemplateFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddTemplateFieldsFormPartial = ({
@@ -510,7 +510,6 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>

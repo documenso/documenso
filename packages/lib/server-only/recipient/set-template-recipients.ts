@@ -1,7 +1,6 @@
 import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import {
   DIRECT_TEMPLATE_RECIPIENT_EMAIL,
   DIRECT_TEMPLATE_RECIPIENT_NAME,
@@ -15,10 +14,11 @@ import {
 } from '../../types/document-auth';
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type SetTemplateRecipientsOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   recipients: {
     id?: number;
@@ -39,24 +39,19 @@ export const setTemplateRecipients = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       directLink: true,
+      team: {
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -67,17 +62,10 @@ export const setTemplateRecipients = async ({
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (recipientsHaveActionAuth && !template.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const normalizedRecipients = recipients.map((recipient) => {

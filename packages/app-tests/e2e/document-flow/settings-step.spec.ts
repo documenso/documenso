@@ -129,13 +129,13 @@ test.describe('[EE_ONLY]', () => {
 });
 
 test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   // Set title.
@@ -163,21 +163,21 @@ test('[DOCUMENT_FLOW]: add settings', async ({ page }) => {
 });
 
 test('[DOCUMENT_FLOW]: title should be disabled depending on document status', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const pendingDocument = await seedPendingDocument(user, []);
-  const draftDocument = await seedDraftDocument(user, []);
+  const pendingDocument = await seedPendingDocument(user, team.id, []);
+  const draftDocument = await seedDraftDocument(user, team.id, []);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${pendingDocument.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${pendingDocument.id}/edit`,
   });
 
   // Should be disabled for pending documents.
   await expect(page.getByLabel('Title')).toBeDisabled();
 
   // Should be enabled for draft documents.
-  await page.goto(`/documents/${draftDocument.id}/edit`);
+  await page.goto(`/t/${team.url}/documents/${draftDocument.id}/edit`);
   await expect(page.getByLabel('Title')).toBeEnabled();
 });

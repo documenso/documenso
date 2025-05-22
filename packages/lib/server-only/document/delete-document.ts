@@ -1,14 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type {
-  Document,
-  DocumentMeta,
-  Recipient,
-  Team,
-  TeamGlobalSettings,
-  User,
-} from '@prisma/client';
+import type { Document, DocumentMeta, Recipient, User } from '@prisma/client';
 import { DocumentStatus, SendStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
@@ -29,13 +22,14 @@ import type { ApiRequestMetadata } from '../../universal/extract-request-metadat
 import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getEmailContext } from '../email/get-email-context';
+import { getMemberRoles } from '../team/get-member-roles';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
   id: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -64,12 +58,6 @@ export const deleteDocument = async ({
     include: {
       recipients: true,
       documentMeta: true,
-      team: {
-        include: {
-          members: true,
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -79,8 +67,17 @@ export const deleteDocument = async ({
     });
   }
 
+  const isUserTeamMember = await getMemberRoles({
+    teamId: document.teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
+  })
+    .then(() => true)
+    .catch(() => false);
+
   const isUserOwner = document.userId === userId;
-  const isUserTeamMember = document.team?.members.some((member) => member.userId === userId);
   const userRecipient = document.recipients.find((recipient) => recipient.email === user.email);
 
   if (!isUserOwner && !isUserTeamMember && !userRecipient) {
@@ -94,7 +91,6 @@ export const deleteDocument = async ({
     await handleDocumentOwnerDelete({
       document,
       user,
-      team: document.team,
       requestMetadata,
     });
   }
@@ -142,11 +138,6 @@ type HandleDocumentOwnerDeleteOptions = {
     recipients: Recipient[];
     documentMeta: DocumentMeta | null;
   };
-  team?:
-    | (Team & {
-        teamGlobalSettings?: TeamGlobalSettings | null;
-      })
-    | null;
   user: User;
   requestMetadata: ApiRequestMetadata;
 };
@@ -154,12 +145,18 @@ type HandleDocumentOwnerDeleteOptions = {
 const handleDocumentOwnerDelete = async ({
   document,
   user,
-  team,
   requestMetadata,
 }: HandleDocumentOwnerDeleteOptions) => {
   if (document.deletedAt) {
     return;
   }
+
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: document.teamId,
+    },
+  });
 
   // Soft delete completed documents.
   if (isDocumentCompleted(document.status)) {
@@ -235,20 +232,18 @@ const handleDocumentOwnerDelete = async ({
         assetBaseUrl,
       });
 
-      const branding = team?.teamGlobalSettings
-        ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
-        : undefined;
+      const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang: document.documentMeta?.language, branding }),
+        renderEmailWithI18N(template, { lang, branding }),
         renderEmailWithI18N(template, {
-          lang: document.documentMeta?.language,
+          lang,
           branding,
           plainText: true,
         }),
       ]);
 
-      const i18n = await getI18nInstance(document.documentMeta?.language);
+      const i18n = await getI18nInstance(lang);
 
       await mailer.sendMail({
         to: {

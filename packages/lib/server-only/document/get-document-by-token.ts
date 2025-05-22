@@ -85,6 +85,7 @@ export const getDocumentAndSenderByToken = async ({
         select: {
           name: true,
           teamEmail: true,
+          // Todo: orgs, where does this lead to?
           teamGlobalSettings: {
             select: {
               includeSenderDetails: true,

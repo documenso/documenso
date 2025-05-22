@@ -1,5 +1,5 @@
 import type { Context, Next } from 'hono';
-import { deleteCookie, setCookie } from 'hono/cookie';
+import { setCookie } from 'hono/cookie';
 
 import { AppDebugger } from '@documenso/lib/utils/debugger';
 
@@ -35,15 +35,6 @@ export const appMiddleware = async (c: Context, next: Next) => {
   debug.log('Path', path);
 
   const pathname = path.replace('.data', '');
-  const referrer = c.req.header('referer');
-  const referrerUrl = referrer ? new URL(referrer) : null;
-  const referrerPathname = referrerUrl ? referrerUrl.pathname : null;
-
-  // Whether to reset the preferred team url cookie if the user accesses a non team page from a team page.
-  const resetPreferredTeamUrl =
-    referrerPathname &&
-    referrerPathname.startsWith('/t/') &&
-    (!pathname.startsWith('/t/') || pathname === '/');
 
   // Set the preferred team url cookie if user accesses a team page.
   if (pathname.startsWith('/t/')) {
@@ -52,15 +43,6 @@ export const appMiddleware = async (c: Context, next: Next) => {
     setCookie(c, 'preferred-team-url', pathname.split('/')[2], {
       sameSite: 'lax',
     });
-
-    return;
-  }
-
-  // Clear preferred team url cookie if user accesses a non team page from a team page.
-  if (resetPreferredTeamUrl || pathname === '/documents') {
-    debug.log('Deleting preferred team url cookie');
-
-    deleteCookie(c, 'preferred-team-url');
 
     return;
   }

@@ -1,40 +1,40 @@
 import { WebhookTriggerEvents } from '@prisma/client';
 import { z } from 'zod';
 
-export const ZGetTeamWebhooksQuerySchema = z.object({
+export const ZGetTeamWebhooksRequestSchema = z.object({
   teamId: z.number(),
 });
 
-export type TGetTeamWebhooksQuerySchema = z.infer<typeof ZGetTeamWebhooksQuerySchema>;
+export type TGetTeamWebhooksRequestSchema = z.infer<typeof ZGetTeamWebhooksRequestSchema>;
 
-export const ZCreateWebhookMutationSchema = z.object({
+export const ZCreateWebhookRequestSchema = z.object({
   webhookUrl: z.string().url(),
   eventTriggers: z
     .array(z.nativeEnum(WebhookTriggerEvents))
     .min(1, { message: 'At least one event trigger is required' }),
   secret: z.string().nullable(),
   enabled: z.boolean(),
-  teamId: z.number().optional(),
+  teamId: z.number(),
 });
 
-export type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookMutationSchema>;
+export type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookRequestSchema>;
 
-export const ZGetWebhookByIdQuerySchema = z.object({
+export const ZGetWebhookByIdRequestSchema = z.object({
   id: z.string(),
-  teamId: z.number().optional(),
+  teamId: z.number(),
 });
 
-export type TGetWebhookByIdQuerySchema = z.infer<typeof ZGetWebhookByIdQuerySchema>;
+export type TGetWebhookByIdRequestSchema = z.infer<typeof ZGetWebhookByIdRequestSchema>;
 
-export const ZEditWebhookMutationSchema = ZCreateWebhookMutationSchema.extend({
+export const ZEditWebhookRequestSchema = ZCreateWebhookRequestSchema.extend({
   id: z.string(),
 });
 
-export type TEditWebhookMutationSchema = z.infer<typeof ZEditWebhookMutationSchema>;
+export type TEditWebhookRequestSchema = z.infer<typeof ZEditWebhookRequestSchema>;
 
-export const ZDeleteWebhookMutationSchema = z.object({
+export const ZDeleteWebhookRequestSchema = z.object({
   id: z.string(),
-  teamId: z.number().optional(),
+  teamId: z.number(),
 });
 
-export type TDeleteWebhookMutationSchema = z.infer<typeof ZDeleteWebhookMutationSchema>;
+export type TDeleteWebhookRequestSchema = z.infer<typeof ZDeleteWebhookRequestSchema>;

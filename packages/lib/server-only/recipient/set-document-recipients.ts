@@ -5,7 +5,6 @@ import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -30,11 +29,12 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEmailContext } from '../email/get-email-context';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
@@ -47,33 +47,33 @@ export const setDocumentRecipients = async ({
   recipients,
   requestMetadata,
 }: SetDocumentRecipientsOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       fields: true,
       documentMeta: true,
       team: {
-        include: {
-          teamGlobalSettings: true,
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
         },
       },
+    },
+  });
+
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId,
     },
   });
 
@@ -99,17 +99,10 @@ export const setDocumentRecipients = async ({
   const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const normalizedRecipients = recipients.map((recipient) => ({
@@ -306,16 +299,14 @@ export const setDocumentRecipients = async ({
           assetBaseUrl,
         });
 
-        const branding = document.team?.teamGlobalSettings
-          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-          : undefined;
+        const lang = document.documentMeta?.language ?? settings.documentLanguage;
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-          renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+          renderEmailWithI18N(template, { lang, branding }),
+          renderEmailWithI18N(template, { lang, branding, plainText: true }),
         ]);
 
-        const i18n = await getI18nInstance(document.documentMeta?.language);
+        const i18n = await getI18nInstance(lang);
 
         await mailer.sendMail({
           to: {

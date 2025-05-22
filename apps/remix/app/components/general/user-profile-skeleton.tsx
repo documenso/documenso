@@ -1,5 +1,4 @@
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { File, User2 } from 'lucide-react';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
@@ -9,7 +8,10 @@ import { Button } from '@documenso/ui/primitives/button';
 
 export type UserProfileSkeletonProps = {
   className?: string;
-  user: Pick<User, 'name' | 'url'>;
+  user: {
+    name: string;
+    url: string;
+  };
   rows?: number;
 };
 

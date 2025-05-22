@@ -59,13 +59,13 @@ test.describe('[EE_ONLY]', () => {
 });
 
 test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   // Save the settings by going to the next step.

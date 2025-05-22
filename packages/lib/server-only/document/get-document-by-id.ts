@@ -11,7 +11,7 @@ import { getTeamById } from '../team/get-team';
 export type GetDocumentByIdOptions = {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   folderId?: string;
 };
 
@@ -21,7 +21,7 @@ export const getDocumentById = async ({
   teamId,
   folderId,
 }: GetDocumentByIdOptions) => {
-  const documentWhereInput = await getDocumentWhereInput({
+  const { documentWhereInput } = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
@@ -68,18 +68,7 @@ export const getDocumentById = async ({
 export type GetDocumentWhereInputOptions = {
   documentId: number;
   userId: number;
-  teamId?: number;
-
-  /**
-   * Whether to return a filter that allows access to both the user and team documents.
-   * This only applies if `teamId` is passed in.
-   *
-   * If true, and `teamId` is passed in, the filter will allow both team and user documents.
-   * If false, and `teamId` is passed in, the filter will only allow team documents.
-   *
-   * Defaults to false.
-   */
-  overlapUserTeamScope?: boolean;
+  teamId: number;
 };
 
 /**
@@ -91,42 +80,18 @@ export const getDocumentWhereInput = async ({
   documentId,
   userId,
   teamId,
-  overlapUserTeamScope = false,
 }: GetDocumentWhereInputOptions) => {
-  const documentWhereInput: Prisma.DocumentWhereUniqueInput = {
-    id: documentId,
-    OR: [
-      {
-        userId,
-      },
-    ],
-  };
-
-  if (teamId === undefined || !documentWhereInput.OR) {
-    return documentWhereInput;
-  }
-
   const team = await getTeamById({ teamId, userId });
 
-  // Allow access to team and user documents.
-  if (overlapUserTeamScope) {
-    documentWhereInput.OR.push({
+  const documentOrInput: Prisma.DocumentWhereInput[] = [
+    {
       teamId: team.id,
-    });
-  }
-
-  // Allow access to only team documents.
-  if (!overlapUserTeamScope) {
-    documentWhereInput.OR = [
-      {
-        teamId: team.id,
-      },
-    ];
-  }
+    },
+  ];
 
   // Allow access to documents sent to or from the team email.
   if (team.teamEmail) {
-    documentWhereInput.OR.push(
+    documentOrInput.push(
       {
         recipients: {
           some: {
@@ -142,15 +107,22 @@ export const getDocumentWhereInput = async ({
     );
   }
 
+  const documentWhereInput: Prisma.DocumentWhereUniqueInput = {
+    id: documentId,
+    OR: documentOrInput,
+  };
+
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
   });
 
+  // Todo: orgs test this
   const visibilityFilters = [
-    ...match(team.currentTeamMember?.role)
+    ...match(team.currentTeamRole)
       .with(TeamMemberRole.ADMIN, () => [
+        // Is this even needed?
         { visibility: DocumentVisibility.EVERYONE },
         { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
         { visibility: DocumentVisibility.ADMIN },
@@ -177,7 +149,10 @@ export const getDocumentWhereInput = async ({
   ];
 
   return {
-    ...documentWhereInput,
-    OR: [...visibilityFilters],
+    documentWhereInput: {
+      ...documentWhereInput,
+      OR: [...visibilityFilters],
+    },
+    team,
   };
 };

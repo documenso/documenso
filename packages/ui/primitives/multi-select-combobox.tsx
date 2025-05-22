@@ -26,6 +26,7 @@ type MultiSelectComboboxProps<T = OptionValue> = {
   enableClearAllButton?: boolean;
   enableSearch?: boolean;
   className?: string;
+  contentClassName?: string;
   loading?: boolean;
   inputPlaceholder?: MessageDescriptor;
   onChange: (_values: T[]) => void;
@@ -46,6 +47,7 @@ export function MultiSelectCombobox<T = OptionValue>({
   enableClearAllButton,
   enableSearch = true,
   className,
+  contentClassName,
   inputPlaceholder,
   loading,
   onChange,
@@ -149,7 +151,7 @@ export function MultiSelectCombobox<T = OptionValue>({
         )}
       </div>
 
-      <PopoverContent className="w-[200px] p-0">
+      <PopoverContent className={cn('z-[50000000] w-full p-0', contentClassName)}>
         <Command>
           {enableSearch && <CommandInput placeholder={inputPlaceholder && _(inputPlaceholder)} />}
           <CommandEmpty>

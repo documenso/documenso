@@ -7,7 +7,6 @@ import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
 
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
@@ -17,7 +16,7 @@ import {
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getTranslations } from '@documenso/lib/utils/i18n';
@@ -63,11 +62,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
-  const team = document.teamId
-    ? await getTeamById({ teamId: document.teamId, userId: document.userId })
-    : null;
-
-  const isPlatformDocument = await isDocumentPlatform(document);
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: document.teamId });
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
 
@@ -79,9 +74,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return {
     document,
-    team,
+    hidePoweredBy: organisationClaim.flags.hidePoweredBy,
     documentLanguage,
-    isPlatformDocument,
     auditLogs,
     messages,
   };
@@ -97,7 +91,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, team, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
+  const { document, documentLanguage, hidePoweredBy, auditLogs, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -349,7 +343,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
         </CardContent>
       </Card>
 
-      {!isPlatformDocument && !team?.teamGlobalSettings?.brandingHidePoweredBy && (
+      {!hidePoweredBy && (
         <div className="my-8 flex-row-reverse space-y-4">
           <div className="flex items-end justify-end gap-x-4">
             <div
@@ -366,7 +360,6 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
             <p className="flex-shrink-0 text-sm font-medium print:text-xs">
               {_(msg`Signing certificate provided by`)}:
             </p>
-
             <BrandingLogo className="max-h-6 print:max-h-4" />
           </div>
         </div>

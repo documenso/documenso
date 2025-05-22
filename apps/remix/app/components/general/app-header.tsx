@@ -1,12 +1,11 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
-import { MenuIcon, SearchIcon } from 'lucide-react';
-import { Link, useLocation, useParams } from 'react-router';
+import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
+import { Link, useParams } from 'react-router';
 
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
 import { getRootHref } from '@documenso/lib/utils/params';
 import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 
@@ -15,14 +14,10 @@ import { AppNavDesktop } from './app-nav-desktop';
 import { AppNavMobile } from './app-nav-mobile';
 import { MenuSwitcher } from './menu-switcher';
 
-export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
-  user: SessionUser;
-  teams: TGetTeamsResponse;
-};
+export type HeaderProps = HTMLAttributes<HTMLDivElement>;
 
-export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
+export const Header = ({ className, ...props }: HeaderProps) => {
   const params = useParams();
-  const { pathname } = useLocation();
 
   const [isCommandMenuOpen, setIsCommandMenuOpen] = useState(false);
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
@@ -38,15 +33,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  const isPathTeamUrl = (teamUrl: string) => {
-    if (!pathname || !pathname.startsWith(`/t/`)) {
-      return false;
-    }
-
-    return pathname.split('/')[2] === teamUrl;
-  };
-
-  const selectedTeam = teams?.find((team) => isPathTeamUrl(team.url));
+  const unreadCount = 1;
 
   return (
     <header
@@ -59,7 +46,7 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
     >
       <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
         <Link
-          to={`${getRootHref(params, { returnEmptyRootString: true })}/documents`}
+          to={`${getRootHref(params, { returnEmptyRootString: true })}`}
           className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
           <BrandingLogo className="h-6 w-auto" />
@@ -67,11 +54,20 @@ export const Header = ({ className, user, teams, ...props }: HeaderProps) => {
 
         <AppNavDesktop setIsCommandMenuOpen={setIsCommandMenuOpen} />
 
-        <div
-          className="flex gap-x-4 md:ml-8"
-          title={selectedTeam ? selectedTeam.name : (user.name ?? '')}
-        >
-          <MenuSwitcher user={user} teams={teams} />
+        <Button asChild variant="outline" className="relative h-10 w-10 rounded-lg">
+          <Link to="/inbox" className="relative block h-10 w-10">
+            <InboxIcon className="text-muted-foreground hover:text-foreground h-5 w-5 flex-shrink-0 transition-colors" />
+
+            {unreadCount > 0 && (
+              <span className="bg-muted text-muted-foreground absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full text-[10px]">
+                {unreadCount}
+              </span>
+            )}
+          </Link>
+        </Button>
+
+        <div className="md:ml-4">
+          <MenuSwitcher />
         </div>
 
         <div className="flex flex-row items-center space-x-4 md:hidden">

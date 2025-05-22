@@ -22,7 +22,7 @@ export const useLimits = () => {
 
 export type LimitsProviderProps = {
   initialValue?: TLimitsResponseSchema;
-  teamId?: number;
+  teamId: number;
   children?: React.ReactNode;
 };
 

@@ -2,7 +2,6 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import type { Prisma } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
@@ -22,14 +21,14 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { isDocumentCompleted } from '../../utils/document';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { getEmailContext } from '../email/get-email-context';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
   userId: number;
   recipients: number[];
-  teamId?: number;
+  teamId: number;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -46,7 +45,7 @@ export const resendDocument = async ({
     },
   });
 
-  const documentWhereInput: Prisma.DocumentWhereUniqueInput = await getDocumentWhereInput({
+  const { documentWhereInput } = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
@@ -68,7 +67,6 @@ export const resendDocument = async ({
         select: {
           teamEmail: true,
           name: true,
-          teamGlobalSettings: true,
         },
       },
     },
@@ -101,13 +99,21 @@ export const resendDocument = async ({
     return;
   }
 
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: document.teamId,
+    },
+  });
+
   await Promise.all(
     document.recipients.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }
 
-      const i18n = await getI18nInstance(document.documentMeta?.language);
+      const lang = document.documentMeta?.language ?? settings.documentLanguage;
+      const i18n = await getI18nInstance(lang);
 
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -161,17 +167,13 @@ export const resendDocument = async ({
         teamName: document.team?.name,
       });
 
-      const branding = document.team?.teamGlobalSettings
-        ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-        : undefined;
-
       const [html, text] = await Promise.all([
         renderEmailWithI18N(template, {
-          lang: document.documentMeta?.language,
+          lang,
           branding,
         }),
         renderEmailWithI18N(template, {
-          lang: document.documentMeta?.language,
+          lang,
           branding,
           plainText: true,
         }),

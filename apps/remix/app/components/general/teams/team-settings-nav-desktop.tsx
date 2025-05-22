@@ -1,10 +1,9 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Settings, Settings2, Users, Webhook } from 'lucide-react';
+import { Braces, Globe2Icon, GroupIcon, Settings, Settings2, Users, Webhook } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -20,9 +19,9 @@ export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavD
   const preferencesPath = `/t/${teamUrl}/settings/preferences`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
+  const groupsPath = `/t/${teamUrl}/settings/groups`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
   const webhooksPath = `/t/${teamUrl}/settings/webhooks`;
-  const billingPath = `/t/${teamUrl}/settings/billing`;
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)} {...props}>
@@ -76,6 +75,16 @@ export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavD
         </Button>
       </Link>
 
+      <Link to={groupsPath}>
+        <Button
+          variant="ghost"
+          className={cn('w-full justify-start', pathname?.startsWith(groupsPath) && 'bg-secondary')}
+        >
+          <GroupIcon className="mr-2 h-5 w-5" />
+          <Trans>Groups</Trans>
+        </Button>
+      </Link>
+
       <Link to={tokensPath}>
         <Button
           variant="ghost"
@@ -98,21 +107,6 @@ export const TeamSettingsNavDesktop = ({ className, ...props }: TeamSettingsNavD
           <Trans>Webhooks</Trans>
         </Button>
       </Link>
-
-      {IS_BILLING_ENABLED() && (
-        <Link to={billingPath}>
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith(billingPath) && 'bg-secondary',
-            )}
-          >
-            <CreditCard className="mr-2 h-5 w-5" />
-            <Trans>Billing</Trans>
-          </Button>
-        </Link>
-      )}
     </div>
   );
 };

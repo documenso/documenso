@@ -19,7 +19,7 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
@@ -42,7 +42,7 @@ export const DocumentsTable = ({
 }: DocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -180,9 +180,7 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
   const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
-  const formatPath = row.folderId
-    ? `${documentsPath}/f/${row.folderId}/${row.id}`
-    : `${documentsPath}/${row.id}`;
+  const formatPath = `${documentsPath}/${row.id}`;
 
   return match({
     isOwner,

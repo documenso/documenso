@@ -1,10 +1,9 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Key, Settings2, User, Webhook } from 'lucide-react';
+import { Braces, Globe2Icon, GroupIcon, Key, Settings2, User, Webhook } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -20,9 +19,9 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
   const preferencesPath = `/t/${teamUrl}/preferences`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
+  const groupsPath = `/t/${teamUrl}/settings/groups`;
   const tokensPath = `/t/${teamUrl}/settings/tokens`;
   const webhooksPath = `/t/${teamUrl}/settings/webhooks`;
-  const billingPath = `/t/${teamUrl}/settings/billing`;
 
   return (
     <div
@@ -85,6 +84,16 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
         </Button>
       </Link>
 
+      <Link to={groupsPath}>
+        <Button
+          variant="ghost"
+          className={cn('w-full justify-start', pathname?.startsWith(groupsPath) && 'bg-secondary')}
+        >
+          <GroupIcon className="mr-2 h-5 w-5" />
+          <Trans>Groups</Trans>
+        </Button>
+      </Link>
+
       <Link to={tokensPath}>
         <Button
           variant="ghost"
@@ -107,21 +116,6 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
           <Trans>Webhooks</Trans>
         </Button>
       </Link>
-
-      {IS_BILLING_ENABLED() && (
-        <Link to={billingPath}>
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith(billingPath) && 'bg-secondary',
-            )}
-          >
-            <CreditCard className="mr-2 h-5 w-5" />
-            <Trans>Billing</Trans>
-          </Button>
-        </Link>
-      )}
     </div>
   );
 };

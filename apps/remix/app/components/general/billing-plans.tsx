@@ -1,62 +1,48 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AnimatePresence, motion } from 'framer-motion';
 
-import type { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type Interval = keyof PriceIntervals;
-
-const INTERVALS: Interval[] = ['day', 'week', 'month', 'year'];
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const isInterval = (value: unknown): value is Interval => INTERVALS.includes(value as Interval);
-
-const FRIENDLY_INTERVALS: Record<Interval, MessageDescriptor> = {
-  day: msg`Daily`,
-  week: msg`Weekly`,
-  month: msg`Monthly`,
-  year: msg`Yearly`,
-};
-
 const MotionCard = motion(Card);
 
 export type BillingPlansProps = {
-  prices: PriceIntervals;
+  plans: InternalClaimPlans;
 };
 
-export const BillingPlans = ({ prices }: BillingPlansProps) => {
+export const BillingPlans = ({ plans }: BillingPlansProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
   const isMounted = useIsMounted();
 
-  const [interval, setInterval] = useState<Interval>('month');
+  const organisation = useCurrentOrganisation();
+
+  const [interval, setInterval] = useState<'monthlyPrice' | 'yearlyPrice'>('yearlyPrice');
   const [checkoutSessionPriceId, setCheckoutSessionPriceId] = useState<string | null>(null);
 
-  const { mutateAsync: createCheckoutSession } = trpc.profile.createCheckoutSession.useMutation();
+  const { mutateAsync: createSubscription } = trpc.billing.subscription.create.useMutation();
 
   const onSubscribeClick = async (priceId: string) => {
     try {
       setCheckoutSessionPriceId(priceId);
 
-      const url = await createCheckoutSession({ priceId });
+      const { redirectUrl } = await createSubscription({
+        organisationId: organisation.id,
+        priceId,
+      });
 
-      if (!url) {
-        throw new Error('Unable to create session');
-      }
-
-      window.open(url);
+      window.open(redirectUrl, '_blank');
     } catch (_err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -68,24 +54,37 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
     }
   };
 
+  const pricesToDisplay = useMemo(() => {
+    const prices = [];
+
+    for (const plan of Object.values(plans)) {
+      if (plan[interval] && plan[interval].isVisibleInApp) {
+        prices.push(plan[interval]);
+      }
+    }
+
+    return prices;
+  }, [plans, interval]);
+
   return (
     <div>
-      <Tabs value={interval} onValueChange={(value) => isInterval(value) && setInterval(value)}>
+      <Tabs
+        value={interval}
+        onValueChange={(value) => setInterval(value as 'monthlyPrice' | 'yearlyPrice')}
+      >
         <TabsList>
-          {INTERVALS.map(
-            (interval) =>
-              prices[interval].length > 0 && (
-                <TabsTrigger key={interval} className="min-w-[150px]" value={interval}>
-                  {_(FRIENDLY_INTERVALS[interval])}
-                </TabsTrigger>
-              ),
-          )}
+          <TabsTrigger className="min-w-[150px]" value="monthlyPrice">
+            <Trans>Monthly</Trans>
+          </TabsTrigger>
+          <TabsTrigger className="min-w-[150px]" value="yearlyPrice">
+            <Trans>Yearly</Trans>
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-2 2xl:grid-cols-3">
         <AnimatePresence mode="wait">
-          {prices[interval].map((price) => (
+          {pricesToDisplay.map((price) => (
             <MotionCard
               key={price.id}
               initial={{ opacity: isMounted ? 0 : 1, y: isMounted ? 20 : 0 }}
@@ -96,8 +95,14 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                 <CardTitle>{price.product.name}</CardTitle>
 
                 <div className="text-muted-foreground mt-2 text-lg font-medium">
-                  ${toHumanPrice(price.unit_amount ?? 0)} {price.currency.toUpperCase()}{' '}
-                  <span className="text-xs">per {interval}</span>
+                  {price.friendlyPrice + ' '}
+                  <span className="text-xs">
+                    {interval === 'monthlyPrice' ? (
+                      <Trans>per month</Trans>
+                    ) : (
+                      <Trans>per year</Trans>
+                    )}
+                  </span>
                 </div>
 
                 <div className="text-muted-foreground mt-1.5 text-sm">

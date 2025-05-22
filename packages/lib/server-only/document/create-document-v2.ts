@@ -6,9 +6,7 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
-import { TeamMemberRole } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -28,11 +26,14 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getMemberRoles } from '../team/get-member-roles';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentDataId: string;
   normalizePdf?: boolean;
   data: {
@@ -59,35 +60,27 @@ export const createDocumentV2 = async ({
 }: CreateDocumentOptions) => {
   const { title, formValues } = data;
 
-  const team = teamId
-    ? await prisma.team.findFirst({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery(userId, teamId),
+    include: {
+      organisation: {
+        select: {
+          organisationClaim: true,
         },
-        include: {
-          teamGlobalSettings: true,
-          members: {
-            where: {
-              userId: userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      })
-    : null;
+      },
+    },
+  });
 
-  if (teamId !== undefined && !team) {
+  if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
     });
   }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
@@ -120,23 +113,24 @@ export const createDocumentV2 = async ({
   const recipientsHaveActionAuth = data.recipients?.some((recipient) => recipient.actionAuth);
 
   // Check if user has permission to set the global action auth.
-  if (authOptions.globalActionAuth || recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (
+    (authOptions.globalActionAuth || recipientsHaveActionAuth) &&
+    !team.organisation.organisationClaim.flags.cfr21
+  ) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
-  const visibility = determineDocumentVisibility(
-    team?.teamGlobalSettings?.documentVisibility,
-    team?.members[0].role ?? TeamMemberRole.MEMBER,
-  );
+  const { teamRole } = await getMemberRoles({
+    teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
+  });
+
+  const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
@@ -156,13 +150,10 @@ export const createDocumentV2 = async ({
             ...meta,
             signingOrder: meta?.signingOrder || undefined,
             emailSettings: meta?.emailSettings || undefined,
-            language: meta?.language || team?.teamGlobalSettings?.documentLanguage,
-            typedSignatureEnabled:
-              meta?.typedSignatureEnabled ?? team?.teamGlobalSettings?.typedSignatureEnabled,
-            uploadSignatureEnabled:
-              meta?.uploadSignatureEnabled ?? team?.teamGlobalSettings?.uploadSignatureEnabled,
-            drawSignatureEnabled:
-              meta?.drawSignatureEnabled ?? team?.teamGlobalSettings?.drawSignatureEnabled,
+            language: meta?.language || settings.documentLanguage,
+            typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
+            uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
+            drawSignatureEnabled: meta?.drawSignatureEnabled ?? settings.drawSignatureEnabled,
           },
         },
       },

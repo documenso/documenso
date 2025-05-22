@@ -8,7 +8,7 @@ import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZEditWebhookMutationSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { ZEditWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -30,7 +30,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/settings.webhooks.$id';
 
-const ZEditWebhookFormSchema = ZEditWebhookMutationSchema.omit({ id: true });
+const ZEditWebhookFormSchema = ZEditWebhookRequestSchema.omit({ id: true, teamId: true });
 
 type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 

@@ -45,7 +45,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { data: auditLogs } = await findDocumentAuditLogs({
     documentId: documentId,
     userId: document.userId,
-    teamId: document.teamId || undefined,
+    teamId: document.teamId,
     perPage: 100_000,
   });
 

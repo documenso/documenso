@@ -1,14 +1,13 @@
-import type { TeamMember } from '@prisma/client';
+import type { OrganisationMember } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { P, match } from 'ts-pattern';
-import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import { TeamMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamMemberSchema';
-import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { FindResultResponse } from '../../types/search-params';
-import { ZFindResultResponse } from '../../types/search-params';
+import { getHighestOrganisationRoleInGroup } from '../../utils/organisations';
+import { getHighestTeamRoleInGroup } from '../../utils/teams';
 
 export interface FindTeamMembersOptions {
   userId: number;
@@ -17,21 +16,10 @@ export interface FindTeamMembersOptions {
   page?: number;
   perPage?: number;
   orderBy?: {
-    column: keyof TeamMember | 'name';
+    column: keyof OrganisationMember | 'name';
     direction: 'asc' | 'desc';
   };
 }
-
-export const ZFindTeamMembersResponseSchema = ZFindResultResponse.extend({
-  data: TeamMemberSchema.extend({
-    user: UserSchema.pick({
-      name: true,
-      email: true,
-    }),
-  }).array(),
-});
-
-export type TFindTeamMembersResponse = z.infer<typeof ZFindTeamMembersResponseSchema>;
 
 export const findTeamMembers = async ({
   userId,
@@ -40,39 +28,69 @@ export const findTeamMembers = async ({
   page = 1,
   perPage = 10,
   orderBy,
-}: FindTeamMembersOptions): Promise<TFindTeamMembersResponse> => {
+}: FindTeamMembersOptions) => {
   const orderByColumn = orderBy?.column ?? 'name';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
   // Check that the user belongs to the team they are trying to find members in.
-  const userTeam = await prisma.team.findUniqueOrThrow({
+  const userTeam = await prisma.organisationMember.findFirst({
     where: {
-      id: teamId,
-      members: {
+      userId,
+      organisationGroupMembers: {
         some: {
-          userId,
+          group: {
+            teamGroups: {
+              some: {
+                teamId,
+              },
+            },
+          },
         },
       },
     },
   });
 
-  const termFilters: Prisma.TeamMemberWhereInput | undefined = match(query)
+  if (!userTeam) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED);
+  }
+
+  const termFilters: Prisma.OrganisationMemberWhereInput | undefined = match(query)
     .with(P.string.minLength(1), () => ({
       user: {
-        name: {
-          contains: query,
-          mode: Prisma.QueryMode.insensitive,
-        },
+        OR: [
+          {
+            name: {
+              contains: query,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+          {
+            email: {
+              contains: query,
+              mode: Prisma.QueryMode.insensitive,
+            },
+          },
+        ],
       },
     }))
     .otherwise(() => undefined);
 
-  const whereClause: Prisma.TeamMemberWhereInput = {
+  const whereClause: Prisma.OrganisationMemberWhereInput = {
     ...termFilters,
-    teamId: userTeam.id,
+    organisationGroupMembers: {
+      some: {
+        group: {
+          teamGroups: {
+            some: {
+              teamId,
+            },
+          },
+        },
+      },
+    },
   };
 
-  let orderByClause: Prisma.TeamMemberOrderByWithRelationInput = {
+  let orderByClause: Prisma.OrganisationMemberOrderByWithRelationInput = {
     [orderByColumn]: orderByDirection,
   };
 
@@ -86,7 +104,7 @@ export const findTeamMembers = async ({
   }
 
   const [data, count] = await Promise.all([
-    prisma.teamMember.findMany({
+    prisma.organisationMember.findMany({
       where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
@@ -94,22 +112,51 @@ export const findTeamMembers = async ({
       include: {
         user: {
           select: {
-            name: true,
+            id: true,
             email: true,
+            name: true,
+            avatarImageId: true,
+          },
+        },
+        organisationGroupMembers: {
+          include: {
+            group: {
+              include: {
+                teamGroups: true,
+              },
+            },
           },
         },
       },
     }),
-    prisma.teamMember.count({
+    prisma.organisationMember.count({
       where: whereClause,
     }),
   ]);
 
+  // same as get-team-members.
+  const mappedData = data.map((member) => ({
+    id: member.id,
+    userId: member.userId,
+    createdAt: member.createdAt,
+    email: member.user.email,
+    name: member.user.name,
+    avatarImageId: member.user.avatarImageId,
+    // Todo: orgs test this
+    teamRole: getHighestTeamRoleInGroup(
+      member.organisationGroupMembers.flatMap(({ group }) => group.teamGroups),
+    ),
+    teamRoleGroupType: member.organisationGroupMembers[0].group.type,
+    organisationRole: getHighestOrganisationRoleInGroup(
+      member.organisationGroupMembers.flatMap(({ group }) => group),
+    ),
+  }));
+
   return {
-    data,
+    data: mappedData,
     count,
     currentPage: Math.max(page, 1),
     perPage,
     totalPages: Math.ceil(count / perPage),
-  } satisfies FindResultResponse<typeof data>;
+  } satisfies FindResultResponse<typeof mappedData>;
 };

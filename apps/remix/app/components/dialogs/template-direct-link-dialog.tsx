@@ -15,6 +15,7 @@ import { P, match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { DIRECT_TEMPLATE_DOCUMENTATION } from '@documenso/lib/constants/template';
@@ -74,6 +75,8 @@ export const TemplateDirectLinkDialog = ({
   const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(
     token ? 'MANAGE' : 'ONBOARD',
   );
+
+  const organisation = useCurrentOrganisation();
 
   const validDirectTemplateRecipients = useMemo(
     () =>
@@ -237,7 +240,7 @@ export const TemplateDirectLinkDialog = ({
                         templates.{' '}
                         <Link
                           className="mt-1 block underline underline-offset-4"
-                          to="/settings/billing"
+                          to={`/org/${organisation.url}/settings/billing`}
                         >
                           Upgrade your account to continue!
                         </Link>

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { motion } from 'framer-motion';
+import { AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
@@ -55,23 +57,34 @@ export const AppNavDesktop = ({
       )}
       {...props}
     >
-      <div className="flex items-baseline gap-x-6">
-        {navigationLinks.map(({ href, label }) => (
-          <Link
-            key={href}
-            to={`${rootHref}${href}`}
-            className={cn(
-              'text-muted-foreground dark:text-muted-foreground/60 focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
-              {
-                'text-foreground dark:text-muted-foreground': pathname?.startsWith(
-                  `${rootHref}${href}`,
-                ),
-              },
-            )}
-          >
-            {_(label)}
-          </Link>
-        ))}
+      <div>
+        <AnimatePresence>
+          {params.teamUrl && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-baseline gap-x-6"
+            >
+              {navigationLinks.map(({ href, label }) => (
+                <Link
+                  key={href}
+                  to={`${rootHref}${href}`}
+                  className={cn(
+                    'text-muted-foreground dark:text-muted-foreground/60 focus-visible:ring-ring ring-offset-background rounded-md font-medium leading-5 hover:opacity-80 focus-visible:outline-none focus-visible:ring-2',
+                    {
+                      'text-foreground dark:text-muted-foreground': pathname?.startsWith(
+                        `${rootHref}${href}`,
+                      ),
+                    },
+                  )}
+                >
+                  {_(label)}
+                </Link>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       <Button

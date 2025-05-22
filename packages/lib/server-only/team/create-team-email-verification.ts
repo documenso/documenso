@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import type { Team, TeamGlobalSettings } from '@prisma/client';
+import type { Team } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
@@ -15,9 +15,11 @@ import { createTokenVerification } from '@documenso/lib/utils/token-verification
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEmailContext } from '../email/get-email-context';
 
 export type CreateTeamEmailVerificationOptions = {
   userId: number;
@@ -34,33 +36,22 @@ export const createTeamEmailVerification = async ({
   data,
 }: CreateTeamEmailVerificationOptions): Promise<void> => {
   try {
+    const team = await prisma.team.findFirstOrThrow({
+      where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      include: {
+        teamEmail: true,
+        emailVerification: true,
+      },
+    });
+
+    if (team.teamEmail || team.emailVerification) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Team already has an email or existing email verification.',
+      });
+    }
+
     await prisma.$transaction(
       async (tx) => {
-        const team = await tx.team.findFirstOrThrow({
-          where: {
-            id: teamId,
-            members: {
-              some: {
-                userId,
-                role: {
-                  in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-                },
-              },
-            },
-          },
-          include: {
-            teamEmail: true,
-            emailVerification: true,
-            teamGlobalSettings: true,
-          },
-        });
-
-        if (team.teamEmail || team.emailVerification) {
-          throw new AppError(AppErrorCode.INVALID_REQUEST, {
-            message: 'Team already has an email or existing email verification.',
-          });
-        }
-
         const existingTeamEmail = await tx.teamEmail.findFirst({
           where: {
             email: data.email,
@@ -116,13 +107,7 @@ export const createTeamEmailVerification = async ({
  * @param teamName The name of the team the user is being invited to.
  * @param teamUrl The url of the team the user is being invited to.
  */
-export const sendTeamEmailVerificationEmail = async (
-  email: string,
-  token: string,
-  team: Team & {
-    teamGlobalSettings?: TeamGlobalSettings | null;
-  },
-) => {
+export const sendTeamEmailVerificationEmail = async (email: string, token: string, team: Team) => {
   const assetBaseUrl = env('NEXT_PUBLIC_WEBAPP_URL') || 'http://localhost:3000';
 
   const template = createElement(ConfirmTeamEmailTemplate, {
@@ -133,11 +118,15 @@ export const sendTeamEmailVerificationEmail = async (
     token,
   });
 
-  const branding = team.teamGlobalSettings
-    ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
-    : undefined;
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: team.id,
+    },
+  });
 
-  const lang = team.teamGlobalSettings?.documentLanguage;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const lang = settings.documentLanguage as SupportedLanguageCodes;
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, { lang, branding }),

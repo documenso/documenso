@@ -26,6 +26,7 @@ export interface DataTableProps<TData, TValue> {
   totalPages?: number;
   onPaginationChange?: (_page: number, _perPage: number) => void;
   onClearFilters?: () => void;
+  emptyState?: React.ReactNode;
   hasFilters?: boolean;
   children?: DataTableChildren<TData>;
   skeleton?: {
@@ -52,6 +53,7 @@ export function DataTable<TData, TValue>({
   onClearFilters,
   onPaginationChange,
   children,
+  emptyState,
 }: DataTableProps<TData, TValue>) {
   const pagination = useMemo<PaginationState>(() => {
     if (currentPage !== undefined && perPage !== undefined) {
@@ -142,17 +144,21 @@ export function DataTable<TData, TValue>({
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-32 text-center">
-                  <p>
-                    <Trans>No results found</Trans>
-                  </p>
+                  {emptyState ?? (
+                    <>
+                      <p>
+                        <Trans>No results found</Trans>
+                      </p>
 
-                  {hasFilters && onClearFilters !== undefined && (
-                    <button
-                      onClick={() => onClearFilters()}
-                      className="text-foreground mt-1 text-sm"
-                    >
-                      <Trans>Clear filters</Trans>
-                    </button>
+                      {hasFilters && onClearFilters !== undefined && (
+                        <button
+                          onClick={() => onClearFilters()}
+                          className="text-foreground mt-1 text-sm"
+                        >
+                          <Trans>Clear filters</Trans>
+                        </button>
+                      )}
+                    </>
                   )}
                 </TableCell>
               </TableRow>

@@ -258,7 +258,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+      const { remaining } = await getServerLimits({ teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -467,7 +467,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {
@@ -565,7 +565,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {
@@ -1599,26 +1599,20 @@ const updateDocument = async ({
   documentId: number;
   data: Prisma.DocumentUpdateInput;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }) => {
   return await prisma.document.update({
     where: {
       id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
+      userId,
+      team: {
+        id: teamId,
+        members: {
+          some: {
             userId,
-            teamId: null,
-          }),
+          },
+        },
+      },
     },
     data: {
       ...data,

@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { contextStorage } from 'hono/context-storage';
 
-import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -39,7 +38,7 @@ app.route('/api/auth', auth);
 app.route('/api/files', filesRoute);
 
 // API servers.
-app.route('/api/v1', tsRestHonoApp);
+// app.route('/api/v1', tsRestHonoApp); // Todo: Orgs
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 

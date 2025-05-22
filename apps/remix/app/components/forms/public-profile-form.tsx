@@ -16,8 +16,8 @@ import { AppError } from '@documenso/lib/errors/app-error';
 import { formatUserProfilePath } from '@documenso/lib/utils/public-profiles';
 import {
   MAX_PROFILE_BIO_LENGTH,
-  ZUpdatePublicProfileMutationSchema,
-} from '@documenso/trpc/server/profile-router/schema';
+  ZUpdateTeamPublicProfileMutationSchema,
+} from '@documenso/trpc/server/team-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -32,7 +32,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export const ZPublicProfileFormSchema = ZUpdatePublicProfileMutationSchema.pick({
+export const ZPublicProfileFormSchema = ZUpdateTeamPublicProfileMutationSchema.pick({
   bio: true,
   enabled: true,
   url: true,
@@ -43,7 +43,7 @@ export type TPublicProfileFormSchema = z.infer<typeof ZPublicProfileFormSchema>;
 export type PublicProfileFormProps = {
   className?: string;
   profileUrl?: string | null;
-  teamUrl?: string;
+  teamUrl: string;
   onProfileUpdate: (data: TPublicProfileFormSchema) => Promise<unknown>;
   profile: UserProfile | TeamProfile;
 };

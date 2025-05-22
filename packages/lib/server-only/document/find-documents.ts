@@ -9,6 +9,7 @@ import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-documen
 import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
+import { getTeamById } from '../team/get-team';
 
 export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
 
@@ -53,32 +54,15 @@ export const findDocuments = async ({
   let team = null;
 
   if (teamId !== undefined) {
-    team = await prisma.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-      include: {
-        teamEmail: true,
-        members: {
-          where: {
-            userId,
-          },
-          select: {
-            role: true,
-          },
-        },
-      },
+    team = await getTeamById({
+      userId,
+      teamId,
     });
   }
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
-  const teamMemberRole = team?.members[0].role ?? null;
+  const teamMemberRole = team?.currentTeamRole ?? null;
 
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
@@ -291,7 +275,6 @@ const findDocumentsFilter = (
       OR: [
         {
           userId: user.id,
-          teamId: null,
           folderId: folderId,
         },
         {
@@ -330,14 +313,12 @@ const findDocumentsFilter = (
     }))
     .with(ExtendedDocumentStatus.DRAFT, () => ({
       userId: user.id,
-      teamId: null,
       status: ExtendedDocumentStatus.DRAFT,
     }))
     .with(ExtendedDocumentStatus.PENDING, () => ({
       OR: [
         {
           userId: user.id,
-          teamId: null,
           status: ExtendedDocumentStatus.PENDING,
           folderId: folderId,
         },
@@ -360,7 +341,6 @@ const findDocumentsFilter = (
       OR: [
         {
           userId: user.id,
-          teamId: null,
           status: ExtendedDocumentStatus.COMPLETED,
           folderId: folderId,
         },
@@ -379,7 +359,6 @@ const findDocumentsFilter = (
       OR: [
         {
           userId: user.id,
-          teamId: null,
           status: ExtendedDocumentStatus.REJECTED,
           folderId: folderId,
         },

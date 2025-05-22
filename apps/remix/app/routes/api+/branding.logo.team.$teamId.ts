@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
-import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
 
@@ -18,10 +18,8 @@ export async function loader({ params }: Route.LoaderArgs) {
     );
   }
 
-  const settings = await prisma.teamGlobalSettings.findFirst({
-    where: {
-      teamId,
-    },
+  const settings = await getTeamSettings({
+    teamId,
   });
 
   if (!settings || !settings.brandingLogo) {

@@ -3,6 +3,7 @@ import type { TeamProfile } from '@prisma/client';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { updateTeamPublicProfile } from './update-team-public-profile';
 
 export type GetTeamPublicProfileOptions = {
@@ -20,14 +21,7 @@ export const getTeamPublicProfile = async ({
   teamId,
 }: GetTeamPublicProfileOptions): Promise<GetTeamPublicProfileResponse> => {
   const team = await prisma.team.findFirst({
-    where: {
-      id: teamId,
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
+    where: buildTeamWhereQuery(teamId, userId),
     include: {
       profile: true,
     },

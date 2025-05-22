@@ -34,7 +34,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 const ZCreateFolderFormSchema = z.object({
   name: z.string().min(1, { message: 'Folder name is required' }),
@@ -52,7 +52,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
   const { folderId } = useParams();
 
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
@@ -75,13 +75,13 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
 
       setIsCreateFolderOpen(false);
 
+      const documentsPath = formatDocumentsPath(team.url);
+
+      await navigate(`${documentsPath}/f/${newFolder.id}`);
+
       toast({
         description: 'Folder created successfully',
       });
-
-      const documentsPath = formatDocumentsPath(team?.url);
-
-      void navigate(`${documentsPath}/f/${newFolder.id}`);
     } catch (err) {
       const error = AppError.parseError(err);
 

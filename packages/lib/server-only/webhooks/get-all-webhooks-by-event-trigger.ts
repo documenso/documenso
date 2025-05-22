@@ -5,7 +5,7 @@ import { prisma } from '@documenso/prisma';
 export type GetAllWebhooksByEventTriggerOptions = {
   event: WebhookTriggerEvents;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const getAllWebhooksByEventTrigger = async ({
@@ -19,21 +19,22 @@ export const getAllWebhooksByEventTrigger = async ({
       eventTriggers: {
         has: event,
       },
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
+      team: {
+        id: teamId,
+        teamGroups: {
+          some: {
+            organisationGroup: {
+              organisationGroupMembers: {
                 some: {
-                  userId,
+                  organisationMember: {
+                    userId,
+                  },
                 },
               },
             },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+          },
+        },
+      },
     },
   });
 };

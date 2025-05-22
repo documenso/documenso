@@ -3,7 +3,11 @@ import type { Document, Recipient, User } from '@prisma/client';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import {
+  buildTeamWhereQuery,
+  formatDocumentsPath,
+  getHighestTeamRoleInGroup,
+} from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 export type SearchDocumentsWithKeywordOptions = {
@@ -84,16 +88,7 @@ export const searchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
-          teamId: {
-            not: null,
-          },
-          team: {
-            members: {
-              some: {
-                userId: userId,
-              },
-            },
-          },
+          team: buildTeamWhereQuery(undefined, userId),
           deletedAt: null,
         },
         {
@@ -101,16 +96,7 @@ export const searchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
-          teamId: {
-            not: null,
-          },
-          team: {
-            members: {
-              some: {
-                userId: userId,
-              },
-            },
-          },
+          team: buildTeamWhereQuery(undefined, userId),
           deletedAt: null,
         },
       ],
@@ -120,12 +106,17 @@ export const searchDocumentsWithKeyword = async ({
       team: {
         select: {
           url: true,
-          members: {
+          teamGroups: {
             where: {
-              userId: userId,
-            },
-            select: {
-              role: true,
+              organisationGroup: {
+                organisationGroupMembers: {
+                  some: {
+                    organisationMember: {
+                      userId,
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -147,7 +138,8 @@ export const searchDocumentsWithKeyword = async ({
         return true;
       }
 
-      const teamMemberRole = document.team?.members[0]?.role;
+      // Todo: Orgs test.
+      const teamMemberRole = getHighestTeamRoleInGroup(document.team.teamGroups);
 
       if (!teamMemberRole) {
         return false;

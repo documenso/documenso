@@ -27,7 +27,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
   if (isAuthenticated) {
-    throw redirect('/documents');
+    throw redirect('/');
   }
 
   return {

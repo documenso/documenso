@@ -5,6 +5,8 @@ import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type UpdateTeamOptions = {
   userId: number;
   teamId: number;
@@ -17,37 +19,31 @@ export type UpdateTeamOptions = {
 export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): Promise<void> => {
   try {
     await prisma.$transaction(async (tx) => {
-      const foundPendingTeamWithUrl = await tx.teamPending.findFirst({
+      const foundTeamWithUrl = await tx.team.findFirst({
         where: {
           url: data.url,
         },
       });
 
-      if (foundPendingTeamWithUrl) {
+      const foundOrganisationWithUrl = await tx.organisation.findFirst({
+        where: {
+          url: data.url,
+        },
+      });
+
+      if (foundTeamWithUrl || foundOrganisationWithUrl) {
         throw new AppError(AppErrorCode.ALREADY_EXISTS, {
           message: 'Team URL already exists.',
         });
       }
 
-      const team = await tx.team.update({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-              role: {
-                in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-              },
-            },
-          },
-        },
+      return await tx.team.update({
+        where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
         data: {
           url: data.url,
           name: data.name,
         },
       });
-
-      return team;
     });
   } catch (err) {
     console.error(err);

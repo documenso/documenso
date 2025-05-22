@@ -41,7 +41,6 @@ import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radi
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
-  teamId?: number;
   title: MessageDescriptor;
   description: MessageDescriptor;
   field: FieldFormType;

@@ -11,9 +11,9 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import { formatDocumentsPath } from '../../../utils/teams';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendSigningRejectionEmailsJobDefinition } from './send-rejection-emails';
@@ -40,7 +40,6 @@ export const run = async ({
             teamEmail: true,
             name: true,
             url: true,
-            teamGlobalSettings: true,
           },
         },
       },
@@ -63,7 +62,16 @@ export const run = async ({
     return;
   }
 
-  const i18n = await getI18nInstance(documentMeta?.language);
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: document.teamId,
+    },
+  });
+
+  const lang = documentMeta?.language ?? settings.documentLanguage;
+
+  const i18n = await getI18nInstance(lang);
 
   // Send confirmation email to the recipient who rejected
   await io.runTask('send-rejection-confirmation-email', async () => {
@@ -75,14 +83,10 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const branding = document.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-      : undefined;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(recipientTemplate, { lang: documentMeta?.language, branding }),
+      renderEmailWithI18N(recipientTemplate, { lang, branding }),
       renderEmailWithI18N(recipientTemplate, {
-        lang: documentMeta?.language,
+        lang,
         branding,
         plainText: true,
       }),
@@ -115,14 +119,10 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const branding = document.team?.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-      : undefined;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(ownerTemplate, { lang: documentMeta?.language, branding }),
+      renderEmailWithI18N(ownerTemplate, { lang, branding }),
       renderEmailWithI18N(ownerTemplate, {
-        lang: documentMeta?.language,
+        lang,
         branding,
         plainText: true,
       }),

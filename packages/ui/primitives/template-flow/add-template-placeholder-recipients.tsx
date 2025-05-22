@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -52,14 +53,12 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
   templateDirectLink?: TemplateDirectLink | null;
-  isEnterprise: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
   isDocumentPdfLoaded: boolean;
 };
 
 export const AddTemplatePlaceholderRecipientsFormPartial = ({
   documentFlow,
-  isEnterprise,
   recipients,
   templateDirectLink,
   fields,
@@ -73,6 +72,8 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
   const { _ } = useLingui();
   const { user } = useSession();
+
+  const organisation = useCurrentOrganisation();
 
   const [placeholderRecipientCount, setPlaceholderRecipientCount] = useState(() =>
     recipients.length > 1 ? recipients.length + 1 : 2,
@@ -643,29 +644,30 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                 )}
                               />
 
-                              {showAdvancedSettings && isEnterprise && (
-                                <FormField
-                                  control={form.control}
-                                  name={`signers.${index}.actionAuth`}
-                                  render={({ field }) => (
-                                    <FormItem
-                                      className={cn('col-span-8', {
-                                        'col-span-10': isSigningOrderSequential,
-                                      })}
-                                    >
-                                      <FormControl>
-                                        <RecipientActionAuthSelect
-                                          {...field}
-                                          onValueChange={field.onChange}
-                                          disabled={isSubmitting}
-                                        />
-                                      </FormControl>
+                              {showAdvancedSettings &&
+                                organisation.organisationClaim.flags.cfr21 && (
+                                  <FormField
+                                    control={form.control}
+                                    name={`signers.${index}.actionAuth`}
+                                    render={({ field }) => (
+                                      <FormItem
+                                        className={cn('col-span-8', {
+                                          'col-span-10': isSigningOrderSequential,
+                                        })}
+                                      >
+                                        <FormControl>
+                                          <RecipientActionAuthSelect
+                                            {...field}
+                                            onValueChange={field.onChange}
+                                            disabled={isSubmitting}
+                                          />
+                                        </FormControl>
 
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              )}
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
 
                               <div className="col-span-2 flex gap-x-2">
                                 <FormField
@@ -767,7 +769,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
               </Button>
             </div>
 
-            {!alwaysShowAdvancedSettings && isEnterprise && (
+            {!alwaysShowAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
               <div className="mt-4 flex flex-row items-center">
                 <Checkbox
                   id="showAdvancedRecipientSettings"

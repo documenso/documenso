@@ -5,9 +5,11 @@ import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TDuplicateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type DuplicateTemplateOptions = TDuplicateTemplateMutationSchema & {
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const duplicateTemplate = async ({
@@ -18,21 +20,7 @@ export const duplicateTemplate = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery(teamId, userId),
     },
     include: {
       recipients: true,

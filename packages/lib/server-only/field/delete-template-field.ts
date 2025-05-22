@@ -1,10 +1,11 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export interface DeleteTemplateFieldOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   fieldId: number;
 }
 
@@ -16,21 +17,9 @@ export const deleteTemplateField = async ({
   const field = await prisma.field.findFirst({
     where: {
       id: fieldId,
-      template: teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          },
+      template: {
+        team: buildTeamWhereQuery(teamId, userId),
+      },
     },
   });
 

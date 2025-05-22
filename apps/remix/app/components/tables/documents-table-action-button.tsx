@@ -15,7 +15,7 @@ import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionButtonProps = {
   row: TDocumentRow;
@@ -26,7 +26,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -40,9 +40,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const isCurrentTeamDocument = team && row.team?.url === team.url;
 
   const documentsPath = formatDocumentsPath(team?.url);
-  const formatPath = row.folderId
-    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
-    : `${documentsPath}/${row.id}/edit`;
+  const formatPath = `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {

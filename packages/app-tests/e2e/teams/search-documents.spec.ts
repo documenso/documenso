@@ -1,7 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
+import { prisma } from '@documenso/prisma';
 import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
+import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -9,38 +11,74 @@ import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
 
 test('[TEAMS]: search respects team document visibility', async ({ page }) => {
-  const team = await seedTeam();
-  const adminUser = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.ADMIN });
-  const managerUser = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MANAGER });
-  const memberUser = await seedTeamMember({ teamId: team.id, role: TeamMemberRole.MEMBER });
+  const { user: owner, organisation, team } = await seedUser();
+
+  const [adminUser, managerUser, memberUser] = await seedOrganisationMembers({
+    organisationId: organisation.id,
+    members: [
+      {
+        organisationRole: OrganisationMemberRole.ADMIN,
+      },
+      {
+        organisationRole: OrganisationMemberRole.MEMBER, // Org managers = team admins so need to workaround this.
+      },
+      {
+        organisationRole: OrganisationMemberRole.MEMBER,
+      },
+    ],
+  });
+
+  const managerTeamGroup = await prisma.teamGroup.findFirstOrThrow({
+    where: {
+      teamId: team.id,
+      teamRole: TeamMemberRole.MANAGER,
+    },
+    include: {
+      organisationGroup: true,
+    },
+  });
+
+  const managerOrganisationMember = await prisma.organisationMember.findFirstOrThrow({
+    where: {
+      organisationId: organisation.id,
+      userId: managerUser.id,
+    },
+  });
+
+  await prisma.organisationGroupMember.create({
+    data: {
+      groupId: managerTeamGroup.organisationGroupId,
+      organisationMemberId: managerOrganisationMember.id,
+    },
+  });
 
   await seedDocuments([
     {
-      sender: team.owner,
+      sender: owner,
+      teamId: team.id,
       recipients: [],
       type: DocumentStatus.COMPLETED,
       documentOptions: {
-        teamId: team.id,
         visibility: 'EVERYONE',
         title: 'Searchable Document for Everyone',
       },
     },
     {
-      sender: team.owner,
+      sender: owner,
+      teamId: team.id,
       recipients: [],
       type: DocumentStatus.COMPLETED,
       documentOptions: {
-        teamId: team.id,
         visibility: 'MANAGER_AND_ABOVE',
         title: 'Searchable Document for Managers',
       },
     },
     {
-      sender: team.owner,
+      sender: owner,
+      teamId: team.id,
       recipients: [],
       type: DocumentStatus.COMPLETED,
       documentOptions: {
-        teamId: team.id,
         visibility: 'ADMIN',
         title: 'Searchable Document for Admins',
       },
@@ -70,26 +108,30 @@ test('[TEAMS]: search respects team document visibility', async ({ page }) => {
 });
 
 test('[TEAMS]: search does not reveal documents from other teams', async ({ page }) => {
-  const { team: teamA, teamMember2: teamAMember } = await seedTeamDocuments();
-  const { team: teamB } = await seedTeamDocuments();
+  const {
+    team: teamA,
+    teamOwner: teamAOwner,
+    teamMember2: teamAMember,
+  } = await seedTeamDocuments();
+  const { team: teamB, teamOwner: teamBOwner } = await seedTeamDocuments();
 
   await seedDocuments([
     {
-      sender: teamA.owner,
+      sender: teamAOwner,
       recipients: [],
       type: DocumentStatus.COMPLETED,
+      teamId: teamA.id,
       documentOptions: {
-        teamId: teamA.id,
         visibility: 'EVERYONE',
         title: 'Unique Team A Document',
       },
     },
     {
-      sender: teamB.owner,
+      sender: teamBOwner,
       recipients: [],
       type: DocumentStatus.COMPLETED,
+      teamId: teamB.id,
       documentOptions: {
-        teamId: teamB.id,
         visibility: 'EVERYONE',
         title: 'Unique Team B Document',
       },
@@ -112,47 +154,6 @@ test('[TEAMS]: search does not reveal documents from other teams', async ({ page
   await apiSignout({ page });
 });
 
-test('[PERSONAL]: search does not reveal team documents in personal account', async ({ page }) => {
-  const { team, teamMember2 } = await seedTeamDocuments();
-
-  await seedDocuments([
-    {
-      sender: teamMember2,
-      recipients: [],
-      type: DocumentStatus.COMPLETED,
-      documentOptions: {
-        teamId: null,
-        title: 'Personal Unique Document',
-      },
-    },
-    {
-      sender: team.owner,
-      recipients: [],
-      type: DocumentStatus.COMPLETED,
-      documentOptions: {
-        teamId: team.id,
-        visibility: 'EVERYONE',
-        title: 'Team Unique Document',
-      },
-    },
-  ]);
-
-  await apiSignin({
-    page,
-    email: teamMember2.email,
-    redirectPath: '/documents',
-  });
-
-  await page.getByPlaceholder('Search documents...').fill('Unique');
-  await page.waitForURL(/query=Unique/);
-
-  await checkDocumentTabCount(page, 'All', 1);
-  await expect(page.getByRole('link', { name: 'Personal Unique Document' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Team Unique Document' })).not.toBeVisible();
-
-  await apiSignout({ page });
-});
-
 test('[TEAMS]: search respects recipient visibility regardless of team visibility', async ({
   page,
 }) => {
@@ -162,10 +163,10 @@ test('[TEAMS]: search respects recipient visibility regardless of team visibilit
   await seedDocuments([
     {
       sender: team.owner,
+      teamId: team.id,
       recipients: [memberUser],
       type: DocumentStatus.COMPLETED,
       documentOptions: {
-        teamId: team.id,
         visibility: 'ADMIN',
         title: 'Admin Document with Member Recipient',
       },

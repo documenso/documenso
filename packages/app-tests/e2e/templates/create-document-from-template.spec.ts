@@ -26,21 +26,21 @@ const EXAMPLE_PDF_PATH = path.join(__dirname, '../../../../assets/example.pdf');
  * If you update this test please update that test as well.
  */
 test('[TEMPLATE]: should create a document from a template', async ({ page }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   const isBillingEnabled =
     process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
 
-  await seedUserSubscription({
-    userId: user.id,
-    priceId: enterprisePriceId,
-  });
+  // await seedUserSubscription({
+  //   userId: user.id,
+  //   priceId: enterprisePriceId,
+  // });
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -95,12 +95,12 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -294,8 +294,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 test('[TEMPLATE]: should create a document from a template with custom document', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   // Create a temporary PDF file for upload
 
@@ -460,8 +460,8 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 test('[TEMPLATE]: should create a document from a template using template document when custom document is not enabled', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,

@@ -1,4 +1,4 @@
-import type { FieldType, Team } from '@prisma/client';
+import type { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
@@ -13,11 +13,12 @@ import {
 import type { TFieldMetaSchema as FieldMeta } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export type CreateFieldOptions = {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipientId: number;
   type: FieldType;
   pageNumber: number;
@@ -43,58 +44,21 @@ export const createField = async ({
   fieldMeta,
   requestMetadata,
 }: CreateFieldOptions) => {
+  const { documentWhereInput, team } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
+    where: documentWhereInput,
     select: {
       id: true,
-    },
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
     },
   });
 
   if (!document) {
     throw new Error('Document not found');
-  }
-
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      name: true,
-      email: true,
-    },
-  });
-
-  let team: Team | null = null;
-
-  if (teamId) {
-    team = await prisma.team.findFirst({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-    });
   }
 
   const advancedField = ['NUMBER', 'RADIO', 'CHECKBOX', 'DROPDOWN', 'TEXT'].includes(type);
@@ -154,9 +118,9 @@ export const createField = async ({
       type: 'FIELD_CREATED',
       documentId,
       user: {
-        id: team?.id ?? user.id,
-        email: team?.name ?? user.email,
-        name: team ? '' : user.name,
+        id: team.id,
+        email: team.name,
+        name: '',
       },
       data: {
         fieldId: field.secondaryId,

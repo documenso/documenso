@@ -36,7 +36,7 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
   document: Document & {
@@ -52,7 +52,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const { _ } = useLingui();
 
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);

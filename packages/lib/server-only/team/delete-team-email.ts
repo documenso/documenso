@@ -12,7 +12,8 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../utils/team-global-settings-to-branding';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEmailContext } from '../email/get-email-context';
 
 export type DeleteTeamEmailOptions = {
   userId: number;
@@ -26,47 +27,44 @@ export type DeleteTeamEmailOptions = {
  * The user must either be part of the team with the required permissions, or the owner of the email.
  */
 export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamEmailOptions) => {
-  const team = await prisma.$transaction(async (tx) => {
-    const foundTeam = await tx.team.findFirstOrThrow({
-      where: {
-        id: teamId,
-        OR: [
-          {
-            teamEmail: {
-              email: userEmail,
-            },
-          },
-          {
-            members: {
-              some: {
-                userId,
-                role: {
-                  in: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-                },
-              },
-            },
-          },
-        ],
-      },
-      include: {
-        teamEmail: true,
-        owner: {
-          select: {
-            name: true,
-            email: true,
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId,
+    },
+  });
+
+  const team = await prisma.team.findFirstOrThrow({
+    where: {
+      OR: [
+        buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+        {
+          id: teamId,
+          teamEmail: {
+            email: userEmail,
           },
         },
-        teamGlobalSettings: true,
+      ],
+    },
+    include: {
+      teamEmail: true,
+      organisation: {
+        select: {
+          owner: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+        },
       },
-    });
+    },
+  });
 
-    await tx.teamEmail.delete({
-      where: {
-        teamId,
-      },
-    });
-
-    return foundTeam;
+  await prisma.teamEmail.delete({
+    where: {
+      teamId,
+    },
   });
 
   try {
@@ -80,11 +78,7 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       teamUrl: team.url,
     });
 
-    const branding = team.teamGlobalSettings
-      ? teamGlobalSettingsToBranding(team.teamGlobalSettings)
-      : undefined;
-
-    const lang = team.teamGlobalSettings?.documentLanguage;
+    const lang = settings.documentLanguage;
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(template, { lang, branding }),
@@ -95,8 +89,8 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
 
     await mailer.sendMail({
       to: {
-        address: team.owner.email,
-        name: team.owner.name ?? '',
+        address: team.organisation.owner.email,
+        name: team.organisation.owner.name ?? '',
       },
       from: {
         name: FROM_NAME,

@@ -1,11 +1,10 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, CreditCard, Globe2Icon, Lock, User, Users, Webhook } from 'lucide-react';
+import { Lock, User, Users } from 'lucide-react';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router';
 
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -13,8 +12,6 @@ export type SettingsDesktopNavProps = HTMLAttributes<HTMLDivElement>;
 
 export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavProps) => {
   const { pathname } = useLocation();
-
-  const isBillingEnabled = IS_BILLING_ENABLED();
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)} {...props}>
@@ -31,29 +28,16 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
         </Button>
       </Link>
 
-      <Link to="/settings/public-profile">
+      <Link to="/settings/organisations">
         <Button
           variant="ghost"
           className={cn(
             'w-full justify-start',
-            pathname?.startsWith('/settings/public-profile') && 'bg-secondary',
-          )}
-        >
-          <Globe2Icon className="mr-2 h-5 w-5" />
-          <Trans>Public Profile</Trans>
-        </Button>
-      </Link>
-
-      <Link to="/settings/teams">
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start',
-            pathname?.startsWith('/settings/teams') && 'bg-secondary',
+            pathname?.startsWith('/settings/organisations') && 'bg-secondary',
           )}
         >
           <Users className="mr-2 h-5 w-5" />
-          <Trans>Teams</Trans>
+          <Trans>Organisations</Trans>
         </Button>
       </Link>
 
@@ -69,47 +53,6 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
           <Trans>Security</Trans>
         </Button>
       </Link>
-
-      <Link to="/settings/tokens">
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start',
-            pathname?.startsWith('/settings/tokens') && 'bg-secondary',
-          )}
-        >
-          <Braces className="mr-2 h-5 w-5" />
-          <Trans>API Tokens</Trans>
-        </Button>
-      </Link>
-
-      <Link to="/settings/webhooks">
-        <Button
-          variant="ghost"
-          className={cn(
-            'w-full justify-start',
-            pathname?.startsWith('/settings/webhooks') && 'bg-secondary',
-          )}
-        >
-          <Webhook className="mr-2 h-5 w-5" />
-          <Trans>Webhooks</Trans>
-        </Button>
-      </Link>
-
-      {isBillingEnabled && (
-        <Link to="/settings/billing">
-          <Button
-            variant="ghost"
-            className={cn(
-              'w-full justify-start',
-              pathname?.startsWith('/settings/billing') && 'bg-secondary',
-            )}
-          >
-            <CreditCard className="mr-2 h-5 w-5" />
-            <Trans>Billing</Trans>
-          </Button>
-        </Link>
-      )}
     </div>
   );
 };

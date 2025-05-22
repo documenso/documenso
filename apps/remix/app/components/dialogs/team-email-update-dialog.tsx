@@ -61,7 +61,7 @@ export const TeamEmailUpdateDialog = ({
     },
   });
 
-  const { mutateAsync: updateTeamEmail } = trpc.team.updateTeamEmail.useMutation();
+  const { mutateAsync: updateTeamEmail } = trpc.team.email.update.useMutation();
 
   const onFormSubmit = async ({ name }: TUpdateTeamEmailFormSchema) => {
     try {

@@ -9,6 +9,7 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import {
   DOCUMENT_DISTRIBUTION_METHODS,
@@ -77,7 +78,6 @@ export type AddTemplateSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   template: TTemplate;
   currentTeamMemberRole?: TeamMemberRole;
@@ -88,13 +88,14 @@ export const AddTemplateSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  isEnterprise,
   isDocumentPdfLoaded,
   template,
   currentTeamMemberRole,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
   const { t, i18n } = useLingui();
+
+  const organisation = useCurrentOrganisation();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -366,7 +367,7 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
-            {isEnterprise && (
+            {organisation.organisationClaim.flags.cfr21 && (
               <FormField
                 control={form.control}
                 name="globalActionAuth"

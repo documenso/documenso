@@ -10,6 +10,7 @@ import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -38,6 +39,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
   const navigate = useNavigate();
   const analytics = useAnalytics();
+  const organisation = useCurrentOrganisation();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -53,7 +55,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
   const onFileDrop = async (file: File) => {
     if (isUploadDisabled && IS_BILLING_ENABLED()) {
-      await navigate('/settings/billing');
+      await navigate(`/org/${organisation.url}/settings/billing`);
       return;
     }
 
@@ -83,11 +85,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
         timestamp: new Date().toISOString(),
       });
 
-      await navigate(
-        folderId
-          ? `${formatDocumentsPath(team?.url)}/f/${folderId}/${id}/edit`
-          : `${formatDocumentsPath(team?.url)}/${id}/edit`,
-      );
+      await navigate(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -156,7 +154,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
             {isUploadDisabled && IS_BILLING_ENABLED() && (
               <Link
-                to="/settings/billing"
+                to={`/org/${organisation.url}/settings/billing`}
                 className="mt-4 text-sm text-amber-500 hover:underline dark:text-amber-400"
               >
                 <Trans>Upgrade your plan to upload more documents</Trans>

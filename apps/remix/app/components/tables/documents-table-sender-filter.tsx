@@ -3,7 +3,6 @@ import { Trans } from '@lingui/react/macro';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { trpc } from '@documenso/trpc/react';
 import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
 
@@ -18,18 +17,20 @@ export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilte
 
   const isMounted = useIsMounted();
 
-  const senderIds = parseToIntegerArray(searchParams?.get('senderIds') ?? '');
+  const senderIds = (searchParams?.get('senderIds') ?? '')
+    .split(',')
+    .filter((value) => value !== '');
 
-  const { data, isLoading } = trpc.team.getTeamMembers.useQuery({
+  const { data, isLoading } = trpc.team.member.getMany.useQuery({
     teamId,
   });
 
   const comboBoxOptions = (data ?? []).map((member) => ({
-    label: member.user.name ?? member.user.email,
-    value: member.user.id,
+    label: member.name ?? member.email,
+    value: member.id,
   }));
 
-  const onChange = (newSenderIds: number[]) => {
+  const onChange = (newSenderIds: string[]) => {
     if (!pathname) {
       return;
     }

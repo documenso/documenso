@@ -126,13 +126,13 @@ test.describe('[EE_ONLY]', () => {
 });
 
 test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set title.
@@ -159,19 +159,13 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
 });
 
 test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
-  const { owner, ...team } = await seedTeam({
-    createTeamMembers: 1,
-  });
+  const { user, team } = await seedUser();
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
-    email: owner.email,
+    email: user.email,
     redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
@@ -196,7 +190,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
 });
 
 test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
-  const team = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2, // Create an additional member to test different roles
   });
 
@@ -209,11 +203,10 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
     },
   });
 
-  const owner = team.owner;
   const managerUser = team.members[1].user;
   const memberUser = team.members[2].user;
 
-  const template = await seedBlankTemplate(owner, {
+  const template = await seedBlankTemplate(owner, team.id, {
     createTemplateOptions: {
       teamId: team.id,
     },
@@ -249,7 +242,7 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
 
   // Create a new template with 'everyone' visibility
-  const everyoneTemplate = await seedBlankTemplate(owner, {
+  const everyoneTemplate = await seedBlankTemplate(owner, team.id, {
     createTemplateOptions: {
       teamId: team.id,
       visibility: 'EVERYONE',
