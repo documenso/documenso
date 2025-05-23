@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -14,6 +14,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -59,36 +60,6 @@ export type AddSignersFormProps = {
   isDocumentPdfLoaded: boolean;
 };
 
-// TODO: move this hook to a separate file
-const useAutoSave = (saveFn: (data: TAddSignersFormSchema) => Promise<void>) => {
-  const saveTimeoutRef = useRef<NodeJS.Timeout>();
-
-  const saveFormData = async (data: TAddSignersFormSchema) => {
-    try {
-      await saveFn(data);
-    } catch (error) {
-      console.error('Auto-save failed:', error);
-    }
-  };
-
-  const scheduleSave = useCallback((data: TAddSignersFormSchema) => {
-    if (saveTimeoutRef.current) {
-      clearTimeout(saveTimeoutRef.current);
-    }
-    saveTimeoutRef.current = setTimeout(() => void saveFormData(data), 2000);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
-      }
-    };
-  }, []);
-
-  return { scheduleSave };
-};
-
 export const AddSignersFormPartial = ({
   documentFlow,
   recipients,
@@ -123,8 +94,6 @@ export const AddSignersFormPartial = ({
 
   const form = useForm<TAddSignersFormSchema>({
     resolver: zodResolver(ZAddSignersFormSchema),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
     defaultValues: {
       signers:
         recipients.length > 0
@@ -443,6 +412,7 @@ export const AddSignersFormPartial = ({
   const handleOnBlur = useCallback(async () => {
     const isFormValid = await form.trigger();
     const { isDirty } = form.formState;
+
     const formData = form.getValues();
 
     if (isFormValid && isDirty && emptySigners().length === 0) {

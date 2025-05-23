@@ -382,7 +382,7 @@ export const DocumentEditForm = ({
             />
 
             <AddSignersFormPartial
-              key={recipients.length}
+              key={document.id}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
