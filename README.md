@@ -247,14 +247,14 @@ Now you can install the dependencies and build it:
 
 ```
 npm i
-npm run build:web
+npm run build
 npm run prisma:migrate-deploy
 ```
 
 Finally, you can start it with:
 
 ```
-cd apps/web
+cd apps/remix
 npm run start
 ```
 
@@ -275,7 +275,7 @@ After=network.target
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/web
+WorkingDirectory=/var/www/documenso/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always
