@@ -43,6 +43,7 @@ export type AddSubjectFormProps = {
   fields: Field[];
   document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
+  onAutoSave: (_data: TAddSubjectFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -52,6 +53,7 @@ export const AddSubjectFormPartial = ({
   fields: fields,
   document,
   onSubmit,
+  onAutoSave,
   isDocumentPdfLoaded,
 }: AddSubjectFormProps) => {
   const { _ } = useLingui();

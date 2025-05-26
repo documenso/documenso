@@ -21,6 +21,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import {
@@ -83,6 +84,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  onAutoSave: (_data: TAddFieldsFormSchema) => Promise<void>;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
   teamId?: number;
@@ -94,6 +96,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  onAutoSave,
   canGoBack = false,
   isDocumentPdfLoaded,
   teamId,
@@ -166,7 +169,6 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -590,6 +592,19 @@ export const AddFieldsFormPartial = ({
     }
   };
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleOnBlur = useCallback(async () => {
+    const isFormValid = await form.trigger();
+    const { isDirty } = form.formState;
+
+    const formData = form.getValues();
+
+    if (isFormValid && isDirty) {
+      scheduleSave(formData);
+    }
+  }, [form, scheduleSave]);
+
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -661,7 +676,10 @@ export const AddFieldsFormPartial = ({
                       defaultWidth={DEFAULT_WIDTH_PX}
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
-                      onBlur={() => setLastActiveField(null)}
+                      onBlur={() => {
+                        setLastActiveField(null);
+                        void handleOnBlur();
+                      }}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
