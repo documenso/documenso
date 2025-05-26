@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -7,6 +9,7 @@ import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@pris
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -63,7 +66,9 @@ export const AddSubjectFormPartial = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    getValues,
+    trigger,
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
       meta: {
@@ -99,6 +104,16 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleOnBlur = useCallback(async () => {
+    const isFormValid = await trigger();
+
+    if (isFormValid && isDirty) {
+      scheduleSave(getValues());
+    }
+  }, [isDirty, scheduleSave]);
 
   return (
     <>
@@ -155,6 +170,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2"
                     disabled={isSubmitting}
                     {...register('meta.subject')}
+                    onBlur={handleOnBlur}
                   />
 
                   <FormErrorMessage className="mt-2" error={errors.meta?.subject} />
@@ -172,6 +188,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2 h-32 resize-none"
                     disabled={isSubmitting}
                     {...register('meta.message')}
+                    onBlur={handleOnBlur}
                   />
 
                   <FormErrorMessage
@@ -187,7 +204,10 @@ export const AddSubjectFormPartial = ({
                 <DocumentEmailCheckboxes
                   className="mt-2"
                   value={emailSettings}
-                  onChange={(value) => setValue('meta.emailSettings', value)}
+                  onChange={(value) => {
+                    setValue('meta.emailSettings', value);
+                    void handleOnBlur();
+                  }}
                 />
               </motion.div>
             )}
