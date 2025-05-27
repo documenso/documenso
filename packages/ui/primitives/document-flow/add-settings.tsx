@@ -174,7 +174,7 @@ export const AddSettingsFormPartial = ({
     } else {
       console.log('Form validation failed during auto-save:', parseResult.error);
     }
-  }, [form, scheduleSave]);
+  }, [form, form.formState.isDirty, scheduleSave]);
 
   return (
     <>
