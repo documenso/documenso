@@ -256,10 +256,16 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   });
 
   // Open document action menu.
-  await page
-    .locator('tr', { hasText: 'Document 1 - Completed' })
-    .getByTestId('document-table-action-btn')
-    .click();
+  await expect(async () => {
+    await page
+      .locator('tr', { hasText: 'Document 1 - Completed' })
+      .getByTestId('document-table-action-btn')
+      .click();
+
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
+  }).toPass();
 
   // Delete document.
   await page.getByRole('menuitem', { name: 'Hide' }).click();
@@ -267,11 +273,16 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
 
   await page.waitForTimeout(1000);
 
-  // Open document action menu.
-  await page
-    .locator('tr', { hasText: 'Document 1 - Pending' })
-    .getByTestId('document-table-action-btn')
-    .click();
+  await expect(async () => {
+    await page
+      .locator('tr', { hasText: 'Document 1 - Pending' })
+      .getByTestId('document-table-action-btn')
+      .click();
+
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Hide' })).toBeVisible();
+  }).toPass();
 
   // Delete document.
   await page.getByRole('menuitem', { name: 'Hide' }).click();

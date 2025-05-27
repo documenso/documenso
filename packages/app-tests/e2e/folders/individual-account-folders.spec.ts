@@ -342,7 +342,13 @@ test('user can move a document to a document folder', async ({ page }) => {
     redirectPath: '/documents',
   });
 
-  await page.getByTestId('document-table-action-btn').click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Move to Folder' })).toBeVisible();
+  }).toPass();
+
   await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
   await page.getByRole('button', { name: 'Proposals' }).click();
@@ -379,7 +385,13 @@ test('user can move a document from folder to the root', async ({ page }) => {
 
   await page.getByText('Proposals').click();
 
-  await page.getByTestId('document-table-action-btn').click();
+  await expect(async () => {
+    await page.getByTestId('document-table-action-btn').first().click();
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Move to Folder' })).toBeVisible();
+  }).toPass();
+
   await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
   await page.getByRole('button', { name: 'Root' }).click();
@@ -791,7 +803,13 @@ test('user can move a template to a template folder', async ({ page }) => {
     redirectPath: '/templates',
   });
 
-  await page.getByTestId('template-table-action-btn').click();
+  await expect(async () => {
+    await page.getByTestId('template-table-action-btn').first().click();
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Move to Folder' })).toBeVisible();
+  }).toPass();
+
   await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
   await page.getByRole('button', { name: 'Client Templates' }).click();
@@ -828,7 +846,13 @@ test('user can move a template from a folder to the root', async ({ page }) => {
 
   await page.getByText('Client Templates').click();
 
-  await page.getByTestId('template-table-action-btn').click();
+  await expect(async () => {
+    await page.getByTestId('template-table-action-btn').first().click();
+    await page.waitForTimeout(1000);
+
+    await expect(page.getByRole('menuitem', { name: 'Move to Folder' })).toBeVisible();
+  }).toPass();
+
   await page.getByRole('menuitem', { name: 'Move to Folder' }).click();
 
   await page.getByRole('button', { name: 'Root' }).click();
