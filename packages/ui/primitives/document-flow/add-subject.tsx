@@ -107,7 +107,7 @@ export const AddSubjectFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleOnBlur = useCallback(async () => {
+  const handleAutoSave = useCallback(async () => {
     const isFormValid = await trigger();
 
     if (isFormValid && isDirty) {
@@ -170,7 +170,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2"
                     disabled={isSubmitting}
                     {...register('meta.subject')}
-                    onBlur={handleOnBlur}
+                    onBlur={handleAutoSave}
                   />
 
                   <FormErrorMessage className="mt-2" error={errors.meta?.subject} />
@@ -188,7 +188,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2 h-32 resize-none"
                     disabled={isSubmitting}
                     {...register('meta.message')}
-                    onBlur={handleOnBlur}
+                    onBlur={handleAutoSave}
                   />
 
                   <FormErrorMessage
@@ -206,7 +206,7 @@ export const AddSubjectFormPartial = ({
                   value={emailSettings}
                   onChange={(value) => {
                     setValue('meta.emailSettings', value);
-                    void handleOnBlur();
+                    void handleAutoSave();
                   }}
                 />
               </motion.div>

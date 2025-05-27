@@ -154,7 +154,7 @@ export const AddSettingsFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleOnBlur = useCallback(() => {
+  const handleAutoSave = useCallback(() => {
     const { isDirty } = form.formState;
 
     if (!isDirty) {
@@ -211,7 +211,7 @@ export const AddSettingsFormPartial = ({
                       className="bg-background"
                       {...field}
                       disabled={document.status !== DocumentStatus.DRAFT || field.disabled}
-                      onBlur={handleOnBlur}
+                      onBlur={handleAutoSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -246,7 +246,7 @@ export const AddSettingsFormPartial = ({
                       {...field}
                       onValueChange={(value) => {
                         field.onChange(value);
-                        void handleOnBlur();
+                        void handleAutoSave();
                       }}
                     >
                       <SelectTrigger className="bg-background">
@@ -282,7 +282,7 @@ export const AddSettingsFormPartial = ({
                       {...field}
                       onValueChange={(value) => {
                         field.onChange(value);
-                        void handleOnBlur();
+                        void handleAutoSave();
                       }}
                     />
                   </FormControl>
@@ -308,7 +308,7 @@ export const AddSettingsFormPartial = ({
                         {...field}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          void handleOnBlur();
+                          void handleAutoSave();
                         }}
                       />
                     </FormControl>
@@ -333,7 +333,7 @@ export const AddSettingsFormPartial = ({
                         {...field}
                         onValueChange={(value) => {
                           field.onChange(value);
-                          void handleOnBlur();
+                          void handleAutoSave();
                         }}
                       />
                     </FormControl>
@@ -372,7 +372,7 @@ export const AddSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} onBlur={handleOnBlur} />
+                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
@@ -399,7 +399,7 @@ export const AddSettingsFormPartial = ({
                               selectedValues={field.value}
                               onChange={(value) => {
                                 field.onChange(value);
-                                void handleOnBlur();
+                                void handleAutoSave();
                               }}
                               className="bg-background w-full"
                               emptySelectionPlaceholder="Select signature types"
@@ -425,7 +425,7 @@ export const AddSettingsFormPartial = ({
                               {...field}
                               onValueChange={(value) => {
                                 field.onChange(value);
-                                void handleOnBlur();
+                                void handleAutoSave();
                               }}
                               disabled={documentHasBeenSent}
                             >
@@ -464,7 +464,7 @@ export const AddSettingsFormPartial = ({
                               {...field}
                               onChange={(value) => {
                                 value && field.onChange(value);
-                                void handleOnBlur();
+                                void handleAutoSave();
                               }}
                               disabled={documentHasBeenSent}
                             />
@@ -496,7 +496,7 @@ export const AddSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} onBlur={handleOnBlur} />
+                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
