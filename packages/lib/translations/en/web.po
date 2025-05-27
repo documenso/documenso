@@ -106,11 +106,6 @@ msgstr "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 msgstr "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 
-#. placeholder {0}: selectedValues.length
-#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
-msgid "{0, plural, zero {Select values} other {# selected...}}"
-msgstr "{0, plural, zero {Select values} other {# selected...}}"
-
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 msgid "{0}"
@@ -868,6 +863,7 @@ msgstr "Advanced Options"
 
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Advanced settings"
 msgstr "Advanced settings"
@@ -2720,8 +2716,13 @@ msgstr "Due to an unpaid invoice, your team has been restricted. Please settle t
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Duplicate"
 msgstr "Duplicate"
+
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Duplicate on all pages"
+msgstr "Duplicate on all pages"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks._index.tsx
@@ -3910,7 +3911,6 @@ msgstr "No valid direct templates found"
 msgid "No valid recipients found"
 msgstr "No valid recipients found"
 
-#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 #: apps/remix/app/components/general/multiselect-role-combobox.tsx
 #: packages/ui/primitives/multi-select-combobox.tsx
 #: packages/ui/primitives/combobox.tsx
@@ -4602,6 +4602,7 @@ msgstr "Reminder: Please {recipientActionVerb} your document"
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Remove"
 msgstr "Remove"
@@ -4843,6 +4844,11 @@ msgstr "Select default option"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "Select passkey"
+
+#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
+#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
+msgid "Select triggers"
+msgstr "Select triggers"
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
