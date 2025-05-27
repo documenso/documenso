@@ -109,9 +109,10 @@ export const AddSubjectFormPartial = ({
 
   const handleAutoSave = useCallback(async () => {
     const isFormValid = await trigger();
+    const formData = getValues();
 
     if (isFormValid && isDirty) {
-      scheduleSave(getValues());
+      scheduleSave(formData);
     }
   }, [isDirty, scheduleSave]);
 
@@ -205,7 +206,7 @@ export const AddSubjectFormPartial = ({
                   className="mt-2"
                   value={emailSettings}
                   onChange={(value) => {
-                    setValue('meta.emailSettings', value);
+                    setValue('meta.emailSettings', value, { shouldDirty: true });
                     void handleAutoSave();
                   }}
                 />
