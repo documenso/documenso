@@ -164,6 +164,24 @@ export const AddSignersFormPartial = ({
     name: 'signers',
   });
 
+  const emptySigners = useCallback(
+    () => form.getValues('signers').filter((signer) => signer.email === ''),
+    [form],
+  );
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = useCallback(async () => {
+    const isFormValid = await form.trigger();
+    const { isDirty } = form.formState;
+
+    const formData = form.getValues();
+
+    if (isFormValid && isDirty && emptySigners().length === 0) {
+      scheduleSave(formData);
+    }
+  }, [form, emptySigners, scheduleSave]);
+
   const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
   const isUserAlreadyARecipient = watchedSigners.some(
     (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
@@ -222,7 +240,7 @@ export const AddSignersFormPartial = ({
         shouldDirty: true,
       });
 
-      void handleOnBlur();
+      void handleAutoSave();
     }
   };
 
@@ -300,8 +318,10 @@ export const AddSignersFormPartial = ({
       }
 
       await form.trigger('signers');
+
+      void handleAutoSave();
     },
-    [form, canRecipientBeModified, watchedSigners, toast],
+    [form, canRecipientBeModified, watchedSigners, handleAutoSave, toast],
   );
 
   const handleRoleChange = useCallback(
@@ -397,28 +417,21 @@ export const AddSignersFormPartial = ({
       role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
     }));
 
-    form.setValue('signers', updatedSigners);
-    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
-    form.setValue('allowDictateNextSigner', false);
+    form.setValue('signers', updatedSigners, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    form.setValue('allowDictateNextSigner', false, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    void handleAutoSave();
   }, [form]);
-
-  const emptySigners = useCallback(
-    () => form.getValues('signers').filter((signer) => signer.email === ''),
-    [form],
-  );
-
-  const { scheduleSave } = useAutoSave(onAutoSave);
-
-  const handleOnBlur = useCallback(async () => {
-    const isFormValid = await form.trigger();
-    const { isDirty } = form.formState;
-
-    const formData = form.getValues();
-
-    if (isFormValid && isDirty && emptySigners().length === 0) {
-      scheduleSave(formData);
-    }
-  }, [form, emptySigners, scheduleSave]);
 
   return (
     <>
@@ -447,7 +460,7 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                      onBlur={handleOnBlur}
+                      onBlur={handleAutoSave}
                       onCheckedChange={(checked) => {
                         if (!checked && hasAssistantRole) {
                           setShowSigningOrderConfirmation(true);
@@ -509,7 +522,7 @@ export const AddSignersFormPartial = ({
                         field.onChange(checked);
                       }}
                       disabled={isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential}
-                      onBlur={handleOnBlur}
+                      onBlur={handleAutoSave}
                     />
                   </FormControl>
 
@@ -606,6 +619,7 @@ export const AddSignersFormPartial = ({
                                         <Input
                                           type="number"
                                           max={signers.length}
+                                          data-testid="signing-order-input"
                                           className={cn(
                                             'w-full text-center',
                                             '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
@@ -614,11 +628,12 @@ export const AddSignersFormPartial = ({
                                           onChange={(e) => {
                                             field.onChange(e);
                                             handleSigningOrderChange(index, e.target.value);
+                                            void handleAutoSave();
                                           }}
                                           onBlur={(e) => {
                                             field.onBlur();
                                             handleSigningOrderChange(index, e.target.value);
-                                            void handleOnBlur();
+                                            void handleAutoSave();
                                           }}
                                           disabled={
                                             snapshot.isDragging ||
@@ -663,7 +678,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
-                                        onBlur={handleOnBlur}
+                                        onBlur={handleAutoSave}
                                       />
                                     </FormControl>
 
@@ -701,7 +716,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
-                                        onBlur={handleOnBlur}
+                                        onBlur={handleAutoSave}
                                       />
                                     </FormControl>
 
@@ -760,7 +775,7 @@ export const AddSignersFormPartial = ({
                                           onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                                             handleRoleChange(index, value as RecipientRole);
-                                            void handleOnBlur();
+                                            void handleAutoSave();
                                           }}
                                           disabled={
                                             snapshot.isDragging ||
@@ -783,6 +798,7 @@ export const AddSignersFormPartial = ({
                                       'mb-6': form.formState.errors.signers?.[index],
                                     },
                                   )}
+                                  data-testid="remove-signer-button"
                                   disabled={
                                     snapshot.isDragging ||
                                     isSubmitting ||
