@@ -172,15 +172,19 @@ export const AddSignersFormPartial = ({
   const { scheduleSave } = useAutoSave(onAutoSave);
 
   const handleAutoSave = useCallback(async () => {
+    if (emptySigners().length > 0) {
+      return;
+    }
+
     const isFormValid = await form.trigger();
     const { isDirty } = form.formState;
 
     const formData = form.getValues();
 
-    if (isFormValid && isDirty && emptySigners().length === 0) {
+    if (isFormValid && isDirty) {
       scheduleSave(formData);
     }
-  }, [form, emptySigners, scheduleSave]);
+  }, [form, emptySigners, form.formState.isDirty, scheduleSave]);
 
   const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
   const isUserAlreadyARecipient = watchedSigners.some(
@@ -460,7 +464,6 @@ export const AddSignersFormPartial = ({
                       {...field}
                       id="signingOrder"
                       checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                      onBlur={handleAutoSave}
                       onCheckedChange={(checked) => {
                         if (!checked && hasAssistantRole) {
                           setShowSigningOrderConfirmation(true);
@@ -478,6 +481,8 @@ export const AddSignersFormPartial = ({
                             shouldDirty: true,
                           });
                         }
+
+                        void handleAutoSave();
                       }}
                       disabled={isSubmitting || hasDocumentBeenSent || emptySigners().length !== 0}
                     />
@@ -520,9 +525,9 @@ export const AddSignersFormPartial = ({
                       checked={value}
                       onCheckedChange={(checked) => {
                         field.onChange(checked);
+                        void handleAutoSave();
                       }}
                       disabled={isSubmitting || hasDocumentBeenSent || !isSigningOrderSequential}
-                      onBlur={handleAutoSave}
                     />
                   </FormControl>
 
@@ -677,6 +682,7 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
+                                        data-testid="signer-email-input"
                                         onKeyDown={onKeyDown}
                                         onBlur={handleAutoSave}
                                       />
