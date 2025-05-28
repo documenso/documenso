@@ -8,6 +8,7 @@ import { type TGetTeamByUrlResponse, getTeamByUrl } from '@documenso/lib/server-
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
+import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplateEditForm } from '~/components/general/template/template-edit-form';
 import { TemplateType } from '~/components/general/template/template-type';
@@ -44,13 +45,20 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(templateRootPath);
   }
 
+  if (template.folderId) {
+    throw redirect(`${templateRootPath}/f/${template.folderId}/${templateId}/edit`);
+  }
+
   const isTemplateEnterprise = await isUserEnterprise({
     userId: user.id,
     teamId: team?.id,
   });
 
   return superLoaderJson({
-    template,
+    template: {
+      ...template,
+      folder: null,
+    },
     isTemplateEnterprise,
     templateRootPath,
   });
@@ -64,7 +72,11 @@ export default function TemplateEditPage() {
       <div className="flex flex-col justify-between sm:flex-row">
         <div>
           <Link
-            to={`${templateRootPath}/${template.id}`}
+            to={
+              template.folderId
+                ? `${templateRootPath}/f/${template.folderId}/${template.id}`
+                : `${templateRootPath}/${template.id}`
+            }
             className="flex items-center text-[#7AC455] hover:opacity-80"
           >
             <ChevronLeft className="mr-2 inline-block h-5 w-5" />
@@ -91,8 +103,14 @@ export default function TemplateEditPage() {
           </div>
         </div>
 
-        <div className="mt-2 sm:mt-0 sm:self-end">
+        <div className="mt-2 flex items-center gap-2 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+
+          {template.useLegacyFieldInsertion && (
+            <div>
+              <LegacyFieldWarningPopover type="template" templateId={template.id} />
+            </div>
+          )}
         </div>
       </div>
 

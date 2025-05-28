@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 import {
   CheckCircle,
@@ -11,6 +10,8 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileDown,
+  FolderInput,
   Loader,
   MoreHorizontal,
   MoveRight,
@@ -22,6 +23,7 @@ import { Link } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
@@ -43,14 +45,14 @@ import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/d
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
-  row: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
-  };
+  row: TDocumentRow;
+  onMoveDocument?: () => void;
 };
 
-export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
+export const DocumentsTableActionDropdown = ({
+  row,
+  onMoveDocument,
+}: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
   const team = useOptionalCurrentTeam();
 
@@ -73,6 +75,9 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team?.url);
+  const formatPath = row.folderId
+    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
+    : `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -91,6 +96,32 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
       }
 
       await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onDownloadOriginalClick = async () => {
+    try {
+      const document = !recipient
+        ? await trpcClient.document.getDocumentById.query({
+            documentId: row.id,
+          })
+        : await trpcClient.document.getDocumentByToken.query({
+            token: recipient.token,
+          });
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: row.title, version: 'original' });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -141,7 +172,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link to={`${documentsPath}/${row.id}/edit`}>
+          <Link to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
@@ -150,6 +181,11 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
           <Download className="mr-2 h-4 w-4" />
           <Trans>Download</Trans>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem onClick={onDownloadOriginalClick}>
+          <FileDown className="mr-2 h-4 w-4" />
+          <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
@@ -162,6 +198,13 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
             <MoveRight className="mr-2 h-4 w-4" />
             <Trans>Move to Team</Trans>
+          </DropdownMenuItem>
+        )}
+
+        {onMoveDocument && (
+          <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
+            <FolderInput className="mr-2 h-4 w-4" />
+            <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
 

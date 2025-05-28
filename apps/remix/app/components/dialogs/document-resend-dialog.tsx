@@ -4,14 +4,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Team } from '@prisma/client';
-import { type Document, type Recipient, SigningStatus } from '@prisma/client';
+import { type Recipient, SigningStatus } from '@prisma/client';
 import { History } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -43,9 +43,7 @@ import { StackAvatar } from '../general/stack-avatar';
 const FORM_ID = 'resend-email';
 
 export type DocumentResendDialogProps = {
-  document: Document & {
-    team: Pick<Team, 'id' | 'url'> | null;
-  };
+  document: TDocumentRow;
   recipients: Recipient[];
 };
 

@@ -22,6 +22,7 @@ import { addRejectionStampToPdf } from '../pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
 import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
+import { legacy_insertFieldInPDF } from '../pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
@@ -146,7 +147,9 @@ export const sealDocument = async ({
   }
 
   for (const field of fields) {
-    await insertFieldInPDF(doc, field);
+    document.useLegacyFieldInsertion
+      ? await legacy_insertFieldInPDF(doc, field)
+      : await insertFieldInPDF(doc, field);
   }
 
   // Re-flatten post-insertion to handle fields that create arcoFields

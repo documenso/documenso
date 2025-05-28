@@ -19,7 +19,7 @@ import { z } from 'zod';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentCreatedFromDirectTemplateEmailTemplate } from '@documenso/email/templates/document-created-from-direct-template';
-import { nanoid } from '@documenso/lib/universal/id';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/field-router/schema';
 
@@ -276,6 +276,7 @@ export const createDocumentFromDirectTemplate = async ({
     // Create the document and non direct template recipients.
     const document = await tx.document.create({
       data: {
+        qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: template.id,
         userId: template.userId,

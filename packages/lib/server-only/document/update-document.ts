@@ -21,6 +21,7 @@ export type UpdateDocumentOptions = {
     visibility?: DocumentVisibility | null;
     globalAccessAuth?: TDocumentAccessAuthTypes | null;
     globalActionAuth?: TDocumentActionAuthTypes | null;
+    useLegacyFieldInsertion?: boolean;
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -115,6 +116,7 @@ export const updateDocument = async ({
   }
 
   if (!data || Object.values(data).length === 0) {
+    console.log('no data');
     return document;
   }
 
@@ -217,7 +219,8 @@ export const updateDocument = async ({
     );
   }
 
-  if (auditLogs.length === 0) {
+  // Early return if nothing is required.
+  if (auditLogs.length === 0 && data.useLegacyFieldInsertion === undefined) {
     return document;
   }
 
@@ -235,6 +238,7 @@ export const updateDocument = async ({
         title: data.title,
         externalId: data.externalId,
         visibility: data.visibility as DocumentVisibility,
+        useLegacyFieldInsertion: data.useLegacyFieldInsertion,
         authOptions,
       },
     });
