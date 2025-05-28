@@ -31,6 +31,12 @@ export const DocumentGlobalAuthActionSelect = forwardRef<
 >(({ isDocumentEnterprise, ...props }, ref) => {
   const { _ } = useLingui();
 
+  const authTypes = isDocumentEnterprise
+    ? Object.values(DocumentActionAuth).filter((auth) => auth !== DocumentAuth.ACCOUNT)
+    : Object.values(NonEnterpriseDocumentActionAuth).filter(
+        (auth) => auth !== DocumentAuth.EXPLICIT_NONE,
+      );
+
   return (
     <Select {...props}>
       <SelectTrigger className="bg-background text-muted-foreground">
@@ -47,21 +53,11 @@ export const DocumentGlobalAuthActionSelect = forwardRef<
           <Trans>No restrictions</Trans>
         </SelectItem>
 
-        {isDocumentEnterprise
-          ? Object.values(DocumentActionAuth)
-              .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-              .map((authType) => (
-                <SelectItem key={authType} value={authType}>
-                  {DOCUMENT_AUTH_TYPES[authType].value}
-                </SelectItem>
-              ))
-          : Object.values(NonEnterpriseDocumentActionAuth)
-              .filter((auth) => auth !== DocumentAuth.EXPLICIT_NONE)
-              .map((authType) => (
-                <SelectItem key={authType} value={authType}>
-                  {DOCUMENT_AUTH_TYPES[authType].value}
-                </SelectItem>
-              ))}
+        {authTypes.map((authType) => (
+          <SelectItem key={authType} value={authType}>
+            {DOCUMENT_AUTH_TYPES[authType].value}
+          </SelectItem>
+        ))}
       </SelectContent>
     </Select>
   );

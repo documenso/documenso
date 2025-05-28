@@ -62,7 +62,7 @@ export const DocumentSigningTextField = ({
   const [errors, setErrors] = useState(initialErrors);
   const userInputHasErrors = Object.values(errors).some((error) => error.length > 0);
 
-  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);

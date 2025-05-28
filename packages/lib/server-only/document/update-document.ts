@@ -114,7 +114,6 @@ export const updateDocument = async ({
     }
   }
 
-  // If no data just return the document since this function is normally chained after a meta update.
   if (!data || Object.values(data).length === 0) {
     return document;
   }
@@ -126,25 +125,10 @@ export const updateDocument = async ({
   const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
   const documentGlobalActionAuth = documentAuthOption?.globalActionAuth ?? null;
 
-  // If the new global auth values aren't passed in, fallback to the current document values.
   const newGlobalAccessAuth =
     data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
   const newGlobalActionAuth =
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
-
-  // Check if user has permission to set the global action auth.
-  // if (newGlobalActionAuth) {
-  //   const isDocumentEnterprise = await isUserEnterprise({
-  //     userId,
-  //     teamId,
-  //   });
-
-  //   if (!isDocumentEnterprise) {
-  //     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-  //       message: 'You do not have permission to set the action auth',
-  //     });
-  //   }
-  // }
 
   const isTitleSame = data.title === undefined || data.title === document.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
@@ -233,7 +217,6 @@ export const updateDocument = async ({
     );
   }
 
-  // Early return if nothing is required.
   if (auditLogs.length === 0) {
     return document;
   }

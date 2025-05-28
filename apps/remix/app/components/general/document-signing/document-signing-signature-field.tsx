@@ -59,7 +59,7 @@ export const DocumentSigningSignatureField = ({
   const { signature: providedSignature, setSignature: setProvidedSignature } =
     useRequiredDocumentSigningContext();
 
-  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
   const { mutateAsync: signFieldWithToken, isPending: isSignFieldWithTokenLoading } =
     trpc.field.signFieldWithToken.useMutation(DO_NOT_INVALIDATE_QUERY_ON_MUTATION);

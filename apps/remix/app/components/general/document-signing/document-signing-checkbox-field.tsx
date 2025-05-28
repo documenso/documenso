@@ -43,7 +43,7 @@ export const DocumentSigningCheckboxField = ({
 
   const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
-  const { executeActionAuthProcedure, isEnterprise } = useRequiredDocumentSigningAuthContext();
+  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
   const parsedFieldMeta = ZCheckboxFieldMeta.parse(
     field.fieldMeta ?? {
