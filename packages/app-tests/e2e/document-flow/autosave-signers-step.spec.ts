@@ -121,6 +121,18 @@ test.describe('AutoSave Signers Step', () => {
     await page.getByLabel('Allow signers to dictate next signer').check();
     await triggerAutosave(page);
 
+    await page.getByTestId('signing-order-input').nth(0).fill('3');
+    await page.getByTestId('signing-order-input').nth(0).blur();
+    await triggerAutosave(page);
+
+    await page.getByTestId('signing-order-input').nth(1).fill('1');
+    await page.getByTestId('signing-order-input').nth(1).blur();
+    await triggerAutosave(page);
+
+    await page.getByTestId('signing-order-input').nth(2).fill('2');
+    await page.getByTestId('signing-order-input').nth(2).blur();
+    await triggerAutosave(page);
+
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
@@ -131,14 +143,11 @@ test.describe('AutoSave Signers Step', () => {
       userId: user.id,
     });
 
-    expect(recipientsFromDB.length).toBe(3);
-    expect(recipientsFromDB[0].email).toBe('recipient1@documenso.com');
-    expect(recipientsFromDB[0].name).toBe('Recipient 1');
-    expect(recipientsFromDB[1].email).toBe('recipient2@documenso.com');
-    expect(recipientsFromDB[1].name).toBe('Recipient 2');
-    expect(recipientsFromDB[2].email).toBe('recipient3@documenso.com');
-    expect(recipientsFromDB[2].name).toBe('Recipient 3');
     expect(documentDataFromDB.documentMeta?.signingOrder).toBe('SEQUENTIAL');
     expect(documentDataFromDB.documentMeta?.allowDictateNextSigner).toBe(true);
+    expect(recipientsFromDB.length).toBe(3);
+    expect(recipientsFromDB[0].signingOrder).toBe(2);
+    expect(recipientsFromDB[1].signingOrder).toBe(3);
+    expect(recipientsFromDB[2].signingOrder).toBe(1);
   });
 });
