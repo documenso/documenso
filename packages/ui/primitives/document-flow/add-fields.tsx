@@ -594,7 +594,7 @@ export const AddFieldsFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleOnBlur = useCallback(async () => {
+  const handleAutoSave = useCallback(async () => {
     const isFormValid = await form.trigger();
     const { isDirty } = form.formState;
 
@@ -603,7 +603,7 @@ export const AddFieldsFormPartial = ({
     if (isFormValid && isDirty) {
       scheduleSave(formData);
     }
-  }, [form, scheduleSave]);
+  }, [form, form.formState.isDirty, scheduleSave]);
 
   return (
     <>
@@ -618,7 +618,10 @@ export const AddFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
-          onSave={handleSavedFieldSettings}
+          onSave={(fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            void handleAutoSave();
+          }}
           teamId={teamId}
         />
       ) : (
@@ -678,13 +681,22 @@ export const AddFieldsFormPartial = ({
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => {
                         setLastActiveField(null);
-                        void handleOnBlur();
+                        void handleAutoSave();
                       }}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
-                      onRemove={() => remove(index)}
-                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                      onRemove={() => {
+                        remove(index);
+                        void handleAutoSave();
+                      }}
+                      onDuplicate={() => {
+                        onFieldCopy(null, { duplicate: true });
+                        void handleAutoSave();
+                      }}
+                      onDuplicateAllPages={() => {
+                        onFieldCopy(null, { duplicateAll: true });
+                        void handleAutoSave();
+                      }}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
