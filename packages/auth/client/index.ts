@@ -47,6 +47,24 @@ export class AuthClient {
     window.location.href = redirectPath ?? this.signOutredirectPath;
   }
 
+  public async signOutAllSessions({ redirectPath }: { redirectPath?: string } = {}) {
+    await this.client['signout-all'].$post();
+
+    window.location.href = redirectPath ?? this.signOutredirectPath;
+  }
+
+  public async signOutSession({
+    sessionId,
+    redirectPath,
+  }: {
+    sessionId: string;
+    redirectPath?: string;
+  }) {
+    await this.client['signout-session'][':sessionId'].$post({ param: { sessionId } });
+
+    window.location.href = redirectPath ?? this.signOutredirectPath;
+  }
+
   public async getSession() {
     const response = await this.client['session-json'].$get();
 
