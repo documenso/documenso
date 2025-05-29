@@ -35,12 +35,27 @@ export default defineConfig({
   ],
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
-    external: ['@node-rs/bcrypt', '@prisma/client', '@documenso/tailwind-config'],
+    external: [
+      '@node-rs/bcrypt',
+      '@prisma/client',
+      '@documenso/tailwind-config',
+      'playwright',
+      'playwright-core',
+      '@playwright/browser-chromium',
+    ],
   },
   optimizeDeps: {
     entries: ['./app/**/*', '../../packages/ui/**/*', '../../packages/lib/**/*'],
     include: ['prop-types', 'file-selector', 'attr-accept'],
-    exclude: ['node_modules', '@node-rs/bcrypt', '@documenso/pdf-sign', 'sharp'],
+    exclude: [
+      'node_modules',
+      '@node-rs/bcrypt',
+      '@documenso/pdf-sign',
+      'sharp',
+      'playwright',
+      'playwright-core',
+      '@playwright/browser-chromium',
+    ],
   },
   resolve: {
     alias: {
@@ -68,7 +83,8 @@ export default defineConfig({
         '@documenso/pdf-sign',
         '@aws-sdk/cloudfront-signer',
         'nodemailer',
-        'playwright',
+        /playwright/,
+        '@playwright/browser-chromium',
       ],
     },
   },

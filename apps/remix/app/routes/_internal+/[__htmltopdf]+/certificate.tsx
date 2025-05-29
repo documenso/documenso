@@ -17,6 +17,7 @@ import {
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getTranslations } from '@documenso/lib/utils/i18n';
@@ -62,6 +63,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
+  const team = document.teamId
+    ? await getTeamById({ teamId: document.teamId, userId: document.userId })
+    : null;
+
   const isPlatformDocument = await isDocumentPlatform(document);
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
@@ -74,6 +79,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return {
     document,
+    team,
     documentLanguage,
     isPlatformDocument,
     auditLogs,
@@ -91,7 +97,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
+  const { document, team, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -343,7 +349,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
         </CardContent>
       </Card>
 
-      {isPlatformDocument && (
+      {!isPlatformDocument && !team?.teamGlobalSettings?.brandingHidePoweredBy && (
         <div className="my-8 flex-row-reverse space-y-4">
           <div className="flex items-end justify-end gap-x-4">
             <div

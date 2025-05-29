@@ -15,7 +15,6 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@auth/kysely-adapter": "^0.6.0",
     "@aws-sdk/client-s3": "^3.410.0",
     "@aws-sdk/cloudfront-signer": "^3.410.0",
     "@aws-sdk/s3-request-presigner": "^3.410.0",
@@ -41,12 +40,13 @@
     "kysely": "0.26.3",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
-    "nanoid": "^4.0.2",
+    "nanoid": "^5.1.5",
     "oslo": "^0.17.0",
     "pdf-lib": "^1.17.1",
     "pg": "^8.11.3",
-    "playwright": "1.43.0",
-    "posthog-js": "^1.224.0",
+    "playwright": "1.52.0",
+    "posthog-js": "^1.245.0",
+    "posthog-node": "^4.17.0",
     "react": "^18",
     "remeda": "^2.17.3",
     "sharp": "0.32.6",
@@ -55,7 +55,7 @@
     "zod": "3.24.1"
   },
   "devDependencies": {
-    "@playwright/browser-chromium": "1.43.0",
+    "@playwright/browser-chromium": "1.52.0",
     "@types/luxon": "^3.3.1",
     "@types/pg": "^8.11.4"
   }
