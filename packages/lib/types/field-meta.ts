@@ -155,6 +155,10 @@ export const ZFieldMetaPrefillFieldsSchema = z
         label: z.string().optional(),
         value: z.string().optional(),
       }),
+      z.object({
+        type: z.literal('date'),
+        value: z.string().optional(),
+      }),
     ]),
   );
 

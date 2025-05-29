@@ -10,6 +10,8 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileDown,
+  FolderInput,
   Loader,
   MoreHorizontal,
   MoveRight,
@@ -182,7 +184,7 @@ export const DocumentsTableActionDropdown = ({
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <Download className="mr-2 h-4 w-4" />
+          <FileDown className="mr-2 h-4 w-4" />
           <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
@@ -201,7 +203,7 @@ export const DocumentsTableActionDropdown = ({
 
         {onMoveDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
-            <MoveRight className="mr-2 h-4 w-4" />
+            <FolderInput className="mr-2 h-4 w-4" />
             <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}

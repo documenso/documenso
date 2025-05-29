@@ -119,6 +119,15 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
   key: z.string(),
 });
 
+export const ZDownloadDocumentQuerySchema = z.object({
+  downloadOriginalDocument: z
+    .preprocess((val) => String(val) === 'true' || String(val) === '1', z.boolean())
+    .optional()
+    .default(false),
+});
+
+export type TDownloadDocumentQuerySchema = z.infer<typeof ZDownloadDocumentQuerySchema>;
+
 export const ZDownloadDocumentSuccessfulSchema = z.object({
   downloadUrl: z.string(),
 });

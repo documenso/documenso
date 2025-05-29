@@ -11,6 +11,7 @@ import {
   ZDeleteDocumentMutationSchema,
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
+  ZDownloadDocumentQuerySchema,
   ZDownloadDocumentSuccessfulSchema,
   ZFindTeamMembersResponseSchema,
   ZGenerateDocumentFromTemplateMutationResponseSchema,
@@ -71,6 +72,7 @@ export const ApiContractV1 = c.router(
     downloadSignedDocument: {
       method: 'GET',
       path: '/api/v1/documents/:id/download',
+      query: ZDownloadDocumentQuerySchema,
       responses: {
         200: ZDownloadDocumentSuccessfulSchema,
         401: ZUnsuccessfulResponseSchema,

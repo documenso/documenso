@@ -1,9 +1,14 @@
-import { DocumentSource, type Prisma } from '@prisma/client';
+import { DocumentSource, type Prisma, WebhookTriggerEvents } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import {
+  ZWebhookDocumentSchema,
+  mapDocumentToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { prefixedId } from '../../universal/id';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
@@ -86,7 +91,24 @@ export const duplicateDocument = async ({
     };
   }
 
-  const createdDocument = await prisma.document.create(createDocumentArguments);
+  const createdDocument = await prisma.document.create({
+    ...createDocumentArguments,
+    include: {
+      recipients: true,
+      documentMeta: true,
+    },
+  });
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_CREATED,
+    data: ZWebhookDocumentSchema.parse({
+      ...mapDocumentToWebhookDocumentPayload(createdDocument),
+      recipients: createdDocument.recipients,
+      documentMeta: createdDocument.documentMeta,
+    }),
+    userId: userId,
+    teamId: teamId,
+  });
 
   return {
     documentId: createdDocument.id,

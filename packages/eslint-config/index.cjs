@@ -1,13 +1,7 @@
 module.exports = {
-  extends: [
-    'next',
-    'turbo',
-    'eslint:recommended',
-    'plugin:@typescript-eslint/recommended',
-    'plugin:package-json/recommended',
-  ],
+  extends: ['next', 'turbo', 'eslint:recommended', 'plugin:@typescript-eslint/recommended'],
 
-  plugins: ['package-json', 'unused-imports'],
+  plugins: ['unused-imports'],
 
   env: {
     es2022: true,

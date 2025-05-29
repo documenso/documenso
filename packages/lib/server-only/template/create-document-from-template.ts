@@ -9,11 +9,13 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -508,10 +510,8 @@ export const createDocumentFromTemplate = async ({
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
           const prefillField = prefillFields?.find((value) => value.id === field.id);
-          // Use type assertion to help TypeScript understand the structure
-          const updatedFieldMeta = getUpdatedFieldMeta(field, prefillField);
 
-          return {
+          const payload = {
             documentId: document.id,
             recipientId: recipient.id,
             type: field.type,
@@ -522,8 +522,38 @@ export const createDocumentFromTemplate = async ({
             height: field.height,
             customText: '',
             inserted: false,
-            fieldMeta: updatedFieldMeta,
+            fieldMeta: field.fieldMeta,
           };
+
+          if (prefillField) {
+            match(prefillField)
+              .with({ type: 'date' }, (selector) => {
+                if (!selector.value) {
+                  throw new AppError(AppErrorCode.INVALID_BODY, {
+                    message: `Date value is required for field ${field.id}`,
+                  });
+                }
+
+                const date = new Date(selector.value);
+
+                if (isNaN(date.getTime())) {
+                  throw new AppError(AppErrorCode.INVALID_BODY, {
+                    message: `Invalid date value for field ${field.id}: ${selector.value}`,
+                  });
+                }
+
+                payload.customText = DateTime.fromJSDate(date).toFormat(
+                  template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                );
+
+                payload.inserted = true;
+              })
+              .otherwise((selector) => {
+                payload.fieldMeta = getUpdatedFieldMeta(field, selector);
+              });
+          }
+
+          return payload;
         }),
       );
     });

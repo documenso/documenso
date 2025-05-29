@@ -1,5 +1,6 @@
 import { type Page, expect, test } from '@playwright/test';
 
+import { alphaid } from '@documenso/lib/universal/id';
 import {
   extractUserVerificationToken,
   seedTestEmail,
@@ -23,9 +24,11 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   await signSignaturePad(page);
 
   await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await page.getByLabel('Public profile username').fill(Date.now().toString());
 
-  await page.getByRole('button', { name: 'Complete', exact: true }).click();
+  await page.getByLabel('Public profile username').fill(alphaid(10));
+  await page.getByLabel('Public profile username').blur();
+
+  await page.getByRole('button', { name: 'Complete' }).click();
 
   await page.waitForURL('/unverified-account');
 
