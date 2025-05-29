@@ -16,7 +16,7 @@ export type DocumentDialogProps = {
 /**
  * A dialog which renders the provided document.
  */
-export default function DocumentDialog({ trigger, documentData, ...props }: DocumentDialogProps) {
+export function DocumentDialog({ trigger, documentData, ...props }: DocumentDialogProps) {
   const [documentLoaded, setDocumentLoaded] = useState(false);
 
   const onDocumentLoad = () => {

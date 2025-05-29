@@ -26,7 +26,7 @@ import { getAllRecipientsByDocumentId } from '@documenso/lib/server-only/recipie
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
-import DocumentDialog from '@documenso/ui/components/document/document-dialog';
+import { DocumentDialog } from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -57,16 +57,15 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const [fields, recipient] = await Promise.all([
+  const [fields, recipient, allRecipients] = await Promise.all([
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getAllRecipientsByDocumentId({ documentId: document.id }),
   ]);
 
   if (!recipient) {
     throw new Response('Not Found', { status: 404 });
   }
-
-  const allRecipients = await getAllRecipientsByDocumentId({ documentId: document.id });
 
   const isDocumentAccessValid = await isRecipientAuthorized({
     type: 'ACCESS',
@@ -75,9 +74,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     userId: user?.id,
   });
 
-  const isDocumentWaitingForSignatureFromOthers = allRecipients.some(
-    (r) => r.role !== RecipientRole.CC && r.signingStatus !== SigningStatus.SIGNED,
-  );
+  const isDocumentWaitingForSignatureFromOthers =
+    allRecipients.length > 1 &&
+    allRecipients.some(
+      (r) => r.role !== RecipientRole.CC && r.signingStatus !== SigningStatus.SIGNED,
+    );
 
   if (!isDocumentAccessValid) {
     return {
@@ -88,9 +89,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const signatures = await getRecipientSignatures({ recipientId: recipient.id });
-  const isExistingUser = await getUserByEmail({ email: recipient.email })
-    .then((u) => !!u)
-    .catch(() => false);
+  const isExistingUser = recipient.email
+    ? await getUserByEmail({ email: recipient.email })
+        .then((u) => !!u)
+        .catch(() => false)
+    : false;
 
   const recipientName =
     recipient.name ||
@@ -129,7 +132,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
   } = loaderData;
 
   if (!isDocumentAccessValid) {
-    return <DocumentSigningAuthPageView email={recipientEmail} />;
+    return <DocumentSigningAuthPageView email={recipientEmail ?? ''} />;
   }
 
   return (
@@ -158,7 +161,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
           {/* Card with recipient */}
           <SigningCard3D
-            name={recipientName}
+            name={recipientName ?? ''}
             signature={signatures.at(0)}
             signingCelebrationImage={signingCelebration}
           />
@@ -186,7 +189,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               <div className="mt-4 flex items-center text-center text-blue-600">
                 <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                 <span className="text-sm">
-                  <Trans>Processing document... Please wait.</Trans>
+                  <Trans>Processing document...</Trans>
                 </span>
               </div>
             ))
@@ -284,7 +287,10 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 </Trans>
               </p>
 
-              <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
+              <ClaimAccount
+                defaultName={recipientName ?? ''}
+                defaultEmail={recipient.email ?? ''}
+              />
             </div>
           )}
 

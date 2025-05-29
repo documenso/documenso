@@ -8,6 +8,7 @@ import { Link, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import { isDocumentBeingProcessed } from '@documenso/lib/utils/document';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
@@ -75,7 +76,12 @@ export default function AdminDocumentsPage() {
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => (
+          <DocumentStatus
+            status={row.original.status}
+            isProcessing={isDocumentBeingProcessed(row.original)}
+          />
+        ),
       },
       {
         header: _(msg`Owner`),
