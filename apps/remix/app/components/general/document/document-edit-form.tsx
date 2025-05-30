@@ -465,7 +465,7 @@ export const DocumentEditForm = ({
             />
 
             <AddFieldsFormPartial
-              key={fields.length}
+              key={document.id}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}

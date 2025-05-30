@@ -201,11 +201,8 @@ test.describe('AutoSave Fields Step', () => {
     expect(fieldsFromDB[3].type).toBe('SIGNATURE');
   });
 
-  // TODO: Add test for autosave the fields with advanced settings
-  /* test('should autosave the fields with advanced settings', async ({ page }) => {
+  test('should autosave the fields with advanced settings', async ({ page }) => {
     const { user, document } = await setupDocumentAndNavigateToFieldsStep(page);
-
-    await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -228,5 +225,36 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('textbox', { name: 'Field label' }).fill('Test Field');
     await page.getByRole('textbox', { name: 'Field placeholder' }).fill('Test Placeholder');
     await page.getByRole('textbox', { name: 'Add text to the field' }).fill('Test Text');
-  }); */
+
+    await page.waitForTimeout(2500);
+    await triggerAutosave(page);
+
+    const fieldsFromDB = await getFieldsForDocument({
+      documentId: document.id,
+      userId: user.id,
+    });
+
+    expect(fieldsFromDB.length).toBe(2);
+    expect(fieldsFromDB[0].type).toBe('SIGNATURE');
+    expect(fieldsFromDB[1].type).toBe('TEXT');
+
+    const textField = fieldsFromDB[1];
+    expect(textField.fieldMeta).toBeDefined();
+
+    if (
+      textField.fieldMeta &&
+      typeof textField.fieldMeta === 'object' &&
+      'type' in textField.fieldMeta
+    ) {
+      expect(textField.fieldMeta.type).toBe('text');
+      expect(textField.fieldMeta.label).toBe('Test Field');
+      expect(textField.fieldMeta.placeholder).toBe('Test Placeholder');
+
+      if (textField.fieldMeta.type === 'text') {
+        expect(textField.fieldMeta.text).toBe('Test Text');
+      }
+    } else {
+      throw new Error('fieldMeta should be defined and contain advanced settings');
+    }
+  });
 });

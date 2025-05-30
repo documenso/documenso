@@ -622,6 +622,10 @@ export const AddFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             void handleAutoSave();
           }}
+          onAutoSave={async (fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            await handleAutoSave();
+          }}
           teamId={teamId}
         />
       ) : (

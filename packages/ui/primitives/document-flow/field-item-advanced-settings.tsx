@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -6,6 +6,7 @@ import { useLingui } from '@lingui/react';
 import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import {
   type TBaseFieldMeta as BaseFieldMeta,
   type TCheckboxFieldMeta as CheckboxFieldMeta,
@@ -49,6 +50,7 @@ export type FieldAdvancedSettingsProps = {
   onAdvancedSettings?: () => void;
   isDocumentPdfLoaded?: boolean;
   onSave?: (fieldState: FieldMeta) => void;
+  onAutoSave: (fieldState: FieldMeta) => Promise<void>;
 };
 
 export type FieldMetaKeys =
@@ -146,7 +148,16 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
 
 export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSettingsProps>(
   (
-    { title, description, field, fields, onAdvancedSettings, isDocumentPdfLoaded = true, onSave },
+    {
+      title,
+      description,
+      field,
+      fields,
+      onAdvancedSettings,
+      isDocumentPdfLoaded = true,
+      onSave,
+      onAutoSave,
+    },
     ref,
   ) => {
     const { _ } = useLingui();
@@ -176,6 +187,24 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
+
+    const { scheduleSave } = useAutoSave(onAutoSave);
+
+    const handleAutoSave = useCallback(() => {
+      if (errors.length === 0) {
+        scheduleSave(fieldState);
+      }
+    }, [fieldState, errors.length, scheduleSave]);
+
+    // Auto-save to localStorage and schedule remote save when fieldState changes
+    useEffect(() => {
+      try {
+        localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
+        handleAutoSave();
+      } catch (error) {
+        console.error('Failed to save to localStorage:', error);
+      }
+    }, [fieldState, localStorageKey, handleAutoSave]);
 
     const handleFieldChange = (
       key: FieldMetaKeys,
