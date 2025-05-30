@@ -140,8 +140,6 @@ test.describe('AutoSave Settings Step', () => {
       userId: user.id,
     });
 
-    console.log(documentDataFromDB.documentMeta);
-
     expect(documentDataFromDB.documentMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
   });
 
@@ -159,8 +157,6 @@ test.describe('AutoSave Settings Step', () => {
       documentId: document.id,
       userId: user.id,
     });
-
-    console.log(documentDataFromDB.documentMeta);
 
     expect(documentDataFromDB.documentMeta?.timezone).toBe('Europe/London');
   });
