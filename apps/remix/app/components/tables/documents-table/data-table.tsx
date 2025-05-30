@@ -1,62 +1,111 @@
 import { useMemo, useTransition } from 'react';
 
+import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
+import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { DataTable } from '@documenso/ui/primitives/data-table/data-table';
+import {
+  type TimePeriod,
+  isDateInPeriod,
+} from '@documenso/ui/primitives/data-table/utils/time-filters';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
-import { DocumentsTableActionButton } from './documents-table-action-button';
-import { DocumentsTableActionDropdown } from './documents-table-action-dropdown';
+import { DocumentsTableActionButton } from '../documents-table-action-button';
+import { DocumentsTableActionDropdown } from '../documents-table-action-dropdown';
 
-export type DocumentsTableProps = {
-  data?: TFindDocumentsResponse;
+export type DataTableProps = {
+  data?: TFindDocumentsInternalResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
   onMoveDocument?: (documentId: number) => void;
 };
 
-type DocumentsTableRow = TFindDocumentsResponse['data'][number];
+type DocumentsTableRow = TFindDocumentsInternalResponse['data'][number];
 
-export const DocumentsTable = ({
+export function DocumentsDataTable({
   data,
   isLoading,
   isLoadingError,
   onMoveDocument,
-}: DocumentsTableProps) => {
-  const { _, i18n } = useLingui();
-
+}: DataTableProps) {
+  const { _ } = useLingui();
   const team = useOptionalCurrentTeam();
   const [isPending, startTransition] = useTransition();
-
   const updateSearchParams = useUpdateSearchParams();
+  const [searchParams] = useSearchParams();
+
+  const handleStatusFilterChange = (values: string[]) => {
+    startTransition(() => {
+      if (values.length === 0) {
+        updateSearchParams({ status: undefined, page: undefined });
+      } else {
+        updateSearchParams({ status: values.join(','), page: undefined });
+      }
+    });
+  };
+
+  const currentStatus = searchParams.get('status');
+  const selectedStatusValues = currentStatus ? currentStatus.split(',').filter(Boolean) : [];
+
+  const handleResetFilters = () => {
+    startTransition(() => {
+      updateSearchParams({ status: undefined, period: undefined, page: undefined });
+    });
+  };
+
+  const isStatusFiltered = selectedStatusValues.length > 0;
+
+  const handleTimePeriodFilterChange = (values: string[]) => {
+    startTransition(() => {
+      if (values.length === 0) {
+        updateSearchParams({ period: undefined, page: undefined });
+      } else {
+        updateSearchParams({ period: values[0], page: undefined });
+      }
+    });
+  };
+
+  const currentPeriod = searchParams.get('period');
+  const selectedTimePeriodValues = currentPeriod ? [currentPeriod] : [];
+  const isTimePeriodFiltered = selectedTimePeriodValues.length > 0;
 
   const columns = useMemo(() => {
     return [
       {
-        header: _(msg`Created`),
+        header: 'Created',
         accessorKey: 'createdAt',
         cell: ({ row }) =>
           i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        filterFn: (row, id, value) => {
+          const createdAt = row.getValue(id) as Date;
+          if (!value || !Array.isArray(value) || value.length === 0) {
+            return true;
+          }
+
+          const period = value[0] as TimePeriod;
+          return isDateInPeriod(createdAt, period);
+        },
       },
       {
         header: _(msg`Title`),
+        accessorKey: 'title',
         cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
       },
       {
@@ -79,6 +128,9 @@ export const DocumentsTable = ({
         accessorKey: 'status',
         cell: ({ row }) => <DocumentStatus status={row.original.status} />,
         size: 140,
+        filterFn: (row, id, value) => {
+          return value.includes(row.getValue(id));
+        },
       },
       {
         header: _(msg`Actions`),
@@ -115,8 +167,8 @@ export const DocumentsTable = ({
   return (
     <div className="relative">
       <DataTable
-        columns={columns}
         data={results.data}
+        columns={columns}
         perPage={results.perPage}
         currentPage={results.currentPage}
         totalPages={results.totalPages}
@@ -124,6 +176,14 @@ export const DocumentsTable = ({
         columnVisibility={{
           sender: team !== undefined,
         }}
+        stats={data?.stats}
+        onStatusFilterChange={handleStatusFilterChange}
+        selectedStatusValues={selectedStatusValues}
+        onTimePeriodFilterChange={handleTimePeriodFilterChange}
+        selectedTimePeriodValues={selectedTimePeriodValues}
+        onResetFilters={handleResetFilters}
+        isStatusFiltered={isStatusFiltered}
+        isTimePeriodFiltered={isTimePeriodFiltered}
         error={{
           enable: isLoadingError || false,
         }}
@@ -163,7 +223,7 @@ export const DocumentsTable = ({
       )}
     </div>
   );
-};
+}
 
 type DataTableTitleProps = {
   row: DocumentsTableRow;

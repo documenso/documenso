@@ -10,14 +10,26 @@ import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
-export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
+export type PeriodSelectorValue =
+  | ''
+  | 'today'
+  | 'yesterday'
+  | 'this-week'
+  | 'last-week'
+  | 'this-month'
+  | 'last-month'
+  | 'this-quarter'
+  | 'last-quarter'
+  | 'this-year'
+  | 'last-year'
+  | 'all-time';
 
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
   templateId?: number;
   source?: DocumentSource;
-  status?: ExtendedDocumentStatus;
+  status?: ExtendedDocumentStatus[];
   page?: number;
   perPage?: number;
   orderBy?: {
@@ -35,7 +47,7 @@ export const findDocuments = async ({
   teamId,
   templateId,
   source,
-  status = ExtendedDocumentStatus.ALL,
+  status = [ExtendedDocumentStatus.ALL],
   page = 1,
   perPage = 10,
   orderBy,
@@ -122,10 +134,30 @@ export const findDocuments = async ({
     },
   ];
 
-  let filters: Prisma.DocumentWhereInput | null = findDocumentsFilter(status, user, folderId);
+  let filters: Prisma.DocumentWhereInput | null = null;
+
+  if (status.length === 1) {
+    filters = findDocumentsFilter(status[0], user, folderId);
+  } else if (status.length > 1) {
+    const statusFilters = status
+      .map((s) => findDocumentsFilter(s, user, folderId))
+      .filter((filter): filter is Prisma.DocumentWhereInput => filter !== null);
+    if (statusFilters.length > 0) {
+      filters = { OR: statusFilters };
+    }
+  }
 
   if (team) {
-    filters = findTeamDocumentsFilter(status, team, visibilityFilters, folderId);
+    if (status.length === 1) {
+      filters = findTeamDocumentsFilter(status[0], team, visibilityFilters, folderId);
+    } else if (status.length > 1) {
+      const statusFilters = status
+        .map((s) => findTeamDocumentsFilter(s, team, visibilityFilters, folderId))
+        .filter((filter): filter is Prisma.DocumentWhereInput => filter !== null);
+      if (statusFilters.length > 0) {
+        filters = { OR: statusFilters };
+      }
+    }
   }
 
   if (filters === null) {
@@ -213,13 +245,60 @@ export const findDocuments = async ({
     AND: whereAndClause,
   };
 
-  if (period) {
-    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+  if (period && period !== 'all-time') {
+    const now = DateTime.now();
+    let startDate: DateTime;
+    let endDate: DateTime;
 
-    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+    switch (period) {
+      case 'today':
+        startDate = now.startOf('day');
+        endDate = now.endOf('day');
+        break;
+      case 'yesterday':
+        startDate = now.minus({ days: 1 }).startOf('day');
+        endDate = now.minus({ days: 1 }).endOf('day');
+        break;
+      case 'this-week':
+        startDate = now.startOf('week');
+        endDate = now.endOf('week');
+        break;
+      case 'last-week':
+        startDate = now.minus({ weeks: 1 }).startOf('week');
+        endDate = now.minus({ weeks: 1 }).endOf('week');
+        break;
+      case 'this-month':
+        startDate = now.startOf('month');
+        endDate = now.endOf('month');
+        break;
+      case 'last-month':
+        startDate = now.minus({ months: 1 }).startOf('month');
+        endDate = now.minus({ months: 1 }).endOf('month');
+        break;
+      case 'this-quarter':
+        startDate = now.startOf('quarter');
+        endDate = now.endOf('quarter');
+        break;
+      case 'last-quarter':
+        startDate = now.minus({ quarters: 1 }).startOf('quarter');
+        endDate = now.minus({ quarters: 1 }).endOf('quarter');
+        break;
+      case 'this-year':
+        startDate = now.startOf('year');
+        endDate = now.endOf('year');
+        break;
+      case 'last-year':
+        startDate = now.minus({ years: 1 }).startOf('year');
+        endDate = now.minus({ years: 1 }).endOf('year');
+        break;
+      default:
+        startDate = now.startOf('day');
+        endDate = now.endOf('day');
+    }
 
     whereClause.createdAt = {
-      gte: startOfPeriod.toJSDate(),
+      gte: startDate.toJSDate(),
+      lte: endDate.toJSDate(),
     };
   }
 
