@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -7,6 +9,7 @@ import { DocumentDistributionMethod, DocumentStatus, RecipientRole } from '@pris
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -43,6 +46,7 @@ export type AddSubjectFormProps = {
   fields: Field[];
   document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
+  onAutoSave: (_data: TAddSubjectFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -52,6 +56,7 @@ export const AddSubjectFormPartial = ({
   fields: fields,
   document,
   onSubmit,
+  onAutoSave,
   isDocumentPdfLoaded,
 }: AddSubjectFormProps) => {
   const { _ } = useLingui();
@@ -61,7 +66,9 @@ export const AddSubjectFormPartial = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { errors, isSubmitting },
+    getValues,
+    trigger,
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<TAddSubjectFormSchema>({
     defaultValues: {
       meta: {
@@ -97,6 +104,17 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = useCallback(async () => {
+    const isFormValid = await trigger();
+    const formData = getValues();
+
+    if (isFormValid && isDirty) {
+      scheduleSave(formData);
+    }
+  }, [isDirty, scheduleSave]);
 
   return (
     <>
@@ -153,6 +171,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2"
                     disabled={isSubmitting}
                     {...register('meta.subject')}
+                    onBlur={handleAutoSave}
                   />
 
                   <FormErrorMessage className="mt-2" error={errors.meta?.subject} />
@@ -170,6 +189,7 @@ export const AddSubjectFormPartial = ({
                     className="bg-background mt-2 h-32 resize-none"
                     disabled={isSubmitting}
                     {...register('meta.message')}
+                    onBlur={handleAutoSave}
                   />
 
                   <FormErrorMessage
@@ -185,7 +205,10 @@ export const AddSubjectFormPartial = ({
                 <DocumentEmailCheckboxes
                   className="mt-2"
                   value={emailSettings}
-                  onChange={(value) => setValue('meta.emailSettings', value)}
+                  onChange={(value) => {
+                    setValue('meta.emailSettings', value, { shouldDirty: true });
+                    void handleAutoSave();
+                  }}
                 />
               </motion.div>
             )}
