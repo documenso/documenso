@@ -167,7 +167,7 @@ export const DocumentsTable = ({
 
 type DataTableTitleProps = {
   row: DocumentsTableRow;
-  teamUrl?: string;
+  teamUrl: string;
 };
 
 const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
@@ -179,7 +179,7 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isRecipient = !!recipient;
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
-  const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
+  const documentsPath = formatDocumentsPath(teamUrl);
   const formatPath = `${documentsPath}/${row.id}`;
 
   return match({

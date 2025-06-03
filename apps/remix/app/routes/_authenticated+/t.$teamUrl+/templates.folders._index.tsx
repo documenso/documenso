@@ -15,6 +15,7 @@ import { TemplateFolderDeleteDialog } from '~/components/dialogs/template-folder
 import { TemplateFolderMoveDialog } from '~/components/dialogs/template-folder-move-dialog';
 import { TemplateFolderSettingsDialog } from '~/components/dialogs/template-folder-settings-dialog';
 import { FolderCard } from '~/components/general/folder/folder-card';
+import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
@@ -23,6 +24,8 @@ export function meta() {
 
 export default function TemplatesFoldersPage() {
   const navigate = useNavigate();
+  const team = useCurrentTeam();
+
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
   const [isDeletingFolder, setIsDeletingFolder] = useState(false);
@@ -39,7 +42,7 @@ export default function TemplatesFoldersPage() {
   const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
   const navigateToFolder = (folderId?: string | null) => {
-    const templatesPath = formatTemplatesPath();
+    const templatesPath = formatTemplatesPath(team.url);
 
     if (folderId) {
       void navigate(`${templatesPath}/f/${folderId}`);

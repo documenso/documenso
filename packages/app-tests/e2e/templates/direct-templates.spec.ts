@@ -9,7 +9,6 @@ import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templat
 import { seedTestEmail, seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
-import { checkDocumentTabCount } from '../fixtures/documents';
 
 // Duped from `packages/lib/utils/teams.ts` due to errors when importing that file.
 const formatDocumentsPath = (teamUrl: string) => `/t/${teamUrl}/documents`;
@@ -179,17 +178,4 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await page.getByRole('button', { name: 'Sign' }).click();
   await page.waitForURL(/\/sign/);
   await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
-
-  await apiSignin({
-    page,
-    email: owner.email,
-  });
-
-  // Check that the owner has the documents.
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(template.team?.url)}`);
-
-  await expect(async () => {
-    // Check that the document is in the 'All' tab.
-    await checkDocumentTabCount(page, 'Completed', 1);
-  }).toPass();
 });

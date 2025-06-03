@@ -94,7 +94,7 @@ type CreatePersonalOrganisationOptions = {
   orgUrl?: string;
   throwErrorOnOrganisationCreationFailure?: boolean;
   inheritMembers?: boolean;
-  type: OrganisationType;
+  type?: OrganisationType;
 };
 
 export const createPersonalOrganisation = async ({

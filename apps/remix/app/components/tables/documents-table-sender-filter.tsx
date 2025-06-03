@@ -27,7 +27,7 @@ export const DocumentsTableSenderFilter = ({ teamId }: DocumentsTableSenderFilte
 
   const comboBoxOptions = (data ?? []).map((member) => ({
     label: member.name ?? member.email,
-    value: member.userId,
+    value: member.userId.toString(),
   }));
 
   const onChange = (newSenderIds: string[]) => {

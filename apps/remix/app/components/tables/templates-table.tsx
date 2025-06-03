@@ -54,8 +54,7 @@ export const TemplatesTable = ({
   const updateSearchParams = useUpdateSearchParams();
 
   const formatTemplateLink = (row: TemplatesTableRow) => {
-    const isCurrentTeamTemplate = team?.url && row.team?.url === team?.url;
-    const path = formatTemplatesPath(isCurrentTeamTemplate ? team?.url : undefined);
+    const path = formatTemplatesPath(team.url);
 
     return `${path}/${row.id}`;
   };

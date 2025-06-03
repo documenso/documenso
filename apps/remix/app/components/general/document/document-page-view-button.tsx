@@ -19,7 +19,7 @@ export type DocumentPageViewButtonProps = {
   document: Document & {
     user: Pick<User, 'id' | 'name' | 'email'>;
     recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
+    team: Pick<Team, 'id' | 'url'>;
   };
 };
 
@@ -37,7 +37,7 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const role = recipient?.role;
 
-  const documentsPath = formatDocumentsPath(document.team?.url);
+  const documentsPath = formatDocumentsPath(document.team.url);
   const formatPath = `${documentsPath}/${document.id}/edit`;
 
   const onDownloadClick = async () => {
