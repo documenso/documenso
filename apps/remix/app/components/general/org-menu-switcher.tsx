@@ -51,7 +51,7 @@ export const OrgMenuSwitcher = () => {
   const isUserAdmin = isAdmin(user);
 
   const isPathOrgUrl = (orgUrl: string) => {
-    if (!pathname || !pathname.startsWith(`/org/`)) {
+    if (!pathname || !pathname.startsWith(`/o/`)) {
       return false;
     }
 
@@ -77,22 +77,6 @@ export const OrgMenuSwitcher = () => {
     }
 
     return user.name ? extractInitials(user.name) : user.email.slice(0, 1).toUpperCase();
-  };
-
-  /**
-   * Formats the redirect URL so we can switch between documents and templates page
-   * seemlessly between organisations and personal accounts.
-   */
-  const formatRedirectUrlOnSwitch = (orgUrl?: string) => {
-    const baseUrl = orgUrl ? `/org/${orgUrl}` : '';
-
-    const currentPathname = (pathname ?? '/').replace(/^\/org\/[^/]+/, '');
-
-    if (currentPathname === '/templates') {
-      return `${baseUrl}/templates`;
-    }
-
-    return baseUrl;
   };
 
   const dropdownMenuAvatarText = useMemo(() => {
@@ -184,7 +168,7 @@ export const OrgMenuSwitcher = () => {
                     )}
                     asChild
                   >
-                    <Link to={`/org/${org.url}`} className="flex items-center space-x-2 pr-8">
+                    <Link to={`/o/${org.url}`} className="flex items-center space-x-2 pr-8">
                       <span
                         className={cn('min-w-0 flex-1 truncate', {
                           'font-semibold': org.id === selectedOrg?.id,
@@ -201,7 +185,7 @@ export const OrgMenuSwitcher = () => {
                   ) && (
                     <div className="absolute bottom-0 right-0 top-0 flex items-center justify-center">
                       <Link
-                        to={`/org/${org.url}/settings`}
+                        to={`/o/${org.url}/settings`}
                         className="text-muted-foreground mr-2 rounded-sm border p-1 transition-opacity duration-200 group-hover:opacity-100 md:opacity-0"
                       >
                         <Settings2Icon className="h-3.5 w-3.5" />
@@ -271,7 +255,7 @@ export const OrgMenuSwitcher = () => {
 
                 {displayedOrg && (
                   <Button variant="ghost" className="w-full justify-start" asChild>
-                    <Link to={`/org/${displayedOrg.url}/settings/teams?action=add-team`}>
+                    <Link to={`/o/${displayedOrg.url}/settings/teams?action=add-team`}>
                       <Plus className="mr-2 h-4 w-4" />
                       <Trans>Create Team</Trans>
                     </Link>
@@ -316,7 +300,7 @@ export const OrgMenuSwitcher = () => {
                   currentOrganisation.currentOrganisationRole,
                 ) && (
                   <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                    <Link to={`/org/${currentOrganisation.url}/settings`}>
+                    <Link to={`/o/${currentOrganisation.url}/settings`}>
                       <Trans>Organisation settings</Trans>
                     </Link>
                   </DropdownMenuItem>

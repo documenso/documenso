@@ -8,7 +8,7 @@ import type { ApiToken } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -48,8 +48,9 @@ export const EXPIRATION_DATES = {
   ONE_YEAR: msg`12 months`,
 } as const;
 
-const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.extend({
-  enabled: z.boolean(),
+const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.pick({
+  tokenName: true,
+  expirationDate: true,
 });
 
 type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
@@ -86,7 +87,6 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     defaultValues: {
       tokenName: '',
       expirationDate: '',
-      enabled: false,
     },
   });
 
@@ -149,7 +149,10 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     <div className={cn(className)}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset className="mt-6 flex w-full flex-col gap-4">
+          <fieldset
+            className="mt-6 flex w-full flex-col gap-4"
+            disabled={form.formState.isSubmitting}
+          >
             <FormField
               control={form.control}
               name="tokenName"
@@ -209,47 +212,30 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="enabled"
-                render={({ field }) => (
-                  <FormItem className="">
-                    <FormLabel className="text-muted-foreground mt-2">
-                      <Trans>Never expire</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="block md:py-1.5">
-                        <Switch
-                          className="bg-background"
-                          checked={field.value}
-                          onCheckedChange={(val) => {
-                            setNoExpirationDate((prev) => !prev);
-                            field.onChange(val);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div>
+                <FormLabel className="text-muted-foreground mt-2">
+                  <Trans>Never expire</Trans>
+                </FormLabel>
+                <div className="block md:py-1.5">
+                  <Switch
+                    className="bg-background mt-2"
+                    checked={noExpirationDate}
+                    onCheckedChange={setNoExpirationDate}
+                  />
+                </div>
+              </div>
             </div>
 
             <Button
               type="submit"
               className="hidden md:inline-flex"
-              disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
               <Trans>Create token</Trans>
             </Button>
 
             <div className="md:hidden">
-              <Button
-                type="submit"
-                disabled={!form.formState.isDirty}
-                loading={form.formState.isSubmitting}
-              >
+              <Button type="submit" loading={form.formState.isSubmitting}>
                 <Trans>Create token</Trans>
               </Button>
             </div>

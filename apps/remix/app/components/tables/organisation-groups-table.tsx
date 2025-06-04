@@ -82,7 +82,7 @@ export const OrganisationGroupsDataTable = () => {
         cell: ({ row }) => (
           <div className="flex justify-end space-x-2">
             <Button asChild variant="outline">
-              <Link to={`/org/${organisation.url}/settings/groups/${row.original.id}`}>Manage</Link>
+              <Link to={`/o/${organisation.url}/settings/groups/${row.original.id}`}>Manage</Link>
             </Button>
 
             <OrganisationGroupDeleteDialog

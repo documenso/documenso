@@ -68,7 +68,7 @@ export const DocumentDropzone = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button className="hover:bg-warning/80 bg-warning" asChild>
-              <Link to={`/org/${organisation.url}/settings/billing`}>
+              <Link to={`/o/${organisation.url}/settings/billing`}>
                 <Trans>Upgrade</Trans>
               </Link>
             </Button>

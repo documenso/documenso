@@ -207,7 +207,7 @@ export const TemplatesTable = ({
               You have reached your document limit.{' '}
               <Link
                 className="underline underline-offset-4"
-                to={`/org/${organisation.url}/settings/billing`}
+                to={`/o/${organisation.url}/settings/billing`}
               >
                 Upgrade your account to continue!
               </Link>

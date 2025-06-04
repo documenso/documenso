@@ -53,7 +53,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   let [redirectState, redirectPath] = storedRedirectPath.split(' ');
 
   if (redirectState !== storedState || !redirectPath) {
-    redirectPath = '/documents';
+    redirectPath = '/';
   }
 
   const tokens = await oAuthClient.validateAuthorizationCode(

@@ -267,7 +267,7 @@ const BillingPlanForm = ({
   const [billingPeriod, setBillingPeriod] = useState<'monthlyPrice' | 'yearlyPrice'>('yearlyPrice');
 
   const dynamicPlans = useMemo(() => {
-    return [INTERNAL_CLAIM_ID.INDIVIDUAL, INTERNAL_CLAIM_ID.PRO, INTERNAL_CLAIM_ID.PLATFORM].map(
+    return [INTERNAL_CLAIM_ID.INDIVIDUAL, INTERNAL_CLAIM_ID.TEAM, INTERNAL_CLAIM_ID.PLATFORM].map(
       (planId) => {
         const plan = plans[planId];
 

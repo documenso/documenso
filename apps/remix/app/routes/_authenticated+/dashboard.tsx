@@ -103,7 +103,7 @@ export default function DashboardPage() {
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {organisations.map((org) => (
                 <div key={org.id} className="group relative">
-                  <Link to={`/org/${org.url}`}>
+                  <Link to={`/o/${org.url}`}>
                     <Card className="hover:bg-muted/50 h-full border pr-6 transition-all">
                       <CardContent className="p-4">
                         <div className="flex items-center gap-3">
@@ -149,7 +149,7 @@ export default function DashboardPage() {
                     org.currentOrganisationRole,
                   ) && (
                     <div className="text-muted-foreground absolute right-4 top-4 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                      <Link to={`/org/${org.url}/settings`}>
+                      <Link to={`/o/${org.url}/settings`}>
                         <SettingsIcon className="h-4 w-4" />
                       </Link>
                     </div>

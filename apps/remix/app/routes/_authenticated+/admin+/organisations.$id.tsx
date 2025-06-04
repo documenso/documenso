@@ -324,7 +324,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
               {!form.formState.errors.url && (
                 <span className="text-foreground/50 text-xs font-normal">
                   {field.value ? (
-                    `${NEXT_PUBLIC_WEBAPP_URL()}/org/${field.value}`
+                    `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                   ) : (
                     <Trans>A unique URL to identify the organisation</Trans>
                   )}

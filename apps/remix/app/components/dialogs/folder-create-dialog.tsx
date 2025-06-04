@@ -124,7 +124,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: CreateFolderDialogProp
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
           <DialogDescription>
-            Enter a name for your new folder. Folders help you organize your documents.
+            Enter a name for your new folder. Folders help you organise your documents.
           </DialogDescription>
         </DialogHeader>
 

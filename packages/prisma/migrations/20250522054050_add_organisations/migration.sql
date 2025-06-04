@@ -345,7 +345,7 @@ INSERT INTO "SubscriptionClaim" ("id", "name", "locked", "teamCount", "memberCou
 VALUES
   ('free', 'Free', true, 1, 1, '{}', NOW(), NOW()),
   ('individual', 'Individual', true, 1, 1, '{"unlimitedDocuments": true}', NOW(), NOW()),
-  ('pro', 'Teams', true, 1, 5, '{"unlimitedDocuments": true, "branding": true, "embedSigning": true}', NOW(), NOW()),
+  ('team', 'Teams', true, 1, 5, '{"unlimitedDocuments": true, "branding": true, "embedSigning": true}', NOW(), NOW()),
   ('platform', 'Platform', true, 1, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedAuthoring": false, "embedAuthoringWhiteLabel": true, "embedSigning": false, "embedSigningWhiteLabel": true}', NOW(), NOW()),
   ('enterprise', 'Enterprise', true, 0, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedAuthoring": true, "embedAuthoringWhiteLabel": true, "embedSigning": true, "embedSigningWhiteLabel": true, "cfr21": true}', NOW(), NOW()),
   ('earlyAdopter', 'Early Adopter', true, 0, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedSigning": true, "embedSigningWhiteLabel": true}', NOW(), NOW());

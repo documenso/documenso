@@ -1,4 +1,4 @@
-import PreferencesPage, { meta } from '../../org.$orgUrl.settings.preferences';
+import PreferencesPage, { meta } from '../../o.$orgUrl.settings.preferences';
 
 export { meta };
 

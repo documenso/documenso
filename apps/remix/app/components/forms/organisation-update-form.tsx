@@ -70,7 +70,7 @@ export const OrganisationUpdateForm = () => {
       });
 
       if (url !== organisation.url) {
-        await navigate(`/org/${url}/settings`);
+        await navigate(`/o/${url}/settings`);
       }
     } catch (err) {
       const error = AppError.parseError(err);
@@ -128,7 +128,7 @@ export const OrganisationUpdateForm = () => {
                 {!form.formState.errors.url && (
                   <span className="text-foreground/50 text-xs font-normal">
                     {field.value ? (
-                      `${NEXT_PUBLIC_WEBAPP_URL()}/org/${field.value}`
+                      `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                     ) : (
                       <Trans>A unique URL to identify your organisation</Trans>
                     )}

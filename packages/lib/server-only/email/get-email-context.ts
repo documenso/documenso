@@ -1,6 +1,7 @@
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
-import type { OrganisationClaim, OrganisationGlobalSettings } from '@documenso/prisma/client';
+import type { OrganisationType } from '@documenso/prisma/client';
+import { type OrganisationClaim, type OrganisationGlobalSettings } from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
@@ -25,6 +26,7 @@ type EmailContextResponse = {
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
   claims: OrganisationClaim;
+  organisationType: OrganisationType;
 };
 
 export const getEmailContext = async (
@@ -67,6 +69,7 @@ export const getEmailContext = async (
       ),
       settings: organisation.organisationGlobalSettings,
       claims,
+      organisationType: organisation.type,
     };
   }
 
@@ -82,5 +85,6 @@ export const getEmailContext = async (
     ),
     settings: teamSettings,
     claims,
+    organisationType: organisation.type,
   };
 };

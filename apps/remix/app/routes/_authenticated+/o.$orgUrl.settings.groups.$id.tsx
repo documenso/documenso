@@ -44,7 +44,7 @@ import { OrganisationGroupDeleteDialog } from '~/components/dialogs/organisation
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
-import type { Route } from './+types/org.$orgUrl.settings.groups.$id';
+import type { Route } from './+types/o.$orgUrl.settings.groups.$id';
 
 export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
@@ -95,7 +95,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/org/${organisation.url}/settings/groups`}>
+            <Link to={`/o/${organisation.url}/settings/groups`}>
               <Trans>Go back</Trans>
             </Link>
           </Button>

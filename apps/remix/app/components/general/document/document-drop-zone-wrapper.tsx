@@ -55,7 +55,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
   const onFileDrop = async (file: File) => {
     if (isUploadDisabled && IS_BILLING_ENABLED()) {
-      await navigate(`/org/${organisation.url}/settings/billing`);
+      await navigate(`/o/${organisation.url}/settings/billing`);
       return;
     }
 
@@ -154,7 +154,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
             {isUploadDisabled && IS_BILLING_ENABLED() && (
               <Link
-                to={`/org/${organisation.url}/settings/billing`}
+                to={`/o/${organisation.url}/settings/billing`}
                 className="mt-4 text-sm text-amber-500 hover:underline dark:text-amber-400"
               >
                 <Trans>Upgrade your plan to upload more documents</Trans>

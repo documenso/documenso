@@ -1,7 +1,13 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { DocumentSource, DocumentStatus, RecipientRole, SendStatus } from '@prisma/client';
+import {
+  DocumentSource,
+  DocumentStatus,
+  OrganisationType,
+  RecipientRole,
+  SendStatus,
+} from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
@@ -74,7 +80,7 @@ export const run = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, organisationType } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -83,7 +89,6 @@ export const run = async ({
 
   const customEmail = document?.documentMeta;
   const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
-  const isTeamDocument = document.teamId !== null;
 
   const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -117,7 +122,7 @@ export const run = async ({
     );
   }
 
-  if (isTeamDocument && team) {
+  if (organisationType === OrganisationType.ORGANISATION) {
     emailSubject = i18n._(msg`${team.name} invited you to ${recipientActionVerb} a document`);
     emailMessage = customEmail?.message ?? '';
 
@@ -144,13 +149,16 @@ export const run = async ({
   const template = createElement(DocumentInviteEmailTemplate, {
     documentName: document.title,
     inviterName: user.name || undefined,
-    inviterEmail: isTeamDocument ? team?.teamEmail?.email || user.email : user.email,
+    inviterEmail:
+      organisationType === OrganisationType.ORGANISATION
+        ? team?.teamEmail?.email || user.email
+        : user.email,
     assetBaseUrl,
     signDocumentLink,
     customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
     role: recipient.role,
     selfSigner,
-    isTeamInvite: isTeamDocument,
+    organisationType,
     teamName: team?.name,
     teamEmail: team?.teamEmail?.email,
     includeSenderDetails: settings.includeSenderDetails,

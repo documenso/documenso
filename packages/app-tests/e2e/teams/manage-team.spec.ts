@@ -17,7 +17,7 @@ test('[TEAMS]: create team', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/org/${organisation.url}/settings/teams`,
+    redirectPath: `/o/${organisation.url}/settings/teams`,
   });
 
   const teamId = `team-${Date.now()}`;

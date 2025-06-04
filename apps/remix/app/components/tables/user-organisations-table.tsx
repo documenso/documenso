@@ -47,7 +47,7 @@ export const UserOrganisationsTable = () => {
         accessorKey: 'name',
         cell: ({ row }) => (
           <Link
-            to={isPersonalLayoutMode ? `/settings/organisations` : `/org/${row.original.url}`}
+            to={isPersonalLayoutMode ? `/settings/organisations` : `/o/${row.original.url}`}
             preventScrollReset={true}
           >
             <AvatarWithText
@@ -62,7 +62,7 @@ export const UserOrganisationsTable = () => {
               secondaryText={
                 isPersonalLayoutMode
                   ? _(msg`Your personal organisation`)
-                  : `${NEXT_PUBLIC_WEBAPP_URL()}/org/${row.original.url}`
+                  : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`
               }
             />
           </Link>
@@ -90,7 +90,7 @@ export const UserOrganisationsTable = () => {
               row.original.currentOrganisationRole,
             ) && (
               <Button variant="outline" asChild>
-                <Link to={`/org/${row.original.url}/settings`}>
+                <Link to={`/o/${row.original.url}/settings`}>
                   <Trans>Manage</Trans>
                 </Link>
               </Button>
@@ -115,7 +115,7 @@ export const UserOrganisationsTable = () => {
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [isPersonalLayoutMode]);
 
   return (
     <div>

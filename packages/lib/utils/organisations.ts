@@ -64,7 +64,7 @@ export const getHighestOrganisationRoleInGroup = (
   return highestOrganisationRole;
 };
 
-// Todo: orgs test
+// Todo: orgs - hard review
 export const buildOrganisationWhereQuery = (
   organisationId: string | undefined,
   userId: number,

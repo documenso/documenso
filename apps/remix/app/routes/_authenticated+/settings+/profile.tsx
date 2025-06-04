@@ -2,6 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { AnimatePresence } from 'framer-motion';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 
@@ -18,8 +20,11 @@ export function meta() {
 
 export default function SettingsProfile() {
   const { _ } = useLingui();
+  const { organisations, user } = useSession();
 
   const { data: teamEmail } = trpc.team.email.get.useQuery();
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   return (
     <div>
@@ -35,7 +40,7 @@ export default function SettingsProfile() {
 
       <div className="max-w-xl space-y-8">
         <AnimatePresence>
-          {teamEmail && (
+          {(!isPersonalLayoutMode || user.email !== teamEmail?.email) && teamEmail && (
             <AnimateGenericFadeInOut>
               <TeamEmailUsage teamEmail={teamEmail} />
             </AnimateGenericFadeInOut>

@@ -66,7 +66,7 @@ export const createSubscriptionRoute = authenticatedProcedure
     const redirectUrl = await createCheckoutSession({
       customerId,
       priceId,
-      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/org/${organisation.url}/settings/billing`,
+      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`,
     });
 
     if (!redirectUrl) {

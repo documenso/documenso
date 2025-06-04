@@ -184,7 +184,7 @@ export default function OrganisationSettingsPreferencesPage() {
                 to={
                   isPersonalLayoutMode
                     ? '/settings/billing'
-                    : `/org/${organisation.url}/settings/billing`
+                    : `/o/${organisation.url}/settings/billing`
                 }
               >
                 <Trans>Update Billing</Trans>

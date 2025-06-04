@@ -19,7 +19,7 @@ export type GenericErrorLayoutProps = {
   errorCode?: number;
   errorCodeMap?: ErrorCodeMap;
   /**
-   * The primary button to display. If left as undefined, the default /documents link will be displayed.
+   * The primary button to display. If left as undefined, the default home link will be displayed.
    *
    * Set to null if you want no button.
    */

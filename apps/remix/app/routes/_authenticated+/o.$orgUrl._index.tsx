@@ -55,7 +55,7 @@ export default function OrganisationSettingsTeamsPage() {
           <>
             <p className="text-muted-foreground mb-8 max-w-md text-center text-sm">
               <Trans>
-                Teams help you organize your work and collaborate with others. Create your first
+                Teams help you organise your work and collaborate with others. Create your first
                 team to get started.
               </Trans>
             </p>
@@ -120,7 +120,7 @@ export default function OrganisationSettingsTeamsPage() {
         </div>
 
         <Button asChild>
-          <Link to={`/org/${organisation.url}/settings`}>Manage Organisation</Link>
+          <Link to={`/o/${organisation.url}/settings`}>Manage Organisation</Link>
         </Button>
       </div>
 

@@ -127,7 +127,7 @@ export const TemplateFolderCreateDialog = ({
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
           <DialogDescription>
-            Enter a name for your new folder. Folders help you organize your templates.
+            Enter a name for your new folder. Folders help you organise your templates.
           </DialogDescription>
         </DialogHeader>
 

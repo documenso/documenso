@@ -161,7 +161,7 @@ export default function TeamsSettingsPage() {
           organisation.currentOrganisationRole,
         ) && (
           <Button asChild variant="outline">
-            <Link to={`/org/${organisation.url}/settings/preferences`}>
+            <Link to={`/o/${organisation.url}/settings/preferences`}>
               <Trans>Manage</Trans>
             </Link>
           </Button>

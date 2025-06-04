@@ -22,7 +22,7 @@ test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Leave' })).toBeDisabled();
 
   await page.getByRole('link', { name: 'Manage' }).click();
-  await page.waitForURL(`/org/${organisation.url}/settings/general`);
+  await page.waitForURL(`/o/${organisation.url}/settings/general`);
 
   await page.getByRole('button', { name: 'Delete' }).click();
   await page
@@ -50,7 +50,7 @@ test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/org/${organisation.url}/settings/general`,
+    redirectPath: `/o/${organisation.url}/settings/general`,
   });
 
   const updatedOrganisationId = `organisation-${Date.now()}`;
@@ -66,7 +66,7 @@ test('[ORGANISATIONS]: manage general settings', async ({ page }) => {
   await page.getByRole('button', { name: 'Update organisation' }).click();
 
   // Check we have been redirected to the new organisation URL and the name is updated.
-  await page.waitForURL(`/org/${updatedOrganisationId}/settings/general`);
+  await page.waitForURL(`/o/${updatedOrganisationId}/settings/general`);
 });
 
 test('[ORGANISATIONS]: inherit members', async ({ page }) => {
@@ -300,7 +300,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/org/${organisation.url}/settings/groups`,
+    redirectPath: `/o/${organisation.url}/settings/groups`,
   });
 
   // Create a custom group A with 3 members "ORGANISATION ADMIN" to check that they get the correct roles.
@@ -315,7 +315,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByTestId('dialog-create-organisation-button').click();
   await expect(page.getByText('Group has been created.').first()).toBeVisible();
 
-  await page.goto(`/org/${organisation.url}/settings/members`);
+  await page.goto(`/o/${organisation.url}/settings/members`);
 
   // Confirm org roles have been applied to these members.
   await expect(
@@ -329,7 +329,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   ).toBeVisible();
 
   // Test updating the group.
-  await page.goto(`/org/${organisation.url}/settings/groups`);
+  await page.goto(`/o/${organisation.url}/settings/groups`);
   await page.getByRole('link', { name: 'Manage' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_A');
   await page.getByRole('combobox').filter({ hasText: 'Organisation Admin' }).click();
@@ -339,7 +339,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByRole('button', { name: 'Update' }).click();
   await expect(page.getByText('Group has been updated successfully').first()).toBeVisible();
 
-  await page.goto(`/org/${organisation.url}/settings/groups`);
+  await page.goto(`/o/${organisation.url}/settings/groups`);
 
   // Create a custom member group with the 3 admins to check that they still get the ADMIN roles.
   await page.getByRole('button', { name: 'Create group' }).click();
@@ -351,7 +351,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.getByTestId('dialog-create-organisation-button').click();
   await expect(page.getByText('Group has been created.').first()).toBeVisible();
 
-  await page.goto(`/org/${organisation.url}/settings/members`);
+  await page.goto(`/o/${organisation.url}/settings/members`);
 
   // Confirm admins still get admin roles.
   await expect(
@@ -365,7 +365,7 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   ).toBeVisible();
 
   // Create another custom group with 3 members with "ORGANISATION MEMBER" role.
-  await page.goto(`/org/${organisation.url}/settings/groups`);
+  await page.goto(`/o/${organisation.url}/settings/groups`);
   await page.getByRole('button', { name: 'Create group' }).click();
   await page.getByRole('textbox', { name: 'Group Name *' }).fill('CUSTOM_GROUP_B');
   await page.getByRole('combobox').filter({ hasText: 'Organisation Member' }).click();
@@ -427,21 +427,21 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
 
   // Member 1 should see inherit team and teamA
   await apiSignout({ page });
-  await apiSignin({ page, email: memberEmail1, redirectPath: `/org/${organisation.url}` });
+  await apiSignin({ page, email: memberEmail1, redirectPath: `/o/${organisation.url}` });
   await expectTextToBeVisible(page, teamInheritName);
   await expectTextToBeVisible(page, teamAName);
   await expectTextToNotBeVisible(page, teamBName);
 
   // Member 3 should only see inherit team
   await apiSignout({ page });
-  await apiSignin({ page, email: memberEmail3, redirectPath: `/org/${organisation.url}` });
+  await apiSignin({ page, email: memberEmail3, redirectPath: `/o/${organisation.url}` });
   await expectTextToBeVisible(page, teamInheritName);
   await expectTextToNotBeVisible(page, teamAName);
   await expectTextToNotBeVisible(page, teamBName);
 
   // Admin 1 should see all teams.
   await apiSignout({ page });
-  await apiSignin({ page, email: adminEmail1, redirectPath: `/org/${organisation.url}` });
+  await apiSignin({ page, email: adminEmail1, redirectPath: `/o/${organisation.url}` });
   await expectTextToBeVisible(page, teamInheritName);
   await expectTextToBeVisible(page, teamAName);
   await expectTextToBeVisible(page, teamBName);
@@ -462,7 +462,7 @@ test('[ORGANISATIONS]: member invites', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/org/${organisation.url}/settings/members`,
+    redirectPath: `/o/${organisation.url}/settings/members`,
   });
 
   await page.getByRole('button', { name: 'Invite member' }).click();
@@ -518,7 +518,7 @@ test('[ORGANISATIONS]: member invites', async ({ page }) => {
   await expect(page.getByText(user2.email)).not.toBeVisible();
 
   // Expect 2 members in organisation.
-  await page.goto(`/org/${organisation.url}/settings/members`);
+  await page.goto(`/o/${organisation.url}/settings/members`);
   await expect(page.getByText(user.email)).toBeVisible();
   await expect(page.getByText(user2.email)).toBeVisible();
 

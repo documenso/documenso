@@ -77,7 +77,7 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
 export enum INTERNAL_CLAIM_ID {
   FREE = 'free',
   INDIVIDUAL = 'individual',
-  PRO = 'pro',
+  TEAM = 'team',
   EARLY_ADOPTER = 'earlyAdopter',
   PLATFORM = 'platform',
   ENTERPRISE = 'enterprise',
@@ -112,8 +112,8 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
     },
   },
-  [INTERNAL_CLAIM_ID.PRO]: {
-    id: INTERNAL_CLAIM_ID.PRO, // Team -> Pro
+  [INTERNAL_CLAIM_ID.TEAM]: {
+    id: INTERNAL_CLAIM_ID.TEAM,
     name: 'Teams',
     description: msg`Embedding, 5 members included and more`,
     teamCount: 1,
@@ -122,7 +122,7 @@ export const internalClaims: InternalClaims = {
     flags: {
       unlimitedDocuments: true,
       allowCustomBranding: true,
-      embedSigning: true, // Pro (team) plan only gets embedSigning right?
+      embedSigning: true,
     },
   },
   [INTERNAL_CLAIM_ID.PLATFORM]: {

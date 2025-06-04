@@ -1,4 +1,4 @@
-import BillingPage, { meta } from '../../org.$orgUrl.settings.billing';
+import BillingPage, { meta } from '../../o.$orgUrl.settings.billing';
 
 export { meta };
 

@@ -65,7 +65,7 @@ export const manageSubscriptionRoute = authenticatedProcedure
 
     const redirectUrl = await getPortalSession({
       customerId,
-      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/org/${organisation.url}/settings/billing`,
+      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`,
     });
 
     return {

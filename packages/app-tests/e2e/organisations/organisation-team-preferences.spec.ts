@@ -16,7 +16,7 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/org/${organisation.url}/settings/preferences`,
+    redirectPath: `/o/${organisation.url}/settings/preferences`,
   });
 
   // Update document preferences.

@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { DocumentStatus, OrganisationType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
@@ -73,7 +73,6 @@ export const resendDocument = async ({
   });
 
   const customEmail = document?.documentMeta;
-  const isTeamDocument = document?.team !== null;
 
   if (!document) {
     throw new Error('Document not found');
@@ -99,7 +98,7 @@ export const resendDocument = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, organisationType } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -134,7 +133,7 @@ export const resendDocument = async ({
         emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} your document`);
       }
 
-      if (isTeamDocument && document.team) {
+      if (organisationType === OrganisationType.ORGANISATION) {
         emailSubject = i18n._(
           msg`Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`,
         );
@@ -157,13 +156,16 @@ export const resendDocument = async ({
       const template = createElement(DocumentInviteEmailTemplate, {
         documentName: document.title,
         inviterName: user.name || undefined,
-        inviterEmail: isTeamDocument ? document.team?.teamEmail?.email || user.email : user.email,
+        inviterEmail:
+          organisationType === OrganisationType.ORGANISATION
+            ? document.team?.teamEmail?.email || user.email
+            : user.email,
         assetBaseUrl,
         signDocumentLink,
         customBody: renderCustomEmailTemplate(emailMessage, customEmailTemplate),
         role: recipient.role,
         selfSigner,
-        isTeamInvite: isTeamDocument,
+        organisationType,
         teamName: document.team?.name,
       });
 

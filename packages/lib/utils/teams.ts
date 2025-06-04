@@ -106,7 +106,7 @@ export const extractTeamSignatureSettings = (
   return signatureTypes;
 };
 
-// Todo: orgs test
+// Todo: orgs - hard review
 export const buildTeamWhereQuery = (
   teamId: number | undefined, // Todo: test if this is okay
   userId: number,

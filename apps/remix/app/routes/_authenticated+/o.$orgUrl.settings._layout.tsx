@@ -25,32 +25,32 @@ export default function SettingsLayout() {
 
   const organisationSettingRoutes = [
     {
-      path: `/org/${organisation.url}/settings/general`,
+      path: `/o/${organisation.url}/settings/general`,
       label: t`General`,
       icon: Building2Icon,
     },
     {
-      path: `/org/${organisation.url}/settings/preferences`,
+      path: `/o/${organisation.url}/settings/preferences`,
       label: t`Preferences`,
       icon: Settings2Icon,
     },
     {
-      path: `/org/${organisation.url}/settings/teams`,
+      path: `/o/${organisation.url}/settings/teams`,
       label: t`Teams`,
       icon: FaUsers,
     },
     {
-      path: `/org/${organisation.url}/settings/members`,
+      path: `/o/${organisation.url}/settings/members`,
       label: t`Members`,
       icon: Users2Icon,
     },
     {
-      path: `/org/${organisation.url}/settings/groups`,
+      path: `/o/${organisation.url}/settings/groups`,
       label: t`Groups`,
       icon: GroupIcon,
     },
     {
-      path: `/org/${organisation.url}/settings/billing`,
+      path: `/o/${organisation.url}/settings/billing`,
       label: t`Billing`,
       icon: CreditCardIcon,
     },
@@ -69,7 +69,7 @@ export default function SettingsLayout() {
         }}
         primaryButton={
           <Button asChild>
-            <Link to={`/org/${organisation.url}`}>
+            <Link to={`/o/${organisation.url}`}>
               <Trans>Go Back</Trans>
             </Link>
           </Button>
