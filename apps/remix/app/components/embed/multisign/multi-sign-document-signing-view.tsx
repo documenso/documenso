@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType } from '@prisma/client';
+import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 import { Loader, LucideChevronDown, LucideChevronUp, X } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
@@ -82,14 +82,14 @@ export const MultiSignDocumentSigningView = ({
 
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
-  const { mutateAsync: rejectDocumentWithToken } =
-    trpc.recipient.rejectDocumentWithToken.useMutation();
 
   const hasSignatureField = document?.fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const [pendingFields, completedFields] = [
-    document?.fields.filter((field) => !field.inserted) ?? [],
-    document?.fields.filter((field) => field.inserted) ?? [],
+    document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??
+      [],
+    document?.fields.filter((field) => field.recipient.signingStatus === SigningStatus.SIGNED) ??
+      [],
   ];
 
   const onSignField = async (payload: TSignFieldWithTokenMutationSchema) => {
