@@ -1,17 +1,17 @@
 import type { Prisma, User } from '@prisma/client';
 import { DocumentVisibility, SigningStatus, TeamMemberRole } from '@prisma/client';
-import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TimePeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
+import { getDateRangeForPeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
 
 export type GetStatsInput = {
   user: User;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
-  period?: PeriodSelectorValue;
+  period?: TimePeriod;
   search?: string;
   folderId?: string;
 };
@@ -26,60 +26,14 @@ export const getStats = async ({
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period && period !== 'all-time') {
-    const now = DateTime.now();
-    let startDate: DateTime;
-    let endDate: DateTime;
+    const dateRange = getDateRangeForPeriod(period);
 
-    switch (period) {
-      case 'today':
-        startDate = now.startOf('day');
-        endDate = now.endOf('day');
-        break;
-      case 'yesterday':
-        startDate = now.minus({ days: 1 }).startOf('day');
-        endDate = now.minus({ days: 1 }).endOf('day');
-        break;
-      case 'this-week':
-        startDate = now.startOf('week');
-        endDate = now.endOf('week');
-        break;
-      case 'last-week':
-        startDate = now.minus({ weeks: 1 }).startOf('week');
-        endDate = now.minus({ weeks: 1 }).endOf('week');
-        break;
-      case 'this-month':
-        startDate = now.startOf('month');
-        endDate = now.endOf('month');
-        break;
-      case 'last-month':
-        startDate = now.minus({ months: 1 }).startOf('month');
-        endDate = now.minus({ months: 1 }).endOf('month');
-        break;
-      case 'this-quarter':
-        startDate = now.startOf('quarter');
-        endDate = now.endOf('quarter');
-        break;
-      case 'last-quarter':
-        startDate = now.minus({ quarters: 1 }).startOf('quarter');
-        endDate = now.minus({ quarters: 1 }).endOf('quarter');
-        break;
-      case 'this-year':
-        startDate = now.startOf('year');
-        endDate = now.endOf('year');
-        break;
-      case 'last-year':
-        startDate = now.minus({ years: 1 }).startOf('year');
-        endDate = now.minus({ years: 1 }).endOf('year');
-        break;
-      default:
-        startDate = now.startOf('day');
-        endDate = now.endOf('day');
+    if (dateRange) {
+      createdAt = {
+        gte: dateRange.start.toJSDate(),
+        lte: dateRange.end.toJSDate(),
+      };
     }
-
-    createdAt = {
-      gte: startDate.toJSDate(),
-      lte: endDate.toJSDate(),
-    };
   }
 
   const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
