@@ -19,6 +19,11 @@ type StripeWebhookResponse = {
   message: string;
 };
 
+/**
+ * Todo: We might want to pull this into a job so we can do steps. Since if organisation creation passes but
+ * fails after this would be automatically rerun by Stripe, which means duplicate organisations can be
+ * potentially created.
+ */
 export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCreatedOptions) => {
   const customerId =
     typeof subscription.customer === 'string' ? subscription.customer : subscription.customer.id;
@@ -60,6 +65,7 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
   await handleSubscriptionCreate({
     subscription,
     organisationId,
+    customerId,
     subscriptionClaim,
   });
 };
@@ -67,12 +73,14 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
 type HandleSubscriptionCreateOptions = {
   subscription: Stripe.Subscription;
   organisationId: string;
+  customerId: string;
   subscriptionClaim: SubscriptionClaim;
 };
 
 const handleSubscriptionCreate = async ({
   subscription,
   organisationId,
+  customerId,
   subscriptionClaim,
 }: HandleSubscriptionCreateOptions) => {
   const status = match(subscription.status)
@@ -84,7 +92,8 @@ const handleSubscriptionCreate = async ({
     await tx.subscription.create({
       data: {
         organisationId,
-        status: status,
+        status,
+        customerId,
         planId: subscription.id,
         priceId: subscription.items.data[0].price.id,
         periodEnd: new Date(subscription.current_period_end * 1000),
@@ -111,6 +120,13 @@ type HandleOrganisationCreateOrGetOptions = {
   customerId: string;
 };
 
+/**
+ * Handles the creation of an organisation or getting an existing one.
+ *
+ * If there is `organisationCreateData` in the subscription metadata, we create a new organisation.
+ *
+ * Otherwise, we get the existing organisation by `customerId`.
+ */
 const handleOrganisationCreateOrGet = async ({
   subscription,
   customerId,

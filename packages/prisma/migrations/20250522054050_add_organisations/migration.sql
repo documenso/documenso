@@ -12,12 +12,12 @@
  * - Move individual subscriptions into personal organisations and delete the original organisation
  * - Set claims for all organisations
  * - Todo: orgs check for anything else.
- *
  */
 
 /*
  * Clean up subscriptions prior to full migration:
  * - Ensure each user has a maximum of 1 subscription tied to the "User" table
+ * - Move the customerId from the teams/users into the subscription itself
  */
 -- [CUSTOM_CHANGE_START]
 WITH subscriptions_to_delete AS (
@@ -39,6 +39,29 @@ to_delete AS (
 )
 DELETE FROM "Subscription"
 WHERE id IN (SELECT id FROM to_delete);
+
+-- Add customerId to Subscription
+ALTER TABLE "Subscription" ADD COLUMN "customerId" TEXT;
+
+-- Move customerId from User to Subscription
+UPDATE "Subscription" s
+SET "customerId" = u."customerId"
+FROM "User" u
+WHERE s."userId" = u."id";
+
+-- Move customerId from Team to Subscription
+UPDATE "Subscription" s
+SET "customerId" = t."customerId"
+FROM "Team" t
+WHERE s."teamId" = t."id";
+
+-- Remove any subscriptions with missing customerId
+DELETE FROM "Subscription"
+WHERE "customerId" IS NULL;
+
+-- Make customerId not null
+ALTER TABLE "Subscription" ALTER COLUMN "customerId" SET NOT NULL;
+
 -- [CUSTOM_CHANGE_END]
 
 -- DropForeignKey
@@ -110,19 +133,25 @@ AND "Template"."userId" = t."ownerUserId"
 AND "Template"."teamId" IS NULL
 AND t."isPersonal" = true;
 
--- 8. Migrate user's webhooks to their team
+-- 8. Migrate user's folders to their team
+UPDATE "Folder" f
+SET "teamId" = t."id"
+FROM "Team" t
+WHERE f."userId" = t."ownerUserId" AND f."teamId" IS NULL;
+
+-- 9. Migrate user's webhooks to their team
 UPDATE "Webhook" w
 SET "teamId" = t."id"
 FROM "Team" t
 WHERE w."userId" = t."ownerUserId" AND w."teamId" IS NULL;
 
--- 9. Migrate user's API tokens to their team
+-- 10. Migrate user's API tokens to their team
 UPDATE "ApiToken" apiToken
 SET "teamId" = t."id"
 FROM "Team" t
 WHERE apiToken."userId" = t."ownerUserId" AND apiToken."teamId" IS NULL;
 
--- 10. Migrate user's team profiles to their team
+-- 11. Migrate user's team profiles to their team
 INSERT INTO "TeamProfile" ("id", "enabled", "bio", "teamId")
 SELECT
   gen_random_uuid(),
@@ -182,6 +211,9 @@ DROP INDEX "User_url_key";
 
 -- DropTable
 DROP TABLE "UserProfile";
+
+-- AlterTable
+ALTER TABLE "Folder" ALTER COLUMN "teamId" SET NOT NULL;
 
 -- AlterTable
 ALTER TABLE "ApiToken" ADD COLUMN     "organisationId" TEXT,
@@ -527,7 +559,7 @@ ALTER TABLE "Team" ADD CONSTRAINT "Team_teamGlobalSettingsId_fkey" FOREIGN KEY (
  */
 WITH new_organisations AS (
   INSERT INTO "Organisation" (
-    "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId"
+    "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId", "customerId"
   )
   SELECT
     gen_random_uuid(),
@@ -541,11 +573,12 @@ WITH new_organisations AS (
     gen_random_uuid(),
     t."avatarImageId",
     t."ownerUserId",
-    t."id"
+    t."id",
+    s."customerId"
   FROM "Team" t
   LEFT JOIN "Subscription" s ON s."teamId" = t."id"
   WHERE t."isPersonal" OR s."teamId" IS NOT NULL
-  RETURNING "id", "ownerUserId", "teamId"
+  RETURNING "id", "ownerUserId", "teamId", "customerId"
 )
 UPDATE "Team" t
 SET "organisationId" = o."id"
@@ -567,7 +600,7 @@ WHERE o."teamId" = t."id";
  *
  */
 WITH users_to_migrate AS (
-  SELECT u."id" AS user_id, u."url" as user_url
+  SELECT u."id" AS user_id, u."url" as user_url, MAX(s."customerId") AS customer_id
   FROM "User" u
   JOIN "Subscription" s ON s."userId" = u."id"
   JOIN "Team" t ON t."ownerUserId" = u."id"
@@ -575,7 +608,7 @@ WITH users_to_migrate AS (
 ),
 new_orgs AS (
   INSERT INTO "Organisation" (
-    "id", "createdAt", "updatedAt", "type", "name", "url", "ownerUserId"
+    "id", "createdAt", "updatedAt", "type", "name", "url", "ownerUserId", "customerId"
   )
   SELECT
     gen_random_uuid(),
@@ -584,9 +617,10 @@ new_orgs AS (
     'ORGANISATION'::"OrganisationType",
     'Organisation Name',
     u.user_url,
-    u.user_id
+    u.user_id,
+    u.customer_id
   FROM users_to_migrate u
-  RETURNING "id", "ownerUserId"
+  RETURNING "id", "ownerUserId", "customerId"
 ),
 update_teams AS (
   UPDATE "Team" t

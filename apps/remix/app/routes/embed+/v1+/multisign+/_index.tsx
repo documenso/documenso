@@ -4,12 +4,9 @@ import { SigningStatus } from '@prisma/client';
 import { useRevalidator } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isCommunityPlan as isUserCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
@@ -54,26 +51,10 @@ export async function loader({ request }: Route.LoaderArgs) {
     });
   }
 
-  const team = firstDocument.teamId
-    ? await getTeamById({ teamId: firstDocument.teamId, userId: firstDocument.userId }).catch(
-        () => null,
-      )
-    : null;
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: firstDocument.teamId });
 
-  const [isPlatformDocument, isEnterpriseDocument, isCommunityPlan] = await Promise.all([
-    isDocumentPlatform(firstDocument),
-    isUserEnterprise({
-      userId: firstDocument.userId,
-      teamId: firstDocument.teamId ?? undefined,
-    }),
-    isUserCommunityPlan({
-      userId: firstDocument.userId,
-      teamId: firstDocument.teamId ?? undefined,
-    }),
-  ]);
-
-  const hidePoweredBy = team?.teamGlobalSettings?.brandingHidePoweredBy ?? false;
-  const allowWhitelabelling = isCommunityPlan || isPlatformDocument || isEnterpriseDocument;
+  const allowWhitelabelling = organisationClaim.flags.embedSigningWhiteLabel;
+  const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
 
   return superLoaderJson({
     envelopes,

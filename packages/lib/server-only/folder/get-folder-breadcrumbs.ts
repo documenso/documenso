@@ -42,14 +42,10 @@ export const getFolderBreadcrumbs = async ({
   const whereClause = (folderId: string) => ({
     id: folderId,
     ...(type ? { type } : {}),
-    ...(teamId
-      ? {
-          OR: [
-            { teamId, ...visibilityFilters },
-            { userId, teamId },
-          ],
-        }
-      : { userId, teamId: null }),
+    OR: [
+      { teamId, ...visibilityFilters },
+      { userId, teamId },
+    ],
   });
 
   const breadcrumbs = [];

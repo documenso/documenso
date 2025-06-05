@@ -38,14 +38,10 @@ export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolde
   const whereClause = {
     id: folderId,
     ...(type ? { type } : {}),
-    ...(teamId
-      ? {
-          OR: [
-            { teamId, ...visibilityFilters },
-            { userId, teamId },
-          ],
-        }
-      : { userId, teamId: null }),
+    OR: [
+      { teamId, ...visibilityFilters },
+      { userId, teamId },
+    ],
   };
 
   const folder = await prisma.folder.findFirst({

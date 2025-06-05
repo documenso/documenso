@@ -37,14 +37,12 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
   const whereClause = {
     AND: [
       { parentId },
-      teamId
-        ? {
-            OR: [
-              { teamId, ...visibilityFilters },
-              { userId, teamId },
-            ],
-          }
-        : { userId, teamId: null },
+      {
+        OR: [
+          { teamId, ...visibilityFilters },
+          { userId, teamId },
+        ],
+      },
     ],
   };
 
@@ -64,7 +62,8 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
             prisma.folder.findMany({
               where: {
                 parentId: folder.id,
-                ...(teamId ? { teamId, ...visibilityFilters } : { userId, teamId: null }),
+                teamId,
+                ...visibilityFilters,
               },
               orderBy: {
                 createdAt: 'desc',
@@ -83,7 +82,8 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
             prisma.folder.count({
               where: {
                 parentId: folder.id,
-                ...(teamId ? { teamId, ...visibilityFilters } : { userId, teamId: null }),
+                teamId,
+                ...visibilityFilters,
               },
             }),
           ]);

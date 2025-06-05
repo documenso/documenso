@@ -13,7 +13,6 @@ import type { z } from 'zod';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import type { TCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { ZCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -111,7 +110,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     }
   };
 
-  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
+  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenFormSchema) => {
     try {
       await createTokenMutation({
         teamId: team.id,

@@ -64,14 +64,10 @@ export const moveDocumentToFolder = async ({
     const folderWhereClause = {
       id: folderId,
       type: FolderType.DOCUMENT,
-      ...(teamId
-        ? {
-            OR: [
-              { teamId, ...visibilityFilters },
-              { userId, teamId },
-            ],
-          }
-        : { userId, teamId: null }),
+      OR: [
+        { teamId, ...visibilityFilters },
+        { userId, teamId },
+      ],
     };
 
     const folder = await prisma.folder.findFirst({

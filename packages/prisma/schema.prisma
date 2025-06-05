@@ -243,6 +243,8 @@ model Subscription {
   updatedAt         DateTime           @updatedAt
   cancelAtPeriodEnd Boolean            @default(false)
 
+  customerId String
+
   organisationId String       @unique
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
 
@@ -346,8 +348,8 @@ model Folder {
   name       String
   userId     Int
   user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  teamId     Int?
-  team       Team?              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId     Int
+  team       Team               @relation(fields: [teamId], references: [id], onDelete: Cascade)
   pinned     Boolean            @default(false)
   parentId   String?
   parent     Folder?            @relation("FolderToFolder", fields: [parentId], references: [id], onDelete: Cascade)
