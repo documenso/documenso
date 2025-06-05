@@ -1,8 +1,15 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
-import type { PDFDocument, PDFFont } from 'pdf-lib';
-import { RotationTypes, TextAlignment, degrees, radiansToDegrees, rgb } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFTextField } from 'pdf-lib';
+import {
+  RotationTypes,
+  TextAlignment,
+  degrees,
+  radiansToDegrees,
+  rgb,
+  setFontAndSize,
+} from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -442,6 +449,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         adjustedFieldY = adjustedPosition.yPos;
       }
 
+      // Set properties for the text field
+      setTextFieldFontSize(textField, font, fontSize);
+      textField.setText(textToInsert);
+
       // Set the position and size of the text field
       textField.addToPage(page, {
         x: adjustedFieldX,
@@ -450,6 +461,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         height: adjustedFieldHeight,
         rotate: degrees(pageRotationInDegrees),
 
+        font,
+
         // Hide borders.
         borderWidth: 0,
         borderColor: undefined,
@@ -457,10 +470,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
         ...(isDebugMode ? { borderWidth: 1, borderColor: rgb(0, 0, 1) } : {}),
       });
-
-      // Set properties for the text field
-      textField.setFontSize(fontSize);
-      textField.setText(textToInsert);
     });
 
   return pdf;
@@ -629,3 +638,21 @@ function breakLongString(text: string, maxWidth: number, font: PDFFont, fontSize
 
   return lines.join('\n');
 }
+
+const setTextFieldFontSize = (textField: PDFTextField, font: PDFFont, fontSize: number) => {
+  textField.defaultUpdateAppearances(font);
+  textField.updateAppearances(font);
+
+  try {
+    textField.setFontSize(fontSize);
+  } catch (err) {
+    let da = textField.acroField.getDefaultAppearance() ?? '';
+
+    da += `\n ${setFontAndSize(font.name, fontSize)}`;
+
+    textField.acroField.setDefaultAppearance(da);
+  }
+
+  textField.defaultUpdateAppearances(font);
+  textField.updateAppearances(font);
+};

@@ -128,7 +128,7 @@ export const sealDocument = async ({
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  flattenForm(doc);
+  await flattenForm(doc);
   flattenAnnotations(doc);
 
   // Add rejection stamp if the document is rejected
@@ -153,7 +153,7 @@ export const sealDocument = async ({
   }
 
   // Re-flatten post-insertion to handle fields that create arcoFields
-  flattenForm(doc);
+  await flattenForm(doc);
 
   const pdfBytes = await doc.save();
 
