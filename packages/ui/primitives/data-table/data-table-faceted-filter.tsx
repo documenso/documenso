@@ -64,7 +64,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         key={option.value}
                         className={cn(
                           'rounded-sm border-none px-2 py-0.5 font-normal',
-                          option.bgColor ? option.bgColor : 'variant-secondary',
+                          option.bgColor ? option.bgColor : 'bg-secondary',
                         )}
                       >
                         {option.label}
@@ -130,20 +130,6 @@ export function DataTableFacetedFilter<TData, TValue>({
                 );
               })}
             </CommandGroup>
-            {/* Option to clear filters, disabled for now since it makes the ui clanky. */}
-            {/* {selectedValues.size > 0 && (
-              <>
-                <CommandSeparator />
-                <CommandGroup>
-                  <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
-                    className="justify-center text-center"
-                  >
-                    Clear filters
-                  </CommandItem>
-                </CommandGroup>
-              </>
-            )} */}
           </CommandList>
         </Command>
       </PopoverContent>

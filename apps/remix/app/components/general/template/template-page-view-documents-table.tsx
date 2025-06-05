@@ -218,6 +218,9 @@ export const TemplatePageViewDocumentsTable = ({
         cell: ({ row }) => <DocumentStatusComponent status={row.original.status} />,
         size: 140,
         filterFn: (row, id, value) => {
+          if (!value || !Array.isArray(value) || value.length === 0) {
+            return true;
+          }
           return value.includes(row.getValue(id));
         },
       },
@@ -265,6 +268,9 @@ export const TemplatePageViewDocumentsTable = ({
           </div>
         ),
         filterFn: (row, id, value) => {
+          if (!value || !Array.isArray(value) || value.length === 0) {
+            return true;
+          }
           return value.includes(row.getValue(id));
         },
       },

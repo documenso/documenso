@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -33,7 +33,7 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
     .with(ExtendedDocumentStatus.REJECTED, () => ({
       title: msg`No rejected documents`,
       message: msg`There are no rejected documents. Documents that have been declined will appear here.`,
-      icon: CheckCircle2,
+      icon: XCircle,
     }))
     .with(ExtendedDocumentStatus.INBOX, () => ({
       title: msg`Your inbox is empty`,

@@ -101,15 +101,15 @@ export function getDateRangeForPeriod(
 }
 
 export function isDateInPeriod(date: Date, period: TimePeriod): boolean {
-  const dateTime = DateTime.fromJSDate(date);
-
   if (period === 'all-time') {
     return true;
   }
 
+  const dateTime = DateTime.fromJSDate(date);
   const range = getDateRangeForPeriod(period);
+
   if (!range) {
-    return true;
+    return false;
   }
 
   return dateTime >= range.start && dateTime <= range.end;

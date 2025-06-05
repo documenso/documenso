@@ -11,8 +11,6 @@ import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
-export type PeriodSelectorValue = '' | TimePeriod;
-
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
@@ -25,7 +23,7 @@ export type FindDocumentsOptions = {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-  period?: PeriodSelectorValue;
+  period?: TimePeriod;
   senderIds?: number[];
   query?: string;
   folderId?: string;
@@ -236,58 +234,71 @@ export const findDocuments = async ({
 
   if (period && period !== 'all-time') {
     const now = DateTime.now();
-    let startDate: DateTime;
-    let endDate: DateTime;
 
-    switch (period) {
-      case 'today':
-        startDate = now.startOf('day');
-        endDate = now.endOf('day');
-        break;
-      case 'yesterday':
-        startDate = now.minus({ days: 1 }).startOf('day');
-        endDate = now.minus({ days: 1 }).endOf('day');
-        break;
-      case 'this-week':
-        startDate = now.startOf('week');
-        endDate = now.endOf('week');
-        break;
-      case 'last-week':
-        startDate = now.minus({ weeks: 1 }).startOf('week');
-        endDate = now.minus({ weeks: 1 }).endOf('week');
-        break;
-      case 'this-month':
-        startDate = now.startOf('month');
-        endDate = now.endOf('month');
-        break;
-      case 'last-month':
-        startDate = now.minus({ months: 1 }).startOf('month');
-        endDate = now.minus({ months: 1 }).endOf('month');
-        break;
-      case 'this-quarter':
-        startDate = now.startOf('quarter');
-        endDate = now.endOf('quarter');
-        break;
-      case 'last-quarter':
-        startDate = now.minus({ quarters: 1 }).startOf('quarter');
-        endDate = now.minus({ quarters: 1 }).endOf('quarter');
-        break;
-      case 'this-year':
-        startDate = now.startOf('year');
-        endDate = now.endOf('year');
-        break;
-      case 'last-year':
-        startDate = now.minus({ years: 1 }).startOf('year');
-        endDate = now.minus({ years: 1 }).endOf('year');
-        break;
-      default:
-        startDate = now.startOf('day');
-        endDate = now.endOf('day');
-    }
+    const { startDate, endDate } = match(period)
+      .with('today', () => ({
+        startDate: now.startOf('day'),
+        endDate: now.startOf('day').plus({ days: 1 }),
+      }))
+      .with('yesterday', () => {
+        const yesterday = now.minus({ days: 1 });
+        return {
+          startDate: yesterday.startOf('day'),
+          endDate: yesterday.startOf('day').plus({ days: 1 }),
+        };
+      })
+      .with('this-week', () => ({
+        startDate: now.startOf('week'),
+        endDate: now.startOf('week').plus({ weeks: 1 }),
+      }))
+      .with('last-week', () => {
+        const lastWeek = now.minus({ weeks: 1 });
+        return {
+          startDate: lastWeek.startOf('week'),
+          endDate: lastWeek.startOf('week').plus({ weeks: 1 }),
+        };
+      })
+      .with('this-month', () => ({
+        startDate: now.startOf('month'),
+        endDate: now.startOf('month').plus({ months: 1 }),
+      }))
+      .with('last-month', () => {
+        const lastMonth = now.minus({ months: 1 });
+        return {
+          startDate: lastMonth.startOf('month'),
+          endDate: lastMonth.startOf('month').plus({ months: 1 }),
+        };
+      })
+      .with('this-quarter', () => ({
+        startDate: now.startOf('quarter'),
+        endDate: now.startOf('quarter').plus({ quarters: 1 }),
+      }))
+      .with('last-quarter', () => {
+        const lastQuarter = now.minus({ quarters: 1 });
+        return {
+          startDate: lastQuarter.startOf('quarter'),
+          endDate: lastQuarter.startOf('quarter').plus({ quarters: 1 }),
+        };
+      })
+      .with('this-year', () => ({
+        startDate: now.startOf('year'),
+        endDate: now.startOf('year').plus({ years: 1 }),
+      }))
+      .with('last-year', () => {
+        const lastYear = now.minus({ years: 1 });
+        return {
+          startDate: lastYear.startOf('year'),
+          endDate: lastYear.startOf('year').plus({ years: 1 }),
+        };
+      })
+      .otherwise(() => ({
+        startDate: now.startOf('day'),
+        endDate: now.startOf('day').plus({ days: 1 }),
+      }));
 
     whereClause.createdAt = {
       gte: startDate.toJSDate(),
-      lte: endDate.toJSDate(),
+      lt: endDate.toJSDate(),
     };
   }
 

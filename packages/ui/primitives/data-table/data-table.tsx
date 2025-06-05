@@ -29,7 +29,6 @@ import { DataTableToolbar } from './data-table-toolbar';
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  columnVisibility?: VisibilityState;
   perPage?: number;
   currentPage?: number;
   totalPages?: number;
@@ -126,7 +125,7 @@ export function DataTable<TData, TValue>({
       pagination: manualPagination ? pagination : undefined,
     },
     manualPagination,
-    pageCount: totalPages,
+    pageCount: manualPagination ? totalPages : undefined,
     initialState: {
       pagination: {
         pageSize: 10,

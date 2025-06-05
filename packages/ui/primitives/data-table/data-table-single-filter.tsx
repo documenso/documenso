@@ -44,8 +44,7 @@ export function DataTableSingleFilter<TData, TValue>({
   selectedValues,
 }: DataTableSingleFilterProps<TData, TValue>) {
   const filterValue = column?.getFilterValue() as string[] | undefined;
-  const selectedValue =
-    selectedValues?.[0] || (filterValue && filterValue.length > 0 ? filterValue[0] : undefined);
+  const selectedValue = selectedValues?.[0] || (filterValue?.[0] ?? undefined);
   const selectedOption = options.find((option) => option.value === selectedValue);
 
   const handleValueChange = (value: string) => {

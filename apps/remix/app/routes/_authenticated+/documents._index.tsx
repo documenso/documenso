@@ -26,7 +26,7 @@ import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialo
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
 import { FolderCard } from '~/components/general/folder/folder-card';
-import { DocumentsDataTable } from '~/components/tables/documents-table/data-table';
+import { DocumentsDataTable } from '~/components/tables/documents-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
