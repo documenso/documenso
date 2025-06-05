@@ -91,7 +91,7 @@ export function DocumentsDataTable({
   const columns = useMemo(() => {
     return [
       {
-        header: 'Created',
+        header: _(msg`Created`),
         accessorKey: 'createdAt',
         cell: ({ row }) =>
           i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),

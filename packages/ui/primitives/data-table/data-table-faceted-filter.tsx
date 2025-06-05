@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import type { Column } from '@tanstack/react-table';
 import { Check } from 'lucide-react';
 
@@ -18,7 +21,7 @@ interface DataTableFacetedFilterProps<TData, TValue> {
   onFilterChange?: (values: string[]) => void;
   selectedValues?: string[];
   options: {
-    label: string;
+    label: MessageDescriptor;
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
     color?: string;
@@ -35,6 +38,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   selectedValues,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
+  const { _ } = useLingui();
   const facets = column?.getFacetedUniqueValues();
   const selectedValuesSet = new Set(selectedValues || (column?.getFilterValue() as string[]));
 
@@ -53,7 +57,7 @@ export function DataTableFacetedFilter<TData, TValue>({
               <div className="hidden gap-1 lg:flex">
                 {selectedValuesSet.size > 2 ? (
                   <Badge variant="neutral" className="rounded-sm px-2 py-0.5 font-normal">
-                    {selectedValuesSet.size} selected
+                    {selectedValuesSet.size} {_(msg`selected`)}
                   </Badge>
                 ) : (
                   options
@@ -67,7 +71,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                           option.bgColor ? option.bgColor : 'bg-secondary',
                         )}
                       >
-                        {option.label}
+                        {_(option.label)}
                       </Badge>
                     ))
                 )}
@@ -79,7 +83,7 @@ export function DataTableFacetedFilter<TData, TValue>({
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{_(msg`No results found.`)}</CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValuesSet.has(option.value);
@@ -120,7 +124,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         )}
                       />
                     )}
-                    <span>{option.label}</span>
+                    <span>{_(option.label)}</span>
                     {(stats?.[option.value] || facets?.get(option.value)) && (
                       <span className="text-muted-foreground ml-auto flex size-4 items-center justify-center font-mono text-xs">
                         {stats?.[option.value] || facets?.get(option.value)}

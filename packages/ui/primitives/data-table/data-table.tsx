@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useMemo } from 'react';
 
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type {
   ColumnDef,
@@ -83,6 +85,7 @@ export function DataTable<TData, TValue>({
   isSourceFiltered,
   emptyState,
 }: DataTableProps<TData, TValue>) {
+  const { _ } = useLingui();
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
@@ -211,10 +214,14 @@ export function DataTable<TData, TValue>({
           </div>
         ) : emptyState?.enable ? (
           (emptyState.component ?? (
-            <div className="flex h-24 items-center justify-center text-center">No results.</div>
+            <div className="flex h-24 items-center justify-center text-center">
+              {_(msg`No results.`)}
+            </div>
           ))
         ) : (
-          <div className="flex h-24 items-center justify-center text-center">No results.</div>
+          <div className="flex h-24 items-center justify-center text-center">
+            {_(msg`No results.`)}
+          </div>
         )}
       </div>
 

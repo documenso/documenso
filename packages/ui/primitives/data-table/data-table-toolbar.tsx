@@ -1,3 +1,5 @@
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import type { Table } from '@tanstack/react-table';
 import { Calendar, CircleDashedIcon, Globe, ListFilter, X, XCircle } from 'lucide-react';
 
@@ -36,6 +38,7 @@ export function DataTableToolbar<TData>({
   isTimePeriodFiltered,
   isSourceFiltered,
 }: DataTableToolbarProps<TData>) {
+  const { _ } = useLingui();
   const isFiltered =
     table.getState().columnFilters.length > 0 ||
     isStatusFiltered ||
@@ -58,7 +61,7 @@ export function DataTableToolbar<TData>({
         <div className="relative">
           <Input
             className="peer h-8 w-[150px] pe-9 ps-9 lg:w-[250px]"
-            placeholder="Search documents..."
+            placeholder={_(msg`Search documents...`)}
             value={searchValue}
             onChange={(event) => table.getColumn('title')?.setFilterValue(event.target.value)}
           />
@@ -68,7 +71,7 @@ export function DataTableToolbar<TData>({
           {searchValue && (
             <button
               className="text-muted-foreground/80 hover:text-foreground focus-visible:border-ring focus-visible:ring-ring/50 absolute inset-y-0 end-0 flex h-full w-9 items-center justify-center rounded-e-md outline-none transition-[color,box-shadow] focus:z-10 focus-visible:ring-[3px] disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Clear filter"
+              aria-label={_(msg`Clear filter`)}
               onClick={handleClearFilter}
             >
               <XCircle className="size-3" aria-hidden="true" />
@@ -79,7 +82,7 @@ export function DataTableToolbar<TData>({
         {table.getColumn('status') && (
           <DataTableFacetedFilter
             column={table.getColumn('status')}
-            title="Status"
+            title={_(msg`Status`)}
             options={statuses}
             icon={CircleDashedIcon}
             stats={stats}
@@ -91,7 +94,7 @@ export function DataTableToolbar<TData>({
         {table.getColumn('createdAt') && (
           <DataTableSingleFilter
             column={table.getColumn('createdAt')}
-            title="Time Period"
+            title={_(msg`Time Period`)}
             options={timePeriods}
             groups={timePeriodGroups}
             icon={Calendar}
@@ -103,7 +106,7 @@ export function DataTableToolbar<TData>({
         {table.getColumn('source') && (
           <DataTableFacetedFilter
             column={table.getColumn('source')}
-            title="Source"
+            title={_(msg`Source`)}
             options={sources}
             icon={Globe}
             onFilterChange={onSourceFilterChange}
@@ -113,7 +116,7 @@ export function DataTableToolbar<TData>({
 
         {isFiltered && (
           <Button variant="ghost" className="h-8 gap-2" size="sm" onClick={handleReset}>
-            Reset
+            {_(msg`Reset`)}
             <X className="size-4" />
           </Button>
         )}

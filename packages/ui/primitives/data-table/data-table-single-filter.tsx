@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import type { MessageDescriptor } from '@lingui/core';
+import { useLingui } from '@lingui/react';
 import type { Column } from '@tanstack/react-table';
 
 import { cn } from '../../lib/utils';
@@ -22,14 +24,14 @@ interface DataTableSingleFilterProps<TData, TValue> {
   onFilterChange?: (values: string[]) => void;
   selectedValues?: string[];
   options: {
-    label: string;
+    label: MessageDescriptor;
     value: string;
     icon?: React.ComponentType<{ className?: string }>;
     color?: string;
     bgColor?: string;
   }[];
   groups?: {
-    label: string;
+    label: MessageDescriptor;
     values: string[];
   }[];
 }
@@ -43,6 +45,7 @@ export function DataTableSingleFilter<TData, TValue>({
   onFilterChange,
   selectedValues,
 }: DataTableSingleFilterProps<TData, TValue>) {
+  const { _ } = useLingui();
   const filterValue = column?.getFilterValue() as string[] | undefined;
   const selectedValue = selectedValues?.[0] || (filterValue?.[0] ?? undefined);
   const selectedOption = options.find((option) => option.value === selectedValue);
@@ -66,9 +69,9 @@ export function DataTableSingleFilter<TData, TValue>({
   const renderOptions = () => {
     if (groups) {
       return groups.map((group, groupIndex) => (
-        <React.Fragment key={group.label}>
+        <React.Fragment key={JSON.stringify(group.label)}>
           <SelectGroup>
-            <SelectLabel>{group.label}</SelectLabel>
+            <SelectLabel>{_(group.label)}</SelectLabel>
             {options
               .filter((option) => group.values.includes(option.value))
               .map((option) => (
@@ -82,7 +85,7 @@ export function DataTableSingleFilter<TData, TValue>({
                         )}
                       />
                     )}
-                    <span>{option.label}</span>
+                    <span>{_(option.label)}</span>
                   </div>
                 </SelectItem>
               ))}
@@ -102,7 +105,7 @@ export function DataTableSingleFilter<TData, TValue>({
                   className={cn('size-4', option.color ? option.color : 'text-muted-foreground')}
                 />
               )}
-              <span>{option.label}</span>
+              <span>{_(option.label)}</span>
             </div>
           </SelectItem>
         ))}
@@ -125,7 +128,7 @@ export function DataTableSingleFilter<TData, TValue>({
                 selectedOption.bgColor ? selectedOption.bgColor : 'variant-secondary',
               )}
             >
-              {selectedOption.label}
+              {_(selectedOption.label)}
             </Badge>
           </>
         )}
