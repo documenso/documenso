@@ -27,7 +27,6 @@ export type DocumentSigningAuthDialogProps = {
   actionTarget: FieldType | 'DOCUMENT';
   open: boolean;
   onOpenChange: (value: boolean) => void;
-
   /**
    * The callback to run when the reauth form is filled out.
    */
@@ -38,6 +37,7 @@ export const DocumentSigningAuthDialog = ({
   title,
   description,
   documentAuthType,
+  actionTarget,
   open,
   onOpenChange,
   onReauthFormSubmit,
@@ -56,10 +56,22 @@ export const DocumentSigningAuthDialog = ({
     <Dialog open={open} onOpenChange={handleOnOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{title || <Trans>Sign field</Trans>}</DialogTitle>
+          <DialogTitle>
+            {title ||
+              (actionTarget === 'DOCUMENT' ? (
+                <Trans>Sign document</Trans>
+              ) : (
+                <Trans>Sign field</Trans>
+              ))}
+          </DialogTitle>
 
           <DialogDescription>
-            {description || <Trans>Reauthentication is required to sign this field</Trans>}
+            {description || (
+              <Trans>
+                Reauthentication is required to sign this{' '}
+                {actionTarget === 'DOCUMENT' ? 'document' : 'field'}
+              </Trans>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -78,6 +90,7 @@ export const DocumentSigningAuthDialog = ({
           ))
           .with({ documentAuthType: DocumentAuth.TWO_FACTOR_AUTH }, () => (
             <DocumentSigningAuth2FA
+              actionTarget={actionTarget === 'DOCUMENT' ? 'DOCUMENT' : 'FIELD'}
               open={open}
               onOpenChange={onOpenChange}
               onReauthFormSubmit={onReauthFormSubmit}

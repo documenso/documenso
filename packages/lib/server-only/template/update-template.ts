@@ -5,6 +5,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import { DocumentAuth } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 
 export type UpdateTemplateOptions = {
@@ -74,7 +75,11 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
+  // Only ACCOUNT and PASSKEY require enterprise permissions
+  if (
+    newGlobalActionAuth &&
+    (newGlobalActionAuth === DocumentAuth.ACCOUNT || newGlobalActionAuth === DocumentAuth.PASSKEY)
+  ) {
     const isDocumentEnterprise = await isUserEnterprise({
       userId,
       teamId,
@@ -82,7 +87,7 @@ export const updateTemplate = async ({
 
     if (!isDocumentEnterprise) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
+        message: 'You do not have permission to set this action auth type',
       });
     }
   }

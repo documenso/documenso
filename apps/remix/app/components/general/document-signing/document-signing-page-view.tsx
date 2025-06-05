@@ -47,6 +47,7 @@ export type DocumentSigningPageViewProps = {
   completedFields: CompletedField[];
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
+  isEnterprise: boolean;
 };
 
 export const DocumentSigningPageView = ({
@@ -56,6 +57,7 @@ export const DocumentSigningPageView = ({
   completedFields,
   isRecipientsTurn,
   allRecipients = [],
+  isEnterprise,
 }: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
@@ -153,6 +155,7 @@ export const DocumentSigningPageView = ({
               isRecipientsTurn={isRecipientsTurn}
               allRecipients={allRecipients}
               setSelectedSignerId={setSelectedSignerId}
+              isEnterprise={isEnterprise}
             />
           </div>
         </div>
