@@ -52,6 +52,10 @@ interface DataTableProps<TData, TValue> {
     enable: boolean;
     component?: React.ReactNode;
   };
+  emptyState?: {
+    enable: boolean;
+    component?: React.ReactNode;
+  };
 }
 
 export function DataTable<TData, TValue>({
@@ -72,6 +76,7 @@ export function DataTable<TData, TValue>({
   onResetFilters,
   isStatusFiltered,
   isTimePeriodFiltered,
+  emptyState,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -149,61 +154,65 @@ export function DataTable<TData, TValue>({
           isStatusFiltered={isStatusFiltered}
           isTimePeriodFiltered={isTimePeriodFiltered}
         />
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <TableHead key={header.id} colSpan={header.colSpan}>
-                        {header.isPlaceholder
-                          ? null
-                          : flexRender(header.column.columnDef.header, header.getContext())}
-                      </TableHead>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableHeader>
-            <TableBody>
-              {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+        {table.getRowModel().rows?.length || error?.enable || skeleton?.enable ? (
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => {
+                      return (
+                        <TableHead key={header.id} colSpan={header.colSpan}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : error?.enable ? (
+                  <TableRow>
+                    {error.component ?? (
+                      <TableCell colSpan={columns.length} className="h-32 text-center">
+                        <Trans>Something went wrong.</Trans>
                       </TableCell>
-                    ))}
+                    )}
                   </TableRow>
-                ))
-              ) : error?.enable ? (
-                <TableRow>
-                  {error.component ?? (
-                    <TableCell colSpan={columns.length} className="h-32 text-center">
-                      <Trans>Something went wrong.</Trans>
-                    </TableCell>
-                  )}
-                </TableRow>
-              ) : skeleton?.enable ? (
-                Array.from({ length: skeleton.rows }).map((_, i) => (
-                  <TableRow key={`skeleton-row-${i}`}>
-                    {skeleton.component ?? <Skeleton />}
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={columns.length} className="h-24 text-center">
-                    No results.
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+                ) : skeleton?.enable ? (
+                  Array.from({ length: skeleton.rows }).map((_, i) => (
+                    <TableRow key={`skeleton-row-${i}`}>
+                      {skeleton.component ?? <Skeleton />}
+                    </TableRow>
+                  ))
+                ) : null}
+              </TableBody>
+            </Table>
+          </div>
+        ) : emptyState?.enable ? (
+          (emptyState.component ?? (
+            <div className="flex h-24 items-center justify-center text-center">No results.</div>
+          ))
+        ) : (
+          <div className="flex h-24 items-center justify-center text-center">No results.</div>
+        )}
       </div>
 
-      {children && <div className="mt-8 w-full">{children(table)}</div>}
+      {children && (table.getRowModel().rows?.length || error?.enable || skeleton?.enable) && (
+        <div className="mt-8 w-full">{children(table)}</div>
+      )}
     </>
   );
 }

@@ -10,7 +10,7 @@ import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
 import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/schema';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -26,7 +26,6 @@ import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialo
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
 import { FolderCard } from '~/components/general/folder/folder-card';
-import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsDataTable } from '~/components/tables/documents-table/data-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -248,27 +247,15 @@ export default function DocumentsPage() {
 
         <div className="mt-8">
           <div>
-            {data &&
-            data.count === 0 &&
-            (!foldersData?.folders.length || foldersData.folders.length === 0) ? (
-              <DocumentsTableEmptyState
-                status={
-                  Array.isArray(findDocumentSearchParams.status)
-                    ? findDocumentSearchParams.status[0] || ExtendedDocumentStatus.ALL
-                    : findDocumentSearchParams.status || ExtendedDocumentStatus.ALL
-                }
-              />
-            ) : (
-              <DocumentsDataTable
-                data={data}
-                isLoading={isLoading}
-                isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
-                  setIsMovingDocument(true);
-                }}
-              />
-            )}
+            <DocumentsDataTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              onMoveDocument={(documentId) => {
+                setDocumentToMove(documentId);
+                setIsMovingDocument(true);
+              }}
+            />
           </div>
         </div>
 

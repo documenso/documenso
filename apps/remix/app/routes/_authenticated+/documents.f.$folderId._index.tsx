@@ -3,22 +3,18 @@ import { useEffect, useMemo, useState } from 'react';
 import { Trans } from '@lingui/react/macro';
 import { FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
 import { useNavigate, useParams, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
-import {
-  type TFindDocumentsInternalResponse,
-  ZFindDocumentsInternalRequestSchema,
-} from '@documenso/trpc/server/document-router/schema';
+import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/schema';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
@@ -26,14 +22,9 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
-import { DocumentSearch } from '~/components/general/document/document-search';
-import { DocumentStatus } from '~/components/general/document/document-status';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
 import { FolderCard } from '~/components/general/folder/folder-card';
-import { PeriodSelector } from '~/components/general/period-selector';
-import { DocumentsTable } from '~/components/tables/documents-table';
-import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
-import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
+import { DocumentsDataTable } from '~/components/tables/documents-table/data-table';
 import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -42,13 +33,23 @@ export function meta() {
 }
 
 const ZSearchParamsSchema = ZFindDocumentsInternalRequestSchema.pick({
-  status: true,
   period: true,
   page: true,
   perPage: true,
   query: true,
 }).extend({
   senderIds: z.string().transform(parseToIntegerArray).optional().catch([]),
+  status: z
+    .string()
+    .transform(
+      (val) =>
+        val
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean) as ExtendedDocumentStatus[],
+    )
+    .optional()
+    .catch(undefined),
 });
 
 export default function DocumentsPage() {
@@ -71,15 +72,6 @@ export default function DocumentsPage() {
   const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
   const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
-  const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
-    [ExtendedDocumentStatus.DRAFT]: 0,
-    [ExtendedDocumentStatus.PENDING]: 0,
-    [ExtendedDocumentStatus.COMPLETED]: 0,
-    [ExtendedDocumentStatus.REJECTED]: 0,
-    [ExtendedDocumentStatus.INBOX]: 0,
-    [ExtendedDocumentStatus.ALL]: 0,
-  });
-
   const findDocumentSearchParams = useMemo(
     () => ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
     [searchParams],
@@ -97,6 +89,7 @@ export default function DocumentsPage() {
     isLoading: isFoldersLoading,
     refetch: refetchFolders,
   } = trpc.folder.getFolders.useQuery({
+    type: FolderType.DOCUMENT,
     parentId: folderId,
   });
 
@@ -104,28 +97,6 @@ export default function DocumentsPage() {
     void refetch();
     void refetchFolders();
   }, [team?.url]);
-
-  const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
-    const params = new URLSearchParams(searchParams);
-
-    params.set('status', value);
-
-    if (value === ExtendedDocumentStatus.ALL) {
-      params.delete('status');
-    }
-
-    if (params.has('page')) {
-      params.delete('page');
-    }
-
-    return `${formatDocumentsPath(team?.url)}/f/${folderId}?${params.toString()}`;
-  };
-
-  useEffect(() => {
-    if (data?.stats) {
-      setStats(data.stats);
-    }
-  }, [data?.stats]);
 
   const navigateToFolder = (folderId?: string | null) => {
     const documentsPath = formatDocumentsPath(team?.url);
@@ -255,65 +226,19 @@ export default function DocumentsPage() {
               <Trans>Documents</Trans>
             </h2>
           </div>
-
-          <div className="-m-1 flex flex-wrap gap-x-4 gap-y-6 overflow-hidden p-1">
-            <Tabs value={findDocumentSearchParams.status || 'ALL'} className="overflow-x-auto">
-              <TabsList>
-                {[
-                  ExtendedDocumentStatus.INBOX,
-                  ExtendedDocumentStatus.PENDING,
-                  ExtendedDocumentStatus.COMPLETED,
-                  ExtendedDocumentStatus.DRAFT,
-                  ExtendedDocumentStatus.ALL,
-                ].map((value) => (
-                  <TabsTrigger
-                    key={value}
-                    className="hover:text-foreground min-w-[60px]"
-                    value={value}
-                    asChild
-                  >
-                    <Link to={getTabHref(value)} preventScrollReset>
-                      <DocumentStatus status={value} />
-
-                      {value !== ExtendedDocumentStatus.ALL && (
-                        <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
-                      )}
-                    </Link>
-                  </TabsTrigger>
-                ))}
-              </TabsList>
-            </Tabs>
-
-            {team && <DocumentsTableSenderFilter teamId={team.id} />}
-
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <PeriodSelector />
-            </div>
-            <div className="flex w-48 flex-wrap items-center justify-between gap-x-2 gap-y-4">
-              <DocumentSearch initialValue={findDocumentSearchParams.query} />
-            </div>
-          </div>
         </div>
 
         <div className="mt-8">
           <div>
-            {data &&
-            data.count === 0 &&
-            (!foldersData?.folders.length || foldersData.folders.length === 0) ? (
-              <DocumentsTableEmptyState
-                status={findDocumentSearchParams.status || ExtendedDocumentStatus.ALL}
-              />
-            ) : (
-              <DocumentsTable
-                data={data}
-                isLoading={isLoading}
-                isLoadingError={isLoadingError}
-                onMoveDocument={(documentId) => {
-                  setDocumentToMove(documentId);
-                  setIsMovingDocument(true);
-                }}
-              />
-            )}
+            <DocumentsDataTable
+              data={data}
+              isLoading={isLoading}
+              isLoadingError={isLoadingError}
+              onMoveDocument={(documentId) => {
+                setDocumentToMove(documentId);
+                setIsMovingDocument(true);
+              }}
+            />
           </div>
         </div>
 

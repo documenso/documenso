@@ -2,6 +2,13 @@ import { CheckCircle2, Clock, File, Inbox, XCircle } from 'lucide-react';
 
 export const statuses = [
   {
+    value: 'INBOX',
+    label: 'Inbox',
+    icon: Inbox,
+    color: 'text-blue-700 dark:text-blue-300',
+    bgColor: 'bg-blue-100 dark:bg-blue-100 text-blue-700 dark:text-blue-700',
+  },
+  {
     value: 'DRAFT',
     label: 'Draft',
     icon: File,
@@ -28,13 +35,6 @@ export const statuses = [
     icon: XCircle,
     color: 'text-red-700 dark:text-red-300',
     bgColor: 'bg-red-100 dark:bg-red-100 text-red-500 dark:text-red-700',
-  },
-  {
-    value: 'INBOX',
-    label: 'Inbox',
-    icon: Inbox,
-    color: 'text-blue-700 dark:text-blue-300',
-    bgColor: 'bg-blue-100 dark:bg-blue-100 text-blue-700 dark:text-blue-700',
   },
 ];
 

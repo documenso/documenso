@@ -12,6 +12,7 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -29,6 +30,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { DocumentsTableActionButton } from '../documents-table-action-button';
 import { DocumentsTableActionDropdown } from '../documents-table-action-dropdown';
+import { DocumentsTableEmptyState } from '../documents-table-empty-state';
 
 export type DataTableProps = {
   data?: TFindDocumentsInternalResponse;
@@ -164,6 +166,13 @@ export function DocumentsDataTable({
     totalPages: 1,
   };
 
+  const getEmptyStateStatus = (): ExtendedDocumentStatus => {
+    if (selectedStatusValues.length > 0) {
+      return selectedStatusValues[0] as ExtendedDocumentStatus;
+    }
+    return ExtendedDocumentStatus.ALL;
+  };
+
   return (
     <div className="relative">
       <DataTable
@@ -211,6 +220,10 @@ export function DocumentsDataTable({
               </TableCell>
             </>
           ),
+        }}
+        emptyState={{
+          enable: !isLoading && !isLoadingError,
+          component: <DocumentsTableEmptyState status={getEmptyStateStatus()} />,
         }}
       >
         {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
