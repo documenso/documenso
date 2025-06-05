@@ -17,7 +17,7 @@
 
 /*
  * Clean up subscriptions prior to full migration:
- * - A user has a maximum of 1 subscription
+ * - Ensure each user has a maximum of 1 subscription tied to the "User" table
  */
 -- [CUSTOM_CHANGE_START]
 WITH subscriptions_to_delete AS (
@@ -27,7 +27,7 @@ WITH subscriptions_to_delete AS (
       PARTITION BY "userId"
       ORDER BY
         (status = 'ACTIVE') DESC,  -- Prioritize active subscriptions
-        "createdAt" DESC          -- Then by most recent
+        "updatedAt" DESC          -- Then by most recently updated
     ) AS rn
   FROM "Subscription" s
   WHERE s."userId" IS NOT NULL
@@ -41,8 +41,6 @@ DELETE FROM "Subscription"
 WHERE id IN (SELECT id FROM to_delete);
 -- [CUSTOM_CHANGE_END]
 
-
-
 -- DropForeignKey
 ALTER TABLE "Subscription" DROP CONSTRAINT "Subscription_teamId_fkey";
 ALTER TABLE "Subscription" DROP CONSTRAINT "Subscription_userId_fkey";
@@ -54,17 +52,10 @@ DROP INDEX "Subscription_userId_idx";
 -- DropConstraints
 ALTER TABLE "Subscription" DROP CONSTRAINT "teamid_or_userid_check";
 
-
-
 /*
  * Before starting the real migration, we want to do the following:
  * - Give every user a team with their personal entities (documents, templates, webhooks, profile, apiTokens)
  * - The team is temporary and tagged with a "isPersonal" boolean
- * - Move the "Individual" subscription into the personal team
- *
- * Our criteria for determining an individual plan is:
- * - User has 1 "user subscription" and 0 "team subscriptions"
- *
 */
 -- [CUSTOM_CHANGE_START]
 
@@ -76,7 +67,7 @@ WHERE "url" IS NULL;
 -- 2. Make User URL required
 ALTER TABLE "User" ALTER COLUMN "url" SET NOT NULL;
 
--- 3. Add isPersonal boolean to Team table with default false
+-- 3. Add temp isPersonal boolean to Team table with default false
 ALTER TABLE "Team" ADD COLUMN "isPersonal" BOOLEAN NOT NULL DEFAULT false;
 
 -- 4. Create a personal team for every user
@@ -144,67 +135,6 @@ JOIN "Team" t ON t."ownerUserId" = u."id" AND t."isPersonal" = TRUE;
 
 -- [CUSTOM_CHANGE_END]
 
-
-/*
-
-
-The current state of the migration is that:
-- All users have a team with their personal entities excluding subscriptions
-- Users with "free" teams from Platform/Enterprise/EarlyAdopter will have teams with no subscription since those are "account" level subscriptions
-
-
-- Users with "individual" subscription should ??
-
-Our goal is now to migrate organisations
-
-If subscription is attached to user account, that means it is either:
-- Individual
-- Platform
-- Enterprise
-- Early Adopter
-
-We will handle moving Individual plans into personal organisations as a secondary migration script.
-
-
-
-1. Create an organisation for each team
-2. Move the subscription from the team -> organisation
-3. Move all their teams (with no subscription AND not personal) into that organisation
-4. Migrate team members into organisation members and groups
-
-
-
-
-
-
-
-Therefore, we create organisations as follows:
-1. If the user has an individual subscription, assign it to their personal team
-- We know it's individual
-
-2. If the user has any other account level subscription
-- Create an organisation
-- Move the user subscription into the organisation
-- Move all their teams (with no subscription) into that organisation
-- Migrate team members into organisation members and groups
-
-3. For any remaining teams with a subscription (should only be teams subscription remaining)
-- Create an organisation
-- Assign the user subscription into the organisation
-- Move all their teams (with no subscription) into that organisation
-- Migrate team members into organisation members and groups
-
-4. For any remaining teams with no subscription
-- Create a free organisation
-
-Therefore when creating an organisation do this:
-1.
-
-
-
-
-
-*/
 -- CreateEnum
 CREATE TYPE "OrganisationGroupType" AS ENUM ('INTERNAL_ORGANISATION', 'INTERNAL_TEAM', 'CUSTOM');
 
@@ -543,25 +473,48 @@ ALTER TABLE "Team" ADD CONSTRAINT "Team_organisationId_fkey" FOREIGN KEY ("organ
 -- AddForeignKey
 ALTER TABLE "Team" ADD CONSTRAINT "Team_teamGlobalSettingsId_fkey" FOREIGN KEY ("teamGlobalSettingsId") REFERENCES "TeamGlobalSettings"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
-
-
-
-/* !!!!!!!!!!!!!!!!!!!!!! [CUSTOM_CHANGE]: MIGRATIONS  !!!!!!!!!!!!!!!!!!!!!!!!!
-
-Handle creating organisations...
-
-
-
-
-
-*/
-
-
--- [CUSTOM_CHANGE] MIGRATIONS
-
-
+-- [CUSTOM_CHANGE] FROM HERE ON IT'S ALL CUSTOM
 
 /*
+ * The current state of the migration is that:
+ * - All users have a team with their personal entities excluding subscriptions
+ * - All entities should be tied into teams
+ *
+ * Our goal is now to migrate organisations
+ *
+ * If subscription is attached to user account, that means it is either:
+ * - Individual
+ * - Platform
+ * - Enterprise
+ * - Early Adopter
+ *
+ * If subscription is attached to a team, that means it is:
+ * - Team
+ *
+ * Therefore, we create organisations as follows:
+ * 1. If the user has an account level subscription
+ * - Create an organisation
+ * - Move the user subscription into the organisation
+ * - Move all their teams (with no subscription) into that organisation
+ *
+ * 2. For any remaining teams with a subscription (should only be teams subscription remaining)
+ * - Create an organisation
+ * - Assign the user subscription into the organisation
+ * - Move all their teams (with no subscription) into that organisation
+ *
+ * 3. For any remaining teams with no subscription
+ * - Create a free organisation
+ *
+ * Afterwards we migrate team members, etc into the organisation.
+ *
+ * Note: We will handle moving Individual plans into personal organisations as a part of a
+ * secondary migration script since we need the Stripe price IDs
+ *
+*/
+
+/*
+ * Handle free and team level subscriptions
+ *
  * Goal:
  * - Create organisations for each personal team.
  * - Create organisations for each "teams plan" team.
@@ -600,6 +553,8 @@ FROM new_organisations o
 WHERE o."teamId" = t."id";
 
 /*
+ * Handle account level subscriptions
+ *
  * Goal:
  * - Create a single organisation for each user subscription
  * - Move all non personal teams without subscriptions into the newly created organisation
@@ -646,13 +601,6 @@ UPDATE "Subscription" s
 SET "organisationId" = o."id"
 FROM new_orgs o
 WHERE s."userId" = o."ownerUserId";
-
-
-
-
-
-
-
 
 -- Create internal groups for each organisation (ADMIN, MANAGER, MEMBER)
 WITH org_groups AS (
@@ -711,7 +659,6 @@ FROM teams_to_update ttu
 WHERE t."id" = ttu.team_id;
 
 -- Create OrganisationClaim for every organisation, use the default "FREE" claim
--- Todo: orgs we need a POST update to handle updating to the correct values
 WITH orgs_to_update AS (
   SELECT "id" AS org_id, gen_random_uuid() AS claim_id
   FROM "Organisation"
@@ -722,6 +669,7 @@ new_claims AS (
     "id",
     "createdAt",
     "updatedAt",
+    "originalSubscriptionClaimId",
     "teamCount",
     "memberCount",
     "flags"
@@ -730,6 +678,7 @@ new_claims AS (
     claim_id,
     now(),
     now(),
+    'free',
     1,
     1,
     '{}'::jsonb
@@ -740,25 +689,6 @@ UPDATE "Organisation" o
 SET "organisationClaimId" = otu.claim_id
 FROM orgs_to_update otu
 WHERE o."id" = otu.org_id;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
--- Todo: For each team create INTERNAL_TEAM groups
--- Todo: Test these migrations
 
 -- Create TeamGroups to assign the internal Organisation Admin/Manager groups to teams
 WITH org_internal_groups AS (
@@ -822,10 +752,6 @@ SELECT
   ntg.group_id,
   ntg.team_role
 FROM new_team_groups ntg;
-
-
-
-
 
 -- Create OrganisationMembers for each unique user-organisation combination
 -- This ensures only one OrganisationMember per user per organisation, even if they belong to multiple teams

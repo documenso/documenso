@@ -9,6 +9,8 @@ import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { trpc } from '@documenso/trpc/client';
 import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 
+import { SKIP_QUERY_BATCH_META } from '../../constants/trpc';
+
 export type AppSession = {
   session: Session;
   user: SessionUser;
@@ -68,7 +70,7 @@ export const SessionProvider = ({ children, initialSession }: SessionProviderPro
     }
 
     const organisations = await trpc.organisation.internal.getOrganisationSession
-      .query()
+      .query(undefined, SKIP_QUERY_BATCH_META.trpc)
       .catch(() => {
         // Todo: (RR7) Log
         return [];
