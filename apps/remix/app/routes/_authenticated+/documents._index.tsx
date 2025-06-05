@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-// imports for tasks
 import { FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
@@ -17,7 +16,6 @@ import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 
-// Tasks Imports
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';

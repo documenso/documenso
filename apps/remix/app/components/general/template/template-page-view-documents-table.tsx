@@ -163,14 +163,6 @@ export const TemplatePageViewDocumentsTable = ({
     perPage: 10,
     currentPage: 1,
     totalPages: 1,
-    stats: {
-      [ExtendedDocumentStatus.DRAFT]: 0,
-      [ExtendedDocumentStatus.PENDING]: 0,
-      [ExtendedDocumentStatus.COMPLETED]: 0,
-      [ExtendedDocumentStatus.REJECTED]: 0,
-      [ExtendedDocumentStatus.INBOX]: 0,
-      [ExtendedDocumentStatus.ALL]: 0,
-    },
   };
 
   const getEmptyStateStatus = (): ExtendedDocumentStatus => {
