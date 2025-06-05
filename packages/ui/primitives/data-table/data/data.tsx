@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, File, Inbox, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, File, FileText, Inbox, Link, XCircle } from 'lucide-react';
 
 export const statuses = [
   {
@@ -19,8 +19,8 @@ export const statuses = [
     value: 'PENDING',
     label: 'Pending',
     icon: Clock,
-    color: 'text-water-700 dark:text-water-300',
-    bgColor: 'bg-water-100 dark:bg-water-100 text-water-700 dark:text-water-700',
+    color: 'text-blue-700 dark:text-blue-300',
+    bgColor: 'bg-blue-100 dark:bg-blue-100 text-blue-700 dark:text-blue-700',
   },
   {
     value: 'COMPLETED',
@@ -35,6 +35,23 @@ export const statuses = [
     icon: XCircle,
     color: 'text-red-700 dark:text-red-300',
     bgColor: 'bg-red-100 dark:bg-red-100 text-red-500 dark:text-red-700',
+  },
+];
+
+export const sources = [
+  {
+    value: 'TEMPLATE',
+    label: 'Template',
+    icon: FileText,
+    color: 'text-blue-700 dark:text-blue-300',
+    bgColor: 'bg-blue-100 dark:bg-blue-100 text-blue-700 dark:text-blue-700',
+  },
+  {
+    value: 'DIRECT_LINK',
+    label: 'Direct Link',
+    icon: Link,
+    color: 'text-green-700 dark:text-green-300',
+    bgColor: 'bg-green-100 dark:bg-green-100 text-green-700 dark:text-green-700',
   },
 ];
 

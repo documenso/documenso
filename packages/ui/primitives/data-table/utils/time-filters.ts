@@ -1,17 +1,20 @@
 import { DateTime } from 'luxon';
 
-export type TimePeriod =
-  | 'today'
-  | 'this-week'
-  | 'this-month'
-  | 'this-quarter'
-  | 'this-year'
-  | 'yesterday'
-  | 'last-week'
-  | 'last-month'
-  | 'last-quarter'
-  | 'last-year'
-  | 'all-time';
+export const timePeriods = [
+  'today',
+  'this-week',
+  'this-month',
+  'this-quarter',
+  'this-year',
+  'yesterday',
+  'last-week',
+  'last-month',
+  'last-quarter',
+  'last-year',
+  'all-time',
+] as const;
+
+export type TimePeriod = (typeof timePeriods)[number];
 
 export function getDateRangeForPeriod(
   period: TimePeriod,

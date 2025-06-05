@@ -40,9 +40,12 @@ interface DataTableProps<TData, TValue> {
   selectedStatusValues?: string[];
   onTimePeriodFilterChange?: (values: string[]) => void;
   selectedTimePeriodValues?: string[];
+  onSourceFilterChange?: (values: string[]) => void;
+  selectedSourceValues?: string[];
   onResetFilters?: () => void;
   isStatusFiltered?: boolean;
   isTimePeriodFiltered?: boolean;
+  isSourceFiltered?: boolean;
   skeleton?: {
     enable: boolean;
     rows: number;
@@ -73,9 +76,12 @@ export function DataTable<TData, TValue>({
   selectedStatusValues,
   onTimePeriodFilterChange,
   selectedTimePeriodValues,
+  onSourceFilterChange,
+  selectedSourceValues,
   onResetFilters,
   isStatusFiltered,
   isTimePeriodFiltered,
+  isSourceFiltered,
   emptyState,
 }: DataTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
@@ -150,9 +156,12 @@ export function DataTable<TData, TValue>({
           selectedStatusValues={selectedStatusValues}
           onTimePeriodFilterChange={onTimePeriodFilterChange}
           selectedTimePeriodValues={selectedTimePeriodValues}
+          onSourceFilterChange={onSourceFilterChange}
+          selectedSourceValues={selectedSourceValues}
           onResetFilters={onResetFilters}
           isStatusFiltered={isStatusFiltered}
           isTimePeriodFiltered={isTimePeriodFiltered}
+          isSourceFiltered={isSourceFiltered}
         />
         {table.getRowModel().rows?.length || error?.enable || skeleton?.enable ? (
           <div className="rounded-md border">

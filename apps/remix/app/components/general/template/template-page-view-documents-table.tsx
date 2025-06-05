@@ -1,36 +1,38 @@
-import { useMemo } from 'react';
+import { useMemo, useTransition } from 'react';
 
+import { i18n } from '@lingui/core';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentSource, DocumentStatus as DocumentStatusEnum } from '@prisma/client';
-import { InfoIcon } from 'lucide-react';
+import { DocumentSource } from '@prisma/client';
+import { InfoIcon, Loader } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
-import { z } from 'zod';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
+import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { SelectItem } from '@documenso/ui/primitives/select';
+import { DataTable } from '@documenso/ui/primitives/data-table/data-table';
+import {
+  type TimePeriod,
+  isDateInPeriod,
+  timePeriods,
+} from '@documenso/ui/primitives/data-table/utils/time-filters';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-import { SearchParamSelector } from '~/components/forms/search-param-selector';
-import { DocumentSearch } from '~/components/general/document/document-search';
-import { DocumentStatus } from '~/components/general/document/document-status';
+import { DocumentStatus as DocumentStatusComponent } from '~/components/general/document/document-status';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from '~/components/tables/documents-table-action-button';
 import { DocumentsTableActionDropdown } from '~/components/tables/documents-table-action-dropdown';
 import { DataTableTitle } from '~/components/tables/documents-table-title';
+import { TemplateDocumentsTableEmptyState } from '~/components/tables/template-documents-table-empty-state';
 import { useOptionalCurrentTeam } from '~/providers/team';
-
-import { PeriodSelector } from '../period-selector';
 
 const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   DOCUMENT: msg`Document`,
@@ -38,43 +40,109 @@ const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   TEMPLATE_DIRECT_LINK: msg`Direct link`,
 };
 
-const ZDocumentSearchParamsSchema = ZUrlSearchParamsSchema.extend({
-  source: z
-    .nativeEnum(DocumentSource)
-    .optional()
-    .catch(() => undefined),
-  status: z
-    .nativeEnum(DocumentStatusEnum)
-    .optional()
-    .catch(() => undefined),
-});
-
 type TemplatePageViewDocumentsTableProps = {
   templateId: number;
 };
 
+type DocumentsTableRow = TFindDocumentsInternalResponse['data'][number];
+
 export const TemplatePageViewDocumentsTable = ({
   templateId,
 }: TemplatePageViewDocumentsTableProps) => {
-  const { _, i18n } = useLingui();
-
+  const { _ } = useLingui();
   const [searchParams] = useSearchParams();
+  const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
 
   const team = useOptionalCurrentTeam();
 
-  const parsedSearchParams = ZDocumentSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
-  );
+  const handleStatusFilterChange = (values: string[]) => {
+    startTransition(() => {
+      if (values.length === 0) {
+        updateSearchParams({ status: undefined, page: undefined });
+      } else {
+        updateSearchParams({ status: values.join(','), page: undefined });
+      }
+    });
+  };
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocuments.useQuery(
+  const currentStatus = searchParams.get('status');
+  const selectedStatusValues = currentStatus ? currentStatus.split(',').filter(Boolean) : [];
+
+  const handleResetFilters = () => {
+    startTransition(() => {
+      updateSearchParams({
+        status: undefined,
+        source: undefined,
+        period: undefined,
+        page: undefined,
+      });
+    });
+  };
+
+  const isStatusFiltered = selectedStatusValues.length > 0;
+
+  const handleTimePeriodFilterChange = (values: string[]) => {
+    startTransition(() => {
+      if (values.length === 0) {
+        updateSearchParams({ period: undefined, page: undefined });
+      } else {
+        updateSearchParams({ period: values[0], page: undefined });
+      }
+    });
+  };
+
+  const currentPeriod = searchParams.get('period');
+  const selectedTimePeriodValues = currentPeriod ? [currentPeriod] : [];
+  const isTimePeriodFiltered = selectedTimePeriodValues.length > 0;
+
+  const handleSourceFilterChange = (values: string[]) => {
+    startTransition(() => {
+      if (values.length === 0) {
+        updateSearchParams({ source: undefined, page: undefined });
+      } else {
+        updateSearchParams({ source: values.join(','), page: undefined });
+      }
+    });
+  };
+
+  const currentSource = searchParams.get('source');
+  const selectedSourceValues = currentSource ? currentSource.split(',').filter(Boolean) : [];
+  const isSourceFiltered = selectedSourceValues.length > 0;
+
+  const sourceParam = searchParams.get('source');
+  const statusParam = searchParams.get('status');
+  const periodParam = searchParams.get('period');
+
+  // Parse status parameter to handle multiple values
+  const parsedStatus = statusParam
+    ? statusParam
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .filter((status) =>
+          Object.values(ExtendedDocumentStatus).includes(status as ExtendedDocumentStatus),
+        )
+        .map((status) => status as ExtendedDocumentStatus)
+    : undefined;
+
+  const parsedPeriod =
+    periodParam && timePeriods.includes(periodParam as TimePeriod)
+      ? (periodParam as TimePeriod)
+      : undefined;
+
+  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
     {
       templateId,
-      page: parsedSearchParams.page,
-      perPage: parsedSearchParams.perPage,
-      query: parsedSearchParams.query,
-      source: parsedSearchParams.source,
-      status: parsedSearchParams.status,
+      page: Number(searchParams.get('page')) || 1,
+      perPage: Number(searchParams.get('perPage')) || 10,
+      query: searchParams.get('query') || undefined,
+      source:
+        sourceParam && Object.values(DocumentSource).includes(sourceParam as DocumentSource)
+          ? (sourceParam as DocumentSource)
+          : undefined,
+      status: parsedStatus,
+      period: parsedPeriod,
     },
     {
       placeholderData: (previousData) => previousData,
@@ -82,9 +150,11 @@ export const TemplatePageViewDocumentsTable = ({
   );
 
   const onPaginationChange = (page: number, perPage: number) => {
-    updateSearchParams({
-      page,
-      perPage,
+    startTransition(() => {
+      updateSearchParams({
+        page,
+        perPage,
+      });
     });
   };
 
@@ -93,6 +163,21 @@ export const TemplatePageViewDocumentsTable = ({
     perPage: 10,
     currentPage: 1,
     totalPages: 1,
+    stats: {
+      [ExtendedDocumentStatus.DRAFT]: 0,
+      [ExtendedDocumentStatus.PENDING]: 0,
+      [ExtendedDocumentStatus.COMPLETED]: 0,
+      [ExtendedDocumentStatus.REJECTED]: 0,
+      [ExtendedDocumentStatus.INBOX]: 0,
+      [ExtendedDocumentStatus.ALL]: 0,
+    },
+  };
+
+  const getEmptyStateStatus = (): ExtendedDocumentStatus => {
+    if (selectedStatusValues.length > 0) {
+      return selectedStatusValues[0] as ExtendedDocumentStatus;
+    }
+    return ExtendedDocumentStatus.ALL;
   };
 
   const columns = useMemo(() => {
@@ -102,12 +187,21 @@ export const TemplatePageViewDocumentsTable = ({
         accessorKey: 'createdAt',
         cell: ({ row }) =>
           i18n.date(row.original.createdAt, { ...DateTime.DATETIME_SHORT, hourCycle: 'h12' }),
+        filterFn: (row, id, value) => {
+          const createdAt = row.getValue(id) as Date;
+          if (!value || !Array.isArray(value) || value.length === 0) {
+            return true;
+          }
+
+          const period = value[0] as TimePeriod;
+          return isDateInPeriod(createdAt, period);
+        },
       },
       {
         header: _(msg`Title`),
+        accessorKey: 'title',
         cell: ({ row }) => <DataTableTitle row={row.original} teamUrl={team?.url} />,
       },
-
       {
         header: _(msg`Recipient`),
         accessorKey: 'recipient',
@@ -121,8 +215,11 @@ export const TemplatePageViewDocumentsTable = ({
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.getValue('status')} />,
+        cell: ({ row }) => <DocumentStatusComponent status={row.original.status} />,
         size: 140,
+        filterFn: (row, id, value) => {
+          return value.includes(row.getValue(id));
+        },
       },
       {
         header: () => (
@@ -161,79 +258,48 @@ export const TemplatePageViewDocumentsTable = ({
             </Tooltip>
           </div>
         ),
-        accessorKey: 'type',
+        accessorKey: 'source',
         cell: ({ row }) => (
           <div className="flex flex-row items-center">
-            {_(DOCUMENT_SOURCE_LABELS[row.original.source])}
+            {_(DOCUMENT_SOURCE_LABELS[row.original.source as DocumentSource])}
           </div>
         ),
+        filterFn: (row, id, value) => {
+          return value.includes(row.getValue(id));
+        },
       },
       {
-        id: 'actions',
         header: _(msg`Actions`),
         cell: ({ row }) => (
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-x-4">
             <DocumentsTableActionButton row={row.original} />
-
             <DocumentsTableActionDropdown row={row.original} />
           </div>
         ),
       },
-    ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+    ] satisfies DataTableColumnDef<DocumentsTableRow>[];
+  }, [_, team?.url]);
 
   return (
-    <div>
-      <div className="mb-4 flex flex-row space-x-4">
-        <DocumentSearch />
-
-        <SearchParamSelector
-          paramKey="status"
-          isValueValid={(value) =>
-            [...DocumentStatusEnum.COMPLETED].includes(value as unknown as string)
-          }
-        >
-          <SelectItem value="all">
-            <Trans>Any Status</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.COMPLETED}>
-            <Trans>Completed</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.PENDING}>
-            <Trans>Pending</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentStatusEnum.DRAFT}>
-            <Trans>Draft</Trans>
-          </SelectItem>
-        </SearchParamSelector>
-
-        <SearchParamSelector
-          paramKey="source"
-          isValueValid={(value) =>
-            [...DocumentSource.TEMPLATE].includes(value as unknown as string)
-          }
-        >
-          <SelectItem value="all">
-            <Trans>Any Source</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentSource.TEMPLATE}>
-            <Trans>Template</Trans>
-          </SelectItem>
-          <SelectItem value={DocumentSource.TEMPLATE_DIRECT_LINK}>
-            <Trans>Direct Link</Trans>
-          </SelectItem>
-        </SearchParamSelector>
-
-        <PeriodSelector />
-      </div>
-
+    <div className="relative">
       <DataTable
-        columns={columns}
         data={results.data}
+        columns={columns}
         perPage={results.perPage}
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+        stats={data?.stats}
+        onStatusFilterChange={handleStatusFilterChange}
+        selectedStatusValues={selectedStatusValues}
+        onTimePeriodFilterChange={handleTimePeriodFilterChange}
+        selectedTimePeriodValues={selectedTimePeriodValues}
+        onSourceFilterChange={handleSourceFilterChange}
+        selectedSourceValues={selectedSourceValues}
+        onResetFilters={handleResetFilters}
+        isStatusFiltered={isStatusFiltered}
+        isTimePeriodFiltered={isTimePeriodFiltered}
+        isSourceFiltered={isSourceFiltered}
         error={{
           enable: isLoadingError,
         }}
@@ -265,9 +331,19 @@ export const TemplatePageViewDocumentsTable = ({
             </>
           ),
         }}
+        emptyState={{
+          enable: !isLoading && !isLoadingError,
+          component: <TemplateDocumentsTableEmptyState status={getEmptyStateStatus()} />,
+        }}
       >
         {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
       </DataTable>
+
+      {isPending && (
+        <div className="bg-background/50 absolute inset-0 flex items-center justify-center">
+          <Loader className="text-muted-foreground h-8 w-8 animate-spin" />
+        </div>
+      )}
     </div>
   );
 };

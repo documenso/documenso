@@ -1,11 +1,11 @@
 import type { Table } from '@tanstack/react-table';
-import { Calendar, CircleDashedIcon, ListFilter, X, XCircle } from 'lucide-react';
+import { Calendar, CircleDashedIcon, Globe, ListFilter, X, XCircle } from 'lucide-react';
 
 import { Button } from '../button';
 import { Input } from '../input';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
 import { DataTableSingleFilter } from './data-table-single-filter';
-import { statuses, timePeriodGroups, timePeriods } from './data/data';
+import { sources, statuses, timePeriodGroups, timePeriods } from './data/data';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -14,9 +14,12 @@ interface DataTableToolbarProps<TData> {
   selectedStatusValues?: string[];
   onTimePeriodFilterChange?: (values: string[]) => void;
   selectedTimePeriodValues?: string[];
+  onSourceFilterChange?: (values: string[]) => void;
+  selectedSourceValues?: string[];
   onResetFilters?: () => void;
   isStatusFiltered?: boolean;
   isTimePeriodFiltered?: boolean;
+  isSourceFiltered?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -26,12 +29,18 @@ export function DataTableToolbar<TData>({
   selectedStatusValues,
   onTimePeriodFilterChange,
   selectedTimePeriodValues,
+  onSourceFilterChange,
+  selectedSourceValues,
   onResetFilters,
   isStatusFiltered,
   isTimePeriodFiltered,
+  isSourceFiltered,
 }: DataTableToolbarProps<TData>) {
   const isFiltered =
-    table.getState().columnFilters.length > 0 || isStatusFiltered || isTimePeriodFiltered;
+    table.getState().columnFilters.length > 0 ||
+    isStatusFiltered ||
+    isTimePeriodFiltered ||
+    isSourceFiltered;
   const searchValue = (table.getColumn('title')?.getFilterValue() as string) ?? '';
 
   const handleClearFilter = () => {
@@ -88,6 +97,17 @@ export function DataTableToolbar<TData>({
             icon={Calendar}
             onFilterChange={onTimePeriodFilterChange}
             selectedValues={selectedTimePeriodValues}
+          />
+        )}
+
+        {table.getColumn('source') && (
+          <DataTableFacetedFilter
+            column={table.getColumn('source')}
+            title="Source"
+            options={sources}
+            icon={Globe}
+            onFilterChange={onSourceFilterChange}
+            selectedValues={selectedSourceValues}
           />
         )}
 

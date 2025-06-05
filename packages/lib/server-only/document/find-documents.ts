@@ -5,24 +5,13 @@ import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TimePeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
 
 import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 
-export type PeriodSelectorValue =
-  | ''
-  | 'today'
-  | 'yesterday'
-  | 'this-week'
-  | 'last-week'
-  | 'this-month'
-  | 'last-month'
-  | 'this-quarter'
-  | 'last-quarter'
-  | 'this-year'
-  | 'last-year'
-  | 'all-time';
+export type PeriodSelectorValue = '' | TimePeriod;
 
 export type FindDocumentsOptions = {
   userId: number;

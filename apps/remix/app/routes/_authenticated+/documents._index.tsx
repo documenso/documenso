@@ -246,17 +246,15 @@ export default function DocumentsPage() {
         </div>
 
         <div className="mt-8">
-          <div>
-            <DocumentsDataTable
-              data={data}
-              isLoading={isLoading}
-              isLoadingError={isLoadingError}
-              onMoveDocument={(documentId) => {
-                setDocumentToMove(documentId);
-                setIsMovingDocument(true);
-              }}
-            />
-          </div>
+          <DocumentsDataTable
+            data={data}
+            isLoading={isLoading}
+            isLoadingError={isLoadingError}
+            onMoveDocument={(documentId) => {
+              setDocumentToMove(documentId);
+              setIsMovingDocument(true);
+            }}
+          />
         </div>
 
         {documentToMove && (
