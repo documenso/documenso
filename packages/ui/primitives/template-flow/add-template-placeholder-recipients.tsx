@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -54,6 +55,7 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   templateDirectLink?: TemplateDirectLink | null;
   isEnterprise: boolean;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
+  onAutoSave: (_data: TAddTemplatePlacholderRecipientsFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -67,6 +69,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   allowDictateNextSigner,
   isDocumentPdfLoaded,
   onSubmit,
+  onAutoSave,
 }: AddTemplatePlaceholderRecipientsFormProps) => {
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
@@ -120,6 +123,28 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       allowDictateNextSigner: allowDictateNextSigner ?? false,
     },
   });
+
+  const emptySigners = useCallback(
+    () => form.getValues('signers').filter((signer) => signer.email === ''),
+    [form],
+  );
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = useCallback(async () => {
+    if (emptySigners().length > 0) {
+      return;
+    }
+
+    const isFormValid = await form.trigger();
+    const { isDirty } = form.formState;
+
+    const formData = form.getValues();
+
+    if (isFormValid && isDirty) {
+      scheduleSave(formData);
+    }
+  }, [form, emptySigners, form.formState.isDirty, scheduleSave]);
 
   useEffect(() => {
     form.reset({
@@ -196,7 +221,12 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
   const onRemoveSigner = (index: number) => {
     removeSigner(index);
     const updatedSigners = signers.filter((_, idx) => idx !== index);
-    form.setValue('signers', normalizeSigningOrders(updatedSigners));
+    form.setValue('signers', normalizeSigningOrders(updatedSigners), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    void handleAutoSave();
   };
 
   const isSignerDirectRecipient = (
@@ -223,7 +253,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         signingOrder: index + 1,
       }));
 
-      form.setValue('signers', updatedSigners);
+      form.setValue('signers', updatedSigners, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
 
       const lastSigner = updatedSigners[updatedSigners.length - 1];
       if (lastSigner.role === RecipientRole.ASSISTANT) {
@@ -236,8 +269,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       }
 
       await form.trigger('signers');
+
+      void handleAutoSave();
     },
-    [form, watchedSigners, toast],
+    [form, watchedSigners, toast, handleAutoSave],
   );
 
   const triggerDragAndDrop = useCallback(
@@ -321,7 +356,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         signingOrder: idx + 1,
       }));
 
-      form.setValue('signers', updatedSigners);
+      form.setValue('signers', updatedSigners, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
 
       if (signer.role === RecipientRole.ASSISTANT && newPosition === remainingSigners.length - 1) {
         toast({
@@ -331,8 +369,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           ),
         });
       }
+
+      void handleAutoSave();
     },
-    [form, toast],
+    [form, toast, handleAutoSave],
   );
 
   const handleRoleChange = useCallback(
@@ -342,7 +382,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
       // Handle parallel to sequential conversion for assistants
       if (role === RecipientRole.ASSISTANT && signingOrder === DocumentSigningOrder.PARALLEL) {
-        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL);
+        form.setValue('signingOrder', DocumentSigningOrder.SEQUENTIAL, {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
         toast({
           title: _(msg`Signing order is enabled.`),
           description: _(msg`You cannot add assistants when signing order is disabled.`),
@@ -357,7 +400,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         signingOrder: idx + 1,
       }));
 
-      form.setValue('signers', updatedSigners);
+      form.setValue('signers', updatedSigners, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
 
       if (role === RecipientRole.ASSISTANT && index === updatedSigners.length - 1) {
         toast({
@@ -367,8 +413,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
           ),
         });
       }
+
+      void handleAutoSave();
     },
-    [form, toast],
+    [form, toast, handleAutoSave],
   );
 
   const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
@@ -382,10 +430,21 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       role: signer.role === RecipientRole.ASSISTANT ? RecipientRole.SIGNER : signer.role,
     }));
 
-    form.setValue('signers', updatedSigners);
-    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL);
-    form.setValue('allowDictateNextSigner', false);
-  }, [form]);
+    form.setValue('signers', updatedSigners, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    form.setValue('signingOrder', DocumentSigningOrder.PARALLEL, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    form.setValue('allowDictateNextSigner', false, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    void handleAutoSave();
+  }, [form, handleAutoSave]);
 
   return (
     <>
@@ -430,8 +489,13 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
                         // If sequential signing is turned off, disable dictate next signer
                         if (!checked) {
-                          form.setValue('allowDictateNextSigner', false);
+                          form.setValue('allowDictateNextSigner', false, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
                         }
+
+                        void handleAutoSave();
                       }}
                       disabled={isSubmitting}
                     />
@@ -457,7 +521,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                       {...field}
                       id="allowDictateNextSigner"
                       checked={value}
-                      onCheckedChange={field.onChange}
+                      onCheckedChange={(checked) => {
+                        field.onChange(checked);
+                        void handleAutoSave();
+                      }}
                       disabled={isSubmitting || !isSigningOrderSequential}
                     />
                   </FormControl>
@@ -601,6 +668,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        onBlur={handleAutoSave}
                                       />
                                     </FormControl>
 
@@ -635,6 +703,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        onBlur={handleAutoSave}
                                       />
                                     </FormControl>
 
@@ -675,10 +744,10 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                       <FormControl>
                                         <RecipientRoleSelect
                                           {...field}
-                                          onValueChange={(value) =>
+                                          onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                                            handleRoleChange(index, value as RecipientRole)
-                                          }
+                                            handleRoleChange(index, value as RecipientRole);
+                                          }}
                                           disabled={isSubmitting}
                                           hideCCRecipients={isSignerDirectRecipient(signer)}
                                         />
