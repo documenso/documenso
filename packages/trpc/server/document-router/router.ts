@@ -125,7 +125,7 @@ export const documentRouter = router({
         templateId,
         query,
         source,
-        status,
+        status: status ? [status] : undefined,
         page,
         perPage,
         folderId,
