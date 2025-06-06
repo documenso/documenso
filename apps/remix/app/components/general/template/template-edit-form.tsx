@@ -134,8 +134,8 @@ export const TemplateEditForm = ({
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
-          globalAccessAuth: data.globalAccessAuth ?? null,
-          globalActionAuth: data.globalActionAuth ?? null,
+          globalAccessAuth: data.globalAccessAuth ?? [],
+          globalActionAuth: data.globalActionAuth ?? [],
         },
         meta: {
           ...data.meta,

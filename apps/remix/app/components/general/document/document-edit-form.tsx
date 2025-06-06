@@ -183,8 +183,8 @@ export const DocumentEditForm = ({
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
-          globalAccessAuth: data.globalAccessAuth ?? null,
-          globalActionAuth: data.globalActionAuth ?? null,
+          globalAccessAuth: data.globalAccessAuth ?? [],
+          globalActionAuth: data.globalActionAuth ?? [],
         },
         meta: {
           timezone,
@@ -229,7 +229,7 @@ export const DocumentEditForm = ({
           recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
-            actionAuth: signer.actionAuth || null,
+            actionAuth: signer.actionAuth ?? [],
           })),
         }),
       ]);

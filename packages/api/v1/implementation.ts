@@ -821,7 +821,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             name,
             role,
             signingOrder,
-            actionAuth: authOptions?.actionAuth ?? null,
+            actionAuth: authOptions?.actionAuth ?? [],
           },
         ],
         requestMetadata: metadata,
@@ -888,7 +888,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       name,
       role,
       signingOrder,
-      actionAuth: authOptions?.actionAuth,
+      actionAuth: authOptions?.actionAuth ?? [],
       requestMetadata: metadata.requestMetadata,
     }).catch(() => null);
 

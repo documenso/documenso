@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { mailer } from '@documenso/email/mailer';
@@ -96,7 +97,9 @@ export const setDocumentRecipients = async ({
     throw new Error('Document already complete');
   }
 
-  const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = recipients.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
   if (recipientsHaveActionAuth) {
@@ -245,8 +248,8 @@ export const setDocumentRecipients = async ({
               metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
-                accessAuth: recipient.accessAuth || undefined,
-                actionAuth: recipient.actionAuth || undefined,
+                accessAuth: recipient.accessAuth || [],
+                actionAuth: recipient.actionAuth || [],
               },
             }),
           });
@@ -361,8 +364,8 @@ type RecipientData = {
   name: string;
   role: RecipientRole;
   signingOrder?: number | null;
-  accessAuth?: TRecipientAccessAuthTypes | null;
-  actionAuth?: TRecipientActionAuthTypes | null;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
 };
 
 type RecipientDataWithClientId = Recipient & {
@@ -372,15 +375,15 @@ type RecipientDataWithClientId = Recipient & {
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
   const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-  const newRecipientAccessAuth = newRecipientData.accessAuth || null;
-  const newRecipientActionAuth = newRecipientData.actionAuth || null;
+  const newRecipientAccessAuth = newRecipientData.accessAuth || [];
+  const newRecipientActionAuth = newRecipientData.actionAuth || [];
 
   return (
     recipient.email !== newRecipientData.email ||
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
     recipient.signingOrder !== newRecipientData.signingOrder ||
-    authOptions.accessAuth !== newRecipientAccessAuth ||
-    authOptions.actionAuth !== newRecipientActionAuth
+    !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
+    !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
   );
 };

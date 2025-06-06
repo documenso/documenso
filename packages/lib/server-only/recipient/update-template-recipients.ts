@@ -22,8 +22,8 @@ export interface UpdateTemplateRecipientsOptions {
     name?: string;
     role?: RecipientRole;
     signingOrder?: number | null;
-    accessAuth?: TRecipientAccessAuthTypes | null;
-    actionAuth?: TRecipientActionAuthTypes | null;
+    accessAuth?: TRecipientAccessAuthTypes[];
+    actionAuth?: TRecipientActionAuthTypes[];
   }[];
 }
 
@@ -63,7 +63,9 @@ export const updateTemplateRecipients = async ({
     });
   }
 
-  const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = recipients.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
   if (recipientsHaveActionAuth) {

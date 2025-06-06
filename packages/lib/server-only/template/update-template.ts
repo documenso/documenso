@@ -15,8 +15,8 @@ export type UpdateTemplateOptions = {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility;
-    globalAccessAuth?: TDocumentAccessAuthTypes | null;
-    globalActionAuth?: TDocumentActionAuthTypes | null;
+    globalAccessAuth?: TDocumentAccessAuthTypes[];
+    globalActionAuth?: TDocumentActionAuthTypes[];
     publicTitle?: string;
     publicDescription?: string;
     type?: Template['type'];
@@ -74,7 +74,7 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
+  if (newGlobalActionAuth && newGlobalActionAuth.length > 0) {
     const isDocumentEnterprise = await isUserEnterprise({
       userId,
       teamId,

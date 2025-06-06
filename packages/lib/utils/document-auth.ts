@@ -27,17 +27,21 @@ export const extractDocumentAuthMethods = ({
   const documentAuthOption = ZDocumentAuthOptionsSchema.parse(documentAuth);
   const recipientAuthOption = ZRecipientAuthOptionsSchema.parse(recipientAuth);
 
-  const derivedRecipientAccessAuth: TRecipientAccessAuthTypes | null =
-    recipientAuthOption.accessAuth || documentAuthOption.globalAccessAuth;
+  const derivedRecipientAccessAuth: TRecipientAccessAuthTypes[] =
+    recipientAuthOption.accessAuth.length > 0
+      ? recipientAuthOption.accessAuth
+      : documentAuthOption.globalAccessAuth;
 
-  const derivedRecipientActionAuth: TRecipientActionAuthTypes | null =
-    recipientAuthOption.actionAuth || documentAuthOption.globalActionAuth;
+  const derivedRecipientActionAuth: TRecipientActionAuthTypes[] =
+    recipientAuthOption.actionAuth.length > 0
+      ? recipientAuthOption.actionAuth
+      : documentAuthOption.globalActionAuth;
 
-  const recipientAccessAuthRequired = derivedRecipientAccessAuth !== null;
+  const recipientAccessAuthRequired = derivedRecipientAccessAuth.length > 0;
 
   const recipientActionAuthRequired =
-    derivedRecipientActionAuth !== DocumentAuth.EXPLICIT_NONE &&
-    derivedRecipientActionAuth !== null;
+    derivedRecipientActionAuth.length > 0 &&
+    !derivedRecipientActionAuth.includes(DocumentAuth.EXPLICIT_NONE);
 
   return {
     derivedRecipientAccessAuth,
@@ -54,8 +58,8 @@ export const extractDocumentAuthMethods = ({
  */
 export const createDocumentAuthOptions = (options: TDocumentAuthOptions): TDocumentAuthOptions => {
   return {
-    globalAccessAuth: options?.globalAccessAuth ?? null,
-    globalActionAuth: options?.globalActionAuth ?? null,
+    globalAccessAuth: options?.globalAccessAuth ?? [],
+    globalActionAuth: options?.globalActionAuth ?? [],
   };
 };
 
@@ -66,7 +70,7 @@ export const createRecipientAuthOptions = (
   options: TRecipientAuthOptions,
 ): TRecipientAuthOptions => {
   return {
-    accessAuth: options?.accessAuth ?? null,
-    actionAuth: options?.actionAuth ?? null,
+    accessAuth: options?.accessAuth ?? [],
+    actionAuth: options?.actionAuth ?? [],
   };
 };

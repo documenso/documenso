@@ -81,9 +81,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     documentAuth: document.authOptions,
   });
 
-  const isAccessAuthValid = match(derivedRecipientAccessAuth)
-    .with(DocumentAccessAuth.ACCOUNT, () => user !== null)
-    .with(null, () => true)
+  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
+    .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+    .with(undefined, () => true)
     .exhaustive();
 
   if (!isAccessAuthValid) {

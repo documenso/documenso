@@ -172,8 +172,8 @@ test('[DIRECT_TEMPLATES]: direct template link auth access', async ({ page }) =>
     userId: user.id,
     createTemplateOptions: {
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: 'ACCOUNT',
-        globalActionAuth: null,
+        globalAccessAuth: ['ACCOUNT'],
+        globalActionAuth: [],
       }),
     },
   });

@@ -16,17 +16,6 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/trpc/server/document-router/schema';
 
-export const ZMapNegativeOneToUndefinedSchema = z
-  .string()
-  .optional()
-  .transform((val) => {
-    if (val === '-1') {
-      return undefined;
-    }
-
-    return val;
-  });
-
 export const ZAddSettingsFormSchema = z.object({
   title: z
     .string()
@@ -34,12 +23,8 @@ export const ZAddSettingsFormSchema = z.object({
     .min(1, { message: msg`Title cannot be empty`.id }),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
-  globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-    ZDocumentAccessAuthTypesSchema.optional(),
-  ),
-  globalActionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-    ZDocumentActionAuthTypesSchema.optional(),
-  ),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema),
   meta: z.object({
     timezone: ZDocumentMetaTimezoneSchema.optional().default(DEFAULT_DOCUMENT_TIME_ZONE),
     dateFormat: ZDocumentMetaDateFormatSchema.optional().default(DEFAULT_DOCUMENT_DATE_FORMAT),

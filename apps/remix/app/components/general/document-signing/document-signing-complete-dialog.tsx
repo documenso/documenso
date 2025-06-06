@@ -92,8 +92,6 @@ export const DocumentSigningCompleteDialog = ({
   };
 
   const onFormSubmit = async (data: TNextSignerFormSchema) => {
-    console.log('data', data);
-    console.log('form.formState.errors', form.formState.errors);
     try {
       if (allowDictateNextSigner && data.name && data.email) {
         await onSignatureComplete({ name: data.name, email: data.email });

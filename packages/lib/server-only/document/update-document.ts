@@ -21,8 +21,8 @@ export type UpdateDocumentOptions = {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility | null;
-    globalAccessAuth?: TDocumentAccessAuthTypes | null;
-    globalActionAuth?: TDocumentActionAuthTypes | null;
+    globalAccessAuth?: TDocumentAccessAuthTypes[];
+    globalActionAuth?: TDocumentActionAuthTypes[];
     useLegacyFieldInsertion?: boolean;
   };
   requestMetadata: ApiRequestMetadata;
@@ -119,7 +119,6 @@ export const updateDocument = async ({
 
   // If no data just return the document since this function is normally chained after a meta update.
   if (!data || Object.values(data).length === 0) {
-    console.log('no data');
     return document;
   }
 
@@ -137,7 +136,7 @@ export const updateDocument = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
+  if (newGlobalActionAuth && newGlobalActionAuth.length > 0) {
     const isDocumentEnterprise = await isUserEnterprise({
       userId,
       teamId,

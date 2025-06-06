@@ -42,8 +42,8 @@ test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page
     {
       createDocumentOptions: {
         authOptions: createDocumentAuthOptions({
-          globalAccessAuth: 'ACCOUNT',
-          globalActionAuth: null,
+          globalAccessAuth: ['ACCOUNT'],
+          globalActionAuth: [],
         }),
       },
     },
