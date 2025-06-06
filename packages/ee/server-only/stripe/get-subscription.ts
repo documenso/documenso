@@ -11,11 +11,11 @@ export type GetSubscriptionOptions = {
 
 export const getSubscription = async ({ organisationId, userId }: GetSubscriptionOptions) => {
   const organisation = await prisma.organisation.findFirst({
-    where: buildOrganisationWhereQuery(
+    where: buildOrganisationWhereQuery({
       organisationId,
       userId,
-      ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
-    ),
+      roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+    }),
     include: {
       subscription: true,
     },

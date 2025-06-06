@@ -12,7 +12,11 @@ export type DeleteTokenByIdOptions = {
 
 export const deleteTokenById = async ({ id, userId, teamId }: DeleteTokenByIdOptions) => {
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+    where: buildTeamWhereQuery({
+      teamId,
+      userId,
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+    }),
   });
 
   if (!team) {

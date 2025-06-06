@@ -13,7 +13,11 @@ export const deleteTeamEmailVerification = async ({
   teamId,
 }: DeleteTeamEmailVerificationOptions) => {
   await prisma.team.findFirstOrThrow({
-    where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+    where: buildTeamWhereQuery({
+      teamId,
+      userId,
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+    }),
   });
 
   await prisma.teamEmailVerification.delete({

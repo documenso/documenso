@@ -32,7 +32,7 @@ export const getTeamWithEmail = async ({
 }) => {
   return await prisma.team.findFirstOrThrow({
     where: {
-      ...buildTeamWhereQuery(undefined, userId),
+      ...buildTeamWhereQuery({ teamId: undefined, userId }),
       url: teamUrl,
     },
     include: {

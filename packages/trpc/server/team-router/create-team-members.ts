@@ -42,7 +42,11 @@ export const createTeamMembers = async ({
   membersToCreate,
 }: CreateTeamMembersOptions) => {
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+    where: buildTeamWhereQuery({
+      teamId,
+      userId,
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+    }),
     include: {
       organisation: {
         include: {

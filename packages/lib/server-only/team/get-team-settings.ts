@@ -13,7 +13,7 @@ export type GetTeamSettingsOptions = {
  */
 export const getTeamSettings = async ({ userId, teamId }: GetTeamSettingsOptions) => {
   const team = await prisma.team.findFirst({
-    where: userId !== undefined ? buildTeamWhereQuery(teamId, userId) : { id: teamId },
+    where: userId !== undefined ? buildTeamWhereQuery({ teamId, userId }) : { id: teamId },
     include: {
       organisation: {
         include: {

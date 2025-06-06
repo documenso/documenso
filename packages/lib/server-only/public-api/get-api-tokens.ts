@@ -12,7 +12,11 @@ export const getApiTokens = async ({ userId, teamId }: GetApiTokensOptions) => {
   return await prisma.apiToken.findMany({
     where: {
       userId,
-      team: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
     },
     select: {
       id: true,

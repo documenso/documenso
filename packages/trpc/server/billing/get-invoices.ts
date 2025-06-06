@@ -22,11 +22,11 @@ export const getInvoicesRoute = authenticatedProcedure
     }
 
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
+      where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
-      ),
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      }),
       include: {
         subscription: true,
       },

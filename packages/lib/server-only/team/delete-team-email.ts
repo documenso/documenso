@@ -37,7 +37,11 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
   const team = await prisma.team.findFirstOrThrow({
     where: {
       OR: [
-        buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+        buildTeamWhereQuery({
+          teamId,
+          userId,
+          roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+        }),
         {
           id: teamId,
           teamEmail: {

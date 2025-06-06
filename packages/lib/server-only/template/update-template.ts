@@ -35,7 +35,7 @@ export const updateTemplate = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       templateMeta: true,

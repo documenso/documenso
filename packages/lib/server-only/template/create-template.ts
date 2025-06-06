@@ -25,7 +25,7 @@ export const createTemplate = async ({
   folderId,
 }: CreateTemplateOptions) => {
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId),
+    where: buildTeamWhereQuery({ teamId, userId }),
   });
 
   if (!team) {

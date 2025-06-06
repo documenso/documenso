@@ -17,7 +17,7 @@ export const updateTeamPublicProfile = async ({
   data,
 }: UpdatePublicProfileOptions) => {
   return await prisma.team.update({
-    where: buildTeamWhereQuery(teamId, userId),
+    where: buildTeamWhereQuery({ teamId, userId }),
     data: {
       profile: {
         upsert: {

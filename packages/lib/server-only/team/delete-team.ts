@@ -26,7 +26,11 @@ export type DeleteTeamOptions = {
 export const deleteTeam = async ({ userId, teamId }: DeleteTeamOptions) => {
   // Todo: orgs - hard review
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_TEAM']),
+    where: buildTeamWhereQuery({
+      teamId,
+      userId,
+      roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_TEAM'],
+    }),
     include: {
       organisation: {
         select: {

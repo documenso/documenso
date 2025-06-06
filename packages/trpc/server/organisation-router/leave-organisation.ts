@@ -21,7 +21,7 @@ export const leaveOrganisationRoute = authenticatedProcedure
     const userId = ctx.user.id;
 
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(organisationId, userId),
+      where: buildOrganisationWhereQuery({ organisationId, userId }),
       include: {
         organisationClaim: true,
         subscription: true,

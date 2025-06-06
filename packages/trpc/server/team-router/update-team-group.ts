@@ -22,11 +22,11 @@ export const updateTeamGroupRoute = authenticatedProcedure
     const teamGroup = await prisma.teamGroup.findFirst({
       where: {
         id,
-        team: buildTeamWhereQuery(
-          undefined,
-          user.id,
-          TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-        ),
+        team: buildTeamWhereQuery({
+          teamId: undefined,
+          userId: user.id,
+          roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+        }),
       },
       include: {
         organisationGroup: true,

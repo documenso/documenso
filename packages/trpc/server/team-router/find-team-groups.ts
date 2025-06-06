@@ -54,7 +54,7 @@ export const findTeamGroups = async ({
   perPage = 10,
 }: FindTeamGroupsOptions) => {
   const whereClause: Prisma.TeamGroupWhereInput = {
-    team: buildTeamWhereQuery(teamId, userId),
+    team: buildTeamWhereQuery({ teamId, userId }),
     id: teamGroupId,
     organisationGroup: {
       organisationRole: organisationRoles.length > 0 ? { in: organisationRoles } : undefined,

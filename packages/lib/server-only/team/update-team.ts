@@ -40,7 +40,11 @@ export const updateTeam = async ({ userId, teamId, data }: UpdateTeamOptions): P
     }
 
     await prisma.team.update({
-      where: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      where: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
       data: {
         url: data.url,
         name: data.name,

@@ -21,7 +21,7 @@ export const deleteTemplateRecipient = async ({
           id: recipientId,
         },
       },
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       recipients: {

@@ -19,7 +19,7 @@ export const getFieldsForDocument = async ({
     where: {
       document: {
         id: documentId,
-        team: buildTeamWhereQuery(teamId, userId),
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
     include: {

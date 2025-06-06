@@ -40,11 +40,11 @@ export const setAvatarImage = async ({
 
   if (target.type === 'team') {
     const team = await prisma.team.findFirst({
-      where: buildTeamWhereQuery(
-        target.teamId,
+      where: buildTeamWhereQuery({
+        teamId: target.teamId,
         userId,
-        TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
-      ),
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
     });
 
     if (!team) {
@@ -56,11 +56,11 @@ export const setAvatarImage = async ({
     oldAvatarImageId = team.avatarImageId;
   } else if (target.type === 'organisation') {
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
-        target.organisationId,
+      where: buildOrganisationWhereQuery({
+        organisationId: target.organisationId,
         userId,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
-      ),
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      }),
     });
 
     if (!organisation) {

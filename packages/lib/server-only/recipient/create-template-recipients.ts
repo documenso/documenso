@@ -33,7 +33,7 @@ export const createTemplateRecipients = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       recipients: true,

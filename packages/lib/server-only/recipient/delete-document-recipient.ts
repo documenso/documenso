@@ -39,7 +39,7 @@ export const deleteDocumentRecipient = async ({
           id: recipientId,
         },
       },
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       documentMeta: true,

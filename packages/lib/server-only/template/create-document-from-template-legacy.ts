@@ -30,7 +30,7 @@ export const createDocumentFromTemplateLegacy = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       recipients: true,

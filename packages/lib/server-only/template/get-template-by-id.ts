@@ -19,7 +19,7 @@ export const getTemplateById = async ({
   const template = await prisma.template.findFirst({
     where: {
       id,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
       ...(folderId ? { folderId } : {}),
     },
     include: {

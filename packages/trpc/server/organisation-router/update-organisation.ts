@@ -20,11 +20,11 @@ export const updateOrganisationRoute = authenticatedProcedure
 
     // Check if organisation exists and user has access to it
     const existingOrganisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
+      where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
-      ),
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      }),
     });
 
     if (!existingOrganisation) {

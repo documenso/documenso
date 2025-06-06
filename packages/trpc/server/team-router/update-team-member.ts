@@ -24,7 +24,11 @@ export const updateTeamMemberRoute = authenticatedProcedure
     const team = await prisma.team.findFirst({
       where: {
         AND: [
-          buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+          buildTeamWhereQuery({
+            teamId,
+            userId,
+            roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+          }),
           {
             organisation: {
               members: {

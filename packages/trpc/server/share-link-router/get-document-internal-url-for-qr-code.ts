@@ -27,7 +27,7 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
           },
           {
             id: documentId,
-            team: buildTeamWhereQuery(undefined, ctx.user.id),
+            team: buildTeamWhereQuery({ teamId: undefined, userId: ctx.user.id }),
           },
         ],
       },

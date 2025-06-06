@@ -23,11 +23,11 @@ export const manageSubscriptionRoute = authenticatedProcedure
     }
 
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
+      where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_BILLING'],
-      ),
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_BILLING'],
+      }),
       include: {
         subscription: true,
         owner: {
@@ -45,6 +45,30 @@ export const manageSubscriptionRoute = authenticatedProcedure
 
     let customerId = organisation.customerId;
 
+    // If for some reason customer ID is missing in the organisation but
+    // exists in the subscription take it from the subscription.
+    if (!customerId && organisation.subscription?.customerId) {
+      customerId = organisation.subscription.customerId;
+
+      await prisma.organisation
+        .update({
+          where: {
+            id: organisationId,
+          },
+          data: {
+            customerId,
+          },
+        })
+        .catch((err) => {
+          // Todo: Logger
+          console.error('Critical error, potential conflicting data');
+          console.error(err.message);
+
+          throw err;
+        });
+    }
+
+    // If the customer ID is still missing create a new customer.
     if (!customerId) {
       const customer = await createCustomer({
         name: organisation.name,

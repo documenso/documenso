@@ -48,7 +48,7 @@ export const getTeam = async ({
 }) => {
   const team = await prisma.team.findFirst({
     where: {
-      ...buildTeamWhereQuery(undefined, userId),
+      ...buildTeamWhereQuery({ teamId: undefined, userId }),
       id: typeof teamReference === 'number' ? teamReference : undefined,
       url: typeof teamReference === 'string' ? teamReference : undefined,
     },

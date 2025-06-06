@@ -18,11 +18,11 @@ export const deleteOrganisationRoute = authenticatedProcedure
     const { user } = ctx;
 
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
+      where: buildOrganisationWhereQuery({
         organisationId,
-        user.id,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_ORGANISATION'],
-      ),
+        userId: user.id,
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_ORGANISATION'],
+      }),
     });
 
     if (!organisation) {

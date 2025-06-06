@@ -88,7 +88,7 @@ export const searchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
-          team: buildTeamWhereQuery(undefined, userId),
+          team: buildTeamWhereQuery({ teamId: undefined, userId }),
           deletedAt: null,
         },
         {
@@ -96,7 +96,7 @@ export const searchDocumentsWithKeyword = async ({
             contains: query,
             mode: 'insensitive',
           },
-          team: buildTeamWhereQuery(undefined, userId),
+          team: buildTeamWhereQuery({ teamId: undefined, userId }),
           deletedAt: null,
         },
       ],

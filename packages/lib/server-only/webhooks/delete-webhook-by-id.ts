@@ -13,7 +13,11 @@ export const deleteWebhookById = async ({ id, userId, teamId }: DeleteWebhookByI
   return await prisma.webhook.delete({
     where: {
       id,
-      team: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
     },
   });
 };

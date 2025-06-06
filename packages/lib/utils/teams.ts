@@ -106,12 +106,18 @@ export const extractTeamSignatureSettings = (
   return signatureTypes;
 };
 
+type BuildTeamWhereQueryOptions = {
+  teamId: number | undefined; // Todo: test if this is okay
+  userId: number;
+  roles?: TeamMemberRole[];
+};
+
 // Todo: orgs - hard review
-export const buildTeamWhereQuery = (
-  teamId: number | undefined, // Todo: test if this is okay
-  userId: number,
-  roles?: TeamMemberRole[],
-): Prisma.TeamWhereUniqueInput => {
+export const buildTeamWhereQuery = ({
+  teamId,
+  userId,
+  roles,
+}: BuildTeamWhereQueryOptions): Prisma.TeamWhereUniqueInput => {
   // Note: Not using inline ternary since typesafety breaks for some reason.
   if (!roles) {
     return {

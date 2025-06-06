@@ -12,7 +12,7 @@ export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptio
   return await prisma.template.delete({
     where: {
       id,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
   });
 };

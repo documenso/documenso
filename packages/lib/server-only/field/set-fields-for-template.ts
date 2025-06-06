@@ -44,7 +44,7 @@ export const setFieldsForTemplate = async ({
   const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
   });
 

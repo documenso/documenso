@@ -64,12 +64,18 @@ export const getHighestOrganisationRoleInGroup = (
   return highestOrganisationRole;
 };
 
+type BuildOrganisationWhereQueryOptions = {
+  organisationId: string | undefined;
+  userId: number;
+  roles?: OrganisationMemberRole[];
+};
+
 // Todo: orgs - hard review
-export const buildOrganisationWhereQuery = (
-  organisationId: string | undefined,
-  userId: number,
-  roles?: OrganisationMemberRole[],
-): Prisma.OrganisationWhereInput => {
+export const buildOrganisationWhereQuery = ({
+  organisationId,
+  userId,
+  roles,
+}: BuildOrganisationWhereQueryOptions): Prisma.OrganisationWhereInput => {
   // Note: Not using inline ternary since typesafety breaks for some reason.
   if (!roles) {
     return {

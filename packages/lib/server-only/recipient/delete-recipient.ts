@@ -28,7 +28,7 @@ export const deleteRecipient = async ({
       document: {
         id: documentId,
         userId,
-        team: buildTeamWhereQuery(teamId, userId),
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });
@@ -48,7 +48,7 @@ export const deleteRecipient = async ({
   });
 
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId),
+    where: buildTeamWhereQuery({ teamId, userId }),
   });
 
   if (!team) {

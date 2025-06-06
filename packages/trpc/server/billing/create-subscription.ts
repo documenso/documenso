@@ -23,11 +23,11 @@ export const createSubscriptionRoute = authenticatedProcedure
     }
 
     const organisation = await prisma.organisation.findFirst({
-      where: buildOrganisationWhereQuery(
+      where: buildOrganisationWhereQuery({
         organisationId,
         userId,
-        ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_BILLING'],
-      ),
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_BILLING'],
+      }),
       include: {
         subscription: true,
         owner: {

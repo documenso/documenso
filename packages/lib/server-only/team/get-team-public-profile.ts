@@ -21,7 +21,7 @@ export const getTeamPublicProfile = async ({
   teamId,
 }: GetTeamPublicProfileOptions): Promise<GetTeamPublicProfileResponse> => {
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(teamId, userId),
+    where: buildTeamWhereQuery({ teamId, userId }),
     include: {
       profile: true,
     },

@@ -55,7 +55,7 @@ export const findOrganisationGroups = async ({
   perPage = 10,
 }: FindOrganisationGroupsOptions) => {
   const organisation = await prisma.organisation.findFirst({
-    where: buildOrganisationWhereQuery(organisationId, userId),
+    where: buildOrganisationWhereQuery({ organisationId, userId }),
   });
 
   if (!organisation) {

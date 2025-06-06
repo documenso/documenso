@@ -49,7 +49,7 @@ export const updateField = async ({
       document: {
         id: documentId,
         userId,
-        team: buildTeamWhereQuery(teamId, userId),
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });
@@ -89,7 +89,7 @@ export const updateField = async ({
 
     if (teamId) {
       team = await prisma.team.findFirst({
-        where: buildTeamWhereQuery(teamId, userId),
+        where: buildTeamWhereQuery({ teamId, userId }),
       });
     }
 

@@ -22,7 +22,7 @@ export const getRecipientById = async ({
     where: {
       id: recipientId,
       document: {
-        team: buildTeamWhereQuery(teamId, userId),
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
     include: {

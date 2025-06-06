@@ -16,7 +16,11 @@ export const editWebhook = async ({ id, data, userId, teamId }: EditWebhookOptio
   return await prisma.webhook.update({
     where: {
       id,
-      team: buildTeamWhereQuery(teamId, userId, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
     },
     data: {
       ...data,

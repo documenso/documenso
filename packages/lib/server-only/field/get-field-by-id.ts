@@ -28,7 +28,7 @@ export const getFieldById = async ({
         id: fieldId,
         document: {
           id: documentId,
-          team: buildTeamWhereQuery(teamId, userId),
+          team: buildTeamWhereQuery({ teamId, userId }),
         },
       },
     });
@@ -40,7 +40,7 @@ export const getFieldById = async ({
         id: fieldId,
         template: {
           id: templateId,
-          team: buildTeamWhereQuery(teamId, userId),
+          team: buildTeamWhereQuery({ teamId, userId }),
         },
       },
     });

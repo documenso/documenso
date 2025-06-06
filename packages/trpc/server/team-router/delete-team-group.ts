@@ -20,7 +20,11 @@ export const deleteTeamGroupRoute = authenticatedProcedure
     const { user } = ctx;
 
     const team = await prisma.team.findFirst({
-      where: buildTeamWhereQuery(teamId, user.id, TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM']),
+      where: buildTeamWhereQuery({
+        teamId,
+        userId: user.id,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_TEAM'],
+      }),
     });
 
     if (!team) {

@@ -978,7 +978,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       select: { id: true, status: true },
       where: {
         id: Number(documentId),
-        team: buildTeamWhereQuery(team.id, user.id),
+        team: buildTeamWhereQuery({ teamId: team.id, userId: user.id }),
       },
     });
 
@@ -1335,7 +1335,7 @@ const updateDocument = async ({
     where: {
       id: documentId,
       userId,
-      team: buildTeamWhereQuery(teamId, userId),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     data: {
       ...data,

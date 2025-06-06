@@ -18,7 +18,7 @@ export const deleteTemplateField = async ({
     where: {
       id: fieldId,
       template: {
-        team: buildTeamWhereQuery(teamId, userId),
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });

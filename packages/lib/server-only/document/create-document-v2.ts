@@ -61,7 +61,7 @@ export const createDocumentV2 = async ({
   const { title, formValues } = data;
 
   const team = await prisma.team.findFirst({
-    where: buildTeamWhereQuery(userId, teamId),
+    where: buildTeamWhereQuery({ teamId, userId }),
     include: {
       organisation: {
         select: {
