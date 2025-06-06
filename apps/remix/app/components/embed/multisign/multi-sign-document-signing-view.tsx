@@ -92,6 +92,8 @@ export const MultiSignDocumentSigningView = ({
       [],
   ];
 
+  const uninsertedFields = document?.fields.filter((field) => !field.inserted);
+
   const onSignField = async (payload: TSignFieldWithTokenMutationSchema) => {
     try {
       await signFieldWithToken(payload);
@@ -335,7 +337,7 @@ export const MultiSignDocumentSigningView = ({
                       <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
 
                       <div className="embed--DocumentWidgetFooter mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
-                        {pendingFields.length > 0 ? (
+                        {uninsertedFields.length > 0 ? (
                           <Button className="col-start-2" onClick={onNextFieldClick}>
                             <Trans>Next</Trans>
                           </Button>
