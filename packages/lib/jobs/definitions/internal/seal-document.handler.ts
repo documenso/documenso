@@ -157,7 +157,7 @@ export const run = async ({
 
     // Normalize and flatten layers that could cause issues with the signature
     normalizeSignatureAppearances(pdfDoc);
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
     flattenAnnotations(pdfDoc);
 
     // Add rejection stamp if the document is rejected
@@ -188,7 +188,7 @@ export const run = async ({
 
     // Re-flatten the form to handle our checkbox and radio fields that
     // create native arcoFields
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
