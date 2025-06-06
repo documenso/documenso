@@ -37,7 +37,7 @@ test.describe('[EE_ONLY]', () => {
 
     // Set EE action auth.
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
@@ -79,7 +79,7 @@ test.describe('[EE_ONLY]', () => {
 
     // Set EE action auth.
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
 
     // Save the settings by going to the next step.
@@ -140,7 +140,7 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
 
   // Set access auth.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
   // Action auth should NOT be visible.

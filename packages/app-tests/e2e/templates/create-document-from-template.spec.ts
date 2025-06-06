@@ -48,13 +48,13 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
   // Set EE action auth.
   if (isBillingEnabled) {
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
   }
 
@@ -85,8 +85,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   // Apply require passkey for Recipient 1.
   if (isBillingEnabled) {
     await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
+    await page.getByTestId('documentActionSelectValue').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
   }
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -119,10 +119,12 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
+
+  if (isBillingEnabled) {
+    expect(documentAuth.documentAuthOption.globalActionAuth).toContain('PASSKEY');
+  }
+
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -143,11 +145,11 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   });
 
   if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
+    expect(recipientOneAuth.derivedRecipientActionAuth).toContain('PASSKEY');
   }
 
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
@@ -183,13 +185,13 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
   // Set EE action auth.
   if (isBillingEnabled) {
     await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
     await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
   }
 
@@ -220,8 +222,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   // Apply require passkey for Recipient 1.
   if (isBillingEnabled) {
     await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
+    await page.getByTestId('documentActionSelectValue').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
   }
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -256,10 +258,12 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
+
+  if (isBillingEnabled) {
+    expect(documentAuth.documentAuthOption.globalActionAuth).toContain('PASSKEY');
+  }
+
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -280,11 +284,11 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   });
 
   if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
+    expect(recipientOneAuth.derivedRecipientActionAuth).toContain('PASSKEY');
   }
 
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**

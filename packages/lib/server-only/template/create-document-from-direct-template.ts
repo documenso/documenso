@@ -70,7 +70,7 @@ export type CreateDocumentFromDirectTemplateOptions = {
 
 type CreatedDirectRecipientField = {
   field: Field & { signature?: Signature | null };
-  derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
+  derivedRecipientActionAuth?: TRecipientActionAuthTypes;
 };
 
 export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
@@ -151,9 +151,9 @@ export const createDocumentFromDirectTemplate = async ({
   const directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
-  const isAccessAuthValid = match(derivedRecipientAccessAuth)
+  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
     .with(DocumentAccessAuth.ACCOUNT, () => user && user?.email === directRecipientEmail)
-    .with(null, () => true)
+    .with(undefined, () => true)
     .exhaustive();
 
   if (!isAccessAuthValid) {
@@ -460,7 +460,7 @@ export const createDocumentFromDirectTemplate = async ({
     const createdDirectRecipientFields: CreatedDirectRecipientField[] = [
       ...createdDirectRecipient.fields.map((field) => ({
         field,
-        derivedRecipientActionAuth: null,
+        derivedRecipientActionAuth: undefined,
       })),
       ...createdDirectRecipientSignatureFields,
     ];
@@ -567,6 +567,7 @@ export const createDocumentFromDirectTemplate = async ({
           recipientId: createdDirectRecipient.id,
           recipientName: createdDirectRecipient.name,
           recipientRole: createdDirectRecipient.role,
+          actionAuth: createdDirectRecipient.authOptions?.actionAuth ?? [],
         },
       }),
     ];

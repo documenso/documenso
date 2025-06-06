@@ -58,8 +58,8 @@ test.describe('[EE_ONLY]', () => {
 
     // Add advanced settings for a single recipient.
     await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
+    await page.getByTestId('documentActionSelectValue').click();
+    await page.getByRole('option').filter({ hasText: 'Require passkey' }).click();
 
     // Navigate to the next step and back.
     await page.getByRole('button', { name: 'Continue' }).click();

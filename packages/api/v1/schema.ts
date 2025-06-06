@@ -177,8 +177,8 @@ export const ZCreateDocumentMutationSchema = z.object({
     .default({}),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
     })
     .optional()
     .openapi({
@@ -237,8 +237,8 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     .optional(),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
@@ -310,8 +310,8 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     .optional(),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
@@ -350,7 +350,7 @@ export const ZCreateRecipientMutationSchema = z.object({
   signingOrder: z.number().nullish(),
   authOptions: z
     .object({
-      actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+      actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
     })
     .optional()
     .openapi({

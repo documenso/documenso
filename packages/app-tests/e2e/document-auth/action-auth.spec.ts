@@ -65,8 +65,8 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
     recipients: [recipientWithAccount],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: null,
-        globalActionAuth: 'ACCOUNT',
+        globalAccessAuth: [],
+        globalActionAuth: ['ACCOUNT'],
       }),
     },
   });
@@ -116,8 +116,8 @@ test.skip('[DOCUMENT_AUTH]: should deny signing document when required for globa
     recipients: [recipientWithAccount],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: null,
-        globalActionAuth: 'ACCOUNT',
+        globalAccessAuth: [],
+        globalActionAuth: ['ACCOUNT'],
       }),
     },
   });
@@ -147,8 +147,8 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
     recipients: [recipientWithAccount, seedTestEmail()],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: null,
-        globalActionAuth: 'ACCOUNT',
+        globalAccessAuth: [],
+        globalActionAuth: ['ACCOUNT'],
       }),
     },
   });
@@ -193,20 +193,20 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
     recipientsCreateOptions: [
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: null,
+          accessAuth: [],
+          actionAuth: [],
         }),
       },
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: 'EXPLICIT_NONE',
+          accessAuth: [],
+          actionAuth: ['EXPLICIT_NONE'],
         }),
       },
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: 'ACCOUNT',
+          accessAuth: [],
+          actionAuth: ['ACCOUNT'],
         }),
       },
     ],
@@ -218,7 +218,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
     const { actionAuth } = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
     // This document has no global action auth, so only account should require auth.
-    const isAuthRequired = actionAuth === 'ACCOUNT';
+    const isAuthRequired = actionAuth.includes('ACCOUNT');
 
     const signUrl = `/sign/${token}`;
 
@@ -292,28 +292,28 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
     recipientsCreateOptions: [
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: null,
+          accessAuth: [],
+          actionAuth: [],
         }),
       },
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: 'EXPLICIT_NONE',
+          accessAuth: [],
+          actionAuth: ['EXPLICIT_NONE'],
         }),
       },
       {
         authOptions: createRecipientAuthOptions({
-          accessAuth: null,
-          actionAuth: 'ACCOUNT',
+          accessAuth: [],
+          actionAuth: ['ACCOUNT'],
         }),
       },
     ],
     fields: [FieldType.DATE, FieldType.SIGNATURE],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: null,
-        globalActionAuth: 'ACCOUNT',
+        globalAccessAuth: [],
+        globalActionAuth: ['ACCOUNT'],
       }),
     },
   });
@@ -323,7 +323,7 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient an
     const { actionAuth } = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
     // This document HAS global action auth, so account and inherit should require auth.
-    const isAuthRequired = actionAuth === 'ACCOUNT' || actionAuth === null;
+    const isAuthRequired = actionAuth.includes('ACCOUNT') || actionAuth.length === 0;
 
     const signUrl = `/sign/${token}`;
 

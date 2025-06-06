@@ -3,8 +3,6 @@ import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
-import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
-
 export const ZAddTemplatePlacholderRecipientsFormSchema = z
   .object({
     signers: z.array(
@@ -15,9 +13,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-          ZRecipientActionAuthTypesSchema.optional(),
-        ),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
     signingOrder: z.nativeEnum(DocumentSigningOrder),

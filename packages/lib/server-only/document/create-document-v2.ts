@@ -39,8 +39,8 @@ export type CreateDocumentOptions = {
     title: string;
     externalId?: string;
     visibility?: DocumentVisibility;
-    globalAccessAuth?: TDocumentAccessAuthTypes;
-    globalActionAuth?: TDocumentActionAuthTypes;
+    globalAccessAuth?: TDocumentAccessAuthTypes[];
+    globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
     recipients: TCreateDocumentV2Request['recipients'];
   };
@@ -113,14 +113,16 @@ export const createDocumentV2 = async ({
   }
 
   const authOptions = createDocumentAuthOptions({
-    globalAccessAuth: data?.globalAccessAuth || null,
-    globalActionAuth: data?.globalActionAuth || null,
+    globalAccessAuth: data?.globalAccessAuth || [],
+    globalActionAuth: data?.globalActionAuth || [],
   });
 
-  const recipientsHaveActionAuth = data.recipients?.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = data.recipients?.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
-  if (authOptions.globalActionAuth || recipientsHaveActionAuth) {
+  if (authOptions.globalActionAuth.length > 0 || recipientsHaveActionAuth) {
     const isDocumentEnterprise = await isUserEnterprise({
       userId,
       teamId,
@@ -171,8 +173,8 @@ export const createDocumentV2 = async ({
     await Promise.all(
       (data.recipients || []).map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
-          accessAuth: recipient.accessAuth || null,
-          actionAuth: recipient.actionAuth || null,
+          accessAuth: recipient.accessAuth ?? [],
+          actionAuth: recipient.actionAuth ?? [],
         });
 
         await tx.recipient.create({

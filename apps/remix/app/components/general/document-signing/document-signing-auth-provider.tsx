@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
 import { type Document, FieldType, type Passkey, type Recipient } from '@prisma/client';
-import { match } from 'ts-pattern';
 
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
@@ -33,8 +32,8 @@ export type DocumentSigningAuthContextValue = {
   recipient: Recipient;
   recipientAuthOption: TRecipientAuthOptions;
   setRecipient: (_value: Recipient) => void;
-  derivedRecipientAccessAuth: TRecipientAccessAuthTypes | null;
-  derivedRecipientActionAuth: TRecipientActionAuthTypes | null;
+  derivedRecipientAccessAuth: TRecipientAccessAuthTypes[];
+  derivedRecipientActionAuth: TRecipientActionAuthTypes[];
   isAuthRedirectRequired: boolean;
   isCurrentlyAuthenticating: boolean;
   setIsCurrentlyAuthenticating: (_value: boolean) => void;
@@ -100,7 +99,7 @@ export const DocumentSigningAuthProvider = ({
     },
     {
       placeholderData: (previousData) => previousData,
-      enabled: derivedRecipientActionAuth === DocumentAuth.PASSKEY,
+      enabled: derivedRecipientActionAuth?.includes(DocumentAuth.PASSKEY) ?? false,
     },
   );
 
@@ -121,21 +120,28 @@ export const DocumentSigningAuthProvider = ({
    * Will be `null` if the user still requires authentication, or if they don't need
    * authentication.
    */
-  const preCalculatedActionAuthOptions = match(derivedRecipientActionAuth)
-    .with(DocumentAuth.ACCOUNT, () => {
-      if (recipient.email !== user?.email) {
-        return null;
-      }
+  const preCalculatedActionAuthOptions = useMemo(() => {
+    if (
+      !derivedRecipientActionAuth ||
+      derivedRecipientActionAuth.length === 0 ||
+      derivedRecipientActionAuth.includes(DocumentAuth.EXPLICIT_NONE)
+    ) {
+      return {
+        type: DocumentAuth.EXPLICIT_NONE,
+      };
+    }
 
+    if (
+      derivedRecipientActionAuth.includes(DocumentAuth.ACCOUNT) &&
+      user?.email == recipient.email
+    ) {
       return {
         type: DocumentAuth.ACCOUNT,
       };
-    })
-    .with(DocumentAuth.EXPLICIT_NONE, () => ({
-      type: DocumentAuth.EXPLICIT_NONE,
-    }))
-    .with(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, null, () => null)
-    .exhaustive();
+    }
+
+    return null;
+  }, [derivedRecipientActionAuth, user, recipient]);
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
     // Directly run callback if no auth required.
@@ -170,7 +176,8 @@ export const DocumentSigningAuthProvider = ({
   // Assume that a user must be logged in for any auth requirements.
   const isAuthRedirectRequired = Boolean(
     derivedRecipientActionAuth &&
-      derivedRecipientActionAuth !== DocumentAuth.EXPLICIT_NONE &&
+      derivedRecipientActionAuth.length > 0 &&
+      !derivedRecipientActionAuth.includes(DocumentAuth.EXPLICIT_NONE) &&
       user?.email !== recipient.email,
   );
 
@@ -208,7 +215,7 @@ export const DocumentSigningAuthProvider = ({
           onOpenChange={() => setDocumentAuthDialogPayload(null)}
           onReauthFormSubmit={documentAuthDialogPayload.onReauthFormSubmit}
           actionTarget={documentAuthDialogPayload.actionTarget}
-          documentAuthType={derivedRecipientActionAuth}
+          availableAuthTypes={derivedRecipientActionAuth}
         />
       )}
     </DocumentSigningAuthContext.Provider>
@@ -217,7 +224,7 @@ export const DocumentSigningAuthProvider = ({
 
 type ExecuteActionAuthProcedureOptions = Omit<
   DocumentSigningAuthDialogProps,
-  'open' | 'onOpenChange' | 'documentAuthType' | 'recipientRole'
+  'open' | 'onOpenChange' | 'documentAuthType' | 'recipientRole' | 'availableAuthTypes'
 >;
 
 DocumentSigningAuthProvider.displayName = 'DocumentSigningAuthProvider';

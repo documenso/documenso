@@ -133,8 +133,8 @@ export const ZUpdateTemplateRequestSchema = z.object({
       title: z.string().min(1).optional(),
       externalId: z.string().nullish(),
       visibility: z.nativeEnum(DocumentVisibility).optional(),
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
       publicTitle: z
         .string()
         .trim()

@@ -3,6 +3,7 @@ import { useLingui } from '@lingui/react';
 import { FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
+import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 import { renderSVG } from 'uqr';
@@ -133,18 +134,30 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       recipientAuth: recipient.authOptions,
     });
 
-    let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
+    const insertedAuditLogsWithFieldAuth = sortBy(
+      auditLogs.DOCUMENT_FIELD_INSERTED.filter(
+        (log) => log.data.recipientId === recipient.id && log.data.fieldSecurity,
+      ),
+      [prop('createdAt'), 'desc'],
+    );
+
+    const actionAuthMethod = insertedAuditLogsWithFieldAuth.at(0)?.data?.fieldSecurity?.type;
+
+    let authLevel = match(actionAuthMethod)
       .with('ACCOUNT', () => _(msg`Account Re-Authentication`))
       .with('TWO_FACTOR_AUTH', () => _(msg`Two-Factor Re-Authentication`))
+      .with('PASSWORD', () => _(msg`Password Re-Authentication`))
       .with('PASSKEY', () => _(msg`Passkey Re-Authentication`))
       .with('EXPLICIT_NONE', () => _(msg`Email`))
-      .with(null, () => null)
+      .with(undefined, () => null)
       .exhaustive();
 
     if (!authLevel) {
-      authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
+      const accessAuthMethod = extractedAuthMethods.derivedRecipientAccessAuth.at(0);
+
+      authLevel = match(accessAuthMethod)
         .with('ACCOUNT', () => _(msg`Account Authentication`))
-        .with(null, () => _(msg`Email`))
+        .with(undefined, () => _(msg`Email`))
         .exhaustive();
     }
 

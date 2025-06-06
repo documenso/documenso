@@ -1,6 +1,7 @@
 import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 
 import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -72,7 +73,9 @@ export const updateDocumentRecipients = async ({
     });
   }
 
-  const recipientsHaveActionAuth = recipients.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = recipients.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
   if (recipientsHaveActionAuth) {
@@ -218,8 +221,8 @@ type RecipientData = {
   name?: string;
   role?: RecipientRole;
   signingOrder?: number | null;
-  accessAuth?: TRecipientAccessAuthTypes | null;
-  actionAuth?: TRecipientActionAuthTypes | null;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
 };
 
 const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
@@ -233,7 +236,7 @@ const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: Recipie
     recipient.name !== newRecipientData.name ||
     recipient.role !== newRecipientData.role ||
     recipient.signingOrder !== newRecipientData.signingOrder ||
-    authOptions.accessAuth !== newRecipientAccessAuth ||
-    authOptions.actionAuth !== newRecipientActionAuth
+    !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
+    !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
   );
 };

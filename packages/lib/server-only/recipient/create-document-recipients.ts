@@ -22,8 +22,8 @@ export interface CreateDocumentRecipientsOptions {
     name: string;
     role: RecipientRole;
     signingOrder?: number | null;
-    accessAuth?: TRecipientAccessAuthTypes | null;
-    actionAuth?: TRecipientActionAuthTypes | null;
+    accessAuth?: TRecipientAccessAuthTypes[];
+    actionAuth?: TRecipientActionAuthTypes[];
   }[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -71,7 +71,9 @@ export const createDocumentRecipients = async ({
     });
   }
 
-  const recipientsHaveActionAuth = recipientsToCreate.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = recipientsToCreate.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
   if (recipientsHaveActionAuth) {
@@ -110,8 +112,8 @@ export const createDocumentRecipients = async ({
     return await Promise.all(
       normalizedRecipients.map(async (recipient) => {
         const authOptions = createRecipientAuthOptions({
-          accessAuth: recipient.accessAuth || null,
-          actionAuth: recipient.actionAuth || null,
+          accessAuth: recipient.accessAuth ?? [],
+          actionAuth: recipient.actionAuth ?? [],
         });
 
         const createdRecipient = await tx.recipient.create({
@@ -140,8 +142,8 @@ export const createDocumentRecipients = async ({
               recipientName: createdRecipient.name,
               recipientId: createdRecipient.id,
               recipientRole: createdRecipient.role,
-              accessAuth: recipient.accessAuth || undefined,
-              actionAuth: recipient.actionAuth || undefined,
+              accessAuth: recipient.accessAuth ?? [],
+              actionAuth: recipient.actionAuth ?? [],
             },
           }),
         });
