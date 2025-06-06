@@ -81,7 +81,7 @@ export const TeamMemberSelectDialog = ({
             emptySelectionPlaceholder={
               <p className="text-muted-foreground font-normal">
                 <Trans>
-                  <span className="text-muted-foreground/70">Member:</span> All
+                  <span className="text-muted-foreground/70">Member:</span>
                 </Trans>
               </p>
             }

@@ -438,6 +438,10 @@ msgstr "<0>E-Mail</0> - Der Empfänger erhält das Dokument zur Unterschrift, Ge
 msgid "<0>Inherit authentication method</0> - Use the global action signing authentication method configured in the \"General Settings\" step"
 msgstr "<0>Authentifizierungsmethode erben</0> - Verwenden Sie die in den \"Allgemeinen Einstellungen\" konfigurierte globale Aktionssignatur-Authentifizierungsmethode"
 
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
+msgid "<0>Member:</0>"
+msgstr "<0>Mitglieder:</0>"
+
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "<0>No restrictions</0> - No authentication required"
 msgstr "<0>Keine Einschränkungen</0> - Keine Authentifizierung erforderlich"
@@ -726,6 +730,7 @@ msgstr "Aktiv"
 msgid "Active Subscriptions"
 msgstr "Aktive Abonnements"
 
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add"
 msgstr "Hinzufügen"
@@ -782,6 +787,10 @@ msgstr "E-Mail hinzufügen"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Add Fields"
 msgstr "Felder hinzufügen"
+
+#: packages/ui/primitives/document-flow/add-signers.tsx
+msgid "Add member"
+msgstr "Mitglieder hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-member-invite-dialog.tsx
 msgid "Add more"
@@ -892,6 +901,10 @@ msgstr "Alle"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "All documents"
 msgstr "Alle Dokumente"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "All documents have been completed!"
+msgstr ""
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "All documents have been processed. Any new documents that are sent or received will show here."
@@ -1113,6 +1126,7 @@ msgstr "Beim Unterschreiben als Assistent ist ein Fehler aufgetreten."
 #: apps/remix/app/components/general/document-signing/document-signing-dropdown-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "An error occurred while signing the document."
 msgstr "Ein Fehler ist aufgetreten, während das Dokument unterzeichnet wurde."
 
@@ -1296,6 +1310,10 @@ msgstr "Die Rolle des Assistenten ist nur verfügbar, wenn das Dokument im seque
 #: packages/lib/constants/recipient-roles.ts
 msgid "Assistants"
 msgstr "Assistenten"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Assistants and Copy roles are currently not compatible with the multi-sign experience."
+msgstr ""
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: packages/lib/constants/recipient-roles.ts
@@ -1504,6 +1522,7 @@ msgstr "Kann vorbereiten"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/team-transfer-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-leave-dialog.tsx
@@ -1644,6 +1663,7 @@ msgstr "Klicken Sie, um den Signatur-Link zu kopieren, um ihn an den Empfänger 
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Click to insert field"
 msgstr "Klicken, um das Feld auszufüllen"
 
@@ -1670,6 +1690,7 @@ msgstr ""
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Complete"
 msgstr "Abschließen"
 
@@ -1701,6 +1722,7 @@ msgstr "Betrachten abschließen"
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/document.ts
 #: packages/email/template-components/template-document-self-signed.tsx
 #: packages/email/template-components/template-document-recipient-signed.tsx
@@ -2772,6 +2794,7 @@ msgstr "Offenlegung der elektronischen Unterschrift"
 #: apps/remix/app/components/forms/forgot-password.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
@@ -2954,6 +2977,7 @@ msgstr "Geben Sie hier Ihren Text ein"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -3008,6 +3032,10 @@ msgstr "Externe ID"
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 msgid "Failed to create folder"
+msgstr ""
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
+msgid "Failed to load document"
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -3153,6 +3181,7 @@ msgstr "Freie Unterschrift"
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Full Name"
 msgstr "Vollständiger Name"
 
@@ -3435,6 +3464,10 @@ msgstr "Es ist entscheidend, dass Sie Ihre Kontaktinformationen, insbesondere Ih
 msgid "It looks like {0} hasn't added any documents to their profile yet."
 msgstr "Es sieht so aus, als ob {0} noch keine Dokumente zu ihrem Profil hinzugefügt hat."
 
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "It looks like we ran into an issue!"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
 msgstr "Es scheint, dass das bereitgestellte Token abgelaufen ist. Wir haben Ihnen gerade ein weiteres Token gesendet, bitte überprüfen Sie Ihre E-Mails und versuchen Sie es erneut."
@@ -3553,6 +3586,7 @@ msgid "Load older activity"
 msgstr "Ältere Aktivitäten laden"
 
 #: apps/remix/app/components/general/skeletons/document-edit-skeleton.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: packages/ui/primitives/pdf-viewer.tsx
 msgid "Loading document..."
 msgstr "Lade Dokument..."
@@ -3839,6 +3873,7 @@ msgstr "Neue Vorlage"
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: packages/ui/primitives/signature-pad/signature-pad-dialog.tsx
 msgid "Next"
 msgstr "Nächster"
@@ -4004,6 +4039,10 @@ msgstr "Sobald Sie den QR-Code gescannt oder den Code manuell eingegeben haben, 
 #: packages/lib/constants/template.ts
 msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
 msgstr "Sobald Ihre Vorlage eingerichtet ist, teilen Sie den Link überall, wo Sie möchten. Die Person, die den Link öffnet, kann ihre Informationen im Feld für direkte Empfänger eingeben und alle anderen ihr zugewiesenen Felder ausfüllen."
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
+msgstr ""
 
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
 msgid "Only admins can access and view the document"
@@ -4256,6 +4295,10 @@ msgstr "Bitte bestätige deine E-Mail-Adresse"
 msgid "Please contact support if you would like to revert this action."
 msgstr "Bitte kontaktieren Sie den Support, wenn Sie diese Aktion rückgängig machen möchten."
 
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Please contact the site owner for further assistance."
+msgstr ""
+
 #: apps/remix/app/components/forms/token.tsx
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr "Bitte geben Sie einen aussagekräftigen Namen für Ihr Token ein. Dies wird Ihnen helfen, es später zu identifizieren."
@@ -4391,6 +4434,10 @@ msgstr "Profil ist derzeit <0>sichtbar</0>."
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Profile updated"
 msgstr "Profil aktualisiert"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Progress"
+msgstr ""
 
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/general/template/template-type.tsx
@@ -4562,6 +4609,7 @@ msgstr "Dokument Ablehnen"
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/document.ts
 msgid "Rejected"
 msgstr "Abgelehnt"
@@ -4768,6 +4816,7 @@ msgstr "Vorlage speichern"
 #: apps/remix/app/components/tables/user-settings-teams-page-table.tsx
 #: apps/remix/app/components/tables/documents-table-sender-filter.tsx
 #: apps/remix/app/components/general/app-nav-desktop.tsx
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
 msgid "Search"
 msgstr "Suchen"
 
@@ -4849,6 +4898,11 @@ msgstr "Standardoption auswählen"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "Passkey auswählen"
+
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
+#: apps/remix/app/components/dialogs/team-member-select-dialog.tsx
+msgid "Select team member"
+msgstr "Team Mitglied auswählen"
 
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
@@ -5030,6 +5084,7 @@ msgstr "Unterzeichnen als<0>{0} <1>({1})</1></0>"
 
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Sign document"
 msgstr "Dokument unterschreiben"
 
@@ -5037,6 +5092,10 @@ msgstr "Dokument unterschreiben"
 #: packages/email/template-components/template-document-invite.tsx
 msgid "Sign Document"
 msgstr "Dokument signieren"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Sign Documents"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Sign field"
@@ -5063,6 +5122,7 @@ msgstr "Ausloggen"
 
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Sign the document to complete the process."
 msgstr "Unterschreiben Sie das Dokument, um den Vorgang abzuschließen."
 
@@ -5086,6 +5146,7 @@ msgstr "Registrieren mit OIDC"
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -5640,6 +5701,10 @@ msgstr "Textausrichtung"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Text Color"
 msgstr "Textfarbe"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Thank you for completing the signing process."
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -6716,6 +6781,7 @@ msgstr "Versionsverlauf"
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "View"
 msgstr "Betrachten"
@@ -6773,6 +6839,10 @@ msgstr "Einladungen ansehen"
 msgid "View more"
 msgstr "Mehr anzeigen"
 
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "View next document"
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "View Original Document"
 msgstr "Originaldokument ansehen"
@@ -6792,6 +6862,7 @@ msgstr "Teams ansehen"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "Viewed"
 msgstr "Betrachtet"
@@ -7339,6 +7410,10 @@ msgstr "Du wurdest eingeladen, dem folgenden Team beizutreten"
 #: packages/lib/server-only/recipient/delete-document-recipient.ts
 msgid "You have been removed from a document"
 msgstr "Du wurdest von einem Dokument entfernt"
+
+#: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "You have been requested to sign the following documents. Review each document carefully and complete the signing process."
+msgstr ""
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/request-team-ownership-transfer.ts
