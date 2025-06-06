@@ -92,7 +92,7 @@ export const MultiSignDocumentSigningView = ({
       [],
   ];
 
-  const uninsertedFields = document?.fields.filter((field) => !field.inserted);
+  const uninsertedFields = document?.fields.filter((field) => !field.inserted) ?? [];
 
   const onSignField = async (payload: TSignFieldWithTokenMutationSchema) => {
     try {
