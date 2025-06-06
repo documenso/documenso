@@ -85,7 +85,7 @@ export const AddSignersFormPartial = ({
       email: '',
       role: RecipientRole.SIGNER,
       signingOrder: 1,
-      actionAuth: undefined,
+      actionAuth: [],
     },
   ];
 
@@ -119,10 +119,14 @@ export const AddSignersFormPartial = ({
     const recipientHasAuthOptions = recipients.find((recipient) => {
       const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-      return recipientAuthOptions?.accessAuth || recipientAuthOptions?.actionAuth;
+      return (
+        recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0
+      );
     });
 
-    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth);
+    const formHasActionAuth = form
+      .getValues('signers')
+      .find((signer) => signer.actionAuth.length > 0);
 
     return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
   }, [recipients, form]);
@@ -190,7 +194,7 @@ export const AddSignersFormPartial = ({
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
-      actionAuth: undefined,
+      actionAuth: [],
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });
   };
@@ -226,7 +230,7 @@ export const AddSignersFormPartial = ({
         name: user?.name ?? '',
         email: user?.email ?? '',
         role: RecipientRole.SIGNER,
-        actionAuth: undefined,
+        actionAuth: [],
         signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
       });
     }

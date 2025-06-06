@@ -98,8 +98,8 @@ export const AddSettingsFormPartial = ({
       title: document.title,
       externalId: document.externalId || '',
       visibility: document.visibility || '',
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
+      globalActionAuth: documentAuthOption?.globalActionAuth || [],
 
       meta: {
         timezone:
@@ -130,6 +130,12 @@ export const AddSettingsFormPartial = ({
         document.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
     )
     .otherwise(() => false);
+
+  const onFormSubmit = form.handleSubmit(onSubmit);
+
+  const onGoNextClick = () => {
+    void onFormSubmit().catch(console.error);
+  };
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -214,7 +220,11 @@ export const AddSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger className="bg-background">
                         <SelectValue />
                       </SelectTrigger>
@@ -244,7 +254,11 @@ export const AddSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <DocumentGlobalAuthAccessSelect {...field} onValueChange={field.onChange} />
+                    <DocumentGlobalAuthAccessSelect
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -286,7 +300,11 @@ export const AddSettingsFormPartial = ({
                     </FormLabel>
 
                     <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                      <DocumentGlobalAuthActionSelect
+                        value={field.value}
+                        disabled={field.disabled}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -370,7 +388,7 @@ export const AddSettingsFormPartial = ({
 
                           <FormControl>
                             <Select
-                              {...field}
+                              value={field.value}
                               onValueChange={field.onChange}
                               disabled={documentHasBeenSent}
                             >
@@ -406,7 +424,7 @@ export const AddSettingsFormPartial = ({
                             <Combobox
                               className="bg-background"
                               options={TIME_ZONES}
-                              {...field}
+                              value={field.value}
                               onChange={(value) => value && field.onChange(value)}
                               disabled={documentHasBeenSent}
                             />
@@ -461,7 +479,7 @@ export const AddSettingsFormPartial = ({
           disabled={form.formState.isSubmitting}
           canGoBack={stepIndex !== 0}
           onGoBackClick={previousStep}
-          onGoNextClick={form.handleSubmit(onSubmit)}
+          onGoNextClick={onGoNextClick}
         />
       </DocumentFlowFormContainerFooter>
     </>

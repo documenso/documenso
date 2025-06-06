@@ -20,7 +20,7 @@ export type UpdateRecipientOptions = {
   name?: string;
   role?: RecipientRole;
   signingOrder?: number | null;
-  actionAuth?: TRecipientActionAuthTypes | null;
+  actionAuth?: TRecipientActionAuthTypes[];
   userId: number;
   teamId?: number;
   requestMetadata?: RequestMetadata;
@@ -90,7 +90,7 @@ export const updateRecipient = async ({
     throw new Error('Recipient not found');
   }
 
-  if (actionAuth) {
+  if (actionAuth && actionAuth.length > 0) {
     const isDocumentEnterprise = await isUserEnterprise({
       userId,
       teamId,
@@ -117,7 +117,7 @@ export const updateRecipient = async ({
         signingOrder,
         authOptions: createRecipientAuthOptions({
           accessAuth: recipientAuthOptions.accessAuth,
-          actionAuth: actionAuth ?? null,
+          actionAuth: actionAuth ?? [],
         }),
       },
     });

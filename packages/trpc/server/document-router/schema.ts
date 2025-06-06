@@ -206,8 +206,8 @@ export const ZCreateDocumentV2RequestSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
-  globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-  globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
   recipients: z
     .array(

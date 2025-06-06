@@ -86,7 +86,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         {
           formId: initialId,
           role: RecipientRole.SIGNER,
-          actionAuth: undefined,
+          actionAuth: [],
           ...generateRecipientPlaceholder(1),
           signingOrder: 1,
         },
@@ -136,10 +136,14 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     const recipientHasAuthOptions = recipients.find((recipient) => {
       const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
-      return recipientAuthOptions?.accessAuth || recipientAuthOptions?.actionAuth;
+      return (
+        recipientAuthOptions.accessAuth.length > 0 || recipientAuthOptions.actionAuth.length > 0
+      );
     });
 
-    const formHasActionAuth = form.getValues('signers').find((signer) => signer.actionAuth);
+    const formHasActionAuth = form
+      .getValues('signers')
+      .find((signer) => signer.actionAuth.length > 0);
 
     return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
   }, [recipients, form]);
@@ -179,6 +183,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       email: user.email ?? '',
       role: RecipientRole.SIGNER,
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      actionAuth: [],
     });
   };
 
@@ -188,6 +193,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       role: RecipientRole.SIGNER,
       ...generateRecipientPlaceholder(placeholderRecipientCount),
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      actionAuth: [],
     });
 
     setPlaceholderRecipientCount((count) => count + 1);

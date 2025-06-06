@@ -38,8 +38,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 
       const recipient = await getRecipientByToken({ token });
 
-      console.log('document', document.id);
-
       return { document, recipient };
     }),
   );
