@@ -18,6 +18,9 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import type { Member } from '@documenso/remix/app/components/dialogs/team-member-select-dialog';
+import { TeamMemberSelectDialog } from '@documenso/remix/app/components/dialogs/team-member-select-dialog';
+import { useOptionalCurrentTeam } from '@documenso/remix/app/providers/team';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -72,6 +75,7 @@ export const AddSignersFormPartial = ({
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { user } = useSession();
+  const team = useOptionalCurrentTeam();
 
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
@@ -193,6 +197,19 @@ export const AddSignersFormPartial = ({
       actionAuth: undefined,
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
     });
+  };
+
+  const onAddTeamMembers = (members: Member[]) => {
+    members.map((member) =>
+      appendSigner({
+        formId: nanoid(12),
+        name: member.name,
+        email: member.email,
+        role: RecipientRole.SIGNER,
+        actionAuth: undefined,
+        signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+      }),
+    );
   };
 
   const onRemoveSigner = (index: number) => {
@@ -743,6 +760,23 @@ export const AddSignersFormPartial = ({
                 <Plus className="-ml-1 mr-2 h-5 w-5" />
                 <Trans>Add Signer</Trans>
               </Button>
+
+              {team && (
+                <TeamMemberSelectDialog
+                  teamId={team.id}
+                  onSubmit={(members) => onAddTeamMembers(members)}
+                  trigger={
+                    <Button
+                      type="button"
+                      className="flex-1"
+                      disabled={isSubmitting || signers.length >= remaining.recipients}
+                    >
+                      <Plus className="-ml-1 mr-2 h-5 w-5" />
+                      <Trans>Add member</Trans>
+                    </Button>
+                  }
+                />
+              )}
 
               <Button
                 type="button"
