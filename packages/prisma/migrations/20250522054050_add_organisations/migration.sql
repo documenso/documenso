@@ -305,12 +305,12 @@ CREATE TABLE "SubscriptionClaim" (
 -- [CUSTOM_CHANGE] Insert default subscription claims
 INSERT INTO "SubscriptionClaim" ("id", "name", "locked", "teamCount", "memberCount", "flags", "createdAt", "updatedAt")
 VALUES
-  ('free', 'Free', true, 1, 1, '{}', NOW(), NOW()),
-  ('individual', 'Individual', true, 1, 1, '{"unlimitedDocuments": true}', NOW(), NOW()),
-  ('team', 'Teams', true, 1, 5, '{"unlimitedDocuments": true, "branding": true, "embedSigning": true}', NOW(), NOW()),
-  ('platform', 'Platform', true, 1, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedAuthoring": false, "embedAuthoringWhiteLabel": true, "embedSigning": false, "embedSigningWhiteLabel": true}', NOW(), NOW()),
-  ('enterprise', 'Enterprise', true, 0, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedAuthoring": true, "embedAuthoringWhiteLabel": true, "embedSigning": true, "embedSigningWhiteLabel": true, "cfr21": true}', NOW(), NOW()),
-  ('earlyAdopter', 'Early Adopter', true, 0, 0, '{"unlimitedDocuments": true, "branding": true, "hidePoweredBy": true, "embedSigning": true, "embedSigningWhiteLabel": true}', NOW(), NOW());
+  ('free', 'Free', true, 1, 1, '{}'::jsonb, NOW(), NOW()),
+  ('individual', 'Individual', true, 1, 1, '{"unlimitedDocuments": true}'::jsonb, NOW(), NOW()),
+  ('team', 'Teams', true, 1, 5, '{"unlimitedDocuments": true, "allowCustomBranding": true, "embedSigning": true}'::jsonb, NOW(), NOW()),
+  ('platform', 'Platform', true, 1, 0, '{"unlimitedDocuments": true, "allowCustomBranding": true, "hidePoweredBy": true, "embedAuthoring": false, "embedAuthoringWhiteLabel": true, "embedSigning": false, "embedSigningWhiteLabel": true}'::jsonb, NOW(), NOW()),
+  ('enterprise', 'Enterprise', true, 0, 0, '{"unlimitedDocuments": true, "allowCustomBranding": true, "hidePoweredBy": true, "embedAuthoring": true, "embedAuthoringWhiteLabel": true, "embedSigning": true, "embedSigningWhiteLabel": true, "cfr21": true}'::jsonb, NOW(), NOW()),
+  ('earlyAdopter', 'Early Adopter', true, 0, 0, '{"unlimitedDocuments": true, "allowCustomBranding": true, "hidePoweredBy": true, "embedSigning": true, "embedSigningWhiteLabel": true}'::jsonb, NOW(), NOW());
 
 -- CreateTable
 CREATE TABLE "OrganisationClaim" (
@@ -523,41 +523,18 @@ ALTER TABLE "Team" ADD CONSTRAINT "Team_teamGlobalSettingsId_fkey" FOREIGN KEY (
  * If subscription is attached to a team, that means it is:
  * - Team
  *
- * Therefore, we create organisations as follows:
- * 1. If the user has an account level subscription
- * - Create an organisation
- * - Move the user subscription into the organisation
- * - Move all their teams (with no subscription) into that organisation
- *
- * 2. For any remaining teams with a subscription (should only be teams subscription remaining)
- * - Create an organisation
- * - Assign the user subscription into the organisation
- * - Move all their teams (with no subscription) into that organisation
- *
- * 3. For any remaining teams with no subscription
- * - Create a free organisation
- *
- * Afterwards we migrate team members, etc into the organisation.
- *
  * Note: We will handle moving Individual plans into personal organisations as a part of a
  * secondary migration script since we need the Stripe price IDs
  *
 */
 
 /*
- * Handle free and team level subscriptions
- *
- * Goal:
- * - Create organisations for each personal team.
- * - Create organisations for each "teams plan" team.
+ * Handle creating free personal organisations
  *
  * Criteria for "personal team":
  * - Team is "isPersonal" is true
- *
- * Criteria for "teams plan" team:
- * - Team has a subscription
  */
-WITH new_organisations AS (
+WITH personal_organisations AS (
   INSERT INTO "Organisation" (
     "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId", "customerId"
   )
@@ -565,10 +542,7 @@ WITH new_organisations AS (
     gen_random_uuid(),
     t."createdAt",
     NOW(),
-    CASE
-      WHEN t."isPersonal" THEN 'PERSONAL'::"OrganisationType"
-      ELSE 'ORGANISATION'::"OrganisationType"
-    END,
+    'PERSONAL'::"OrganisationType",
     t."name",
     gen_random_uuid(),
     t."avatarImageId",
@@ -577,12 +551,43 @@ WITH new_organisations AS (
     s."customerId"
   FROM "Team" t
   LEFT JOIN "Subscription" s ON s."teamId" = t."id"
-  WHERE t."isPersonal" OR s."teamId" IS NOT NULL
+  WHERE t."isPersonal"
   RETURNING "id", "ownerUserId", "teamId", "customerId"
 )
 UPDATE "Team" t
 SET "organisationId" = o."id"
-FROM new_organisations o
+FROM personal_organisations o
+WHERE o."teamId" = t."id";
+
+/*
+ * Handle creating organisations for teams with "teams plan" subscriptions
+ *
+ * Criteria for "teams plan" team:
+ * - Team has a subscription
+ */
+WITH team_plan_organisations AS (
+  INSERT INTO "Organisation" (
+    "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId", "customerId"
+  )
+  SELECT
+    gen_random_uuid(),
+    t."createdAt",
+    NOW(),
+    'ORGANISATION'::"OrganisationType",
+    t."name",
+    gen_random_uuid(),
+    t."avatarImageId",
+    t."ownerUserId",
+    t."id",
+    s."customerId"
+  FROM "Team" t
+  LEFT JOIN "Subscription" s ON s."teamId" = t."id"
+  WHERE s."teamId" IS NOT NULL
+  RETURNING "id", "ownerUserId", "teamId", "customerId"
+)
+UPDATE "Team" t
+SET "organisationId" = o."id"
+FROM team_plan_organisations o
 WHERE o."teamId" = t."id";
 
 /*
@@ -600,11 +605,9 @@ WHERE o."teamId" = t."id";
  *
  */
 WITH users_to_migrate AS (
-  SELECT u."id" AS user_id, u."url" as user_url, MAX(s."customerId") AS customer_id
+  SELECT u."id" AS user_id, u."url" as user_url, s."customerId" AS customer_id
   FROM "User" u
   JOIN "Subscription" s ON s."userId" = u."id"
-  JOIN "Team" t ON t."ownerUserId" = u."id"
-  GROUP BY u."id", u."url"
 ),
 new_orgs AS (
   INSERT INTO "Organisation" (
@@ -799,6 +802,19 @@ SELECT DISTINCT
 FROM "TeamMember" tm
 JOIN "Team" t ON t."id" = tm."teamId"
 GROUP BY tm."userId", t."organisationId";
+
+-- Create OrganisationMembers for Organisations with 0 members
+-- This can only occur for platform/enterprise/earlyAdopter plans where they have 0 teams
+-- So we create an OrganisationMember for the owner user
+INSERT INTO "OrganisationMember" ("id", "createdAt", "updatedAt", "userId", "organisationId")
+SELECT
+  gen_random_uuid(),
+  NOW(),
+  NOW(),
+  o."ownerUserId",
+  o."id"
+FROM "Organisation" o
+WHERE o."id" NOT IN (SELECT "organisationId" FROM "OrganisationMember");
 
 -- Add users to the appropriate INTERNAL_TEAM groups based on their team membership and role
 -- This creates OrganisationGroupMember records to link users to their team-specific groups
