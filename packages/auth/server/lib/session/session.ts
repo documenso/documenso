@@ -148,3 +148,74 @@ export const invalidateSession = async (
     },
   });
 };
+
+export const invalidateAllUserSessions = async (
+  userId: number,
+  metadata: RequestMetadata,
+): Promise<void> => {
+  const userSessions = await prisma.session.findMany({
+    where: { userId },
+    select: { id: true },
+  });
+
+  for (const userSession of userSessions) {
+    try {
+      await invalidateSession(userSession.id, metadata);
+    } catch (error) {
+      console.error(
+        `Failed to invalidate session ${userSession.id} for user ${userId} during signout-all:`,
+        error,
+      );
+    }
+  }
+};
+
+export const invalidateSpecificSession = async (
+  currentUserId: number,
+  currentSessionId: string,
+  targetSessionId: string,
+  metadata: RequestMetadata,
+): Promise<{
+  success: boolean;
+  status: number;
+  message: string;
+}> => {
+  try {
+    const targetSession = await prisma.session.findUnique({
+      where: { id: targetSessionId },
+      select: { userId: true },
+    });
+
+    if (!targetSession) {
+      return {
+        success: false,
+        status: 404,
+        message: 'Target session not found',
+      };
+    }
+
+    if (targetSession.userId !== currentUserId) {
+      return {
+        success: false,
+        status: 403,
+        message: 'Unauthorized to sign out this session',
+      };
+    }
+
+    await invalidateSession(targetSessionId, metadata);
+
+    return {
+      success: true,
+      status: 200,
+      message: 'Successfully signed out the specified session.',
+    };
+  } catch (error) {
+    console.error('Error signing out specific session:', error);
+
+    return {
+      success: false,
+      status: 500,
+      message: 'Failed to sign out the specified session',
+    };
+  }
+};
