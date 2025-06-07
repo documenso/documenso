@@ -1,13 +1,13 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { TGetTeamsResponse } from '@documenso/lib/server-only/team/get-teams';
+import type { TeamSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
 
-type TeamProviderValue = TGetTeamsResponse[0];
+type TeamProviderValue = TeamSession;
 
 interface TeamProviderProps {
   children: React.ReactNode;
-  team: TeamProviderValue;
+  team: TeamProviderValue | null;
 }
 
 const TeamContext = createContext<TeamProviderValue | null>(null);

@@ -22,9 +22,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type TeamMemberDeleteDialogProps = {
   teamId: number;
   teamName: string;
-  teamMemberId: number;
-  teamMemberName: string;
-  teamMemberEmail: string;
+  memberId: string;
+  memberName: string;
+  memberEmail: string;
   trigger?: React.ReactNode;
 };
 
@@ -32,17 +32,17 @@ export const TeamMemberDeleteDialog = ({
   trigger,
   teamId,
   teamName,
-  teamMemberId,
-  teamMemberName,
-  teamMemberEmail,
+  memberId,
+  memberName,
+  memberEmail,
 }: TeamMemberDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: deleteTeamMembers, isPending: isDeletingTeamMember } =
-    trpc.team.deleteTeamMembers.useMutation({
+  const { mutateAsync: deleteTeamMember, isPending: isDeletingTeamMember } =
+    trpc.team.member.delete.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),
@@ -69,7 +69,7 @@ export const TeamMemberDeleteDialog = ({
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="secondary">
-            <Trans>Delete team member</Trans>
+            <Trans>Remove team member</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -91,9 +91,9 @@ export const TeamMemberDeleteDialog = ({
         <Alert variant="neutral" padding="tight">
           <AvatarWithText
             avatarClass="h-12 w-12"
-            avatarFallback={teamMemberName.slice(0, 1).toUpperCase()}
-            primaryText={<span className="font-semibold">{teamMemberName}</span>}
-            secondaryText={teamMemberEmail}
+            avatarFallback={memberName.slice(0, 1).toUpperCase()}
+            primaryText={<span className="font-semibold">{memberName}</span>}
+            secondaryText={memberEmail}
           />
         </Alert>
 
@@ -107,9 +107,9 @@ export const TeamMemberDeleteDialog = ({
               type="submit"
               variant="destructive"
               loading={isDeletingTeamMember}
-              onClick={async () => deleteTeamMembers({ teamId, teamMemberIds: [teamMemberId] })}
+              onClick={async () => deleteTeamMember({ teamId, memberId })}
             >
-              <Trans>Delete</Trans>
+              <Trans>Remove</Trans>
             </Button>
           </DialogFooter>
         </fieldset>

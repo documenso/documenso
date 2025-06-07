@@ -33,7 +33,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type TemplateMoveToFolderDialogProps = {
   templateId: number;
@@ -60,7 +60,7 @@ export function TemplateMoveToFolderDialog({
   const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const form = useForm<TMoveTemplateFormSchema>({
     resolver: zodResolver(ZMoveTemplateFormSchema),
@@ -104,7 +104,7 @@ export function TemplateMoveToFolderDialog({
 
       onOpenChange(false);
 
-      const templatesPath = formatTemplatesPath(team?.url);
+      const templatesPath = formatTemplatesPath(team.url);
 
       if (data.folderId) {
         void navigate(`${templatesPath}/f/${data.folderId}`);

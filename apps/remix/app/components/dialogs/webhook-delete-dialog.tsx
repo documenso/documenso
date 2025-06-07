@@ -30,7 +30,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type WebhookDeleteDialogProps = {
   webhook: Pick<Webhook, 'id' | 'webhookUrl'>;
@@ -42,7 +42,7 @@ export const WebhookDeleteDialog = ({ webhook, children }: WebhookDeleteDialogPr
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
 
@@ -67,7 +67,7 @@ export const WebhookDeleteDialog = ({ webhook, children }: WebhookDeleteDialogPr
 
   const onSubmit = async () => {
     try {
-      await deleteWebhook({ id: webhook.id, teamId: team?.id });
+      await deleteWebhook({ id: webhook.id, teamId: team.id });
 
       toast({
         title: _(msg`Webhook deleted`),

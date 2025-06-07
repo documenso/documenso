@@ -8,12 +8,11 @@ import type { ApiToken } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import { z } from 'zod';
+import type { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import type { TCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { ZCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -38,7 +37,7 @@ import {
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export const EXPIRATION_DATES = {
   ONE_WEEK: msg`7 days`,
@@ -48,8 +47,9 @@ export const EXPIRATION_DATES = {
   ONE_YEAR: msg`12 months`,
 } as const;
 
-const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.extend({
-  enabled: z.boolean(),
+const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.pick({
+  tokenName: true,
+  expirationDate: true,
 });
 
 type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
@@ -67,7 +67,7 @@ export type ApiTokenFormProps = {
 export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const [, copy] = useCopyToClipboard();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -86,7 +86,6 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     defaultValues: {
       tokenName: '',
       expirationDate: '',
-      enabled: false,
     },
   });
 
@@ -111,10 +110,10 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     }
   };
 
-  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenMutationSchema) => {
+  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenFormSchema) => {
     try {
       await createTokenMutation({
-        teamId: team?.id,
+        teamId: team.id,
         tokenName,
         expirationDate: noExpirationDate ? null : expirationDate,
       });
@@ -149,7 +148,10 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     <div className={cn(className)}>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset className="mt-6 flex w-full flex-col gap-4">
+          <fieldset
+            className="mt-6 flex w-full flex-col gap-4"
+            disabled={form.formState.isSubmitting}
+          >
             <FormField
               control={form.control}
               name="tokenName"
@@ -209,47 +211,30 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="enabled"
-                render={({ field }) => (
-                  <FormItem className="">
-                    <FormLabel className="text-muted-foreground mt-2">
-                      <Trans>Never expire</Trans>
-                    </FormLabel>
-                    <FormControl>
-                      <div className="block md:py-1.5">
-                        <Switch
-                          className="bg-background"
-                          checked={field.value}
-                          onCheckedChange={(val) => {
-                            setNoExpirationDate((prev) => !prev);
-                            field.onChange(val);
-                          }}
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div>
+                <FormLabel className="text-muted-foreground mt-2">
+                  <Trans>Never expire</Trans>
+                </FormLabel>
+                <div className="block md:py-1.5">
+                  <Switch
+                    className="bg-background mt-2"
+                    checked={noExpirationDate}
+                    onCheckedChange={setNoExpirationDate}
+                  />
+                </div>
+              </div>
             </div>
 
             <Button
               type="submit"
               className="hidden md:inline-flex"
-              disabled={!form.formState.isDirty}
               loading={form.formState.isSubmitting}
             >
               <Trans>Create token</Trans>
             </Button>
 
             <div className="md:hidden">
-              <Button
-                type="submit"
-                disabled={!form.formState.isDirty}
-                loading={form.formState.isSubmitting}
-              >
+              <Button type="submit" loading={form.formState.isSubmitting}>
                 <Trans>Create token</Trans>
               </Button>
             </div>

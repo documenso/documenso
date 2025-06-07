@@ -17,6 +17,7 @@ import { getNextPendingRecipient } from '@documenso/lib/server-only/recipient/ge
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -139,6 +140,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const [recipientSignature] = await getRecipientSignatures({ recipientId: recipient.id });
 
+  const settings = await getTeamSettings({ teamId: document.teamId });
+
   return superLoaderJson({
     isDocumentAccessValid: true,
     document,
@@ -149,6 +152,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     completedFields,
     recipientSignature,
     isRecipientsTurn,
+    includeSenderDetails: settings.includeSenderDetails,
   } as const);
 }
 
@@ -175,6 +179,7 @@ export default function SigningPage() {
     recipientSignature,
     isRecipientsTurn,
     allRecipients,
+    includeSenderDetails,
     recipientWithFields,
   } = data;
 
@@ -207,7 +212,7 @@ export default function SigningPage() {
           </p>
 
           {user ? (
-            <Link to="/documents" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-36">
               <Trans>Go Back Home</Trans>
             </Link>
           ) : (
@@ -249,6 +254,7 @@ export default function SigningPage() {
           completedFields={completedFields}
           isRecipientsTurn={isRecipientsTurn}
           allRecipients={allRecipients}
+          includeSenderDetails={includeSenderDetails}
         />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>

@@ -6,7 +6,6 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { ErrorCode, useDropzone } from 'react-dropzone';
 import { useForm } from 'react-hook-form';
-import { useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -29,8 +28,6 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
-
 export const ZAvatarImageFormSchema = z.object({
   bytes: z.string().nullish(),
 });
@@ -39,29 +36,44 @@ export type TAvatarImageFormSchema = z.infer<typeof ZAvatarImageFormSchema>;
 
 export type AvatarImageFormProps = {
   className?: string;
+  team?: {
+    id: number;
+    name: string;
+    avatarImageId: string | null;
+  };
+  organisation?: {
+    id: string;
+    name: string;
+    avatarImageId: string | null;
+  };
 };
 
-export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
+export const AvatarImageForm = ({ className, team, organisation }: AvatarImageFormProps) => {
   const { user, refreshSession } = useSession();
   const { _ } = useLingui();
   const { toast } = useToast();
-  const { revalidate } = useRevalidator();
-
-  const team = useOptionalCurrentTeam();
 
   const { mutateAsync: setProfileImage } = trpc.profile.setProfileImage.useMutation();
 
-  const initials = extractInitials(team?.name || user.name || '');
+  const initials = extractInitials(team?.name || organisation?.name || user.name || '');
 
   const hasAvatarImage = useMemo(() => {
     if (team) {
       return team.avatarImageId !== null;
     }
 
-    return user.avatarImageId !== null;
-  }, [team, user.avatarImageId]);
+    if (organisation) {
+      return organisation.avatarImageId !== null;
+    }
 
-  const avatarImageId = team ? team.avatarImageId : user.avatarImageId;
+    return user.avatarImageId !== null;
+  }, [team, organisation, user.avatarImageId]);
+
+  const avatarImageId = team
+    ? team.avatarImageId
+    : organisation
+      ? organisation.avatarImageId
+      : user.avatarImageId;
 
   const form = useForm<TAvatarImageFormSchema>({
     values: {
@@ -100,7 +112,8 @@ export const AvatarImageForm = ({ className }: AvatarImageFormProps) => {
     try {
       await setProfileImage({
         bytes: data.bytes,
-        teamId: team?.id,
+        teamId: team?.id ?? null,
+        organisationId: organisation?.id ?? null,
       });
 
       await refreshSession();

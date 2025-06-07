@@ -35,11 +35,12 @@ const getDocumentByToken = async (token: string) => {
 };
 
 test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
     email: user.email,
+    redirectPath: `/t/${team.url}/documents`,
   });
 
   // Upload document.
@@ -58,17 +59,17 @@ test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }
   await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
 
   // Wait to be redirected to the edit page.
-  await page.waitForURL(/\/documents\/\d+/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 });
 
 test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -114,7 +115,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL('/documents');
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -123,13 +124,13 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
 test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipients', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -199,7 +200,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL('/documents');
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -208,13 +209,13 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipients with different roles', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   // Set title
@@ -297,7 +298,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL('/documents');
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: 'Test Title' })).toBeVisible();
@@ -306,13 +307,13 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
 test('[DOCUMENT_FLOW]: should not be able to create a document without signatures', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -342,10 +343,11 @@ test('[DOCUMENT_FLOW]: should not be able to create a document without signature
 });
 
 test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: ['user@documenso.com', 'approver@documenso.com'],
     recipientsCreateOptions: [
       {
@@ -393,13 +395,13 @@ test('[DOCUMENT_FLOW]: should be able to approve a document', async ({ page }) =
 test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a document and redirect to redirect url', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -430,12 +432,12 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL('/documents');
+  await page.waitForURL(`/t/${team.url}/documents`);
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
   await page.getByRole('link', { name: documentTitle }).click();
-  await page.waitForURL(/\/documents\/\d+/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const url = page.url().split('/');
   const documentId = url[url.length - 1];
@@ -467,11 +469,12 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
 });
 
 test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
   const now = DateTime.utc();
 
   const { document, recipients } = await seedPendingDocumentWithFullFields({
+    teamId: team.id,
     owner: user,
     recipients: ['user1@example.com'],
     fields: [FieldType.DATE],
@@ -516,13 +519,13 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
 test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recipients in sequential order', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `Sequential-Signing-${Date.now()}.pdf`;
@@ -579,7 +582,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL('/documents');
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
 
@@ -642,9 +645,10 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
 test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', async ({
   page,
 }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
+    teamId: team.id,
     owner: user,
     recipients: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
     fields: [FieldType.SIGNATURE],

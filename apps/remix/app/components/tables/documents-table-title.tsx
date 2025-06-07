@@ -7,7 +7,7 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 export type DataTableTitleProps = {
   row: TDocumentRow;
-  teamUrl?: string;
+  teamUrl: string;
 };
 
 export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
@@ -19,7 +19,7 @@ export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isRecipient = !!recipient;
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
-  const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
+  const documentsPath = formatDocumentsPath(teamUrl);
 
   return match({
     isOwner,

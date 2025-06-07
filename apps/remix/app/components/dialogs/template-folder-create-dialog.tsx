@@ -34,7 +34,7 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 const ZCreateFolderFormSchema = z.object({
   name: z.string().min(1, { message: 'Folder name is required' }),
@@ -52,9 +52,10 @@ export const TemplateFolderCreateDialog = ({
 }: TemplateFolderCreateDialogProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
-  const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
   const { folderId } = useParams();
+
+  const navigate = useNavigate();
+  const team = useCurrentTeam();
 
   const [isCreateFolderOpen, setIsCreateFolderOpen] = useState(false);
 
@@ -81,7 +82,7 @@ export const TemplateFolderCreateDialog = ({
         description: _(msg`Folder created successfully`),
       });
 
-      const templatesPath = formatTemplatesPath(team?.url);
+      const templatesPath = formatTemplatesPath(team.url);
 
       void navigate(`${templatesPath}/f/${newFolder.id}`);
     } catch (err) {
@@ -126,7 +127,7 @@ export const TemplateFolderCreateDialog = ({
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
           <DialogDescription>
-            Enter a name for your new folder. Folders help you organize your templates.
+            Enter a name for your new folder. Folders help you organise your templates.
           </DialogDescription>
         </DialogHeader>
 

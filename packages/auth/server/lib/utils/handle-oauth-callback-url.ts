@@ -2,7 +2,6 @@ import { UserSecurityAuditLogType } from '@prisma/client';
 import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
-import { nanoid } from 'nanoid';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
@@ -54,7 +53,7 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   let [redirectState, redirectPath] = storedRedirectPath.split(' ');
 
   if (redirectState !== storedState || !redirectPath) {
-    redirectPath = '/documents';
+    redirectPath = '/';
   }
 
   const tokens = await oAuthClient.validateAuthorizationCode(
@@ -164,7 +163,6 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
         email: email,
         name: name,
         emailVerified: new Date(),
-        url: nanoid(17),
       },
     });
 

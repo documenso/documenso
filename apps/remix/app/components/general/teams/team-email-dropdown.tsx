@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Edit, Loader, Mail, MoreHorizontal, X } from 'lucide-react';
 
-import type { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import type { getTeamWithEmail } from '@documenso/lib/server-only/team/get-team-email-by-email';
 import { trpc } from '@documenso/trpc/react';
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import { TeamEmailDeleteDialog } from '~/components/dialogs/team-email-delete-di
 import { TeamEmailUpdateDialog } from '~/components/dialogs/team-email-update-dialog';
 
 export type TeamEmailDropdownProps = {
-  team: Awaited<ReturnType<typeof getTeamByUrl>>;
+  team: Awaited<ReturnType<typeof getTeamWithEmail>>;
 };
 
 export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
@@ -25,7 +25,7 @@ export const TeamEmailDropdown = ({ team }: TeamEmailDropdownProps) => {
   const { toast } = useToast();
 
   const { mutateAsync: resendEmailVerification, isPending: isResendingEmailVerification } =
-    trpc.team.resendTeamEmailVerification.useMutation({
+    trpc.team.email.verification.resend.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),

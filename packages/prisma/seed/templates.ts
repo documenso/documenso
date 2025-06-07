@@ -17,7 +17,7 @@ const examplePdf = fs
 type SeedTemplateOptions = {
   title?: string;
   userId: number;
-  teamId?: number;
+  teamId: number;
   createTemplateOptions?: Partial<Prisma.TemplateCreateInput>;
 };
 
@@ -26,7 +26,11 @@ type CreateTemplateOptions = {
   createTemplateOptions?: Partial<Prisma.TemplateUncheckedCreateInput>;
 };
 
-export const seedBlankTemplate = async (owner: User, options: CreateTemplateOptions = {}) => {
+export const seedBlankTemplate = async (
+  owner: User,
+  teamId: number,
+  options: CreateTemplateOptions = {},
+) => {
   const { key, createTemplateOptions = {} } = options;
 
   const documentData = await prisma.documentData.create({
@@ -40,6 +44,7 @@ export const seedBlankTemplate = async (owner: User, options: CreateTemplateOpti
   return await prisma.template.create({
     data: {
       title: `[TEST] Template ${key}`,
+      teamId,
       templateDocumentDataId: documentData.id,
       userId: owner.id,
       ...createTemplateOptions,
@@ -82,15 +87,11 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
           role: RecipientRole.SIGNER,
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              connect: {
-                id: teamId,
-              },
-            },
-          }
-        : {}),
+      team: {
+        connect: {
+          id: teamId,
+        },
+      },
     },
   });
 };
@@ -126,15 +127,11 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
           token: Math.random().toString().slice(2, 7),
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              connect: {
-                id: teamId,
-              },
-            },
-          }
-        : {}),
+      team: {
+        connect: {
+          id: teamId,
+        },
+      },
       ...options.createTemplateOptions,
     },
     include: {

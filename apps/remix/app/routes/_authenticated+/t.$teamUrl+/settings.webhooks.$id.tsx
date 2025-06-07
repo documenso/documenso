@@ -8,7 +8,7 @@ import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZEditWebhookMutationSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { ZEditWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -27,12 +27,17 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/settings.webhooks.$id';
 
-const ZEditWebhookFormSchema = ZEditWebhookMutationSchema.omit({ id: true });
+const ZEditWebhookFormSchema = ZEditWebhookRequestSchema.omit({ id: true, teamId: true });
 
 type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
+
+export function meta() {
+  return appMetaTags('Webhooks');
+}
 
 export default function WebhookPage({ params }: Route.ComponentProps) {
   const { _ } = useLingui();

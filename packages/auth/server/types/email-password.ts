@@ -37,15 +37,6 @@ export const ZSignUpSchema = z.object({
   email: z.string().email(),
   password: ZPasswordSchema,
   signature: z.string().nullish(),
-  url: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .min(1)
-    .regex(/^[a-z0-9-]+$/, {
-      message: 'Username can only container alphanumeric characters and dashes.',
-    })
-    .optional(),
 });
 
 export type TSignUpSchema = z.infer<typeof ZSignUpSchema>;

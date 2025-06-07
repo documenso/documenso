@@ -3,7 +3,7 @@ import { prisma } from '@documenso/prisma';
 export interface GetRecipientsForTemplateOptions {
   templateId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }
 
 export const getRecipientsForTemplate = async ({

@@ -13,12 +13,10 @@ import {
   ZDeleteRecipientMutationSchema,
   ZDownloadDocumentQuerySchema,
   ZDownloadDocumentSuccessfulSchema,
-  ZFindTeamMembersResponseSchema,
   ZGenerateDocumentFromTemplateMutationResponseSchema,
   ZGenerateDocumentFromTemplateMutationSchema,
   ZGetDocumentsQuerySchema,
   ZGetTemplatesQuerySchema,
-  ZInviteTeamMemberMutationSchema,
   ZNoBodyMutationSchema,
   ZResendDocumentForSigningMutationSchema,
   ZSendDocumentForSigningMutationSchema,
@@ -29,17 +27,13 @@ import {
   ZSuccessfulGetDocumentResponseSchema,
   ZSuccessfulGetTemplateResponseSchema,
   ZSuccessfulGetTemplatesResponseSchema,
-  ZSuccessfulInviteTeamMemberResponseSchema,
   ZSuccessfulRecipientResponseSchema,
-  ZSuccessfulRemoveTeamMemberResponseSchema,
   ZSuccessfulResendDocumentResponseSchema,
   ZSuccessfulResponseSchema,
   ZSuccessfulSigningResponseSchema,
-  ZSuccessfulUpdateTeamMemberResponseSchema,
   ZUnsuccessfulResponseSchema,
   ZUpdateFieldMutationSchema,
   ZUpdateRecipientMutationSchema,
-  ZUpdateTeamMemberMutationSchema,
 } from './schema';
 
 const c = initContract();
@@ -283,61 +277,6 @@ export const ApiContractV1 = c.router(
         500: ZUnsuccessfulResponseSchema,
       },
       summary: 'Delete a field from a document',
-    },
-
-    findTeamMembers: {
-      method: 'GET',
-      path: '/api/v1/team/:id/members',
-      responses: {
-        200: ZFindTeamMembersResponseSchema,
-        400: ZUnsuccessfulResponseSchema,
-        401: ZUnsuccessfulResponseSchema,
-        404: ZUnsuccessfulResponseSchema,
-        500: ZUnsuccessfulResponseSchema,
-      },
-      summary: 'List team members',
-    },
-
-    inviteTeamMember: {
-      method: 'POST',
-      path: '/api/v1/team/:id/members/invite',
-      body: ZInviteTeamMemberMutationSchema,
-      responses: {
-        200: ZSuccessfulInviteTeamMemberResponseSchema,
-        400: ZUnsuccessfulResponseSchema,
-        401: ZUnsuccessfulResponseSchema,
-        404: ZUnsuccessfulResponseSchema,
-        500: ZUnsuccessfulResponseSchema,
-      },
-      summary: 'Invite a member to a team',
-    },
-
-    updateTeamMember: {
-      method: 'PUT',
-      path: '/api/v1/team/:id/members/:memberId',
-      body: ZUpdateTeamMemberMutationSchema,
-      responses: {
-        200: ZSuccessfulUpdateTeamMemberResponseSchema,
-        400: ZUnsuccessfulResponseSchema,
-        401: ZUnsuccessfulResponseSchema,
-        404: ZUnsuccessfulResponseSchema,
-        500: ZUnsuccessfulResponseSchema,
-      },
-      summary: 'Update a team member',
-    },
-
-    removeTeamMember: {
-      method: 'DELETE',
-      path: '/api/v1/team/:id/members/:memberId',
-      body: null,
-      responses: {
-        200: ZSuccessfulRemoveTeamMemberResponseSchema,
-        400: ZUnsuccessfulResponseSchema,
-        401: ZUnsuccessfulResponseSchema,
-        404: ZUnsuccessfulResponseSchema,
-        500: ZUnsuccessfulResponseSchema,
-      },
-      summary: 'Remove a member from a team',
     },
   },
   {

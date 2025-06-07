@@ -4,12 +4,13 @@ import { prisma } from '@documenso/prisma';
 
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type DeleteFieldOptions = {
   fieldId: number;
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata?: RequestMetadata;
 };
 
@@ -25,21 +26,8 @@ export const deleteField = async ({
       id: fieldId,
       document: {
         id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
-              userId,
-              teamId: null,
-            }),
+        userId,
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
     include: {

@@ -1,5 +1,6 @@
 import type { I18n, MessageDescriptor } from '@lingui/core';
 import { i18n } from '@lingui/core';
+import type { MacroMessageDescriptor } from '@lingui/core/macro';
 
 import type { I18nLocaleData, SupportedLanguageCodes } from '../constants/i18n';
 import { APP_I18N_OPTIONS } from '../constants/i18n';
@@ -83,4 +84,11 @@ export const extractLocaleData = ({ headers }: ExtractLocaleDataOptions): I18nLo
 
 export const parseMessageDescriptor = (_: I18n['_'], value: string | MessageDescriptor) => {
   return typeof value === 'string' ? value : _(value);
+};
+
+export const parseMessageDescriptorMacro = (
+  t: (descriptor: MacroMessageDescriptor) => string,
+  value: string | MessageDescriptor,
+) => {
+  return typeof value === 'string' ? value : t(value);
 };

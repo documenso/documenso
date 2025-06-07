@@ -6,49 +6,19 @@ import { prisma } from '@documenso/prisma';
 
 import { DocumentVisibility } from '../../types/document-visibility';
 import type { TFolderType } from '../../types/folder-type';
+import { getTeamById } from '../team/get-team';
 
 export interface GetFolderByIdOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   folderId?: string;
   type?: TFolderType;
 }
 
 export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolderByIdOptions) => {
-  let teamMemberRole = null;
+  const team = await getTeamById({ userId, teamId });
 
-  if (teamId !== undefined) {
-    try {
-      const team = await prisma.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
-        },
-        include: {
-          members: {
-            where: {
-              userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-
-      teamMemberRole = team.members[0].role;
-    } catch (error) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Team not found',
-      });
-    }
-  }
-
-  const visibilityFilters = match(teamMemberRole)
+  const visibilityFilters = match(team.currentTeamRole)
     .with(TeamMemberRole.ADMIN, () => ({
       visibility: {
         in: [
@@ -68,14 +38,10 @@ export const getFolderById = async ({ userId, teamId, folderId, type }: GetFolde
   const whereClause = {
     id: folderId,
     ...(type ? { type } : {}),
-    ...(teamId
-      ? {
-          OR: [
-            { teamId, ...visibilityFilters },
-            { userId, teamId },
-          ],
-        }
-      : { userId, teamId: null }),
+    OR: [
+      { teamId, ...visibilityFilters },
+      { userId, teamId },
+    ],
   };
 
   const folder = await prisma.folder.findFirst({

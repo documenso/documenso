@@ -9,14 +9,14 @@ export const run = async ({
   payload: TSendTeamDeletedEmailJobDefinition;
   io: JobRunIO;
 }) => {
-  const { team, members } = payload;
+  const { team, members, organisationId } = payload;
 
   for (const member of members) {
     await io.runTask(`send-team-deleted-email--${team.url}_${member.id}`, async () => {
       await sendTeamDeleteEmail({
         email: member.email,
         team,
-        isOwner: member.id === team.ownerUserId,
+        organisationId,
       });
     });
   }

@@ -18,12 +18,13 @@ import { signSignaturePad } from '../fixtures/signature';
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [recipientWithAccount, seedTestEmail()],
   });
 
@@ -56,12 +57,13 @@ test('[DOCUMENT_AUTH]: should allow signing when no auth setup', async ({ page }
 });
 
 test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [recipientWithAccount],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
@@ -107,12 +109,13 @@ test('[DOCUMENT_AUTH]: should allow signing with valid global auth', async ({ pa
 test.skip('[DOCUMENT_AUTH]: should deny signing document when required for global auth', async ({
   page,
 }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
   const { recipients } = await seedPendingDocumentNoFields({
     owner: user,
+    teamId: team.id,
     recipients: [recipientWithAccount],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
@@ -138,12 +141,13 @@ test.skip('[DOCUMENT_AUTH]: should deny signing document when required for globa
 test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth', async ({
   page,
 }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [recipientWithAccount, seedTestEmail()],
     updateDocumentOptions: {
       authOptions: createDocumentAuthOptions({
@@ -177,14 +181,15 @@ test('[DOCUMENT_AUTH]: should deny signing fields when required for global auth'
 test('[DOCUMENT_AUTH]: should allow field signing when required for recipient auth', async ({
   page,
 }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithInheritAuth = await seedUser();
-  const recipientWithExplicitNoneAuth = await seedUser();
-  const recipientWithExplicitAccountAuth = await seedUser();
+  const { user: recipientWithInheritAuth } = await seedUser();
+  const { user: recipientWithExplicitNoneAuth } = await seedUser();
+  const { user: recipientWithExplicitAccountAuth } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [
       recipientWithInheritAuth,
       recipientWithExplicitNoneAuth,
@@ -276,14 +281,15 @@ test('[DOCUMENT_AUTH]: should allow field signing when required for recipient au
 test('[DOCUMENT_AUTH]: should allow field signing when required for recipient and global auth', async ({
   page,
 }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithInheritAuth = await seedUser();
-  const recipientWithExplicitNoneAuth = await seedUser();
-  const recipientWithExplicitAccountAuth = await seedUser();
+  const { user: recipientWithInheritAuth } = await seedUser();
+  const { user: recipientWithExplicitNoneAuth } = await seedUser();
+  const { user: recipientWithExplicitAccountAuth } = await seedUser();
 
   const { recipients } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [
       recipientWithInheritAuth,
       recipientWithExplicitNoneAuth,

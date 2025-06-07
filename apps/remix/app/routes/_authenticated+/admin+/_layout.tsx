@@ -1,5 +1,13 @@
 import { Trans } from '@lingui/react/macro';
-import { BarChart3, FileStack, Settings, Trophy, Users, Wallet2 } from 'lucide-react';
+import {
+  BarChart3,
+  Building2Icon,
+  FileStack,
+  Settings,
+  Trophy,
+  Users,
+  Wallet2,
+} from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -13,7 +21,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
 
   if (!user || !isAdmin(user)) {
-    throw redirect('/documents');
+    throw redirect('/');
   }
 }
 
@@ -21,8 +29,12 @@ export default function AdminLayout() {
   const { pathname } = useLocation();
 
   return (
-    <div className="mx-auto mt-16 w-full max-w-screen-xl px-4 md:px-8">
-      <div className="grid grid-cols-12 md:mt-8 md:gap-8">
+    <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+      <h1 className="text-4xl font-semibold">
+        <Trans>Admin Panel</Trans>
+      </h1>
+
+      <div className="mt-4 grid grid-cols-12 gap-x-8 md:mt-8">
         <div
           className={cn(
             'col-span-12 flex gap-x-2.5 gap-y-2 overflow-hidden overflow-x-auto md:col-span-3 md:flex md:flex-col',
@@ -39,6 +51,34 @@ export default function AdminLayout() {
             <Link to="/admin/stats">
               <BarChart3 className="mr-2 h-5 w-5" />
               <Trans>Stats</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/organisations') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/organisations">
+              <Building2Icon className="mr-2 h-5 w-5" />
+              <Trans>Organisations</Trans>
+            </Link>
+          </Button>
+
+          <Button
+            variant="ghost"
+            className={cn(
+              'justify-start md:w-full',
+              pathname?.startsWith('/admin/claims') && 'bg-secondary',
+            )}
+            asChild
+          >
+            <Link to="/admin/claims">
+              <Wallet2 className="mr-2 h-5 w-5" />
+              <Trans>Claims</Trans>
             </Link>
           </Button>
 
@@ -67,20 +107,6 @@ export default function AdminLayout() {
             <Link to="/admin/documents">
               <FileStack className="mr-2 h-5 w-5" />
               <Trans>Documents</Trans>
-            </Link>
-          </Button>
-
-          <Button
-            variant="ghost"
-            className={cn(
-              'justify-start md:w-full',
-              pathname?.startsWith('/admin/subscriptions') && 'bg-secondary',
-            )}
-            asChild
-          >
-            <Link to="/admin/subscriptions">
-              <Wallet2 className="mr-2 h-5 w-5" />
-              <Trans>Subscriptions</Trans>
             </Link>
           </Button>
 

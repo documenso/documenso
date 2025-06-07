@@ -1,10 +1,8 @@
-import { isCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
-import { prisma } from '@documenso/prisma';
 
 import { procedure } from '../trpc';
 import {
@@ -42,24 +40,11 @@ export const createEmbeddingPresignTokenRoute = procedure
           });
         }
 
-        const [hasCommunityPlan, hasEnterprisePlan] = await Promise.all([
-          isCommunityPlan({ userId: token.userId, teamId: token.teamId ?? undefined }),
-          isUserEnterprise({ userId: token.userId, teamId: token.teamId ?? undefined }),
-        ]);
+        const organisationClaim = await getOrganisationClaimByTeamId({
+          teamId: token.teamId,
+        });
 
-        let hasTeamAuthoringFlag = false;
-
-        if (token.teamId) {
-          const teamGlobalSettings = await prisma.teamGlobalSettings.findFirst({
-            where: {
-              teamId: token.teamId,
-            },
-          });
-
-          hasTeamAuthoringFlag = teamGlobalSettings?.allowEmbeddedAuthoring ?? false;
-        }
-
-        if (!hasCommunityPlan && !hasEnterprisePlan && !hasTeamAuthoringFlag) {
+        if (!organisationClaim.flags.embedAuthoring) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
             message: 'You do not have permission to create embedding presign tokens',
           });

@@ -28,7 +28,6 @@ type DocumentDeleteDialogProps = {
   onDelete?: () => Promise<void> | void;
   status: DocumentStatus;
   documentTitle: string;
-  teamId?: number;
   canManageDocument: boolean;
 };
 

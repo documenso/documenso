@@ -17,11 +17,11 @@ export const limitsHandler = async (req: Request) => {
       teamId = parseInt(rawTeamId, 10);
     }
 
-    if (!teamId && rawTeamId) {
+    if (!teamId) {
       throw new Error(ERROR_CODES.INVALID_TEAM_ID);
     }
 
-    const limits = await getServerLimits({ email: user.email, teamId });
+    const limits = await getServerLimits({ userId: user.id, teamId });
 
     return Response.json(limits, {
       status: 200,

@@ -7,7 +7,7 @@ const BULK_SEND_TEMPLATE_JOB_DEFINITION_ID = 'internal.bulk-send-template';
 
 const BULK_SEND_TEMPLATE_JOB_DEFINITION_SCHEMA = z.object({
   userId: z.number(),
-  teamId: z.number().optional(),
+  teamId: z.number(),
   templateId: z.number(),
   csvContent: z.string(),
   sendImmediately: z.boolean(),

@@ -21,9 +21,7 @@ export default function RecipientLayout() {
 
   return (
     <div className="min-h-screen">
-      {sessionData?.user && (
-        <AuthenticatedHeader user={sessionData.user} teams={sessionData.teams} />
-      )}
+      {sessionData?.user && <AuthenticatedHeader />}
 
       <main className="mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8">
         <Outlet />

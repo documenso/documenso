@@ -5,49 +5,19 @@ import { prisma } from '@documenso/prisma';
 
 import { DocumentVisibility } from '../../types/document-visibility';
 import type { TFolderType } from '../../types/folder-type';
+import { getTeamById } from '../team/get-team';
 
 export interface FindFoldersOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   parentId?: string | null;
   type?: TFolderType;
 }
 
 export const findFolders = async ({ userId, teamId, parentId, type }: FindFoldersOptions) => {
-  let team = null;
-  let teamMemberRole = null;
+  const team = await getTeamById({ userId, teamId });
 
-  if (teamId !== undefined) {
-    try {
-      team = await prisma.team.findFirstOrThrow({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
-        },
-        include: {
-          members: {
-            where: {
-              userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      });
-
-      teamMemberRole = team.members[0].role;
-    } catch (error) {
-      console.error('Error finding team:', error);
-      throw error;
-    }
-  }
-
-  const visibilityFilters = match(teamMemberRole)
+  const visibilityFilters = match(team.currentTeamRole)
     .with(TeamMemberRole.ADMIN, () => ({
       visibility: {
         in: [
@@ -67,14 +37,12 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
   const whereClause = {
     AND: [
       { parentId },
-      teamId
-        ? {
-            OR: [
-              { teamId, ...visibilityFilters },
-              { userId, teamId },
-            ],
-          }
-        : { userId, teamId: null },
+      {
+        OR: [
+          { teamId, ...visibilityFilters },
+          { userId, teamId },
+        ],
+      },
     ],
   };
 
@@ -94,7 +62,8 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
             prisma.folder.findMany({
               where: {
                 parentId: folder.id,
-                ...(teamId ? { teamId, ...visibilityFilters } : { userId, teamId: null }),
+                teamId,
+                ...visibilityFilters,
               },
               orderBy: {
                 createdAt: 'desc',
@@ -113,7 +82,8 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
             prisma.folder.count({
               where: {
                 parentId: folder.id,
-                ...(teamId ? { teamId, ...visibilityFilters } : { userId, teamId: null }),
+                teamId,
+                ...visibilityFilters,
               },
             }),
           ]);

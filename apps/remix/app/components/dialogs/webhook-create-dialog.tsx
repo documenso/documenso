@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateWebhookMutationSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { ZCreateWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -34,11 +34,11 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
 
-const ZCreateWebhookFormSchema = ZCreateWebhookMutationSchema.omit({ teamId: true });
+const ZCreateWebhookFormSchema = ZCreateWebhookRequestSchema.omit({ teamId: true });
 
 type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
@@ -50,7 +50,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
 
@@ -78,7 +78,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
         eventTriggers,
         secret,
         webhookUrl,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
       setOpen(false);

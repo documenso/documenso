@@ -1,13 +1,17 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useMemo } from 'react';
+
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { Link, useParams } from 'react-router';
+import { Link } from 'react-router';
 
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
-import { getRootHref } from '@documenso/lib/utils/params';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type AppNavMobileProps = {
   isMenuOpen: boolean;
@@ -15,34 +19,55 @@ export type AppNavMobileProps = {
 };
 
 export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
-  const params = useParams();
+  const { organisations } = useSession();
+
+  const currentTeam = useOptionalCurrentTeam();
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);
   };
 
-  const rootHref = getRootHref(params, { returnEmptyRootString: true });
+  const menuNavigationLinks = useMemo(() => {
+    let teamUrl = currentTeam?.url || null;
 
-  const menuNavigationLinks = [
-    {
-      href: `${rootHref}/documents`,
-      text: msg`Documents`,
-    },
-    {
-      href: `${rootHref}/templates`,
-      text: msg`Templates`,
-    },
-    {
-      href: '/settings/teams',
-      text: msg`Teams`,
-    },
-    {
-      href: '/settings/profile',
-      text: msg`Settings`,
-    },
-  ];
+    if (!teamUrl && isPersonalLayout(organisations)) {
+      teamUrl = organisations[0].teams[0]?.url || null;
+    }
+
+    if (!teamUrl) {
+      return [
+        {
+          href: '/inbox',
+          text: t`Inbox`,
+        },
+        {
+          href: '/settings/profile',
+          text: t`Settings`,
+        },
+      ];
+    }
+
+    return [
+      {
+        href: `/t/${teamUrl}/documents`,
+        label: t`Documents`,
+      },
+      {
+        href: `/t/${teamUrl}/templates`,
+        label: t`Templates`,
+      },
+      {
+        href: '/inbox',
+        text: t`Inbox`,
+      },
+      {
+        href: '/settings/profile',
+        text: t`Settings`,
+      },
+    ];
+  }, [currentTeam, organisations]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
@@ -65,7 +90,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
               to={href}
               onClick={() => handleMenuItemClick()}
             >
-              {_(text)}
+              {text}
             </Link>
           ))}
 

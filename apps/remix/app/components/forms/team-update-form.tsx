@@ -10,7 +10,7 @@ import type { z } from 'zod';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZUpdateTeamMutationSchema } from '@documenso/trpc/server/team-router/schema';
+import { ZUpdateTeamRequestSchema } from '@documenso/trpc/server/team-router/update-team.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -29,7 +29,7 @@ export type UpdateTeamDialogProps = {
   teamUrl: string;
 };
 
-const ZTeamUpdateFormSchema = ZUpdateTeamMutationSchema.shape.data.pick({
+const ZTeamUpdateFormSchema = ZUpdateTeamRequestSchema.shape.data.pick({
   name: true,
   url: true,
 });
@@ -49,7 +49,7 @@ export const TeamUpdateForm = ({ teamId, teamName, teamUrl }: UpdateTeamDialogPr
     },
   });
 
-  const { mutateAsync: updateTeam } = trpc.team.updateTeam.useMutation();
+  const { mutateAsync: updateTeam } = trpc.team.update.useMutation();
 
   const onFormSubmit = async ({ name, url }: TTeamUpdateFormSchema) => {
     try {

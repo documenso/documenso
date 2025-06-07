@@ -8,15 +8,17 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 test.describe('Document API', () => {
   test('sendDocument: should respect sendCompletionEmails setting', async ({ request }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { document } = await seedPendingDocumentWithFullFields({
       owner: user,
       recipients: ['signer@example.com'],
+      teamId: team.id,
     });
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });
@@ -81,11 +83,12 @@ test.describe('Document API', () => {
   test('sendDocument: should not modify email settings when sendCompletionEmails is not provided', async ({
     request,
   }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { document } = await seedPendingDocumentWithFullFields({
       owner: user,
       recipients: ['signer@example.com'],
+      teamId: team.id,
     });
 
     // Set initial email settings
@@ -109,6 +112,7 @@ test.describe('Document API', () => {
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });

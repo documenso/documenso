@@ -49,7 +49,7 @@ import {
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type ManagePublicTemplateDialogProps = {
   directTemplates: (Template & {
@@ -95,7 +95,7 @@ export const ManagePublicTemplateDialog = ({
 
   const [open, onOpenChange] = useState(isOpen);
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [selectedTemplateId, setSelectedTemplateId] = useState<number | null>(initialTemplateId);
 

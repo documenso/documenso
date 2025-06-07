@@ -6,10 +6,10 @@ import { ZLimitsResponseSchema } from './schema';
 
 export type GetLimitsOptions = {
   headers?: Record<string, string>;
-  teamId?: number | null;
+  teamId: number;
 };
 
-export const getLimits = async ({ headers, teamId }: GetLimitsOptions = {}) => {
+export const getLimits = async ({ headers, teamId }: GetLimitsOptions) => {
   const requestHeaders = headers ?? {};
 
   const url = new URL('/api/limits', NEXT_PUBLIC_WEBAPP_URL());

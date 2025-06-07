@@ -25,8 +25,8 @@ export const authenticatedMiddleware = <
 >(
   handler: (
     args: T & { req: TsRestRequest },
-    user: User,
-    team: Team | null | undefined,
+    user: Pick<User, 'id' | 'email' | 'name' | 'disabled'>,
+    team: Team,
     options: { metadata: ApiRequestMetadata },
   ) => Promise<R>,
 ) => {

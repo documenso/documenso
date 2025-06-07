@@ -1,13 +1,13 @@
 import { test } from '@playwright/test';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { expectTextToBeVisible } from '../fixtures/generic';
 
 test('[TEAMS]: create team', async ({ page }) => {
-  const user = await seedUser();
+  const { user, organisation } = await seedUser();
 
   test.skip(
     process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true',
@@ -17,7 +17,7 @@ test('[TEAMS]: create team', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: '/settings/teams',
+    redirectPath: `/o/${organisation.url}/settings/teams`,
   });
 
   const teamId = `team-${Date.now()}`;
@@ -34,37 +34,31 @@ test('[TEAMS]: create team', async ({ page }) => {
 });
 
 test('[TEAMS]: delete team', async ({ page }) => {
-  const team = await seedTeam();
+  const { user, team, organisation } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: user.email,
     redirectPath: `/t/${team.url}/settings`,
   });
 
   // Delete team.
-  await page.getByRole('button', { name: 'Delete team' }).click();
-  await page.getByLabel(`Confirm by typing delete ${team.url}`).fill(`delete ${team.url}`);
+  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByLabel(`Confirm by typing delete ${team.name}`).fill(`delete ${team.name}`);
   await page.getByRole('button', { name: 'Delete' }).click();
 
-  // Check that we have been redirected to the teams page.
-  await page.waitForURL(`${NEXT_PUBLIC_WEBAPP_URL()}/settings/teams`);
+  // Your team has been successfully deleted
+  await expectTextToBeVisible(page, 'Your team has been successfully deleted');
 });
 
 test('[TEAMS]: update team', async ({ page }) => {
-  const team = await seedTeam();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings`,
   });
-
-  // Navigate to create team page.
-  await page.getByTestId('menu-switcher').click();
-  await page.getByRole('menuitem', { name: 'Manage teams' }).click();
-
-  // Goto team settings page.
-  await page.getByRole('row').filter({ hasText: team.url }).getByRole('link').nth(1).click();
 
   const updatedTeamId = `team-${Date.now()}`;
 

@@ -11,7 +11,7 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
   const oldPassword = 'Test123!';
   const newPassword = 'Test124!';
 
-  const user = await seedUser({
+  const { user } = await seedUser({
     password: oldPassword,
   });
 
@@ -51,17 +51,18 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
     page,
     email: user.email,
     password: newPassword,
+    redirectPath: '/settings/profile',
   });
 
-  await page.waitForURL('/documents');
-  await expect(page).toHaveURL('/documents');
+  await page.waitForURL('/settings/profile');
+  await expect(page).toHaveURL('/settings/profile');
 });
 
 test('[USER] can reset password via user settings', async ({ page }: { page: Page }) => {
   const oldPassword = 'Test123!';
   const newPassword = 'Test124!';
 
-  const user = await seedUser({
+  const { user } = await seedUser({
     password: oldPassword,
   });
 
@@ -87,8 +88,9 @@ test('[USER] can reset password via user settings', async ({ page }: { page: Pag
     page,
     email: user.email,
     password: newPassword,
+    redirectPath: '/settings/profile',
   });
 
-  await page.waitForURL('/documents');
-  await expect(page).toHaveURL('/documents');
+  await page.waitForURL('/settings/profile');
+  await expect(page).toHaveURL('/settings/profile');
 });

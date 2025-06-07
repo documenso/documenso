@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router';
 import { Theme, useTheme } from 'remix-themes';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
@@ -20,6 +21,7 @@ import {
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import {
@@ -33,28 +35,7 @@ import {
 } from '@documenso/ui/primitives/command';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const DOCUMENTS_PAGES = [
-  {
-    label: msg`All documents`,
-    path: '/documents?status=ALL',
-    shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
-  },
-  { label: msg`Draft documents`, path: '/documents?status=DRAFT' },
-  {
-    label: msg`Completed documents`,
-    path: '/documents?status=COMPLETED',
-  },
-  { label: msg`Pending documents`, path: '/documents?status=PENDING' },
-  { label: msg`Inbox documents`, path: '/documents?status=INBOX' },
-];
-
-const TEMPLATES_PAGES = [
-  {
-    label: msg`All templates`,
-    path: '/templates',
-    shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
-  },
-];
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 const SETTINGS_PAGES = [
   {
@@ -73,8 +54,10 @@ export type AppCommandMenuProps = {
 
 export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const { _ } = useLingui();
+  const { organisations } = useSession();
 
   const navigate = useNavigate();
+  const currentTeam = useOptionalCurrentTeam();
 
   const [isOpen, setIsOpen] = useState(() => open ?? false);
   const [search, setSearch] = useState('');
@@ -93,6 +76,60 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       },
     );
+
+  const teamUrl = useMemo(() => {
+    let teamUrl = currentTeam?.url || null;
+
+    if (!teamUrl && isPersonalLayout(organisations)) {
+      teamUrl = organisations[0].teams[0]?.url || null;
+    }
+
+    return teamUrl;
+  }, [currentTeam, organisations]);
+
+  const documentPageLinks = useMemo(() => {
+    if (!teamUrl) {
+      return [];
+    }
+
+    return [
+      {
+        label: msg`All documents`,
+        path: `/t/${teamUrl}/documents?status=ALL`,
+        shortcut: DOCUMENTS_PAGE_SHORTCUT.replace('+', ''),
+      },
+      {
+        label: msg`Draft documents`,
+        path: `/t/${teamUrl}/documents?status=DRAFT`,
+      },
+      {
+        label: msg`Completed documents`,
+        path: `/t/${teamUrl}/documents?status=COMPLETED`,
+      },
+      {
+        label: msg`Pending documents`,
+        path: `/t/${teamUrl}/documents?status=PENDING`,
+      },
+      {
+        label: msg`Inbox documents`,
+        path: `/t/${teamUrl}/documents?status=INBOX`,
+      },
+    ];
+  }, [currentTeam, organisations]);
+
+  const templatePageLinks = useMemo(() => {
+    if (!teamUrl) {
+      return [];
+    }
+
+    return [
+      {
+        label: msg`All templates`,
+        path: `/t/${teamUrl}/templates`,
+        shortcut: TEMPLATES_PAGE_SHORTCUT.replace('+', ''),
+      },
+    ];
+  }, [currentTeam, organisations]);
 
   const searchResults = useMemo(() => {
     if (!searchDocumentsData) {
@@ -145,8 +182,8 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   };
 
   const goToSettings = useCallback(() => push(SETTINGS_PAGES[0].path), [push]);
-  const goToDocuments = useCallback(() => push(DOCUMENTS_PAGES[0].path), [push]);
-  const goToTemplates = useCallback(() => push(TEMPLATES_PAGES[0].path), [push]);
+  const goToDocuments = useCallback(() => push(documentPageLinks[0].path), [push]);
+  const goToTemplates = useCallback(() => push(templatePageLinks[0].path), [push]);
 
   useHotkeys(['ctrl+k', 'meta+k'], toggleOpen, { preventDefault: true });
   useHotkeys(SETTINGS_PAGE_SHORTCUT, goToSettings);
@@ -197,12 +234,16 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         )}
         {!currentPage && (
           <>
-            <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Documents`)}>
-              <Commands push={push} pages={DOCUMENTS_PAGES} />
-            </CommandGroup>
-            <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Templates`)}>
-              <Commands push={push} pages={TEMPLATES_PAGES} />
-            </CommandGroup>
+            {documentPageLinks.length > 0 && (
+              <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Documents`)}>
+                <Commands push={push} pages={documentPageLinks} />
+              </CommandGroup>
+            )}
+            {templatePageLinks.length > 0 && (
+              <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Templates`)}>
+                <Commands push={push} pages={templatePageLinks} />
+              </CommandGroup>
+            )}
             <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Settings`)}>
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>

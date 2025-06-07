@@ -7,7 +7,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { apiSignin } from '../fixtures/authentication';
 
 test('[USER] delete account', async ({ page }) => {
-  const user = await seedUser();
+  const { user } = await seedUser();
 
   await apiSignin({ page, email: user.email, redirectPath: '/settings' });
 
