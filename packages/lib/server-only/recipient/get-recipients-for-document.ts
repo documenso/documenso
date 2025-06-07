@@ -37,3 +37,26 @@ export const getRecipientsForDocument = async ({
 
   return recipients;
 };
+
+export interface GetAllRecipientsByDocumentIdOptions {
+  documentId: number;
+}
+
+export const getAllRecipientsByDocumentId = async ({
+  documentId,
+}: GetAllRecipientsByDocumentIdOptions) => {
+  const recipients = await prisma.recipient.findMany({
+    where: {
+      documentId,
+    },
+    select: {
+      role: true,
+      signingStatus: true,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return recipients;
+};

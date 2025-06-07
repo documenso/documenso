@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router';
-import { Link } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
 import { FolderType } from '@documenso/lib/types/folder-type';
@@ -27,6 +26,7 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
+import { DocumentProcessingPoll } from '~/components/general/document/document-processing-poll';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
@@ -332,6 +332,8 @@ export default function DocumentsPage() {
               />
             )}
           </div>
+
+          <DocumentProcessingPoll documents={data?.data} />
         </div>
 
         {documentToMove && (

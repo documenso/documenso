@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { CheckCircle2, Clock, File, XCircle } from 'lucide-react';
+import { CheckCircle2, Clock, File, Loader2, XCircle } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react/dist/lucide-react';
 
 import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -15,6 +15,7 @@ type FriendlyStatus = {
   labelExtended: MessageDescriptor;
   icon?: LucideIcon;
   color: string;
+  animate?: boolean;
 };
 
 export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus> = {
@@ -55,20 +56,31 @@ export const FRIENDLY_STATUS_MAP: Record<ExtendedDocumentStatus, FriendlyStatus>
   },
 };
 
+const PROCESSING_STATUS: FriendlyStatus = {
+  label: msg`Processing`,
+  labelExtended: msg`Document processing`,
+  icon: Loader2,
+  color: 'text-blue-600 dark:text-blue-300',
+  animate: true,
+};
+
 export type DocumentStatusProps = HTMLAttributes<HTMLSpanElement> & {
   status: ExtendedDocumentStatus;
   inheritColor?: boolean;
+  isProcessing?: boolean;
 };
 
 export const DocumentStatus = ({
   className,
   status,
   inheritColor,
+  isProcessing,
   ...props
 }: DocumentStatusProps) => {
   const { _ } = useLingui();
 
-  const { label, icon: Icon, color } = FRIENDLY_STATUS_MAP[status];
+  const statusConfig = isProcessing ? PROCESSING_STATUS : FRIENDLY_STATUS_MAP[status];
+  const { label, icon: Icon, color, animate } = statusConfig;
 
   return (
     <span className={cn('flex items-center', className)} {...props}>
@@ -76,6 +88,7 @@ export const DocumentStatus = ({
         <Icon
           className={cn('mr-2 inline-block h-4 w-4', {
             [color]: !inheritColor,
+            'animate-spin': animate,
           })}
         />
       )}
