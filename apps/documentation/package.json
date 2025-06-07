@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002",
-    "build": "next build",
+    "build": "next build && next-sitemap",
     "start": "next start -p 3002",
     "lint:fix": "next lint --fix",
-    "clean": "rimraf .next && rimraf node_modules"
+    "clean": "rimraf .next && rimraf node_modules",
+    "postbuild": "next-sitemap"
   },
   "dependencies": {
     "@documenso/assets": "*",
@@ -26,6 +27,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "next-sitemap": "^4.2.3",
     "typescript": "5.6.2"
   }
 }
