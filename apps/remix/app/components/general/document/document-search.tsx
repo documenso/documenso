@@ -30,8 +30,12 @@ export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string })
   );
 
   useEffect(() => {
-    handleSearch(searchTerm);
-  }, [debouncedSearchTerm]);
+    const currentQueryParam = searchParams.get('query') || '';
+
+    if (debouncedSearchTerm !== currentQueryParam) {
+      handleSearch(debouncedSearchTerm);
+    }
+  }, [debouncedSearchTerm, searchParams]);
 
   return (
     <Input
