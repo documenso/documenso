@@ -1,7 +1,7 @@
-import type { Prisma, SubscriptionClaim } from '@prisma/client';
 import { SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
+import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
 import { prisma } from '@documenso/prisma';
 
@@ -114,24 +114,6 @@ export const onSubscriptionUpdated = async ({
       });
     }
   });
-};
-
-export const createOrganisationClaimUpsertData = (subscriptionClaim: SubscriptionClaim) => {
-  // Done like this to ensure type errors are thrown if items are added.
-  const data: Omit<
-    Prisma.SubscriptionClaimCreateInput,
-    'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'
-  > = {
-    flags: {
-      ...subscriptionClaim.flags,
-    },
-    teamCount: subscriptionClaim.teamCount,
-    memberCount: subscriptionClaim.memberCount,
-  };
-
-  return {
-    ...data,
-  };
 };
 
 /**

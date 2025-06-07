@@ -69,8 +69,10 @@ export const getTeamMembers = async ({
       email: member.user.email,
       name: member.user.name,
       avatarImageId: member.user.avatarImageId,
-      // Todo: orgs - hard review
-      teamRole: getHighestTeamRoleInGroup(memberGroups.flatMap((group) => group.teamGroups)),
+      // Filter teamGroups to only include the current team
+      teamRole: getHighestTeamRoleInGroup(
+        memberGroups.flatMap((group) => group.teamGroups.filter((tg) => tg.teamId === teamId)),
+      ),
       organisationRole: getHighestOrganisationRoleInGroup(memberGroups),
     };
   });

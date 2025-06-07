@@ -1,14 +1,19 @@
-import type { SubscriptionClaim } from '@prisma/client';
 import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+import {
+  createOrganisation,
+  createOrganisationClaimUpsertData,
+} from '@documenso/lib/server-only/organisation/create-organisation';
 import { type Stripe } from '@documenso/lib/server-only/stripe';
-import type { StripeOrganisationCreateMetadata } from '@documenso/lib/types/subscription';
+import type {
+  InternalClaim,
+  StripeOrganisationCreateMetadata,
+} from '@documenso/lib/types/subscription';
 import { ZStripeOrganisationCreateMetadataSchema } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 
-import { createOrganisationClaimUpsertData, extractStripeClaim } from './on-subscription-updated';
+import { extractStripeClaim } from './on-subscription-updated';
 
 export type OnSubscriptionCreatedOptions = {
   subscription: Stripe.Subscription;
@@ -41,16 +46,11 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
     );
   }
 
-  const organisationId = await handleOrganisationCreateOrGet({
-    subscription,
-    customerId,
-  });
-
   const subscriptionItem = subscription.items.data[0];
-  const subscriptionClaim = await extractStripeClaim(subscriptionItem.price);
+  const claim = await extractStripeClaim(subscriptionItem.price);
 
   // Todo: logging
-  if (!subscriptionClaim) {
+  if (!claim) {
     console.error(`Subscription claim on ${subscriptionItem.price.id} not found`);
 
     throw Response.json(
@@ -62,112 +62,99 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
     );
   }
 
-  await handleSubscriptionCreate({
-    subscription,
-    organisationId,
-    customerId,
-    subscriptionClaim,
-  });
-};
+  const organisationCreateData = subscription.metadata?.organisationCreateData;
 
-type HandleSubscriptionCreateOptions = {
-  subscription: Stripe.Subscription;
-  organisationId: string;
-  customerId: string;
-  subscriptionClaim: SubscriptionClaim;
-};
+  // A new subscription can be for an existing organisation or a new one.
+  const organisationId = organisationCreateData
+    ? await handleOrganisationCreate({
+        customerId,
+        claim,
+        unknownCreateData: organisationCreateData,
+      })
+    : await handleOrganisationUpdate({
+        customerId,
+        claim,
+      });
 
-const handleSubscriptionCreate = async ({
-  subscription,
-  organisationId,
-  customerId,
-  subscriptionClaim,
-}: HandleSubscriptionCreateOptions) => {
   const status = match(subscription.status)
     .with('active', () => SubscriptionStatus.ACTIVE)
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
-  await prisma.$transaction(async (tx) => {
-    await tx.subscription.create({
-      data: {
-        organisationId,
-        status,
-        customerId,
-        planId: subscription.id,
-        priceId: subscription.items.data[0].price.id,
-        periodEnd: new Date(subscription.current_period_end * 1000),
-        cancelAtPeriodEnd: subscription.cancel_at_period_end,
-      },
-    });
-
-    await tx.organisationClaim.create({
-      data: {
-        organisation: {
-          connect: {
-            id: organisationId,
-          },
-        },
-        originalSubscriptionClaimId: subscriptionClaim.id,
-        ...createOrganisationClaimUpsertData(subscriptionClaim),
-      },
-    });
+  await prisma.subscription.create({
+    data: {
+      organisationId,
+      status,
+      customerId,
+      planId: subscription.id,
+      priceId: subscription.items.data[0].price.id,
+      periodEnd: new Date(subscription.current_period_end * 1000),
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
   });
 };
 
-type HandleOrganisationCreateOrGetOptions = {
-  subscription: Stripe.Subscription;
+type HandleOrganisationCreateOptions = {
   customerId: string;
+  claim: InternalClaim;
+  unknownCreateData: string;
 };
 
 /**
- * Handles the creation of an organisation or getting an existing one.
- *
- * If there is `organisationCreateData` in the subscription metadata, we create a new organisation.
- *
- * Otherwise, we get the existing organisation by `customerId`.
+ * Handles the creation of an organisation.
  */
-const handleOrganisationCreateOrGet = async ({
-  subscription,
+const handleOrganisationCreate = async ({
   customerId,
-}: HandleOrganisationCreateOrGetOptions) => {
+  claim,
+  unknownCreateData,
+}: HandleOrganisationCreateOptions) => {
   let organisationCreateFlowData: StripeOrganisationCreateMetadata | null = null;
 
-  if (subscription.metadata?.organisationCreateData) {
-    const parseResult = ZStripeOrganisationCreateMetadataSchema.safeParse(
-      JSON.parse(subscription.metadata.organisationCreateData),
+  const parseResult = ZStripeOrganisationCreateMetadataSchema.safeParse(
+    JSON.parse(unknownCreateData),
+  );
+
+  if (!parseResult.success) {
+    console.error('Invalid organisation create flow data');
+
+    throw Response.json(
+      {
+        success: false,
+        message: 'Invalid organisation create flow data',
+      } satisfies StripeWebhookResponse,
+      { status: 500 },
     );
-
-    if (!parseResult.success) {
-      console.error('Invalid organisation create flow data');
-
-      throw Response.json(
-        {
-          success: false,
-          message: 'Invalid organisation create flow data',
-        } satisfies StripeWebhookResponse,
-        { status: 500 },
-      );
-    }
-
-    organisationCreateFlowData = parseResult.data;
-
-    const createdOrganisation = await createOrganisation({
-      name: organisationCreateFlowData.organisationName,
-      userId: organisationCreateFlowData.userId,
-      type: OrganisationType.ORGANISATION,
-      customerId,
-    });
-
-    return createdOrganisation.id;
   }
 
+  organisationCreateFlowData = parseResult.data;
+
+  const createdOrganisation = await createOrganisation({
+    name: organisationCreateFlowData.organisationName,
+    userId: organisationCreateFlowData.userId,
+    type: OrganisationType.ORGANISATION,
+    customerId,
+    claim,
+  });
+
+  return createdOrganisation.id;
+};
+
+type HandleOrganisationUpdateOptions = {
+  customerId: string;
+  claim: InternalClaim;
+};
+
+/**
+ * Handles the updating an exist organisation claims.
+ */
+const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisationUpdateOptions) => {
   const organisation = await prisma.organisation.findFirst({
     where: {
       customerId,
     },
     include: {
       subscription: true,
+      organisationClaim: true,
     },
   });
 
@@ -194,6 +181,16 @@ const handleOrganisationCreateOrGet = async ({
       { status: 500 },
     );
   }
+
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisation.organisationClaimId,
+    },
+    data: {
+      originalSubscriptionClaimId: claim.id,
+      ...createOrganisationClaimUpsertData(claim),
+    },
+  });
 
   return organisation.id;
 };

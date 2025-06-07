@@ -1,14 +1,17 @@
-import type { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import { TeamMemberRole } from '@documenso/prisma/generated/types';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 
-import { getHighestTeamRoleInGroup } from '../../utils/teams';
+import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '../../utils/teams';
 
 export type GetTeamsOptions = {
   userId: number;
+
+  /**
+   * If teamId is undefined we get all teams the user belongs to.
+   */
   teamId?: number;
 };
 
@@ -19,43 +22,8 @@ export const ZGetTeamsResponseSchema = TeamSchema.extend({
 export type TGetTeamsResponse = z.infer<typeof ZGetTeamsResponseSchema>;
 
 export const getTeams = async ({ userId, teamId }: GetTeamsOptions) => {
-  let whereQuery: Prisma.TeamWhereInput = {
-    teamGroups: {
-      some: {
-        organisationGroup: {
-          organisationGroupMembers: {
-            some: {
-              organisationMember: {
-                userId,
-              },
-            },
-          },
-        },
-      },
-    },
-  };
-
-  if (teamId) {
-    whereQuery = {
-      teamGroups: {
-        some: {
-          teamId,
-          organisationGroup: {
-            organisationGroupMembers: {
-              some: {
-                organisationMember: {
-                  userId,
-                },
-              },
-            },
-          },
-        },
-      },
-    };
-  }
-
   const teams = await prisma.team.findMany({
-    where: whereQuery,
+    where: buildTeamWhereQuery({ teamId, userId }),
     include: {
       teamGroups: {
         where: {

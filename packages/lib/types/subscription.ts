@@ -1,5 +1,3 @@
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
 import type { SubscriptionClaim } from '@prisma/client';
 import { z } from 'zod';
 
@@ -83,9 +81,7 @@ export enum INTERNAL_CLAIM_ID {
   ENTERPRISE = 'enterprise',
 }
 
-export type InternalClaim = Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'> & {
-  description: MessageDescriptor | string;
-};
+export type InternalClaim = Omit<SubscriptionClaim, 'createdAt' | 'updatedAt'>;
 
 export type InternalClaims = {
   [key in INTERNAL_CLAIM_ID]: InternalClaim;
@@ -95,7 +91,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.FREE]: {
     id: INTERNAL_CLAIM_ID.FREE,
     name: 'Free',
-    description: msg`5 Documents a month`,
     teamCount: 1,
     memberCount: 1,
     locked: true,
@@ -104,7 +99,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.INDIVIDUAL]: {
     id: INTERNAL_CLAIM_ID.INDIVIDUAL,
     name: 'Individual',
-    description: msg`Unlimited documents, API and more`,
     teamCount: 1,
     memberCount: 1,
     locked: true,
@@ -115,7 +109,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.TEAM]: {
     id: INTERNAL_CLAIM_ID.TEAM,
     name: 'Teams',
-    description: msg`Embedding, 5 members included and more`,
     teamCount: 1,
     memberCount: 5,
     locked: true,
@@ -128,7 +121,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.PLATFORM]: {
     id: INTERNAL_CLAIM_ID.PLATFORM,
     name: 'Platform',
-    description: msg`Whitelabeling, unlimited members and more`,
     teamCount: 1,
     memberCount: 0,
     locked: true,
@@ -145,7 +137,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.ENTERPRISE]: {
     id: INTERNAL_CLAIM_ID.ENTERPRISE,
     name: 'Enterprise',
-    description: '',
     teamCount: 0,
     memberCount: 0,
     locked: true,
@@ -163,7 +154,6 @@ export const internalClaims: InternalClaims = {
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {
     id: INTERNAL_CLAIM_ID.EARLY_ADOPTER,
     name: 'Early Adopter',
-    description: '',
     teamCount: 0,
     memberCount: 0,
     locked: true,

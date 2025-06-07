@@ -70,7 +70,6 @@ type BuildOrganisationWhereQueryOptions = {
   roles?: OrganisationMemberRole[];
 };
 
-// Todo: orgs - hard review
 export const buildOrganisationWhereQuery = ({
   organisationId,
   userId,

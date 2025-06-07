@@ -138,8 +138,9 @@ export const searchDocumentsWithKeyword = async ({
         return true;
       }
 
-      // Todo: Orgs - hard review
-      const teamMemberRole = getHighestTeamRoleInGroup(document.team.teamGroups);
+      const teamMemberRole = getHighestTeamRoleInGroup(
+        document.team.teamGroups.filter((tg) => tg.teamId === document.teamId),
+      );
 
       if (!teamMemberRole) {
         return false;

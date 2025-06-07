@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
 import { OrganisationMemberRole } from '@prisma/client';
 
@@ -6,9 +7,10 @@ import { prisma } from '@documenso/prisma';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppErrorCode } from '../../errors/app-error';
 import { AppError } from '../../errors/app-error';
+import type { InternalClaim } from '../../types/subscription';
+import { INTERNAL_CLAIM_ID, internalClaims } from '../../types/subscription';
 import { prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
-import { generateDefaultOrganisationClaims } from '../../utils/organisations-claims';
 import { createTeam } from '../team/create-team';
 
 type CreateOrganisationOptions = {
@@ -17,6 +19,7 @@ type CreateOrganisationOptions = {
   type: OrganisationType;
   url?: string;
   customerId?: string;
+  claim: InternalClaim;
 };
 
 export const createOrganisation = async ({
@@ -25,14 +28,20 @@ export const createOrganisation = async ({
   type,
   userId,
   customerId,
+  claim,
 }: CreateOrganisationOptions) => {
   return await prisma.$transaction(async (tx) => {
     const organisationSetting = await tx.organisationGlobalSettings.create({
       data: generateDefaultOrganisationSettings(),
     });
 
+    // Note: `originalSubscriptionClaimId` should be set in the Stripe subscription
+    // updated webhook.
     const organisationClaim = await tx.organisationClaim.create({
-      data: generateDefaultOrganisationClaims(),
+      data: {
+        originalSubscriptionClaimId: claim.id,
+        ...createOrganisationClaimUpsertData(claim),
+      },
     });
 
     const organisation = await tx.organisation
@@ -109,6 +118,7 @@ export const createPersonalOrganisation = async ({
     userId,
     url: orgUrl,
     type,
+    claim: internalClaims[INTERNAL_CLAIM_ID.FREE],
   }).catch((err) => {
     console.error(err);
 
@@ -134,4 +144,22 @@ export const createPersonalOrganisation = async ({
   }
 
   return organisation;
+};
+
+export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalClaim) => {
+  // Done like this to ensure type errors are thrown if items are added.
+  const data: Omit<
+    Prisma.SubscriptionClaimCreateInput,
+    'id' | 'createdAt' | 'updatedAt' | 'locked' | 'name'
+  > = {
+    flags: {
+      ...subscriptionClaim.flags,
+    },
+    teamCount: subscriptionClaim.teamCount,
+    memberCount: subscriptionClaim.memberCount,
+  };
+
+  return {
+    ...data,
+  };
 };

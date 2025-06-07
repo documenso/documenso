@@ -136,19 +136,6 @@ export const createTeam = async ({
     );
 
   await prisma.$transaction(async (tx) => {
-    // Todo: orgs check if required
-    const alreadyExists = await tx.organisation.findFirst({
-      where: {
-        url: teamUrl,
-      },
-    });
-
-    if (alreadyExists) {
-      throw new AppError(AppErrorCode.ALREADY_EXISTS, {
-        message: 'Team with this URL already exists.',
-      });
-    }
-
     const teamSettings = await tx.teamGlobalSettings.create({
       data: generateDefaultTeamSettings(),
     });

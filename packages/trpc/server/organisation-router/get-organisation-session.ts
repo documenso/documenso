@@ -1,5 +1,5 @@
 import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
-import { getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
+import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -43,21 +43,7 @@ export const getOrganisationSession = async ({
         },
       },
       teams: {
-        where: {
-          teamGroups: {
-            some: {
-              organisationGroup: {
-                organisationGroupMembers: {
-                  some: {
-                    organisationMember: {
-                      userId,
-                    },
-                  },
-                },
-              },
-            },
-          },
-        },
+        where: buildTeamWhereQuery({ teamId: undefined, userId }),
         include: {
           teamGroups: {
             where: {

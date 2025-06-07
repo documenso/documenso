@@ -5,6 +5,7 @@ import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
 import { generateStripeOrganisationCreateMetadata } from '@documenso/lib/utils/billing';
 import { prisma } from '@documenso/prisma';
 
@@ -69,6 +70,7 @@ export const createOrganisationRoute = authenticatedProcedure
       userId: user.id,
       name,
       type: organisationType,
+      claim: internalClaims[INTERNAL_CLAIM_ID.FREE],
     });
 
     return {

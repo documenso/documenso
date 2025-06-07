@@ -1,4 +1,3 @@
-// Todo: orgs - hard review.
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -19,24 +18,12 @@ type GetMemberRolesOptions = {
 };
 
 /**
- * Returns the highest Organisation and Team role of a given member or user of a team
+ * Returns the highest Team role of a given member or user of a team
  */
 export const getMemberRoles = async ({ teamId, reference }: GetMemberRolesOptions) => {
   const team = await prisma.team.findFirst({
     where: {
       id: teamId,
-      organisation: {
-        members: {
-          some:
-            reference.type === 'User'
-              ? {
-                  userId: reference.id,
-                }
-              : {
-                  id: reference.id,
-                },
-        },
-      },
     },
     include: {
       teamGroups: {
@@ -56,25 +43,19 @@ export const getMemberRoles = async ({ teamId, reference }: GetMemberRolesOption
             },
           },
         },
-        include: {
-          organisationGroup: true,
-        },
       },
     },
   });
 
-  if (!team) {
+  if (!team || team.teamGroups.length === 0) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Roles not found',
     });
   }
 
-  // Todo: orgs there's likely a bug here somewhere.
-  // Incorrect org roles?
   return {
-    organisationRole: getHighestOrganisationRoleInGroup(
-      team.teamGroups.flatMap((group) => group.organisationGroup),
-    ),
+    // Todo: Would be nice bonus to have. If implemented make sure to test hard.
+    // organisationRole: getHighestOrganisationRoleInGroup(),
     teamRole: getHighestTeamRoleInGroup(team.teamGroups),
   };
 };
@@ -123,7 +104,7 @@ export const getMemberOrganisationRole = async ({
     },
   });
 
-  if (!organisation) {
+  if (!organisation || organisation.groups.length === 0) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Roles not found',
     });

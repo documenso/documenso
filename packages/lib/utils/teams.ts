@@ -107,12 +107,11 @@ export const extractTeamSignatureSettings = (
 };
 
 type BuildTeamWhereQueryOptions = {
-  teamId: number | undefined; // Todo: test if this is okay
+  teamId: number | undefined;
   userId: number;
   roles?: TeamMemberRole[];
 };
 
-// Todo: orgs - hard review
 export const buildTeamWhereQuery = ({
   teamId,
   userId,
@@ -125,9 +124,9 @@ export const buildTeamWhereQuery = ({
       teamGroups: {
         some: {
           organisationGroup: {
-            organisation: {
-              members: {
-                some: {
+            organisationGroupMembers: {
+              some: {
+                organisationMember: {
                   userId,
                 },
               },
@@ -143,9 +142,9 @@ export const buildTeamWhereQuery = ({
     teamGroups: {
       some: {
         organisationGroup: {
-          organisation: {
-            members: {
-              some: {
+          organisationGroupMembers: {
+            some: {
+              organisationMember: {
                 userId,
               },
             },

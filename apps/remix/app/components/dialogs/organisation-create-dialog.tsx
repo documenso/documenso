@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
@@ -249,6 +251,19 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
   );
 };
 
+// This is separated from the internal claims constant because we need to use the msg
+// macro which would cause import issues.
+const internalClaimsDescription: {
+  [key in INTERNAL_CLAIM_ID]: MessageDescriptor | string;
+} = {
+  [INTERNAL_CLAIM_ID.FREE]: msg`5 Documents a month`,
+  [INTERNAL_CLAIM_ID.INDIVIDUAL]: msg`Unlimited documents, API and more`,
+  [INTERNAL_CLAIM_ID.TEAM]: msg`Embedding, 5 members included and more`,
+  [INTERNAL_CLAIM_ID.PLATFORM]: msg`Whitelabeling, unlimited members and more`,
+  [INTERNAL_CLAIM_ID.ENTERPRISE]: '',
+  [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: '',
+};
+
 type BillingPlanFormProps = {
   value: string;
   onChange: (priceId: string) => void;
@@ -274,7 +289,7 @@ const BillingPlanForm = ({
         return {
           id: planId,
           name: plan.name,
-          description: parseMessageDescriptorMacro(t, plan.description),
+          description: parseMessageDescriptorMacro(t, internalClaimsDescription[planId]),
           monthlyPrice: plan.monthlyPrice,
           yearlyPrice: plan.yearlyPrice,
         };

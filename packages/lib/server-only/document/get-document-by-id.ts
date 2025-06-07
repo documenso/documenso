@@ -118,11 +118,9 @@ export const getDocumentWhereInput = async ({
     },
   });
 
-  // Todo: orgs - hard review
   const visibilityFilters = [
     ...match(team.currentTeamRole)
       .with(TeamMemberRole.ADMIN, () => [
-        // Is this even needed?
         { visibility: DocumentVisibility.EVERYONE },
         { visibility: DocumentVisibility.MANAGER_AND_ABOVE },
         { visibility: DocumentVisibility.ADMIN },
