@@ -216,6 +216,9 @@ DROP TABLE "UserProfile";
 ALTER TABLE "Folder" ALTER COLUMN "teamId" SET NOT NULL;
 
 -- AlterTable
+ALTER TABLE "Webhook" ALTER COLUMN "teamId" SET NOT NULL;
+
+-- AlterTable
 ALTER TABLE "ApiToken" ADD COLUMN     "organisationId" TEXT,
 ALTER COLUMN "teamId" SET NOT NULL;
 
@@ -543,13 +546,14 @@ WITH personal_organisations AS (
     t."createdAt",
     NOW(),
     'PERSONAL'::"OrganisationType",
-    t."name",
-    gen_random_uuid(),
+    'Personal Organisation',
+    u."url",
     t."avatarImageId",
     t."ownerUserId",
     t."id",
     s."customerId"
   FROM "Team" t
+  JOIN "User" u ON u."id" = t."ownerUserId"
   LEFT JOIN "Subscription" s ON s."teamId" = t."id"
   WHERE t."isPersonal"
   RETURNING "id", "ownerUserId", "teamId", "customerId"
@@ -605,7 +609,7 @@ WHERE o."teamId" = t."id";
  *
  */
 WITH users_to_migrate AS (
-  SELECT u."id" AS user_id, u."url" as user_url, s."customerId" AS customer_id
+  SELECT u."id" AS user_id, s."customerId" AS customer_id
   FROM "User" u
   JOIN "Subscription" s ON s."userId" = u."id"
 ),
@@ -619,7 +623,7 @@ new_orgs AS (
     NOW(),
     'ORGANISATION'::"OrganisationType",
     'Organisation Name',
-    u.user_url,
+    gen_random_uuid(),
     u.user_id,
     u.customer_id
   FROM users_to_migrate u
@@ -639,7 +643,7 @@ SET "organisationId" = o."id"
 FROM new_orgs o
 WHERE s."userId" = o."ownerUserId";
 
--- Create internal groups for each organisation (ADMIN, MANAGER, MEMBER)
+-- Create 3 internal groups for each organisation (ADMIN, MANAGER, MEMBER)
 WITH org_groups AS (
   SELECT
     o.id as org_id,
@@ -727,7 +731,7 @@ SET "organisationClaimId" = otu.claim_id
 FROM orgs_to_update otu
 WHERE o."id" = otu.org_id;
 
--- Create TeamGroups to assign the internal Organisation Admin/Manager groups to teams
+-- Create 2 TeamGroups to assign the internal Organisation Admin/Manager groups to teams
 WITH org_internal_groups AS (
   SELECT
     og.id as group_id,
@@ -744,51 +748,57 @@ SELECT
   gen_random_uuid(),
   oig.team_id,
   oig.group_id,
-  'ADMIN'::"TeamMemberRole"
+  'ADMIN'::"TeamMemberRole" -- Org Admins/Managers will be Team ADMINS
 FROM org_internal_groups oig;
 
--- Create 3 INTERNAL_TEAM groups for each team
-WITH team_internal_groups AS (
-  SELECT
-    t.id as team_id,
-    t."organisationId",
-    unnest(ARRAY[
-      'ADMIN'::"TeamMemberRole",
-      'MANAGER'::"TeamMemberRole",
-      'MEMBER'::"TeamMemberRole"
-    ]) as team_role
-  FROM "Team" t
-)
-INSERT INTO "OrganisationGroup" ("id", "type", "organisationRole", "organisationId")
-SELECT
-  gen_random_uuid(),
-  'INTERNAL_TEAM'::"OrganisationGroupType",
-  'MEMBER'::"OrganisationMemberRole",
-  tig."organisationId"
-FROM team_internal_groups tig;
+-- Temp columns for the following procedure
+ALTER TABLE "OrganisationGroup" ADD COLUMN temp_team_id INT;
+ALTER TABLE "OrganisationGroup" ADD COLUMN temp_team_role TEXT;
 
--- Link INTERNAL_TEAM groups to teams
-WITH new_team_groups AS (
+WITH team_internal_groups AS (
+  -- Step 1: Create all team+role combinations
   SELECT
-    og.id as group_id,
-    t.id as team_id,
-    CASE
-      WHEN og.type = 'INTERNAL_TEAM' AND row_number() OVER (PARTITION BY t.id ORDER BY og.id) = 1 THEN 'ADMIN'::"TeamMemberRole"
-      WHEN og.type = 'INTERNAL_TEAM' AND row_number() OVER (PARTITION BY t.id ORDER BY og.id) = 2 THEN 'MANAGER'::"TeamMemberRole"
-      ELSE 'MEMBER'::"TeamMemberRole"
-    END as team_role
-  FROM "OrganisationGroup" og
-  CROSS JOIN "Team" t
-  WHERE og.type = 'INTERNAL_TEAM'
-  AND t."organisationId" = og."organisationId"
+      t.id as team_id,
+      t."organisationId",
+      unnest(ARRAY[
+        'ADMIN'::"TeamMemberRole",
+        'MANAGER'::"TeamMemberRole",
+        'MEMBER'::"TeamMemberRole"
+      ]) as team_role
+  FROM "Team" t
+),
+created_org_groups AS (
+  -- Step 2: Create OrganisationGroups with temp data
+  INSERT INTO "OrganisationGroup" (
+    "id",
+    "type",
+    "organisationRole",
+    "organisationId",
+    temp_team_id,
+    temp_team_role
+  )
+  SELECT
+    gen_random_uuid(),
+    'INTERNAL_TEAM'::"OrganisationGroupType",
+    'MEMBER'::"OrganisationMemberRole",
+    tig."organisationId",
+    tig.team_id,
+    tig.team_role::TEXT
+  FROM team_internal_groups tig
+  RETURNING "id", temp_team_id, temp_team_role
 )
-INSERT INTO "TeamGroup" ("id", "teamId", "organisationGroupId", "teamRole")
+-- Step 3: Create TeamGroups using the temp data
+INSERT INTO "TeamGroup" ("id", "organisationGroupId", "teamRole", "teamId")
 SELECT
   gen_random_uuid(),
-  ntg.team_id,
-  ntg.group_id,
-  ntg.team_role
-FROM new_team_groups ntg;
+  cog."id",
+  cog.temp_team_role::"TeamMemberRole",
+  cog.temp_team_id
+FROM created_org_groups cog;
+
+-- Clean up temp columns
+ALTER TABLE "OrganisationGroup" DROP COLUMN temp_team_id;
+ALTER TABLE "OrganisationGroup" DROP COLUMN temp_team_role;
 
 -- Create OrganisationMembers for each unique user-organisation combination
 -- This ensures only one OrganisationMember per user per organisation, even if they belong to multiple teams
@@ -804,7 +814,7 @@ JOIN "Team" t ON t."id" = tm."teamId"
 GROUP BY tm."userId", t."organisationId";
 
 -- Create OrganisationMembers for Organisations with 0 members
--- This can only occur for platform/enterprise/earlyAdopter plans where they have 0 teams
+-- This can only occur for platform/enterprise/earlyAdopter/individual plans where they have 0 teams
 -- So we create an OrganisationMember for the owner user
 INSERT INTO "OrganisationMember" ("id", "createdAt", "updatedAt", "userId", "organisationId")
 SELECT

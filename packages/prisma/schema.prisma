@@ -180,8 +180,8 @@ model Webhook {
   updatedAt     DateTime               @default(now()) @updatedAt
   userId        Int
   user          User                   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  teamId        Int?
-  team          Team?                  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  teamId        Int
+  team          Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade)
   webhookCalls  WebhookCall[]
 
   organisationId String?
