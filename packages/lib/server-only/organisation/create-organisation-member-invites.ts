@@ -17,6 +17,7 @@ import { prisma } from '@documenso/prisma';
 import type { TCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
+import { generateDatabaseId } from '../../universal/id';
 import { validateIfSubscriptionIsRequired } from '../../utils/billing';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
@@ -113,6 +114,7 @@ export const createOrganisationMemberInvites = async ({
 
   const organisationMemberInvites: Prisma.OrganisationMemberInviteCreateManyInput[] =
     usersToInvite.map(({ email, organisationRole }) => ({
+      id: generateDatabaseId('member_invite'),
       email,
       organisationId,
       organisationRole,

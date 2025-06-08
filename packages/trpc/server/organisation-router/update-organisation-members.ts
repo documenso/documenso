@@ -2,6 +2,7 @@ import { OrganisationGroupType } from '@prisma/client';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import {
   buildOrganisationWhereQuery,
   getHighestOrganisationRoleInGroup,
@@ -146,6 +147,7 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
 
       await tx.organisationGroupMember.create({
         data: {
+          id: generateDatabaseId('group_member'),
           organisationMemberId: organisationMemberToUpdate.id,
           groupId: newMemberGroup.id,
         },

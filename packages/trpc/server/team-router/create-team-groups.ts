@@ -4,6 +4,7 @@ import {
 } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 import {
@@ -97,6 +98,7 @@ export const createTeamGroupsRoute = authenticatedProcedure
 
     await prisma.teamGroup.createMany({
       data: groups.map((group) => ({
+        id: generateDatabaseId('team_group'),
         teamId,
         organisationGroupId: group.organisationGroupId,
         teamRole: group.teamRole,

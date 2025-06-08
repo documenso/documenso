@@ -3,6 +3,7 @@ import { OrganisationGroupType } from '@prisma/client';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import {
   buildOrganisationWhereQuery,
   isOrganisationRoleWithinUserHierarchy,
@@ -69,6 +70,7 @@ export const createOrganisationGroupRoute = authenticatedProcedure
     await prisma.$transaction(async (tx) => {
       const group = await tx.organisationGroup.create({
         data: {
+          id: generateDatabaseId('org_group'),
           organisationId,
           name,
           type: OrganisationGroupType.CUSTOM,
@@ -78,6 +80,7 @@ export const createOrganisationGroupRoute = authenticatedProcedure
 
       await tx.organisationGroupMember.createMany({
         data: memberIds.map((memberId) => ({
+          id: generateDatabaseId('group_member'),
           organisationMemberId: memberId,
           groupId: group.id,
         })),

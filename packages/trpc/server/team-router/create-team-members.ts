@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberRoles } from '@documenso/lib/server-only/team/get-member-roles';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { buildTeamWhereQuery, isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
@@ -140,6 +141,7 @@ export const createTeamMembers = async ({
 
   await prisma.organisationGroupMember.createMany({
     data: membersToCreate.map((member) => ({
+      id: generateDatabaseId('group_member'),
       organisationMemberId: member.organisationMemberId,
       groupId: match(member.teamRole)
         .with(TeamMemberRole.MEMBER, () => teamMemberGroup.organisationGroupId)

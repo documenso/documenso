@@ -3,6 +3,7 @@ import { unique } from 'remeda';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getMemberOrganisationRole } from '@documenso/lib/server-only/team/get-member-roles';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import {
   buildOrganisationWhereQuery,
   isOrganisationRoleWithinUserHierarchy,
@@ -116,6 +117,7 @@ export const updateOrganisationGroupRoute = authenticatedProcedure
       if (data.memberIds && membersToCreate.length > 0) {
         await tx.organisationGroupMember.createMany({
           data: membersToCreate.map((id) => ({
+            id: generateDatabaseId('group_member'),
             groupId: organisationGroup.id,
             organisationMemberId: id,
           })),

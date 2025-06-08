@@ -84,7 +84,7 @@ ALTER TABLE "Subscription" DROP CONSTRAINT "teamid_or_userid_check";
 
 -- 1. Ensure all users have a URL by setting a default CUID
 UPDATE "User"
-SET "url" = gen_random_uuid()
+SET "url" = generate_id()
 WHERE "url" IS NULL;
 
 -- 2. Make User URL required
@@ -262,7 +262,7 @@ ALTER COLUMN "uploadSignatureEnabled" DROP NOT NULL,
 ALTER COLUMN "uploadSignatureEnabled" DROP DEFAULT;
 
 -- [CUSTOM_CHANGE] Generate IDs for existing TeamGlobalSettings records
-UPDATE "TeamGlobalSettings" SET "id" = gen_random_uuid() WHERE "id" IS NULL;
+UPDATE "TeamGlobalSettings" SET "id" = generate_prefix_id('team_setting') WHERE "id" IS NULL;
 
 -- [CUSTOM_CHANGE] Make the id column NOT NULL and add primary key
 ALTER TABLE "TeamGlobalSettings"
@@ -542,7 +542,7 @@ WITH personal_organisations AS (
     "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId", "customerId"
   )
   SELECT
-    gen_random_uuid(),
+    generate_prefix_id('org'),
     t."createdAt",
     NOW(),
     'PERSONAL'::"OrganisationType",
@@ -574,12 +574,12 @@ WITH team_plan_organisations AS (
     "id", "createdAt", "updatedAt", "type", "name", "url", "avatarImageId", "ownerUserId", "teamId", "customerId"
   )
   SELECT
-    gen_random_uuid(),
+    generate_prefix_id('org'),
     t."createdAt",
     NOW(),
     'ORGANISATION'::"OrganisationType",
     t."name",
-    gen_random_uuid(),
+    generate_id(),
     t."avatarImageId",
     t."ownerUserId",
     t."id",
@@ -618,12 +618,12 @@ new_orgs AS (
     "id", "createdAt", "updatedAt", "type", "name", "url", "ownerUserId", "customerId"
   )
   SELECT
-    gen_random_uuid(),
+    generate_prefix_id('org'),
     NOW(),
     NOW(),
     'ORGANISATION'::"OrganisationType",
     'Organisation Name',
-    gen_random_uuid(),
+    generate_id(),
     u.user_id,
     u.customer_id
   FROM users_to_migrate u
@@ -656,7 +656,7 @@ WITH org_groups AS (
 )
 INSERT INTO "OrganisationGroup" ("id", "type", "organisationRole", "organisationId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('org_group'),
   'INTERNAL_ORGANISATION'::"OrganisationGroupType",
   og.role,
   og.org_id
@@ -664,7 +664,7 @@ FROM org_groups og;
 
 -- Create default OrganisationGlobalSettings for all organisations
 WITH orgs_to_update AS (
-  SELECT "id" AS org_id, gen_random_uuid() AS settings_id
+  SELECT "id" AS org_id, generate_prefix_id('org_setting') AS settings_id
   FROM "Organisation"
   WHERE "organisationGlobalSettingsId" IS NULL
 ),
@@ -685,7 +685,7 @@ WHERE o.id = otu.org_id;
 
 -- Create TeamGlobalSettings for all teams missing it
 WITH teams_to_update AS (
-  SELECT "id" AS team_id, gen_random_uuid() AS settings_id
+  SELECT "id" AS team_id, generate_prefix_id('team_setting') AS settings_id
   FROM "Team"
   WHERE "teamGlobalSettingsId" IS NULL
 ),
@@ -701,7 +701,7 @@ WHERE t."id" = ttu.team_id;
 
 -- Create OrganisationClaim for every organisation, use the default "FREE" claim
 WITH orgs_to_update AS (
-  SELECT "id" AS org_id, gen_random_uuid() AS claim_id
+  SELECT "id" AS org_id, generate_prefix_id('org_claim') AS claim_id
   FROM "Organisation"
   WHERE "organisationClaimId" IS NULL
 ),
@@ -745,7 +745,7 @@ WITH org_internal_groups AS (
 )
 INSERT INTO "TeamGroup" ("id", "teamId", "organisationGroupId", "teamRole")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('team_group'),
   oig.team_id,
   oig.group_id,
   'ADMIN'::"TeamMemberRole" -- Org Admins/Managers will be Team ADMINS
@@ -778,7 +778,7 @@ created_org_groups AS (
     temp_team_role
   )
   SELECT
-    gen_random_uuid(),
+    generate_prefix_id('org_group'),
     'INTERNAL_TEAM'::"OrganisationGroupType",
     'MEMBER'::"OrganisationMemberRole",
     tig."organisationId",
@@ -790,7 +790,7 @@ created_org_groups AS (
 -- Step 3: Create TeamGroups using the temp data
 INSERT INTO "TeamGroup" ("id", "organisationGroupId", "teamRole", "teamId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('team_group'),
   cog."id",
   cog.temp_team_role::"TeamMemberRole",
   cog.temp_team_id
@@ -804,7 +804,7 @@ ALTER TABLE "OrganisationGroup" DROP COLUMN temp_team_role;
 -- This ensures only one OrganisationMember per user per organisation, even if they belong to multiple teams
 INSERT INTO "OrganisationMember" ("id", "createdAt", "updatedAt", "userId", "organisationId")
 SELECT DISTINCT
-  gen_random_uuid(),
+  generate_prefix_id('member'),
   MIN(tm."createdAt"),
   NOW(),
   tm."userId",
@@ -818,7 +818,7 @@ GROUP BY tm."userId", t."organisationId";
 -- So we create an OrganisationMember for the owner user
 INSERT INTO "OrganisationMember" ("id", "createdAt", "updatedAt", "userId", "organisationId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('member'),
   NOW(),
   NOW(),
   o."ownerUserId",
@@ -831,7 +831,7 @@ WHERE o."id" NOT IN (SELECT "organisationId" FROM "OrganisationMember");
 -- Skip organisation owners as they are handled separately
 INSERT INTO "OrganisationGroupMember" ("id", "groupId", "organisationMemberId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('group_member'),
   og."id",
   om."id"
 FROM "TeamMember" tm
@@ -845,7 +845,7 @@ WHERE tm."userId" != o."ownerUserId";
 -- Add organisation owners to the INTERNAL_ORGANISATION ADMIN group
 INSERT INTO "OrganisationGroupMember" ("id", "groupId", "organisationMemberId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('group_member'),
   og."id",
   om."id"
 FROM "Organisation" o
@@ -857,7 +857,7 @@ JOIN "OrganisationGroup" og ON og."organisationId" = o."id"
 -- Add all other organisation members to the INTERNAL_ORGANISATION MEMBER group
 INSERT INTO "OrganisationGroupMember" ("id", "groupId", "organisationMemberId")
 SELECT
-  gen_random_uuid(),
+  generate_prefix_id('group_member'),
   og."id",
   om."id"
 FROM "Organisation" o

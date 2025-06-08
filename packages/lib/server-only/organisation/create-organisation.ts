@@ -9,7 +9,7 @@ import { AppErrorCode } from '../../errors/app-error';
 import { AppError } from '../../errors/app-error';
 import type { InternalClaim } from '../../types/subscription';
 import { INTERNAL_CLAIM_ID, internalClaims } from '../../types/subscription';
-import { prefixedId } from '../../universal/id';
+import { generateDatabaseId, prefixedId } from '../../universal/id';
 import { generateDefaultOrganisationSettings } from '../../utils/organisations';
 import { createTeam } from '../team/create-team';
 
@@ -32,27 +32,37 @@ export const createOrganisation = async ({
 }: CreateOrganisationOptions) => {
   return await prisma.$transaction(async (tx) => {
     const organisationSetting = await tx.organisationGlobalSettings.create({
-      data: generateDefaultOrganisationSettings(),
+      data: {
+        ...generateDefaultOrganisationSettings(),
+        id: generateDatabaseId('org_setting'),
+      },
     });
 
     const organisationClaim = await tx.organisationClaim.create({
       data: {
+        id: generateDatabaseId('org_claim'),
         originalSubscriptionClaimId: claim.id,
         ...createOrganisationClaimUpsertData(claim),
       },
     });
 
+    const orgIdAndUrl = prefixedId('org');
+
     const organisation = await tx.organisation
       .create({
         data: {
+          id: orgIdAndUrl,
           name,
           type,
-          url: url || prefixedId('org'),
+          url: url || orgIdAndUrl,
           ownerUserId: userId,
           organisationGlobalSettingsId: organisationSetting.id,
           organisationClaimId: organisationClaim.id,
           groups: {
-            create: ORGANISATION_INTERNAL_GROUPS,
+            create: ORGANISATION_INTERNAL_GROUPS.map((group) => ({
+              ...group,
+              id: generateDatabaseId('org_group'),
+            })),
           },
           customerId,
         },
@@ -82,10 +92,12 @@ export const createOrganisation = async ({
 
     await tx.organisationMember.create({
       data: {
+        id: generateDatabaseId('member'),
         userId,
         organisationId: organisation.id,
         organisationGroupMembers: {
           create: {
+            id: generateDatabaseId('group_member'),
             groupId: adminGroup.id,
           },
         },

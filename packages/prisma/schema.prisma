@@ -268,7 +268,7 @@ model SubscriptionClaim {
 
 /// @zod.import(["import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';"])
 model OrganisationClaim {
-  id        String   @id @default(cuid())
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -603,7 +603,7 @@ enum OrganisationType {
 }
 
 model Organisation {
-  id        String   @id @default(cuid())
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -637,7 +637,7 @@ model Organisation {
 }
 
 model OrganisationMember {
-  id        String   @id @default(cuid())
+  id        String   @id
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -653,7 +653,7 @@ model OrganisationMember {
 }
 
 model OrganisationMemberInvite {
-  id        String   @id @default(cuid())
+  id        String   @id
   createdAt DateTime @default(now())
 
   email String
@@ -667,7 +667,7 @@ model OrganisationMemberInvite {
 }
 
 model OrganisationGroup {
-  id   String  @id @default(cuid())
+  id   String  @id
   name String?
 
   type             OrganisationGroupType
@@ -682,7 +682,7 @@ model OrganisationGroup {
 }
 
 model OrganisationGroupMember {
-  id String @id @default(cuid())
+  id String @id
 
   groupId String
   group   OrganisationGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -694,7 +694,7 @@ model OrganisationGroupMember {
 }
 
 model TeamGroup {
-  id String @id @default(cuid())
+  id String @id
 
   organisationGroupId String
   organisationGroup   OrganisationGroup @relation(fields: [organisationGroupId], references: [id], onDelete: Cascade)
@@ -732,7 +732,7 @@ enum OrganisationMemberInviteStatus {
 }
 
 model OrganisationGlobalSettings {
-  id           String        @id @default(cuid())
+  id           String        @id
   organisation Organisation?
 
   documentVisibility        DocumentVisibility @default(EVERYONE)
@@ -751,7 +751,7 @@ model OrganisationGlobalSettings {
 }
 
 model TeamGlobalSettings {
-  id   String @id @default(cuid())
+  id   String @id
   team Team?
 
   documentVisibility        DocumentVisibility?

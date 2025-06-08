@@ -15,6 +15,7 @@ import {
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
 } from '../../constants/organisations';
 import { TEAM_INTERNAL_GROUPS } from '../../constants/teams';
+import { generateDatabaseId } from '../../universal/id';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { generateDefaultTeamSettings } from '../../utils/teams';
 
@@ -137,7 +138,10 @@ export const createTeam = async ({
 
   await prisma.$transaction(async (tx) => {
     const teamSettings = await tx.teamGlobalSettings.create({
-      data: generateDefaultTeamSettings(),
+      data: {
+        ...generateDefaultTeamSettings(),
+        id: generateDatabaseId('team_setting'),
+      },
     });
 
     const team = await tx.team.create({
@@ -149,7 +153,10 @@ export const createTeam = async ({
         teamGroups: {
           createMany: {
             // Attach the internal organisation groups to the team.
-            data: internalOrganisationGroups,
+            data: internalOrganisationGroups.map((group) => ({
+              ...group,
+              id: generateDatabaseId('team_group'),
+            })),
           },
         },
       },
@@ -173,11 +180,13 @@ export const createTeam = async ({
       TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
         tx.organisationGroup.create({
           data: {
+            id: generateDatabaseId('org_group'),
             type: teamGroup.type,
             organisationRole: LOWEST_ORGANISATION_ROLE,
             organisationId,
             teamGroups: {
               create: {
+                id: generateDatabaseId('team_group'),
                 teamId: team.id,
                 teamRole: teamGroup.teamRole,
               },

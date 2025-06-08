@@ -4,6 +4,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
+import { generateDatabaseId } from '../../universal/id';
 
 export type AcceptOrganisationInvitationOptions = {
   token: string;
@@ -70,10 +71,12 @@ export const acceptOrganisationInvitation = async ({
     async (tx) => {
       await tx.organisationMember.create({
         data: {
+          id: generateDatabaseId('member'),
           userId: user.id,
           organisationId: organisation.id,
           organisationGroupMembers: {
             create: {
+              id: generateDatabaseId('group_member'),
               groupId: organisationGroupToUse.id,
             },
           },
