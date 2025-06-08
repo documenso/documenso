@@ -1,11 +1,15 @@
+import { useEffect } from 'react';
+
 import { Outlet, redirect } from 'react-router';
 
+import { authClient } from '@documenso/auth/client';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getLimits } from '@documenso/ee/server-only/limits/client';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
+import { trpc } from '@documenso/trpc/react';
 
 import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
@@ -44,6 +48,25 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { user, teams } = useSession();
+
+  const { data: userProfile } = trpc.profile.getUser.useQuery(
+    {
+      id: user?.id,
+    },
+    {
+      enabled: !!user,
+    },
+  );
+
+  useEffect(() => {
+    const closeSession = async () => {
+      await authClient.signOut();
+    };
+
+    if (userProfile?.disabled) {
+      void closeSession();
+    }
+  }, [userProfile]);
 
   const { banner, limits } = loaderData;
 
