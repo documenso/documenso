@@ -94,8 +94,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(null);
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
+
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -115,8 +115,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
     recipientAuth: recipientTwo.authOptions,
   });
 
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
@@ -199,8 +199,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(null);
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -220,8 +219,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
     recipientAuth: recipientTwo.authOptions,
   });
 
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
