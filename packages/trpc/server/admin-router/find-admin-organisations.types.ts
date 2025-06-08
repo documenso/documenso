@@ -1,11 +1,14 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import OrganisationSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationSchema';
 import SubscriptionSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
 import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
-export const ZFindAdminOrganisationsRequestSchema = ZFindSearchParamsSchema;
+export const ZFindAdminOrganisationsRequestSchema = ZFindSearchParamsSchema.extend({
+  ownerUserId: z.number().optional(),
+  memberUserId: z.number().optional(),
+});
 
 export const ZFindAdminOrganisationsResponseSchema = ZFindResultResponse.extend({
   data: OrganisationSchema.pick({

@@ -13,12 +13,14 @@ export const findAdminOrganisationsRoute = adminProcedure
   .input(ZFindAdminOrganisationsRequestSchema)
   .output(ZFindAdminOrganisationsResponseSchema)
   .query(async ({ input }) => {
-    const { query, page, perPage } = input;
+    const { query, page, perPage, ownerUserId, memberUserId } = input;
 
     return await findAdminOrganisations({
       query,
       page,
       perPage,
+      ownerUserId,
+      memberUserId,
     });
   });
 
@@ -26,12 +28,16 @@ type FindAdminOrganisationsOptions = {
   query?: string;
   page?: number;
   perPage?: number;
+  ownerUserId?: number;
+  memberUserId?: number;
 };
 
 export const findAdminOrganisations = async ({
   query,
   page = 1,
   perPage = 10,
+  ownerUserId,
+  memberUserId,
 }: FindAdminOrganisationsOptions) => {
   let whereClause: Prisma.OrganisationWhereInput = {};
 
@@ -81,9 +87,35 @@ export const findAdminOrganisations = async ({
 
   if (query && query.startsWith('org_')) {
     whereClause = {
-      url: {
-        equals: query,
-        mode: Prisma.QueryMode.insensitive,
+      OR: [
+        {
+          id: {
+            equals: query,
+            mode: Prisma.QueryMode.insensitive,
+          },
+        },
+        {
+          url: {
+            equals: query,
+            mode: Prisma.QueryMode.insensitive,
+          },
+        },
+      ],
+    };
+  }
+
+  if (ownerUserId) {
+    whereClause = {
+      ...whereClause,
+      ownerUserId,
+    };
+  }
+
+  if (memberUserId) {
+    whereClause = {
+      ...whereClause,
+      members: {
+        some: { userId: memberUserId },
       },
     };
   }

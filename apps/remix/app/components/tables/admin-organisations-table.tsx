@@ -15,6 +15,7 @@ import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-upda
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { trpc } from '@documenso/trpc/react';
+import { Badge } from '@documenso/ui/primitives/badge';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
@@ -28,7 +29,19 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
-export const AdminOrganisationsTable = () => {
+type AdminOrganisationsTableOptions = {
+  ownerUserId?: number;
+  memberUserId?: number;
+  showOwnerColumn?: boolean;
+  hidePaginationUntilOverflow?: boolean;
+};
+
+export const AdminOrganisationsTable = ({
+  ownerUserId,
+  memberUserId,
+  showOwnerColumn = true,
+  hidePaginationUntilOverflow,
+}: AdminOrganisationsTableOptions) => {
   const { t, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -40,6 +53,8 @@ export const AdminOrganisationsTable = () => {
     query: parsedSearchParams.query,
     page: parsedSearchParams.page,
     perPage: parsedSearchParams.perPage,
+    ownerUserId,
+    memberUserId,
   });
 
   const onPaginationChange = (page: number, perPage: number) => {
@@ -75,6 +90,14 @@ export const AdminOrganisationsTable = () => {
         accessorKey: 'owner',
         cell: ({ row }) => (
           <Link to={`/admin/users/${row.original.owner.id}`}>{row.original.owner.name}</Link>
+        ),
+      },
+      {
+        header: t`Status`,
+        cell: ({ row }) => (
+          <Badge variant="neutral">
+            {row.original.owner.id === memberUserId ? t`Owner` : t`Member`}
+          </Badge>
         ),
       },
       {
@@ -143,6 +166,10 @@ export const AdminOrganisationsTable = () => {
         currentPage={results.currentPage}
         totalPages={results.totalPages}
         onPaginationChange={onPaginationChange}
+        columnVisibility={{
+          owner: showOwnerColumn,
+          status: memberUserId !== undefined,
+        }}
         error={{
           enable: isLoadingError,
         }}
@@ -172,7 +199,11 @@ export const AdminOrganisationsTable = () => {
           ),
         }}
       >
-        {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+        {(table) =>
+          !hidePaginationUntilOverflow || 1 > table.getPageCount() ? (
+            <DataTablePagination additionalInformation="VisibleCount" table={table} />
+          ) : null
+        }
       </DataTable>
     </div>
   );

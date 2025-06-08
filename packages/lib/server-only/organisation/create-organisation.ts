@@ -35,8 +35,6 @@ export const createOrganisation = async ({
       data: generateDefaultOrganisationSettings(),
     });
 
-    // Note: `originalSubscriptionClaimId` should be set in the Stripe subscription
-    // updated webhook.
     const organisationClaim = await tx.organisationClaim.create({
       data: {
         originalSubscriptionClaimId: claim.id,

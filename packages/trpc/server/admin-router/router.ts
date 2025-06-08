@@ -14,6 +14,7 @@ import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { adminProcedure, router } from '../trpc';
+import { createAdminOrganisationRoute } from './create-admin-organisation';
 import { createStripeCustomerRoute } from './create-stripe-customer';
 import { createSubscriptionClaimRoute } from './create-subscription-claim';
 import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
@@ -38,6 +39,7 @@ export const adminRouter = router({
   organisation: {
     find: findAdminOrganisationsRoute,
     get: getAdminOrganisationRoute,
+    create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
   },
   claims: {
