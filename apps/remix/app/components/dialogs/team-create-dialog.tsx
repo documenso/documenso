@@ -190,7 +190,7 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
               className="flex flex-col justify-between p-6 sm:flex-row sm:items-center"
               variant="neutral"
             >
-              <AlertDescription className="mr-2">
+              <AlertDescription className="mt-0">
                 <Trans>
                   You have reached the maximum number of teams for your plan. Please contact sales
                   at <a href="mailto:support@documenso.com">support@documenso.com</a> if you would

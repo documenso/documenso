@@ -20,11 +20,10 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     drawSignatureEnabled: z.boolean().nullish(),
 
     // Branding related settings.
-    // Todo: Current disabled for now.
-    // brandingEnabled: z.boolean().nullish(),
-    // brandingLogo: z.string().nullish(),
-    // brandingUrl: z.string().nullish(),
-    // brandingCompanyDetails: z.string().nullish(),
+    brandingEnabled: z.boolean().nullish(),
+    brandingLogo: z.string().nullish(),
+    brandingUrl: z.string().nullish(),
+    brandingCompanyDetails: z.string().nullish(),
   }),
 });
 

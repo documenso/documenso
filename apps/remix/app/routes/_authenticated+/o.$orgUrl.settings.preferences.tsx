@@ -159,6 +159,7 @@ export default function OrganisationSettingsPreferencesPage() {
           />
 
           <BrandingPreferencesForm
+            context="Organisation"
             settings={organisationWithSettings.organisationGlobalSettings}
             onFormSubmit={onBrandingPreferencesFormSubmit}
           />

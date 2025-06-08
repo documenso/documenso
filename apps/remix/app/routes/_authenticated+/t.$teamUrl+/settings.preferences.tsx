@@ -1,15 +1,15 @@
-import { Trans, useLingui } from '@lingui/react/macro';
+import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { Link } from 'react-router';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import {
+  BrandingPreferencesForm,
+  type TBrandingPreferencesFormSchema,
+} from '~/components/forms/branding-preferences-form';
 import {
   DocumentPreferencesForm,
   type TDocumentPreferencesFormSchema,
@@ -24,7 +24,6 @@ export function meta() {
 
 export default function TeamsSettingsPage() {
   const team = useCurrentTeam();
-  const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -79,43 +78,42 @@ export default function TeamsSettingsPage() {
     }
   };
 
-  // Todo: Decide whether branding can be customized on the team level.
-  // const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
-  //   try {
-  //     const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+  const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
+    try {
+      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
 
-  //     let uploadedBrandingLogo = settings?.brandingLogo;
+      let uploadedBrandingLogo = teamWithSettings?.teamSettings?.brandingLogo;
 
-  //     if (brandingLogo) {
-  //       uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
-  //     }
+      if (brandingLogo) {
+        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+      }
 
-  //     if (brandingLogo === null) {
-  //       uploadedBrandingLogo = '';
-  //     }
+      if (brandingLogo === null) {
+        uploadedBrandingLogo = '';
+      }
 
-  //     await updateTeamSettings({
-  //       teamId: team.id,
-  //       settings: {
-  //         brandingEnabled,
-  //         brandingLogo: uploadedBrandingLogo,
-  //         brandingUrl,
-  //         brandingCompanyDetails,
-  //       },
-  //     });
+      await updateTeamSettings({
+        teamId: team.id,
+        data: {
+          brandingEnabled,
+          brandingLogo: uploadedBrandingLogo || null,
+          brandingUrl: brandingUrl || null,
+          brandingCompanyDetails: brandingCompanyDetails || null,
+        },
+      });
 
-  //     toast({
-  //       title: t`Branding preferences updated`,
-  //       description: t`Your branding preferences have been updated`,
-  //     });
-  //   } catch (err) {
-  //     toast({
-  //       title: t`Something went wrong`,
-  //       description: t`We were unable to update your branding preferences at this time, please try again later`,
-  //       variant: 'destructive',
-  //     });
-  //   }
-  // };
+      toast({
+        title: t`Branding preferences updated`,
+        description: t`Your branding preferences have been updated`,
+      });
+    } catch (err) {
+      toast({
+        title: t`Something went wrong`,
+        description: t`We were unable to update your branding preferences at this time, please try again later`,
+        variant: 'destructive',
+      });
+    }
+  };
 
   if (isLoadingTeam || !teamWithSettings) {
     return (
@@ -140,35 +138,7 @@ export default function TeamsSettingsPage() {
         />
       </section>
 
-      <hr className="border-border/50 mt-8" />
-
-      <Alert
-        className="mt-8 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
-        variant="neutral"
-      >
-        <div className="mb-4 sm:mb-0">
-          <AlertTitle>
-            <Trans>Branding Preferences</Trans>
-          </AlertTitle>
-
-          <AlertDescription className="mr-2">
-            <Trans>Currently branding can only be configured on the organisation level.</Trans>
-          </AlertDescription>
-        </div>
-
-        {canExecuteOrganisationAction(
-          'MANAGE_ORGANISATION',
-          organisation.currentOrganisationRole,
-        ) && (
-          <Button asChild variant="outline">
-            <Link to={`/o/${organisation.url}/settings/preferences`}>
-              <Trans>Manage</Trans>
-            </Link>
-          </Button>
-        )}
-      </Alert>
-
-      {/* <SettingsHeader
+      <SettingsHeader
         title={t`Branding Preferences`}
         subtitle={t`Here you can set preferences and defaults for branding.`}
         className="mt-8"
@@ -176,11 +146,12 @@ export default function TeamsSettingsPage() {
 
       <section>
         <BrandingPreferencesForm
-          canInherit={false}
+          canInherit={true}
+          context="Team"
           settings={teamWithSettings.teamSettings}
           onFormSubmit={onBrandingPreferencesFormSubmit}
         />
-      </section> */}
+      </section>
     </div>
   );
 }

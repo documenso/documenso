@@ -136,64 +136,79 @@ export const createTeam = async ({
         .exhaustive(),
     );
 
-  await prisma.$transaction(async (tx) => {
-    const teamSettings = await tx.teamGlobalSettings.create({
-      data: {
-        ...generateDefaultTeamSettings(),
-        id: generateDatabaseId('team_setting'),
-      },
-    });
-
-    const team = await tx.team.create({
-      data: {
-        name: teamName,
-        url: teamUrl,
-        organisationId,
-        teamGlobalSettingsId: teamSettings.id,
-        teamGroups: {
-          createMany: {
-            // Attach the internal organisation groups to the team.
-            data: internalOrganisationGroups.map((group) => ({
-              ...group,
-              id: generateDatabaseId('team_group'),
-            })),
-          },
-        },
-      },
-      include: {
-        teamGroups: true,
-      },
-    });
-
-    if (organisation.type === OrganisationType.PERSONAL) {
-      await tx.teamEmail.create({
-        data: {
-          teamId: team.id,
-          email: organisation.owner.email,
-          name: organisation.owner.name || organisation.owner.email,
-        },
-      });
-    }
-
-    // Create the internal team groups.
-    await Promise.all(
-      TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
-        tx.organisationGroup.create({
+  await prisma
+    .$transaction(
+      async (tx) => {
+        const teamSettings = await tx.teamGlobalSettings.create({
           data: {
-            id: generateDatabaseId('org_group'),
-            type: teamGroup.type,
-            organisationRole: LOWEST_ORGANISATION_ROLE,
+            ...generateDefaultTeamSettings(),
+            id: generateDatabaseId('team_setting'),
+          },
+        });
+
+        const team = await tx.team.create({
+          data: {
+            name: teamName,
+            url: teamUrl,
             organisationId,
+            teamGlobalSettingsId: teamSettings.id,
             teamGroups: {
-              create: {
-                id: generateDatabaseId('team_group'),
-                teamId: team.id,
-                teamRole: teamGroup.teamRole,
+              createMany: {
+                // Attach the internal organisation groups to the team.
+                data: internalOrganisationGroups.map((group) => ({
+                  ...group,
+                  id: generateDatabaseId('team_group'),
+                })),
               },
             },
           },
-        }),
-      ),
-    );
-  });
+          include: {
+            teamGroups: true,
+          },
+        });
+
+        if (organisation.type === OrganisationType.PERSONAL) {
+          await tx.teamEmail.create({
+            data: {
+              teamId: team.id,
+              email: organisation.owner.email,
+              name: organisation.owner.name || organisation.owner.email,
+            },
+          });
+        }
+
+        // Create the internal team groups.
+        await Promise.all(
+          TEAM_INTERNAL_GROUPS.map(async (teamGroup) =>
+            tx.organisationGroup.create({
+              data: {
+                id: generateDatabaseId('org_group'),
+                type: teamGroup.type,
+                organisationRole: LOWEST_ORGANISATION_ROLE,
+                organisationId,
+                teamGroups: {
+                  create: {
+                    id: generateDatabaseId('team_group'),
+                    teamId: team.id,
+                    teamRole: teamGroup.teamRole,
+                  },
+                },
+              },
+            }),
+          ),
+        );
+      },
+      {
+        timeout: 7500,
+      },
+    )
+    .catch((err) => {
+      if (err.code === 'P2002') {
+        throw new AppError(AppErrorCode.ALREADY_EXISTS, {
+          message: 'Team URL already exists',
+        });
+      }
+
+      throw err;
+    });
 };

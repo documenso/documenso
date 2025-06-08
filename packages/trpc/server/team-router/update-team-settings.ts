@@ -25,11 +25,12 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+
       // Branding related settings.
-      // brandingEnabled,
-      // brandingLogo,
-      // brandingUrl,
-      // brandingCompanyDetails,
+      brandingEnabled,
+      brandingLogo,
+      brandingUrl,
+      brandingCompanyDetails,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -80,10 +81,10 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             drawSignatureEnabled,
 
             // Branding related settings.
-            // brandingEnabled,
-            // brandingLogo,
-            // brandingUrl,
-            // brandingCompanyDetails,
+            brandingEnabled,
+            brandingLogo,
+            brandingUrl,
+            brandingCompanyDetails,
           },
         },
       },

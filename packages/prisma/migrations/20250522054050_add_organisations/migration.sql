@@ -137,19 +137,19 @@ AND t."isPersonal" = true;
 UPDATE "Folder" f
 SET "teamId" = t."id"
 FROM "Team" t
-WHERE f."userId" = t."ownerUserId" AND f."teamId" IS NULL;
+WHERE f."userId" = t."ownerUserId" AND f."teamId" IS NULL AND t."isPersonal" = true;
 
 -- 9. Migrate user's webhooks to their team
 UPDATE "Webhook" w
 SET "teamId" = t."id"
 FROM "Team" t
-WHERE w."userId" = t."ownerUserId" AND w."teamId" IS NULL;
+WHERE w."userId" = t."ownerUserId" AND w."teamId" IS NULL AND t."isPersonal" = true;
 
 -- 10. Migrate user's API tokens to their team
 UPDATE "ApiToken" apiToken
 SET "teamId" = t."id"
 FROM "Team" t
-WHERE apiToken."userId" = t."ownerUserId" AND apiToken."teamId" IS NULL;
+WHERE apiToken."userId" = t."ownerUserId" AND apiToken."teamId" IS NULL AND t."isPersonal" = true;
 
 -- 11. Migrate user's team profiles to their team
 INSERT INTO "TeamProfile" ("id", "enabled", "bio", "teamId")
@@ -160,6 +160,12 @@ SELECT
   t."id" AS teamId
 FROM "UserProfile" up
 JOIN "User" u ON u."id" = up."userId"
+JOIN "Team" t ON t."ownerUserId" = u."id" AND t."isPersonal" = TRUE;
+
+-- 12. Create team email for all personal teams.
+INSERT INTO "TeamEmail" ("teamId", "createdAt", "name", "email")
+SELECT t."id", NOW(), 'Personal team email', u."email"
+FROM "User" u
 JOIN "Team" t ON t."ownerUserId" = u."id" AND t."isPersonal" = TRUE;
 
 -- [CUSTOM_CHANGE_END]
@@ -198,6 +204,9 @@ ALTER TABLE "TeamTransferVerification" DROP CONSTRAINT "TeamTransferVerification
 ALTER TABLE "UserProfile" DROP CONSTRAINT "UserProfile_userId_fkey";
 
 -- DropIndex
+DROP INDEX "TeamEmail_email_key";
+
+-- DropIndex
 DROP INDEX "Team_customerId_key";
 
 -- DropIndex
@@ -219,8 +228,7 @@ ALTER TABLE "Folder" ALTER COLUMN "teamId" SET NOT NULL;
 ALTER TABLE "Webhook" ALTER COLUMN "teamId" SET NOT NULL;
 
 -- AlterTable
-ALTER TABLE "ApiToken" ADD COLUMN     "organisationId" TEXT,
-ALTER COLUMN "teamId" SET NOT NULL;
+ALTER TABLE "ApiToken" ALTER COLUMN "teamId" SET NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Document" ALTER COLUMN "teamId" SET NOT NULL;
@@ -236,7 +244,6 @@ ADD COLUMN     "teamGlobalSettingsId" TEXT; -- [CUSTOM_CHANGE] This is supposed 
 -- AlterTable
 ALTER TABLE "TeamGlobalSettings" DROP COLUMN "allowEmbeddedAuthoring",
 DROP COLUMN "brandingHidePoweredBy",
-DROP COLUMN "teamId",
 ADD COLUMN     "id" TEXT, -- [CUSTOM_CHANGE] Supposed to be NOT NULL but we apply it after generating default IDs
 ALTER COLUMN "documentVisibility" DROP NOT NULL,
 ALTER COLUMN "documentVisibility" DROP DEFAULT,
@@ -261,7 +268,7 @@ ALTER COLUMN "drawSignatureEnabled" DROP DEFAULT,
 ALTER COLUMN "uploadSignatureEnabled" DROP NOT NULL,
 ALTER COLUMN "uploadSignatureEnabled" DROP DEFAULT;
 
--- [CUSTOM_CHANGE] Generate IDs for existing TeamGlobalSettings records
+-- [CUSTOM_CHANGE] Generate IDs for existing TeamGlobalSettings records. We link it later.
 UPDATE "TeamGlobalSettings" SET "id" = generate_prefix_id('team_setting') WHERE "id" IS NULL;
 
 -- [CUSTOM_CHANGE] Make the id column NOT NULL and add primary key
@@ -274,9 +281,6 @@ ALTER TABLE "Template" ALTER COLUMN "teamId" SET NOT NULL;
 
 -- AlterTable
 ALTER TABLE "User" DROP COLUMN "customerId";
-
--- AlterTable
-ALTER TABLE "Webhook" ADD COLUMN     "organisationId" TEXT;
 
 -- DropTable
 DROP TABLE "TeamMemberInvite";
@@ -414,6 +418,7 @@ CREATE TABLE "OrganisationGlobalSettings" (
     "brandingLogo" TEXT NOT NULL DEFAULT '',
     "brandingUrl" TEXT NOT NULL DEFAULT '',
     "brandingCompanyDetails" TEXT NOT NULL DEFAULT '',
+    "organisationId" TEXT, -- [CUSTOM_CHANGE] This is a temporary column for migration purposes.
 
     CONSTRAINT "OrganisationGlobalSettings_pkey" PRIMARY KEY ("id")
 );
@@ -453,12 +458,6 @@ CREATE UNIQUE INDEX "Team_teamGlobalSettingsId_key" ON "Team"("teamGlobalSetting
 
 -- CreateIndex
 CREATE INDEX "Template_userId_idx" ON "Template"("userId");
-
--- AddForeignKey
-ALTER TABLE "Webhook" ADD CONSTRAINT "Webhook_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "ApiToken" ADD CONSTRAINT "ApiToken_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Subscription" ADD CONSTRAINT "Subscription_organisationId_fkey" FOREIGN KEY ("organisationId") REFERENCES "Organisation"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -662,26 +661,33 @@ SELECT
   og.org_id
 FROM org_groups og;
 
+-- Create TeamGlobalSettings for all teams that do not have a teamGlobalSettingsId
+INSERT INTO "TeamGlobalSettings" ("id", "teamId")
+SELECT
+  generate_prefix_id('team_setting'),
+  t."id"
+FROM "Team" t
+WHERE t."teamGlobalSettingsId" IS NULL;
+
+-- Update teams with their corresponding teamGlobalSettingsId
+UPDATE "Team" t
+SET "teamGlobalSettingsId" = tgs."id"
+FROM "TeamGlobalSettings" tgs
+WHERE tgs."teamId" = t."id" AND t."teamGlobalSettingsId" IS NULL;
+
 -- Create default OrganisationGlobalSettings for all organisations
-WITH orgs_to_update AS (
-  SELECT "id" AS org_id, generate_prefix_id('org_setting') AS settings_id
-  FROM "Organisation"
-  WHERE "organisationGlobalSettingsId" IS NULL
-),
-new_settings AS (
-  INSERT INTO "OrganisationGlobalSettings" (
-    "id"
-  )
-  SELECT
-    o.settings_id
-  FROM orgs_to_update o
-  RETURNING id, -- OrganisationGlobalSettings.id
-            id AS settings_id -- match with orgs_to_update
-)
+INSERT INTO "OrganisationGlobalSettings" ("id", "organisationId")
+SELECT
+  generate_prefix_id('org_setting'),
+  o."id"
+FROM "Organisation" o
+WHERE o."organisationGlobalSettingsId" IS NULL;
+
+-- Update organisations with their corresponding organisationGlobalSettingsId
 UPDATE "Organisation" o
-SET "organisationGlobalSettingsId" = otu.settings_id
-FROM orgs_to_update otu
-WHERE o.id = otu.org_id;
+SET "organisationGlobalSettingsId" = ogs."id"
+FROM "OrganisationGlobalSettings" ogs
+WHERE ogs."organisationId" = o."id" AND o."organisationGlobalSettingsId" IS NULL;
 
 -- Create TeamGlobalSettings for all teams missing it
 WITH teams_to_update AS (
@@ -880,6 +886,8 @@ DROP TABLE "TeamMember";
 -- Drop temp columns
 ALTER TABLE "Organisation" DROP COLUMN "teamId";
 ALTER TABLE "Team" DROP COLUMN "isPersonal";
+ALTER TABLE "TeamGlobalSettings" DROP COLUMN "teamId";
+ALTER TABLE "OrganisationGlobalSettings" DROP COLUMN "organisationId";
 
 -- REAPPLY NOT NULL to any temporary nullable columns
 ALTER TABLE "Team" ALTER COLUMN "organisationId" SET NOT NULL;

@@ -183,9 +183,6 @@ model Webhook {
   teamId        Int
   team          Team                   @relation(fields: [teamId], references: [id], onDelete: Cascade)
   webhookCalls  WebhookCall[]
-
-  organisationId String?
-  organisation   Organisation? @relation(fields: [organisationId], references: [id])
 }
 
 enum WebhookCallStatus {
@@ -222,9 +219,6 @@ model ApiToken {
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int
   team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
-
-  organisationId String?
-  organisation   Organisation? @relation(fields: [organisationId], references: [id])
 }
 
 enum SubscriptionStatus {
@@ -629,9 +623,6 @@ model Organisation {
   ownerUserId Int
   owner       User @relation(fields: [ownerUserId], references: [id], onDelete: Cascade)
 
-  apiTokens ApiToken[]
-  webhooks  Webhook[]
-
   organisationGlobalSettingsId String                     @unique
   organisationGlobalSettings   OrganisationGlobalSettings @relation(fields: [organisationGlobalSettingsId], references: [id])
 }
@@ -800,7 +791,7 @@ model TeamEmail {
   teamId    Int      @id @unique
   createdAt DateTime @default(now())
   name      String
-  email     String   @unique
+  email     String
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 

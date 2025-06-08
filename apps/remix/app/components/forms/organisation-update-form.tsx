@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 import type { z } from 'zod';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
@@ -35,6 +36,8 @@ export const OrganisationUpdateForm = () => {
   const navigate = useNavigate();
   const organisation = useCurrentOrganisation();
 
+  const { refreshSession } = useSession();
+
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -58,6 +61,12 @@ export const OrganisationUpdateForm = () => {
         organisationId: organisation.id,
       });
 
+      await refreshSession();
+
+      if (url !== organisation.url) {
+        await navigate(`/o/${url}/settings`);
+      }
+
       toast({
         title: _(msg`Success`),
         description: _(msg`Your organisation has been successfully updated.`),
@@ -68,10 +77,6 @@ export const OrganisationUpdateForm = () => {
         name,
         url,
       });
-
-      if (url !== organisation.url) {
-        await navigate(`/o/${url}/settings`);
-      }
     } catch (err) {
       const error = AppError.parseError(err);
 

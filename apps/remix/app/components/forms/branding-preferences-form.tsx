@@ -48,11 +48,18 @@ type SettingsSubset = Pick<
 >;
 
 export type BrandingPreferencesFormProps = {
+  canInherit?: boolean;
   settings: SettingsSubset;
   onFormSubmit: (data: TBrandingPreferencesFormSchema) => Promise<void>;
+  context: 'Team' | 'Organisation';
 };
 
-export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPreferencesFormProps) {
+export function BrandingPreferencesForm({
+  canInherit = false,
+  settings,
+  onFormSubmit,
+  context,
+}: BrandingPreferencesFormProps) {
   const { t } = useLingui();
 
   const [previewUrl, setPreviewUrl] = useState<string>('');
@@ -107,7 +114,9 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
             name="brandingEnabled"
             render={({ field }) => (
               <FormItem className="flex-1">
-                <FormLabel>Enable Custom Branding</FormLabel>
+                <FormLabel>
+                  <Trans>Enable Custom Branding</Trans>
+                </FormLabel>
 
                 <div>
                   <FormControl>
@@ -121,7 +130,11 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
                 </div>
 
                 <FormDescription>
-                  <Trans>Enable custom branding for all documents in this team.</Trans>
+                  {context === 'Team' ? (
+                    <Trans>Enable custom branding for all documents in this team</Trans>
+                  ) : (
+                    <Trans>Enable custom branding for all documents in this organisation</Trans>
+                  )}
                 </FormDescription>
               </FormItem>
             )}
@@ -135,7 +148,9 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
               name="brandingLogo"
               render={({ field: { value: _value, onChange, ...field } }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Branding Logo</FormLabel>
+                  <FormLabel>
+                    <Trans>Branding Logo</Trans>
+                  </FormLabel>
 
                   <div className="flex flex-col gap-4">
                     <div className="border-border bg-background relative h-48 w-full overflow-hidden rounded-lg border">
@@ -209,6 +224,13 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
 
                     <FormDescription>
                       <Trans>Upload your brand logo (max 5MB, JPG, PNG, or WebP)</Trans>
+
+                      {canInherit && (
+                        <span>
+                          {'. '}
+                          <Trans>Leave blank to inherit from the organisation.</Trans>
+                        </span>
+                      )}
                     </FormDescription>
                   </div>
                 </FormItem>
@@ -220,7 +242,9 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
               name="brandingUrl"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Brand Website</FormLabel>
+                  <FormLabel>
+                    <Trans>Brand Website</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Input
@@ -233,6 +257,13 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
 
                   <FormDescription>
                     <Trans>Your brand website URL</Trans>
+
+                    {canInherit && (
+                      <span>
+                        {'. '}
+                        <Trans>Leave blank to inherit from the organisation.</Trans>
+                      </span>
+                    )}
                   </FormDescription>
                 </FormItem>
               )}
@@ -243,7 +274,9 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
               name="brandingCompanyDetails"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Brand Details</FormLabel>
+                  <FormLabel>
+                    <Trans>Brand Details</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Textarea
@@ -256,6 +289,13 @@ export function BrandingPreferencesForm({ settings, onFormSubmit }: BrandingPref
 
                   <FormDescription>
                     <Trans>Additional brand information to display at the bottom of emails</Trans>
+
+                    {canInherit && (
+                      <span>
+                        {'. '}
+                        <Trans>Leave blank to inherit from the organisation.</Trans>
+                      </span>
+                    )}
                   </FormDescription>
                 </FormItem>
               )}

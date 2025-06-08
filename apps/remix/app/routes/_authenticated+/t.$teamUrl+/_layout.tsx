@@ -74,11 +74,15 @@ export default function Layout() {
     'x-team-Id': team.id.toString(),
   };
 
+  // Note: We use a key to force a re-render if the team context changes.
+  // This is required otherwise you would see the wrong page content.
   return (
-    <TrpcProvider headers={trpcHeaders}>
-      <LimitsProvider initialValue={limits} teamId={team.id}>
-        <Outlet />
-      </LimitsProvider>
-    </TrpcProvider>
+    <div key={team.url}>
+      <TrpcProvider headers={trpcHeaders}>
+        <LimitsProvider initialValue={limits} teamId={team.id}>
+          <Outlet />
+        </LimitsProvider>
+      </TrpcProvider>
+    </div>
   );
 }
