@@ -10,8 +10,8 @@ import { useForm } from 'react-hook-form';
 import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
 import {
@@ -59,6 +59,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
         prices.push({
           ...plan[interval],
           memberCount: plan.memberCount,
+          claim: plan.id,
         });
       }
     }
@@ -129,6 +130,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
                   priceId={price.id}
                   planName={price.product.name}
                   memberCount={price.memberCount}
+                  claim={price.claim}
                 />
               </CardContent>
             </MotionCard>
@@ -142,11 +144,12 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
 const BillingDialog = ({
   priceId,
   planName,
-  memberCount,
+  claim,
 }: {
   priceId: string;
   planName: string;
   memberCount: number;
+  claim: string;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -156,7 +159,9 @@ const BillingDialog = ({
   const organisation = useCurrentOrganisation();
 
   const [subscriptionOption, setSubscriptionOption] = useState<'update' | 'create'>(
-    organisation.type === 'PERSONAL' ? 'create' : 'update',
+    organisation.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL
+      ? 'update'
+      : 'create',
   );
 
   const [step, setStep] = useState(0);
@@ -232,18 +237,6 @@ const BillingDialog = ({
 
         {step === 0 ? (
           <div>
-            {memberCount !== 1 && subscriptionOption === 'update' && (
-              <Alert variant="warning" className="mb-6">
-                <AlertDescription>
-                  <Trans>
-                    You are currently updating your "Personal" organisation to a plan where you can
-                    add multiple members. These members may have access to the documents, templates
-                    and other data in this organisation, including documents sent to you.
-                  </Trans>
-                </AlertDescription>
-              </Alert>
-            )}
-
             <RadioGroup
               className="space-y-2"
               value={subscriptionOption}
