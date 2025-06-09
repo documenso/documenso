@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-03-25 12:05\n"
+"PO-Revision-Date: 2025-05-22 06:04\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -25,6 +25,10 @@ msgstr " 직접 링크 서명 활성화"
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks.$id.tsx
 msgid " The events that will trigger a webhook to be sent to your URL."
 msgstr " 이벤트가 발생하면 웹훅이 URL로 전송됩니다."
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
+msgstr ".PDF 문서 허용 (최대 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 
 #. placeholder {0}: team.name
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
@@ -96,19 +100,16 @@ msgid "{0, plural, one {1 matching field} other {# matching fields}}"
 msgstr "{0, plural, other {#개 일치하는 필드}}"
 
 #. placeholder {0}: recipients.length
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.edit.tsx
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, other {#명의 수신자}}"
 
 #. placeholder {0}: pendingRecipients.length
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 msgstr "{0, plural, other {#명의 수신자를 대기 중}}"
-
-#. placeholder {0}: selectedValues.length
-#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
-msgid "{0, plural, zero {Select values} other {# selected...}}"
-msgstr "{0, plural, other {#개 선택됨…}}"
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
@@ -144,6 +145,7 @@ msgstr "{0}님이 Documenso의 팀 {teamName}을 떠났습니다."
 #. placeholder {0}: remaining.documents
 #. placeholder {1}: quota.documents
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "{0} of {1} documents remaining this month."
 msgstr "이달에 남은 {1}개 문서 중 {0}개．"
 
@@ -161,6 +163,7 @@ msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the doc
 msgstr "{0}님이 \"{1}\"님을 대신하여 문서 \"{2}\"을(를) {recipientActionVerb}하기 위해 초대했습니다."
 
 #. placeholder {0}: recipients.length
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "{0} Recipient(s)"
 msgstr "{0}명 수신자(s)"
@@ -326,6 +329,10 @@ msgstr "{recipientActionVerb} 문서"
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} the document to complete the process."
 msgstr "{recipientActionVerb} 문서를 클릭하여 절차를 완료하세요．"
+
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
+msgid "{recipientCount} recipients"
+msgstr "{recipientCount} 수신자"
 
 #: packages/email/templates/document-created-from-direct-template.tsx
 msgid "{recipientName} {action} a document by using one of your direct links"
@@ -727,6 +734,7 @@ msgstr "추가"
 msgid "Add a document"
 msgstr "문서 추가"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Add a URL to redirect the user to once the document is signed"
@@ -800,6 +808,7 @@ msgstr "플레이스홀더 수신자 추가"
 msgid "Add Placeholders"
 msgstr "플레이스홀더 추가"
 
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Add Signer"
 msgstr "서명자 추가"
@@ -807,6 +816,10 @@ msgstr "서명자 추가"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Add Signers"
 msgstr "서명자 추가"
+
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
+msgid "Add signers and configure signing preferences"
+msgstr "서명자 추가 및 서명 환경 설정 구성"
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add team email"
@@ -853,9 +866,15 @@ msgstr "관리자 패널"
 msgid "Advanced Options"
 msgstr "고급 옵션"
 
+#: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Advanced settings"
+msgstr "고급 설정"
+
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
+msgid "Advanced Settings"
 msgstr "고급 설정"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
@@ -881,6 +900,11 @@ msgstr "모든 문서가 처리되었습니다． 새로 보내거나 받은 문
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 msgstr "전자 서명 프로세스와 관련된 모든 문서는 우리 플랫폼을 통해 또는 이메일로 전자적으로 제공됩니다. 귀하의 이메일 주소가 최신 상태인지 확인하고 우리의 이메일을 수신 및 열 수 있는지 확인하는 것은 귀하의 책임입니다．"
+
+#: apps/remix/app/routes/_authenticated+/templates.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/documents.folders._index.tsx
+msgid "All Folders"
+msgstr "모든 폴더"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "All inserted signatures will be voided"
@@ -910,11 +934,13 @@ msgstr "모든 시간"
 msgid "Allow document recipients to reply directly to this email address"
 msgstr "문서 수신자가 이 이메일 주소로 직접 회신할 수 있도록 허용"
 
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Allow signers to dictate next signer"
 msgstr "서명자가 다음 서명자를 지명하도록 허용"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Allowed Signature Types"
@@ -999,7 +1025,10 @@ msgid "An error occurred while disabling the user."
 msgstr "사용자를 비활성화하는 동안 오류가 발생했습니다．"
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/general/share-document-download-button.tsx
+#: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 msgid "An error occurred while downloading your document."
@@ -1025,10 +1054,12 @@ msgstr "팀 멤버를 로드하는 동안 오류가 발생했습니다． 나중
 msgid "An error occurred while loading the document."
 msgstr "문서를 로드하는 동안 오류가 발생했습니다．"
 
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "An error occurred while moving the document."
 msgstr "문서를 이동하는 중 오류가 발생했습니다．"
 
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "An error occurred while moving the template."
 msgstr "템플릿을 이동하는 동안 오류가 발생했습니다．"
@@ -1103,6 +1134,7 @@ msgid "An error occurred while updating your profile."
 msgstr "프로필을 업데이트하는 중 오류가 발생했습니다．"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "An error occurred while uploading your document."
 msgstr "문서를 업로드하는 중 오류가 발생했습니다．"
 
@@ -1139,6 +1171,21 @@ msgstr "예상치 못한 오류가 발생했습니다."
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "An unknown error occurred"
 msgstr "알 수 없는 오류가 발생했습니다"
+
+#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "An unknown error occurred while creating the folder."
+msgstr "폴더를 생성하는 동안 알 수 없는 오류가 발생했습니다."
+
+#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "An unknown error occurred while deleting the folder."
+msgstr "폴더를 삭제하는 동안 알 수 없는 오류가 발생했습니다."
+
+#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "An unknown error occurred while moving the folder."
+msgstr "폴더를 이동하는 동안 알 수 없는 오류가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/team-transfer-dialog.tsx
 msgid "Any payment methods attached to this team will remain attached to this team. Please contact us if you need to update this information."
@@ -1297,6 +1344,8 @@ msgstr "이메일 확인 대기 중"
 
 #: apps/remix/app/components/general/direct-template/direct-template-signing-form.tsx
 #: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 msgid "Back"
 msgstr "뒤로"
 
@@ -1447,6 +1496,7 @@ msgstr "준비 가능"
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
@@ -1466,6 +1516,7 @@ msgstr "준비 가능"
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
@@ -1479,6 +1530,10 @@ msgstr "취소"
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Cancelled by user"
 msgstr "사용자가 취소함"
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "Cannot remove document"
+msgstr "문서를 삭제할 수 없습니다."
 
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Cannot remove signer"
@@ -1532,6 +1587,10 @@ msgstr "직접 링크 수신자 선택"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Choose how the document will reach recipients"
 msgstr "문서가 수신자에게 도달하는 방법 선택"
+
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
+msgid "Choose how to distribute your document to recipients. Email will send notifications, None will generate signing links for manual distribution."
+msgstr "수신자에게 문서를 배포하는 방법을 선택하세요. 이메일은 알림을 보내고, '없음'은 수동 배포용 서명 링크를 생성합니다."
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Choose..."
@@ -1602,6 +1661,10 @@ msgstr "필드 삽입하려면 클릭하세요"
 msgid "Close"
 msgstr "닫기"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
+msgid "Communication"
+msgstr "통신"
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/forms/signup.tsx
@@ -1658,9 +1721,32 @@ msgstr "완료된 문서"
 msgid "Completed Documents"
 msgstr "완료된 문서"
 
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
+msgid "Completed on {formattedDate}"
+msgstr "{formattedDate}에 완료됨"
+
+#. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
+#: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
+msgid "Configure {0} Field"
+msgstr "{0} 필드 구성"
+
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
+msgid "Configure additional options and preferences"
+msgstr "추가 옵션 및 환경 설정 구성"
+
 #: packages/lib/constants/template.ts
 msgid "Configure Direct Recipient"
 msgstr "직접 수신자 구성"
+
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
+msgid "Configure Document"
+msgstr "문서 구성"
+
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+msgid "Configure Fields"
+msgstr "필드 구성"
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Configure general settings for the document."
@@ -1674,11 +1760,21 @@ msgstr "템플릿의 일반 설정을 구성합니다．"
 msgid "Configure template"
 msgstr "템플릿 구성"
 
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
+msgid "Configure Template"
+msgstr "템플릿 구성"
+
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
+#: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Configure the {0} field"
 msgstr "{0} 필드 구성"
+
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+msgid "Configure the fields you want to place on the document."
+msgstr "문서에 배치할 필드를 구성하십시오."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -1695,6 +1791,8 @@ msgstr "확인을 위해 입력하세요 <0>{deleteMessage}</0>"
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Confirm by typing: <0>{deleteMessage}</0>"
 msgstr "확인을 위해 입력하세요: <0>{deleteMessage}</0>"
 
@@ -1724,12 +1822,13 @@ msgid "Content"
 msgstr "내용"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.invite.$token.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
@@ -1940,6 +2039,7 @@ msgstr "생성됨"
 msgid "Created At"
 msgstr "생성 시점"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Created by"
 msgstr "작성자"
@@ -1989,10 +2089,12 @@ msgstr "다크 모드"
 msgid "Date"
 msgstr "날짜"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Date created"
 msgstr "생성 날짜"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Date Format"
@@ -2042,8 +2144,11 @@ msgstr "삭제"
 
 #. placeholder {0}: webhook.webhookUrl
 #. placeholder {0}: token.name
+#. placeholder {0}: folder?.name ?? 'folder'
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "delete {0}"
 msgstr "{0} 삭제"
 
@@ -2217,6 +2322,10 @@ msgstr "문서에 이름과 이메일을 표시합니다"
 msgid "Distribute Document"
 msgstr "문서 배포"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
+msgid "Distribution Method"
+msgstr "배포 방법"
+
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Do you want to delete this template?"
 msgstr "이 템플릿을 삭제하시겠습니까？"
@@ -2229,6 +2338,7 @@ msgstr "이 템플릿을 복제하시겠습니까？"
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 msgstr "Documenso는 모든 완료된 문서와 서명을 포함하여 계정에 속한 <0>모든 문서</0>와 기타 모든 자원을 삭제할 것입니다．"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Document"
@@ -2294,6 +2404,10 @@ msgstr "문서가 완료되었습니다！"
 msgid "Document created"
 msgstr "문서 생성됨"
 
+#: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+msgid "Document Created"
+msgstr "문서가 생성되었습니다"
+
 #. placeholder {0}: document.user.name
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "Document created by <0>{0}</0>"
@@ -2312,6 +2426,7 @@ msgstr "<0>직접 연결</0>을 사용하여 생성된 문서"
 msgid "Document Creation"
 msgstr "문서 생성"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
@@ -2344,12 +2459,18 @@ msgstr "문서 중복됨"
 msgid "Document external ID updated"
 msgstr "문서 외부 ID 업데이트됨"
 
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
+msgid "Document found in your account"
+msgstr "계정에서 문서가 발견되었습니다"
+
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 #: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Document history"
 msgstr "문서 이력"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Document ID"
 msgstr "문서 ID"
@@ -2357,6 +2478,14 @@ msgstr "문서 ID"
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document inbox"
 msgstr "문서 수신함"
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "Document is already uploaded"
+msgstr "문서가 이미 업로드되었습니다"
+
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "Document is using legacy field insertion"
+msgstr "문서가 레거시 필드 삽입 방법을 사용하고 있습니다"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Document Limit Exceeded!"
@@ -2366,6 +2495,7 @@ msgstr "문서 제한 초과！"
 msgid "Document metrics"
 msgstr "문서 메트릭스"
 
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "Document moved"
 msgstr "문서 이동됨"
@@ -2429,10 +2559,12 @@ msgstr "문서 서명 인증 업데이트됨"
 msgid "Document signing process will be cancelled"
 msgstr "문서 서명 프로세스가 취소될 것입니다"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Document status"
 msgstr "문서 상태"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Document title"
 msgstr "문서 제목"
@@ -2445,11 +2577,16 @@ msgstr "문서 제목 업데이트됨"
 msgid "Document updated"
 msgstr "문서 업데이트됨"
 
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+msgid "Document updated successfully"
+msgstr "문서가 성공적으로 업데이트되었습니다"
+
 #: apps/remix/app/components/general/document/document-upload.tsx
 msgid "Document upload disabled due to unpaid invoices"
 msgstr "미지불된 청구서로 인해 문서 업로드가 비활성화되었습니다"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "문서 업로드됨"
 
@@ -2466,6 +2603,9 @@ msgid "Document will be permanently deleted"
 msgstr "문서가 영구적으로 삭제될 것입니다"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId._index.tsx
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.edit.tsx
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
@@ -2480,6 +2620,7 @@ msgstr "문서가 영구적으로 삭제될 것입니다"
 msgid "Documents"
 msgstr "문서들"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 msgid "Documents created from template"
 msgstr "템플릿에서 생성된 문서"
@@ -2500,6 +2641,7 @@ msgstr "계정이 없습니까? <0>가입하기</0>"
 #: apps/remix/app/components/tables/team-settings-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/general/share-document-download-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
@@ -2516,6 +2658,11 @@ msgstr "감사 로그 다운로드"
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
 msgid "Download Certificate"
 msgstr "인증서 다운로드"
+
+#: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
+msgid "Download Original"
+msgstr "원본 다운로드"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Download Template CSV"
@@ -2539,9 +2686,21 @@ msgstr "작성된 문서"
 msgid "Drag & drop your PDF here."
 msgstr "PDF를 여기에 끌어다 놓으세요．"
 
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "Drag and drop or click to upload"
+msgstr "드래그 앤 드롭하거나 클릭하여 업로드하세요"
+
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+msgid "Drag and drop your PDF file here"
+msgstr "PDF 파일을 여기에 드래그 앤 드롭하세요"
+
 #: packages/lib/constants/document.ts
 msgid "Draw"
 msgstr "그리다"
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "Drop your document here"
+msgstr "문서를 여기에 놓으세요"
 
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -2562,8 +2721,13 @@ msgstr "결제되지 않은 청구서로 인해 팀이 제한되었습니다．�
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Duplicate"
 msgstr "중복"
+
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Duplicate on all pages"
+msgstr "모든 페이지에 중복"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks._index.tsx
@@ -2577,6 +2741,7 @@ msgstr "중복"
 msgid "Edit"
 msgstr "편집"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 msgid "Edit Template"
 msgstr "템플릿 수정"
@@ -2607,6 +2772,9 @@ msgstr "전자 서명 공개"
 #: apps/remix/app/components/forms/forgot-password.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -2700,6 +2868,7 @@ msgstr "이 팀의 모든 문서에 대해 사용자 정의 브랜딩을 활성�
 msgid "Enable Direct Link Signing"
 msgstr "직접 링크 서명 활성화"
 
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Enable signing order"
@@ -2746,6 +2915,10 @@ msgstr "이름을 입력하세요"
 msgid "Enter your text here"
 msgstr "여기에 텍스트를 입력하세요"
 
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/components/general/verify-email-banner.tsx
@@ -2780,10 +2953,15 @@ msgstr "여기에 텍스트를 입력하세요"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
@@ -2792,6 +2970,10 @@ msgstr "여기에 텍스트를 입력하세요"
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Error"
 msgstr "오류"
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "Error uploading file"
+msgstr "파일 업로드 중 오류가 발생했습니다"
 
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
 msgid "Everyone can access and view the document"
@@ -2823,6 +3005,11 @@ msgstr "{0}에 만료됨"
 msgid "External ID"
 msgstr "외부 ID"
 
+#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+msgid "Failed to create folder"
+msgstr "폴더 생성에 실패했습니다"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
 msgstr "문서 걸쇠 잠금 실패"
@@ -2831,9 +3018,17 @@ msgstr "문서 걸쇠 잠금 실패"
 msgid "Failed to save settings."
 msgstr "설정 저장 실패．"
 
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+msgid "Failed to update document"
+msgstr "문서 업데이트에 실패했습니다"
+
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
 msgstr "수신자 업데이트 실패"
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+msgid "Failed to update template"
+msgstr "템플릿 업데이트에 실패했습니다"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks.$id.tsx
@@ -2887,13 +3082,38 @@ msgstr "서명되지 않은 필드"
 msgid "Fields"
 msgstr "필드"
 
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "Fields updated"
+msgstr "필드가 업데이트되었습니다"
+
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "파일 크기는 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB를 초과할 수 없습니다"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "File size exceeds the limit of {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB"
 msgstr "파일 크기가 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB 제한을 초과합니다"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Folder"
+msgstr "폴더"
+
+#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+msgid "Folder created successfully"
+msgstr "폴더가 성공적으로 생성되었습니다"
+
+#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+msgid "Folder not found"
+msgstr "폴더를 찾을 수 없습니다"
+
+#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+msgid "Folder updated successfully"
+msgstr "폴더가 성공적으로 업데이트되었습니다"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -2941,6 +3161,7 @@ msgstr "전체 이름"
 #: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "General"
 msgstr "일반"
 
@@ -2970,6 +3191,10 @@ msgstr "홈으로 돌아가기"
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 msgid "Go Back Home"
 msgstr "홈으로 돌아가기"
+
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
+msgid "Go to document"
+msgstr "문서로 이동"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Go to owner"
@@ -3142,7 +3367,7 @@ msgstr "잘못된 코드입니다． 다시 시도해 주세요．"
 msgid "Invalid email"
 msgstr "잘못된 이메일"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
 msgstr "잘못된 링크"
@@ -3239,6 +3464,7 @@ msgid "Label"
 msgstr "레이블"
 
 #: apps/remix/app/components/general/menu-switcher.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Language"
@@ -3261,6 +3487,7 @@ msgstr "지난 7일"
 msgid "Last modified"
 msgstr "마지막 수정"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Last updated"
 msgstr "마지막 업데이트"
@@ -3363,6 +3590,7 @@ msgstr "{0}의 프로필 관리"
 msgid "Manage all teams you are currently associated with."
 msgstr "현재 연결된 모든 팀 관리．"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 msgid "Manage and view template"
 msgstr "템플릿 관리 및 보기"
@@ -3471,6 +3699,7 @@ msgstr "회원 가입일"
 msgid "Members"
 msgstr "회원들"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Message <0>(Optional)</0>"
@@ -3498,18 +3727,37 @@ msgstr "월간 활성 사용자: 최소 하나의 문서를 생성한 사용자"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "월간 활성 사용자: 최소 한 개의 문서가 완료된 사용자"
 
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "Move"
 msgstr "이동"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+msgid "Move \"{templateTitle}\" to a folder"
+msgstr "\"{templateTitle}\"를 폴더로 이동"
+
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Move Document to Folder"
+msgstr "문서를 폴더로 이동"
 
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "Move Document to Team"
 msgstr "문서를 팀으로 이동"
 
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+msgid "Move Template to Folder"
+msgstr "템플릿을 폴더로 이동"
+
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "Move Template to Team"
 msgstr "템플릿을 팀으로 이동"
+
+#: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+msgid "Move to Folder"
+msgstr "폴더로 이동"
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -3534,6 +3782,8 @@ msgstr "내 템플릿"
 #: apps/remix/app/components/general/claim-account.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
@@ -3622,8 +3872,8 @@ msgstr "최근 활동 없음"
 msgid "No recent documents"
 msgstr "최근 문서 없음"
 
+#: packages/ui/primitives/recipient-selector.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
-#: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "No recipient matching this description was found."
 msgstr "이 설명과 일치하는 수신자를 찾을 수 없습니다．"
 
@@ -3634,8 +3884,8 @@ msgstr "이 설명과 일치하는 수신자를 찾을 수 없습니다．"
 msgid "No recipients"
 msgstr "수신자 없음"
 
+#: packages/ui/primitives/recipient-selector.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
-#: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "No recipients with this role"
 msgstr "이 역할을 가진 수신자가 없습니다"
 
@@ -3666,7 +3916,6 @@ msgstr "유효한 직접 템플릿을 찾을 수 없음"
 msgid "No valid recipients found"
 msgstr "유효한 수신자를 찾을 수 없음"
 
-#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 #: apps/remix/app/components/general/multiselect-role-combobox.tsx
 #: packages/ui/primitives/multi-select-combobox.tsx
 #: packages/ui/primitives/combobox.tsx
@@ -3677,6 +3926,7 @@ msgstr "값을 찾을 수 없음．"
 msgid "No worries, it happens! Enter your email and we'll email you a special link to reset your password."
 msgstr "걱정 마세요, 그럴 수 있어요! 이메일을 입력하시면, 비밀번호를 재설정할 수 있는 특별한 링크를 이메일로 보내드립니다．"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/lib/constants/document.ts
 msgid "None"
 msgstr "없음"
@@ -3900,8 +4150,8 @@ msgstr "지불 연체"
 #: apps/remix/app/components/tables/user-settings-teams-page-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
-#: apps/remix/app/components/general/document/document-read-only-fields.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/lib/constants/document.ts
 msgid "Pending"
 msgstr "보류 중"
@@ -3988,6 +4238,11 @@ msgstr "업데이트를 확인하려면 이메일을 확인하세요．"
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 msgid "Please choose your new password"
 msgstr "새 비밀번호를 선택하세요"
+
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+msgid "Please configure the document first"
+msgstr "먼저 문서를 구성하세요"
 
 #: packages/lib/server-only/auth/send-confirmation-email.ts
 msgid "Please confirm your email"
@@ -4261,6 +4516,7 @@ msgstr "수신자가 업데이트되었습니다"
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 msgid "Recipients"
 msgstr "수신자들"
 
@@ -4284,6 +4540,7 @@ msgstr "복구 코드"
 msgid "Red"
 msgstr "빨강"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Redirect URL"
@@ -4345,12 +4602,12 @@ msgstr "알림: 문서를 {recipientActionVerb}해주세요"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
-#: apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
 #: apps/remix/app/components/forms/team-branding-preferences-form.tsx
 #: apps/remix/app/components/forms/avatar-image.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Remove"
 msgstr "제거"
@@ -4442,7 +4699,7 @@ msgstr "문서 보유"
 msgid "Retry"
 msgstr "다시 시도"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.invite.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.decline.$token.tsx
@@ -4473,6 +4730,7 @@ msgstr "접근 권한 취소"
 #: apps/remix/app/components/tables/user-settings-current-teams-table.tsx
 #: apps/remix/app/components/tables/team-settings-members-table.tsx
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-invite-dialog.tsx
@@ -4484,12 +4742,19 @@ msgstr "역할"
 msgid "Roles"
 msgstr "역할들"
 
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Root (No Folder)"
+msgstr "루트 (폴더 없음)"
+
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Rows per page"
 msgstr "페이지당 행 수"
 
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-number-field.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
+#: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Save"
@@ -4544,6 +4809,10 @@ msgstr "보안 활동"
 msgid "Select"
 msgstr "선택"
 
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Select a folder to move this document to."
+msgstr "이 문서를 이동할 폴더를 선택하세요."
+
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "Select a team"
@@ -4580,6 +4849,11 @@ msgstr "기본 옵션 선택"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "인증 키 선택"
+
+#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
+#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
+msgid "Select triggers"
+msgstr "트리거 선택"
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -4664,6 +4938,14 @@ msgstr "보냈음"
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
 msgstr "비밀번호 설정"
+
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
+msgid "Set up your document properties and recipient information"
+msgstr "문서 속성과 수신자 정보를 설정하세요"
+
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
+msgid "Set up your template properties and recipient information"
+msgstr "템플릿 속성과 수신자 정보를 설정하세요"
 
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -4806,7 +5088,6 @@ msgstr "OIDC로 가입하기"
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
-#: packages/ui/primitives/document-flow/field-icon.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Signature"
 msgstr "서명"
@@ -4836,8 +5117,8 @@ msgid "Signatures will appear once the document has been completed"
 msgstr "문서가 완료되면 서명이 나타납니다"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
-#: apps/remix/app/components/general/document/document-read-only-fields.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "Signed"
 msgstr "서명됨"
@@ -4934,7 +5215,9 @@ msgstr "일부 서명자에게 서명란이 할당되지 않았습니다． 계�
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/general/share-document-download-button.tsx
 #: apps/remix/app/components/general/billing-portal-button.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/teams/team-layout-billing-banner.tsx
@@ -4945,6 +5228,7 @@ msgstr "일부 서명자에게 서명란이 할당되지 않았습니다． 계�
 #: apps/remix/app/components/general/teams/team-billing-portal-button.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+#: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-certificate-download-button.tsx
@@ -4972,7 +5256,7 @@ msgid "Something went wrong"
 msgstr "문제가 발생했습니다"
 
 #. placeholder {0}: data.teamName
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "Something went wrong while attempting to transfer the ownership of team <0>{0}</0> to your. Please try again later or contact support."
 msgstr "팀 <0>{0}</0>의 소유권을 귀하에게 이전하려는 시도 중 문제가 발생했습니다． 나중에 다시 시도하시거나 지원 센터에 문의하시기 바랍니다．"
 
@@ -5044,6 +5328,7 @@ msgstr "상태"
 msgid "Step <0>{step} of {maxStep}</0>"
 msgstr "단계 <0>{step} 중 {maxStep}</0>"
 
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Subject <0>(Optional)</0>"
@@ -5061,6 +5346,8 @@ msgstr "구독"
 msgid "Subscriptions"
 msgstr "구독"
 
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+#: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/components/tables/user-settings-pending-teams-table-actions.tsx
 #: apps/remix/app/components/tables/team-settings-member-invites-table.tsx
@@ -5201,15 +5488,15 @@ msgstr "팀 전용"
 msgid "Team only templates are not linked anywhere and are visible only to your team."
 msgstr "팀 전용 템플릿은 어디에도 연결되지 않으며 귀하의 팀에게만 표시됩니다．"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "Team ownership transfer"
 msgstr "팀 소유권 이전"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "Team ownership transfer already completed!"
 msgstr "팀 소유권 이전이 이미 완료되었습니다!"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "Team ownership transferred!"
 msgstr "팀 소유권이 이전되었습니다！"
 
@@ -5258,6 +5545,8 @@ msgstr "팀"
 msgid "Teams restricted"
 msgstr "팀 제한"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id.edit.tsx
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -5267,6 +5556,10 @@ msgstr "팀 제한"
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Template"
 msgstr "템플릿"
+
+#: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+msgid "Template Created"
+msgstr "템플릿이 생성되었습니다"
 
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Template deleted"
@@ -5288,6 +5581,11 @@ msgstr "템플릿이 공용 프로필에서 제거되었습니다．"
 msgid "Template has been updated."
 msgstr "템플릿이 업데이트되었습니다．"
 
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "Template is using legacy field insertion"
+msgstr "템플릿이 레거시 필드 삽입 방법을 사용하고 있습니다"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "Template moved"
 msgstr "템플릿이 이동되었습니다"
@@ -5304,6 +5602,12 @@ msgstr "템플릿이 저장되었습니다"
 msgid "Template title"
 msgstr "템플릿 제목"
 
+#: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
+msgid "Template updated successfully"
+msgstr "템플릿이 성공적으로 업데이트되었습니다"
+
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId._index.tsx
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -5379,9 +5683,17 @@ msgstr "배너에 표시할 콘텐츠입니다. HTML 사용이 가능합니다"
 msgid "The direct link has been copied to your clipboard"
 msgstr "직접 링크가 클립보드에 복사되었습니다"
 
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "The document has been moved successfully."
+msgstr "문서가 성공적으로 이동되었습니다."
+
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "The document has been successfully moved to the selected team."
 msgstr "문서가 선택한 팀으로 성공적으로 이동되었습니다．"
+
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "The document is already saved and cannot be changed."
+msgstr "문서가 이미 저장되어 있으며 변경할 수 없습니다."
 
 #: apps/remix/app/components/embed/embed-document-completed.tsx
 msgid "The document is now completed, please follow any instructions provided within the parent application."
@@ -5421,6 +5733,28 @@ msgstr "제공된 이메일 또는 비밀번호가 정확하지 않습니다"
 msgid "The events that will trigger a webhook to be sent to your URL."
 msgstr "URL로 전송될 웹훅을 트리거할 이벤트입니다．"
 
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "The fields have been updated to the new field insertion method successfully"
+msgstr "필드가 새로운 필드 삽입 방법으로 성공적으로 업데이트되었습니다"
+
+#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "The folder you are trying to delete does not exist."
+msgstr "삭제하려는 폴더가 존재하지 않습니다."
+
+#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "The folder you are trying to move does not exist."
+msgstr "이동하려는 폴더가 존재하지 않습니다."
+
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "The folder you are trying to move the document to does not exist."
+msgstr "문서를 이동하려는 폴더가 존재하지 않습니다."
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+msgid "The folder you are trying to move the template to does not exist."
+msgstr "템플릿을 이동하려는 폴더가 존재하지 않습니다."
+
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "The following errors occurred:"
 msgstr "다음 오류가 발생했습니다："
@@ -5434,7 +5768,7 @@ msgid "The following team has been deleted by you"
 msgstr "다음 팀이 삭제되었습니다"
 
 #. placeholder {0}: data.teamName
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "The ownership of team <0>{0}</0> has been successfully transferred to you."
 msgstr "팀 <0>{0}</0>의 소유권이 성공적으로 귀하에게 이전되었습니다．"
 
@@ -5535,6 +5869,10 @@ msgid "The team you are looking for may have been removed, renamed or may have n
 "                existed."
 msgstr "찾고 있는 팀이 삭제되었거나 이름이 변경되었거나 존재하지 않았을 수 있습니다."
 
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+msgid "The template has been moved successfully."
+msgstr "템플릿이 성공적으로 이동되었습니다."
+
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "The template has been successfully moved to the selected team."
 msgstr "템플릿이 선택된 팀으로 성공적으로 이동되었습니다．"
@@ -5590,6 +5928,10 @@ msgstr "현재 활성 초안이 없습니다． 문서를 업로드하여 초안
 msgid "There are no completed documents yet. Documents that you have created or received will appear here once completed."
 msgstr "아직 완료된 문서가 없습니다． 작성하거나 받은 문서는 완료되면 여기에 나타납니다．"
 
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "There was an error uploading your file. Please try again."
+msgstr "파일 업로드 중 오류가 발생했습니다. 다시 시도하세요."
+
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "They have permission on your behalf to:"
 msgstr "다음에 대한 권한을 부여받았습니다："
@@ -5620,6 +5962,10 @@ msgstr "다음 단계에서 직접 각 수신자의 인증 요구 사항을 설�
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
 msgstr "이 문서는 복구할 수 없습니다. 향후 문서의 이유를 논의하고 싶다면 지원팀에 문의하세요．"
 
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+msgid "This document cannot be changed"
+msgstr "이 문서는 변경할 수 없습니다"
+
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "This document could not be deleted at this time. Please try again."
 msgstr "현재 이 문서를 삭제할 수 없습니다． 다시 시도해 주세요．"
@@ -5632,7 +5978,7 @@ msgstr "현재 이 문서를 복제할 수 없습니다． 다시 시도해 주�
 msgid "This document could not be re-sent at this time. Please try again."
 msgstr "현재 이 문서를 다시 보낼 수 없습니다． 다시 시도해 주세요．"
 
-#: packages/ui/primitives/document-flow/add-fields.tsx
+#: packages/ui/primitives/recipient-selector.tsx
 msgid "This document has already been sent to this recipient. You can no longer edit this recipient."
 msgstr "이 문서는 이미 해당 수신자에게 발송되었습니다. 이제 이 수신자를 편집할 수 없습니다．"
 
@@ -5644,17 +5990,28 @@ msgstr "이 문서는 소유자에 의해 취소되었으며 다른 사람들이
 msgid "This document has been cancelled by the owner."
 msgstr "이 문서는 소유자에 의해 취소되었습니다．"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "This document has been rejected by a recipient"
 msgstr "이 문서는 수신자에 의해 거부되었습니다"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "This document has been signed by all recipients"
 msgstr "이 문서는 모든 수신자가 서명했습니다"
 
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
+msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
+msgstr "이 문서는 당신의 Documenso 계정에 있습니다. 자세한 정보, 수신자 및 감사 로그를 거기서 확인할 수 있습니다."
+
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
 msgstr "이 문서는 현재 초안이며 발송되지 않았습니다."
+
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "This document is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
+msgstr "이 문서는 레거시 필드 삽입 방법을 사용하고 있으며, 더욱 정확한 결과를 위해 새로운 필드 삽입 방법을 사용할 것을 권장합니다."
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "This document was created by you or a team member using the template above."
@@ -5696,11 +6053,16 @@ msgstr "다른 수신자가 아직 서명하지 않았을 경우 문서에 서�
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "이 필드는 수정되거나 삭제될 수 없습니다． 이 템플릿의 직접 링크를 공유하거나 공개 프로필에 추가하면, 누구나 이름과 이메일을 입력하고 할당된 필드를 기입할 수 있습니다．"
 
+#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "This folder name is already taken."
+msgstr "이 폴더 이름은 이미 사용 중입니다."
+
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
 msgstr "이 문서를 서명할 준비가 되면 수신자에게 이렇게 도달합니다．"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a transfer request."
 msgstr "이 링크는 유효하지 않거나 만료되었습니다. 팀에 문의하여 이전 요청을 다시 보내십시오."
 
@@ -5740,6 +6102,10 @@ msgstr "이 팀과 관련 데이터 제외 청구서는 영구적으로 삭제�
 msgid "This template could not be deleted at this time. Please try again."
 msgstr "지금 이 템플릿을 삭제할 수 없습니다． 다시 시도해 주세요．"
 
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "This template is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
+msgstr "이 템플릿은 레거시 필드 삽입 방법을 사용하고 있으며, 더욱 정확한 결과를 위해 새로운 필드 삽입 방법을 사용할 것을 권장합니다."
+
 #: apps/remix/app/routes/_unauthenticated+/team.decline.$token.tsx
 msgid "This token is invalid or has expired. No action is needed."
 msgstr "이 토큰은 유효하지 않거나 만료되었습니다． 조치가 필요하지 않습니다．"
@@ -5778,11 +6144,13 @@ msgstr "모든 전역 설정을 무시합니다．"
 msgid "Time"
 msgstr "시간"
 
+#: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id.logs.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id.logs.tsx
 msgid "Time zone"
 msgstr "시간대"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Time Zone"
@@ -5792,6 +6160,7 @@ msgstr "시간대"
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Title"
 msgstr "제목"
@@ -6101,6 +6470,10 @@ msgstr "업데이트"
 msgid "Update Banner"
 msgstr "배너 업데이트"
 
+#: apps/remix/app/components/general/legacy-field-warning-popover.tsx
+msgid "Update Fields"
+msgstr "필드 업데이트"
+
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Update passkey"
 msgstr "암호 업데이트"
@@ -6115,6 +6488,7 @@ msgstr "프로필 업데이트"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Update Recipient"
 msgstr "수신자 업데이트"
 
@@ -6157,9 +6531,14 @@ msgstr "비밀번호 업데이트 중…"
 msgid "Updating Your Information"
 msgstr "정보 업데이트"
 
+#: packages/ui/primitives/document-upload.tsx
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Upgrade"
 msgstr "업그레이드"
+
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+msgid "Upgrade your plan to upload more documents"
+msgstr "계획을 업그레이드하여 더 많은 문서를 업로드하세요"
 
 #: packages/lib/constants/document.ts
 msgid "Upload"
@@ -6189,10 +6568,17 @@ msgstr "CSV 업로드"
 msgid "Upload custom document"
 msgstr "사용자 정의 문서 업로드"
 
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
+#: packages/ui/primitives/document-upload.tsx
+msgid "Upload Document"
+msgstr "문서 업로드"
+
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Upload Signature"
 msgstr "서명 업로드"
 
+#: packages/ui/primitives/document-upload.tsx
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Upload Template Document"
 msgstr "템플릿 문서 업로드"
@@ -6218,6 +6604,11 @@ msgstr "업로드된 파일이 너무 작습니다"
 msgid "Uploaded file not an allowed file type"
 msgstr "업로드된 파일이 허용된 파일 형식이 아닙니다"
 
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+msgid "Uploading document..."
+msgstr "문서 업로드 중..."
+
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
 msgid "Use"
 msgstr "사용"
@@ -6666,6 +7057,7 @@ msgstr "저희가 서명 링크를 생성해드리며, 원하시는 방법으로
 msgid "We won't send anything to notify recipients."
 msgstr "수신자에게 알리기 위해 아무것도 보내지 않습니다．"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates._index.tsx
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "We're all empty"
@@ -6730,6 +7122,7 @@ msgstr "Documenso에 오신 것을 환영합니다！"
 msgid "Were you trying to edit this document instead?"
 msgstr "대신 이 문서를 편집하려고 했나요？"
 
+#: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
@@ -6889,11 +7282,13 @@ msgstr "{MAXIMUM_PASSKEYS}개 이상의 보안 키를 가질 수 없습니다．
 msgid "You cannot modify a team member who has a higher role than you."
 msgstr "자신보다 높은 역할을 가진 팀 구성원을 수정할 수 없습니다．"
 
+#: packages/ui/primitives/document-upload.tsx
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "You cannot upload documents at this time."
 msgstr "현재 문서를 업로드할 수 없습니다．"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "You cannot upload encrypted PDFs"
 msgstr "암호화된 PDF를 업로드할 수 없습니다"
 
@@ -6915,7 +7310,7 @@ msgid "You have accepted an invitation from <0>{0}</0> to join their team."
 msgstr "<0>{0}</0>의 초대를 수락하여 그들의 팀에 가입했습니다．"
 
 #. placeholder {0}: data.teamName
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.token.tsx
+#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "You have already completed the ownership transfer for <0>{0}</0>."
 msgstr "이미 <0>{0}</0>의 소유권 이전을 완료했습니다．"
 
@@ -6965,6 +7360,7 @@ msgstr "귀하에게 {recipientActionVerb}을 요구하는 문서 {0}을 시작�
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
 msgstr "아직 웹훅이 없습니다．웹훅을 만들면 여기에 표시됩니다．"
 
+#: apps/remix/app/routes/_authenticated+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates._index.tsx
 msgid "You have not yet created any templates. To create a template please upload one."
 msgstr "아직 템플릿을 생성하지 않았습니다．템플릿을 만들려면 하나를 업로드하세요．"
@@ -6979,6 +7375,7 @@ msgid "You have reached the maximum limit of {0} direct templates. <0>Upgrade yo
 msgstr "{0}개의 직접 템플릿 최대 한도에 도달했습니다. <0>계정을 업그레이드하여 계속하십시오!</0>"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "You have reached your document limit for this month. Please upgrade your plan."
 msgstr "이번 달 문서 한도에 도달했습니다． 요금제를 업그레이드해 주세요．"
 
@@ -7052,6 +7449,11 @@ msgstr "소유권을 이전하기 위해서는 최소한 다른 팀원이 한 �
 msgid "You must set a profile URL before enabling your public profile."
 msgstr "공개 프로필을 활성화하기 전에 프로필 URL을 설정해야 합니다．"
 
+#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "You must type '{deleteMessage}' to confirm"
+msgstr "확인을 위해 '{deleteMessage}'를 입력해야 합니다"
+
 #: apps/remix/app/routes/_authenticated+/settings+/tokens.tsx
 msgid "You need to be an admin to manage API tokens."
 msgstr "API 토큰을 관리하려면 관리자가 되어야 합니다."
@@ -7117,12 +7519,18 @@ msgid "Your direct signing templates"
 msgstr "직접 서명 템플릿"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
+#: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Your document failed to upload."
 msgstr "문서 업로드에 실패했습니다．"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Your document has been created from the template successfully."
 msgstr "문서가 템플릿에서 성공적으로 생성되었습니다．"
+
+#: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+msgid "Your document has been created successfully"
+msgstr "문서가 성공적으로 생성되었습니다"
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "Your document has been deleted by an admin!"
@@ -7141,6 +7549,7 @@ msgid "Your document has been successfully duplicated."
 msgstr "문서가 성공적으로 복제되었습니다．"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Your document has been uploaded successfully."
 msgstr "문서가 성공적으로 업로드되었습니다．"
 
@@ -7233,6 +7642,10 @@ msgstr "팀이 성공적으로 삭제되었습니다．"
 #: apps/remix/app/components/forms/team-update-form.tsx
 msgid "Your team has been successfully updated."
 msgstr "팀이 성공적으로 업데이트되었습니다．"
+
+#: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
+msgid "Your template has been created successfully"
+msgstr "템플릿이 성공적으로 생성되었습니다"
 
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 msgid "Your template has been duplicated successfully."
