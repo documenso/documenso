@@ -1,9 +1,4 @@
-import {
-  OrganisationGroupType,
-  OrganisationMemberRole,
-  OrganisationType,
-  TeamMemberRole,
-} from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -166,16 +161,6 @@ export const createTeam = async ({
             teamGroups: true,
           },
         });
-
-        if (organisation.type === OrganisationType.PERSONAL) {
-          await tx.teamEmail.create({
-            data: {
-              teamId: team.id,
-              email: organisation.owner.email,
-              name: organisation.owner.name || organisation.owner.email,
-            },
-          });
-        }
 
         // Create the internal team groups.
         await Promise.all(

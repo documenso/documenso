@@ -162,12 +162,6 @@ FROM "UserProfile" up
 JOIN "User" u ON u."id" = up."userId"
 JOIN "Team" t ON t."ownerUserId" = u."id" AND t."isPersonal" = TRUE;
 
--- 12. Create team email for all personal teams.
-INSERT INTO "TeamEmail" ("teamId", "createdAt", "name", "email")
-SELECT t."id", NOW(), 'Personal team email', u."email"
-FROM "User" u
-JOIN "Team" t ON t."ownerUserId" = u."id" AND t."isPersonal" = TRUE;
-
 -- [CUSTOM_CHANGE_END]
 
 -- CreateEnum
@@ -202,9 +196,6 @@ ALTER TABLE "TeamTransferVerification" DROP CONSTRAINT "TeamTransferVerification
 
 -- DropForeignKey
 ALTER TABLE "UserProfile" DROP CONSTRAINT "UserProfile_userId_fkey";
-
--- DropIndex
-DROP INDEX "TeamEmail_email_key";
 
 -- DropIndex
 DROP INDEX "Team_customerId_key";

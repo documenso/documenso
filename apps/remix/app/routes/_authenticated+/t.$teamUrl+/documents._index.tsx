@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { OrganisationType } from '@prisma/client';
 import { FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
@@ -56,6 +58,9 @@ export default function DocumentsPage() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
+  const organisation = useCurrentOrganisation();
+  const team = useCurrentTeam();
+
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
   const [isMovingFolder, setIsMovingFolder] = useState(false);
@@ -64,8 +69,6 @@ export default function DocumentsPage() {
   const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
-
-  const team = useCurrentTeam();
 
   const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
   const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
@@ -110,6 +113,10 @@ export default function DocumentsPage() {
     params.set('status', value);
 
     if (value === ExtendedDocumentStatus.ALL) {
+      params.delete('status');
+    }
+
+    if (value === ExtendedDocumentStatus.INBOX && organisation.type === OrganisationType.PERSONAL) {
       params.delete('status');
     }
 
@@ -282,22 +289,30 @@ export default function DocumentsPage() {
                   ExtendedDocumentStatus.COMPLETED,
                   ExtendedDocumentStatus.DRAFT,
                   ExtendedDocumentStatus.ALL,
-                ].map((value) => (
-                  <TabsTrigger
-                    key={value}
-                    className="hover:text-foreground min-w-[60px]"
-                    value={value}
-                    asChild
-                  >
-                    <Link to={getTabHref(value)} preventScrollReset>
-                      <DocumentStatus status={value} />
+                ]
+                  .filter((value) => {
+                    if (organisation.type === OrganisationType.PERSONAL) {
+                      return value !== ExtendedDocumentStatus.INBOX;
+                    }
 
-                      {value !== ExtendedDocumentStatus.ALL && (
-                        <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
-                      )}
-                    </Link>
-                  </TabsTrigger>
-                ))}
+                    return true;
+                  })
+                  .map((value) => (
+                    <TabsTrigger
+                      key={value}
+                      className="hover:text-foreground min-w-[60px]"
+                      value={value}
+                      asChild
+                    >
+                      <Link to={getTabHref(value)} preventScrollReset>
+                        <DocumentStatus status={value} />
+
+                        {value !== ExtendedDocumentStatus.ALL && (
+                          <span className="ml-1 inline-block opacity-50">{stats[value]}</span>
+                        )}
+                      </Link>
+                    </TabsTrigger>
+                  ))}
               </TabsList>
             </Tabs>
 

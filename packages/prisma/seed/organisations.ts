@@ -4,6 +4,7 @@ import { nanoid } from 'nanoid';
 
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
 import { acceptOrganisationInvitation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
+import { prefixedId } from '@documenso/lib/universal/id';
 
 import { prisma } from '..';
 import { seedTestEmail } from './users';
@@ -56,6 +57,7 @@ export const seedOrganisationMembers = async ({
 
   await prisma.organisationMemberInvite.createMany({
     data: membersToInvite.map((invite) => ({
+      id: prefixedId('member_invite'),
       email: invite.email,
       organisationId,
       organisationRole: invite.organisationRole,

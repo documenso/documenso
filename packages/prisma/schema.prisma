@@ -791,7 +791,7 @@ model TeamEmail {
   teamId    Int      @id @unique
   createdAt DateTime @default(now())
   name      String
-  email     String
+  email     String   @unique
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
 }
 

@@ -3,6 +3,8 @@ import { setCookie } from 'hono/cookie';
 
 import { AppDebugger } from '@documenso/lib/utils/debugger';
 
+import { handleRedirects } from './redirects';
+
 const debug = new AppDebugger('Middleware');
 
 /**
@@ -24,6 +26,14 @@ export const appMiddleware = async (c: Context, next: Next) => {
   }
 
   // PRE-HANDLER CODE: Place code here to execute BEFORE the route handler runs.
+  const redirectPath = await handleRedirects(c);
+
+  if (redirectPath) {
+    debug.log('Redirecting from', path);
+    debug.log('Redirecting to', redirectPath);
+
+    return c.redirect(redirectPath);
+  }
 
   await next();
 

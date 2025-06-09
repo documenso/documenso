@@ -182,13 +182,18 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
     );
   }
 
-  await prisma.organisationClaim.update({
+  await prisma.organisation.update({
     where: {
-      id: organisation.organisationClaimId,
+      id: organisation.id,
     },
     data: {
-      originalSubscriptionClaimId: claim.id,
-      ...createOrganisationClaimUpsertData(claim),
+      type: OrganisationType.ORGANISATION,
+      organisationClaim: {
+        update: {
+          originalSubscriptionClaimId: claim.id,
+          ...createOrganisationClaimUpsertData(claim),
+        },
+      },
     },
   });
 
