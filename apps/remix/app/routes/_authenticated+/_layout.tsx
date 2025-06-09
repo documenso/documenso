@@ -59,11 +59,14 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
   );
 
   useEffect(() => {
+    console.log({ userProfile });
     const closeSession = async () => {
       await authClient.signOut();
     };
 
     if (userProfile?.disabled) {
+      console.log(
+        `User profile is disabled, closing session for user: ${userProfile.id}`,)
       void closeSession();
     }
   }, [userProfile]);
