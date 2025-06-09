@@ -76,12 +76,6 @@ export const updateTeamMemberRoute = authenticatedProcedure
         ),
     );
 
-    if (!internalTeamGroupToRemoveMemberFrom) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Unable to find member role.',
-      });
-    }
-
     const teamMemberGroup = team.teamGroups.find(
       (group) =>
         group.organisationGroup.type === OrganisationGroupType.INTERNAL_TEAM &&
@@ -147,14 +141,16 @@ export const updateTeamMemberRoute = authenticatedProcedure
 
     // Switch member to new internal team group role.
     await prisma.$transaction(async (tx) => {
-      await tx.organisationGroupMember.delete({
-        where: {
-          organisationMemberId_groupId: {
-            organisationMemberId: memberId,
-            groupId: internalTeamGroupToRemoveMemberFrom.organisationGroupId,
+      if (internalTeamGroupToRemoveMemberFrom) {
+        await tx.organisationGroupMember.delete({
+          where: {
+            organisationMemberId_groupId: {
+              organisationMemberId: memberId,
+              groupId: internalTeamGroupToRemoveMemberFrom.organisationGroupId,
+            },
           },
-        },
-      });
+        });
+      }
 
       await tx.organisationGroupMember.create({
         data: {

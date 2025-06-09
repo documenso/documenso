@@ -10,7 +10,10 @@ import type {
   InternalClaim,
   StripeOrganisationCreateMetadata,
 } from '@documenso/lib/types/subscription';
-import { ZStripeOrganisationCreateMetadataSchema } from '@documenso/lib/types/subscription';
+import {
+  INTERNAL_CLAIM_ID,
+  ZStripeOrganisationCreateMetadataSchema,
+} from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 
 import { extractStripeClaim } from './on-subscription-updated';
@@ -182,12 +185,22 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
     );
   }
 
+  let newOrganisationType: OrganisationType = OrganisationType.ORGANISATION;
+
+  // Keep the organisation as personal if the claim is for an individual.
+  if (
+    organisation.type === OrganisationType.PERSONAL &&
+    claim.id === INTERNAL_CLAIM_ID.INDIVIDUAL
+  ) {
+    newOrganisationType = OrganisationType.PERSONAL;
+  }
+
   await prisma.organisation.update({
     where: {
       id: organisation.id,
     },
     data: {
-      type: OrganisationType.ORGANISATION,
+      type: newOrganisationType,
       organisationClaim: {
         update: {
           originalSubscriptionClaimId: claim.id,

@@ -3,6 +3,7 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 import { EditIcon, MoreHorizontal, Trash2Icon } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
@@ -13,6 +14,7 @@ import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -31,6 +33,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 import { TeamMemberDeleteDialog } from '../dialogs/team-member-delete-dialog';
 import { TeamMemberUpdateDialog } from '../dialogs/team-member-update-dialog';
+import { TeamInheritMemberAlert } from '../general/teams/team-inherit-member-alert';
 
 export const TeamMembersTable = () => {
   const { _ } = useLingui();
@@ -42,6 +45,13 @@ export const TeamMembersTable = () => {
   const team = useCurrentTeam();
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
+
+  const groupQuery = trpc.team.group.find.useQuery({
+    teamId: team.id,
+    types: [OrganisationGroupType.INTERNAL_ORGANISATION, OrganisationGroupType.INTERNAL_TEAM],
+    organisationRoles: [OrganisationMemberRole.MEMBER],
+    perPage: 100, // Lets hope this is enough.
+  });
 
   const { data, isLoading, isLoadingError } = trpc.team.member.find.useQuery(
     {
@@ -68,6 +78,14 @@ export const TeamMembersTable = () => {
     currentPage: 1,
     totalPages: 1,
   };
+
+  const groups = groupQuery.data?.data ?? [];
+
+  const memberAccessTeamGroup = groups.find(
+    (group) =>
+      group.organisationGroupType === OrganisationGroupType.INTERNAL_ORGANISATION &&
+      group.teamRole === OrganisationMemberRole.MEMBER,
+  );
 
   const columns = useMemo(() => {
     return [
@@ -97,8 +115,15 @@ export const TeamMembersTable = () => {
       },
       {
         header: _(msg`Source`),
-        cell: ({ row }) => _(msg`Group`),
-        // cell: ({ row }) => (row.original.type === 'member' ? _(msg`Member`) : _(msg`Group`)),
+        cell: ({ row }) => {
+          const internalTeamGroupFound = groups.find(
+            (group) =>
+              group.organisationGroupType === OrganisationGroupType.INTERNAL_TEAM &&
+              group.members.some((member) => member.id === row.original.id),
+          );
+
+          return internalTeamGroupFound ? _(msg`Member`) : _(msg`Group`);
+        },
       },
       {
         header: _(msg`Actions`),
@@ -140,6 +165,7 @@ export const TeamMembersTable = () => {
                 memberId={row.original.id}
                 memberName={row.original.name ?? ''}
                 memberEmail={row.original.email}
+                isInheritMemberEnabled={memberAccessTeamGroup !== undefined}
                 trigger={
                   <DropdownMenuItem
                     onSelect={(e) => e.preventDefault()}
@@ -159,48 +185,56 @@ export const TeamMembersTable = () => {
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [groups]);
 
   return (
-    <DataTable
-      columns={columns}
-      data={results.data}
-      perPage={results.perPage}
-      currentPage={results.currentPage}
-      totalPages={results.totalPages}
-      onPaginationChange={onPaginationChange}
-      error={{
-        enable: isLoadingError,
-      }}
-      skeleton={{
-        enable: isLoading,
-        rows: 3,
-        component: (
-          <>
-            <TableCell className="w-1/2 py-4 pr-4">
-              <div className="flex w-full flex-row items-center">
-                <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
+    <div className="space-y-8">
+      <DataTable
+        columns={columns}
+        data={results.data}
+        perPage={results.perPage}
+        currentPage={results.currentPage}
+        totalPages={results.totalPages}
+        onPaginationChange={onPaginationChange}
+        error={{
+          enable: isLoadingError,
+        }}
+        skeleton={{
+          enable: isLoading || groupQuery.isPending,
+          rows: 3,
+          component: (
+            <>
+              <TableCell className="w-1/2 py-4 pr-4">
+                <div className="flex w-full flex-row items-center">
+                  <Skeleton className="h-12 w-12 flex-shrink-0 rounded-full" />
 
-                <div className="ml-2 flex flex-grow flex-col">
-                  <Skeleton className="h-4 w-1/3 max-w-[8rem]" />
-                  <Skeleton className="mt-1 h-4 w-1/2 max-w-[12rem]" />
+                  <div className="ml-2 flex flex-grow flex-col">
+                    <Skeleton className="h-4 w-1/3 max-w-[8rem]" />
+                    <Skeleton className="mt-1 h-4 w-1/2 max-w-[12rem]" />
+                  </div>
                 </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-12 rounded-full" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-20 rounded-full" />
-            </TableCell>
-            <TableCell>
-              <Skeleton className="h-4 w-6 rounded-full" />
-            </TableCell>
-          </>
-        ),
-      }}
-    >
-      {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
-    </DataTable>
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-12 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-20 rounded-full" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4 w-6 rounded-full" />
+              </TableCell>
+            </>
+          ),
+        }}
+      >
+        {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+      </DataTable>
+
+      <AnimateGenericFadeInOut key={groupQuery.isPending ? 'pending' : 'fetched'}>
+        {!groupQuery.isPending && (
+          <TeamInheritMemberAlert memberAccessTeamGroup={memberAccessTeamGroup || null} />
+        )}
+      </AnimateGenericFadeInOut>
+    </div>
   );
 };

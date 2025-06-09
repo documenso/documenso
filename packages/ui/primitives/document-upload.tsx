@@ -7,8 +7,10 @@ import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 
 import { Button } from './button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
@@ -36,7 +38,11 @@ export const DocumentDropzone = ({
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
 
+  const { organisations } = useSession();
+
   const organisation = useCurrentOrganisation();
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { getRootProps, getInputProps } = useDropzone({
     accept: {
@@ -68,7 +74,13 @@ export const DocumentDropzone = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <Button className="hover:bg-warning/80 bg-warning" asChild>
-              <Link to={`/o/${organisation.url}/settings/billing`}>
+              <Link
+                to={
+                  isPersonalLayoutMode
+                    ? `/settings/billing`
+                    : `/o/${organisation.url}/settings/billing`
+                }
+              >
                 <Trans>Upgrade</Trans>
               </Link>
             </Button>

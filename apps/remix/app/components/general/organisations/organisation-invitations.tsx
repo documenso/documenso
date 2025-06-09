@@ -94,7 +94,7 @@ export const OrganisationInvitations = ({ className }: { className?: string }) =
                                 {invitation.organisation.name}
                               </span>
                             }
-                            secondaryText={`/orgs/${invitation.organisation.url}`}
+                            secondaryText={`/o/${invitation.organisation.url}`}
                             rightSideComponent={
                               <div className="ml-auto space-x-2">
                                 <DeclineOrganisationInvitationButton token={invitation.token} />

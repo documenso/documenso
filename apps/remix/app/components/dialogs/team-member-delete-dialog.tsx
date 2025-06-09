@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import { trpc } from '@documenso/trpc/react';
-import { Alert } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -25,6 +25,7 @@ export type TeamMemberDeleteDialogProps = {
   memberId: string;
   memberName: string;
   memberEmail: string;
+  isInheritMemberEnabled: boolean | null;
   trigger?: React.ReactNode;
 };
 
@@ -35,6 +36,7 @@ export const TeamMemberDeleteDialog = ({
   memberId,
   memberName,
   memberEmail,
+  isInheritMemberEnabled,
 }: TeamMemberDeleteDialogProps) => {
   const [open, setOpen] = useState(false);
 
@@ -88,29 +90,42 @@ export const TeamMemberDeleteDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Alert variant="neutral" padding="tight">
-          <AvatarWithText
-            avatarClass="h-12 w-12"
-            avatarFallback={memberName.slice(0, 1).toUpperCase()}
-            primaryText={<span className="font-semibold">{memberName}</span>}
-            secondaryText={memberEmail}
-          />
-        </Alert>
+        {isInheritMemberEnabled ? (
+          <Alert variant="neutral">
+            <AlertDescription>
+              <Trans>
+                You cannot remove members from this team if the inherit member feature is enabled.
+              </Trans>
+            </AlertDescription>
+          </Alert>
+        ) : (
+          <Alert variant="neutral" padding="tight">
+            <AvatarWithText
+              avatarClass="h-12 w-12"
+              avatarFallback={memberName.slice(0, 1).toUpperCase()}
+              primaryText={<span className="font-semibold">{memberName}</span>}
+              secondaryText={memberEmail}
+            />
+          </Alert>
+        )}
 
         <fieldset disabled={isDeletingTeamMember}>
           <DialogFooter>
             <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-              <Trans>Cancel</Trans>
+              <Trans>Close</Trans>
             </Button>
 
-            <Button
-              type="submit"
-              variant="destructive"
-              loading={isDeletingTeamMember}
-              onClick={async () => deleteTeamMember({ teamId, memberId })}
-            >
-              <Trans>Remove</Trans>
-            </Button>
+            {!isInheritMemberEnabled && (
+              <Button
+                type="submit"
+                variant="destructive"
+                disabled={Boolean(isInheritMemberEnabled)}
+                loading={isDeletingTeamMember}
+                onClick={async () => deleteTeamMember({ teamId, memberId })}
+              >
+                <Trans>Remove</Trans>
+              </Button>
+            )}
           </DialogFooter>
         </fieldset>
       </DialogContent>

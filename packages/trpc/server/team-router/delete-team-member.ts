@@ -85,8 +85,11 @@ export const deleteTeamMemberRoute = authenticatedProcedure
     const teamGroupToRemoveMemberFrom = team.teamGroups[0];
 
     // Sanity check.
+    // This means that the member was inherited (which means they should not be deleted directly)
+    // or it means that they are not part of any team groups relating to this?
     if (team.teamGroups.length !== 1) {
-      console.error('Team has more than one internal team group. This should not happen.');
+      console.error('Member must have 1 one internal team group. This should not happen.');
+
       // Todo: Logging.
     }
 

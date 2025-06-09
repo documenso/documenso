@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -13,11 +13,14 @@ import { z } from 'zod';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
 import { cn } from '@documenso/ui/lib/utils';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -45,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -132,6 +136,10 @@ export const OrganisationMemberInviteDialog = ({
   const { mutateAsync: createOrganisationMemberInvites } =
     trpc.organisation.member.invite.createMany.useMutation();
 
+  const { data: fullOrganisation } = trpc.organisation.get.useQuery({
+    organisationReference: organisation.id,
+  });
+
   const onAddOrganisationMemberInvite = () => {
     appendOrganisationMemberInvite({
       email: '',
@@ -163,6 +171,27 @@ export const OrganisationMemberInviteDialog = ({
       });
     }
   };
+
+  const dialogState = useMemo(() => {
+    if (!fullOrganisation) {
+      return 'loading';
+    }
+
+    if (!IS_BILLING_ENABLED()) {
+      return 'form';
+    }
+
+    if (fullOrganisation.organisationClaim.memberCount === 0) {
+      return 'form';
+    }
+
+    // This is probably going to screw us over in the future.
+    if (fullOrganisation.organisationClaim.originalSubscriptionClaimId !== INTERNAL_CLAIM_ID.TEAM) {
+      return 'alert';
+    }
+
+    return 'form';
+  }, [fullOrganisation]);
 
   useEffect(() => {
     if (!open) {
@@ -263,159 +292,186 @@ export const OrganisationMemberInviteDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <Tabs
-          defaultValue="INDIVIDUAL"
-          value={invitationType}
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          onValueChange={(value) => setInvitationType(value as TabTypes)}
-        >
-          <TabsList className="w-full">
-            <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
-              <MailIcon size={20} className="mr-2" />
-              <Trans>Invite Members</Trans>
-            </TabsTrigger>
+        {dialogState === 'loading' && <SpinnerBox className="py-32" />}
 
-            <TabsTrigger value="BULK" className="hover:text-foreground w-full">
-              <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
-            </TabsTrigger>
-          </TabsList>
+        {dialogState === 'alert' && (
+          <>
+            <Alert
+              className="flex flex-col justify-between p-6 sm:flex-row sm:items-center"
+              variant="neutral"
+            >
+              <AlertDescription>
+                <Trans>
+                  Your plan does not support inviting members. Please upgrade or your plan or
+                  contact sales at <a href="mailto:support@documenso.com">support@documenso.com</a>{' '}
+                  if you would like to discuss your options.
+                </Trans>
+              </AlertDescription>
+            </Alert>
 
-          <TabsContent value="INDIVIDUAL">
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onFormSubmit)}>
-                <fieldset
-                  className="flex h-full flex-col space-y-4"
-                  disabled={form.formState.isSubmitting}
-                >
-                  <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
-                    {organisationMemberInvites.map((organisationMemberInvite, index) => (
-                      <div
-                        className="flex w-full flex-row space-x-4"
-                        key={organisationMemberInvite.id}
-                      >
-                        <FormField
-                          control={form.control}
-                          name={`invitations.${index}.email`}
-                          render={({ field }) => (
-                            <FormItem className="w-full">
-                              {index === 0 && (
-                                <FormLabel required>
-                                  <Trans>Email address</Trans>
-                                </FormLabel>
-                              )}
-                              <FormControl>
-                                <Input className="bg-background" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+            <DialogFooter>
+              <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                <Trans>Cancel</Trans>
+              </Button>
+            </DialogFooter>
+          </>
+        )}
 
-                        <FormField
-                          control={form.control}
-                          name={`invitations.${index}.organisationRole`}
-                          render={({ field }) => (
-                            <FormItem className="w-full">
-                              {index === 0 && (
-                                <FormLabel required>
-                                  <Trans>Organisation Role</Trans>
-                                </FormLabel>
-                              )}
-                              <FormControl>
-                                <Select {...field} onValueChange={field.onChange}>
-                                  <SelectTrigger className="text-muted-foreground max-w-[200px]">
-                                    <SelectValue />
-                                  </SelectTrigger>
+        {dialogState === 'form' && (
+          <Tabs
+            defaultValue="INDIVIDUAL"
+            value={invitationType}
+            // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+            onValueChange={(value) => setInvitationType(value as TabTypes)}
+          >
+            <TabsList className="w-full">
+              <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
+                <MailIcon size={20} className="mr-2" />
+                <Trans>Invite Members</Trans>
+              </TabsTrigger>
 
-                                  <SelectContent position="popper">
-                                    {ORGANISATION_MEMBER_ROLE_HIERARCHY[
-                                      organisation.currentOrganisationRole
-                                    ].map((role) => (
-                                      <SelectItem key={role} value={role}>
-                                        {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
-                                      </SelectItem>
-                                    ))}
-                                  </SelectContent>
-                                </Select>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+              <TabsTrigger value="BULK" className="hover:text-foreground w-full">
+                <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
+              </TabsTrigger>
+            </TabsList>
 
-                        <button
-                          type="button"
-                          className={cn(
-                            'justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                            index === 0 ? 'mt-8' : 'mt-0',
-                          )}
-                          disabled={organisationMemberInvites.length === 1}
-                          onClick={() => removeOrganisationMemberInvite(index)}
-                        >
-                          <Trash className="h-5 w-5" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="w-fit"
-                    onClick={() => onAddOrganisationMemberInvite()}
+            <TabsContent value="INDIVIDUAL">
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onFormSubmit)}>
+                  <fieldset
+                    className="flex h-full flex-col space-y-4"
+                    disabled={form.formState.isSubmitting}
                   >
-                    <PlusCircle className="mr-2 h-4 w-4" />
-                    <Trans>Add more</Trans>
+                    <div className="custom-scrollbar -m-1 max-h-[60vh] space-y-4 overflow-y-auto p-1">
+                      {organisationMemberInvites.map((organisationMemberInvite, index) => (
+                        <div
+                          className="flex w-full flex-row space-x-4"
+                          key={organisationMemberInvite.id}
+                        >
+                          <FormField
+                            control={form.control}
+                            name={`invitations.${index}.email`}
+                            render={({ field }) => (
+                              <FormItem className="w-full">
+                                {index === 0 && (
+                                  <FormLabel required>
+                                    <Trans>Email address</Trans>
+                                  </FormLabel>
+                                )}
+                                <FormControl>
+                                  <Input className="bg-background" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={form.control}
+                            name={`invitations.${index}.organisationRole`}
+                            render={({ field }) => (
+                              <FormItem className="w-full">
+                                {index === 0 && (
+                                  <FormLabel required>
+                                    <Trans>Organisation Role</Trans>
+                                  </FormLabel>
+                                )}
+                                <FormControl>
+                                  <Select {...field} onValueChange={field.onChange}>
+                                    <SelectTrigger className="text-muted-foreground max-w-[200px]">
+                                      <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent position="popper">
+                                      {ORGANISATION_MEMBER_ROLE_HIERARCHY[
+                                        organisation.currentOrganisationRole
+                                      ].map((role) => (
+                                        <SelectItem key={role} value={role}>
+                                          {_(ORGANISATION_MEMBER_ROLE_MAP[role]) ?? role}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <button
+                            type="button"
+                            className={cn(
+                              'justify-left inline-flex h-10 w-10 items-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
+                              index === 0 ? 'mt-8' : 'mt-0',
+                            )}
+                            disabled={organisationMemberInvites.length === 1}
+                            onClick={() => removeOrganisationMemberInvite(index)}
+                          >
+                            <Trash className="h-5 w-5" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="w-fit"
+                      onClick={() => onAddOrganisationMemberInvite()}
+                    >
+                      <PlusCircle className="mr-2 h-4 w-4" />
+                      <Trans>Add more</Trans>
+                    </Button>
+
+                    <DialogFooter>
+                      <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                        <Trans>Cancel</Trans>
+                      </Button>
+
+                      <Button type="submit" loading={form.formState.isSubmitting}>
+                        {!form.formState.isSubmitting && <Mail className="mr-2 h-4 w-4" />}
+                        <Trans>Invite</Trans>
+                      </Button>
+                    </DialogFooter>
+                  </fieldset>
+                </form>
+              </Form>
+            </TabsContent>
+
+            <TabsContent value="BULK">
+              <div className="mt-4 space-y-4">
+                <Card gradient className="h-32">
+                  <CardContent
+                    className="text-muted-foreground/80 hover:text-muted-foreground/90 flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 transition-colors"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <Upload className="h-5 w-5" />
+
+                    <p className="mt-1 text-sm">
+                      <Trans>Click here to upload</Trans>
+                    </p>
+
+                    <input
+                      onChange={onFileInputChange}
+                      type="file"
+                      ref={fileInputRef}
+                      accept=".csv"
+                      hidden
+                    />
+                  </CardContent>
+                </Card>
+
+                <DialogFooter>
+                  <Button type="button" variant="secondary" onClick={downloadTemplate}>
+                    <Download className="mr-2 h-4 w-4" />
+                    <Trans>Template</Trans>
                   </Button>
-
-                  <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                      <Trans>Cancel</Trans>
-                    </Button>
-
-                    <Button type="submit" loading={form.formState.isSubmitting}>
-                      {!form.formState.isSubmitting && <Mail className="mr-2 h-4 w-4" />}
-                      <Trans>Invite</Trans>
-                    </Button>
-                  </DialogFooter>
-                </fieldset>
-              </form>
-            </Form>
-          </TabsContent>
-
-          <TabsContent value="BULK">
-            <div className="mt-4 space-y-4">
-              <Card gradient className="h-32">
-                <CardContent
-                  className="text-muted-foreground/80 hover:text-muted-foreground/90 flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-5 w-5" />
-
-                  <p className="mt-1 text-sm">
-                    <Trans>Click here to upload</Trans>
-                  </p>
-
-                  <input
-                    onChange={onFileInputChange}
-                    type="file"
-                    ref={fileInputRef}
-                    accept=".csv"
-                    hidden
-                  />
-                </CardContent>
-              </Card>
-
-              <DialogFooter>
-                <Button type="button" variant="secondary" onClick={downloadTemplate}>
-                  <Download className="mr-2 h-4 w-4" />
-                  <Trans>Template</Trans>
-                </Button>
-              </DialogFooter>
-            </div>
-          </TabsContent>
-        </Tabs>
+                </DialogFooter>
+              </div>
+            </TabsContent>
+          </Tabs>
+        )}
       </DialogContent>
     </Dialog>
   );
