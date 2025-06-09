@@ -1,5 +1,3 @@
-import type { Field } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -7,46 +5,45 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type GetFieldByIdOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   fieldId: number;
-  documentId?: number;
-  templateId?: number;
 };
 
-export const getFieldById = async ({
-  userId,
-  teamId,
-  fieldId,
-  documentId,
-  templateId,
-}: GetFieldByIdOptions) => {
-  let field: Field | null = null;
-
-  if (documentId) {
-    field = await prisma.field.findFirst({
-      where: {
-        id: fieldId,
-        document: {
-          id: documentId,
-          team: buildTeamWhereQuery({ teamId, userId }),
+export const getFieldById = async ({ userId, teamId, fieldId }: GetFieldByIdOptions) => {
+  const field = await prisma.field.findFirst({
+    where: {
+      id: fieldId,
+    },
+    include: {
+      document: {
+        select: {
+          teamId: true,
         },
       },
+      template: {
+        select: {
+          teamId: true,
+        },
+      },
+    },
+  });
+
+  const foundTeamId = field?.document?.teamId || field?.template?.teamId;
+
+  if (!field || !foundTeamId || foundTeamId !== teamId) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Field not found',
     });
   }
 
-  if (templateId) {
-    field = await prisma.field.findFirst({
-      where: {
-        id: fieldId,
-        template: {
-          id: templateId,
-          team: buildTeamWhereQuery({ teamId, userId }),
-        },
-      },
-    });
-  }
+  const team = await prisma.team.findUnique({
+    where: buildTeamWhereQuery({
+      teamId: foundTeamId,
+      userId,
+    }),
+  });
 
-  if (!field) {
+  if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Field not found',
     });

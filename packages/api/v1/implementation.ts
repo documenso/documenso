@@ -1253,7 +1253,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       userId: user.id,
       teamId: team?.id,
       fieldId: Number(fieldId),
-      documentId: Number(documentId),
     }).catch(() => null);
 
     if (!field) {
