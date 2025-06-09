@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { seedBlankDocument, seedTeamDocumentWithMeta } from '@documenso/prisma/seed/documents';
 import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
+import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -80,6 +81,46 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
 
   await page.getByLabel('Email').nth(1).fill('recipient2@documenso.com');
   await page.getByLabel('Name').nth(1).fill('Recipient 2');
+
+  // Advanced settings should not be visible for non EE users.
+  await expect(page.getByLabel('Show advanced settings')).toBeHidden();
+
+  // Navigate to the next step and back.
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+  await page.getByRole('button', { name: 'Go Back' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+});
+
+test('[DOCUMENT_FLOW]: add team members as signers', async ({ page }) => {
+  const team = await seedTeam({ createTeamMembers: 3, createTeamEmail: true });
+  const document = await seedTeamDocumentWithMeta(team);
+
+  await apiSignin({
+    page,
+    email: team.members[0].user.email,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+  });
+
+  // Save the settings by going to the next step.
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+
+  // Open the "Add member" dialog, select two users and check they are added properly
+  await page.getByRole('button', { name: 'Add member' }).click();
+
+  await page.getByRole('combobox').click();
+
+  await page.getByText(team.members[1].user.name!).click();
+  await page.getByText(team.members[2].user.name!).click();
+
+  await page.getByRole('button', { name: 'Add' }).click();
+
+  await expect(page.getByLabel('Email').nth(1)).toHaveValue(team.members[1].user.email);
+  await expect(page.getByLabel('Name').nth(1)).toHaveValue(team.members[1].user.name!);
+
+  await expect(page.getByLabel('Email').nth(2)).toHaveValue(team.members[2].user.email);
+  await expect(page.getByLabel('Name').nth(2)).toHaveValue(team.members[2].user.name!);
 
   // Advanced settings should not be visible for non EE users.
   await expect(page.getByLabel('Show advanced settings')).toBeHidden();
