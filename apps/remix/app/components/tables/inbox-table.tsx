@@ -3,15 +3,20 @@ import { useMemo, useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
-import { CheckCircleIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
+import { DocumentStatus as DocumentStatusEnum } from '@prisma/client';
+import { RecipientRole, SigningStatus } from '@prisma/client';
+import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { trpc as trpcClient } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
+import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -19,7 +24,9 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
@@ -44,8 +51,7 @@ export const InboxTable = () => {
   const page = searchParams?.get?.('page') ? Number(searchParams.get('page')) : undefined;
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
-    status: ExtendedDocumentStatus.INBOX,
+  const { data, isLoading, isLoadingError } = trpc.document.inbox.find.useQuery({
     page: page || 1,
     perPage: perPage || 10,
   });
@@ -61,13 +67,9 @@ export const InboxTable = () => {
       {
         header: _(msg`Title`),
         cell: ({ row }) => (
-          <Link
-            to={`/sign/${row.original.recipients[0]?.token}`}
-            title={row.original.title}
-            className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
-          >
+          <span className="block max-w-[10rem] truncate font-medium md:max-w-[20rem]">
             {row.original.title}
-          </Link>
+          </span>
         ),
       },
       {
@@ -86,34 +88,14 @@ export const InboxTable = () => {
         ),
       },
       {
+        header: _(msg`Status`),
+        accessorKey: 'status',
+        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        size: 140,
+      },
+      {
         header: _(msg`Actions`),
-        cell: ({ row }) => (
-          <div className="flex items-center gap-x-4">
-            <Button className="w-32" asChild>
-              <Link to={`/sign/${row.original.recipients[0]?.token}`}>
-                {match(row.original.recipients[0]?.role)
-                  .with(RecipientRole.SIGNER, () => (
-                    <>
-                      <PencilIcon className="-ml-1 mr-2 h-4 w-4" />
-                      <Trans>Sign</Trans>
-                    </>
-                  ))
-                  .with(RecipientRole.APPROVER, () => (
-                    <>
-                      <CheckCircleIcon className="-ml-1 mr-2 h-4 w-4" />
-                      <Trans>Approve</Trans>
-                    </>
-                  ))
-                  .otherwise(() => (
-                    <>
-                      <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
-                      <Trans>View</Trans>
-                    </>
-                  ))}
-              </Link>
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => <InboxTableActionButton row={row.original} />,
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
   }, [team]);
@@ -196,4 +178,96 @@ export const InboxTable = () => {
       )}
     </div>
   );
+};
+
+export type InboxTableActionButtonProps = {
+  row: TFindInboxResponse['data'][number];
+};
+
+export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => {
+  const { user } = useSession();
+  const { toast } = useToast();
+  const { _ } = useLingui();
+
+  const recipient = row.recipients.find((recipient) => recipient.email === user.email);
+
+  const isPending = row.status === DocumentStatusEnum.PENDING;
+  const isComplete = isDocumentCompleted(row.status);
+  const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const role = recipient?.role;
+
+  if (!recipient) {
+    return null;
+  }
+
+  const onDownloadClick = async () => {
+    try {
+      const document = await trpcClient.document.getDocumentByToken.query({
+        token: recipient.token,
+      });
+
+      const documentData = document?.documentData;
+
+      if (!documentData) {
+        throw Error('No document available');
+      }
+
+      await downloadPDF({ documentData, fileName: row.title });
+    } catch (err) {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
+  if (recipient?.role === RecipientRole.CC && isComplete === false) {
+    return null;
+  }
+
+  return match({
+    isPending,
+    isComplete,
+    isSigned,
+  })
+    .with({ isPending: true, isSigned: false }, () => (
+      <Button className="w-32" asChild>
+        <Link to={`/sign/${recipient?.token}`}>
+          {match(role)
+            .with(RecipientRole.SIGNER, () => (
+              <>
+                <PencilIcon className="-ml-1 mr-2 h-4 w-4" />
+                <Trans>Sign</Trans>
+              </>
+            ))
+            .with(RecipientRole.APPROVER, () => (
+              <>
+                <CheckCircleIcon className="-ml-1 mr-2 h-4 w-4" />
+                <Trans>Approve</Trans>
+              </>
+            ))
+            .otherwise(() => (
+              <>
+                <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+                <Trans>View</Trans>
+              </>
+            ))}
+        </Link>
+      </Button>
+    ))
+    .with({ isPending: true, isSigned: true }, () => (
+      <Button className="w-32" disabled={true}>
+        <EyeIcon className="-ml-1 mr-2 h-4 w-4" />
+        <Trans>View</Trans>
+      </Button>
+    ))
+    .with({ isComplete: true }, () => (
+      <Button className="w-32" onClick={onDownloadClick}>
+        <DownloadIcon className="-ml-1 mr-2 inline h-4 w-4" />
+        <Trans>Download</Trans>
+      </Button>
+    ))
+    .otherwise(() => <div></div>);
 };

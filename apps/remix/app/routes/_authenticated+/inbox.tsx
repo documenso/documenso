@@ -19,7 +19,7 @@ export default function InboxPage() {
           <Trans>Personal Inbox</Trans>
         </h1>
         <p className="text-muted-foreground mt-1">
-          <Trans>Any documents that require your signature will appear here</Trans>
+          <Trans>Any documents that you have been invited to will appear here</Trans>
         </p>
 
         <OrganisationInvitations className="mt-4" />

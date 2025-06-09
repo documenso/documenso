@@ -8,6 +8,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';
+import { expectTextToBeVisible } from '../fixtures/generic';
 
 test('[TEAMS]: check team documents count', async ({ page }) => {
   const { team, teamOwner, teamMember2 } = await seedTeamDocuments();
@@ -477,11 +478,6 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
       path: teamUrlRedirect,
       expectedDocuments: ['Document Visible to Everyone'],
     },
-    {
-      user: outsideUser,
-      path: `/t/${outsideUserTeam.url}/documents`,
-      expectedDocuments: ['Document Visible to Admin with Recipient'],
-    },
   ];
 
   for (const testCase of testCases) {
@@ -498,6 +494,14 @@ test('[TEAMS]: check document visibility based on team member role', async ({ pa
 
     await apiSignout({ page });
   }
+
+  await apiSignin({
+    page,
+    email: outsideUser.email,
+    redirectPath: '/inbox',
+  });
+
+  await expectTextToBeVisible(page, 'Document Visible to Admin with Recipient');
 });
 
 test('[TEAMS]: ensure document owner can see document regardless of visibility', async ({

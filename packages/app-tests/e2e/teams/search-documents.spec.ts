@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 
+import { generateDatabaseId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
@@ -47,6 +48,7 @@ test('[TEAMS]: search respects team document visibility', async ({ page }) => {
 
   await prisma.organisationGroupMember.create({
     data: {
+      id: generateDatabaseId('group_member'),
       groupId: managerTeamGroup.organisationGroupId,
       organisationMemberId: managerOrganisationMember.id,
     },

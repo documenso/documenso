@@ -27,6 +27,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { findInboxRoute } from './find-inbox';
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentV2RequestSchema,
@@ -56,6 +57,10 @@ import {
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
+  inbox: {
+    find: findInboxRoute,
+  },
+
   /**
    * @private
    */
