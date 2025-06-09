@@ -8,7 +8,7 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-03-25 12:05\n"
+"PO-Revision-Date: 2025-05-22 06:04\n"
 "Last-Translator: \n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -28,7 +28,7 @@ msgstr " Los eventos que activarán un webhook para ser enviado a tu URL."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
-msgstr ""
+msgstr ".Documentos PDF aceptados (máx {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 
 #. placeholder {0}: team.name
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
@@ -332,7 +332,7 @@ msgstr "{recipientActionVerb} el documento para completar el proceso."
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "{recipientCount} recipients"
-msgstr ""
+msgstr "{recipientCount} destinatarios"
 
 #: packages/email/templates/document-created-from-direct-template.tsx
 msgid "{recipientName} {action} a document by using one of your direct links"
@@ -819,7 +819,7 @@ msgstr "Agregar Firmantes"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 msgid "Add signers and configure signing preferences"
-msgstr ""
+msgstr "Agregar firmantes y configurar preferencias de firma"
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add team email"
@@ -875,7 +875,7 @@ msgstr "Configuraciones avanzadas"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Advanced Settings"
-msgstr ""
+msgstr "Configuraciones avanzadas"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "After signing a document electronically, you will be provided the opportunity to view, download, and print the document for your records. It is highly recommended that you retain a copy of all electronically signed documents for your personal records. We will also retain a copy of the signed document for our records however we may not be able to provide you with a copy of the signed document after a certain period of time."
@@ -904,7 +904,7 @@ msgstr "Todos los documentos relacionados con el proceso de firma electrónica s
 #: apps/remix/app/routes/_authenticated+/templates.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.folders._index.tsx
 msgid "All Folders"
-msgstr ""
+msgstr "Todas las carpetas"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "All inserted signatures will be voided"
@@ -1175,17 +1175,17 @@ msgstr "Ocurrió un error desconocido"
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "An unknown error occurred while creating the folder."
-msgstr ""
+msgstr "Se produjo un error desconocido al crear la carpeta."
 
 #: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "An unknown error occurred while deleting the folder."
-msgstr ""
+msgstr "Se produjo un error desconocido al eliminar la carpeta."
 
 #: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "An unknown error occurred while moving the folder."
-msgstr ""
+msgstr "Se produjo un error desconocido al mover la carpeta."
 
 #: apps/remix/app/components/dialogs/team-transfer-dialog.tsx
 msgid "Any payment methods attached to this team will remain attached to this team. Please contact us if you need to update this information."
@@ -1533,7 +1533,7 @@ msgstr "Cancelado por el usuario"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Cannot remove document"
-msgstr ""
+msgstr "No se puede eliminar el documento"
 
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Cannot remove signer"
@@ -1590,7 +1590,7 @@ msgstr "Elige cómo el documento llegará a los destinatarios"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Choose how to distribute your document to recipients. Email will send notifications, None will generate signing links for manual distribution."
-msgstr ""
+msgstr "Elija cómo distribuir su documento a los destinatarios. El correo electrónico enviará notificaciones, Ninguno generará enlaces de firma para la distribución manual."
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Choose..."
@@ -1663,7 +1663,7 @@ msgstr "Cerrar"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Communication"
-msgstr ""
+msgstr "Comunicación"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -1723,16 +1723,16 @@ msgstr "Documentos Completados"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Completed on {formattedDate}"
-msgstr ""
+msgstr "Completado el {formattedDate}"
 
 #. placeholder {0}: parseMessageDescriptor(_, FRIENDLY_FIELD_TYPE[currentField.type])
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
 msgid "Configure {0} Field"
-msgstr ""
+msgstr "Configurar el campo {0}"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Configure additional options and preferences"
-msgstr ""
+msgstr "Configurar opciones y preferencias adicionales"
 
 #: packages/lib/constants/template.ts
 msgid "Configure Direct Recipient"
@@ -1740,13 +1740,13 @@ msgstr "Configurar destinatario directo"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Configure Document"
-msgstr ""
+msgstr "Configurar documento"
 
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 msgid "Configure Fields"
-msgstr ""
+msgstr "Configurar campos"
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Configure general settings for the document."
@@ -1762,7 +1762,7 @@ msgstr "Configurar plantilla"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Configure Template"
-msgstr ""
+msgstr "Configurar plantilla"
 
 #. placeholder {0}: parseMessageDescriptor( _, FRIENDLY_FIELD_TYPE[currentField.type], )
 #: apps/remix/app/components/embed/authoring/field-advanced-settings-drawer.tsx
@@ -1774,7 +1774,7 @@ msgstr "Configurar el campo {0}"
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 #: apps/remix/app/components/embed/authoring/configure-fields-view.tsx
 msgid "Configure the fields you want to place on the document."
-msgstr ""
+msgstr "Configure los campos que desea colocar en el documento."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -2324,7 +2324,7 @@ msgstr "Distribuir documento"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Distribution Method"
-msgstr ""
+msgstr "Método de Distribución"
 
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Do you want to delete this template?"
@@ -2406,7 +2406,7 @@ msgstr "Documento creado"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Document Created"
-msgstr ""
+msgstr "Documento Creado"
 
 #. placeholder {0}: document.user.name
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
@@ -2461,7 +2461,7 @@ msgstr "ID externo del documento actualizado"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Document found in your account"
-msgstr ""
+msgstr "Documento encontrado en tu cuenta"
 
 #: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
@@ -2481,11 +2481,11 @@ msgstr "Bandeja de documentos"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Document is already uploaded"
-msgstr ""
+msgstr "El documento ya está cargado"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Document is using legacy field insertion"
-msgstr ""
+msgstr "El documento utiliza inserción de campos heredada"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Document Limit Exceeded!"
@@ -2579,7 +2579,7 @@ msgstr "Documento actualizado"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Document updated successfully"
-msgstr ""
+msgstr "Documento actualizado con éxito"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 msgid "Document upload disabled due to unpaid invoices"
@@ -2662,7 +2662,7 @@ msgstr "Descargar certificado"
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 msgid "Download Original"
-msgstr ""
+msgstr "Descargar Original"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Download Template CSV"
@@ -2688,11 +2688,11 @@ msgstr "Arrastre y suelte su PDF aquí."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
-msgstr ""
+msgstr "Arrastra y suelta o haz clic para cargar"
 
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Drag and drop your PDF file here"
-msgstr ""
+msgstr "Arrastra y suelta tu archivo PDF aquí"
 
 #: packages/lib/constants/document.ts
 msgid "Draw"
@@ -2700,7 +2700,7 @@ msgstr "Dibujar"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
-msgstr ""
+msgstr "Suelta tu documento aquí"
 
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
@@ -2727,7 +2727,7 @@ msgstr "Duplicar"
 
 #: packages/ui/primitives/document-flow/field-item.tsx
 msgid "Duplicate on all pages"
-msgstr ""
+msgstr "Duplicar en todas las páginas"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks._index.tsx
@@ -2973,7 +2973,7 @@ msgstr "Error"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Error uploading file"
-msgstr ""
+msgstr "Error al cargar el archivo"
 
 #: apps/remix/app/components/forms/team-document-preferences-form.tsx
 msgid "Everyone can access and view the document"
@@ -3008,7 +3008,7 @@ msgstr "ID externo"
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 msgid "Failed to create folder"
-msgstr ""
+msgstr "No se pudo crear la carpeta"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -3020,7 +3020,7 @@ msgstr "Fallo al guardar configuraciones."
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
-msgstr ""
+msgstr "No se pudo actualizar el documento"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Failed to update recipient"
@@ -3028,7 +3028,7 @@ msgstr "Falló al actualizar el destinatario"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 msgid "Failed to update template"
-msgstr ""
+msgstr "No se pudo actualizar la plantilla"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/webhooks.$id.tsx
@@ -3084,7 +3084,7 @@ msgstr "Campos"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Fields updated"
-msgstr ""
+msgstr "Campos actualizados"
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
@@ -3099,21 +3099,21 @@ msgstr "El tamaño del archivo excede el límite de {APP_DOCUMENT_UPLOAD_SIZE_LI
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Folder"
-msgstr ""
+msgstr "Carpeta"
 
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 msgid "Folder created successfully"
-msgstr ""
+msgstr "Carpeta creada exitosamente"
 
 #: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 msgid "Folder not found"
-msgstr ""
+msgstr "Carpeta no encontrada"
 
 #: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 msgid "Folder updated successfully"
-msgstr ""
+msgstr "Carpeta actualizada con éxito"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -3194,7 +3194,7 @@ msgstr "Regresar a casa"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Go to document"
-msgstr ""
+msgstr "Ir al documento"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Go to owner"
@@ -3736,11 +3736,11 @@ msgstr "Mover"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move \"{templateTitle}\" to a folder"
-msgstr ""
+msgstr "Mover \"{templateTitle}\" a una carpeta"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Move Document to Folder"
-msgstr ""
+msgstr "Mover Documento a Carpeta"
 
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "Move Document to Team"
@@ -3748,7 +3748,7 @@ msgstr "Mover documento al equipo"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
-msgstr ""
+msgstr "Mover Plantilla a Carpeta"
 
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "Move Template to Team"
@@ -3757,7 +3757,7 @@ msgstr "Mover plantilla al equipo"
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 msgid "Move to Folder"
-msgstr ""
+msgstr "Mover a Carpeta"
 
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -4242,7 +4242,7 @@ msgstr "Por favor, elige tu nueva contraseña"
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Please configure the document first"
-msgstr ""
+msgstr "Por favor configure el documento primero"
 
 #: packages/lib/server-only/auth/send-confirmation-email.ts
 msgid "Please confirm your email"
@@ -4745,7 +4745,7 @@ msgstr "Roles"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Root (No Folder)"
-msgstr ""
+msgstr "Raíz (Sin Carpeta)"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Rows per page"
@@ -4811,7 +4811,7 @@ msgstr "Seleccionar"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
-msgstr ""
+msgstr "Selecciona una carpeta para mover este documento."
 
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
@@ -4853,7 +4853,7 @@ msgstr "Seleccionar clave de acceso"
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 msgid "Select triggers"
-msgstr ""
+msgstr "Seleccionar activaciones"
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -4941,11 +4941,11 @@ msgstr "Establecer una contraseña"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your document properties and recipient information"
-msgstr ""
+msgstr "Configura las propiedades de tu documento y la información del destinatario"
 
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your template properties and recipient information"
-msgstr ""
+msgstr "Configura las propiedades de tu plantilla y la información del destinatario"
 
 #: apps/remix/app/routes/_authenticated+/settings+/_layout.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -5559,7 +5559,7 @@ msgstr "Plantilla"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Template Created"
-msgstr ""
+msgstr "Plantilla Creada"
 
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Template deleted"
@@ -5583,7 +5583,7 @@ msgstr "La plantilla ha sido actualizada."
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Template is using legacy field insertion"
-msgstr ""
+msgstr "La plantilla utiliza inserción de campos heredada"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
@@ -5604,7 +5604,7 @@ msgstr "Título de plantilla"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 msgid "Template updated successfully"
-msgstr ""
+msgstr "Plantilla actualizada con éxito"
 
 #: apps/remix/app/routes/_authenticated+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
@@ -5685,7 +5685,7 @@ msgstr "El enlace directo ha sido copiado a tu portapapeles"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "The document has been moved successfully."
-msgstr ""
+msgstr "El documento se ha movido exitosamente."
 
 #: apps/remix/app/components/dialogs/document-move-dialog.tsx
 msgid "The document has been successfully moved to the selected team."
@@ -5693,7 +5693,7 @@ msgstr "El documento ha sido movido con éxito al equipo seleccionado."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "The document is already saved and cannot be changed."
-msgstr ""
+msgstr "El documento ya está guardado y no se puede cambiar."
 
 #: apps/remix/app/components/embed/embed-document-completed.tsx
 msgid "The document is now completed, please follow any instructions provided within the parent application."
@@ -5735,25 +5735,25 @@ msgstr "Los eventos que activarán un webhook para ser enviado a tu URL."
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "The fields have been updated to the new field insertion method successfully"
-msgstr ""
+msgstr "Los campos se han actualizado al nuevo método de inserción de campo con éxito"
 
 #: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
-msgstr ""
+msgstr "La carpeta que intenta eliminar no existe."
 
 #: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "The folder you are trying to move does not exist."
-msgstr ""
+msgstr "La carpeta que intenta mover no existe."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the document to does not exist."
-msgstr ""
+msgstr "La carpeta a la que intenta mover el documento no existe."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the template to does not exist."
-msgstr ""
+msgstr "La carpeta a la que intenta mover la plantilla no existe."
 
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "The following errors occurred:"
@@ -5865,16 +5865,14 @@ msgid "The team transfer request to <0>{0}</0> has expired."
 msgstr "La solicitud de transferencia de equipo a <0>{0}</0> ha expirado."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
-msgstr ""
-"El equipo que buscas puede haber sido eliminado, renombrado o quizás nunca\n"
+msgstr "El equipo que buscas puede haber sido eliminado, renombrado o quizás nunca\n"
 "                existió."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The template has been moved successfully."
-msgstr ""
+msgstr "La plantilla se ha movido exitosamente."
 
 #: apps/remix/app/components/dialogs/template-move-dialog.tsx
 msgid "The template has been successfully moved to the selected team."
@@ -5933,7 +5931,7 @@ msgstr "Aún no hay documentos completados. Los documentos que hayas creado o re
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "There was an error uploading your file. Please try again."
-msgstr ""
+msgstr "Hubo un error al cargar tu archivo. Por favor, intenta de nuevo."
 
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "They have permission on your behalf to:"
@@ -5967,7 +5965,7 @@ msgstr "Este documento no se puede recuperar, si deseas impugnar la razón para 
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "This document cannot be changed"
-msgstr ""
+msgstr "Este documento no se puede cambiar"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "This document could not be deleted at this time. Please try again."
@@ -6005,7 +6003,7 @@ msgstr "Este documento ha sido firmado por todos los destinatarios"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr ""
+msgstr "Este documento está disponible en tu cuenta de Documenso. Puedes ver más detalles, destinatarios y registros de auditoría allí."
 
 #: apps/remix/app/routes/_authenticated+/documents.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/documents.$id._index.tsx
@@ -6014,7 +6012,7 @@ msgstr "Este documento es actualmente un borrador y no ha sido enviado"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This document is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
-msgstr ""
+msgstr "Este documento está usando inserción de campos heredada, recomendamos usar el nuevo método para resultados más precisos."
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "This document was created by you or a team member using the template above."
@@ -6059,7 +6057,7 @@ msgstr "Este campo no se puede modificar ni eliminar. Cuando comparta el enlace 
 #: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "This folder name is already taken."
-msgstr ""
+msgstr "Este nombre de carpeta ya está en uso."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -6107,7 +6105,7 @@ msgstr "Esta plantilla no se pudo eliminar en este momento. Por favor, inténtal
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "This template is using legacy field insertion, we recommend using the new field insertion method for more accurate results."
-msgstr ""
+msgstr "Esta plantilla utiliza inserción de campos heredada, recomendamos usar el nuevo método para resultados más precisos."
 
 #: apps/remix/app/routes/_unauthenticated+/team.decline.$token.tsx
 msgid "This token is invalid or has expired. No action is needed."
@@ -6475,7 +6473,7 @@ msgstr "Actualizar banner"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
-msgstr ""
+msgstr "Actualizar Campos"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Update passkey"
@@ -6541,7 +6539,7 @@ msgstr "Actualizar"
 
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
-msgstr ""
+msgstr "Actualiza tu plan para cargar más documentos"
 
 #: packages/lib/constants/document.ts
 msgid "Upload"
@@ -6575,7 +6573,7 @@ msgstr "Subir documento personalizado"
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 #: packages/ui/primitives/document-upload.tsx
 msgid "Upload Document"
-msgstr ""
+msgstr "Cargar Documento"
 
 #: packages/ui/primitives/signature-pad/signature-pad-upload.tsx
 msgid "Upload Signature"
@@ -6609,7 +6607,7 @@ msgstr "El archivo subido no es un tipo de archivo permitido"
 
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Uploading document..."
-msgstr ""
+msgstr "Cargando documento..."
 
 #: apps/remix/app/routes/_authenticated+/templates.f.$folderId.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/templates.$id._index.tsx
@@ -7455,7 +7453,7 @@ msgstr "Debes establecer una URL de perfil antes de habilitar tu perfil público
 #: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "You must type '{deleteMessage}' to confirm"
-msgstr ""
+msgstr "Debes escribir '{deleteMessage}' para confirmar"
 
 #: apps/remix/app/routes/_authenticated+/settings+/tokens.tsx
 msgid "You need to be an admin to manage API tokens."
@@ -7533,7 +7531,7 @@ msgstr "Tu documento se ha creado exitosamente a partir de la plantilla."
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Your document has been created successfully"
-msgstr ""
+msgstr "Tu documento se ha creado exitosamente"
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "Your document has been deleted by an admin!"
@@ -7648,7 +7646,7 @@ msgstr "Tu equipo ha sido actualizado con éxito."
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Your template has been created successfully"
-msgstr ""
+msgstr "Tu plantilla se ha creado exitosamente"
 
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 msgid "Your template has been duplicated successfully."
@@ -7677,3 +7675,4 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/remix/app/routes/_authenticated+/settings+/tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
+
