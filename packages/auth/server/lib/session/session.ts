@@ -101,6 +101,7 @@ export const validateSessionToken = async (token: string): Promise<SessionValida
           signature: true,
           url: true,
           customerId: true,
+          disabled: true,
         },
       },
     },

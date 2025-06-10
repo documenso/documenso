@@ -9,7 +9,6 @@ import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
-import { trpc } from '@documenso/trpc/react';
 
 import { AppBanner } from '~/components/general/app-banner';
 import { Header } from '~/components/general/app-header';
@@ -28,6 +27,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   const requestHeaders = Object.fromEntries(request.headers.entries());
 
   const session = await getOptionalSession(request);
+
+  console.log({ session });
 
   if (!session.isAuthenticated) {
     throw redirect('/signin');
@@ -49,27 +50,16 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function Layout({ loaderData }: Route.ComponentProps) {
   const { user, teams } = useSession();
 
-  const { data: userProfile } = trpc.profile.getUser.useQuery(
-    {
-      id: user?.id,
-    },
-    {
-      enabled: !!user,
-    },
-  );
-
   useEffect(() => {
-    console.log({ userProfile });
     const closeSession = async () => {
       await authClient.signOut();
     };
 
-    if (userProfile?.disabled) {
-      console.log(
-        `User profile is disabled, closing session for user: ${userProfile.id}`,)
+    if (user?.disabled) {
+      console.log(`User profile is disabled, closing session for user: ${user.id}`);
       void closeSession();
     }
-  }, [userProfile]);
+  }, [user]);
 
   const { banner, limits } = loaderData;
 
