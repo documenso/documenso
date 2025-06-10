@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentDataType, SigningStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentDataType, SigningStatus } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
@@ -27,9 +27,7 @@ import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-rec
 import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
-import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
-import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
-import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
+import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -52,6 +50,7 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { ApiContractV1 } from './contract';
@@ -258,7 +257,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -467,7 +466,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {
@@ -565,7 +564,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+    const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
     if (remaining.documents <= 0) {
       return {
@@ -879,18 +878,24 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedRecipient = await updateRecipient({
-      documentId: Number(documentId),
-      recipientId: Number(recipientId),
+    const updatedRecipient = await updateDocumentRecipients({
       userId: user.id,
-      teamId: team?.id,
-      email,
-      name,
-      role,
-      signingOrder,
-      actionAuth: authOptions?.actionAuth ?? [],
-      requestMetadata: metadata.requestMetadata,
-    }).catch(() => null);
+      teamId: team.id,
+      documentId: Number(documentId),
+      recipients: [
+        {
+          id: Number(recipientId),
+          email,
+          name,
+          role,
+          signingOrder,
+          actionAuth: authOptions?.actionAuth ?? [],
+        },
+      ],
+      requestMetadata: metadata,
+    })
+      .then(({ recipients }) => recipients[0])
+      .catch(null);
 
     if (!updatedRecipient) {
       return {
@@ -973,17 +978,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       select: { id: true, status: true },
       where: {
         id: Number(documentId),
-        ...(team?.id
-          ? {
-              team: {
-                id: team.id,
-                members: { some: { userId: user.id } },
-              },
-            }
-          : {
-              userId: user.id,
-              teamId: null,
-            }),
+        team: buildTeamWhereQuery({ teamId: team.id, userId: user.id }),
       },
     });
 
@@ -1233,6 +1228,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     const document = await getDocumentById({
       documentId: Number(documentId),
       userId: user.id,
+      teamId: team.id,
     });
 
     if (!document) {
@@ -1257,7 +1253,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       userId: user.id,
       teamId: team?.id,
       fieldId: Number(fieldId),
-      documentId: Number(documentId),
     }).catch(() => null);
 
     if (!field) {
@@ -1322,272 +1317,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     };
   }),
-
-  findTeamMembers: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId } = args.params;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const members = await prisma.teamMember.findMany({
-      where: {
-        teamId: team.id,
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    return {
-      status: 200,
-      body: {
-        members: members.map((member) => ({
-          id: member.id,
-          email: member.user.email,
-          role: member.role,
-        })),
-      },
-    };
-  }),
-
-  inviteTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId } = args.params;
-
-    const { email, role } = args.body;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const hasAlreadyBeenInvited = await prisma.teamMember.findFirst({
-      where: {
-        teamId: team.id,
-        user: {
-          email,
-        },
-      },
-    });
-
-    if (hasAlreadyBeenInvited) {
-      return {
-        status: 400,
-        body: {
-          message: 'This user has already been invited to the team',
-        },
-      };
-    }
-
-    await createTeamMemberInvites({
-      userId: user.id,
-      userName: user.name ?? '',
-      teamId: team.id,
-      invitations: [
-        {
-          email,
-          role,
-        },
-      ],
-    });
-
-    return {
-      status: 200,
-      body: {
-        message: 'An invite has been sent to the member',
-      },
-    };
-  }),
-
-  updateTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId, memberId } = args.params;
-
-    const { role } = args.body;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const member = await prisma.teamMember.findFirst({
-      where: {
-        id: Number(memberId),
-        teamId: team.id,
-      },
-    });
-
-    if (!member) {
-      return {
-        status: 404,
-        body: {
-          message: 'The provided member id does not exist.',
-        },
-      };
-    }
-
-    const updatedMember = await prisma.teamMember.update({
-      where: {
-        id: member.id,
-      },
-      data: {
-        role,
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    return {
-      status: 200,
-      body: {
-        id: updatedMember.id,
-        email: updatedMember.user.email,
-        role: updatedMember.role,
-      },
-    };
-  }),
-
-  removeTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId, memberId } = args.params;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const member = await prisma.teamMember.findFirst({
-      where: {
-        id: Number(memberId),
-        teamId: Number(teamId),
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    if (!member) {
-      return {
-        status: 404,
-        body: {
-          message: 'Member not found',
-        },
-      };
-    }
-
-    if (team.ownerUserId === member.userId) {
-      return {
-        status: 403,
-        body: {
-          message: 'You cannot remove the owner of the team',
-        },
-      };
-    }
-
-    if (member.userId === user.id) {
-      return {
-        status: 403,
-        body: {
-          message: 'You cannot remove yourself from the team',
-        },
-      };
-    }
-
-    await deleteTeamMembers({
-      userId: user.id,
-      teamId: team.id,
-      teamMemberIds: [member.id],
-    });
-
-    return {
-      status: 200,
-      body: {
-        id: member.id,
-        email: member.user.email,
-        role: member.role,
-      },
-    };
-  }),
 });
 
 const updateDocument = async ({
@@ -1599,26 +1328,13 @@ const updateDocument = async ({
   documentId: number;
   data: Prisma.DocumentUpdateInput;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }) => {
   return await prisma.document.update({
     where: {
       id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      userId,
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     data: {
       ...data,

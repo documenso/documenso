@@ -8,6 +8,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -35,15 +36,22 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type TeamDeleteDialogProps = {
   teamId: number;
   teamName: string;
+  redirectTo?: string;
   trigger?: React.ReactNode;
 };
 
-export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialogProps) => {
+export const TeamDeleteDialog = ({
+  trigger,
+  teamId,
+  teamName,
+  redirectTo,
+}: TeamDeleteDialogProps) => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { refreshSession } = useSession();
 
   const deleteMessage = _(msg`delete ${teamName}`);
 
@@ -60,11 +68,13 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
     },
   });
 
-  const { mutateAsync: deleteTeam } = trpc.team.deleteTeam.useMutation();
+  const { mutateAsync: deleteTeam } = trpc.team.delete.useMutation();
 
   const onFormSubmit = async () => {
     try {
       await deleteTeam({ teamId });
+
+      await refreshSession();
 
       toast({
         title: _(msg`Success`),
@@ -72,7 +82,9 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
         duration: 5000,
       });
 
-      await navigate('/settings/teams');
+      if (redirectTo) {
+        await navigate(redirectTo);
+      }
 
       setOpen(false);
     } catch (err) {
@@ -113,7 +125,7 @@ export const TeamDeleteDialog = ({ trigger, teamId, teamName }: TeamDeleteDialog
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="destructive">
-            <Trans>Delete team</Trans>
+            <Trans>Delete</Trans>
           </Button>
         )}
       </DialogTrigger>

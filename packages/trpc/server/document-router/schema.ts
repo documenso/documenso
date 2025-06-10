@@ -344,10 +344,3 @@ export const ZDownloadAuditLogsMutationSchema = z.object({
 export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
-
-export const ZMoveDocumentToTeamSchema = z.object({
-  documentId: z.number().describe('The ID of the document to move to a team.'),
-  teamId: z.number().describe('The ID of the team to move the document to.'),
-});
-
-export const ZMoveDocumentToTeamResponseSchema = ZDocumentLiteSchema;

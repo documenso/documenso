@@ -7,7 +7,6 @@ import { seedTeamDocuments } from '@documenso/prisma/seed/documents';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedTeamMember } from '@documenso/prisma/seed/teams';
-import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -15,11 +14,11 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel' });
 
 test('[TEAMS]: create document folder button is visible', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}`,
   });
 
@@ -27,11 +26,11 @@ test('[TEAMS]: create document folder button is visible', async ({ page }) => {
 });
 
 test('[TEAMS]: can create document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}`,
   });
 
@@ -44,15 +43,15 @@ test('[TEAMS]: can create document folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can create document subfolder within a document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}`,
   });
 
-  const teamFolder = await seedBlankFolder(team.owner, {
+  const teamFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Folder',
       teamId: team.id,
@@ -70,9 +69,9 @@ test('[TEAMS]: can create document subfolder within a document folder', async ({
 });
 
 test('[TEAMS]: can create a document inside a document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const teamFolder = await seedBlankFolder(team.owner, {
+  const teamFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Documents',
       teamId: team.id,
@@ -81,7 +80,7 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
   });
 
@@ -102,9 +101,9 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
 });
 
 test('[TEAMS]: can pin a document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contracts',
       teamId: team.id,
@@ -113,7 +112,7 @@ test('[TEAMS]: can pin a document folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -126,9 +125,9 @@ test('[TEAMS]: can pin a document folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can unpin a document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contracts',
       pinned: true,
@@ -138,7 +137,7 @@ test('[TEAMS]: can unpin a document folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -151,9 +150,9 @@ test('[TEAMS]: can unpin a document folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can rename a document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contracts',
       teamId: team.id,
@@ -162,7 +161,7 @@ test('[TEAMS]: can rename a document folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -176,9 +175,9 @@ test('[TEAMS]: can rename a document folder', async ({ page }) => {
 });
 
 test('[TEAMS]: document folder visibility is visible to team member', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contracts',
       teamId: team.id,
@@ -187,7 +186,7 @@ test('[TEAMS]: document folder visibility is visible to team member', async ({ p
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -198,16 +197,16 @@ test('[TEAMS]: document folder visibility is visible to team member', async ({ p
 });
 
 test('[TEAMS]: document folder can be moved to another document folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Clients',
       teamId: team.id,
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contracts',
       teamId: team.id,
@@ -216,7 +215,7 @@ test('[TEAMS]: document folder can be moved to another document folder', async (
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -234,23 +233,23 @@ test('[TEAMS]: document folder can be moved to another document folder', async (
 });
 
 test('[TEAMS]: document folder and its contents can be deleted', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Proposals',
       teamId: team.id,
     },
   });
 
-  const proposal = await seedBlankDocument(team.owner, {
+  const proposal = await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Team Proposal 1',
       folderId: folder.id,
     },
   });
 
-  const reportsFolder = await seedBlankFolder(team.owner, {
+  const reportsFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Reports',
       parentId: folder.id,
@@ -258,7 +257,7 @@ test('[TEAMS]: document folder and its contents can be deleted', async ({ page }
     },
   });
 
-  const report = await seedBlankDocument(team.owner, {
+  const report = await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Team Report 1',
       folderId: reportsFolder.id,
@@ -267,7 +266,7 @@ test('[TEAMS]: document folder and its contents can be deleted', async ({ page }
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -289,11 +288,11 @@ test('[TEAMS]: document folder and its contents can be deleted', async ({ page }
 });
 
 test('[TEAMS]: create folder button is visible on templates page', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -301,11 +300,11 @@ test('[TEAMS]: create folder button is visible on templates page', async ({ page
 });
 
 test('[TEAMS]: can create a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -326,9 +325,9 @@ test('[TEAMS]: can create a template folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can create a template subfolder inside a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
       type: FolderType.TEMPLATE,
@@ -338,7 +337,7 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates/f/${folder.id}`,
   });
 
@@ -356,9 +355,9 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 });
 
 test('[TEAMS]: can create a template inside a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
       type: FolderType.TEMPLATE,
@@ -368,7 +367,7 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates/f/${folder.id}`,
   });
 
@@ -400,9 +399,9 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 });
 
 test('[TEAMS]: can pin a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       type: FolderType.TEMPLATE,
@@ -412,7 +411,7 @@ test('[TEAMS]: can pin a template folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -425,9 +424,9 @@ test('[TEAMS]: can pin a template folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can unpin a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       pinned: true,
@@ -438,7 +437,7 @@ test('[TEAMS]: can unpin a template folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -452,9 +451,9 @@ test('[TEAMS]: can unpin a template folder', async ({ page }) => {
 });
 
 test('[TEAMS]: can rename a template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       type: FolderType.TEMPLATE,
@@ -464,7 +463,7 @@ test('[TEAMS]: can rename a template folder', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -478,9 +477,9 @@ test('[TEAMS]: can rename a template folder', async ({ page }) => {
 });
 
 test('[TEAMS]: template folder visibility is not visible to team member', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       type: FolderType.TEMPLATE,
@@ -490,7 +489,7 @@ test('[TEAMS]: template folder visibility is not visible to team member', async 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -501,9 +500,9 @@ test('[TEAMS]: template folder visibility is not visible to team member', async 
 });
 
 test('[TEAMS]: template folder can be moved to another template folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
       type: FolderType.TEMPLATE,
@@ -511,7 +510,7 @@ test('[TEAMS]: template folder can be moved to another template folder', async (
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       type: FolderType.TEMPLATE,
@@ -521,7 +520,7 @@ test('[TEAMS]: template folder can be moved to another template folder', async (
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -539,9 +538,9 @@ test('[TEAMS]: template folder can be moved to another template folder', async (
 });
 
 test('[TEAMS]: template folder and its contents can be deleted', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Proposal Templates',
       type: FolderType.TEMPLATE,
@@ -549,14 +548,14 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
     },
   });
 
-  const template = await seedBlankTemplate(team.owner, {
+  const template = await seedBlankTemplate(teamOwner, team.id, {
     createTemplateOptions: {
       title: 'Team Proposal Template 1',
       folderId: folder.id,
     },
   });
 
-  const subfolder = await seedBlankFolder(team.owner, {
+  const subfolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Report Templates',
       parentId: folder.id,
@@ -565,7 +564,7 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
     },
   });
 
-  const reportTemplate = await seedBlankTemplate(team.owner, {
+  const reportTemplate = await seedBlankTemplate(teamOwner, team.id, {
     createTemplateOptions: {
       title: 'Team Report Template 1',
       folderId: subfolder.id,
@@ -574,7 +573,7 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -596,9 +595,9 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
 });
 
 test('[TEAMS]: can navigate between template folders', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const parentFolder = await seedBlankFolder(team.owner, {
+  const parentFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
       type: FolderType.TEMPLATE,
@@ -606,7 +605,7 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
     },
   });
 
-  const subfolder = await seedBlankFolder(team.owner, {
+  const subfolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Contract Templates',
       parentId: parentFolder.id,
@@ -615,7 +614,7 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
     },
   });
 
-  await seedBlankTemplate(team.owner, {
+  await seedBlankTemplate(teamOwner, team.id, {
     createTemplateOptions: {
       title: 'Team Contract Template 1',
       folderId: subfolder.id,
@@ -625,7 +624,7 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/templates`,
   });
 
@@ -645,7 +644,7 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
 test('[TEAMS]: folder visibility is properly applied based on team member roles', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember1 = await seedTeamMember({
     teamId: team.id,
@@ -665,7 +664,7 @@ test('[TEAMS]: folder visibility is properly applied based on team member roles'
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -673,7 +672,7 @@ test('[TEAMS]: folder visibility is properly applied based on team member roles'
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -681,7 +680,7 @@ test('[TEAMS]: folder visibility is properly applied based on team member roles'
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -691,7 +690,7 @@ test('[TEAMS]: folder visibility is properly applied based on team member roles'
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -731,18 +730,28 @@ test('[TEAMS]: folder visibility is properly applied based on team member roles'
 });
 
 test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
-  const team = await seedTeam();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await prisma.teamGlobalSettings.create({
+  const teamSettingsId = await prisma.teamGlobalSettings.findFirstOrThrow({
+    where: {
+      team: {
+        id: team.id,
+      },
+    },
+  });
+
+  await prisma.teamGlobalSettings.update({
+    where: {
+      id: teamSettingsId.id,
+    },
     data: {
-      teamId: team.id,
       documentVisibility: DocumentVisibility.ADMIN,
     },
   });
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -760,7 +769,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toHaveText('Admins only');
 
   await prisma.teamGlobalSettings.update({
-    where: { teamId: team.id },
+    where: { id: teamSettingsId.id },
     data: { documentVisibility: DocumentVisibility.MANAGER_AND_ABOVE },
   });
 
@@ -780,7 +789,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toHaveText('Managers and above');
 
   await prisma.teamGlobalSettings.update({
-    where: { teamId: team.id },
+    where: { id: teamSettingsId.id },
     data: { documentVisibility: DocumentVisibility.EVERYONE },
   });
 
@@ -801,18 +810,28 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
 });
 
 test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
-  const team = await seedTeam();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await prisma.teamGlobalSettings.create({
+  const teamSettingsId = await prisma.teamGlobalSettings.findFirstOrThrow({
+    where: {
+      team: {
+        id: team.id,
+      },
+    },
+  });
+
+  await prisma.teamGlobalSettings.update({
+    where: {
+      id: teamSettingsId.id,
+    },
     data: {
-      teamId: team.id,
       documentVisibility: DocumentVisibility.ADMIN,
     },
   });
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -839,16 +858,16 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
 });
 
 test('[TEAMS]: documents are properly organized within folders', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const folder = await seedBlankFolder(team.owner, {
+  const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Folder',
       teamId: team.id,
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Folder Document',
       folderId: folder.id,
@@ -858,7 +877,7 @@ test('[TEAMS]: documents are properly organized within folders', async ({ page }
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -871,7 +890,7 @@ test('[TEAMS]: documents are properly organized within folders', async ({ page }
 });
 
 test('[TEAMS]: team member can move documents to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -879,7 +898,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     role: TeamMemberRole.MEMBER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -888,7 +907,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -897,7 +916,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -906,7 +925,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -914,7 +933,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -922,7 +941,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -961,7 +980,7 @@ test('[TEAMS]: team member can move documents to everyone folder', async ({ page
 });
 
 test('[TEAMS]: team manager can move manager document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -969,7 +988,7 @@ test('[TEAMS]: team manager can move manager document to manager folder', async 
     role: TeamMemberRole.MANAGER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -978,7 +997,7 @@ test('[TEAMS]: team manager can move manager document to manager folder', async 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1014,7 +1033,7 @@ test('[TEAMS]: team manager can move manager document to manager folder', async 
 });
 
 test('[TEAMS]: team manager can move manager document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -1022,7 +1041,7 @@ test('[TEAMS]: team manager can move manager document to everyone folder', async
     role: TeamMemberRole.MANAGER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1031,7 +1050,7 @@ test('[TEAMS]: team manager can move manager document to everyone folder', async
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1067,7 +1086,7 @@ test('[TEAMS]: team manager can move manager document to everyone folder', async
 });
 
 test('[TEAMS]: team manager can move everyone document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -1075,7 +1094,7 @@ test('[TEAMS]: team manager can move everyone document to manager folder', async
     role: TeamMemberRole.MANAGER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1084,7 +1103,7 @@ test('[TEAMS]: team manager can move everyone document to manager folder', async
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1120,7 +1139,7 @@ test('[TEAMS]: team manager can move everyone document to manager folder', async
 });
 
 test('[TEAMS]: team admin can move admin document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1128,7 +1147,7 @@ test('[TEAMS]: team admin can move admin document to admin folder', async ({ pag
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1137,7 +1156,7 @@ test('[TEAMS]: team admin can move admin document to admin folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1171,7 +1190,7 @@ test('[TEAMS]: team admin can move admin document to admin folder', async ({ pag
 });
 
 test('[TEAMS]: team admin can move admin document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1179,7 +1198,7 @@ test('[TEAMS]: team admin can move admin document to manager folder', async ({ p
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1188,7 +1207,7 @@ test('[TEAMS]: team admin can move admin document to manager folder', async ({ p
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1222,7 +1241,7 @@ test('[TEAMS]: team admin can move admin document to manager folder', async ({ p
 });
 
 test('[TEAMS]: team admin can move admin document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1230,7 +1249,7 @@ test('[TEAMS]: team admin can move admin document to everyone folder', async ({ 
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1239,7 +1258,7 @@ test('[TEAMS]: team admin can move admin document to everyone folder', async ({ 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1273,7 +1292,7 @@ test('[TEAMS]: team admin can move admin document to everyone folder', async ({ 
 });
 
 test('[TEAMS]: team admin can move manager document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1281,7 +1300,7 @@ test('[TEAMS]: team admin can move manager document to admin folder', async ({ p
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1290,7 +1309,7 @@ test('[TEAMS]: team admin can move manager document to admin folder', async ({ p
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1324,7 +1343,7 @@ test('[TEAMS]: team admin can move manager document to admin folder', async ({ p
 });
 
 test('[TEAMS]: team admin can move manager document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1332,7 +1351,7 @@ test('[TEAMS]: team admin can move manager document to manager folder', async ({
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1341,7 +1360,7 @@ test('[TEAMS]: team admin can move manager document to manager folder', async ({
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1375,7 +1394,7 @@ test('[TEAMS]: team admin can move manager document to manager folder', async ({
 });
 
 test('[TEAMS]: team admin can move manager document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1383,7 +1402,7 @@ test('[TEAMS]: team admin can move manager document to everyone folder', async (
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1392,7 +1411,7 @@ test('[TEAMS]: team admin can move manager document to everyone folder', async (
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1426,7 +1445,7 @@ test('[TEAMS]: team admin can move manager document to everyone folder', async (
 });
 
 test('[TEAMS]: team admin can move everyone document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1434,7 +1453,7 @@ test('[TEAMS]: team admin can move everyone document to admin folder', async ({ 
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1443,7 +1462,7 @@ test('[TEAMS]: team admin can move everyone document to admin folder', async ({ 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1477,7 +1496,7 @@ test('[TEAMS]: team admin can move everyone document to admin folder', async ({ 
 });
 
 test('[TEAMS]: team admin can move everyone document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1485,7 +1504,7 @@ test('[TEAMS]: team admin can move everyone document to manager folder', async (
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1494,7 +1513,7 @@ test('[TEAMS]: team admin can move everyone document to manager folder', async (
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1528,7 +1547,7 @@ test('[TEAMS]: team admin can move everyone document to manager folder', async (
 });
 
 test('[TEAMS]: team admin can move everyone document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -1536,7 +1555,7 @@ test('[TEAMS]: team admin can move everyone document to everyone folder', async 
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1545,7 +1564,7 @@ test('[TEAMS]: team admin can move everyone document to everyone folder', async 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1579,9 +1598,9 @@ test('[TEAMS]: team admin can move everyone document to everyone folder', async 
 });
 
 test('[TEAMS]: team owner can move admin document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1590,7 +1609,7 @@ test('[TEAMS]: team owner can move admin document to admin folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1600,7 +1619,7 @@ test('[TEAMS]: team owner can move admin document to admin folder', async ({ pag
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1624,9 +1643,9 @@ test('[TEAMS]: team owner can move admin document to admin folder', async ({ pag
 });
 
 test('[TEAMS]: team owner can move admin document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1635,7 +1654,7 @@ test('[TEAMS]: team owner can move admin document to manager folder', async ({ p
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1645,7 +1664,7 @@ test('[TEAMS]: team owner can move admin document to manager folder', async ({ p
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1669,9 +1688,9 @@ test('[TEAMS]: team owner can move admin document to manager folder', async ({ p
 });
 
 test('[TEAMS]: team owner can move admin document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1680,7 +1699,7 @@ test('[TEAMS]: team owner can move admin document to everyone folder', async ({ 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Admin Document',
       teamId: team.id,
@@ -1690,7 +1709,7 @@ test('[TEAMS]: team owner can move admin document to everyone folder', async ({ 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1714,9 +1733,9 @@ test('[TEAMS]: team owner can move admin document to everyone folder', async ({ 
 });
 
 test('[TEAMS]: team owner can move manager document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1725,7 +1744,7 @@ test('[TEAMS]: team owner can move manager document to admin folder', async ({ p
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1735,7 +1754,7 @@ test('[TEAMS]: team owner can move manager document to admin folder', async ({ p
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1759,9 +1778,9 @@ test('[TEAMS]: team owner can move manager document to admin folder', async ({ p
 });
 
 test('[TEAMS]: team owner can move manager document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1770,7 +1789,7 @@ test('[TEAMS]: team owner can move manager document to manager folder', async ({
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1780,7 +1799,7 @@ test('[TEAMS]: team owner can move manager document to manager folder', async ({
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1804,9 +1823,9 @@ test('[TEAMS]: team owner can move manager document to manager folder', async ({
 });
 
 test('[TEAMS]: team owner can move manager document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1815,7 +1834,7 @@ test('[TEAMS]: team owner can move manager document to everyone folder', async (
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Manager Document',
       teamId: team.id,
@@ -1825,7 +1844,7 @@ test('[TEAMS]: team owner can move manager document to everyone folder', async (
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1849,9 +1868,9 @@ test('[TEAMS]: team owner can move manager document to everyone folder', async (
 });
 
 test('[TEAMS]: team owner can move everyone document to admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Folder',
       teamId: team.id,
@@ -1860,7 +1879,7 @@ test('[TEAMS]: team owner can move everyone document to admin folder', async ({ 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1870,7 +1889,7 @@ test('[TEAMS]: team owner can move everyone document to admin folder', async ({ 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1894,9 +1913,9 @@ test('[TEAMS]: team owner can move everyone document to admin folder', async ({ 
 });
 
 test('[TEAMS]: team owner can move everyone document to manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -1905,7 +1924,7 @@ test('[TEAMS]: team owner can move everyone document to manager folder', async (
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1915,7 +1934,7 @@ test('[TEAMS]: team owner can move everyone document to manager folder', async (
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1939,9 +1958,9 @@ test('[TEAMS]: team owner can move everyone document to manager folder', async (
 });
 
 test('[TEAMS]: team owner can move everyone document to everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -1950,7 +1969,7 @@ test('[TEAMS]: team owner can move everyone document to everyone folder', async 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: '[TEST] Everyone Document',
       teamId: team.id,
@@ -1960,7 +1979,7 @@ test('[TEAMS]: team owner can move everyone document to everyone folder', async 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -1984,7 +2003,7 @@ test('[TEAMS]: team owner can move everyone document to everyone folder', async 
 });
 
 test('[TEAMS]: team member cannot see admin folder in folder list', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -1992,7 +2011,7 @@ test('[TEAMS]: team member cannot see admin folder in folder list', async ({ pag
     role: TeamMemberRole.MEMBER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2012,7 +2031,7 @@ test('[TEAMS]: team member cannot see admin folder in folder list', async ({ pag
 test('[TEAMS]: team member can access admin folder via URL and see everyone documents', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -2020,7 +2039,7 @@ test('[TEAMS]: team member can access admin folder via URL and see everyone docu
     role: TeamMemberRole.MEMBER,
   });
 
-  const adminFolder = await seedBlankFolder(team.owner, {
+  const adminFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2028,7 +2047,7 @@ test('[TEAMS]: team member can access admin folder via URL and see everyone docu
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Everyone Document',
       folderId: adminFolder.id,
@@ -2037,7 +2056,7 @@ test('[TEAMS]: team member can access admin folder via URL and see everyone docu
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Manager Document',
       folderId: adminFolder.id,
@@ -2046,7 +2065,7 @@ test('[TEAMS]: team member can access admin folder via URL and see everyone docu
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Admin Document',
       folderId: adminFolder.id,
@@ -2068,7 +2087,7 @@ test('[TEAMS]: team member can access admin folder via URL and see everyone docu
 });
 
 test('[TEAMS]: team member cannot see manager folder in folder list', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -2076,7 +2095,7 @@ test('[TEAMS]: team member cannot see manager folder in folder list', async ({ p
     role: TeamMemberRole.MEMBER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2096,7 +2115,7 @@ test('[TEAMS]: team member cannot see manager folder in folder list', async ({ p
 test('[TEAMS]: team member can access manager folder via URL and see everyone documents', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -2104,7 +2123,7 @@ test('[TEAMS]: team member can access manager folder via URL and see everyone do
     role: TeamMemberRole.MEMBER,
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  const managerFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2112,7 +2131,7 @@ test('[TEAMS]: team member can access manager folder via URL and see everyone do
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Everyone Document',
       folderId: managerFolder.id,
@@ -2121,7 +2140,7 @@ test('[TEAMS]: team member can access manager folder via URL and see everyone do
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Manager Document',
       folderId: managerFolder.id,
@@ -2130,7 +2149,7 @@ test('[TEAMS]: team member can access manager folder via URL and see everyone do
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Admin Document',
       folderId: managerFolder.id,
@@ -2152,7 +2171,7 @@ test('[TEAMS]: team member can access manager folder via URL and see everyone do
 });
 
 test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -2160,7 +2179,7 @@ test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
     role: TeamMemberRole.MEMBER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2168,7 +2187,7 @@ test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2176,7 +2195,7 @@ test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2198,7 +2217,7 @@ test('[TEAMS]: team member can see everyone folders', async ({ page }) => {
 test('[TEAMS]: team member can only see everyone documents in everyone folder', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamMember = await seedTeamMember({
     teamId: team.id,
@@ -2206,7 +2225,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
     role: TeamMemberRole.MEMBER,
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  const everyoneFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2214,7 +2233,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Document',
       folderId: everyoneFolder.id,
@@ -2223,7 +2242,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Document',
       folderId: everyoneFolder.id,
@@ -2232,7 +2251,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Document',
       folderId: everyoneFolder.id,
@@ -2255,7 +2274,7 @@ test('[TEAMS]: team member can only see everyone documents in everyone folder', 
 test('[TEAMS]: team manager can see manager and everyone folders in folder list', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -2263,7 +2282,7 @@ test('[TEAMS]: team manager can see manager and everyone folders in folder list'
     role: TeamMemberRole.MANAGER,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2271,7 +2290,7 @@ test('[TEAMS]: team manager can see manager and everyone folders in folder list'
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2279,7 +2298,7 @@ test('[TEAMS]: team manager can see manager and everyone folders in folder list'
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2301,7 +2320,7 @@ test('[TEAMS]: team manager can see manager and everyone folders in folder list'
 test('[TEAMS]: team manager can see manager and everyone documents in manager folder', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -2309,7 +2328,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     role: TeamMemberRole.MANAGER,
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  const managerFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2317,7 +2336,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Everyone Document',
       folderId: managerFolder.id,
@@ -2326,7 +2345,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Manager Document',
       folderId: managerFolder.id,
@@ -2335,7 +2354,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Admin Document',
       folderId: managerFolder.id,
@@ -2359,7 +2378,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
 test('[TEAMS]: team manager can see manager and everyone documents in everyone folder', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -2367,7 +2386,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
     role: TeamMemberRole.MANAGER,
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  const everyoneFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2375,7 +2394,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Everyone Document',
       folderId: everyoneFolder.id,
@@ -2384,7 +2403,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Manager Document',
       folderId: everyoneFolder.id,
@@ -2393,7 +2412,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Admin Document',
       folderId: everyoneFolder.id,
@@ -2417,7 +2436,7 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
 test('[TEAMS]: team manager can access admin folder via URL and see manager and everyone documents', async ({
   page,
 }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamManager = await seedTeamMember({
     teamId: team.id,
@@ -2425,7 +2444,7 @@ test('[TEAMS]: team manager can access admin folder via URL and see manager and 
     role: TeamMemberRole.MANAGER,
   });
 
-  const adminFolder = await seedBlankFolder(team.owner, {
+  const adminFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2433,7 +2452,7 @@ test('[TEAMS]: team manager can access admin folder via URL and see manager and 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Everyone Document',
       folderId: adminFolder.id,
@@ -2442,7 +2461,7 @@ test('[TEAMS]: team manager can access admin folder via URL and see manager and 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Manager Document',
       folderId: adminFolder.id,
@@ -2451,7 +2470,7 @@ test('[TEAMS]: team manager can access admin folder via URL and see manager and 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Admin Document',
       folderId: adminFolder.id,
@@ -2473,9 +2492,9 @@ test('[TEAMS]: team manager can access admin folder via URL and see manager and 
 });
 
 test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2483,7 +2502,7 @@ test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) 
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2491,7 +2510,7 @@ test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) 
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2501,7 +2520,7 @@ test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents`,
   });
 
@@ -2511,9 +2530,9 @@ test('[TEAMS]: team owner can see all folders in folder list', async ({ page }) 
 });
 
 test('[TEAMS]: team owner can see all documents in admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const adminFolder = await seedBlankFolder(team.owner, {
+  const adminFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2521,7 +2540,7 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Everyone Document',
       folderId: adminFolder.id,
@@ -2530,7 +2549,7 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Manager Document',
       folderId: adminFolder.id,
@@ -2539,7 +2558,7 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Admin Document',
       folderId: adminFolder.id,
@@ -2550,7 +2569,7 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
@@ -2561,9 +2580,9 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
 });
 
 test('[TEAMS]: team owner can see all documents in manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  const managerFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2571,7 +2590,7 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Everyone Document',
       folderId: managerFolder.id,
@@ -2580,7 +2599,7 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Manager Document',
       folderId: managerFolder.id,
@@ -2589,7 +2608,7 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Admin Document',
       folderId: managerFolder.id,
@@ -2600,7 +2619,7 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
@@ -2611,9 +2630,9 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
 });
 
 test('[TEAMS]: team owner can see all documents in everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  const everyoneFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2621,7 +2640,7 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Everyone Document',
       folderId: everyoneFolder.id,
@@ -2630,7 +2649,7 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Manager Document',
       folderId: everyoneFolder.id,
@@ -2639,7 +2658,7 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Admin Document',
       folderId: everyoneFolder.id,
@@ -2650,7 +2669,7 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
 
   await apiSignin({
     page,
-    email: team.owner.email,
+    email: teamOwner.email,
     redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
   });
 
@@ -2661,7 +2680,7 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
 });
 
 test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -2669,7 +2688,7 @@ test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) 
     role: TeamMemberRole.ADMIN,
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2677,7 +2696,7 @@ test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) 
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2685,7 +2704,7 @@ test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) 
     },
   });
 
-  await seedBlankFolder(team.owner, {
+  await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2705,7 +2724,7 @@ test('[TEAMS]: team admin can see all folders in folder list', async ({ page }) 
 });
 
 test('[TEAMS]: team admin can see all documents in admin folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -2713,7 +2732,7 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
     role: TeamMemberRole.ADMIN,
   });
 
-  const adminFolder = await seedBlankFolder(team.owner, {
+  const adminFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Admin Only Folder',
       teamId: team.id,
@@ -2721,7 +2740,7 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Everyone Document',
       folderId: adminFolder.id,
@@ -2730,7 +2749,7 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Manager Document',
       folderId: adminFolder.id,
@@ -2739,7 +2758,7 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Admin Folder - Admin Document',
       folderId: adminFolder.id,
@@ -2761,7 +2780,7 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
 });
 
 test('[TEAMS]: team admin can see all documents in manager folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -2769,7 +2788,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     role: TeamMemberRole.ADMIN,
   });
 
-  const managerFolder = await seedBlankFolder(team.owner, {
+  const managerFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Manager Folder',
       teamId: team.id,
@@ -2777,7 +2796,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Everyone Document',
       folderId: managerFolder.id,
@@ -2786,7 +2805,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Manager Document',
       folderId: managerFolder.id,
@@ -2795,7 +2814,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Manager Folder - Admin Document',
       folderId: managerFolder.id,
@@ -2817,7 +2836,7 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
 });
 
 test('[TEAMS]: team admin can see all documents in everyone folder', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { team, teamOwner } = await seedTeamDocuments();
 
   const teamAdmin = await seedTeamMember({
     teamId: team.id,
@@ -2825,7 +2844,7 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
     role: TeamMemberRole.ADMIN,
   });
 
-  const everyoneFolder = await seedBlankFolder(team.owner, {
+  const everyoneFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Everyone Folder',
       teamId: team.id,
@@ -2833,7 +2852,7 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Everyone Document',
       folderId: everyoneFolder.id,
@@ -2842,7 +2861,7 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Manager Document',
       folderId: everyoneFolder.id,
@@ -2851,7 +2870,7 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
     },
   });
 
-  await seedBlankDocument(team.owner, {
+  await seedBlankDocument(teamOwner, team.id, {
     createDocumentOptions: {
       title: 'Everyone Folder - Admin Document',
       folderId: everyoneFolder.id,

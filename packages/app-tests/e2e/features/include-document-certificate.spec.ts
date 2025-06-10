@@ -14,12 +14,15 @@ import { signSignaturePad } from '../fixtures/signature';
 
 test.describe('Signing Certificate Tests', () => {
   test('individual document should always include signing certificate', async ({ page }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser({
+      isPersonalOrganisation: true,
+    });
 
     const { document, recipients } = await seedPendingDocumentWithFullFields({
       owner: user,
       recipients: ['signer@example.com'],
       fields: [FieldType.SIGNATURE],
+      teamId: team.id,
     });
 
     const documentData = await prisma.documentData
@@ -76,20 +79,28 @@ test.describe('Signing Certificate Tests', () => {
   test('team document with signing certificate enabled should include certificate', async ({
     page,
   }) => {
-    const team = await seedTeam();
+    const { owner, team } = await seedTeam();
 
     const { document, recipients } = await seedPendingDocumentWithFullFields({
-      owner: team.owner,
+      owner: owner,
       recipients: ['signer@example.com'],
       fields: [FieldType.SIGNATURE],
-      updateDocumentOptions: {
-        teamId: team.id,
+      teamId: team.id,
+    });
+
+    const teamSettingsId = await prisma.teamGlobalSettings.findFirstOrThrow({
+      where: {
+        team: {
+          id: team.id,
+        },
       },
     });
 
-    await prisma.teamGlobalSettings.create({
+    await prisma.teamGlobalSettings.update({
+      where: {
+        id: teamSettingsId.id,
+      },
       data: {
-        teamId: team.id,
         includeSigningCertificate: true,
       },
     });
@@ -148,20 +159,28 @@ test.describe('Signing Certificate Tests', () => {
   test('team document with signing certificate disabled should not include certificate', async ({
     page,
   }) => {
-    const team = await seedTeam();
+    const { owner, team } = await seedTeam();
 
     const { document, recipients } = await seedPendingDocumentWithFullFields({
-      owner: team.owner,
+      owner: owner,
       recipients: ['signer@example.com'],
       fields: [FieldType.SIGNATURE],
-      updateDocumentOptions: {
-        teamId: team.id,
+      teamId: team.id,
+    });
+
+    const teamSettingsId = await prisma.teamGlobalSettings.findFirstOrThrow({
+      where: {
+        team: {
+          id: team.id,
+        },
       },
     });
 
-    await prisma.teamGlobalSettings.create({
+    await prisma.teamGlobalSettings.update({
+      where: {
+        id: teamSettingsId.id,
+      },
       data: {
-        teamId: team.id,
         includeSigningCertificate: false,
       },
     });
@@ -218,16 +237,22 @@ test.describe('Signing Certificate Tests', () => {
   });
 
   test('team can toggle signing certificate setting', async ({ page }) => {
-    const team = await seedTeam();
+    const { owner, team } = await seedTeam();
 
     await apiSignin({
       page,
-      email: team.owner.email,
+      email: owner.email,
       redirectPath: `/t/${team.url}/settings/preferences`,
     });
 
-    // Toggle signing certificate setting
-    await page.getByLabel('Include the Signing Certificate in the Document').click();
+    await page
+      .getByRole('group')
+      .locator('div')
+      .filter({ hasText: 'Include the Signing' })
+      .getByRole('combobox')
+      .click();
+    await page.getByRole('option', { name: 'No' }).click();
+
     await page
       .getByRole('button', { name: /Update/ })
       .first()
@@ -244,7 +269,13 @@ test.describe('Signing Certificate Tests', () => {
     expect(updatedTeam.teamGlobalSettings?.includeSigningCertificate).toBe(false);
 
     // Toggle the setting back to true
-    await page.getByLabel('Include the Signing Certificate in the Document').click();
+    await page
+      .getByRole('group')
+      .locator('div')
+      .filter({ hasText: 'Include the Signing' })
+      .getByRole('combobox')
+      .click();
+    await page.getByRole('option', { name: 'Yes' }).click();
     await page
       .getByRole('button', { name: /Update/ })
       .first()

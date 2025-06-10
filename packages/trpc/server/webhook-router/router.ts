@@ -3,24 +3,19 @@ import { deleteWebhookById } from '@documenso/lib/server-only/webhooks/delete-we
 import { editWebhook } from '@documenso/lib/server-only/webhooks/edit-webhook';
 import { getWebhookById } from '@documenso/lib/server-only/webhooks/get-webhook-by-id';
 import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-team-id';
-import { getWebhooksByUserId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-user-id';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
-  ZCreateWebhookMutationSchema,
-  ZDeleteWebhookMutationSchema,
-  ZEditWebhookMutationSchema,
-  ZGetTeamWebhooksQuerySchema,
-  ZGetWebhookByIdQuerySchema,
+  ZCreateWebhookRequestSchema,
+  ZDeleteWebhookRequestSchema,
+  ZEditWebhookRequestSchema,
+  ZGetTeamWebhooksRequestSchema,
+  ZGetWebhookByIdRequestSchema,
 } from './schema';
 
 export const webhookRouter = router({
-  getWebhooks: authenticatedProcedure.query(async ({ ctx }) => {
-    return await getWebhooksByUserId(ctx.user.id);
-  }),
-
   getTeamWebhooks: authenticatedProcedure
-    .input(ZGetTeamWebhooksQuerySchema)
+    .input(ZGetTeamWebhooksRequestSchema)
     .query(async ({ ctx, input }) => {
       const { teamId } = input;
 
@@ -28,7 +23,7 @@ export const webhookRouter = router({
     }),
 
   getWebhookById: authenticatedProcedure
-    .input(ZGetWebhookByIdQuerySchema)
+    .input(ZGetWebhookByIdRequestSchema)
     .query(async ({ input, ctx }) => {
       const { id, teamId } = input;
 
@@ -40,7 +35,7 @@ export const webhookRouter = router({
     }),
 
   createWebhook: authenticatedProcedure
-    .input(ZCreateWebhookMutationSchema)
+    .input(ZCreateWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { enabled, eventTriggers, secret, webhookUrl, teamId } = input;
 
@@ -55,7 +50,7 @@ export const webhookRouter = router({
     }),
 
   deleteWebhook: authenticatedProcedure
-    .input(ZDeleteWebhookMutationSchema)
+    .input(ZDeleteWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, teamId } = input;
 
@@ -67,7 +62,7 @@ export const webhookRouter = router({
     }),
 
   editWebhook: authenticatedProcedure
-    .input(ZEditWebhookMutationSchema)
+    .input(ZEditWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, teamId, ...data } = input;
 

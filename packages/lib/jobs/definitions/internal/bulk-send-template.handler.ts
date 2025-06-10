@@ -1,7 +1,6 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
 
@@ -16,8 +15,8 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { AppError } from '../../../errors/app-error';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TBulkSendTemplateJobDefinition } from './bulk-send-template';
 
@@ -163,29 +162,24 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    let teamGlobalSettings: TeamGlobalSettings | undefined | null;
+    const { branding, settings } = await getEmailContext({
+      source: {
+        type: 'team',
+        teamId,
+      },
+    });
 
-    if (template.teamId) {
-      teamGlobalSettings = await prisma.teamGlobalSettings.findUnique({
-        where: {
-          teamId: template.teamId,
-        },
-      });
-    }
+    const lang = template.templateMeta?.language ?? settings.documentLanguage;
 
-    const branding = teamGlobalSettings
-      ? teamGlobalSettingsToBranding(teamGlobalSettings)
-      : undefined;
-
-    const i18n = await getI18nInstance(teamGlobalSettings?.documentLanguage);
+    const i18n = await getI18nInstance(lang);
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(completionTemplate, {
-        lang: teamGlobalSettings?.documentLanguage,
+        lang,
         branding,
       }),
       renderEmailWithI18N(completionTemplate, {
-        lang: teamGlobalSettings?.documentLanguage,
+        lang,
         branding,
         plainText: true,
       }),

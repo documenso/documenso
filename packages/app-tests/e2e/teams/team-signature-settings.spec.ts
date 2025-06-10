@@ -3,26 +3,20 @@ import { expect, test } from '@playwright/test';
 import { prisma } from '@documenso/prisma';
 import {
   seedTeamDocumentWithMeta,
-  seedTeamDocuments,
   seedTeamTemplateWithMeta,
 } from '@documenso/prisma/seed/documents';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test('[TEAMS]: check that default team signature settings are all enabled', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
+    email: user.email,
     redirectPath: `/t/${team.url}/settings/preferences`,
   });
-
-  // Verify that the default created team settings has all signatures enabled
-  await expect(page.getByRole('combobox').filter({ hasText: 'Type' })).toBeVisible();
-  await expect(page.getByRole('combobox').filter({ hasText: 'Upload' })).toBeVisible();
-  await expect(page.getByRole('combobox').filter({ hasText: 'Draw' })).toBeVisible();
 
   const document = await seedTeamDocumentWithMeta(team);
 
@@ -46,12 +40,11 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
 });
 
 test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
+    email: user.email,
     redirectPath: `/t/${team.url}/settings/preferences`,
   });
 
@@ -105,12 +98,11 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
 });
 
 test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
+    email: user.email,
     redirectPath: `/t/${team.url}/settings/preferences`,
   });
 

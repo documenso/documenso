@@ -2,21 +2,25 @@ import { DocumentSource, SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 
-import { getDocumentRelatedPrices } from '../stripe/get-document-related-prices.ts';
-import { FREE_PLAN_LIMITS, SELFHOSTED_PLAN_LIMITS, TEAM_PLAN_LIMITS } from './constants';
+import {
+  FREE_PLAN_LIMITS,
+  INACTIVE_PLAN_LIMITS,
+  PAID_PLAN_LIMITS,
+  SELFHOSTED_PLAN_LIMITS,
+} from './constants';
 import { ERROR_CODES } from './errors';
 import type { TLimitsResponseSchema } from './schema';
-import { ZLimitsSchema } from './schema';
 
 export type GetServerLimitsOptions = {
-  email: string;
-  teamId?: number | null;
+  userId: number;
+  teamId: number;
 };
 
 export const getServerLimits = async ({
-  email,
+  userId,
   teamId,
 }: GetServerLimitsOptions): Promise<TLimitsResponseSchema> => {
   if (!IS_BILLING_ENABLED()) {
@@ -26,141 +30,96 @@ export const getServerLimits = async ({
     };
   }
 
-  if (!email) {
-    throw new Error(ERROR_CODES.UNAUTHORIZED);
-  }
-
-  return teamId ? handleTeamLimits({ email, teamId }) : handleUserLimits({ email });
-};
-
-type HandleUserLimitsOptions = {
-  email: string;
-};
-
-const handleUserLimits = async ({ email }: HandleUserLimitsOptions) => {
-  const user = await prisma.user.findFirst({
+  const organisation = await prisma.organisation.findFirst({
     where: {
-      email,
-    },
-    include: {
-      subscriptions: true,
-    },
-  });
-
-  if (!user) {
-    throw new Error(ERROR_CODES.USER_FETCH_FAILED);
-  }
-
-  let quota = structuredClone(FREE_PLAN_LIMITS);
-  let remaining = structuredClone(FREE_PLAN_LIMITS);
-
-  const activeSubscriptions = user.subscriptions.filter(
-    ({ status }) => status === SubscriptionStatus.ACTIVE,
-  );
-
-  if (activeSubscriptions.length > 0) {
-    const documentPlanPrices = await getDocumentRelatedPrices();
-
-    for (const subscription of activeSubscriptions) {
-      const price = documentPlanPrices.find((price) => price.id === subscription.priceId);
-
-      if (!price || typeof price.product === 'string' || price.product.deleted) {
-        continue;
-      }
-
-      const currentQuota = ZLimitsSchema.parse(
-        'metadata' in price.product ? price.product.metadata : {},
-      );
-
-      // Use the subscription with the highest quota.
-      if (currentQuota.documents > quota.documents && currentQuota.recipients > quota.recipients) {
-        quota = currentQuota;
-        remaining = structuredClone(quota);
-      }
-    }
-
-    // Assume all active subscriptions provide unlimited direct templates.
-    remaining.directTemplates = Infinity;
-  }
-
-  const [documents, directTemplates] = await Promise.all([
-    prisma.document.count({
-      where: {
-        userId: user.id,
-        teamId: null,
-        createdAt: {
-          gte: DateTime.utc().startOf('month').toJSDate(),
-        },
-        source: {
-          not: DocumentSource.TEMPLATE_DIRECT_LINK,
+      teams: {
+        some: {
+          id: teamId,
         },
       },
-    }),
-    prisma.template.count({
-      where: {
-        userId: user.id,
-        teamId: null,
-        directLink: {
-          isNot: null,
-        },
-      },
-    }),
-  ]);
-
-  remaining.documents = Math.max(remaining.documents - documents, 0);
-  remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
-
-  return {
-    quota,
-    remaining,
-  };
-};
-
-type HandleTeamLimitsOptions = {
-  email: string;
-  teamId: number;
-};
-
-const handleTeamLimits = async ({ email, teamId }: HandleTeamLimitsOptions) => {
-  const team = await prisma.team.findFirst({
-    where: {
-      id: teamId,
       members: {
         some: {
-          user: {
-            email,
-          },
+          userId,
         },
       },
     },
     include: {
       subscription: true,
+      organisationClaim: true,
     },
   });
 
-  if (!team) {
-    throw new Error('Team not found');
+  if (!organisation) {
+    throw new Error(ERROR_CODES.USER_FETCH_FAILED);
   }
 
-  const { subscription } = team;
+  const quota = structuredClone(FREE_PLAN_LIMITS);
+  const remaining = structuredClone(FREE_PLAN_LIMITS);
 
-  if (subscription && subscription.status === SubscriptionStatus.INACTIVE) {
+  const subscription = organisation.subscription;
+
+  // Bypass all limits even if plan expired for ENTERPRISE.
+  if (organisation.organisationClaimId === INTERNAL_CLAIM_ID.ENTERPRISE) {
     return {
-      quota: {
-        documents: 0,
-        recipients: 0,
-        directTemplates: 0,
-      },
-      remaining: {
-        documents: 0,
-        recipients: 0,
-        directTemplates: 0,
-      },
+      quota: PAID_PLAN_LIMITS,
+      remaining: PAID_PLAN_LIMITS,
+    };
+  }
+
+  // If plan expired.
+  if (subscription && subscription.status !== SubscriptionStatus.ACTIVE) {
+    return {
+      quota: INACTIVE_PLAN_LIMITS,
+      remaining: INACTIVE_PLAN_LIMITS,
+    };
+  }
+
+  if (subscription && organisation.organisationClaim.flags.unlimitedDocuments) {
+    return {
+      quota: PAID_PLAN_LIMITS,
+      remaining: PAID_PLAN_LIMITS,
+    };
+  }
+
+  // If free tier or plan does not have unlimited documents.
+  if (!subscription || !organisation.organisationClaim.flags.unlimitedDocuments) {
+    const [documents, directTemplates] = await Promise.all([
+      prisma.document.count({
+        where: {
+          team: {
+            organisationId: organisation.id,
+          },
+          createdAt: {
+            gte: DateTime.utc().startOf('month').toJSDate(),
+          },
+          source: {
+            not: DocumentSource.TEMPLATE_DIRECT_LINK,
+          },
+        },
+      }),
+      prisma.template.count({
+        where: {
+          team: {
+            organisationId: organisation.id,
+          },
+          directLink: {
+            isNot: null,
+          },
+        },
+      }),
+    ]);
+
+    remaining.documents = Math.max(remaining.documents - documents, 0);
+    remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
+
+    return {
+      quota,
+      remaining,
     };
   }
 
   return {
-    quota: structuredClone(TEAM_PLAN_LIMITS),
-    remaining: structuredClone(TEAM_PLAN_LIMITS),
+    quota: PAID_PLAN_LIMITS,
+    remaining: PAID_PLAN_LIMITS,
   };
 };

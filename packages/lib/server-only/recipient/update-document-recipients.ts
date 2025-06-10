@@ -3,7 +3,6 @@ import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
@@ -20,10 +19,11 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientBeModified } from '../../utils/recipients';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export interface UpdateDocumentRecipientsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
@@ -36,28 +36,26 @@ export const updateDocumentRecipients = async ({
   recipients,
   requestMetadata,
 }: UpdateDocumentRecipientsOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       fields: true,
       recipients: true,
+      team: {
+        select: {
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
+        },
+      },
     },
   });
 
@@ -78,17 +76,10 @@ export const updateDocumentRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth) {
-    const isEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const recipientsToUpdate = recipients.map((recipient) => {
