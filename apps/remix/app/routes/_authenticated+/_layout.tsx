@@ -28,8 +28,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const session = await getOptionalSession(request);
 
-  console.log({ session });
-
   if (!session.isAuthenticated) {
     throw redirect('/signin');
   }
@@ -55,6 +53,7 @@ export default function Layout({ loaderData }: Route.ComponentProps) {
       await authClient.signOut();
     };
 
+    //@ts-expect-error - user is not defined
     if (user?.disabled) {
       console.log(`User profile is disabled, closing session for user: ${user.id}`);
       void closeSession();
