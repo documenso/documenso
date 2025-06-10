@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-05-22 06:04\n"
+"PO-Revision-Date: 2025-06-10 02:27\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -50,11 +50,11 @@ msgstr "\"{documentTitle}\" wurde erfolgreich gelöscht"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
-msgstr ""
+msgstr "\"{placeholderEmail}\" im Auftrag des \"Team Name\" hat Sie eingeladen, das \"Beispieldokument\" zu unterschreiben."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
-msgstr ""
+msgstr "\"Team Name\" hat Sie eingeladen, das \"Beispieldokument\" zu unterschreiben."
 
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
@@ -80,13 +80,13 @@ msgstr "{0, plural, one {# Empfänger} other {# Empfänger}}"
 #. placeholder {0}: org.teams.length
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "{0, plural, one {# team} other {# teams}}"
-msgstr ""
+msgstr "{0, plural, one {# Team} other {# Teams}}"
 
 #. placeholder {0}: data.length
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "{0, plural, one {<0>You have <1>1</1> pending invitation</0>} other {<2>You have <3>#</3> pending invitations</2>}}"
-msgstr ""
+msgstr "{0, plural, one {<0>Sie haben <1>1</1> ausstehende Einladung</0>} other {<2>Sie haben <3>#</3> ausstehende Einladungen</2>}}"
 
 #. placeholder {0}: autoSignableFields.filter((f) => f.type === fieldType).length
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
@@ -154,7 +154,7 @@ msgstr "{0} Empfänger(in)"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "{0} Teams"
-msgstr ""
+msgstr "{0} Teams"
 
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 msgid "{charactersRemaining, plural, one {1 character remaining} other {{charactersRemaining} characters remaining}}"
@@ -442,7 +442,7 @@ msgstr "<0>Passkey erforderlich</0> - Der Empfänger muss ein Konto haben und de
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "<0>Require password</0> - The recipient must have an account and password configured via their settings, the password will be verified during signing"
-msgstr ""
+msgstr "<0>Passwort erforderlich</0> - Der Empfänger muss ein Konto und ein Passwort konfiguriert haben, das Passwort wird beim Signieren überprüft"
 
 #: apps/remix/app/components/tables/documents-table-sender-filter.tsx
 msgid "<0>Sender:</0> All"
@@ -471,11 +471,11 @@ msgstr "<0>Sie sind dabei, die Ansicht von \"<1>{documentTitle}</1>\" abzuschlie
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "0 Free organisations left"
-msgstr ""
+msgstr "0 freie Organisationen übrig"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "1 Free organisations left"
-msgstr ""
+msgstr "1 Freie Organisationen übrig"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "1 month"
@@ -487,7 +487,7 @@ msgstr "12 Monate"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "2FA"
-msgstr ""
+msgstr "2FA"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "3 months"
@@ -496,7 +496,7 @@ msgstr "3 Monate"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "401 Unauthorized"
-msgstr ""
+msgstr "401 Nicht autorisiert"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "404 not found"
@@ -504,12 +504,12 @@ msgstr "404 nicht gefunden"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "404 Organisation group not found"
-msgstr ""
+msgstr "404 Organisationsgruppe nicht gefunden"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "404 Organisation not found"
-msgstr ""
+msgstr "404 Organisation nicht gefunden"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "404 Profile not found"
@@ -522,15 +522,15 @@ msgstr "404 Team nicht gefunden"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "404 User not found"
-msgstr ""
+msgstr "404 Benutzer nicht gefunden"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 documents a month"
-msgstr ""
+msgstr "5 Dokumente pro Monat"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 Documents a month"
-msgstr ""
+msgstr "5 Dokumente im Monat"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "500 Internal Server Error"
@@ -578,27 +578,27 @@ msgstr "Ein Mittel, um Dokumente für Ihre Unterlagen zu drucken oder herunterzu
 
 #: packages/email/templates/organisation-join.tsx
 msgid "A member has joined your organisation on Documenso"
-msgstr ""
+msgstr "Ein Mitglied ist Ihrer Organisation bei Documenso beigetreten"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
-msgstr ""
+msgstr "Ein Mitglied hat Ihre Organisation verlassen"
 
 #: packages/email/templates/organisation-leave.tsx
 msgid "A member has left your organisation {organisationName}"
-msgstr ""
+msgstr "Ein Mitglied hat Ihre Organisation {organisationName} verlassen"
 
 #: packages/email/templates/organisation-leave.tsx
 msgid "A member has left your organisation on Documenso"
-msgstr ""
+msgstr "Ein Mitglied hat Ihre Organisation auf Documenso verlassen"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-joined-email.handler.ts
 msgid "A new member has joined your organisation"
-msgstr ""
+msgstr "Ein neues Mitglied ist Ihrer Organisation beigetreten"
 
 #: packages/email/templates/organisation-join.tsx
 msgid "A new member has joined your organisation {organisationName}"
-msgstr ""
+msgstr "Ein neues Mitglied ist Ihrer Organisation {organisationName} beigetreten"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "A new token was created successfully."
@@ -649,11 +649,11 @@ msgstr "Eine eindeutige URL, um auf dein Profil zuzugreifen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "A unique URL to identify the organisation"
-msgstr ""
+msgstr "Eine eindeutige URL zur Identifizierung der Organisation"
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "A unique URL to identify your organisation"
-msgstr ""
+msgstr "Eine eindeutige URL zur Identifizierung Ihrer Organisation"
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
@@ -672,7 +672,7 @@ msgstr "Akzeptieren"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "Accept invitation to join an organisation on Documenso"
-msgstr ""
+msgstr "Einladung annehmen, um einer Organisation auf Documenso beizutreten"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Accept team email request for {teamName} on Documenso"
@@ -684,16 +684,16 @@ msgstr "Zustimmung und Einverständnis"
 
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 msgid "Access disabled"
-msgstr ""
+msgstr "Zugriff deaktiviert"
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Access enabled"
-msgstr ""
+msgstr "Zugang aktiviert"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Account"
-msgstr ""
+msgstr "Konto"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Account Authentication"
@@ -815,25 +815,25 @@ msgstr "Felder hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add group roles"
-msgstr ""
+msgstr "Gruppenrollen hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add groups"
-msgstr ""
+msgstr "Gruppen hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add members"
-msgstr ""
+msgstr "Mitglieder hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Add Members"
-msgstr ""
+msgstr "Mitglieder hinzufügen"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Add members roles"
-msgstr ""
+msgstr "Mitgliederrollen hinzufügen"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Add more"
@@ -913,7 +913,7 @@ msgstr "Admin-Panel"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Admin Panel"
-msgstr ""
+msgstr "Admin-Panel"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
@@ -949,7 +949,7 @@ msgstr "Alle Dokumente"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "All documents have been completed!"
-msgstr ""
+msgstr "Alle Dokumente wurden fertiggestellt!"
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "All documents have been processed. Any new documents that are sent or received will show here."
@@ -990,7 +990,7 @@ msgstr "Alle Zeiten"
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "Allow all organisation members to access this team"
-msgstr ""
+msgstr "Erlaube allen Organisationsmitgliedern den Zugriff auf dieses Team"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Allow document recipients to reply directly to this email address"
@@ -1010,7 +1010,7 @@ msgstr "Erlaubte Signaturtypen"
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 msgid "Allowed teams"
-msgstr ""
+msgstr "Erlaubte Teams"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Allows authenticating using biometrics, password managers, hardware keys, etc."
@@ -1260,7 +1260,7 @@ msgstr "Ein unbekannter Fehler ist beim Verschieben des Ordners aufgetreten."
 
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
-msgstr ""
+msgstr "Alle Dokumente, zu denen Sie eingeladen wurden, erscheinen hier"
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Any Source"
@@ -1320,7 +1320,7 @@ msgstr "Sind Sie sicher, dass Sie das Dokument abschließen möchten? Diese Akti
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie den folgenden Antrag löschen möchten?"
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Are you sure you want to delete this token?"
@@ -1336,7 +1336,7 @@ msgstr "Bist du sicher, dass du den <0>{passkeyName}</0> Passkey entfernen möch
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Are you sure you wish to delete this organisation?"
-msgstr ""
+msgstr "Sind Sie sicher, dass Sie diese Organisation löschen möchten?"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "Are you sure you wish to delete this team?"
@@ -1359,7 +1359,7 @@ msgstr "Bist du dir sicher?"
 
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 msgid "Assigned Teams"
-msgstr ""
+msgstr "Zugewiesene Teams"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "Assist"
@@ -1388,7 +1388,7 @@ msgstr "Assistenten"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Assistants and Copy roles are currently not compatible with the multi-sign experience."
-msgstr ""
+msgstr "Assistenten- und Kopierollen sind derzeit nicht mit der Multi-Signatur-Erfahrung kompatibel."
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: packages/lib/constants/recipient-roles.ts
@@ -1446,7 +1446,7 @@ msgstr "Zurück"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Back home"
-msgstr ""
+msgstr "Zurück nach Hause"
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Background Color"
@@ -1486,15 +1486,15 @@ msgstr "Blau"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
-msgstr ""
+msgstr "Markendetails"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Website"
-msgstr ""
+msgstr "Marken-Website"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Branding Logo"
-msgstr ""
+msgstr "Branding-Logo"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
@@ -1709,7 +1709,7 @@ msgstr "Wählen Sie, wie Sie Ihr Dokument an Empfänger verteilen möchten. E-Ma
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Choose your preferred authentication method:"
-msgstr ""
+msgstr "Wählen Sie Ihre bevorzugte Authentifizierungsmethode aus:"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Choose..."
@@ -1721,7 +1721,7 @@ msgstr "Konto beanspruchen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Claims"
-msgstr ""
+msgstr "Ansprüche"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Clear file"
@@ -1786,7 +1786,7 @@ msgstr "Kommunikation"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Compare all plans and features in detail"
-msgstr ""
+msgstr "Vergleichen Sie alle Pläne und Funktionen im Detail"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -1903,11 +1903,11 @@ msgstr "Konfigurieren Sie die Felder, die Sie auf dem Dokument platzieren möcht
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Configure the team roles for each group"
-msgstr ""
+msgstr "Konfigurieren Sie die Teamrollen für jede Gruppe"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Configure the team roles for each member"
-msgstr ""
+msgstr "Konfigurieren Sie die Teamrollen für jedes Mitglied"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -1949,7 +1949,7 @@ msgstr "Kontaktinformationen"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Contact sales here"
-msgstr ""
+msgstr "Vertrieb hier kontaktieren"
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Content"
@@ -2079,7 +2079,7 @@ msgstr "Ein neues Konto erstellen"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create a new organisation with {planName} plan. Keep your current organisation on it's current plan"
-msgstr ""
+msgstr "Erstellen Sie eine neue Organisation mit dem {planName} Plan. Behalten Sie Ihre aktuelle Organisation auf dem aktuellen Plan"
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "Create a team to collaborate with your team members."
@@ -2092,15 +2092,15 @@ msgstr "Konto erstellen"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Create an organisation for this user"
-msgstr ""
+msgstr "Erstellen Sie eine Organisation für diesen Benutzer"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Create an organisation to collaborate with teams"
-msgstr ""
+msgstr "Erstellen Sie eine Organisation, um mit Teams zusammenzuarbeiten"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Create an organisation to get started."
-msgstr ""
+msgstr "Erstellen Sie eine Organisation, um zu beginnen."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create and send"
@@ -2116,11 +2116,11 @@ msgstr "Als ausstehend erstellen"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create claim"
-msgstr ""
+msgstr "Antrag erstellen"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create Claim"
-msgstr ""
+msgstr "Antrag erstellen"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog-wrapper.tsx
 msgid "Create Direct Link"
@@ -2137,11 +2137,11 @@ msgstr "Dokument aus der Vorlage erstellen"
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Create group"
-msgstr ""
+msgstr "Gruppe erstellen"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Create Groups"
-msgstr ""
+msgstr "Gruppen erstellen"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Create now"
@@ -2157,17 +2157,17 @@ msgstr "Einen automatisch erstellen"
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Create organisation"
-msgstr ""
+msgstr "Organisation erstellen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 msgid "Create Organisation"
-msgstr ""
+msgstr "Organisation erstellen"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create separate organisation"
-msgstr ""
+msgstr "Separate Organisation erstellen"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create signing links"
@@ -2175,15 +2175,15 @@ msgstr "Unterzeichnung Links erstellen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Create Stripe customer"
-msgstr ""
+msgstr "Stripe-Kunden erstellen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Create subscription"
-msgstr ""
+msgstr "Abonnement erstellen"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Create Subscription Claim"
-msgstr ""
+msgstr "Abonnementsanspruch erstellen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
@@ -2274,15 +2274,15 @@ msgstr "Aktuelle Empfänger:"
 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "Currently all organisation members can access this team"
-msgstr ""
+msgstr "Derzeit können alle Organisationsmitglieder auf dieses Team zugreifen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 msgid "Currently branding can only be configured for Teams and above plans."
-msgstr ""
+msgstr "Zurzeit kann das Branding nur für Teams und darüber konfiguriert werden."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
-msgstr ""
+msgstr "Benutzerdefinierte Organisationsgruppen"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Dark Mode"
@@ -2290,7 +2290,7 @@ msgstr "Dunkelmodus"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-date-field.tsx
@@ -2397,15 +2397,15 @@ msgstr "Dokument löschen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
-msgstr ""
+msgstr "Organisation löschen"
 
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 msgid "Delete organisation group"
-msgstr ""
+msgstr "Organisationsgruppe löschen"
 
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 msgid "Delete organisation member"
-msgstr ""
+msgstr "Organisationsmitglied löschen"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Delete passkey"
@@ -2413,7 +2413,7 @@ msgstr "Passkey löschen"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Delete Subscription Claim"
-msgstr ""
+msgstr "Abonnementsanspruch löschen"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Delete team"
@@ -2421,7 +2421,7 @@ msgstr "Team löschen"
 
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 msgid "Delete team group"
-msgstr ""
+msgstr "Teamgruppe löschen"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
@@ -2523,7 +2523,7 @@ msgstr "2FA deaktivieren"
 
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 msgid "Disable access"
-msgstr ""
+msgstr "Zugriff deaktivieren"
 
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 msgid "Disable account"
@@ -2857,7 +2857,7 @@ msgstr "Dokumente empfangen"
 
 #: apps/remix/app/components/tables/inbox-table.tsx
 msgid "Documents that require your attention will appear here"
-msgstr ""
+msgstr "Dokumente, die Ihre Aufmerksamkeit erfordern, erscheinen hier"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Documents Viewed"
@@ -3069,7 +3069,7 @@ msgstr "E-Mail-Verifizierung wurde erneut gesendet"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Embedding, 5 members included and more"
-msgstr ""
+msgstr "Einbettung, 5 Mitglieder enthalten und mehr"
 
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Empty field"
@@ -3077,7 +3077,7 @@ msgstr "Leeres Feld"
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Enable"
-msgstr ""
+msgstr "Aktivieren"
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
@@ -3086,7 +3086,7 @@ msgstr "2FA aktivieren"
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "Enable access"
-msgstr ""
+msgstr "Zugriff aktivieren"
 
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 msgid "Enable account"
@@ -3103,15 +3103,15 @@ msgstr "Authenticator-App aktivieren"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable Custom Branding"
-msgstr ""
+msgstr "Benutzerdefiniertes Branding aktivieren"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable custom branding for all documents in this organisation"
-msgstr ""
+msgstr "Aktivieren Sie das benutzerdefinierte Branding für alle Dokumente in dieser Organisation"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enable custom branding for all documents in this team"
-msgstr ""
+msgstr "Aktivieren Sie das benutzerdefinierte Branding für alle Dokumente in diesem Team"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: packages/lib/constants/template.ts
@@ -3141,11 +3141,11 @@ msgstr "Beigefügte Dokument"
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
-msgstr ""
+msgstr "Anspruchsname eingeben"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Enter your 2FA code"
-msgstr ""
+msgstr "Geben Sie Ihren 2FA-Code ein"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Enter your brand details"
@@ -3165,7 +3165,7 @@ msgstr "Geben Sie Ihren Namen ein"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Enter your password"
-msgstr ""
+msgstr "Geben Sie Ihr Passwort ein"
 
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 msgid "Enter your text here"
@@ -3173,7 +3173,7 @@ msgstr "Geben Sie hier Ihren Text ein"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Enterprise"
-msgstr ""
+msgstr "Unternehmen"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
@@ -3272,15 +3272,15 @@ msgstr "Ordner konnte nicht erstellt werden"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Failed to create subscription claim."
-msgstr ""
+msgstr "Fehler beim Erstellen des Abonnementsanspruchs."
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
-msgstr ""
+msgstr "Fehler beim Löschen des Abonnementsanspruchs."
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
-msgstr ""
+msgstr "Fehler beim Laden des Dokuments"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -3300,7 +3300,7 @@ msgstr "Empfänger konnte nicht aktualisiert werden"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Failed to update subscription claim."
-msgstr ""
+msgstr "Fehler beim Aktualisieren des Abonnementsanspruchs."
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 msgid "Failed to update template"
@@ -3318,7 +3318,7 @@ msgstr "Fehlgeschlagen: {failedCount}"
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Feature Flags"
-msgstr ""
+msgstr "Funktionsflaggen"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -3379,7 +3379,7 @@ msgstr "Dateigröße überschreitet das Limit von {APP_DOCUMENT_UPLOAD_SIZE_LIMI
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Fill in the details to create a new subscription claim."
-msgstr ""
+msgstr "Füllen Sie die Details aus, um einen neuen Abonnementsanspruch zu erstellen."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
@@ -3419,7 +3419,7 @@ msgstr "Für jeden Empfänger geben Sie dessen E-Mail (erforderlich) und Namen (
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "For example, if the claim has a new flag \"FLAG_1\" set to true, then this organisation will get that flag added."
-msgstr ""
+msgstr "Wenn der Anspruch zum Beispiel das neue Flag 'FLAG_1' hat, das auf wahr gesetzt ist, wird dieser Organisation dieses Flag hinzugefügt."
 
 #: packages/lib/server-only/auth/send-forgot-password.ts
 msgid "Forgot Password?"
@@ -3433,7 +3433,7 @@ msgstr "Hast du dein Passwort vergessen?"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Free"
-msgstr ""
+msgstr "Kostenlos"
 
 #: packages/ui/primitives/document-flow/types.ts
 msgid "Free Signature"
@@ -3473,7 +3473,7 @@ msgstr "Globale Empfängerauthentifizierung"
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Go back"
-msgstr ""
+msgstr "Zurückgehen"
 
 #: apps/remix/app/routes/_recipient+/_layout.tsx
 #: apps/remix/app/routes/_profile+/_layout.tsx
@@ -3498,7 +3498,7 @@ msgstr "Zurück nach Hause"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 msgid "Go home"
-msgstr ""
+msgstr "Nach Hause gehen"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Go to document"
@@ -3510,7 +3510,7 @@ msgstr "Zum Eigentümer gehen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Go to team"
-msgstr ""
+msgstr "Zum Team gehen"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 msgid "Go to your <0>public profile settings</0> to add documents."
@@ -3525,20 +3525,20 @@ msgstr "Grün"
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Group"
-msgstr ""
+msgstr "Gruppe"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Group has been created."
-msgstr ""
+msgstr "Gruppe wurde erstellt."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Group has been updated successfully"
-msgstr ""
+msgstr "Gruppe wurde erfolgreich aktualisiert"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Group Name"
-msgstr ""
+msgstr "Gruppenname"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/components/tables/organisation-members-table.tsx
@@ -3546,7 +3546,7 @@ msgstr ""
 #: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Groups"
-msgstr ""
+msgstr "Gruppen"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to approve this document"
@@ -3579,7 +3579,7 @@ msgstr "Hilfe beim Abschließen des Dokuments für andere Unterzeichner."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Here you can edit your organisation details."
-msgstr ""
+msgstr "Hier können Sie die Details Ihrer Organisation bearbeiten."
 
 #: apps/remix/app/routes/_authenticated+/settings+/profile.tsx
 msgid "Here you can edit your personal details."
@@ -3596,7 +3596,7 @@ msgstr "Hier können Sie Präferenzen und Voreinstellungen für das Branding fes
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 msgid "Here you can set preferences and defaults for your organisation. Teams will inherit these settings by default."
-msgstr ""
+msgstr "Hier können Sie die Einstellungen und Voreinstellungen für Ihre Organisation festlegen. Teams werden diese Einstellungen standardmäßig erben."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
 msgid "Here you can set preferences and defaults for your team."
@@ -3604,7 +3604,7 @@ msgstr "Hier können Sie Präferenzen und Voreinstellungen für Ihr Team festleg
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 msgid "Here you can set your general preferences"
-msgstr ""
+msgstr "Hier können Sie Ihre allgemeinen Präferenzen festlegen."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Here's how it works:"
@@ -3634,7 +3634,7 @@ msgstr "Zusätzliche Informationen ausblenden"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "Home"
-msgstr ""
+msgstr "Startseite"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -3667,11 +3667,11 @@ msgstr "Ich bin mir sicher! Löschen"
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 msgid "ID copied to clipboard"
-msgstr ""
+msgstr "ID in die Zwischenablage kopiert"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "If you do not want to use the authenticator prompted, you can close it, which will then display the next available authenticator."
@@ -3715,16 +3715,16 @@ msgstr "Authentifizierungsmethode erben"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Inherit from organisation"
-msgstr ""
+msgstr "Von der Organisation erben"
 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "Inherit organisation members"
-msgstr ""
+msgstr "Organisationsmitglieder erben"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Inherited subscription claim"
-msgstr ""
+msgstr "Geerbter Abonnementsanspruch"
 
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -3763,7 +3763,7 @@ msgstr "Ungültiges Token bereitgestellt. Bitte versuchen Sie es erneut."
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Invitation accepted"
-msgstr ""
+msgstr "Einladung angenommen"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "Invitation accepted!"
@@ -3796,11 +3796,11 @@ msgstr "Mitglieder einladen"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Invite organisation members"
-msgstr ""
+msgstr "Organisationsmitglieder einladen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Invite team members to collaborate"
-msgstr ""
+msgstr "Laden Sie Teammitglieder zur Zusammenarbeit ein"
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Invited At"
@@ -3826,7 +3826,7 @@ msgstr "Es sieht so aus, als ob {0} noch keine Dokumente zu ihrem Profil hinzuge
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "It looks like we ran into an issue!"
-msgstr ""
+msgstr "Es sieht so aus, als ob wir auf ein Problem gestoßen sind!"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "It seems that the provided token has expired. We've just sent you another token, please check your email and try again."
@@ -3846,12 +3846,12 @@ msgstr "Es ist derzeit nicht deine Reihe zu unterschreiben. Du erhältst eine E-
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "Join {organisationName} on Documenso"
-msgstr ""
+msgstr "Tritt {organisationName} auf Documenso bei"
 
 #. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Joined {0}"
-msgstr ""
+msgstr "Beigetreten {0}"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
@@ -3915,11 +3915,11 @@ msgstr "Verlassen"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Leave blank to inherit from the organisation."
-msgstr ""
+msgstr "Leer lassen, um von der Organisation zu erben."
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "Leave organisation"
-msgstr ""
+msgstr "Organisation verlassen"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Legality of Electronic Signatures"
@@ -3988,11 +3988,11 @@ msgstr "Verwalten Sie das Profil von {0}"
 
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
 msgid "Manage all organisations you are currently associated with."
-msgstr ""
+msgstr "Verwalten Sie alle Organisationen, mit denen Sie derzeit verbunden sind."
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Manage all subscription claims"
-msgstr ""
+msgstr "Verwalten Sie alle Abonnementsansprüche"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Manage and view template"
@@ -4016,11 +4016,11 @@ msgstr "Dokumente verwalten"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Manage organisation"
-msgstr ""
+msgstr "Organisation verwalten"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
-msgstr ""
+msgstr "Organisationen verwalten"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Manage passkeys"
@@ -4028,7 +4028,7 @@ msgstr "Passkeys verwalten"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage permissions and access controls"
-msgstr ""
+msgstr "Verwalten Sie Berechtigungen und Zugangskontrollen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -4038,16 +4038,16 @@ msgstr "Abonnement verwalten"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Manage the {0} organisation"
-msgstr ""
+msgstr "Verwalten Sie die {0} Organisation"
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Manage the {0} organisation subscription"
-msgstr ""
+msgstr "Verwalten Sie das Abonnement der {0} Organisation"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
-msgstr ""
+msgstr "Verwalten Sie die benutzerdefinierten Gruppen von Mitgliedern für Ihre Organisation."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Manage the direct link signing for this template"
@@ -4055,11 +4055,11 @@ msgstr "Die direkte Linkunterzeichnung für diese Vorlage verwalten"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.groups.tsx
 msgid "Manage the groups assigned to this team."
-msgstr ""
+msgstr "Verwalten Sie die Gruppen, die diesem Team zugewiesen sind."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.members.tsx
 msgid "Manage the members of your team."
-msgstr ""
+msgstr "Verwalten Sie die Mitglieder Ihres Teams."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 msgid "Manage the members or invite new members."
@@ -4067,7 +4067,7 @@ msgstr "Die Mitglieder verwalten oder neue Mitglieder einladen."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.teams.tsx
 msgid "Manage the teams in this organisation."
-msgstr ""
+msgstr "Verwalten Sie die Teams in dieser Organisation."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users._index.tsx
 msgid "Manage users"
@@ -4075,7 +4075,7 @@ msgstr "Benutzer verwalten"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Manage your organisation group settings."
-msgstr ""
+msgstr "Verwalten Sie Ihre Organisationsgruppeneinstellungen."
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.passkeys.tsx
 msgid "Manage your passkeys."
@@ -4127,7 +4127,7 @@ msgstr "Mitglied"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Member Count"
-msgstr ""
+msgstr "Mitgliederanzahl"
 
 #: apps/remix/app/components/tables/organisation-members-table.tsx
 msgid "Member Since"
@@ -4162,7 +4162,7 @@ msgstr "Empfänger ändern"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Modify the details of the subscription claim."
-msgstr ""
+msgstr "Ändern Sie die Details des Abonnementsanspruchs."
 
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
@@ -4201,7 +4201,7 @@ msgstr "In Ordner verschieben"
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Multiple access methods can be selected."
-msgstr ""
+msgstr "Es können mehrere Zugriffsmethoden ausgewählt werden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -4233,7 +4233,7 @@ msgstr "Name"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Name is required"
-msgstr ""
+msgstr "Name ist erforderlich"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Need to sign documents?"
@@ -4285,7 +4285,7 @@ msgstr "Nächstes Feld"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "No"
-msgstr ""
+msgstr "Nein"
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
@@ -4298,7 +4298,7 @@ msgstr "Es sind derzeit keine weiteren Maßnahmen Ihrerseits erforderlich."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
-msgstr ""
+msgstr "Keine Organisationen gefunden"
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
@@ -4348,15 +4348,15 @@ msgstr "Kein Unterschriftsfeld gefunden"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "No Stripe customer attached"
-msgstr ""
+msgstr "Kein Stripe-Kunde angehängt"
 
 #: apps/remix/app/components/tables/team-groups-table.tsx
 msgid "No team groups found"
-msgstr ""
+msgstr "Keine Teamgruppen gefunden"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "No teams yet"
-msgstr ""
+msgstr "Noch keine Teams"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "No valid direct templates found"
@@ -4405,12 +4405,12 @@ msgstr "Zahlenformat"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Number of members allowed. 0 = Unlimited"
-msgstr ""
+msgstr "Anzahl der erlaubten Mitglieder. 0 = Unbegrenzt"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Number of teams allowed. 0 = Unlimited"
-msgstr ""
+msgstr "Anzahl der erlaubten Teams. 0 = Unbegrenzt"
 
 #. placeholder {0}: document.team?.name
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
@@ -4466,7 +4466,7 @@ msgstr "Sobald Ihre Vorlage eingerichtet ist, teilen Sie den Link überall, wo S
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
-msgstr ""
+msgstr "Eines der Dokumente im aktuellen Paket hat eine Signaturrolle, die mit der aktuellen Signiererfahrung nicht kompatibel ist."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Only admins can access and view the document"
@@ -4498,51 +4498,51 @@ msgstr "Oder fahren Sie fort mit"
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "Organisation"
-msgstr ""
+msgstr "Organisation"
 
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Admin"
-msgstr ""
+msgstr "Organisationsadministrator"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Organisation created"
-msgstr ""
+msgstr "Organisation erstellt"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Organisation group not found"
-msgstr ""
+msgstr "Organisationsgruppe nicht gefunden"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Organisation Group Settings"
-msgstr ""
+msgstr "Einstellungen für Organisationsgruppen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation has been updated successfully"
-msgstr ""
+msgstr "Organisation wurde erfolgreich aktualisiert"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "Organisation invitation"
-msgstr ""
+msgstr "Organisationseinladung"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Organisation invitations have been sent."
-msgstr ""
+msgstr "Organisationseinladungen wurden verschickt."
 
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Manager"
-msgstr ""
+msgstr "Organisationsmanager"
 
 #: apps/remix/app/components/tables/organisation-members-table.tsx
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: packages/lib/constants/organisations-translations.ts
 msgid "Organisation Member"
-msgstr ""
+msgstr "Organisationsmitglied"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Members"
-msgstr ""
+msgstr "Organisationsmitglieder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
@@ -4550,42 +4550,42 @@ msgstr ""
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Organisation Name"
-msgstr ""
+msgstr "Organisationsname"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation not found"
-msgstr ""
+msgstr "Organisation nicht gefunden"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 msgid "Organisation Preferences"
-msgstr ""
+msgstr "Organisationseinstellungen"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organisation role"
-msgstr ""
+msgstr "Organisationsrolle"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Organisation Role"
-msgstr ""
+msgstr "Organisationsrolle"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Organisation settings"
-msgstr ""
+msgstr "Organisationseinstellungen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 msgid "Organisation Settings"
-msgstr ""
+msgstr "Organisationseinstellungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Organisation Teams"
-msgstr ""
+msgstr "Organisationsteams"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "Organisation URL"
-msgstr ""
+msgstr "Organisations-URL"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
@@ -4594,19 +4594,19 @@ msgstr ""
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Organisations"
-msgstr ""
+msgstr "Organisationen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "Organisations that the user is a member of."
-msgstr ""
+msgstr "Organisationen, in denen der Benutzer Mitglied ist."
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organise your members into groups which can be assigned to teams"
-msgstr ""
+msgstr "Organisieren Sie Ihre Mitglieder in Gruppen, die Teams zugewiesen werden können"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Organize your documents and templates"
-msgstr ""
+msgstr "Organisieren Sie Ihre Dokumente und Vorlagen"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
@@ -4687,7 +4687,7 @@ msgstr "Passwort"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Password Re-Authentication"
-msgstr ""
+msgstr "Passwort-Neuauthentifizierung"
 
 #: packages/email/templates/forgot-password.tsx
 msgid "Password Reset Requested"
@@ -4744,12 +4744,12 @@ msgstr "Ausstehende Einladungen"
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "per month"
-msgstr ""
+msgstr "pro Monat"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "per year"
-msgstr ""
+msgstr "pro Jahr"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Personal"
@@ -4765,7 +4765,7 @@ msgstr "Persönliches Konto"
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 msgid "Personal Inbox"
-msgstr ""
+msgstr "Persönlicher Posteingang"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Pick a number"
@@ -4841,7 +4841,7 @@ msgstr "Bitte kontaktieren Sie den Support, wenn Sie diese Aktion rückgängig m
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Please contact the site owner for further assistance."
-msgstr ""
+msgstr "Bitte kontaktieren Sie den Webseiteninhaber für weitere Unterstützung."
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
@@ -4930,7 +4930,7 @@ msgstr "Bitte geben Sie <0>{0}</0> ein, um zu bestätigen."
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
-msgstr ""
+msgstr "Bitte laden Sie ein Logo hoch"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Pre-formatted CSV template with example data."
@@ -4989,7 +4989,7 @@ msgstr "Profil aktualisiert"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Progress"
-msgstr ""
+msgstr "Fortschritt"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/general/template/template-type.tsx
@@ -5214,11 +5214,11 @@ msgstr "Entfernen"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 msgid "Remove organisation group"
-msgstr ""
+msgstr "Organisationsgruppe entfernen"
 
 #: apps/remix/app/components/tables/organisation-members-table.tsx
 msgid "Remove organisation member"
-msgstr ""
+msgstr "Organisationsmitglied entfernen"
 
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "Remove team email"
@@ -5295,7 +5295,7 @@ msgstr "Seien Sie versichert, Ihr Dokument ist streng vertraulich und wird niema
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Restricted Access"
-msgstr ""
+msgstr "Eingeschränkter Zugriff"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Retention of Documents"
@@ -5381,11 +5381,11 @@ msgstr "Suchen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Search and manage all organisations"
-msgstr ""
+msgstr "Alle Organisationen durchsuchen und verwalten"
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Search by claim ID or name"
-msgstr ""
+msgstr "Suche nach Anspruchs-ID oder Name"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 msgid "Search by document title"
@@ -5398,7 +5398,7 @@ msgstr "Nach Name oder E-Mail suchen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Search by organisation ID, name, customer ID or owner email"
-msgstr ""
+msgstr "Suche nach Organisations-ID, Name, Kunden-ID oder E-Mail des Inhabers"
 
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
@@ -5434,15 +5434,15 @@ msgstr "Wählen Sie einen Ordner, um dieses Dokument zu verschieben."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Select a plan"
-msgstr ""
+msgstr "Einen Plan auswählen"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Select a plan to continue"
-msgstr ""
+msgstr "Wählen Sie einen Plan, um fortzufahren"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Select a team to view its dashboard"
-msgstr ""
+msgstr "Wählen Sie ein Team aus, um sein Dashboard anzuzeigen"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Select a template you'd like to display on your public profile"
@@ -5454,7 +5454,7 @@ msgstr "Wählen Sie eine Vorlage aus, die Sie im öffentlichen Profil Ihres Team
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Select access methods"
-msgstr ""
+msgstr "Zugriffsmethoden auswählen"
 
 #: packages/ui/primitives/combobox.tsx
 msgid "Select an option"
@@ -5462,7 +5462,7 @@ msgstr "Option auswählen"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Select an organisation to view teams"
-msgstr ""
+msgstr "Wählen Sie eine Organisation, um Teams anzuzeigen"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Select at least"
@@ -5471,7 +5471,7 @@ msgstr "Wählen Sie mindestens"
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "Select authentication methods"
-msgstr ""
+msgstr "Authentifizierungsmethoden auswählen"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 msgid "Select default option"
@@ -5479,26 +5479,26 @@ msgstr "Standardoption auswählen"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups"
-msgstr ""
+msgstr "Gruppen auswählen"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
-msgstr ""
+msgstr "Wählen Sie Gruppen aus, die diesem Team hinzugefügt werden sollen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Select members"
-msgstr ""
+msgstr "Mitglieder auswählen"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select members or groups of members to add to the team."
-msgstr ""
+msgstr "Wählen Sie Mitglieder oder Gruppen von Mitgliedern, die dem Team hinzugefügt werden sollen."
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Select members to add to this team"
-msgstr ""
+msgstr "Wählen Sie Mitglieder aus, die diesem Team hinzugefügt werden sollen"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
@@ -5506,15 +5506,15 @@ msgstr "Passkey auswählen"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Select signature types"
-msgstr ""
+msgstr "Signaturtypen auswählen"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Select the members to add to this group"
-msgstr ""
+msgstr "Wählen Sie die Mitglieder, die dieser Gruppe hinzugefügt werden sollen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Select the members to include in this group"
-msgstr ""
+msgstr "Wählen Sie die Mitglieder, die in diese Gruppe aufgenommen werden sollen"
 
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
@@ -5709,7 +5709,7 @@ msgstr "Dokument signieren"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
-msgstr ""
+msgstr "Dokumente unterschreiben"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
@@ -6006,15 +6006,15 @@ msgstr "Schritt <0>{step} von {maxStep}</0>"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "Stripe"
-msgstr ""
+msgstr "Stripe"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Stripe customer created successfully"
-msgstr ""
+msgstr "Stripe-Kunde erfolgreich erstellt"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Stripe Customer ID"
-msgstr ""
+msgstr "Stripe-Kunden-ID"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -6034,19 +6034,19 @@ msgstr "Abonnement"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Subscription claim created successfully."
-msgstr ""
+msgstr "Abonnementanspruch erfolgreich erstellt."
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Subscription claim deleted successfully."
-msgstr ""
+msgstr "Abonnementanspruch erfolgreich gelöscht."
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Subscription claim updated successfully."
-msgstr ""
+msgstr "Abonnementanspruch erfolgreich aktualisiert."
 
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Subscription Claims"
-msgstr ""
+msgstr "Abonnementansprüche"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
@@ -6129,16 +6129,16 @@ msgstr "Team \"{0}\" wurde auf Documenso gelöscht"
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Admin"
-msgstr ""
+msgstr "Team Admin"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Team Assignments"
-msgstr ""
+msgstr "Teamzuweisungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Team Count"
-msgstr ""
+msgstr "Teamanzahl"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
@@ -6184,11 +6184,11 @@ msgstr "Team-E-Mail wurde aktualisiert."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.groups.tsx
 msgid "Team Groups"
-msgstr ""
+msgstr "Teamgruppen"
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Manager"
-msgstr ""
+msgstr "Team Manager"
 
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: packages/lib/constants/teams-translations.ts
@@ -6197,12 +6197,12 @@ msgstr "Teammitglied"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.members.tsx
 msgid "Team Members"
-msgstr ""
+msgstr "Teammitglieder"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Team members have been added."
-msgstr ""
+msgstr "Teammitglieder wurden hinzugefügt."
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
@@ -6230,7 +6230,7 @@ msgstr "Teampräferenzen"
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Team Role"
-msgstr ""
+msgstr "Teamrolle"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 msgid "Team settings"
@@ -6242,7 +6242,7 @@ msgstr "Team-Einstellungen"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Team url"
-msgstr ""
+msgstr "Team-URL"
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
@@ -6258,11 +6258,11 @@ msgstr "Teams"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Teams help you organise your work and collaborate with others. Create your first team to get started."
-msgstr ""
+msgstr "Teams helfen Ihnen, Ihre Arbeit zu organisieren und mit anderen zusammenzuarbeiten. Erstellen Sie Ihr erstes Team, um loszulegen."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Teams that this organisation group is currently assigned to"
-msgstr ""
+msgstr "Teams, denen diese Organisationsgruppe derzeit zugewiesen ist"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
@@ -6355,7 +6355,7 @@ msgstr "Textfarbe"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Thank you for completing the signing process."
-msgstr ""
+msgstr "Danke, dass Sie den Signaturvorgang abgeschlossen haben."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
@@ -6379,15 +6379,15 @@ msgstr "Das Konto wurde erfolgreich aktiviert."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
 msgid "The authentication methods required for recipients to sign fields"
-msgstr ""
+msgstr "Die Authentifizierungsmethoden, die erforderlich sind, damit Empfänger Felder signieren"
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "The authentication methods required for recipients to sign the signature field."
-msgstr ""
+msgstr "Die Authentifizierungsmethoden, die erforderlich sind, damit Empfänger das Signaturfeld signieren können."
 
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "The authentication methods required for recipients to view the document."
-msgstr ""
+msgstr "Die Authentifizierungsmethoden, die erforderlich sind, damit Empfänger das Dokument anzeigen können."
 
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The content to show in the banner, HTML is allowed"
@@ -6473,29 +6473,26 @@ msgstr "Die folgenden Fehler sind aufgetreten:"
 
 #: packages/email/templates/team-delete.tsx
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
-msgstr ""
+msgstr "Das folgende Team wurde gelöscht. Sie können nicht mehr auf dieses Team und seine Dokumente zugreifen."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid ""
-"The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
-msgstr ""
+msgstr "Die Organisationsgruppe, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation role that will be applied to all members in this group."
-msgstr ""
+msgstr "Die Organisationsrolle, die auf alle Mitglieder in dieser Gruppe angewendet wird."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
-msgstr ""
+msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
-msgstr ""
+msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
@@ -6577,14 +6574,12 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Die Team-E-Mail <0>{teamEmail}</0> wurde aus dem folgenden Team entfernt"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
-msgstr ""
+msgstr "Das Team, das Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Das Team, das Sie suchen, könnte entfernt, umbenannt oder nie existiert haben."
 
@@ -6622,10 +6617,9 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "Die URL für Documenso, um Webhook-Ereignisse zu senden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid ""
-"The user you are looking for may have been removed, renamed or may have never\n"
+msgid "The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
-msgstr ""
+msgstr "Der Benutzer, nach dem Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 msgid "The webhook has been successfully deleted."
@@ -6653,11 +6647,11 @@ msgstr "Beim Hochladen Ihrer Datei ist ein Fehler aufgetreten. Bitte versuchen S
 
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 msgid "These can be overriden by setting the authentication requirements directly on each recipient in the next step. Multiple methods can be selected."
-msgstr ""
+msgstr "Diese können überschrieben werden, indem die Authentifizierungsanforderungen im nächsten Schritt direkt für jeden Empfänger festgelegt werden. Mehrere Methoden können ausgewählt werden."
 
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
 msgid "These will override any global settings. Multiple methods can be selected."
-msgstr ""
+msgstr "Diese überschreiben alle globalen Einstellungen. Mehrere Methoden können ausgewählt werden."
 
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "They have permission on your behalf to:"
@@ -6683,7 +6677,7 @@ msgstr "Diese Aktion ist umkehrbar, jedoch bitte seien Sie vorsichtig, da das Ko
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "This claim is locked and cannot be deleted."
-msgstr ""
+msgstr "Dieser Anspruch ist gesperrt und kann nicht gelöscht werden."
 
 #: packages/email/template-components/template-document-super-delete.tsx
 msgid "This document can not be recovered, if you would like to dispute the reason for future documents please contact support."
@@ -6788,11 +6782,11 @@ msgstr "So wird das Dokument die Empfänger erreichen, sobald es zum Unterschrei
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
-msgstr ""
+msgstr "Dies ist der Anspruch, mit dem diese Organisation ursprünglich erstellt wurde. Alle Änderungen an Funktionsflags für diesen Anspruch werden in diese Organisation übernommen."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 msgid "This link is invalid or has expired."
-msgstr ""
+msgstr "Dieser Link ist ungültig oder abgelaufen."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
@@ -6800,7 +6794,7 @@ msgstr "Dieser Link ist ungültig oder abgelaufen. Bitte kontaktieren Sie Ihr Te
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "This organisation, and any associated data will be permanently deleted."
-msgstr ""
+msgstr "Diese Organisation und alle damit verbundenen Daten werden dauerhaft gelöscht."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "This passkey has already been registered."
@@ -6862,7 +6856,7 @@ msgstr "Dies wird an den Dokumenteneigentümer gesendet, sobald das Dokument vol
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
-msgstr ""
+msgstr "Diese werden NUR Funktionsflags zurückspielen, die auf wahr gesetzt sind; alles, was im ursprünglichen Anspruch deaktiviert ist, wird nicht zurückportiert."
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7072,7 +7066,7 @@ msgstr "Direkter Zugriff auf die Vorlage kann nicht erstellt werden. Bitte versu
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Unable to decline this invitation at this time."
-msgstr ""
+msgstr "Zurzeit kann diese Einladung nicht abgelehnt werden."
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Unable to delete invitation. Please try again."
@@ -7088,7 +7082,7 @@ msgstr "Zwei-Faktor-Authentifizierung kann nicht deaktiviert werden"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Unable to join this organisation at this time."
-msgstr ""
+msgstr "Zurzeit kann dieser Organisation nicht beigetreten werden."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-history-sheet.tsx
@@ -7155,15 +7149,15 @@ msgstr "Unbekannt"
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 msgid "Unlimited"
-msgstr ""
+msgstr "Unbegrenzt"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Unlimited documents, API and more"
-msgstr ""
+msgstr "Unbegrenzte Dokumente, API und mehr"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Untitled Group"
-msgstr ""
+msgstr "Unbetitelte Gruppe"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -7190,15 +7184,15 @@ msgstr "Banner aktualisieren"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 msgid "Update Billing"
-msgstr ""
+msgstr "Rechnungsdaten aktualisieren"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Claim"
-msgstr ""
+msgstr "Anspruch aktualisieren"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Update current organisation"
-msgstr ""
+msgstr "Aktuelle Organisation aktualisieren"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
@@ -7206,12 +7200,12 @@ msgstr "Felder aktualisieren"
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "Update organisation"
-msgstr ""
+msgstr "Organisation aktualisieren"
 
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "Update organisation member"
-msgstr ""
+msgstr "Organisationsmitglied aktualisieren"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Update passkey"
@@ -7239,7 +7233,7 @@ msgstr "Rolle aktualisieren"
 
 #: apps/remix/app/components/dialogs/claim-update-dialog.tsx
 msgid "Update Subscription Claim"
-msgstr ""
+msgstr "Abonnementsanspruch aktualisieren"
 
 #: apps/remix/app/components/forms/team-update-form.tsx
 msgid "Update team"
@@ -7253,7 +7247,7 @@ msgstr "Team-E-Mail aktualisieren"
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "Update team group"
-msgstr ""
+msgstr "Teamgruppe aktualisieren"
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
@@ -7288,7 +7282,7 @@ msgstr "Upgrade"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Upgrade <0>{0}</0> to {planName}"
-msgstr ""
+msgstr "<0>{0}</0> auf {planName} aktualisieren"
 
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
@@ -7382,7 +7376,7 @@ msgstr "Vorlage verwenden"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Use your passkey for authentication"
-msgstr ""
+msgstr "Verwenden Sie Ihren Passkey zur Authentifizierung"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7395,7 +7389,7 @@ msgstr "Benutzer hat kein Passwort."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "User not found"
-msgstr ""
+msgstr "Benutzer nicht gefunden"
 
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
@@ -7405,7 +7399,7 @@ msgstr "Benutzer nicht gefunden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "User Organisations"
-msgstr ""
+msgstr "Benutzerorganisationen"
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "User profiles are here!"
@@ -7534,7 +7528,7 @@ msgstr "Mehr anzeigen"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "View next document"
-msgstr ""
+msgstr "Nächstes Dokument anzeigen"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "View Original Document"
@@ -7542,7 +7536,7 @@ msgstr "Originaldokument ansehen"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "View owner"
-msgstr ""
+msgstr "Besitzer anzeigen"
 
 #: packages/email/template-components/template-document-self-signed.tsx
 msgid "View plans"
@@ -7629,16 +7623,16 @@ msgstr "Wir können diesen Schlüssel im Moment nicht aktualisieren. Bitte versu
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't create a Stripe customer. Please try again."
-msgstr ""
+msgstr "Wir konnten keinen Stripe-Kunden erstellen. Bitte versuchen Sie es erneut."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "We couldn't update the group. Please try again."
-msgstr ""
+msgstr "Wir konnten die Gruppe nicht aktualisieren. Bitte versuchen Sie es erneut."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "We couldn't update the organisation. Please try again."
-msgstr ""
+msgstr "Wir konnten die Organisation nicht aktualisieren. Bitte versuchen Sie es erneut."
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
@@ -7651,7 +7645,7 @@ msgstr "Wir sind auf einen Fehler gestoßen, während wir den Webhook aktualisie
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to add team members. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, Teammitglieder hinzuzufügen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "We encountered an unknown error while attempting to add this email. Please try again later."
@@ -7659,12 +7653,12 @@ msgstr "Wir sind auf einen unbekannten Fehler gestoßen, während wir versucht h
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a group. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, eine Gruppe zu erstellen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a organisation. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, eine Organisation zu erstellen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a team. Please try again later."
@@ -7676,7 +7670,7 @@ msgstr "Wir sind auf einen unbekannten Fehler gestoßen, während wir versucht h
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete this organisation. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, diese Organisation zu löschen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to delete this team. Please try again later."
@@ -7692,24 +7686,24 @@ msgstr "Wir sind auf einen unbekannten Fehler gestoßen, während wir versucht h
 
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 msgid "We encountered an unknown error while attempting to disable access."
-msgstr ""
+msgstr "Beim Versuch, den Zugriff zu deaktivieren, trat ein unbekannter Fehler auf."
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "We encountered an unknown error while attempting to enable access."
-msgstr ""
+msgstr "Beim Versuch, den Zugriff zu aktivieren, trat ein unbekannter Fehler auf."
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "We encountered an unknown error while attempting to invite organisation members. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, Organisationsmitglieder einzuladen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "We encountered an unknown error while attempting to leave this organisation. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, diese Organisation zu verlassen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this group. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, diese Gruppe zu entfernen, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "We encountered an unknown error while attempting to remove this template from your profile. Please try again later."
@@ -7748,7 +7742,7 @@ msgstr "Wir sind auf einen unbekannten Fehler gestoßen, während wir versucht h
 
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "We encountered an unknown error while attempting to update this organisation member. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, dieses Organisationsmitglied zu aktualisieren, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
@@ -7757,7 +7751,7 @@ msgstr "Wir sind auf einen unbekannten Fehler gestoßen, während wir versucht h
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "We encountered an unknown error while attempting to update your organisation. Please try again later."
-msgstr ""
+msgstr "Beim Versuch, Ihre Organisation zu aktualisieren, trat ein unbekannter Fehler auf. Bitte versuchen Sie es später erneut."
 
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/avatar-image.tsx
@@ -7913,7 +7907,7 @@ msgstr "Willkommen zurück, wir freuen uns, Sie zu haben."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
-msgstr ""
+msgstr "Willkommen zurück! Hier ist ein Überblick über Ihr Konto."
 
 #: packages/email/template-components/template-confirmation-email.tsx
 msgid "Welcome to Documenso!"
@@ -7925,7 +7919,7 @@ msgstr "Hast du stattdessen versucht, dieses Dokument zu bearbeiten?"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "What you can do with teams:"
-msgstr ""
+msgstr "Was Sie mit Teams machen können:"
 
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
@@ -7951,7 +7945,7 @@ msgstr "Während Sie darauf warten, können Sie Ihr eigenes Documenso-Konto erst
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"
-msgstr ""
+msgstr "Whitelabeling, unbegrenzte Mitglieder und mehr"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Who do you want to remind?"
@@ -7963,7 +7957,7 @@ msgstr "Zustimmung widerrufen"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "Write a description to display on your public profile"
-msgstr ""
+msgstr "Schreiben Sie eine Beschreibung, die in Ihrem öffentlichen Profil angezeigt wird"
 
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
@@ -7974,7 +7968,7 @@ msgstr "Jährlich"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Yes"
-msgstr ""
+msgstr "Ja"
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -7989,7 +7983,7 @@ msgstr "Sie sind dabei, <0>\"{documentTitle}\"</0> zu löschen"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "You are about to delete <0>{0}</0>. All data related to this organisation such as teams, documents, and all other resources will be deleted. This action is irreversible."
-msgstr ""
+msgstr "Sie sind dabei, <0>{0}</0> zu löschen. Alle mit dieser Organisation verbundenen Daten wie Teams, Dokumente und alle anderen Ressourcen werden gelöscht. Diese Aktion ist nicht umkehrbar."
 
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 msgid "You are about to delete the following team email from <0>{teamName}</0>."
@@ -7997,7 +7991,7 @@ msgstr "Sie stehen kurz davor, die folgende Team-E-Mail von <0>{teamName}</0> zu
 
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
 msgid "You are about to give all organisation members access to this team under their organisation role."
-msgstr ""
+msgstr "Sie sind dabei, allen Organisationsmitgliedern Zugriff auf dieses Team im Rahmen ihrer Organisationsrolle zu gewähren."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "You are about to hide <0>\"{documentTitle}\"</0>"
@@ -8005,23 +7999,23 @@ msgstr "Sie sind dabei, <0>\"{documentTitle}\"</0> zu verstecken"
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "You are about to leave the following organisation."
-msgstr ""
+msgstr "Sie verlassen gleich die folgende Organisation."
 
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 msgid "You are about to remove default access to this team for all organisation members. Any members not explicitly added to this team will no longer have access."
-msgstr ""
+msgstr "Sie sind dabei, den Standardzugriff auf dieses Team für alle Organisationsmitglieder zu entfernen. Alle Mitglieder, die diesem Team nicht ausdrücklich hinzugefügt wurden, haben keinen Zugriff mehr."
 
 #. placeholder {0}: team.name
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 msgid "You are about to remove the following group from <0>{0}</0>."
-msgstr ""
+msgstr "Sie sind dabei, die folgende Gruppe von <0>{0}</0> zu entfernen."
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 msgid "You are about to remove the following user from <0>{0}</0>."
-msgstr ""
+msgstr "Sie sind dabei, den folgenden Benutzer von <0>{0}</0> zu entfernen."
 
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
 msgid "You are about to remove the following user from <0>{teamName}</0>."
@@ -8039,7 +8033,7 @@ msgstr "Sie sind dabei, dieses Dokument an die Empfänger zu senden. Sind Sie si
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "You are about to subscribe to the {planName}"
-msgstr ""
+msgstr "Sie sind dabei, das {planName} zu abonnieren"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You are currently on the <0>Free Plan</0>."
@@ -8047,11 +8041,11 @@ msgstr "Sie befinden sich derzeit im <0>kostenlosen Plan</0>."
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You are currently updating <0>{memberName}.</0>"
-msgstr ""
+msgstr "Sie aktualisieren derzeit <0>{memberName}.</0>"
 
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "You are currently updating <0>{organisationMemberName}.</0>"
-msgstr ""
+msgstr "Sie aktualisieren derzeit <0>{organisationMemberName}.</0>"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "You are currently updating the <0>{passkeyName}</0> passkey."
@@ -8059,12 +8053,12 @@ msgstr "Sie aktualisieren derzeit den <0>{passkeyName}</0> Passkey."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
-msgstr ""
+msgstr "Sie aktualisieren derzeit die Teamgruppe <0>{teamGroupName}</0>."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 msgid "You are not authorized to access this page."
-msgstr ""
+msgstr "Sie sind nicht berechtigt, auf diese Seite zuzugreifen."
 
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "You are not authorized to delete this user."
@@ -8084,7 +8078,7 @@ msgstr "Du kannst diesen Link auch kopieren und in deinen Browser einfügen: {co
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "You can choose to enable or disable the profile for public view."
-msgstr ""
+msgstr "Sie können wählen, ob das Profil für die öffentliche Ansicht aktiviert oder deaktiviert werden soll."
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "You can copy and share these links to recipients so they can action the document."
@@ -8092,7 +8086,7 @@ msgstr "Sie können diese Links kopieren und mit den Empfängern teilen, damit s
 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "You can enable access to allow all organisation members to access this team by default."
-msgstr ""
+msgstr "Sie können den Zugriff so aktivieren, dass alle Organisationsmitglieder standardmäßig Zugriff auf dieses Team haben."
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
@@ -8125,7 +8119,7 @@ msgstr "Sie können keine Assistenten hinzufügen, wenn die Unterschriftenreihen
 
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 msgid "You cannot delete a group which has a higher role than you."
-msgstr ""
+msgstr "Sie können keine Gruppe löschen, die eine höhere Rolle hat als Sie."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "You cannot have more than {MAXIMUM_PASSKEYS} passkeys."
@@ -8133,11 +8127,11 @@ msgstr "Sie dürfen nicht mehr als {MAXIMUM_PASSKEYS} Passkeys haben."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You cannot modify a group which has a higher role than you."
-msgstr ""
+msgstr "Sie können keine Gruppe ändern, die eine höhere Rolle hat als Sie."
 
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "You cannot modify a organisation member who has a higher role than you."
-msgstr ""
+msgstr "Sie können kein Organisationsmitglied ändern, das eine höhere Rolle hat als Sie."
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You cannot modify a team member who has a higher role than you."
@@ -8145,7 +8139,7 @@ msgstr "Sie können ein Teammitglied, das eine höhere Rolle als Sie hat, nicht 
 
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
 msgid "You cannot remove members from this team if the inherit member feature is enabled."
-msgstr ""
+msgstr "Sie können keine Mitglieder aus diesem Team entfernen, wenn die Funktion Mitglied übernehmen aktiviert ist."
 
 #: packages/ui/primitives/document-upload.tsx
 #: packages/ui/primitives/document-dropzone.tsx
@@ -8159,11 +8153,11 @@ msgstr "Sie können keine verschlüsselten PDFs hochladen"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription"
-msgstr ""
+msgstr "Sie haben derzeit ein inaktives <0>{currentProductName}</0> Abonnement"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
-msgstr ""
+msgstr "Derzeit haben Sie keinen Zugriff auf Teams in dieser Organisation. Bitte kontaktieren Sie Ihre Organisation, um Zugriff zu erhalten."
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "You do not have permission to create a token for this team"
@@ -8176,7 +8170,7 @@ msgstr "Du musst es nicht mehr unterschreiben."
 #. placeholder {0}: data.organisationName
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "You have accepted an invitation from <0>{0}</0> to join their organisation."
-msgstr ""
+msgstr "Sie haben eine Einladung von <0>{0}</0> angenommen, deren Organisation beizutreten."
 
 #. placeholder {0}: data.teamName
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
@@ -8186,7 +8180,7 @@ msgstr "Sie haben Ihre E-Mail-Adresse für <0>{0}</0> bereits bestätigt."
 #. placeholder {0}: data.organisationName
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "You have been invited by <0>{0}</0> to join their organisation."
-msgstr ""
+msgstr "Sie wurden von <0>{0}</0> eingeladen, deren Organisation beizutreten."
 
 #. placeholder {0}: organisation.name
 #: packages/lib/server-only/organisation/create-organisation-member-invites.ts
@@ -8195,7 +8189,7 @@ msgstr "Du wurdest eingeladen, {0} auf Documenso beizutreten"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "You have been invited to join the following organisation"
-msgstr ""
+msgstr "Sie wurden eingeladen, der folgenden Organisation beizutreten"
 
 #: packages/lib/server-only/recipient/set-document-recipients.ts
 #: packages/lib/server-only/recipient/delete-document-recipient.ts
@@ -8204,12 +8198,12 @@ msgstr "Du wurdest von einem Dokument entfernt"
 
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "You have been requested to sign the following documents. Review each document carefully and complete the signing process."
-msgstr ""
+msgstr "Sie wurden aufgefordert, die folgenden Dokumente zu unterzeichnen. Überprüfen Sie jedes Dokument sorgfältig und schließen Sie den Signaturvorgang ab."
 
 #. placeholder {0}: data.organisationName
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
 msgid "You have declined the invitation from <0>{0}</0> to join their organisation."
-msgstr ""
+msgstr "Sie haben die Einladung von <0>{0}</0> abgelehnt, deren Organisation beizutreten."
 
 #. placeholder {0}: `"${document.title}"`
 #: packages/lib/server-only/document/resend-document.tsx
@@ -8237,7 +8231,7 @@ msgstr "Sie haben das maximale Limit von {0} direkten Vorlagen erreicht. <0>Upgr
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>support@documenso.com</0> if you would like to adjust your plan."
-msgstr ""
+msgstr "Sie haben die maximale Anzahl von Teams für Ihren Plan erreicht. Bitte kontaktieren Sie den Verkauf unter <0>support@documenso.com</0>, wenn Sie Ihren Plan ändern möchten."
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
@@ -8268,7 +8262,7 @@ msgstr "Du hast „{documentName}“ unterzeichnet"
 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "You have successfully left this organisation."
-msgstr ""
+msgstr "Sie haben diese Organisation erfolgreich verlassen."
 
 #: apps/remix/app/components/general/claim-account.tsx
 #: apps/remix/app/components/forms/signup.tsx
@@ -8277,15 +8271,15 @@ msgstr "Sie haben sich erfolgreich registriert. Bitte bestätigen Sie Ihr Konto,
 
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 msgid "You have successfully removed this group from the organisation."
-msgstr ""
+msgstr "Sie haben diese Gruppe erfolgreich aus der Organisation entfernt."
 
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 msgid "You have successfully removed this group from the team."
-msgstr ""
+msgstr "Sie haben diese Gruppe erfolgreich aus dem Team entfernt."
 
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 msgid "You have successfully removed this user from the organisation."
-msgstr ""
+msgstr "Sie haben diesen Benutzer erfolgreich aus der Organisation entfernt."
 
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
 msgid "You have successfully removed this user from the team."
@@ -8301,15 +8295,15 @@ msgstr "Sie haben das Recht, Ihre Zustimmung zur Verwendung elektronischer Unter
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You have updated {memberName}."
-msgstr ""
+msgstr "Sie haben {memberName} aktualisiert."
 
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "You have updated {organisationMemberName}."
-msgstr ""
+msgstr "Sie haben {organisationMemberName} aktualisiert."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You have updated the team group."
-msgstr ""
+msgstr "Sie haben die Teamgruppe aktualisiert."
 
 #. placeholder {0}: data.teamName
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
@@ -8346,7 +8340,7 @@ msgstr "Sie müssen 2FA einrichten, um dieses Dokument als angesehen zu markiere
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "You will need to configure any claims or subscription after creating this organisation"
-msgstr ""
+msgstr "Sie müssen nach der Erstellung dieser Organisation alle Ansprüche oder Abonnements konfigurieren."
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "You will now be required to enter a code from your authenticator app when signing in."
@@ -8387,15 +8381,15 @@ msgstr "Ihre Massenversandoperation für Vorlage \"{templateName}\" ist abgeschl
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "Your current {currentProductName} plan is past due. Please update your payment information."
-msgstr ""
+msgstr "Ihr aktueller {currentProductName} Plan ist überfällig. Bitte aktualisieren Sie Ihre Zahlungsinformationen."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "Your current plan is inactive."
-msgstr ""
+msgstr "Ihr aktueller Plan ist inaktiv."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "Your current plan is past due."
-msgstr ""
+msgstr "Ihr aktueller Plan ist überfällig."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Your direct signing templates"
@@ -8474,15 +8468,15 @@ msgstr "Ihr neues Passwort darf nicht mit Ihrem alten Passwort identisch sein."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Your organisation has been created."
-msgstr ""
+msgstr "Ihre Organisation wurde erstellt."
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Your organisation has been successfully deleted."
-msgstr ""
+msgstr "Ihre Organisation wurde erfolgreich gelöscht."
 
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "Your organisation has been successfully updated."
-msgstr ""
+msgstr "Ihre Organisation wurde erfolgreich aktualisiert."
 
 #: apps/remix/app/components/forms/reset-password.tsx
 #: apps/remix/app/components/forms/password.tsx
@@ -8499,11 +8493,11 @@ msgstr "Ihre Zahlung für Teams ist überfällig. Bitte begleichen Sie die Zahlu
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Your personal organisation"
-msgstr ""
+msgstr "Ihre persönliche Organisation"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>support@documenso.com</0> if you would like to discuss your options."
-msgstr ""
+msgstr "Ihr Plan unterstützt das Einladen von Mitgliedern nicht. Bitte aktualisieren Sie Ihren Plan oder kontaktieren Sie den Verkauf unter <0>support@documenso.com</0>, wenn Sie Ihre Optionen besprechen möchten."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."
@@ -8569,3 +8563,4 @@ msgstr "Ihr Token wurde erfolgreich erstellt! Stellen Sie sicher, dass Sie es ko
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Ihre Tokens werden hier angezeigt, sobald Sie sie erstellt haben."
+
