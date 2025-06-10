@@ -35,7 +35,8 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
   // Update branding.
-  await page.getByRole('switch', { name: 'Enable Custom Branding' }).click();
+  await page.getByTestId('enable-branding').click();
+  await page.getByRole('option', { name: 'Yes' }).click();
   await page.getByRole('textbox', { name: 'Brand Website' }).click();
   await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://documenso.com');
   await page.getByRole('textbox', { name: 'Brand Details' }).click();

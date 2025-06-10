@@ -20,14 +20,20 @@ import {
   FormLabel,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
-import { Switch } from '@documenso/ui/primitives/switch';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
 const ZBrandingPreferencesFormSchema = z.object({
-  brandingEnabled: z.boolean(),
+  brandingEnabled: z.boolean().nullable(),
   brandingLogo: z
     .instanceof(File)
     .refine((file) => file.size <= MAX_FILE_SIZE, 'File size must be less than 5MB')
@@ -67,10 +73,10 @@ export function BrandingPreferencesForm({
 
   const form = useForm<TBrandingPreferencesFormSchema>({
     defaultValues: {
-      brandingEnabled: settings?.brandingEnabled ?? false,
-      brandingUrl: settings?.brandingUrl ?? '',
+      brandingEnabled: settings.brandingEnabled ?? null,
+      brandingUrl: settings.brandingUrl ?? '',
       brandingLogo: undefined,
-      brandingCompanyDetails: settings?.brandingCompanyDetails ?? '',
+      brandingCompanyDetails: settings.brandingCompanyDetails ?? '',
     },
     resolver: zodResolver(ZBrandingPreferencesFormSchema),
   });
@@ -78,7 +84,7 @@ export function BrandingPreferencesForm({
   const isBrandingEnabled = form.watch('brandingEnabled');
 
   useEffect(() => {
-    if (settings?.brandingLogo) {
+    if (settings.brandingLogo) {
       const file = JSON.parse(settings.brandingLogo);
 
       if ('type' in file && 'data' in file) {
@@ -94,7 +100,7 @@ export function BrandingPreferencesForm({
     }
 
     setHasLoadedPreview(true);
-  }, [settings?.brandingLogo]);
+  }, [settings.brandingLogo]);
 
   // Cleanup ObjectURL on unmount or when previewUrl changes
   useEffect(() => {
@@ -118,16 +124,38 @@ export function BrandingPreferencesForm({
                   <Trans>Enable Custom Branding</Trans>
                 </FormLabel>
 
-                <div>
-                  <FormControl>
-                    <Switch
-                      ref={field.ref}
-                      name={field.name}
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                </div>
+                <FormControl>
+                  <Select
+                    {...field}
+                    value={field.value === null ? '-1' : field.value.toString()}
+                    onValueChange={(value) =>
+                      field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                    }
+                  >
+                    <SelectTrigger
+                      className="bg-background text-muted-foreground"
+                      data-testid="enable-branding"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent className="z-[9999]">
+                      <SelectItem value="true">
+                        <Trans>Yes</Trans>
+                      </SelectItem>
+
+                      <SelectItem value="false">
+                        <Trans>No</Trans>
+                      </SelectItem>
+
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
 
                 <FormDescription>
                   {context === 'Team' ? (
@@ -141,7 +169,7 @@ export function BrandingPreferencesForm({
           />
 
           <div className="relative flex w-full flex-col gap-y-4">
-            {!isBrandingEnabled && <div className="bg-background/60 absolute inset-0 z-[9999]" />}
+            {!isBrandingEnabled && <div className="bg-background/60 absolute inset-0 z-[9998]" />}
 
             <FormField
               control={form.control}
