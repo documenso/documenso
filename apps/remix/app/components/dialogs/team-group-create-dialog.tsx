@@ -142,11 +142,11 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
           .with('SELECT', () => (
             <DialogHeader>
               <DialogTitle>
-                <Trans>Add members</Trans>
+                <Trans>Add groups</Trans>
               </DialogTitle>
 
               <DialogDescription>
-                <Trans>Select members or groups of members to add to the team.</Trans>
+                <Trans>Select groups of members to add to the team.</Trans>
               </DialogDescription>
             </DialogHeader>
           ))
