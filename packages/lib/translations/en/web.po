@@ -3708,6 +3708,7 @@ msgstr "Inherit authentication method"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Inherit from organisation"
 msgstr "Inherit from organisation"
 
@@ -4277,6 +4278,7 @@ msgstr "Next field"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "No"
 msgstr "No"
 
@@ -7977,6 +7979,7 @@ msgstr "Yearly"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Yes"
 msgstr "Yes"
 
@@ -8064,10 +8067,6 @@ msgstr "You are currently updating the <0>{passkeyName}</0> passkey."
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
 msgstr "You are currently updating the <0>{teamGroupName}</0> team group."
-
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "You are currently updating your \"Personal\" organisation to a plan where you can add multiple members. These members may have access to the documents, templates and other data in this organisation, including documents sent to you."
-msgstr "You are currently updating your \"Personal\" organisation to a plan where you can add multiple members. These members may have access to the documents, templates and other data in this organisation, including documents sent to you."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx

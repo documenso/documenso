@@ -3713,6 +3713,7 @@ msgstr "Ereditare metodo di autenticazione"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Inherit from organisation"
 msgstr ""
 
@@ -4282,6 +4283,7 @@ msgstr "Campo successivo"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "No"
 msgstr ""
 
@@ -6581,9 +6583,11 @@ msgid ""
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
-msgstr "La squadra che stai cercando potrebbe essere stata rimossa, rinominata o potrebbe non essere mai\n"
+msgstr ""
+"La squadra che stai cercando potrebbe essere stata rimossa, rinominata o potrebbe non essere mai\n"
 "                esistita."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -7970,6 +7974,7 @@ msgstr "Annuale"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Yes"
 msgstr ""
 
@@ -8056,10 +8061,6 @@ msgstr "Stai attualmente aggiornando la chiave d'accesso <0>{passkeyName}</0>."
 
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
-msgstr ""
-
-#: apps/remix/app/components/general/billing-plans.tsx
-msgid "You are currently updating your \"Personal\" organisation to a plan where you can add multiple members. These members may have access to the documents, templates and other data in this organisation, including documents sent to you."
 msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
@@ -8570,4 +8571,3 @@ msgstr "Il tuo token √® stato creato con successo! Assicurati di copiarlo perch√
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "I tuoi token verranno mostrati qui una volta creati."
-
