@@ -206,8 +206,8 @@ export const ZCreateDocumentV2RequestSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
-  globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-  globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
   recipients: z
     .array(
@@ -344,10 +344,3 @@ export const ZDownloadAuditLogsMutationSchema = z.object({
 export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
-
-export const ZMoveDocumentToTeamSchema = z.object({
-  documentId: z.number().describe('The ID of the document to move to a team.'),
-  teamId: z.number().describe('The ID of the team to move the document to.'),
-});
-
-export const ZMoveDocumentToTeamResponseSchema = ZDocumentLiteSchema;

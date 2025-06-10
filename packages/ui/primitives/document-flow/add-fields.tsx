@@ -87,7 +87,7 @@ export type AddFieldsFormProps = {
   onAutoSave: (_data: TAddFieldsFormSchema) => Promise<void>;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddFieldsFormPartial = ({
@@ -626,7 +626,6 @@ export const AddFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             await handleAutoSave();
           }}
-          teamId={teamId}
         />
       ) : (
         <>

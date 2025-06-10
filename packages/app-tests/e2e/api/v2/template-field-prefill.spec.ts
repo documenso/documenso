@@ -18,17 +18,18 @@ test.describe('Template Field Prefill API v2', () => {
     request,
   }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template with seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template with Advanced Fields V2',
       },
@@ -346,17 +347,18 @@ test.describe('Template Field Prefill API v2', () => {
     request,
   }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template with seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template with Default Fields V2',
       },
@@ -511,17 +513,18 @@ test.describe('Template Field Prefill API v2', () => {
 
   test('should handle invalid field prefill values', async ({ request }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template using seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template for Invalid Test V2',
         visibility: 'EVERYONE',

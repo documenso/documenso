@@ -8,7 +8,7 @@ export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
   data: Record<string, unknown>;
   userId: number;
-  teamId?: number;
+  teamId: number;
 };
 
 export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWebhookOptions) => {

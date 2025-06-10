@@ -130,7 +130,7 @@ export const DirectTemplateConfigureForm = ({
                       {...field}
                       disabled={
                         field.disabled ||
-                        derivedRecipientAccessAuth !== null ||
+                        derivedRecipientAccessAuth.length > 0 ||
                         user?.email !== undefined
                       }
                       placeholder="recipient@documenso.com"

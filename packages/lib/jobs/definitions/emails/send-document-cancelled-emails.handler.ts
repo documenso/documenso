@@ -10,9 +10,9 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentCancelledEmailsJobDefinition } from './send-document-cancelled-emails';
 
@@ -38,9 +38,15 @@ export const run = async ({
           teamEmail: true,
           name: true,
           url: true,
-          teamGlobalSettings: true,
         },
       },
+    },
+  });
+
+  const { branding, settings } = await getEmailContext({
+    source: {
+      type: 'team',
+      teamId: document.teamId,
     },
   });
 
@@ -53,7 +59,9 @@ export const run = async ({
     return;
   }
 
-  const i18n = await getI18nInstance(documentMeta?.language);
+  const lang = documentMeta?.language ?? settings.documentLanguage;
+
+  const i18n = await getI18nInstance(lang);
 
   // Send cancellation emails to all recipients who have been sent the document or viewed it
   const recipientsToNotify = document.recipients.filter(
@@ -73,14 +81,10 @@ export const run = async ({
           cancellationReason: cancellationReason || 'The document has been cancelled.',
         });
 
-        const branding = document.team?.teamGlobalSettings
-          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-          : undefined;
-
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
+          renderEmailWithI18N(template, { lang, branding }),
           renderEmailWithI18N(template, {
-            lang: documentMeta?.language,
+            lang,
             branding,
             plainText: true,
           }),

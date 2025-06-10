@@ -1,0 +1,65 @@
+---
+title: Members
+description: Learn how to invite and manage your organisation's members.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Organisation Members
+
+Organisation members are the core users of your organisation. They are the ones who can access the team resources and collaborate with other members.
+
+## Organisation Roles
+
+You can assign different permissions to organisation members by using roles. The roles available are:
+
+|         Role         | Manage Settings/Teams/Members | Billing | Delete Organisation |
+| :------------------: | :---------------------------: | :-----: | ------------------- |
+|  Organisation Owner  |              ✅               |   ✅    | ✅                  |
+|  Organisation Admin  |              ✅               |   ✅    | ✅                  |
+| Organisation Manager |              ✅               |   ❌    | ❌                  |
+| Organisation Member  |              ❌               |   ❌    | ❌                  |
+
+<Callout type="info">
+  Organisation admins and managers will automatically have access to all teams as the "Team Admin"
+  role. When creating a team you can also decide whether to automatically allow normal members to
+  access it by default as well.
+</Callout>
+
+## Invite Organisation Members
+
+To invite organisation members, you need to be an organisation owner, admin or manager.
+
+1. Open the menu switcher top right
+2. Hover over your new organisation and click the settings icon
+3. Navigate to the "Members" tab
+4. Click "Invite Member"
+
+Once you click on the "Invite member" button, you will be prompted to enter the email address of the person you want to invite. You can also select the role of the person you are inviting.
+
+![Invite organisation members](/organisations/organisations-member-invite.webp)
+
+You can also bulk-invite members by uploading a CSV file with the email addresses and roles of the people you want to invite.
+
+The table below shows how the CSV file should be structured:
+
+| Email address             | Role    |
+| ------------------------- | ------- |
+| org-admin@documenso.com   | Admin   |
+| org-manager@documenso.com | Manager |
+| org-member@documenso.com  | Member  |
+
+<Callout type="info">
+  The basic team plan includes 5 organisation members. Going over the 5 members will charge your
+  organisation according to the seat plan pricing.
+</Callout>
+
+## Manage Organisation Members
+
+On the same page, you can change the organisation member's roles or remove them from the organisation.
+
+## What's next?
+
+- [Use groups to organise your members](/users/organisations/groups)

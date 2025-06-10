@@ -26,8 +26,8 @@ export const ZCreateRecipientSchema = z.object({
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
-  accessAuth: ZRecipientAccessAuthTypesSchema.optional().nullable(),
-  actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
 });
 
 export const ZUpdateRecipientSchema = z.object({
@@ -36,8 +36,8 @@ export const ZUpdateRecipientSchema = z.object({
   name: z.string().optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
-  accessAuth: ZRecipientAccessAuthTypesSchema.optional().nullable(),
-  actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
 });
 
 export const ZCreateDocumentRecipientRequestSchema = z.object({
@@ -106,7 +106,7 @@ export const ZSetDocumentRecipientsRequestSchema = z
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
   })
@@ -190,7 +190,7 @@ export const ZSetTemplateRecipientsRequestSchema = z
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
   })

@@ -73,7 +73,7 @@ export type AddTemplateFieldsFormProps = {
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
   onAutoSave: (_data: TAddTemplateFieldsFormSchema) => Promise<void>;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddTemplateFieldsFormPartial = ({
@@ -554,7 +554,6 @@ export const AddTemplateFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             await handleAutoSave();
           }}
-          teamId={teamId}
         />
       ) : (
         <>

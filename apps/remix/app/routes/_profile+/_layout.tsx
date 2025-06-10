@@ -40,7 +40,7 @@ export default function PublicProfileLayout() {
   return (
     <div className="min-h-screen">
       {sessionData ? (
-        <AuthenticatedHeader user={sessionData.user} teams={sessionData.teams} />
+        <AuthenticatedHeader />
       ) : (
         <header
           className={cn(

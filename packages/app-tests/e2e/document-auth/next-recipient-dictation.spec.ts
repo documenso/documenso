@@ -16,13 +16,14 @@ import { signDirectSignaturePad, signSignaturePad } from '../fixtures/signature'
 test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dictation is enabled', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
-  const thirdSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
+  const { user: thirdSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner, thirdSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }, { signingOrder: 3 }],
     updateDocumentOptions: {
@@ -109,12 +110,13 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dict
 });
 
 test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', async ({ page }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }],
     updateDocumentOptions: {
@@ -194,12 +196,13 @@ test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', a
 });
 
 test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async ({ page }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }],
     updateDocumentOptions: {
@@ -278,13 +281,14 @@ test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async
 test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const assistant = await seedUser();
-  const signer = await seedUser();
-  const thirdSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: assistant } = await seedUser();
+  const { user: signer } = await seedUser();
+  const { user: thirdSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [assistant, signer, thirdSigner],
     recipientsCreateOptions: [
       { signingOrder: 1, role: RecipientRole.ASSISTANT },

@@ -1,0 +1,75 @@
+---
+title: Preferences
+description: Learn how to manage your team's global preferences.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Organisation Groups
+
+Organisation groups are a powerful administrative tool that streamlines user management across your entire organisation. Instead of manually assigning individual users to multiple teams, groups allow you to manage access at scale.
+
+This automated approach ensures consistent permissions while reducing administrative overhead for tasks like onboarding employees or managing contractor access.
+
+## Understanding groups
+
+### Key Benefits
+
+- **Instant Access Management**: New hires get immediate, appropriate access across all relevant teams
+- **Bulk Operations**: Remove an entire group (like a departing contractor team) and all members lose access simultaneously
+- **Role Consistency**: Ensure the same role is applied consistently across teams—no more accidentally giving admin access when member access was intended
+- **Audit Trail**: Easily track which groups have access to which teams
+
+### Example use case: Legal Compliance Team
+
+Imagine you have a legal compliance team that needs access to review documents across all departments. Instead of manually adding each legal team member to every departmental team (Sales, Marketing, HR, Operations), you can:
+
+1. Create a "Legal Compliance" group with the "Member" Organisation Role
+2. Add legal team members to this group
+3. Assign the "Legal Compliance" group to the required teams
+
+Now, when Sarah from Legal joins the company, you can simply add her to the "Legal Compliance" group. Once added, she automatically gains access to all teams the "Legal Compliance" group is assigned to.
+
+When John from Legal leaves the company, you remove him from the group and his access is instantly revoked across all teams.
+
+## Getting started with groups
+
+Navigate to the "Groups" section in your organisation settings to create and manage groups.
+
+There are two types of roles when using groups:
+
+- **Organisation Role**: A global organisation role given to all members of the group
+- **Team Role**: A team role you select when assigning the group to a team
+
+You should generally have the "Organisation Role" set to "Organisation Member", otherwise these members would by default have access to all teams anyway due to the high organisation role.
+
+### Creating Custom Groups
+
+When creating a custom group, you can:
+
+1. **Name the Group**: Give it a descriptive name that reflects its purpose
+2. **Set Organisation Role**: Define the default **organisation role** for group members
+3. **Add Members**: Include organisation members in the group
+
+![Organisation group creation](/organisations/organisation-group-create.webp)
+
+### Manage Custom Groups
+
+By clicking the "Manage" button on a custom group, you can view all teams it is assigned to and modify the group's settings.
+
+![Organisation group management](/organisations/organisation-group-manage.webp)
+
+### Assigning a group to a team
+
+To assign a group to a team, you need to navigate to the team settings and click the "Groups" tab.
+
+![Organisation group assignment](/organisations/organisation-group-assignment.webp)
+
+From here, click the "Add groups" button to begin the process of assigning a group to a team. Once you have added the group you can see that the members have been automatically added to the team in the members tab.
+
+## What's next?
+
+- [Create Your First Team](/users/organisations/teams)
+- [Manage Default Settings](/users/documents/document-preferences)

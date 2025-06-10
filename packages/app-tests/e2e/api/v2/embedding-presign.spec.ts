@@ -8,10 +8,11 @@ test.describe('Embedding Presign API', () => {
   test('createEmbeddingPresignToken: should create a token with default expiration', async ({
     request,
   }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });
@@ -44,10 +45,11 @@ test.describe('Embedding Presign API', () => {
   test('createEmbeddingPresignToken: should create a token with custom expiration', async ({
     request,
   }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });
@@ -81,10 +83,11 @@ test.describe('Embedding Presign API', () => {
   test.skip('createEmbeddingPresignToken: should create a token with immediate expiration in dev mode', async ({
     request,
   }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });
@@ -116,10 +119,11 @@ test.describe('Embedding Presign API', () => {
   });
 
   test('verifyEmbeddingPresignToken: should verify a valid token', async ({ request }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });
@@ -170,10 +174,11 @@ test.describe('Embedding Presign API', () => {
   });
 
   test('verifyEmbeddingPresignToken: should reject an invalid token', async ({ request }) => {
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test',
       expiresIn: null,
     });

@@ -61,12 +61,12 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
     },
   });
 
-  const { mutateAsync: createTeamEmailVerification, isPending } =
-    trpc.team.createTeamEmailVerification.useMutation();
+  const { mutateAsync: sendTeamEmailVerification, isPending } =
+    trpc.team.email.verification.send.useMutation();
 
   const onFormSubmit = async ({ name, email }: TCreateTeamEmailFormSchema) => {
     try {
-      await createTeamEmailVerification({
+      await sendTeamEmailVerification({
         teamId,
         name,
         email,

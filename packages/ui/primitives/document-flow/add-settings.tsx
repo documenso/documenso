@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -70,7 +71,6 @@ export type AddSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   document: TDocument;
   currentTeamMemberRole?: TeamMemberRole;
@@ -82,7 +82,6 @@ export const AddSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  isDocumentEnterprise,
   isDocumentPdfLoaded,
   document,
   currentTeamMemberRole,
@@ -90,6 +89,8 @@ export const AddSettingsFormPartial = ({
   onAutoSave,
 }: AddSettingsFormProps) => {
   const { t } = useLingui();
+
+  const organisation = useCurrentOrganisation();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -101,8 +102,8 @@ export const AddSettingsFormPartial = ({
       title: document.title,
       externalId: document.externalId || '',
       visibility: document.visibility || '',
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
+      globalActionAuth: documentAuthOption?.globalActionAuth || [],
 
       meta: {
         timezone:
@@ -133,6 +134,12 @@ export const AddSettingsFormPartial = ({
         document.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
     )
     .otherwise(() => false);
+
+  const onFormSubmit = form.handleSubmit(onSubmit);
+
+  const onGoNextClick = () => {
+    void onFormSubmit().catch(console.error);
+  };
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -248,6 +255,8 @@ export const AddSettingsFormPartial = ({
                         field.onChange(value);
                         void handleAutoSave();
                       }}
+                      value={field.value}
+                      disabled={field.disabled}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue />
@@ -284,6 +293,8 @@ export const AddSettingsFormPartial = ({
                         field.onChange(value);
                         void handleAutoSave();
                       }}
+                      value={field.value}
+                      disabled={field.disabled}
                     />
                   </FormControl>
                 </FormItem>
@@ -317,7 +328,7 @@ export const AddSettingsFormPartial = ({
               />
             )}
 
-            {isDocumentEnterprise && (
+            {organisation.organisationClaim.flags.cfr21 && (
               <FormField
                 control={form.control}
                 name="globalActionAuth"
@@ -335,6 +346,8 @@ export const AddSettingsFormPartial = ({
                           field.onChange(value);
                           void handleAutoSave();
                         }}
+                        value={field.value}
+                        disabled={field.disabled}
                       />
                     </FormControl>
                   </FormItem>
@@ -427,6 +440,7 @@ export const AddSettingsFormPartial = ({
                                 field.onChange(value);
                                 void handleAutoSave();
                               }}
+                              value={field.value}
                               disabled={documentHasBeenSent}
                             >
                               <SelectTrigger className="bg-background">
@@ -466,6 +480,7 @@ export const AddSettingsFormPartial = ({
                                 value && field.onChange(value);
                                 void handleAutoSave();
                               }}
+                              value={field.value}
                               disabled={documentHasBeenSent}
                             />
                           </FormControl>
@@ -519,7 +534,7 @@ export const AddSettingsFormPartial = ({
           disabled={form.formState.isSubmitting}
           canGoBack={stepIndex !== 0}
           onGoBackClick={previousStep}
-          onGoNextClick={form.handleSubmit(onSubmit)}
+          onGoNextClick={onGoNextClick}
         />
       </DocumentFlowFormContainerFooter>
     </>
