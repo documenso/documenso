@@ -104,7 +104,7 @@ export default function OrganisationSettingsPreferencesPage() {
       await updateOrganisationSettings({
         organisationId: organisation.id,
         data: {
-          brandingEnabled,
+          brandingEnabled: brandingEnabled ?? undefined,
           brandingLogo: uploadedBrandingLogo,
           brandingUrl,
           brandingCompanyDetails,
