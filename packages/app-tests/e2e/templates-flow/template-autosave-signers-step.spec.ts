@@ -1,28 +1,28 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
-import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
+import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
+import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
-const setupDocumentAndNavigateToSignersStep = async (page: Page) => {
+const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
   const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const template = await seedBlankTemplate(user);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/templates/${template.id}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  return { user, document };
+  return { user, template };
 };
 
 const triggerAutosave = async (page: Page) => {
@@ -37,14 +37,14 @@ const addSignerAndSave = async (page: Page) => {
   await triggerAutosave(page);
 };
 
-test.describe('AutoSave Signers Step', () => {
+test.describe('AutoSave Signers Step - Templates', () => {
   test('should autosave the signers addition', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, template } = await setupTemplateAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
-    const recipientsFromDB = await getRecipientsForDocument({
-      documentId: document.id,
+    const recipientsFromDB = await getRecipientsForTemplate({
+      templateId: template.id,
       userId: user.id,
     });
 
@@ -54,18 +54,18 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signer deletion', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, template } = await setupTemplateAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
     await page.getByRole('button', { name: 'Add myself' }).click();
     await triggerAutosave(page);
 
-    await page.getByTestId('remove-signer-button').first().click();
+    await page.getByTestId('remove-placeholder-recipient-button').first().click();
     await triggerAutosave(page);
 
-    const recipientsFromDB = await getRecipientsForDocument({
-      documentId: document.id,
+    const recipientsFromDB = await getRecipientsForTemplate({
+      templateId: template.id,
       userId: user.id,
     });
 
@@ -75,7 +75,7 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signer update', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, template } = await setupTemplateAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
@@ -89,8 +89,8 @@ test.describe('AutoSave Signers Step', () => {
 
     await triggerAutosave(page);
 
-    const recipientsFromDB = await getRecipientsForDocument({
-      documentId: document.id,
+    const recipientsFromDB = await getRecipientsForTemplate({
+      templateId: template.id,
       userId: user.id,
     });
 
@@ -101,19 +101,25 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signing order change', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, template } = await setupTemplateAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
-    await page.getByRole('button', { name: 'Add signer' }).click();
+    await page.getByRole('button', { name: 'Add placeholder recipient' }).click();
 
-    await page.getByTestId('signer-email-input').nth(1).fill('recipient2@documenso.com');
-    await page.getByLabel('Name').nth(1).fill('Recipient 2');
+    await page
+      .getByTestId('placeholder-recipient-email-input')
+      .nth(1)
+      .fill('recipient2@documenso.com');
+    await page.getByTestId('placeholder-recipient-name-input').nth(1).fill('Recipient 2');
 
-    await page.getByRole('button', { name: 'Add Signer' }).click();
+    await page.getByRole('button', { name: 'Add placeholder recipient' }).click();
 
-    await page.getByTestId('signer-email-input').nth(2).fill('recipient3@documenso.com');
-    await page.getByLabel('Name').nth(2).fill('Recipient 3');
+    await page
+      .getByTestId('placeholder-recipient-email-input')
+      .nth(2)
+      .fill('recipient3@documenso.com');
+    await page.getByTestId('placeholder-recipient-name-input').nth(2).fill('Recipient 3');
 
     await triggerAutosave(page);
 
@@ -121,30 +127,30 @@ test.describe('AutoSave Signers Step', () => {
     await page.getByLabel('Allow signers to dictate next signer').check();
     await triggerAutosave(page);
 
-    await page.getByTestId('signing-order-input').nth(0).fill('3');
-    await page.getByTestId('signing-order-input').nth(0).blur();
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(0).fill('3');
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(0).blur();
     await triggerAutosave(page);
 
-    await page.getByTestId('signing-order-input').nth(1).fill('1');
-    await page.getByTestId('signing-order-input').nth(1).blur();
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(1).fill('1');
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(1).blur();
     await triggerAutosave(page);
 
-    await page.getByTestId('signing-order-input').nth(2).fill('2');
-    await page.getByTestId('signing-order-input').nth(2).blur();
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(2).fill('2');
+    await page.getByTestId('placeholder-recipient-signing-order-input').nth(2).blur();
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
+    const templateDataFromDB = await getTemplateById({
+      id: template.id,
       userId: user.id,
     });
 
-    const recipientsFromDB = await getRecipientsForDocument({
-      documentId: document.id,
+    const recipientsFromDB = await getRecipientsForTemplate({
+      templateId: template.id,
       userId: user.id,
     });
 
-    expect(documentDataFromDB.documentMeta?.signingOrder).toBe('SEQUENTIAL');
-    expect(documentDataFromDB.documentMeta?.allowDictateNextSigner).toBe(true);
+    expect(templateDataFromDB.templateMeta?.signingOrder).toBe('SEQUENTIAL');
+    expect(templateDataFromDB.templateMeta?.allowDictateNextSigner).toBe(true);
     expect(recipientsFromDB.length).toBe(3);
     expect(recipientsFromDB[0].signingOrder).toBe(2);
     expect(recipientsFromDB[1].signingOrder).toBe(3);

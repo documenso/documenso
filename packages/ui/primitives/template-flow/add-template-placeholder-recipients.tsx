@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -146,15 +146,15 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     }
   }, [form, emptySigners, form.formState.isDirty, scheduleSave]);
 
-  useEffect(() => {
-    form.reset({
-      signers: generateDefaultFormSigners(),
-      signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
-      allowDictateNextSigner: allowDictateNextSigner ?? false,
-    });
+  // useEffect(() => {
+  //   form.reset({
+  //     signers: generateDefaultFormSigners(),
+  //     signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
+  //     allowDictateNextSigner: allowDictateNextSigner ?? false,
+  //   });
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recipients]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [recipients]);
 
   // Always show advanced settings if any recipient has auth options.
   const alwaysShowAdvancedSettings = useMemo(() => {
@@ -615,6 +615,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                         <Input
                                           type="number"
                                           max={signers.length}
+                                          data-testid="placeholder-recipient-signing-order-input"
                                           className={cn(
                                             'w-full text-center',
                                             '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
@@ -669,6 +670,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           isSignerDirectRecipient(signer)
                                         }
                                         onBlur={handleAutoSave}
+                                        data-testid="placeholder-recipient-email-input"
                                       />
                                     </FormControl>
 
@@ -704,6 +706,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           isSignerDirectRecipient(signer)
                                         }
                                         onBlur={handleAutoSave}
+                                        data-testid="placeholder-recipient-name-input"
                                       />
                                     </FormControl>
 
@@ -783,6 +786,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                     className="col-span-1 mt-auto inline-flex h-10 w-10 items-center justify-center text-slate-500 hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
                                     disabled={isSubmitting || signers.length === 1}
                                     onClick={() => onRemoveSigner(index)}
+                                    data-testid="remove-placeholder-recipient-button"
                                   >
                                     <Trash className="h-5 w-5" />
                                   </button>
