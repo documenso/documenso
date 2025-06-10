@@ -5,19 +5,25 @@ description: Learn how to control the visibility of your team documents.
 
 import { Callout } from 'nextra/components';
 
-# Team's Document Visibility
+# Document Visibility
 
-The default document visibility option allows you to control who can view and access the documents uploaded to your team account. The document visibility can be set to one of the following options:
+The default document visibility option allows you to control who can view and access the documents uploaded within a team.
+
+This value can either be set in the [document preferences](/users/documents/document-preferences), or when you [create the document](/users/documents/send-document)
+
+## Document Visibility Options
+
+The document visibility can be set to one of the following options:
 
 - **Everyone** - The document is visible to all team members.
 - **Managers and above** - The document is visible to team members with the role of _Manager or above_ and _Admin_.
 - **Admin only** - The document is only visible to the team's admins.
 
-![A screenshot of the document visibility selector from the team's global preferences page](/teams/team-preferences-document-visibility.webp)
+The default document visibility is set to "_EVERYONE_" by default. You can change this setting by going to the [document preferences page](/users/documents/document-preferences) and selecting a different visibility option.
 
-The default document visibility is set to "_EVERYONE_" by default. You can change this setting by going to the [team's general preferences page](/users/teams/preferences) and selecting a different visibility option.
+![Document visibility preference](/organisations/organisation-document-visibility.webp)
 
-Here's how it works:
+## How it works
 
 - If a user with the "_Member_" role creates a document and the default document visibility is set to "_Everyone_", the document's visibility is set to "_EVERYONE_".
   - The user can't change the visibility of the document in the document editor.
