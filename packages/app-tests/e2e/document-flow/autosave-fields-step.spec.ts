@@ -8,8 +8,8 @@ import { seedUser } from '@documenso/prisma/seed/users';
 import { apiSignin } from '../fixtures/authentication';
 
 const setupDocumentAndNavigateToFieldsStep = async (page: Page) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
@@ -29,7 +29,7 @@ const setupDocumentAndNavigateToFieldsStep = async (page: Page) => {
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  return { user, document };
+  return { user, team, document };
 };
 
 const triggerAutosave = async (page: Page) => {
@@ -39,7 +39,7 @@ const triggerAutosave = async (page: Page) => {
 
 test.describe('AutoSave Fields Step', () => {
   test('should autosave the fields without advanced settings', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToFieldsStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToFieldsStep(page);
 
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -79,6 +79,7 @@ test.describe('AutoSave Fields Step', () => {
     const fieldsFromDB = await getFieldsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(fieldsFromDB.length).toBe(3);
@@ -88,7 +89,7 @@ test.describe('AutoSave Fields Step', () => {
   });
 
   test('should autosave the field deletion', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToFieldsStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToFieldsStep(page);
 
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -136,6 +137,7 @@ test.describe('AutoSave Fields Step', () => {
     const fieldsFromDB = await getFieldsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(fieldsFromDB.length).toBe(2);
@@ -144,7 +146,7 @@ test.describe('AutoSave Fields Step', () => {
   });
 
   test('should autosave the field duplication', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToFieldsStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToFieldsStep(page);
 
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -192,6 +194,7 @@ test.describe('AutoSave Fields Step', () => {
     const fieldsFromDB = await getFieldsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(fieldsFromDB.length).toBe(4);
@@ -202,7 +205,7 @@ test.describe('AutoSave Fields Step', () => {
   });
 
   test('should autosave the fields with advanced settings', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToFieldsStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToFieldsStep(page);
 
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -232,6 +235,7 @@ test.describe('AutoSave Fields Step', () => {
     const fieldsFromDB = await getFieldsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(fieldsFromDB.length).toBe(2);

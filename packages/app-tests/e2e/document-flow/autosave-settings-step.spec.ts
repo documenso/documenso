@@ -10,8 +10,8 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 const setupDocument = async (page: Page) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
@@ -19,7 +19,7 @@ const setupDocument = async (page: Page) => {
     redirectPath: `/documents/${document.id}/edit`,
   });
 
-  return { user, document };
+  return { user, team, document };
 };
 
 const triggerAutosave = async (page: Page) => {
@@ -29,7 +29,7 @@ const triggerAutosave = async (page: Page) => {
 
 test.describe('AutoSave Settings Step', () => {
   test('should autosave the title change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const newDocumentTitle = 'New Document Title';
 
@@ -40,6 +40,7 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
@@ -48,7 +49,7 @@ test.describe('AutoSave Settings Step', () => {
   });
 
   test('should autosave the language change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const newDocumentLanguage = 'French';
     const expectedLanguageCode = 'fr';
@@ -61,13 +62,14 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.language).toBe(expectedLanguageCode);
   });
 
   test('should autosave the document access change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const access = 'Require account';
     const accessValue = 'ACCOUNT';
@@ -80,13 +82,14 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
-    expect(documentDataFromDB.authOptions?.globalAccessAuth).toBe(accessValue);
+    expect(documentDataFromDB.authOptions?.globalAccessAuth).toContain(accessValue);
   });
 
   test('should autosave the external ID change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const newExternalId = '1234567890';
 
@@ -99,17 +102,18 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.externalId).toBe(newExternalId);
   });
 
   test('should autosave the allowed signature types change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(2).click();
+    await page.getByRole('combobox').nth(3).click();
     await page.getByRole('option', { name: 'Draw' }).click();
     await page.getByRole('option', { name: 'Type' }).click();
 
@@ -118,6 +122,7 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.drawSignatureEnabled).toBe(false);
@@ -126,11 +131,11 @@ test.describe('AutoSave Settings Step', () => {
   });
 
   test('should autosave the date format change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(3).click();
+    await page.getByRole('combobox').nth(4).click();
     await page.getByRole('option', { name: 'ISO 8601' }).click();
 
     await triggerAutosave(page);
@@ -138,17 +143,18 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
   });
 
   test('should autosave the timezone change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(4).click();
+    await page.getByRole('combobox').nth(5).click();
     await page.getByRole('option', { name: 'Europe/London' }).click();
 
     await triggerAutosave(page);
@@ -156,13 +162,14 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.timezone).toBe('Europe/London');
   });
 
   test('should autosave the redirect URL change', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const newRedirectUrl = 'https://documenso.com/test/';
 
@@ -175,13 +182,14 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.redirectUrl).toBe(newRedirectUrl);
   });
 
   test('should autosave multiple field changes together', async ({ page }) => {
-    const { user, document } = await setupDocument(page);
+    const { user, document, team } = await setupDocument(page);
 
     const newTitle = 'Updated Document Title';
     await page.getByRole('textbox', { name: 'Title *' }).fill(newTitle);
@@ -196,7 +204,7 @@ test.describe('AutoSave Settings Step', () => {
     const newExternalId = 'MULTI-TEST-123';
     await page.getByRole('textbox', { name: 'External ID' }).fill(newExternalId);
 
-    await page.getByRole('combobox').nth(4).click();
+    await page.getByRole('combobox').nth(5).click();
     await page.getByRole('option', { name: 'Europe/Berlin' }).click();
 
     await triggerAutosave(page);
@@ -204,11 +212,12 @@ test.describe('AutoSave Settings Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.title).toBe(newTitle);
     expect(documentDataFromDB.documentMeta?.language).toBe('de');
-    expect(documentDataFromDB.authOptions?.globalAccessAuth).toBe('ACCOUNT');
+    expect(documentDataFromDB.authOptions?.globalAccessAuth).toContain('ACCOUNT');
     expect(documentDataFromDB.externalId).toBe(newExternalId);
     expect(documentDataFromDB.documentMeta?.timezone).toBe('Europe/Berlin');
   });

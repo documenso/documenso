@@ -10,8 +10,8 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
@@ -38,7 +38,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
 
   await expect(page.getByRole('heading', { name: 'Distribute Document' })).toBeVisible();
 
-  return { user, document };
+  return { user, team, document };
 };
 
 export const triggerAutosave = async (page: Page) => {
@@ -51,7 +51,7 @@ export const triggerAutosave = async (page: Page) => {
 
 test.describe('AutoSave Subject Step', () => {
   test('should autosave the subject field', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSubjectStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSubjectStep(page);
 
     const subject = 'Hello world!';
 
@@ -62,6 +62,7 @@ test.describe('AutoSave Subject Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     await expect(page.getByRole('textbox', { name: 'Subject (Optional)' })).toHaveValue(
@@ -70,7 +71,7 @@ test.describe('AutoSave Subject Step', () => {
   });
 
   test('should autosave the message field', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSubjectStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSubjectStep(page);
 
     const message = 'Please review and sign this important document. Thank you!';
 
@@ -81,6 +82,7 @@ test.describe('AutoSave Subject Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     await expect(page.getByRole('textbox', { name: 'Message (Optional)' })).toHaveValue(
@@ -89,7 +91,7 @@ test.describe('AutoSave Subject Step', () => {
   });
 
   test('should autosave the email settings checkboxes', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSubjectStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSubjectStep(page);
 
     // Toggle some email settings checkboxes (randomly - some checked, some unchecked)
     await page.getByText('Send recipient signed email').click();
@@ -102,6 +104,7 @@ test.describe('AutoSave Subject Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     const emailSettings = documentDataFromDB.documentMeta?.emailSettings;
@@ -131,7 +134,7 @@ test.describe('AutoSave Subject Step', () => {
   });
 
   test('should autosave all fields and settings together', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSubjectStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSubjectStep(page);
 
     const subject = 'Combined Test Subject - Please Sign';
     const message =
@@ -150,6 +153,7 @@ test.describe('AutoSave Subject Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.subject).toBe(subject);

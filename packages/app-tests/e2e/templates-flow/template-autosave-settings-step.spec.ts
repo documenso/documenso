@@ -10,8 +10,8 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 const setupTemplate = async (page: Page) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
@@ -19,7 +19,7 @@ const setupTemplate = async (page: Page) => {
     redirectPath: `/templates/${template.id}/edit`,
   });
 
-  return { user, template };
+  return { user, team, template };
 };
 
 const triggerAutosave = async (page: Page) => {
@@ -29,7 +29,7 @@ const triggerAutosave = async (page: Page) => {
 
 test.describe('AutoSave Settings Step - Templates', () => {
   test('should autosave the title change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const newTemplateTitle = 'New Template Title';
 
@@ -40,6 +40,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
@@ -48,7 +49,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
   });
 
   test('should autosave the language change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const newTemplateLanguage = 'French';
     const expectedLanguageCode = 'fr';
@@ -61,13 +62,14 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.templateMeta?.language).toBe(expectedLanguageCode);
   });
 
   test('should autosave the template access change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const access = 'Require account';
     const accessValue = 'ACCOUNT';
@@ -80,13 +82,14 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
-    expect(templateDataFromDB.authOptions?.globalAccessAuth).toBe(accessValue);
+    expect(templateDataFromDB.authOptions?.globalAccessAuth).toContain(accessValue);
   });
 
   test('should autosave the external ID change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const newExternalId = '1234567890';
 
@@ -99,17 +102,18 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.externalId).toBe(newExternalId);
   });
 
   test('should autosave the allowed signature types change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(3).click();
+    await page.getByRole('combobox').nth(4).click();
     await page.getByRole('option', { name: 'Draw' }).click();
     await page.getByRole('option', { name: 'Type' }).click();
 
@@ -118,6 +122,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.templateMeta?.drawSignatureEnabled).toBe(false);
@@ -126,11 +131,11 @@ test.describe('AutoSave Settings Step - Templates', () => {
   });
 
   test('should autosave the date format change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(4).click();
+    await page.getByRole('combobox').nth(5).click();
     await page.getByRole('option', { name: 'ISO 8601' }).click();
 
     await triggerAutosave(page);
@@ -138,17 +143,18 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.templateMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
   });
 
   test('should autosave the timezone change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(5).click();
+    await page.getByRole('combobox').nth(6).click();
     await page.getByRole('option', { name: 'Europe/London' }).click();
 
     await triggerAutosave(page);
@@ -156,13 +162,14 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.templateMeta?.timezone).toBe('Europe/London');
   });
 
   test('should autosave the redirect URL change', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const newRedirectUrl = 'https://documenso.com/test/';
 
@@ -175,13 +182,14 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.templateMeta?.redirectUrl).toBe(newRedirectUrl);
   });
 
   test('should autosave multiple field changes together', async ({ page }) => {
-    const { user, template } = await setupTemplate(page);
+    const { user, template, team } = await setupTemplate(page);
 
     const newTitle = 'Updated Template Title';
     await page.getByRole('textbox', { name: 'Title *' }).fill(newTitle);
@@ -196,7 +204,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const newExternalId = 'MULTI-TEST-123';
     await page.getByRole('textbox', { name: 'External ID' }).fill(newExternalId);
 
-    await page.getByRole('combobox').nth(5).click();
+    await page.getByRole('combobox').nth(6).click();
     await page.getByRole('option', { name: 'Europe/Berlin' }).click();
 
     await triggerAutosave(page);
@@ -204,11 +212,12 @@ test.describe('AutoSave Settings Step - Templates', () => {
     const templateDataFromDB = await getTemplateById({
       id: template.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(templateDataFromDB.title).toBe(newTitle);
     expect(templateDataFromDB.templateMeta?.language).toBe('de');
-    expect(templateDataFromDB.authOptions?.globalAccessAuth).toBe('ACCOUNT');
+    expect(templateDataFromDB.authOptions?.globalAccessAuth).toContain('ACCOUNT');
     expect(templateDataFromDB.externalId).toBe(newExternalId);
     expect(templateDataFromDB.templateMeta?.timezone).toBe('Europe/Berlin');
   });

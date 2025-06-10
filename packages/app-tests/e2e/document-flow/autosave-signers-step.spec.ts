@@ -11,8 +11,8 @@ import { apiSignin } from '../fixtures/authentication';
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 const setupDocumentAndNavigateToSignersStep = async (page: Page) => {
-  const user = await seedUser();
-  const document = await seedBlankDocument(user);
+  const { user, team } = await seedUser();
+  const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
     page,
@@ -22,7 +22,7 @@ const setupDocumentAndNavigateToSignersStep = async (page: Page) => {
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  return { user, document };
+  return { user, team, document };
 };
 
 const triggerAutosave = async (page: Page) => {
@@ -39,13 +39,14 @@ const addSignerAndSave = async (page: Page) => {
 
 test.describe('AutoSave Signers Step', () => {
   test('should autosave the signers addition', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
     const recipientsFromDB = await getRecipientsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(recipientsFromDB.length).toBe(1);
@@ -54,7 +55,7 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signer deletion', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
@@ -67,6 +68,7 @@ test.describe('AutoSave Signers Step', () => {
     const recipientsFromDB = await getRecipientsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(recipientsFromDB.length).toBe(1);
@@ -75,7 +77,7 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signer update', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
@@ -92,6 +94,7 @@ test.describe('AutoSave Signers Step', () => {
     const recipientsFromDB = await getRecipientsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(recipientsFromDB.length).toBe(1);
@@ -101,7 +104,7 @@ test.describe('AutoSave Signers Step', () => {
   });
 
   test('should autosave the signing order change', async ({ page }) => {
-    const { user, document } = await setupDocumentAndNavigateToSignersStep(page);
+    const { user, document, team } = await setupDocumentAndNavigateToSignersStep(page);
 
     await addSignerAndSave(page);
 
@@ -136,11 +139,13 @@ test.describe('AutoSave Signers Step', () => {
     const documentDataFromDB = await getDocumentById({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     const recipientsFromDB = await getRecipientsForDocument({
       documentId: document.id,
       userId: user.id,
+      teamId: team.id,
     });
 
     expect(documentDataFromDB.documentMeta?.signingOrder).toBe('SEQUENTIAL');
