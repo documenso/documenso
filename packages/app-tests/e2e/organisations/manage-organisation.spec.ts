@@ -31,7 +31,7 @@ test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
   await page.getByRole('button', { name: 'Delete' }).click();
 
   await page.waitForURL(`/settings/organisations`);
-  await expect(page.getByText('No results found')).toBeVisible();
+  await expectTextToBeVisible(page, 'No results found');
   await page.getByRole('button', { name: 'Create organisation' }).click();
 
   await page.getByLabel('Organisation Name*').fill('test');
