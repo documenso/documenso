@@ -187,7 +187,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [fieldMeta]);
 
-    const { scheduleSave } = useAutoSave(onAutoSave);
+    const { scheduleSave } = useAutoSave(onAutoSave || (async () => {}));
 
     const handleAutoSave = useCallback(() => {
       if (errors.length === 0) {
