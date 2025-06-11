@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002",
-    "build": "next build",
+    "build": "next build && next-sitemap",
     "start": "next start -p 3002",
     "lint:fix": "next lint --fix",
-    "clean": "rimraf .next && rimraf node_modules",
-    "postbuild": "next-sitemap"
+    "clean": "rimraf .next && rimraf node_modules"
   },
   "dependencies": {
     "@documenso/assets": "*",
