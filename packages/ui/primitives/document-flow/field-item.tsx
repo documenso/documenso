@@ -36,6 +36,8 @@ export type FieldItemProps = {
   onAdvancedSettings?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   recipientIndex?: number;
   hasErrors?: boolean;
   active?: boolean;
@@ -237,6 +239,8 @@ export const FieldItem = ({
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => onFieldActivate?.()}
       onResizeStart={() => onFieldActivate?.()}
+      onMouseEnter={() => onFocus?.()}
+      onMouseLeave={() => onBlur?.()}
       enableResizing={!fixedSize}
       resizeHandleStyles={{
         bottom: { bottom: -8, cursor: 'ns-resize' },
