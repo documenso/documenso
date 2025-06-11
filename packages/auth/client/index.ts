@@ -59,7 +59,9 @@ export class AuthClient {
     sessionId: string;
     redirectPath?: string;
   }) {
-    await this.client['signout-session'][':sessionId'].$post({ param: { sessionId } });
+    await this.client['signout-session'].$post({
+      json: { sessionId },
+    });
 
     if (redirectPath) {
       window.location.href = redirectPath;
