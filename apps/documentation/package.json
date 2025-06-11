@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002",
-    "build": "next build && next-sitemap",
+    "build": "next build",
     "start": "next start -p 3002",
     "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules",
