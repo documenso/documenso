@@ -178,4 +178,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await page.getByRole('button', { name: 'Sign' }).click();
   await page.waitForURL(/\/sign/);
   await expect(page.getByRole('heading', { name: 'Document Signed' })).toBeVisible();
+
+  // Add a longer waiting period to ensure document status is updated
+  await page.waitForTimeout(3000);
 });

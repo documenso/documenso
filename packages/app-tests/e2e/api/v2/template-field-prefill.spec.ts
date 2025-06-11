@@ -194,7 +194,7 @@ test.describe('Template Field Prefill API v2', () => {
             id: numberField.id,
             type: 'number',
             label: 'Prefilled Number',
-            value: '42',
+            value: '98765',
           },
           {
             id: radioField.id,
@@ -253,7 +253,7 @@ test.describe('Template Field Prefill API v2', () => {
     expect(documentNumberField?.fieldMeta).toMatchObject({
       type: 'number',
       label: 'Prefilled Number',
-      value: '42',
+      value: '98765',
     });
 
     const documentRadioField = document?.fields.find(
@@ -326,7 +326,7 @@ test.describe('Template Field Prefill API v2', () => {
     await expect(page.getByText('This is prefilled')).toBeVisible();
 
     // Number field
-    await expect(page.getByText('42')).toBeVisible();
+    await expect(page.getByText('98765', { exact: true })).toBeVisible();
 
     // Radio field
     await expect(page.getByText('Option A')).toBeVisible();
@@ -380,7 +380,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 5. Add fields to the template
     // Add TEXT field
-    const textField = await prisma.field.create({
+    await prisma.field.create({
       data: {
         templateId: template.id,
         recipientId: recipient.id,
@@ -400,7 +400,7 @@ test.describe('Template Field Prefill API v2', () => {
     });
 
     // Add NUMBER field
-    const numberField = await prisma.field.create({
+    await prisma.field.create({
       data: {
         templateId: template.id,
         recipientId: recipient.id,

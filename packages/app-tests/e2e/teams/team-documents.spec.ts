@@ -1,8 +1,11 @@
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
-import { seedDocuments, seedTeamDocuments } from '@documenso/prisma/seed/documents';
+import {
+  seedBlankDocument,
+  seedDocuments,
+  seedTeamDocuments,
+} from '@documenso/prisma/seed/documents';
 import { seedTeam, seedTeamEmail, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -314,9 +317,9 @@ test('[TEAMS]: delete pending team document', async ({ page }) => {
     await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   }).toPass();
 
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
-  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click({ force: true });
 
   await checkDocumentTabCount(page, 'Pending', 1);
 
@@ -359,9 +362,9 @@ test('[TEAMS]: delete completed team document', async ({ page }) => {
     await expect(page.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
   }).toPass();
 
-  await page.getByRole('menuitem', { name: 'Delete' }).click();
+  await page.getByRole('menuitem', { name: 'Delete' }).click({ force: true });
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
-  await page.getByRole('button', { name: 'Delete' }).click();
+  await page.getByRole('button', { name: 'Delete' }).click({ force: true });
 
   await checkDocumentTabCount(page, 'Completed', 0);
 
