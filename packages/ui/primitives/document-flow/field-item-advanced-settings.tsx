@@ -49,7 +49,7 @@ export type FieldAdvancedSettingsProps = {
   onAdvancedSettings?: () => void;
   isDocumentPdfLoaded?: boolean;
   onSave?: (fieldState: FieldMeta) => void;
-  onAutoSave: (fieldState: FieldMeta) => Promise<void>;
+  onAutoSave?: (fieldState: FieldMeta) => Promise<void>;
 };
 
 export type FieldMetaKeys =
