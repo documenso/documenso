@@ -73,7 +73,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
 
       <Button
         variant="outline"
-        className="text-muted-foreground flex w-96 items-center justify-between rounded-lg"
+        className="text-muted-foreground flex w-full max-w-96 items-center justify-between rounded-lg"
         onClick={() => setIsCommandMenuOpen(true)}
       >
         <div className="flex items-center">
@@ -82,7 +82,7 @@ export const DesktopNav = ({ className, setIsCommandMenuOpen, ...props }: Deskto
         </div>
 
         <div>
-          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5  text-xs tracking-wider">
+          <div className="text-muted-foreground bg-muted flex items-center rounded-md px-1.5 py-0.5 text-xs tracking-wider">
             {modifierKey}+K
           </div>
         </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useId, useLayoutEffect, useState } from 'react';
+import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 
 import { Trans, msg } from '@lingui/macro';
 import { useLingui } from '@lingui/react';
@@ -8,6 +8,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, TemplateMeta } from '@documenso/prisma/client';
 import {
@@ -51,7 +52,7 @@ export type EmbedSignDocumentClientPageProps = {
   metadata?: DocumentMeta | TemplateMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhitelabelling?: boolean;
   allRecipients?: RecipientWithFields[];
 };
 
@@ -64,7 +65,7 @@ export const EmbedSignDocumentClientPage = ({
   metadata,
   isCompleted,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhitelabelling = false,
   allRecipients = [],
 }: EmbedSignDocumentClientPageProps) => {
   const { _ } = useLingui();
@@ -102,19 +103,26 @@ export const EmbedSignDocumentClientPage = ({
   const [throttledOnCompleteClick, isThrottled] = useThrottleFn(() => void onCompleteClick(), 500);
 
   const [pendingFields, _completedFields] = [
-    fields.filter((field) => field.recipientId === recipient.id && !field.inserted),
+    fields.filter(
+      (field) => field.recipientId === recipient.id && isFieldUnsignedAndRequired(field),
+    ),
     fields.filter((field) => field.inserted),
   ];
 
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
 
   const assistantSignersId = useId();
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(fields);
+    validateFieldsInserted(fieldsRequiringValidation);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -126,7 +134,7 @@ export const EmbedSignDocumentClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(fields);
+      const valid = validateFieldsInserted(fieldsRequiringValidation);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
@@ -212,7 +220,7 @@ export const EmbedSignDocumentClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhitelabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,
@@ -288,7 +296,7 @@ export const EmbedSignDocumentClientPage = ({
           {/* Widget */}
           <div
             key={isExpanded ? 'expanded' : 'collapsed'}
-            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
             <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
@@ -303,19 +311,36 @@ export const EmbedSignDocumentClientPage = ({
                     )}
                   </h3>
 
-                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                    {isExpanded ? (
-                      <LucideChevronDown
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(false)}
-                      />
-                    ) : (
-                      <LucideChevronUp
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(true)}
-                      />
-                    )}
-                  </Button>
+                  {isExpanded ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : pendingFields.length > 0 ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(true)}
+                    >
+                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="md:hidden"
+                      disabled={
+                        isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
+                      }
+                      loading={isSubmitting}
+                      onClick={() => throttledOnCompleteClick()}
+                    >
+                      <Trans>Complete</Trans>
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -419,40 +444,42 @@ export const EmbedSignDocumentClientPage = ({
                         />
                       </div>
 
-                      <div>
-                        <Label htmlFor="Signature">
-                          <Trans>Signature</Trans>
-                        </Label>
+                      {hasSignatureField && (
+                        <div>
+                          <Label htmlFor="Signature">
+                            <Trans>Signature</Trans>
+                          </Label>
 
-                        <Card className="mt-2" gradient degrees={-120}>
-                          <CardContent className="p-0">
-                            <SignaturePad
-                              className="h-44 w-full"
-                              disabled={isThrottled || isSubmitting}
-                              defaultValue={signature ?? undefined}
-                              onChange={(value) => {
-                                setSignature(value);
-                              }}
-                              onValidityChange={(isValid) => {
-                                setSignatureValid(isValid);
-                              }}
-                              allowTypedSignature={Boolean(
-                                metadata &&
-                                  'typedSignatureEnabled' in metadata &&
-                                  metadata.typedSignatureEnabled,
-                              )}
-                            />
-                          </CardContent>
-                        </Card>
+                          <Card className="mt-2" gradient degrees={-120}>
+                            <CardContent className="p-0">
+                              <SignaturePad
+                                className="h-44 w-full"
+                                disabled={isThrottled || isSubmitting}
+                                defaultValue={signature ?? undefined}
+                                onChange={(value) => {
+                                  setSignature(value);
+                                }}
+                                onValidityChange={(isValid) => {
+                                  setSignatureValid(isValid);
+                                }}
+                                allowTypedSignature={Boolean(
+                                  metadata &&
+                                    'typedSignatureEnabled' in metadata &&
+                                    metadata.typedSignatureEnabled,
+                                )}
+                              />
+                            </CardContent>
+                          </Card>
 
-                        {hasSignatureField && !signatureValid && (
-                          <div className="text-destructive mt-2 text-sm">
-                            <Trans>
-                              Signature is too small. Please provide a more complete signature.
-                            </Trans>
-                          </div>
-                        )}
-                      </div>
+                          {hasSignatureField && !signatureValid && (
+                            <div className="text-destructive mt-2 text-sm">
+                              <Trans>
+                                Signature is too small. Please provide a more complete signature.
+                              </Trans>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </>
                   )}
                 </div>

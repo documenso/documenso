@@ -13,6 +13,10 @@ import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn'
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import {
+  isFieldUnsignedAndRequired,
+  isRequiredField,
+} from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@documenso/prisma/client';
 import { type DocumentData, type Field, FieldType } from '@documenso/prisma/client';
@@ -49,7 +53,7 @@ export type EmbedDirectTemplateClientPageProps = {
   fields: Field[];
   metadata?: DocumentMeta | TemplateMeta | null;
   hidePoweredBy?: boolean;
-  isPlatformOrEnterprise?: boolean;
+  allowWhiteLabelling?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
@@ -60,7 +64,7 @@ export const EmbedDirectTemplateClientPage = ({
   fields,
   metadata,
   hidePoweredBy = false,
-  isPlatformOrEnterprise = false,
+  allowWhiteLabelling = false,
 }: EmbedDirectTemplateClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -94,7 +98,7 @@ export const EmbedDirectTemplateClientPage = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(() => fields);
 
   const [pendingFields, _completedFields] = [
-    localFields.filter((field) => !field.inserted),
+    localFields.filter((field) => isFieldUnsignedAndRequired(field)),
     localFields.filter((field) => field.inserted),
   ];
 
@@ -112,7 +116,7 @@ export const EmbedDirectTemplateClientPage = ({
 
         const newField: DirectTemplateLocalField = structuredClone({
           ...field,
-          customText: payload.value,
+          customText: payload.value ?? '',
           inserted: true,
           signedValue: payload,
         });
@@ -123,8 +127,10 @@ export const EmbedDirectTemplateClientPage = ({
             created: new Date(),
             recipientId: 1,
             fieldId: 1,
-            signatureImageAsBase64: payload.value.startsWith('data:') ? payload.value : null,
-            typedSignature: payload.value.startsWith('data:') ? null : payload.value,
+            signatureImageAsBase64:
+              payload.value && payload.value.startsWith('data:') ? payload.value : null,
+            typedSignature:
+              payload.value && !payload.value.startsWith('data:') ? payload.value : null,
           } satisfies Signature;
         }
 
@@ -182,7 +188,7 @@ export const EmbedDirectTemplateClientPage = ({
   };
 
   const onNextFieldClick = () => {
-    validateFieldsInserted(localFields);
+    validateFieldsInserted(pendingFields);
 
     setShowPendingFieldTooltip(true);
     setIsExpanded(false);
@@ -194,7 +200,7 @@ export const EmbedDirectTemplateClientPage = ({
         return;
       }
 
-      const valid = validateFieldsInserted(localFields);
+      const valid = validateFieldsInserted(pendingFields);
 
       if (!valid) {
         setShowPendingFieldTooltip(true);
@@ -207,12 +213,6 @@ export const EmbedDirectTemplateClientPage = ({
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
-      localFields.forEach((field) => {
-        if (!field.signedValue) {
-          throw new Error('Invalid configuration');
-        }
-      });
-
       const {
         documentId,
         token: documentToken,
@@ -223,13 +223,11 @@ export const EmbedDirectTemplateClientPage = ({
         directRecipientName: fullName,
         directRecipientEmail: email,
         templateUpdatedAt: updatedAt,
-        signedFieldValues: localFields.map((field) => {
-          if (!field.signedValue) {
-            throw new Error('Invalid configuration');
-          }
-
-          return field.signedValue;
-        }),
+        signedFieldValues: localFields
+          .filter((field) => {
+            return field.signedValue && (isRequiredField(field) || field.inserted);
+          })
+          .map((field) => field.signedValue!),
       });
 
       if (window.parent) {
@@ -288,7 +286,7 @@ export const EmbedDirectTemplateClientPage = ({
         document.documentElement.classList.add('dark-mode-disabled');
       }
 
-      if (isPlatformOrEnterprise) {
+      if (allowWhiteLabelling) {
         injectCss({
           css: data.css,
           cssVars: data.cssVars,
@@ -349,7 +347,7 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
@@ -360,19 +358,34 @@ export const EmbedDirectTemplateClientPage = ({
                   <Trans>Sign document</Trans>
                 </h3>
 
-                <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                  {isExpanded ? (
-                    <LucideChevronDown
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(false)}
-                    />
-                  ) : (
-                    <LucideChevronUp
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(true)}
-                    />
-                  )}
-                </Button>
+                {isExpanded ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(false)}
+                  >
+                    <LucideChevronDown className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : pendingFields.length > 0 ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(true)}
+                  >
+                    <LucideChevronUp className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="md:hidden"
+                    disabled={isThrottled || (hasSignatureField && !signatureValid)}
+                    loading={isSubmitting}
+                    onClick={() => throttledOnCompleteClick()}
+                  >
+                    <Trans>Complete</Trans>
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -417,40 +430,42 @@ export const EmbedDirectTemplateClientPage = ({
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="Signature">
-                    <Trans>Signature</Trans>
-                  </Label>
+                {hasSignatureField && (
+                  <div>
+                    <Label htmlFor="Signature">
+                      <Trans>Signature</Trans>
+                    </Label>
 
-                  <Card className="mt-2" gradient degrees={-120}>
-                    <CardContent className="p-0">
-                      <SignaturePad
-                        className="h-44 w-full"
-                        disabled={isThrottled || isSubmitting}
-                        defaultValue={signature ?? undefined}
-                        onChange={(value) => {
-                          setSignature(value);
-                        }}
-                        onValidityChange={(isValid) => {
-                          setSignatureValid(isValid);
-                        }}
-                        allowTypedSignature={Boolean(
-                          metadata &&
-                            'typedSignatureEnabled' in metadata &&
-                            metadata.typedSignatureEnabled,
-                        )}
-                      />
-                    </CardContent>
-                  </Card>
+                    <Card className="mt-2" gradient degrees={-120}>
+                      <CardContent className="p-0">
+                        <SignaturePad
+                          className="h-44 w-full"
+                          disabled={isThrottled || isSubmitting}
+                          defaultValue={signature ?? undefined}
+                          onChange={(value) => {
+                            setSignature(value);
+                          }}
+                          onValidityChange={(isValid) => {
+                            setSignatureValid(isValid);
+                          }}
+                          allowTypedSignature={Boolean(
+                            metadata &&
+                              'typedSignatureEnabled' in metadata &&
+                              metadata.typedSignatureEnabled,
+                          )}
+                        />
+                      </CardContent>
+                    </Card>
 
-                  {hasSignatureField && !signatureValid && (
-                    <div className="text-destructive mt-2 text-sm">
-                      <Trans>
-                        Signature is too small. Please provide a more complete signature.
-                      </Trans>
-                    </div>
-                  )}
-                </div>
+                    {hasSignatureField && !signatureValid && (
+                      <div className="text-destructive mt-2 text-sm">
+                        <Trans>
+                          Signature is too small. Please provide a more complete signature.
+                        </Trans>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

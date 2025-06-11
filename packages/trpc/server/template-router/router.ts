@@ -227,7 +227,8 @@ export const templateRouter = router({
     .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
-      const { templateId, recipients, distributeDocument, customDocumentDataId } = input;
+      const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
+        input;
 
       const limits = await getServerLimits({ email: ctx.user.email, teamId });
 
@@ -242,6 +243,7 @@ export const templateRouter = router({
         recipients,
         customDocumentDataId,
         requestMetadata: ctx.metadata,
+        prefillFields,
       });
 
       if (distributeDocument) {
