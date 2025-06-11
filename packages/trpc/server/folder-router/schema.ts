@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
+import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility } from '@documenso/prisma/generated/types';
 
 /**
@@ -110,13 +111,6 @@ export const ZGetFoldersResponseSchema = z.object({
 });
 
 export type TGetFoldersResponse = z.infer<typeof ZGetFoldersResponseSchema>;
-
-export const ZFindSearchParamsSchema = z.object({
-  query: z.string().optional(),
-  page: z.number().optional(),
-  perPage: z.number().optional(),
-  type: ZFolderTypeSchema.optional(),
-});
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
   parentId: z.string().nullable().optional(),

@@ -4,8 +4,6 @@ import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
-import { ZMapNegativeOneToUndefinedSchema } from './add-settings.types';
-
 export const ZAddSignersFormSchema = z
   .object({
     signers: z.array(
@@ -19,9 +17,7 @@ export const ZAddSignersFormSchema = z
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-          ZRecipientActionAuthTypesSchema.optional(),
-        ),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
     signingOrder: z.nativeEnum(DocumentSigningOrder),

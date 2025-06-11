@@ -17,10 +17,10 @@ import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes'
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
-import { type TGetTeamsResponse, getTeams } from '@documenso/lib/server-only/team/get-teams';
 import { createPublicEnv, env } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
+import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
 import { Toaster } from '@documenso/ui/primitives/toaster';
 import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
 
@@ -68,18 +68,18 @@ export const shouldRevalidate = () => false;
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
 
-  let teams: TGetTeamsResponse = [];
-
-  if (session.isAuthenticated) {
-    teams = await getTeams({ userId: session.user.id });
-  }
-
   const { getTheme } = await themeSessionResolver(request);
 
   let lang: SupportedLanguageCodes = await langCookie.parse(request.headers.get('cookie') ?? '');
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(lang)) {
     lang = extractLocaleData({ headers: request.headers }).lang;
+  }
+
+  let organisations = null;
+
+  if (session.isAuthenticated) {
+    organisations = await getOrganisationSession({ userId: session.user.id });
   }
 
   return data(
@@ -90,7 +90,7 @@ export async function loader({ request }: Route.LoaderArgs) {
         ? {
             user: session.user,
             session: session.session,
-            teams,
+            organisations: organisations || [],
           }
         : null,
       publicEnv: createPublicEnv(),

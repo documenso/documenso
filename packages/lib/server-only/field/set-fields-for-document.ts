@@ -26,10 +26,11 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   fields: FieldData[];
   requestMetadata: ApiRequestMetadata;
@@ -42,25 +43,14 @@ export const setFieldsForDocument = async ({
   fields,
   requestMetadata,
 }: SetFieldsForDocumentOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       recipients: true,
     },

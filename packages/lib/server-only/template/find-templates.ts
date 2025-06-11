@@ -3,12 +3,12 @@ import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
 import { type FindResultResponse } from '../../types/search-params';
+import { getMemberRoles } from '../team/get-member-roles';
 
 export type FindTemplatesOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   type?: Template['type'];
   page?: number;
   perPage?: number;
@@ -26,28 +26,23 @@ export const findTemplates = async ({
   const whereFilter: Prisma.TemplateWhereInput[] = [];
 
   if (teamId === undefined) {
-    whereFilter.push({ userId, teamId: null });
+    whereFilter.push({ userId });
   }
 
   if (teamId !== undefined) {
-    const teamMember = await prisma.teamMember.findFirst({
-      where: {
-        userId,
-        teamId,
+    const { teamRole } = await getMemberRoles({
+      teamId,
+      reference: {
+        type: 'User',
+        id: userId,
       },
     });
-
-    if (!teamMember) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You are not a member of this team.',
-      });
-    }
 
     whereFilter.push(
       { teamId },
       {
         OR: [
-          match(teamMember.role)
+          match(teamRole)
             .with(TeamMemberRole.ADMIN, () => ({
               visibility: {
                 in: [

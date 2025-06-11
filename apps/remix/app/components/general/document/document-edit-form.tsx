@@ -29,13 +29,12 @@ import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentEditFormProps = {
   className?: string;
   initialDocument: TDocument;
   documentRootPath: string;
-  isDocumentEnterprise: boolean;
 };
 
 type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
@@ -45,7 +44,6 @@ export const DocumentEditForm = ({
   className,
   initialDocument,
   documentRootPath,
-  isDocumentEnterprise,
 }: DocumentEditFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -53,7 +51,7 @@ export const DocumentEditForm = ({
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
@@ -183,8 +181,8 @@ export const DocumentEditForm = ({
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
-          globalAccessAuth: data.globalAccessAuth ?? null,
-          globalActionAuth: data.globalActionAuth ?? null,
+          globalAccessAuth: data.globalAccessAuth ?? [],
+          globalActionAuth: data.globalActionAuth ?? [],
         },
         meta: {
           timezone,
@@ -229,7 +227,7 @@ export const DocumentEditForm = ({
           recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
-            actionAuth: signer.actionAuth || null,
+            actionAuth: signer.actionAuth ?? [],
           })),
         }),
       ]);
@@ -355,10 +353,9 @@ export const DocumentEditForm = ({
               key={recipients.length}
               documentFlow={documentFlow.settings}
               document={document}
-              currentTeamMemberRole={team?.currentTeamMember?.role}
+              currentTeamMemberRole={team.currentTeamRole}
               recipients={recipients}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               onSubmit={onAddSettingsFormSubmit}
             />
@@ -370,7 +367,6 @@ export const DocumentEditForm = ({
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
@@ -382,7 +378,7 @@ export const DocumentEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              teamId={team?.id}
+              teamId={team.id}
             />
 
             <AddSubjectFormPartial

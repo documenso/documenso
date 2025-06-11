@@ -15,6 +15,11 @@ import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog'
 import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
+
+export function meta() {
+  return appMetaTags('Webhooks');
+}
 
 export default function WebhookPage() {
   const { _, i18n } = useLingui();
