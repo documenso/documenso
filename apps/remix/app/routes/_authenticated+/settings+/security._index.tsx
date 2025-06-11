@@ -171,6 +171,27 @@ export default function SettingsSecurity({ loaderData }: Route.ComponentProps) {
           </Link>
         </Button>
       </Alert>
+
+      <Alert
+        className="mt-6 flex flex-col justify-between p-6 sm:flex-row sm:items-center"
+        variant="neutral"
+      >
+        <div className="mb-4 mr-4 sm:mb-0">
+          <AlertTitle>
+            <Trans>Active sessions</Trans>
+          </AlertTitle>
+
+          <AlertDescription className="mr-2">
+            <Trans>View and manage all active sessions for your account.</Trans>
+          </AlertDescription>
+        </div>
+
+        <Button asChild variant="outline" className="bg-background">
+          <Link to="/settings/security/sessions">
+            <Trans>Manage sessions</Trans>
+          </Link>
+        </Button>
+      </Alert>
     </div>
   );
 }
