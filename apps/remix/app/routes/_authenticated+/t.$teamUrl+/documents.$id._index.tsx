@@ -10,6 +10,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { isDocumentBeingProcessed } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -23,6 +24,7 @@ import { DocumentPageViewDropdown } from '~/components/general/document/document
 import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
 import { DocumentPageViewRecentActivity } from '~/components/general/document/document-page-view-recent-activity';
 import { DocumentPageViewRecipients } from '~/components/general/document/document-page-view-recipients';
+import { DocumentProcessingPoll } from '~/components/general/document/document-processing-poll';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import {
   DocumentStatus as DocumentStatusComponent,
@@ -128,6 +130,7 @@ export default function DocumentPage() {
             <DocumentStatusComponent
               inheritColor
               status={document.status}
+              isProcessing={isDocumentBeingProcessed(document)}
               className="text-muted-foreground"
             />
 
@@ -241,6 +244,8 @@ export default function DocumentPage() {
           </div>
         </div>
       </div>
+
+      <DocumentProcessingPoll documents={document} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
+import { isDocumentBeingProcessed } from '@documenso/lib/utils/document';
 import { trpc } from '@documenso/trpc/react';
 import {
   Accordion,
@@ -24,6 +25,7 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
+import { DocumentProcessingPoll } from '~/components/general/document/document-processing-poll';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
 
@@ -69,7 +71,10 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-x-4">
           <h1 className="text-2xl font-semibold">{document.title}</h1>
-          <DocumentStatus status={document.status} />
+          <DocumentStatus
+            status={document.status}
+            isProcessing={isDocumentBeingProcessed(document)}
+          />
         </div>
 
         {document.deletedAt && (
@@ -162,6 +167,8 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       <hr className="my-4" />
 
       {document && <AdminDocumentDeleteDialog document={document} />}
+
+      <DocumentProcessingPoll documents={document} />
     </div>
   );
 }

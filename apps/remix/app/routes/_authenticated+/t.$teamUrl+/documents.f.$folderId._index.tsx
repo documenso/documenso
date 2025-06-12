@@ -26,6 +26,7 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
 import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
+import { DocumentProcessingPoll } from '~/components/general/document/document-processing-poll';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
@@ -314,6 +315,8 @@ export default function DocumentsPage() {
                 }}
               />
             )}
+
+            <DocumentProcessingPoll documents={data?.data} />
           </div>
         </div>
 
