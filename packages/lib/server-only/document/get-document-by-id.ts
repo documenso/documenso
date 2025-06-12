@@ -85,6 +85,7 @@ export const getDocumentWhereInput = async ({
 
   const documentOrInput: Prisma.DocumentWhereInput[] = [
     {
+      userId: userId,
       teamId: team.id,
     },
   ];
@@ -149,7 +150,7 @@ export const getDocumentWhereInput = async ({
   return {
     documentWhereInput: {
       ...documentWhereInput,
-      OR: [...visibilityFilters],
+      // OR: [...visibilityFilters],
     },
     team,
   };
