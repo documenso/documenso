@@ -66,7 +66,7 @@ export const getServerLimits = async ({
     };
   }
 
-  // If plan expired.
+  // Early return for users with an expired subscription.
   if (subscription && subscription.status !== SubscriptionStatus.ACTIVE) {
     return {
       quota: INACTIVE_PLAN_LIMITS,
@@ -74,52 +74,46 @@ export const getServerLimits = async ({
     };
   }
 
-  if (subscription && organisation.organisationClaim.flags.unlimitedDocuments) {
+  // Allow unlimited documents for users with an unlimited documents claim.
+  // This also allows "free" claim users without subscriptions if they have this flag.
+  if (organisation.organisationClaim.flags.unlimitedDocuments) {
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
     };
   }
 
-  // If free tier or plan does not have unlimited documents.
-  if (!subscription || !organisation.organisationClaim.flags.unlimitedDocuments) {
-    const [documents, directTemplates] = await Promise.all([
-      prisma.document.count({
-        where: {
-          team: {
-            organisationId: organisation.id,
-          },
-          createdAt: {
-            gte: DateTime.utc().startOf('month').toJSDate(),
-          },
-          source: {
-            not: DocumentSource.TEMPLATE_DIRECT_LINK,
-          },
+  const [documents, directTemplates] = await Promise.all([
+    prisma.document.count({
+      where: {
+        team: {
+          organisationId: organisation.id,
         },
-      }),
-      prisma.template.count({
-        where: {
-          team: {
-            organisationId: organisation.id,
-          },
-          directLink: {
-            isNot: null,
-          },
+        createdAt: {
+          gte: DateTime.utc().startOf('month').toJSDate(),
         },
-      }),
-    ]);
+        source: {
+          not: DocumentSource.TEMPLATE_DIRECT_LINK,
+        },
+      },
+    }),
+    prisma.template.count({
+      where: {
+        team: {
+          organisationId: organisation.id,
+        },
+        directLink: {
+          isNot: null,
+        },
+      },
+    }),
+  ]);
 
-    remaining.documents = Math.max(remaining.documents - documents, 0);
-    remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
-
-    return {
-      quota,
-      remaining,
-    };
-  }
+  remaining.documents = Math.max(remaining.documents - documents, 0);
+  remaining.directTemplates = Math.max(remaining.directTemplates - directTemplates, 0);
 
   return {
-    quota: PAID_PLAN_LIMITS,
-    remaining: PAID_PLAN_LIMITS,
+    quota,
+    remaining,
   };
 };
