@@ -1,11 +1,5 @@
 import { z } from 'zod';
 
-export const ZGetApiTokenByIdQuerySchema = z.object({
-  id: z.number().min(1),
-});
-
-export type TGetApiTokenByIdQuerySchema = z.infer<typeof ZGetApiTokenByIdQuerySchema>;
-
 export const ZCreateTokenMutationSchema = z.object({
   teamId: z.number(),
   tokenName: z.string().min(3, { message: 'The token name should be 3 characters or longer' }),
