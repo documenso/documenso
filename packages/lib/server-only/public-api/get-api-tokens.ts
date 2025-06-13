@@ -11,7 +11,6 @@ export type GetApiTokensOptions = {
 export const getApiTokens = async ({ userId, teamId }: GetApiTokensOptions) => {
   return await prisma.apiToken.findMany({
     where: {
-      userId,
       team: buildTeamWhereQuery({
         teamId,
         userId,
