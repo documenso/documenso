@@ -8,7 +8,7 @@ msgstr ""
 "Language: sq\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-10 02:27\n"
+"PO-Revision-Date: 2025-06-12 02:33\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -752,6 +752,11 @@ msgstr "Veprime"
 msgid "Active"
 msgstr "Aktive"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Active sessions"
+msgstr "Seanca aktive"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
 msgstr "Abonime aktive"
@@ -818,12 +823,12 @@ msgid "Add group roles"
 msgstr "Shto rolet e grupeve"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add groups"
 msgstr "Shto grupet"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add members"
 msgstr "Shto anëtarët"
 
@@ -1614,6 +1619,7 @@ msgstr "Mund të përgatitë"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -2221,6 +2227,7 @@ msgstr "Krijoni llogarinë tuaj dhe filloni të përdorni nënshkrimin e dokumen
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Krijoni llogarinë tuaj dhe filloni të përdorni nënshkrimin e dokumenteve në gjendje të artit. Nënshkrimi i hapur dhe i bukur është brenda arritjes tuaj."
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -2259,6 +2266,10 @@ msgstr "Krijuar më {0}"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "Struktura CSV"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Current"
+msgstr "Aktual"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -2453,6 +2464,7 @@ msgid "Details"
 msgstr "Detaje"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Device"
 msgstr "Pajisje"
@@ -3179,6 +3191,7 @@ msgstr "Ndërmarrje"
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -3221,6 +3234,7 @@ msgstr "Ndërmarrje"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -3286,9 +3300,17 @@ msgstr "Dështoi ngarkimi i dokumentit"
 msgid "Failed to reseal document"
 msgstr "Dështoi rihapja e dokumentit"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Failed to revoke session"
+msgstr "Dështoi të revokojë seancën"
+
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
 msgstr "Dështoi të ruajë parametrat."
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Failed to sign out all sessions"
+msgstr "Dështoi të dilni nga të gjitha sesionet"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
@@ -3747,7 +3769,6 @@ msgstr "Kodi i pavlefshëm. Ju lutemi provoni përsëri."
 msgid "Invalid email"
 msgstr "Email i pavlefshëm"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
 msgstr "Lidhja e pavlefshme"
@@ -3811,6 +3832,7 @@ msgid "Invoice"
 msgstr "Fatura"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 msgid "IP Address"
 msgstr "Adresa IP"
@@ -3880,6 +3902,10 @@ msgstr "30 ditët e fundit"
 #: apps/remix/app/components/general/period-selector.tsx
 msgid "Last 7 days"
 msgstr "7 ditët e fundit"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Last Active"
+msgstr "Aktiviteti i fundit"
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4029,6 +4055,10 @@ msgstr "Menaxho çelësat e aksesit"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage permissions and access controls"
 msgstr "Menaxhoni lejet dhe kontrollin e qasjes"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Manage sessions"
+msgstr "Menaxho seancat"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -5305,7 +5335,6 @@ msgstr "Ruajtja e Dokumenteve"
 msgid "Retry"
 msgstr "Provoni përsëri"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
@@ -5321,6 +5350,7 @@ msgstr "Kthehu në Faqen Kryesore"
 msgid "Return to sign in"
 msgstr "Kthehu te Hyrja"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke"
 msgstr "Revoko"
@@ -5328,6 +5358,12 @@ msgstr "Revoko"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke access"
 msgstr "Revoko qasje"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Revoke all sessions"
+msgstr "Revoko të gjitha seancat"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -5482,6 +5518,10 @@ msgid "Select groups"
 msgstr "Zgjidh grupet"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+msgid "Select groups of members to add to the team."
+msgstr "Zgjidh grupet e anëtarëve për t'i shtuar në ekip."
+
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
 msgstr "Zgjidh grupet për t'u shtuar në këtë ekip"
 
@@ -5492,7 +5532,6 @@ msgid "Select members"
 msgstr "Zgjidh anëtarët"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select members or groups of members to add to the team."
 msgstr "Zgjidh anëtarët ose grupet e anëtarëve për t'i shtuar në ekip."
 
@@ -5601,6 +5640,14 @@ msgstr "Duke Dërguar..."
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Sent"
 msgstr "Dërguar"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Session revoked"
+msgstr "Sesion i revokuar"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Sessions have been revoked"
+msgstr "Sesione janë revokuar"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
@@ -6784,10 +6831,6 @@ msgstr "Kështu do të arrijë dokumenti te marrësit sapo dokumenti të jetë g
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
 msgstr "Kjo është kërkesa që kjo organizatë fillimisht u krijua me të. Çdo ndryshim në flamurët e veçorive në këtë kërkesë do të transferohet në këtë organizatë."
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
-msgid "This link is invalid or has expired."
-msgstr "Ky lidhje është e pavlefshme ose ka skaduar."
-
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "Ky link është i pavlefshëm ose ka skaduar. Ju lutem kontaktoni ekipin tuaj për të dërguar përsëri një verifikim."
@@ -6857,6 +6900,10 @@ msgstr "Kjo do të dërgohet pronarit të dokumentit sapo dokumenti të jetë pl
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
 msgstr "Kjo do të TRANSFEROHET VETËM flamujt e veçorive që janë vendosur në të vërtetë, çdo gjë që është çaktivizuar në kërkesën fillestare nuk do të transferohet"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
+msgstr "Kjo do t'ju nxjerrë nga të gjitha pajisjet e tjera. Do të duhet të hyni përsëri në ato pajisje për të vazhduar përdorimin e llogarisë suaj."
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7144,6 +7191,9 @@ msgstr "I papërfunduar"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Unknown"
 msgstr "E panjohur"
 
@@ -7496,6 +7546,11 @@ msgstr "Shiko të gjitha dokumentet e lidhura"
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 msgid "View all security activity related to your account."
 msgstr "Shiko të gjitha aktivitetet e sigurisë lidhur me llogarinë tuaj."
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "View and manage all active sessions for your account."
+msgstr "Shiko dhe menaxho të gjitha seancat aktive për llogarinë tuaj."
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
