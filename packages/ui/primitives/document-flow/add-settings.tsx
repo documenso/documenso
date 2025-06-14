@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
@@ -9,6 +9,7 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
@@ -74,6 +75,7 @@ export type AddSettingsFormProps = {
   document: TDocument;
   currentTeamMemberRole?: TeamMemberRole;
   onSubmit: (_data: TAddSettingsFormSchema) => void;
+  onAutoSave: (_data: TAddSettingsFormSchema) => Promise<void>;
 };
 
 export const AddSettingsFormPartial = ({
@@ -84,6 +86,7 @@ export const AddSettingsFormPartial = ({
   document,
   currentTeamMemberRole,
   onSubmit,
+  onAutoSave,
 }: AddSettingsFormProps) => {
   const { t } = useLingui();
 
@@ -156,6 +159,30 @@ export const AddSettingsFormPartial = ({
     document.documentMeta?.timezone,
   ]);
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = useCallback(() => {
+    const { isDirty } = form.formState;
+
+    if (!isDirty) {
+      return;
+    }
+
+    const formData = form.getValues();
+
+    /*
+     * Parse the form data through the Zod schema to handle transformations
+     * (like -1 -> undefined for the Document Global Auth Access)
+     */
+    const parseResult = ZAddSettingsFormSchema.safeParse(formData);
+
+    if (parseResult.success) {
+      scheduleSave(parseResult.data);
+    } else {
+      console.log('Form validation failed during auto-save:', parseResult.error);
+    }
+  }, [form, form.formState.isDirty, scheduleSave]);
+
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -191,6 +218,7 @@ export const AddSettingsFormPartial = ({
                       className="bg-background"
                       {...field}
                       disabled={document.status !== DocumentStatus.DRAFT || field.disabled}
+                      onBlur={handleAutoSave}
                     />
                   </FormControl>
                   <FormMessage />
@@ -222,9 +250,13 @@ export const AddSettingsFormPartial = ({
 
                   <FormControl>
                     <Select
+                      {...field}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void handleAutoSave();
+                      }}
                       value={field.value}
                       disabled={field.disabled}
-                      onValueChange={field.onChange}
                     >
                       <SelectTrigger className="bg-background">
                         <SelectValue />
@@ -256,9 +288,13 @@ export const AddSettingsFormPartial = ({
 
                   <FormControl>
                     <DocumentGlobalAuthAccessSelect
+                      {...field}
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        void handleAutoSave();
+                      }}
                       value={field.value}
                       disabled={field.disabled}
-                      onValueChange={field.onChange}
                     />
                   </FormControl>
                 </FormItem>
@@ -281,7 +317,10 @@ export const AddSettingsFormPartial = ({
                         canUpdateVisibility={canUpdateVisibility}
                         currentTeamMemberRole={currentTeamMemberRole}
                         {...field}
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          void handleAutoSave();
+                        }}
                       />
                     </FormControl>
                   </FormItem>
@@ -302,9 +341,13 @@ export const AddSettingsFormPartial = ({
 
                     <FormControl>
                       <DocumentGlobalAuthActionSelect
+                        {...field}
+                        onValueChange={(value) => {
+                          field.onChange(value);
+                          void handleAutoSave();
+                        }}
                         value={field.value}
                         disabled={field.disabled}
-                        onValueChange={field.onChange}
                       />
                     </FormControl>
                   </FormItem>
@@ -342,7 +385,7 @@ export const AddSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} />
+                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
@@ -367,7 +410,10 @@ export const AddSettingsFormPartial = ({
                                 value: option.value,
                               }))}
                               selectedValues={field.value}
-                              onChange={field.onChange}
+                              onChange={(value) => {
+                                field.onChange(value);
+                                void handleAutoSave();
+                              }}
                               className="bg-background w-full"
                               emptySelectionPlaceholder="Select signature types"
                             />
@@ -389,8 +435,12 @@ export const AddSettingsFormPartial = ({
 
                           <FormControl>
                             <Select
+                              {...field}
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                                void handleAutoSave();
+                              }}
                               value={field.value}
-                              onValueChange={field.onChange}
                               disabled={documentHasBeenSent}
                             >
                               <SelectTrigger className="bg-background">
@@ -425,8 +475,12 @@ export const AddSettingsFormPartial = ({
                             <Combobox
                               className="bg-background"
                               options={TIME_ZONES}
+                              {...field}
+                              onChange={(value) => {
+                                value && field.onChange(value);
+                                void handleAutoSave();
+                              }}
                               value={field.value}
-                              onChange={(value) => value && field.onChange(value)}
                               disabled={documentHasBeenSent}
                             />
                           </FormControl>
@@ -457,7 +511,7 @@ export const AddSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} />
+                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
