@@ -9,7 +9,7 @@ import { match } from 'ts-pattern';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { isDocumentBeingProcessed, isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
@@ -77,7 +77,12 @@ export const DocumentsTable = ({
       {
         header: _(msg`Status`),
         accessorKey: 'status',
-        cell: ({ row }) => <DocumentStatus status={row.original.status} />,
+        cell: ({ row }) => (
+          <DocumentStatus
+            status={row.original.status}
+            isProcessing={isDocumentBeingProcessed(row.original)}
+          />
+        ),
         size: 140,
       },
       {

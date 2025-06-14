@@ -3,8 +3,14 @@ import { useEffect } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Document, DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
+import {
+  type Document,
+  DocumentStatus,
+  FieldType,
+  RecipientRole,
+  SigningStatus,
+} from '@prisma/client';
+import { CheckCircle2, Clock8, FileSearch, Loader2 } from 'lucide-react';
 import { Link, useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -16,10 +22,11 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get-recipient-signatures';
+import { getAllRecipientsByDocumentId } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
-import DocumentDialog from '@documenso/ui/components/document/document-dialog';
+import { DocumentDialog } from '@documenso/ui/components/document/document-dialog';
 import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -50,9 +57,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw new Response('Not Found', { status: 404 });
   }
 
-  const [fields, recipient] = await Promise.all([
+  const [fields, recipient, allRecipients] = await Promise.all([
     getFieldsForToken({ token }),
     getRecipientByToken({ token }).catch(() => null),
+    getAllRecipientsByDocumentId({ documentId: document.id }),
   ]);
 
   if (!recipient) {
@@ -66,17 +74,26 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     userId: user?.id,
   });
 
+  const isDocumentWaitingForSignatureFromOthers =
+    allRecipients.length > 1 &&
+    allRecipients.some(
+      (r) => r.role !== RecipientRole.CC && r.signingStatus !== SigningStatus.SIGNED,
+    );
+
   if (!isDocumentAccessValid) {
     return {
       isDocumentAccessValid: false,
       recipientEmail: recipient.email,
+      isDocumentWaitingForSignatureFromOthers,
     } as const;
   }
 
   const signatures = await getRecipientSignatures({ recipientId: recipient.id });
-  const isExistingUser = await getUserByEmail({ email: recipient.email })
-    .then((u) => !!u)
-    .catch(() => false);
+  const isExistingUser = recipient.email
+    ? await getUserByEmail({ email: recipient.email })
+        .then((u) => !!u)
+        .catch(() => false)
+    : false;
 
   const recipientName =
     recipient.name ||
@@ -93,6 +110,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     signatures,
     document,
     recipient,
+    isDocumentWaitingForSignatureFromOthers,
   };
 }
 
@@ -110,10 +128,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     document,
     recipient,
     recipientEmail,
+    isDocumentWaitingForSignatureFromOthers,
   } = loaderData;
 
   if (!isDocumentAccessValid) {
-    return <DocumentSigningAuthPageView email={recipientEmail} />;
+    return <DocumentSigningAuthPageView email={recipientEmail ?? ''} />;
   }
 
   return (
@@ -142,7 +161,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
           {/* Card with recipient */}
           <SigningCard3D
-            name={recipientName}
+            name={recipientName ?? ''}
             signature={signatures.at(0)}
             signingCelebrationImage={signingCelebration}
           />
@@ -153,7 +172,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
           </h2>
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
+          {match({
+            status: document.status,
+            deletedAt: document.deletedAt,
+            waitingForOthers: isDocumentWaitingForSignatureFromOthers,
+          })
             .with({ status: DocumentStatus.COMPLETED }, () => (
               <div className="text-documenso-700 mt-4 flex items-center text-center">
                 <CheckCircle2 className="mr-2 h-5 w-5" />
@@ -162,7 +185,15 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 </span>
               </div>
             ))
-            .with({ deletedAt: null }, () => (
+            .with({ deletedAt: null, waitingForOthers: false }, () => (
+              <div className="mt-4 flex items-center text-center text-blue-600">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span className="text-sm">
+                  <Trans>Processing document...</Trans>
+                </span>
+              </div>
+            ))
+            .with({ deletedAt: null, waitingForOthers: true }, () => (
               <div className="mt-4 flex items-center text-center text-blue-600">
                 <Clock8 className="mr-2 h-5 w-5" />
                 <span className="text-sm">
@@ -179,7 +210,11 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </div>
             ))}
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
+          {match({
+            status: document.status,
+            deletedAt: document.deletedAt,
+            waitingForOthers: isDocumentWaitingForSignatureFromOthers,
+          })
             .with({ status: DocumentStatus.COMPLETED }, () => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
                 <Trans>
@@ -187,7 +222,15 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 </Trans>
               </p>
             ))
-            .with({ deletedAt: null }, () => (
+            .with({ deletedAt: null, waitingForOthers: false }, () => (
+              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+                <Trans>
+                  All parties have completed their actions. The document is now being finalized. You
+                  will receive an Email copy once it is ready.
+                </Trans>
+              </p>
+            ))
+            .with({ deletedAt: null, waitingForOthers: true }, () => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
                 <Trans>
                   You will receive an Email copy of the signed document once everyone has signed.
@@ -244,7 +287,10 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 </Trans>
               </p>
 
-              <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
+              <ClaimAccount
+                defaultName={recipientName ?? ''}
+                defaultEmail={recipient.email ?? ''}
+              />
             </div>
           )}
 
