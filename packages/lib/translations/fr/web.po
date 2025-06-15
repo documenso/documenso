@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-10 02:27\n"
+"PO-Revision-Date: 2025-06-12 02:33\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -755,7 +755,7 @@ msgstr "Actif"
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Active sessions"
-msgstr ""
+msgstr "Sessions actives"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
@@ -2269,7 +2269,7 @@ msgstr "Structure CSV"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
-msgstr ""
+msgstr "Actuel"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -3302,7 +3302,7 @@ msgstr "Échec du reseal du document"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Failed to revoke session"
-msgstr ""
+msgstr "Échec de la révocation de la session"
 
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
@@ -3310,7 +3310,7 @@ msgstr "Échec de l'enregistrement des paramètres."
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Failed to sign out all sessions"
-msgstr ""
+msgstr "Impossible de se déconnecter de toutes les sessions"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
@@ -3905,7 +3905,7 @@ msgstr "7 derniers jours"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Last Active"
-msgstr ""
+msgstr "Dernière activité"
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4058,7 +4058,7 @@ msgstr "Gérez les autorisations et les contrôles d'accès"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Manage sessions"
-msgstr ""
+msgstr "Gérer les sessions"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -5363,7 +5363,7 @@ msgstr "Révoquer l'accès"
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Revoke all sessions"
-msgstr ""
+msgstr "Révoquer toutes les sessions"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -5519,7 +5519,7 @@ msgstr "Sélectionnez des groupes"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups of members to add to the team."
-msgstr ""
+msgstr "Sélectionnez des groupes de membres à ajouter à l'équipe."
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
@@ -5643,11 +5643,11 @@ msgstr "Envoyé"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
-msgstr ""
+msgstr "Session révoquée"
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Sessions have been revoked"
-msgstr ""
+msgstr "Les sessions ont été révoquées"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
@@ -6523,8 +6523,7 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "L'équipe suivante a été supprimée. Vous ne pourrez plus accéder à cette équipe et à ses documents"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid ""
-"The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Le groupe d'organisation que vous cherchez peut avoir été supprimé, renommé ou n'a peut-être jamais existé."
 
@@ -6533,14 +6532,12 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Le rôle d'organisation qui sera appliqué à tous les membres de ce groupe."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "L'organisation que vous cherchez peut avoir été supprimée, renommée ou n'a peut-être jamais existé."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "L'organisation que vous cherchez peut avoir été supprimée, renommée ou n'a peut-être jamais existé."
 
@@ -6624,14 +6621,12 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "L'email d'équipe <0>{teamEmail}</0> a été supprimé de l'équipe suivante"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "L'équipe que vous cherchez peut avoir été supprimée, renommée ou n'a peut-être jamais existé."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "L'équipe que vous cherchez a peut-être été supprimée, renommée ou n'a peut-être jamais existé."
 
@@ -6669,8 +6664,7 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "L'URL pour Documenso pour envoyer des événements webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid ""
-"The user you are looking for may have been removed, renamed or may have never\n"
+msgid "The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "L'utilisateur que vous cherchez peut avoir été supprimé, renommé ou n'a peut-être jamais existé."
 
@@ -6909,7 +6903,7 @@ msgstr "Cela ne fera que rétroporter les drapeaux de fonctionnalité qui sont a
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
-msgstr ""
+msgstr "Cela entraînera votre déconnexion de tous les autres appareils. Vous devrez vous reconnecter sur ces appareils pour continuer à utiliser votre compte."
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7556,7 +7550,7 @@ msgstr "Voir toute l'activité de sécurité liée à votre compte."
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View and manage all active sessions for your account."
-msgstr ""
+msgstr "Afficher et gérer toutes les sessions actives de votre compte."
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -8624,3 +8618,4 @@ msgstr "Votre token a été créé avec succès ! Assurez-vous de le copier car 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Vos tokens seront affichés ici une fois que vous les aurez créés."
+
