@@ -30,8 +30,3 @@ export const getCertificateStatus = (): CertificateStatus => {
     return { isAvailable: false };
   }
 };
-
-export const getCertificateHealthSummary = (): string => {
-  const status = getCertificateStatus();
-  return status.isAvailable ? '✅ Certificate configured' : '❌ Certificate not available';
-};
