@@ -89,7 +89,83 @@ Replace the placeholders with your actual database and SMTP details.
 
 ## Success
 
-You have now successfully set up Documenso using Docker. You can start organizing and managing your documents efficiently. If you encounter any issues or have further questions, please refer to the official Documenso documentation or seek assistance from the community.
+You have now successfully set up Documenso using Docker. You can start organizing and managing your documents efficiently.
+
+## Troubleshooting
+
+### Certificate Permission Issues
+
+If you encounter errors related to certificate access, here are common solutions:
+
+#### Error: "Failed to read signing certificate"
+
+1. **Check file exists:**
+   ```bash
+   ls -la /path/to/your/cert.p12
+   ```
+
+2. **Fix permissions:**
+   ```bash
+   chmod 644 /path/to/your/cert.p12
+   chown 1001:1001 /path/to/your/cert.p12
+   ```
+
+3. **Verify Docker mount:**
+   ```bash
+   docker exec -it <container_name> ls -la /opt/documenso/cert.p12
+   ```
+
+#### Alternative: Use Base64 Encoding
+
+To avoid file permission issues entirely, encode your certificate:
+
+```bash
+# Encode your certificate
+base64 -i /path/to/your/cert.p12 -o cert_base64.txt
+
+# Add to your .env file
+echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
+
+# Remove the file path variable if using base64
+sed -i '/NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH/d' .env
+```
+
+### Container Logs
+
+Check application logs for detailed error information:
+
+```bash
+# For Docker Compose
+docker-compose logs -f documenso
+
+# For standalone container
+docker logs -f <container_name>
+```
+
+### Health Checks
+
+Check the status of your Documenso instance:
+
+```bash
+# Basic health check (database + certificate)
+curl http://localhost:3000/api/health
+
+# Detailed certificate status
+curl http://localhost:3000/api/certificate-status
+```
+
+The health endpoint will show:
+- `status: "ok"` - Everything working properly
+- `status: "warning"` - App running but certificate issues
+- `status: "error"` - Critical issues (database down, etc.)
+
+### Common Issues
+
+1. **Port already in use:** Change the port mapping in compose.yml or your docker run command
+2. **Database connection issues:** Ensure your database is running and accessible
+3. **SMTP errors:** Verify your email server settings in the .env file
+
+If you encounter any issues or have further questions, please refer to the official Documenso documentation or seek assistance from the community.
 
 ## Advanced Configuration
 

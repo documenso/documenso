@@ -1,5 +1,6 @@
-import fs from 'node:fs';
+import * as fs from 'node:fs';
 
+import { getCertificateStatus } from '@documenso/lib/server-only/cert/cert-status';
 import { env } from '@documenso/lib/utils/env';
 import { signWithP12 } from '@documenso/pdf-sign';
 
@@ -22,12 +23,37 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
   const signatureLength = byteRange[2] - byteRange[1];
 
+  const certStatus = getCertificateStatus();
+
+  if (!certStatus.isAvailable) {
+    const errorMessage = [
+      '🚫 Document signing failed: Certificate not available',
+      '',
+      `❌ Issue: ${certStatus.error}`,
+      '',
+      '🛠️  Solutions:',
+      ...certStatus.recommendations.map((rec) => `   • ${rec}`),
+      '',
+      '📚 For detailed setup instructions, visit:',
+      '   https://docs.documenso.com/developers/self-hosting/signing-certificate',
+    ].join('\n');
+
+    console.error('Certificate error:', errorMessage);
+    throw new Error(errorMessage);
+  }
+
   let cert: Buffer | null = null;
 
   const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');
 
   if (localFileContents) {
-    cert = Buffer.from(localFileContents, 'base64');
+    try {
+      cert = Buffer.from(localFileContents, 'base64');
+    } catch (error) {
+      throw new Error(
+        `Failed to decode base64 certificate contents: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 
   if (!cert) {
@@ -42,7 +68,14 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
       certPath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || './example/cert.p12';
     }
 
-    cert = Buffer.from(fs.readFileSync(certPath));
+    try {
+      cert = Buffer.from(fs.readFileSync(certPath));
+    } catch (error) {
+      // This shouldn't happen since we already checked in getCertificateStatus, but just in case
+      const errorMessage = `Failed to read certificate file: ${error instanceof Error ? error.message : 'Unknown error'}`;
+      console.error('Certificate reading error:', errorMessage);
+      throw new Error(errorMessage);
+    }
   }
 
   const signature = signWithP12({

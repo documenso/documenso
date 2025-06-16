@@ -63,7 +63,7 @@ services:
     ports:
       - ${PORT:-3000}:${PORT:-3000}
     volumes:
-      - /opt/documenso/cert.p12:/opt/documenso/cert.p12
+      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
 
 volumes:
   database:

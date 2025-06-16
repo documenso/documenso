@@ -119,16 +119,66 @@ NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
 NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
 ```
 
-### Update the Volume Binding
+### Set Up Your Signing Certificate
 
-The `cert.p12` file is required to sign and encrypt documents, so you must provide your key file. Update the volume binding in the `compose.yml` file to point to your key file:
+<Callout type="warning">
+  This is the most common source of issues for self-hosters. Please follow these steps carefully.
+</Callout>
 
-```yaml
-volumes:
-  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+The `cert.p12` file is required to sign and encrypt documents. You have two options:
+
+#### Option A: Use the Automated Setup Script (Recommended)
+
+Download and run our setup script that handles certificate configuration automatically:
+
+```bash
+curl -o setup-selfhost.sh https://raw.githubusercontent.com/documenso/documenso/main/docker/setup-selfhost.sh
+chmod +x setup-selfhost.sh
+./setup-selfhost.sh
 ```
 
-After updating the volume binding, save the `compose.yml` file and run the following command to start the containers:
+This script will guide you through:
+
+- Certificate setup (existing file or generating a new one)
+- Environment variable configuration
+- Docker Compose file download
+- Proper file permissions
+
+#### Option B: Manual Certificate Setup
+
+If you prefer to set up manually, follow these steps:
+
+1. **Place your certificate file** in a accessible location on your host system
+2. **Set proper permissions:**
+
+   ```bash
+   # Make sure the certificate is readable
+   chmod 644 /path/to/your/cert.p12
+
+   # For Docker, ensure proper ownership
+   chown 1001:1001 /path/to/your/cert.p12
+   ```
+
+3. **Update the volume binding** in the `compose.yml` file:
+
+   ```yaml
+   volumes:
+     - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
+   ```
+
+4. **Add certificate configuration** to your `.env` file:
+   ```bash
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_passphrase_if_any
+   ```
+
+<Callout type="info">
+  **Alternative:** Instead of mounting a file, you can provide the certificate as a base64-encoded
+  environment variable: ```bash NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=base64_encoded_cert_content
+  ``` This approach avoids file permission issues entirely.
+</Callout>
+
+After setting up your certificate, save the `compose.yml` file and run the following command to start the containers:
 
 ```bash
 docker-compose --env-file ./.env up -d
