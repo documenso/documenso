@@ -17,31 +17,6 @@ export const getOrganisationsWithSubscriptionsCount = async () => {
   });
 };
 
-export const getUserWithAtLeastOneDocumentPerMonth = async () => {
-  const result = await prisma.$queryRaw<[{ count: bigint }]>`
-    SELECT COUNT(DISTINCT "Document"."userId") as "count"
-    FROM "Document"
-    INNER JOIN "Team" ON "Document"."teamId" = "Team"."id"
-    INNER JOIN "Organisation" ON "Team"."organisationId" = "Organisation"."id"
-    WHERE "Document"."createdAt" >= ${DateTime.now().minus({ months: 1 }).toJSDate()}
-  `;
-
-  return Number(result[0].count);
-};
-
-export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
-  const result = await prisma.$queryRaw<[{ count: bigint }]>`
-    SELECT COUNT(DISTINCT "Document"."userId") as "count"
-    FROM "Document"
-    INNER JOIN "Team" ON "Document"."teamId" = "Team"."id"
-    INNER JOIN "Organisation" ON "Team"."organisationId" = "Organisation"."id"
-    WHERE "Document"."status" = 'COMPLETED'
-    AND "Document"."completedAt" >= ${DateTime.now().minus({ months: 1 }).toJSDate()}
-  `;
-
-  return Number(result[0].count);
-};
-
 export type GetUserWithDocumentMonthlyGrowth = Array<{
   month: string;
   count: number;
