@@ -56,9 +56,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     }
   }
 
-  const documentPathForEditing = isOwnerOrTeamMember
-    ? formatDocumentsPath(team?.url) + '/' + document.id
-    : null;
+  const documentPathForEditing =
+    isOwnerOrTeamMember && team ? formatDocumentsPath(team.url) + '/' + document.id : null;
 
   return {
     documentPathForEditing,
@@ -95,7 +94,7 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
             </Button>
           ) : (
             <Button variant="link" asChild>
-              <Link to="/documents">Return Home</Link>
+              <Link to="/">Return Home</Link>
             </Button>
           )}
         </div>

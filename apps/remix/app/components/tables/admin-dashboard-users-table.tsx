@@ -35,7 +35,6 @@ type AdminDashboardUsersTableProps = {
   totalPages: number;
   perPage: number;
   page: number;
-  individualPriceIds: string[];
 };
 
 export const AdminDashboardUsersTable = ({
@@ -43,7 +42,6 @@ export const AdminDashboardUsersTable = ({
   totalPages,
   perPage,
   page,
-  individualPriceIds,
 }: AdminDashboardUsersTableProps) => {
   const { _ } = useLingui();
 
@@ -75,17 +73,6 @@ export const AdminDashboardUsersTable = ({
         cell: ({ row }) => row.original.roles.join(', '),
       },
       {
-        header: _(msg`Subscription`),
-        accessorKey: 'subscription',
-        cell: ({ row }) => {
-          const foundIndividualSubscription = (row.original.subscriptions ?? []).find((sub) =>
-            individualPriceIds.includes(sub.priceId),
-          );
-
-          return foundIndividualSubscription?.status ?? 'NONE';
-        },
-      },
-      {
         header: _(msg`Documents`),
         accessorKey: 'documents',
         cell: ({ row }) => {
@@ -107,7 +94,7 @@ export const AdminDashboardUsersTable = ({
         },
       },
     ] satisfies DataTableColumnDef<(typeof users)[number]>[];
-  }, [individualPriceIds]);
+  }, []);
 
   useEffect(() => {
     startTransition(() => {

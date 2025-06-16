@@ -133,8 +133,8 @@ export const ZUpdateTemplateRequestSchema = z.object({
       title: z.string().min(1).optional(),
       externalId: z.string().nullish(),
       visibility: z.nativeEnum(DocumentVisibility).optional(),
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullable().optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.nullable().optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
       publicTitle: z
         .string()
         .trim()
@@ -196,16 +196,9 @@ export const ZGetTemplateByIdRequestSchema = z.object({
 
 export const ZGetTemplateByIdResponseSchema = ZTemplateSchema;
 
-export const ZMoveTemplateToTeamRequestSchema = z.object({
-  templateId: z.number().describe('The ID of the template to move to.'),
-  teamId: z.number().describe('The ID of the team to move the template to.'),
-});
-
-export const ZMoveTemplateToTeamResponseSchema = ZTemplateLiteSchema;
-
 export const ZBulkSendTemplateMutationSchema = z.object({
   templateId: z.number(),
-  teamId: z.number().optional(),
+  teamId: z.number(),
   csv: z.string().min(1),
   sendImmediately: z.boolean(),
 });

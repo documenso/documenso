@@ -85,7 +85,7 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddFieldsFormPartial = ({
@@ -166,7 +166,6 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -465,6 +464,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
@@ -604,7 +604,6 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -662,6 +661,8 @@ export const AddFieldsFormPartial = ({
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
+                      onMouseEnter={() => setLastActiveField(field)}
+                      onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}

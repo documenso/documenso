@@ -7,7 +7,7 @@ import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';
 
 test('[USER] update full name', async ({ page }) => {
-  const user = await seedUser();
+  const { user } = await seedUser();
 
   await apiSignin({ page, email: user.email, redirectPath: '/settings/profile' });
 

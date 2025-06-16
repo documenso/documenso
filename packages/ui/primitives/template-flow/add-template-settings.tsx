@@ -9,6 +9,7 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import {
   DOCUMENT_DISTRIBUTION_METHODS,
@@ -77,7 +78,6 @@ export type AddTemplateSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   template: TTemplate;
   currentTeamMemberRole?: TeamMemberRole;
@@ -88,13 +88,14 @@ export const AddTemplateSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  isEnterprise,
   isDocumentPdfLoaded,
   template,
   currentTeamMemberRole,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
   const { t, i18n } = useLingui();
+
+  const organisation = useCurrentOrganisation();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -106,8 +107,8 @@ export const AddTemplateSettingsFormPartial = ({
       title: template.title,
       externalId: template.externalId || undefined,
       visibility: template.visibility || '',
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
+      globalActionAuth: documentAuthOption?.globalActionAuth || [],
       meta: {
         subject: template.templateMeta?.subject ?? '',
         message: template.templateMeta?.message ?? '',
@@ -237,7 +238,11 @@ export const AddTemplateSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <DocumentGlobalAuthAccessSelect {...field} onValueChange={field.onChange} />
+                    <DocumentGlobalAuthAccessSelect
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -366,7 +371,7 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
-            {isEnterprise && (
+            {organisation.organisationClaim.flags.cfr21 && (
               <FormField
                 control={form.control}
                 name="globalActionAuth"
@@ -378,7 +383,11 @@ export const AddTemplateSettingsFormPartial = ({
                     </FormLabel>
 
                     <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                      <DocumentGlobalAuthActionSelect
+                        value={field.value}
+                        disabled={field.disabled}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

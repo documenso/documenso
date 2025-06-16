@@ -6,7 +6,13 @@ export const FREE_PLAN_LIMITS: TLimitsSchema = {
   directTemplates: 3,
 };
 
-export const TEAM_PLAN_LIMITS: TLimitsSchema = {
+export const INACTIVE_PLAN_LIMITS: TLimitsSchema = {
+  documents: 0,
+  recipients: 0,
+  directTemplates: 0,
+};
+
+export const PAID_PLAN_LIMITS: TLimitsSchema = {
   documents: Infinity,
   recipients: Infinity,
   directTemplates: Infinity,
