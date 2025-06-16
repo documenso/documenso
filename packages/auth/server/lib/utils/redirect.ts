@@ -11,17 +11,17 @@ export const handleRequestRedirect = (redirectUrl?: string) => {
   const url = new URL(redirectUrl, NEXT_PUBLIC_WEBAPP_URL());
 
   if (url.origin !== NEXT_PUBLIC_WEBAPP_URL()) {
-    window.location.href = '/documents';
+    window.location.href = '/';
   } else {
     window.location.href = redirectUrl;
   }
 };
 
-export const handleSignInRedirect = (redirectUrl: string = '/documents') => {
+export const handleSignInRedirect = (redirectUrl: string = '/') => {
   const url = new URL(redirectUrl, NEXT_PUBLIC_WEBAPP_URL());
 
   if (url.origin !== NEXT_PUBLIC_WEBAPP_URL()) {
-    window.location.href = '/documents';
+    window.location.href = '/';
   } else {
     window.location.href = redirectUrl;
   }

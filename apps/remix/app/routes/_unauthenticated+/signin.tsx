@@ -33,7 +33,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       throw redirect(redirectToAfterLogin);
     }
 
-    throw redirect('/documents');
+    throw redirect('/');
   }
 
   return {

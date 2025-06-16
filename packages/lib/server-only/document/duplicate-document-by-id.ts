@@ -14,7 +14,7 @@ import { getDocumentWhereInput } from './get-document-by-id';
 export interface DuplicateDocumentOptions {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }
 
 export const duplicateDocument = async ({
@@ -22,7 +22,7 @@ export const duplicateDocument = async ({
   userId,
   teamId,
 }: DuplicateDocumentOptions) => {
-  const documentWhereInput = await getDocumentWhereInput({
+  const { documentWhereInput } = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
@@ -66,6 +66,11 @@ export const duplicateDocument = async ({
       user: {
         connect: {
           id: document.userId,
+        },
+      },
+      team: {
+        connect: {
+          id: teamId,
         },
       },
       documentData: {

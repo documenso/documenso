@@ -114,7 +114,7 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
 
     return c.json(
       {
-        url: '/documents',
+        url: '/',
       },
       200,
     );

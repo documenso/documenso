@@ -1,51 +1,75 @@
-import { forwardRef } from 'react';
+import React from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-export const DocumentGlobalAuthAccessSelect = forwardRef<HTMLButtonElement, SelectProps>(
-  (props, ref) => {
-    const { _ } = useLingui();
+export interface DocumentGlobalAuthAccessSelectProps {
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
 
-    return (
-      <Select {...props}>
-        <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-          <SelectValue
-            data-testid="documentAccessSelectValue"
-            placeholder={_(msg`No restrictions`)}
-          />
-        </SelectTrigger>
+export const DocumentGlobalAuthAccessSelect = ({
+  value,
+  defaultValue,
+  onValueChange,
+  disabled,
+  placeholder,
+}: DocumentGlobalAuthAccessSelectProps) => {
+  const { _ } = useLingui();
 
-        <SelectContent position="popper">
-          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-          <SelectItem value={'-1'}>
-            <Trans>No restrictions</Trans>
-          </SelectItem>
+  // Convert auth types to MultiSelect options
+  const authOptions: Option[] = [
+    {
+      value: '-1',
+      label: _(msg`No restrictions`),
+    },
+    ...Object.values(DocumentAccessAuth).map((authType) => ({
+      value: authType,
+      label: DOCUMENT_AUTH_TYPES[authType].value,
+    })),
+  ];
 
-          {Object.values(DocumentAccessAuth).map((authType) => (
-            <SelectItem key={authType} value={authType}>
-              {DOCUMENT_AUTH_TYPES[authType].value}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    );
-  },
-);
+  // Convert string array to Option array for MultiSelect
+  const selectedOptions =
+    (value
+      ?.map((val) => authOptions.find((option) => option.value === val))
+      .filter(Boolean) as Option[]) || [];
+
+  // Convert default value to Option array
+  const defaultOptions =
+    (defaultValue
+      ?.map((val) => authOptions.find((option) => option.value === val))
+      .filter(Boolean) as Option[]) || [];
+
+  const handleChange = (options: Option[]) => {
+    const values = options.map((option) => option.value);
+    onValueChange?.(values);
+  };
+
+  return (
+    <MultiSelect
+      value={selectedOptions}
+      defaultOptions={defaultOptions}
+      options={authOptions}
+      onChange={handleChange}
+      disabled={disabled}
+      placeholder={placeholder || _(msg`Select access methods`)}
+      className="bg-background text-muted-foreground"
+      hideClearAllButton={false}
+      data-testid="documentAccessSelectValue"
+    />
+  );
+};
 
 DocumentGlobalAuthAccessSelect.displayName = 'DocumentGlobalAuthAccessSelect';
 
@@ -63,7 +87,11 @@ export const DocumentGlobalAuthAccessTooltip = () => (
       </h2>
 
       <p>
-        <Trans>The authentication required for recipients to view the document.</Trans>
+        <Trans>The authentication methods required for recipients to view the document.</Trans>
+      </p>
+
+      <p className="mt-2">
+        <Trans>Multiple access methods can be selected.</Trans>
       </p>
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">

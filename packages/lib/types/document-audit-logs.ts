@@ -123,8 +123,8 @@ export const ZDocumentAuditLogFieldDiffSchema = z.union([
 ]);
 
 export const ZGenericFromToSchema = z.object({
-  from: z.string().nullable(),
-  to: z.string().nullable(),
+  from: z.union([z.string(), z.array(z.string())]).nullable(),
+  to: z.union([z.string(), z.array(z.string())]).nullable(),
 });
 
 export const ZRecipientDiffActionAuthSchema = ZGenericFromToSchema.extend({
@@ -296,7 +296,7 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
       },
       z
         .object({
-          type: ZRecipientActionAuthTypesSchema,
+          type: ZRecipientActionAuthTypesSchema.optional(),
         })
         .optional(),
     ),
@@ -384,7 +384,7 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
       },
       z
         .object({
-          type: ZRecipientActionAuthTypesSchema,
+          type: ZRecipientActionAuthTypesSchema.optional(),
         })
         .optional(),
     ),
@@ -428,7 +428,13 @@ export const ZDocumentAuditLogEventDocumentMetaUpdatedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED),
   data: ZBaseRecipientDataSchema.extend({
-    accessAuth: z.string().optional(),
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
   }),
 });
 
@@ -438,7 +444,13 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED),
   data: ZBaseRecipientDataSchema.extend({
-    actionAuth: z.string().optional(),
+    actionAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientActionAuthTypesSchema)),
   }),
 });
 
@@ -516,8 +528,20 @@ export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
 export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
   data: ZBaseRecipientDataSchema.extend({
-    accessAuth: ZRecipientAccessAuthTypesSchema.optional(),
-    actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
+    actionAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientActionAuthTypesSchema)),
   }),
 });
 

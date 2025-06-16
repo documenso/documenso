@@ -18,18 +18,12 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/trpc/server/document-router/schema';
 
-import { ZMapNegativeOneToUndefinedSchema } from '../document-flow/add-settings.types';
-
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
-  globalAccessAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-    ZDocumentAccessAuthTypesSchema.optional(),
-  ),
-  globalActionAuth: ZMapNegativeOneToUndefinedSchema.pipe(
-    ZDocumentActionAuthTypesSchema.optional(),
-  ),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
   meta: z.object({
     subject: z.string(),
     message: z.string(),
