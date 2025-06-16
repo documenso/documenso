@@ -30,6 +30,14 @@ import {
 } from '../document-router/schema';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
+export const ZCreateTemplateV2RequestSchema = z.object({
+  title: z.string().min(1).trim(),
+});
+
+export const ZCreateTemplateV2ResponseSchema = z.object({
+  uploadUrl: z.string().min(1),
+});
+
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
   templateDocumentDataId: z.string().min(1),
