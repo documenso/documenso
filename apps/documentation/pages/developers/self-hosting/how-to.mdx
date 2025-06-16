@@ -132,6 +132,12 @@ The `cert.p12` file is required to sign and encrypt documents. You have two opti
 Download and run our setup script that handles certificate configuration automatically:
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/documenso/documenso/main/docker/setup-selfhost.sh | bash
+```
+
+Or download and run separately:
+
+```bash
 curl -o setup-selfhost.sh https://raw.githubusercontent.com/documenso/documenso/main/docker/setup-selfhost.sh
 chmod +x setup-selfhost.sh
 ./setup-selfhost.sh

@@ -100,11 +100,13 @@ If you encounter errors related to certificate access, here are common solutions
 #### Error: "Failed to read signing certificate"
 
 1. **Check file exists:**
+
    ```bash
    ls -la /path/to/your/cert.p12
    ```
 
 2. **Fix permissions:**
+
    ```bash
    chmod 644 /path/to/your/cert.p12
    chown 1001:1001 /path/to/your/cert.p12
@@ -126,8 +128,8 @@ base64 -i /path/to/your/cert.p12 -o cert_base64.txt
 # Add to your .env file
 echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
 
-# Remove the file path variable if using base64
-sed -i '/NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH/d' .env
+# Remove the file path variable if using base64 (optional - having both is fine)
+# sed -i '/NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH/d' .env
 ```
 
 ### Container Logs
@@ -155,6 +157,7 @@ curl http://localhost:3000/api/certificate-status
 ```
 
 The health endpoint will show:
+
 - `status: "ok"` - Everything working properly
 - `status: "warning"` - App running but certificate issues
 - `status: "error"` - Critical issues (database down, etc.)

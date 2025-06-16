@@ -26,20 +26,8 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   const certStatus = getCertificateStatus();
 
   if (!certStatus.isAvailable) {
-    const errorMessage = [
-      '🚫 Document signing failed: Certificate not available',
-      '',
-      `❌ Issue: ${certStatus.error}`,
-      '',
-      '🛠️  Solutions:',
-      ...certStatus.recommendations.map((rec) => `   • ${rec}`),
-      '',
-      '📚 For detailed setup instructions, visit:',
-      '   https://docs.documenso.com/developers/self-hosting/signing-certificate',
-    ].join('\n');
-
-    console.error('Certificate error:', errorMessage);
-    throw new Error(errorMessage);
+    console.error('Certificate error: Certificate not available for document signing');
+    throw new Error('Document signing failed: Certificate not available');
   }
 
   let cert: Buffer | null = null;
@@ -49,10 +37,8 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
   if (localFileContents) {
     try {
       cert = Buffer.from(localFileContents, 'base64');
-    } catch (error) {
-      throw new Error(
-        `Failed to decode base64 certificate contents: ${error instanceof Error ? error.message : 'Unknown error'}`,
-      );
+    } catch {
+      throw new Error('Failed to decode certificate contents');
     }
   }
 
@@ -70,11 +56,9 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
     try {
       cert = Buffer.from(fs.readFileSync(certPath));
-    } catch (error) {
-      // This shouldn't happen since we already checked in getCertificateStatus, but just in case
-      const errorMessage = `Failed to read certificate file: ${error instanceof Error ? error.message : 'Unknown error'}`;
-      console.error('Certificate reading error:', errorMessage);
-      throw new Error(errorMessage);
+    } catch {
+      console.error('Certificate error: Failed to read certificate file');
+      throw new Error('Document signing failed: Certificate file not accessible');
     }
   }
 
