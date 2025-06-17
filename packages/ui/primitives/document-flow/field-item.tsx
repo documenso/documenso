@@ -6,6 +6,7 @@ import { FieldType } from '@prisma/client';
 import { CopyPlus, Settings2, SquareStack, Trash } from 'lucide-react';
 import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
+import { useSearchParams } from 'react-router';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -35,6 +36,8 @@ export type FieldItemProps = {
   onAdvancedSettings?: () => void;
   onFocus?: () => void;
   onBlur?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
   recipientIndex?: number;
   hasErrors?: boolean;
   active?: boolean;
@@ -69,6 +72,7 @@ export const FieldItem = ({
   onFieldDeactivate,
 }: FieldItemProps) => {
   const { _ } = useLingui();
+  const [searchParams] = useSearchParams();
 
   const [coords, setCoords] = useState({
     pageX: 0,
@@ -80,6 +84,8 @@ export const FieldItem = ({
   const $el = useRef(null);
 
   const signerStyles = useRecipientColors(recipientIndex);
+
+  const isDevMode = searchParams.get('devmode') === 'true';
 
   const advancedField = [
     'NUMBER',
@@ -233,6 +239,8 @@ export const FieldItem = ({
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => onFieldActivate?.()}
       onResizeStart={() => onFieldActivate?.()}
+      onMouseEnter={() => onFocus?.()}
+      onMouseLeave={() => onBlur?.()}
       enableResizing={!fixedSize}
       resizeHandleStyles={{
         bottom: { bottom: -8, cursor: 'ns-resize' },
@@ -303,6 +311,12 @@ export const FieldItem = ({
               (field.signerEmail?.charAt(1)?.toUpperCase() ?? '')}
           </div>
         </div>
+
+        {isDevMode && (
+          <div className="text-muted-foreground absolute -top-6 left-0 right-0 text-center text-[10px]">
+            {`x: ${field.pageX.toFixed(2)}, y: ${field.pageY.toFixed(2)}`}
+          </div>
+        )}
       </div>
 
       {!disabled && settingsActive && (

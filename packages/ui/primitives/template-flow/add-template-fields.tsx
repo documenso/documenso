@@ -209,6 +209,7 @@ export const AddTemplateFieldsFormPartial = ({
         append({
           ...copiedField,
           formId: nanoid(12),
+          nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,

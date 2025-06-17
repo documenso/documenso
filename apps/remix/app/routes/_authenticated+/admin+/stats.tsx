@@ -19,6 +19,7 @@ import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
   getOrganisationsWithSubscriptionsCount,
+  getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
@@ -37,18 +38,14 @@ export async function loader() {
     docStats,
     recipientStats,
     signerConversionMonthly,
-    // userWithAtLeastOneDocumentPerMonth,
-    // userWithAtLeastOneDocumentSignedPerMonth,
-    // MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
   ] = await Promise.all([
     getUsersCount(),
     getOrganisationsWithSubscriptionsCount(),
     getDocumentStats(),
     getRecipientsStats(),
     getSignerConversionMonthly(),
-    // getUserWithAtLeastOneDocumentPerMonth(),
-    // getUserWithAtLeastOneDocumentSignedPerMonth(),
-    // getUserWithSignedDocumentMonthlyGrowth(),
+    getUserWithSignedDocumentMonthlyGrowth(),
   ]);
 
   return {
@@ -57,7 +54,7 @@ export async function loader() {
     docStats,
     recipientStats,
     signerConversionMonthly,
-    // MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
   };
 }
 
@@ -70,7 +67,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
     docStats,
     recipientStats,
     signerConversionMonthly,
-    // MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
   } = loaderData;
 
   return (
@@ -148,14 +145,12 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
           <AdminStatsUsersWithDocumentsChart
-            data={[]}
-            // data={MONTHLY_USERS_SIGNED}
+            data={monthlyUsersWithDocuments}
             title={_(msg`MAU (created document)`)}
             tooltip={_(msg`Monthly Active Users: Users that created at least one Document`)}
           />
           <AdminStatsUsersWithDocumentsChart
-            data={[]}
-            // data={MONTHLY_USERS_SIGNED}
+            data={monthlyUsersWithDocuments}
             completed
             title={_(msg`MAU (had document completed)`)}
             tooltip={_(

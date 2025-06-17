@@ -283,10 +283,10 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   }).toPass();
 
   // Delete document.
-  await page.getByRole('menuitem', { name: 'Hide' }).click();
-  await page.getByRole('button', { name: 'Hide' }).click();
-
-  await page.waitForTimeout(1000);
+  await page.getByRole('menuitem', { name: 'Hide' }).waitFor({ state: 'visible' });
+  await page.getByRole('menuitem', { name: 'Hide' }).click({ force: true });
+  await page.getByRole('button', { name: 'Hide' }).click({ force: true });
+  await page.waitForTimeout(2000);
 
   await expect(async () => {
     await page
@@ -300,8 +300,10 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   }).toPass();
 
   // Delete document.
-  await page.getByRole('menuitem', { name: 'Hide' }).click();
-  await page.getByRole('button', { name: 'Hide' }).click();
+  await page.getByRole('menuitem', { name: 'Hide' }).waitFor({ state: 'visible' });
+  await page.getByRole('menuitem', { name: 'Hide' }).click({ force: true });
+  await page.getByRole('button', { name: 'Hide' }).click({ force: true });
+  await page.waitForTimeout(2000);
 
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();

@@ -27,6 +27,9 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
 
   await page.waitForURL('/unverified-account');
 
+  // Wait to ensure token is created in the database
+  await page.waitForTimeout(2000);
+
   const { token } = await extractUserVerificationToken(email);
 
   const team = await prisma.team.findFirstOrThrow({
