@@ -18,7 +18,6 @@ import {
   createTemplate,
 } from '@documenso/lib/server-only/template/create-template';
 import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
-import { createTemplateV2 } from '@documenso/lib/server-only/template/create-template-v2';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
@@ -168,16 +167,15 @@ export const templateRouter = router({
         type: DocumentDataType.S3_PATH,
       });
 
-      const createdTemplate = await createTemplateV2({
+      const createdTemplate = await createTemplate({
         userId: user.id,
         teamId,
+        title: data?.title || '',
         templateDocumentDataId: templateDocumentData.id,
         data: {
-          title: data?.title || '',
           ...data,
         },
         meta: meta || {},
-        requestMetadata: ctx.metadata,
       });
 
       const fullTemplate = await getTemplateById({
