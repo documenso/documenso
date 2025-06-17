@@ -18,6 +18,7 @@ import {
   createTemplate,
 } from '@documenso/lib/server-only/template/create-template';
 import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
+import { createTemplateV2 } from '@documenso/lib/server-only/template/create-template-v2';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
@@ -156,9 +157,9 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
 
-      const { title } = input;
+      const { data, meta } = input;
 
-      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+      const fileName = data?.title.endsWith('.pdf') ? data?.title : `${data?.title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
 
@@ -167,14 +168,26 @@ export const templateRouter = router({
         type: DocumentDataType.S3_PATH,
       });
 
-      const createdTemplate = await createTemplate({
+      const createdTemplate = await createTemplateV2({
         userId: user.id,
         teamId,
-        title,
         templateDocumentDataId: templateDocumentData.id,
+        data: {
+          title: data?.title || '',
+          ...data,
+        },
+        meta: meta || {},
+        requestMetadata: ctx.metadata,
+      });
+
+      const fullTemplate = await getTemplateById({
+        id: createdTemplate.id,
+        userId: user.id,
+        teamId,
       });
 
       return {
+        template: fullTemplate,
         uploadUrl: url,
       };
     }),

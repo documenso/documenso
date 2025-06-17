@@ -30,11 +30,61 @@ import {
 } from '../document-router/schema';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
+export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
+export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
+
 export const ZCreateTemplateV2RequestSchema = z.object({
-  title: z.string().min(1).trim(),
+  data: z
+    .object({
+      title: z.string().min(1).trim(),
+      folderId: z.string().optional(),
+      externalId: z.string().nullish(),
+      visibility: z.nativeEnum(DocumentVisibility).optional(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
+      publicTitle: z
+        .string()
+        .trim()
+        .min(1)
+        .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH)
+        .describe(
+          'The title of the template that will be displayed to the public. Only applicable for public templates.',
+        )
+        .optional(),
+      publicDescription: z
+        .string()
+        .trim()
+        .min(1)
+        .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
+        .describe(
+          'The description of the template that will be displayed to the public. Only applicable for public templates.',
+        )
+        .optional(),
+      type: z.nativeEnum(TemplateType).optional(),
+      useLegacyFieldInsertion: z.boolean().optional(),
+    })
+    .optional(),
+  meta: z
+    .object({
+      subject: ZDocumentMetaSubjectSchema.optional(),
+      message: ZDocumentMetaMessageSchema.optional(),
+      timezone: ZDocumentMetaTimezoneSchema.optional(),
+      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
+      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
+      language: ZDocumentMetaLanguageSchema.optional(),
+      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
+      allowDictateNextSigner: z.boolean().optional(),
+    })
+    .optional(),
 });
 
 export const ZCreateTemplateV2ResponseSchema = z.object({
+  template: ZTemplateSchema,
   uploadUrl: z.string().min(1),
 });
 
@@ -130,9 +180,6 @@ export const ZToggleTemplateDirectLinkResponseSchema = GenericDirectLinkResponse
 export const ZDeleteTemplateMutationSchema = z.object({
   templateId: z.number(),
 });
-
-export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
-export const MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH = 256;
 
 export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
