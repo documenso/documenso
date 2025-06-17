@@ -14,7 +14,7 @@ import { getTeamSettings } from '../team/get-team-settings';
 export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
   userId: number;
   teamId: number;
-  data: {
+  data?: {
     externalId?: string | null;
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
@@ -24,7 +24,7 @@ export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
     type?: Template['type'];
     useLegacyFieldInsertion?: boolean;
   };
-  meta: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
+  meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
 
 export const ZCreateTemplateResponseSchema = TemplateSchema;
