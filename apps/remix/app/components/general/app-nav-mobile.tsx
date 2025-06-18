@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
+import { ReadStatus } from '@prisma/client';
 import { Link } from 'react-router';
 
 import LogoImage from '@documenso/assets/logo.png';
@@ -26,9 +27,14 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
 
   const currentTeam = useOptionalCurrentTeam();
 
-  const { data: unreadCountData } = trpc.document.inbox.getUnreadCount.useQuery(undefined, {
-    refetchInterval: 30000, // Refetch every 30 seconds
-  });
+  const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
+    {
+      readStatus: ReadStatus.NOT_OPENED,
+    },
+    {
+      // refetchInterval: 30000, // Refetch every 30 seconds
+    },
+  );
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);

@@ -1,5 +1,6 @@
 import { type HTMLAttributes, useEffect, useState } from 'react';
 
+import { ReadStatus } from '@prisma/client';
 import { InboxIcon, MenuIcon, SearchIcon } from 'lucide-react';
 import { Link, useParams } from 'react-router';
 
@@ -29,9 +30,14 @@ export const Header = ({ className, ...props }: HeaderProps) => {
   const [isHamburgerMenuOpen, setIsHamburgerMenuOpen] = useState(false);
   const [scrollY, setScrollY] = useState(0);
 
-  const { data: unreadCountData } = trpc.document.inbox.getUnreadCount.useQuery(undefined, {
-    refetchInterval: 30000, // Refetch every 30 seconds
-  });
+  const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
+    {
+      readStatus: ReadStatus.NOT_OPENED,
+    },
+    {
+      // refetchInterval: 30000, // Refetch every 30 seconds
+    },
+  );
 
   useEffect(() => {
     const onScroll = () => {
