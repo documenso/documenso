@@ -1,19 +1,32 @@
-import { FolderIcon, PinIcon } from 'lucide-react';
+import { Plural, Trans } from '@lingui/react/macro';
+import { FolderType } from '@prisma/client';
+import {
+  ArrowRightIcon,
+  FolderIcon,
+  FolderPlusIcon,
+  MoreVerticalIcon,
+  PinIcon,
+  SettingsIcon,
+  TrashIcon,
+} from 'lucide-react';
+import { Link } from 'react-router';
 
-import { FolderType } from '@documenso/lib/types/folder-type';
-import { formatFolderCount } from '@documenso/lib/utils/format-folder-count';
+import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
 
+import { useCurrentTeam } from '~/providers/team';
+
 export type FolderCardProps = {
   folder: TFolderWithSubfolders;
-  onNavigate: (folderId: string) => void;
   onMove: (folder: TFolderWithSubfolders) => void;
   onPin: (folderId: string) => void;
   onUnpin: (folderId: string) => void;
@@ -23,66 +36,132 @@ export type FolderCardProps = {
 
 export const FolderCard = ({
   folder,
-  onNavigate,
   onMove,
   onPin,
   onUnpin,
   onSettings,
   onDelete,
 }: FolderCardProps) => {
+  const team = useCurrentTeam();
+
+  const formatPath = () => {
+    const rootPath =
+      folder.type === FolderType.DOCUMENT
+        ? formatDocumentsPath(team.url)
+        : formatTemplatesPath(team.url);
+
+    return `${rootPath}/f/${folder.id}`;
+  };
+
   return (
-    <div
-      key={folder.id}
-      className="border-border hover:border-muted-foreground/40 group relative flex flex-col rounded-lg border p-4 transition-all hover:shadow-sm"
-    >
-      <div className="flex items-start justify-between">
-        <button
-          className="flex items-center space-x-2 text-left"
-          onClick={() => onNavigate(folder.id)}
-        >
-          <FolderIcon className="text-documenso h-6 w-6" />
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium">{folder.name}</h3>
-              {folder.pinned && <PinIcon className="text-documenso h-3 w-3" />}
-            </div>
-            <div className="mt-1 flex space-x-2 text-xs text-gray-500">
-              <span>
-                {formatFolderCount(
-                  folder.type === FolderType.TEMPLATE
-                    ? folder._count.templates
-                    : folder._count.documents,
-                  folder.type === FolderType.TEMPLATE ? 'template' : 'document',
-                  folder.type === FolderType.TEMPLATE ? 'templates' : 'documents',
-                )}
-              </span>
-              <span>•</span>
-              <span>{formatFolderCount(folder._count.subfolders, 'folder', 'folders')}</span>
+    <Link to={formatPath()} key={folder.id}>
+      <Card className="hover:bg-muted/50 border-border h-full border transition-all">
+        <CardContent className="p-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <FolderIcon className="text-documenso h-6 w-6 flex-shrink-0" />
+
+            <div className="flex w-full min-w-0 items-center justify-between">
+              <div className="min-w-0 flex-1">
+                <h3 className="flex min-w-0 items-center gap-2 font-medium">
+                  <span className="truncate">{folder.name}</span>
+                  {folder.pinned && <PinIcon className="text-documenso h-3 w-3 flex-shrink-0" />}
+                </h3>
+
+                <div className="text-muted-foreground mt-1 flex space-x-2 truncate text-xs">
+                  <span>
+                    {folder.type === FolderType.TEMPLATE ? (
+                      <Plural
+                        value={folder._count.templates}
+                        one={<Trans># template</Trans>}
+                        other={<Trans># templates</Trans>}
+                      />
+                    ) : (
+                      <Plural
+                        value={folder._count.documents}
+                        one={<Trans># document</Trans>}
+                        other={<Trans># documents</Trans>}
+                      />
+                    )}
+                  </span>
+                  <span>•</span>
+                  <span>
+                    <Plural
+                      value={folder._count.subfolders}
+                      one={<Trans># folder</Trans>}
+                      other={<Trans># folders</Trans>}
+                    />
+                  </span>
+                </div>
+              </div>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0"
+                    data-testid="folder-card-more-button"
+                  >
+                    <MoreVerticalIcon className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+
+                <DropdownMenuContent onClick={(e) => e.stopPropagation()} align="end">
+                  <DropdownMenuItem onClick={() => onMove(folder)}>
+                    <ArrowRightIcon className="mr-2 h-4 w-4" />
+                    <Trans>Move</Trans>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    onClick={() => (folder.pinned ? onUnpin(folder.id) : onPin(folder.id))}
+                  >
+                    <PinIcon className="mr-2 h-4 w-4" />
+                    {folder.pinned ? <Trans>Unpin</Trans> : <Trans>Pin</Trans>}
+                  </DropdownMenuItem>
+
+                  <DropdownMenuItem onClick={() => onSettings(folder)}>
+                    <SettingsIcon className="mr-2 h-4 w-4" />
+                    <Trans>Settings</Trans>
+                  </DropdownMenuItem>
+
+                  <DropdownMenuSeparator />
+
+                  <DropdownMenuItem onClick={() => onDelete(folder)}>
+                    <TrashIcon className="mr-2 h-4 w-4" />
+                    <Trans>Delete</Trans>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
           </div>
-        </button>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+};
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
-              •••
-            </Button>
-          </DropdownMenuTrigger>
+export const FolderCardEmpty = ({ type }: { type: FolderType }) => {
+  return (
+    <Card className="hover:bg-muted/50 border-border h-full border transition-all">
+      <CardContent className="p-4">
+        <div className="flex items-center gap-3">
+          <FolderPlusIcon className="text-muted-foreground/60 h-6 w-6" />
 
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem onClick={() => onMove(folder)}>Move</DropdownMenuItem>
-            {folder.pinned ? (
-              <DropdownMenuItem onClick={() => onUnpin(folder.id)}>Unpin</DropdownMenuItem>
-            ) : (
-              <DropdownMenuItem onClick={() => onPin(folder.id)}>Pin</DropdownMenuItem>
-            )}
-            <DropdownMenuItem onClick={() => onSettings(folder)}>Settings</DropdownMenuItem>
-            <DropdownMenuItem className="text-red-500" onClick={() => onDelete(folder)}>
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-    </div>
+          <div>
+            <h3 className="text-muted-foreground flex items-center gap-2 font-medium">
+              <Trans>Create folder</Trans>
+            </h3>
+
+            <div className="text-muted-foreground/60 mt-1 flex space-x-2 truncate text-xs">
+              {type === FolderType.DOCUMENT ? (
+                <Trans>Organise your documents</Trans>
+              ) : (
+                <Trans>Organise your templates</Trans>
+              )}
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 };

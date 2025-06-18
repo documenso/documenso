@@ -21,7 +21,7 @@ test('[TEAMS]: create document folder button is visible', async ({ page }) => {
     redirectPath: `/t/${team.url}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Create Folder' })).toBeVisible();
+  await expect(page.getByTestId('folder-create-button')).toBeVisible();
 });
 
 test('[TEAMS]: can create document folder', async ({ page }) => {
@@ -33,7 +33,7 @@ test('[TEAMS]: can create document folder', async ({ page }) => {
     redirectPath: `/t/${team.url}`,
   });
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
 
   await page.getByLabel('Folder name').fill('Team Folder');
   await page.getByRole('button', { name: 'Create' }).click();
@@ -59,7 +59,7 @@ test('[TEAMS]: can create document subfolder within a document folder', async ({
 
   await page.goto(`/t/${team.url}/documents/f/${teamFolder.id}`);
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
 
   await page.getByLabel('Folder name').fill('Subfolder');
   await page.getByRole('button', { name: 'Create' }).click();
@@ -115,7 +115,7 @@ test('[TEAMS]: can pin a document folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Pin' }).click();
 
   await page.reload();
@@ -140,7 +140,7 @@ test('[TEAMS]: can unpin a document folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Unpin' }).click();
 
   await page.reload();
@@ -164,7 +164,7 @@ test('[TEAMS]: can rename a document folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await page.getByLabel('Name').fill('Team Archive');
@@ -189,7 +189,7 @@ test('[TEAMS]: document folder visibility is visible to team member', async ({ p
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toBeVisible();
@@ -218,11 +218,11 @@ test('[TEAMS]: document folder can be moved to another document folder', async (
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByTestId('folder-card-more-button').nth(0).click();
   await page.getByRole('menuitem', { name: 'Move' }).click();
 
   await page.getByRole('button', { name: 'Team Clients' }).click();
-  await page.getByRole('button', { name: 'Move Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
 
   await page.waitForTimeout(1000);
 
@@ -269,7 +269,7 @@ test('[TEAMS]: document folder and its contents can be deleted', async ({ page }
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
 
   await page.getByRole('textbox').fill(`delete ${folder.name}`);
@@ -295,7 +295,7 @@ test('[TEAMS]: create folder button is visible on templates page', async ({ page
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await expect(page.getByRole('button', { name: 'Create Folder' })).toBeVisible();
+  await expect(page.getByTestId('folder-create-button')).toBeVisible();
 });
 
 test('[TEAMS]: can create a template folder', async ({ page }) => {
@@ -307,7 +307,7 @@ test('[TEAMS]: can create a template folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await expect(page.getByRole('dialog', { name: 'Create New folder' })).toBeVisible();
 
   await page.getByLabel('Folder name').fill('Team template folder');
@@ -342,7 +342,7 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 
   await expect(page.getByText('Team Client Templates')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await expect(page.getByRole('dialog', { name: 'Create New folder' })).toBeVisible();
 
   await page.getByLabel('Folder name').fill('Team Contract Templates');
@@ -414,7 +414,7 @@ test('[TEAMS]: can pin a template folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Pin' }).click();
 
   await page.reload();
@@ -440,7 +440,7 @@ test('[TEAMS]: can unpin a template folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Unpin' }).click();
 
   await page.reload();
@@ -466,7 +466,7 @@ test('[TEAMS]: can rename a template folder', async ({ page }) => {
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await page.getByLabel('Name').fill('Updated Team Template Folder');
@@ -492,7 +492,7 @@ test('[TEAMS]: template folder visibility is not visible to team member', async 
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await expect(page.getByRole('menuitem', { name: 'Visibility' })).not.toBeVisible();
@@ -523,11 +523,11 @@ test('[TEAMS]: template folder can be moved to another template folder', async (
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByTestId('folder-card-more-button').nth(0).click();
   await page.getByRole('menuitem', { name: 'Move' }).click();
 
   await page.getByRole('button', { name: 'Team Client Templates' }).click();
-  await page.getByRole('button', { name: 'Move Folder' }).click();
+  await page.getByRole('button', { name: 'Move' }).click();
 
   await page.waitForTimeout(1000);
 
@@ -576,7 +576,7 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Delete' }).click();
 
   await page.getByRole('textbox').fill(`delete ${folder.name}`);
@@ -633,10 +633,10 @@ test('[TEAMS]: can navigate between template folders', async ({ page }) => {
   await page.getByText('Team Contract Templates').click();
   await expect(page.getByText('Team Contract Template 1')).toBeVisible();
 
-  await page.getByRole('button', { name: parentFolder.name }).click();
+  await page.getByRole('link', { name: parentFolder.name }).click();
   await expect(page.getByText('Team Contract Templates')).toBeVisible();
 
-  await page.getByRole('button', { name: subfolder.name }).click();
+  await page.getByRole('link', { name: subfolder.name }).click();
   await expect(page.getByText('Team Contract Template 1')).toBeVisible();
 });
 
@@ -754,7 +754,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await page.getByLabel('Name').fill('Admin Only Folder');
   await page.getByRole('button', { name: 'Create' }).click();
 
@@ -762,7 +762,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
 
   await page.goto(`/t/${team.url}/documents/`);
 
-  await page.getByRole('button', { name: '•••' }).click();
+  await page.getByTestId('folder-card-more-button').click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toHaveText('Admins only');
@@ -774,15 +774,15 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
 
   await page.reload();
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await page.getByLabel('Name').fill('Manager and above Folder');
   await page.getByRole('button', { name: 'Create' }).click();
 
   await expect(page.getByText('Manager and above Folder')).toBeVisible();
 
-  await page.goto(`/t/${team.url}/documents/`);
+  await page.goto(`/t/${team.url}/documents`);
 
-  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByTestId('folder-card-more-button').nth(0).click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toHaveText('Managers and above');
@@ -794,7 +794,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
 
   await page.reload();
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await page.getByLabel('Name').fill('Everyone Folder');
   await page.getByRole('button', { name: 'Create' }).click();
 
@@ -802,7 +802,7 @@ test('[TEAMS]: folder inherits team visibility settings', async ({ page }) => {
 
   await page.goto(`/t/${team.url}/documents/`);
 
-  await page.getByRole('button', { name: '•••' }).nth(0).click();
+  await page.getByTestId('folder-card-more-button').nth(0).click();
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await expect(page.getByRole('combobox', { name: 'Visibility' })).toHaveText('Everyone');
@@ -834,7 +834,7 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
     redirectPath: `/t/${team.url}/documents`,
   });
 
-  await page.getByRole('button', { name: 'Create Folder' }).click();
+  await page.getByTestId('folder-create-button').click();
   await page.getByLabel('Name').fill('Admin Only Folder');
   await page.getByRole('button', { name: 'Create' }).click();
 
@@ -2368,7 +2368,10 @@ test('[TEAMS]: team manager can see manager and everyone documents in manager fo
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
+  ).toBeVisible();
+
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).not.toBeVisible();
@@ -2426,7 +2429,10 @@ test('[TEAMS]: team manager can see manager and everyone documents in everyone f
     redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Everyone Folder' }),
+  ).toBeVisible();
+
   await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Admin Document')).not.toBeVisible();
@@ -2572,7 +2578,10 @@ test('[TEAMS]: team owner can see all documents in admin folder', async ({ page 
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Admin Only Folder' }),
+  ).toBeVisible();
+
   await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Admin Folder - Admin Document')).toBeVisible();
@@ -2622,7 +2631,9 @@ test('[TEAMS]: team owner can see all documents in manager folder', async ({ pag
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
+  ).toBeVisible();
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
@@ -2672,7 +2683,9 @@ test('[TEAMS]: team owner can see all documents in everyone folder', async ({ pa
     redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Everyone Folder' }),
+  ).toBeVisible();
   await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();
@@ -2772,7 +2785,10 @@ test('[TEAMS]: team admin can see all documents in admin folder', async ({ page 
     redirectPath: `/t/${team.url}/documents/f/${adminFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Admin Only Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Admin Only Folder' }),
+  ).toBeVisible();
+
   await expect(page.getByText('Admin Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Admin Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Admin Folder - Admin Document')).toBeVisible();
@@ -2828,7 +2844,9 @@ test('[TEAMS]: team admin can see all documents in manager folder', async ({ pag
     redirectPath: `/t/${team.url}/documents/f/${managerFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Manager Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Manager Folder' }),
+  ).toBeVisible();
   await expect(page.getByText('Manager Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Manager Folder - Admin Document')).toBeVisible();
@@ -2884,7 +2902,9 @@ test('[TEAMS]: team admin can see all documents in everyone folder', async ({ pa
     redirectPath: `/t/${team.url}/documents/f/${everyoneFolder.id}`,
   });
 
-  await expect(page.getByRole('button', { name: 'Everyone Folder' })).toBeVisible();
+  await expect(
+    page.getByTestId('folder-grid-breadcrumbs').getByRole('link', { name: 'Everyone Folder' }),
+  ).toBeVisible();
   await expect(page.getByText('Everyone Folder - Everyone Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Manager Document')).toBeVisible();
   await expect(page.getByText('Everyone Folder - Admin Document')).toBeVisible();

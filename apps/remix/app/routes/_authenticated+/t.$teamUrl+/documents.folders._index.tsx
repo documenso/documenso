@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
-import { Trans } from '@lingui/react/macro';
-import { HomeIcon, Loader2 } from 'lucide-react';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { HomeIcon, Loader2, SearchIcon } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { FolderType } from '@documenso/lib/types/folder-type';
@@ -9,8 +9,9 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
+import { Input } from '@documenso/ui/primitives/input';
 
-import { CreateFolderDialog } from '~/components/dialogs/folder-create-dialog';
+import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
@@ -23,6 +24,8 @@ export function meta() {
 }
 
 export default function DocumentsFoldersPage() {
+  const { t } = useLingui();
+
   const navigate = useNavigate();
   const team = useCurrentTeam();
 
@@ -32,6 +35,7 @@ export default function DocumentsFoldersPage() {
   const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data: foldersData, isLoading: isFoldersLoading } = trpc.folder.getFolders.useQuery({
     type: FolderType.DOCUMENT,
@@ -51,6 +55,9 @@ export default function DocumentsFoldersPage() {
     }
   };
 
+  const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
+    folder.name.toLowerCase().includes(searchTerm.toLowerCase());
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex w-full items-center justify-between">
@@ -67,60 +74,41 @@ export default function DocumentsFoldersPage() {
         </div>
 
         <div className="flex flex-col gap-y-4 sm:flex-row sm:justify-end sm:gap-x-4">
-          <CreateFolderDialog />
+          <FolderCreateDialog type={FolderType.DOCUMENT} />
         </div>
       </div>
 
-      <div className="mt-6">
-        {isFoldersLoading ? (
-          <div className="mt-6 flex justify-center">
-            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-          </div>
-        ) : (
-          <>
-            {foldersData?.folders?.some((folder) => folder.pinned) && (
-              <div className="mt-6">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {foldersData.folders
-                    .filter((folder) => folder.pinned)
-                    .map((folder) => (
-                      <FolderCard
-                        key={folder.id}
-                        folder={folder}
-                        onNavigate={navigateToFolder}
-                        onMove={(folder) => {
-                          setFolderToMove(folder);
-                          setIsMovingFolder(true);
-                        }}
-                        onPin={(folderId) => void pinFolder({ folderId })}
-                        onUnpin={(folderId) => void unpinFolder({ folderId })}
-                        onSettings={(folder) => {
-                          setFolderToSettings(folder);
-                          setIsSettingsFolderOpen(true);
-                        }}
-                        onDelete={(folder) => {
-                          setFolderToDelete(folder);
-                          setIsDeletingFolder(true);
-                        }}
-                      />
-                    ))}
-                </div>
-              </div>
-            )}
+      <div className="relative w-full max-w-md py-6">
+        <SearchIcon className="text-muted-foreground absolute left-2 top-9 h-4 w-4" />
+        <Input
+          placeholder={t`Search folders...`}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="pl-8"
+        />
+      </div>
 
-            <div className="mt-12">
-              <h1 className="truncate text-2xl font-semibold md:text-3xl">
-                <Trans>All Folders</Trans>
-              </h1>
+      <h1 className="mt-4 truncate text-2xl font-semibold md:text-3xl">
+        <Trans>All Folders</Trans>
+      </h1>
 
-              <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {foldersData?.folders
-                  .filter((folder) => !folder.pinned)
+      {isFoldersLoading ? (
+        <div className="mt-6 flex justify-center">
+          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+        </div>
+      ) : (
+        <>
+          {foldersData?.folders?.some(
+            (folder) => folder.pinned && isFolderMatchingSearch(folder),
+          ) && (
+            <div className="mt-6">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {foldersData.folders
+                  .filter((folder) => folder.pinned && isFolderMatchingSearch(folder))
                   .map((folder) => (
                     <FolderCard
                       key={folder.id}
                       folder={folder}
-                      onNavigate={navigateToFolder}
                       onMove={(folder) => {
                         setFolderToMove(folder);
                         setIsMovingFolder(true);
@@ -139,9 +127,42 @@ export default function DocumentsFoldersPage() {
                   ))}
               </div>
             </div>
-          </>
-        )}
-      </div>
+          )}
+
+          <div>
+            {searchTerm && foldersData?.folders.filter(isFolderMatchingSearch).length === 0 && (
+              <div className="text-muted-foreground mt-6 text-center">
+                <Trans>No folders found matching "{searchTerm}"</Trans>
+              </div>
+            )}
+
+            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+              {foldersData?.folders
+                .filter((folder) => !folder.pinned)
+                .map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onMove={(folder) => {
+                      setFolderToMove(folder);
+                      setIsMovingFolder(true);
+                    }}
+                    onPin={(folderId) => void pinFolder({ folderId })}
+                    onUnpin={(folderId) => void unpinFolder({ folderId })}
+                    onSettings={(folder) => {
+                      setFolderToSettings(folder);
+                      setIsSettingsFolderOpen(true);
+                    }}
+                    onDelete={(folder) => {
+                      setFolderToDelete(folder);
+                      setIsDeletingFolder(true);
+                    }}
+                  />
+                ))}
+            </div>
+          </div>
+        </>
+      )}
 
       <FolderMoveDialog
         foldersData={foldersData?.folders}
@@ -168,17 +189,19 @@ export default function DocumentsFoldersPage() {
         }}
       />
 
-      <FolderDeleteDialog
-        folder={folderToDelete}
-        isOpen={isDeletingFolder}
-        onOpenChange={(open) => {
-          setIsDeletingFolder(open);
+      {folderToDelete && (
+        <FolderDeleteDialog
+          folder={folderToDelete}
+          isOpen={isDeletingFolder}
+          onOpenChange={(open) => {
+            setIsDeletingFolder(open);
 
-          if (!open) {
-            setFolderToDelete(null);
-          }
-        }}
-      />
+            if (!open) {
+              setFolderToDelete(null);
+            }
+          }}
+        />
+      )}
     </div>
   );
 }
