@@ -83,7 +83,9 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
   const { mutateAsync: createOrganisation } = trpc.organisation.create.useMutation();
 
-  const { data: plansData } = trpc.billing.plans.get.useQuery();
+  const { data: plansData } = trpc.billing.plans.get.useQuery(undefined, {
+    enabled: IS_BILLING_ENABLED(),
+  });
 
   const onFormSubmit = async ({ name }: TCreateOrganisationFormSchema) => {
     try {

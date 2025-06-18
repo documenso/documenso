@@ -1,4 +1,4 @@
-import { DocumentStatus, SubscriptionStatus } from '@prisma/client';
+import { SubscriptionStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
@@ -12,37 +12,6 @@ export const getOrganisationsWithSubscriptionsCount = async () => {
     where: {
       subscription: {
         status: SubscriptionStatus.ACTIVE,
-      },
-    },
-  });
-};
-
-export const getUserWithAtLeastOneDocumentPerMonth = async () => {
-  return await prisma.user.count({
-    where: {
-      documents: {
-        some: {
-          createdAt: {
-            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
-          },
-        },
-      },
-    },
-  });
-};
-
-export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
-  return await prisma.user.count({
-    where: {
-      documents: {
-        some: {
-          status: {
-            equals: DocumentStatus.COMPLETED,
-          },
-          completedAt: {
-            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
-          },
-        },
       },
     },
   });
@@ -67,6 +36,8 @@ export const getUserWithSignedDocumentMonthlyGrowth = async () => {
         COUNT(DISTINCT "Document"."userId") as "count",
         COUNT(DISTINCT CASE WHEN "Document"."status" = 'COMPLETED' THEN "Document"."userId" END) as "signed_count"
       FROM "Document"
+      INNER JOIN "Team" ON "Document"."teamId" = "Team"."id"
+      INNER JOIN "Organisation" ON "Team"."organisationId" = "Organisation"."id"
       GROUP BY "month"
       ORDER BY "month" DESC
       LIMIT 12

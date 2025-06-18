@@ -752,6 +752,11 @@ msgstr "Akcje"
 msgid "Active"
 msgstr "Aktywne"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Active sessions"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
 msgstr "Aktywne subskrypcje"
@@ -818,12 +823,12 @@ msgid "Add group roles"
 msgstr "Dodaj role grupowe"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add groups"
 msgstr "Dodaj grupy"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add members"
 msgstr "Dodaj członków"
 
@@ -1614,6 +1619,7 @@ msgstr "Może przygotować"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -2221,6 +2227,7 @@ msgstr "Utwórz swoje konto i zacznij korzystać z nowoczesnego podpisywania dok
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "Utwórz swoje konto i zacznij korzystać z nowoczesnego podpisywania dokumentów. Otwarty i piękny podpis jest w zasięgu ręki."
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -2259,6 +2266,10 @@ msgstr "Utworzono {0}"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "Struktura CSV"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Current"
+msgstr ""
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -2453,6 +2464,7 @@ msgid "Details"
 msgstr "Szczegóły"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Device"
 msgstr "Urządzenie"
@@ -3179,6 +3191,7 @@ msgstr "Enterprise"
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -3221,6 +3234,7 @@ msgstr "Enterprise"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -3286,9 +3300,17 @@ msgstr "Nie udało się załadować dokumentu"
 msgid "Failed to reseal document"
 msgstr "Nie udało się ponownie zaplombować dokumentu"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Failed to revoke session"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
 msgstr "Nie udało się zapisać ustawień."
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Failed to sign out all sessions"
+msgstr ""
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
@@ -3747,7 +3769,6 @@ msgstr "Nieprawidłowy kod. Proszę spróbuj ponownie."
 msgid "Invalid email"
 msgstr "Nieprawidłowy email"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
 msgstr "Nieprawidłowy link"
@@ -3811,6 +3832,7 @@ msgid "Invoice"
 msgstr "Faktura"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 msgid "IP Address"
 msgstr "Adres IP"
@@ -3880,6 +3902,10 @@ msgstr "Ostatnie 30 dni"
 #: apps/remix/app/components/general/period-selector.tsx
 msgid "Last 7 days"
 msgstr "Ostatnie 7 dni"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Last Active"
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4029,6 +4055,10 @@ msgstr "Zarządzaj kluczami dostępu"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage permissions and access controls"
 msgstr "Zarządzaj uprawnieniami i kontrolą dostępu"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Manage sessions"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -5305,7 +5335,6 @@ msgstr "Przechowywanie dokumentów"
 msgid "Retry"
 msgstr "Spróbuj ponownie"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
@@ -5321,6 +5350,7 @@ msgstr "Powrót do strony głównej"
 msgid "Return to sign in"
 msgstr "Powrót do logowania"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke"
 msgstr "Cofnij"
@@ -5328,6 +5358,12 @@ msgstr "Cofnij"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke access"
 msgstr "Cofnij dostęp"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Revoke all sessions"
+msgstr ""
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -5482,6 +5518,10 @@ msgid "Select groups"
 msgstr "Wybierz grupy"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+msgid "Select groups of members to add to the team."
+msgstr ""
+
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
 msgstr "Wybierz grupy, które chcesz dodać do tego zespołu"
 
@@ -5492,7 +5532,6 @@ msgid "Select members"
 msgstr "Wybierz członków"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select members or groups of members to add to the team."
 msgstr "Wybierz członków lub grupy członków, aby dodać do zespołu."
 
@@ -5601,6 +5640,14 @@ msgstr "Wysyłanie..."
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Sent"
 msgstr "Wysłano"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Session revoked"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Sessions have been revoked"
+msgstr ""
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
@@ -6476,7 +6523,8 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "Poniższy zespół został usunięty. Nie będziesz mógł już uzyskać dostępu do tego zespołu i jego dokumentów."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Grupa organizacji, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6485,12 +6533,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Rola organizacji, która zostanie zastosowana do wszystkich członków tej grupy."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6574,12 +6624,14 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Email zespołowy <0>{teamEmail}</0> został usunięty z następującego zespołu"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmienić nazwę lub mógł nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony na, albo nigdy nie istniał."
 
@@ -6617,7 +6669,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "URL dla Documenso do wysyłania zdarzeń webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Użytkownik, którego szukasz, mógł zostać usunięty, zmieniony nazwę lub mógł nigdy nie istnieć."
 
@@ -6784,10 +6837,6 @@ msgstr "W ten sposób dokument dotrze do odbiorców, gdy tylko dokument będzie 
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
 msgstr "To jest roszczenie, z którym pierwotnie została utworzona ta organizacja. Wszelkie zmiany flag funkcji w tym roszczeniu zostaną przeniesione do tej organizacji."
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
-msgid "This link is invalid or has expired."
-msgstr "Ten link jest nieprawidłowy lub wygasł."
-
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się ze swoim zespołem, aby ponownie wysłać weryfikację."
@@ -6857,6 +6906,10 @@ msgstr "To zostanie wysłane do właściciela dokumentu, gdy dokument zostanie w
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
 msgstr "To będzie TYLKO przenoś funkcje flag, które są ustawione na true, wszystko, co wyłączone w początkowym roszczeniu, nie zostanie przeniesione"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
+msgstr ""
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7144,6 +7197,9 @@ msgstr "Niezakończony"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Unknown"
 msgstr "Nieznany"
 
@@ -7496,6 +7552,11 @@ msgstr "Zobacz wszystkie powiązane dokumenty"
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 msgid "View all security activity related to your account."
 msgstr "Wyświetl wszystkie aktywności związane z bezpieczeństwem twojego konta."
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "View and manage all active sessions for your account."
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -8563,4 +8624,3 @@ msgstr "Twój token został pomyślnie utworzony! Upewnij się, że go skopiujes
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Twoje tokeny będą tutaj wyświetlane po ich utworzeniu."
-
