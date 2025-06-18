@@ -619,6 +619,9 @@ model Organisation {
 
   teams Team[]
 
+  emailDomains       EmailDomain[]
+  organisationEmails OrganisationEmail[]
+
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   ownerUserId Int
@@ -951,4 +954,43 @@ model AvatarImage {
   team         Team[]
   user         User[]
   organisation Organisation[]
+}
+
+enum EmailDomainStatus {
+  PENDING
+  ACTIVE
+}
+
+model EmailDomain {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status EmailDomainStatus @default(PENDING)
+
+  selector   String @unique
+  domain     String @unique
+  publicKey  String
+  privateKey String
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  emails OrganisationEmail[]
+}
+
+model OrganisationEmail {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String  @unique
+  emailName String
+  replyTo   String?
+
+  emailDomainId String
+  emailDomain   EmailDomain @relation(fields: [emailDomainId], references: [id], onDelete: Cascade)
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
 }

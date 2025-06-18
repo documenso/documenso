@@ -1,7 +1,11 @@
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
-import type { OrganisationType } from '@documenso/prisma/client';
-import { type OrganisationClaim, type OrganisationGlobalSettings } from '@documenso/prisma/client';
+import type { OrganisationEmail, OrganisationType } from '@documenso/prisma/client';
+import {
+  EmailDomainStatus,
+  type OrganisationClaim,
+  type OrganisationGlobalSettings,
+} from '@documenso/prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
@@ -23,6 +27,7 @@ type GetEmailContextOptions = {
 };
 
 type EmailContextResponse = {
+  allowedEmails: OrganisationEmail[];
   branding: BrandingSettings;
   settings: Omit<OrganisationGlobalSettings, 'id'>;
   claims: OrganisationClaim;
@@ -51,6 +56,14 @@ export const getEmailContext = async (
       subscription: true,
       organisationClaim: true,
       organisationGlobalSettings: true,
+      emailDomains: {
+        omit: {
+          privateKey: true,
+        },
+        include: {
+          emails: true,
+        },
+      },
     },
   });
 
@@ -60,8 +73,13 @@ export const getEmailContext = async (
 
   const claims = organisation.organisationClaim;
 
+  const allowedEmails = organisation.emailDomains
+    .filter((emailDomain) => emailDomain.status === EmailDomainStatus.ACTIVE)
+    .flatMap((emailDomain) => emailDomain.emails);
+
   if (source.type === 'organisation') {
     return {
+      allowedEmails,
       branding: organisationGlobalSettingsToBranding(
         organisation.organisationGlobalSettings,
         organisation.id,
@@ -78,6 +96,7 @@ export const getEmailContext = async (
   });
 
   return {
+    allowedEmails,
     branding: teamGlobalSettingsToBranding(
       teamSettings,
       source.teamId,

@@ -449,7 +449,11 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         adjustedFieldY = adjustedPosition.yPos;
       }
 
-      // Set properties for the text field
+      /**
+       * POTENTIAL ERROR POINT 1:
+       * If the PDF's form dictionary is corrupted or missing, this could throw
+       * "Expected instance of PDFDict, but got instance of undefined"
+       */
       setTextFieldFontSize(textField, font, fontSize);
       textField.setText(textToInsert);
 
@@ -640,16 +644,31 @@ function breakLongString(text: string, maxWidth: number, font: PDFFont, fontSize
 }
 
 const setTextFieldFontSize = (textField: PDFTextField, font: PDFFont, fontSize: number) => {
+  /**
+   * POTENTIAL ERROR POINT 2:
+   * If the text field's appearance dictionary is corrupted or missing,
+   * this could throw "Expected instance of PDFDict, but got instance of undefined"
+   */
   textField.defaultUpdateAppearances(font);
   textField.updateAppearances(font);
 
   try {
     textField.setFontSize(fontSize);
   } catch (err) {
+    /**
+     * POTENTIAL ERROR POINT 3:
+     * If textField.acroField is undefined or corrupted,
+     * getDefaultAppearance() could throw "Expected instance of PDFDict, but got instance of undefined"
+     */
     let da = textField.acroField.getDefaultAppearance() ?? '';
 
     da += `\n ${setFontAndSize(font.name, fontSize)}`;
 
+    /**
+     * POTENTIAL ERROR POINT 4:
+     * If textField.acroField is undefined or corrupted,
+     * setDefaultAppearance() could throw "Expected instance of PDFDict, but got instance of undefined"
+     */
     textField.acroField.setDefaultAppearance(da);
   }
 
