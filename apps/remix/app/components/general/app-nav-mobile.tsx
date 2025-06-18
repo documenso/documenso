@@ -8,6 +8,7 @@ import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
 
@@ -24,6 +25,10 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
   const { organisations } = useSession();
 
   const currentTeam = useOptionalCurrentTeam();
+
+  const { data: unreadCountData } = trpc.document.inbox.getUnreadCount.useQuery(undefined, {
+    refetchInterval: 30000, // Refetch every 30 seconds
+  });
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);
@@ -52,11 +57,11 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
     return [
       {
         href: `/t/${teamUrl}/documents`,
-        label: t`Documents`,
+        text: t`Documents`,
       },
       {
         href: `/t/${teamUrl}/templates`,
-        label: t`Templates`,
+        text: t`Templates`,
       },
       {
         href: '/inbox',
@@ -86,11 +91,16 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           {menuNavigationLinks.map(({ href, text }) => (
             <Link
               key={href}
-              className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
+              className="text-foreground hover:text-foreground/80 flex items-center gap-2 text-2xl font-semibold"
               to={href}
               onClick={() => handleMenuItemClick()}
             >
               {text}
+              {href === '/inbox' && unreadCountData && unreadCountData.count > 0 && (
+                <span className="bg-primary text-primary-foreground flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-semibold">
+                  {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
+                </span>
+              )}
             </Link>
           ))}
 

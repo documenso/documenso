@@ -28,6 +28,7 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { findInboxRoute } from './find-inbox';
+import { getInboxUnreadCountRoute } from './get-inbox-unread-count';
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentV2RequestSchema,
@@ -59,6 +60,7 @@ import { updateDocumentRoute } from './update-document';
 export const documentRouter = router({
   inbox: {
     find: findInboxRoute,
+    getUnreadCount: getInboxUnreadCountRoute,
   },
 
   /**
