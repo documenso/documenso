@@ -170,7 +170,7 @@ export const templateRouter = router({
       const createdTemplate = await createTemplate({
         userId: user.id,
         teamId,
-        title: data?.title || '',
+        title: data?.title || 'untitled',
         templateDocumentDataId: templateDocumentData.id,
         data: {
           ...data,

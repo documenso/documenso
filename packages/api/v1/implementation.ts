@@ -397,6 +397,34 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
+      const dateFormat = body?.meta?.dateFormat
+        ? DATE_FORMATS.find((format) => format.value === body?.meta?.dateFormat)
+        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+
+      if (body?.meta?.dateFormat && !dateFormat) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
+          },
+        };
+      }
+
+      const timezone = body?.meta?.timezone
+        ? TIME_ZONES.find((tz) => tz === body?.meta?.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isTimeZoneValid = body?.meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+
+      if (!isTimeZoneValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid timezone. Please provide a valid timezone',
+          },
+        };
+      }
+
       const fileName = data?.title?.endsWith('.pdf')
         ? data.title
         : `${data?.title ?? 'untitled'}.pdf`;

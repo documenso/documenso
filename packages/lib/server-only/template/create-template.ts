@@ -74,6 +74,7 @@ export const createTemplate = async ({
       teamId,
       userId,
       templateDocumentDataId,
+      folderId,
       externalId: data?.externalId,
       useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
       visibility: data?.visibility ?? settings.documentVisibility,

@@ -98,7 +98,7 @@ export const ApiContractV1 = c.router(
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },
-      summary: 'Create a new template',
+      summary: 'Create a new template and get a presigned URL',
     },
 
     deleteTemplate: {
