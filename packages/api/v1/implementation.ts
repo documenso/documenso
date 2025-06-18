@@ -425,9 +425,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const fileName = data?.title?.endsWith('.pdf')
-        ? data.title
-        : `${data?.title ?? 'untitled'}.pdf`;
+      const fileName = data?.title?.endsWith('.pdf') ? data.title : `${data?.title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
 
@@ -437,7 +435,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       const template = await createTemplate({
-        title: data?.title || 'untitled',
+        title: data?.title,
         userId: user.id,
         teamId: team?.id,
         templateDocumentDataId: templateDocumentData.id,
