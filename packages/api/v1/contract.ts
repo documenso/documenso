@@ -8,6 +8,8 @@ import {
   ZCreateDocumentMutationSchema,
   ZCreateFieldMutationSchema,
   ZCreateRecipientMutationSchema,
+  ZCreateTemplateMutationResponseSchema,
+  ZCreateTemplateMutationSchema,
   ZDeleteDocumentMutationSchema,
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
@@ -85,6 +87,18 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Upload a new document and get a presigned URL',
+    },
+
+    createTemplate: {
+      method: 'POST',
+      path: '/api/v1/templates',
+      body: ZCreateTemplateMutationSchema,
+      responses: {
+        200: ZCreateTemplateMutationResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Create a new template',
     },
 
     deleteTemplate: {
