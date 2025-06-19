@@ -2,7 +2,6 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { FolderType } from '@prisma/client';
-import { AnimatePresence, motion } from 'framer-motion';
 import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -38,7 +37,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
   const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
-  const { data: foldersData, isLoading: isFoldersLoading } = trpc.folder.getFolders.useQuery({
+  const { data: foldersData, isPending } = trpc.folder.getFolders.useQuery({
     type,
     parentId,
   });
@@ -68,7 +67,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
 
   return (
     <div>
-      <div className="mb-2 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+      <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div
           className="text-muted-foreground hover:text-muted-foreground/80 flex flex-1 items-center text-sm font-medium"
           data-testid="folder-grid-breadcrumbs"
@@ -78,15 +77,23 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
             <Trans>Home</Trans>
           </Link>
 
-          {foldersData?.breadcrumbs.map((folder) => (
-            <div key={folder.id} className="flex items-center">
-              <span className="px-3">/</span>
-              <Link to={formatBreadCrumbPath(folder.id)} className="flex items-center">
-                <FolderIcon className="mr-2 h-4 w-4" />
-                <span>{folder.name}</span>
-              </Link>
+          {isPending && parentId ? (
+            <div className="flex items-center">
+              <Skeleton className="mx-3 h-4 w-1 rotate-12" />
+
+              <Skeleton className="h-4 w-20" />
             </div>
-          ))}
+          ) : (
+            foldersData?.breadcrumbs.map((folder) => (
+              <div key={folder.id} className="flex items-center">
+                <span className="px-3">/</span>
+                <Link to={formatBreadCrumbPath(folder.id)} className="flex items-center">
+                  <FolderIcon className="mr-2 h-4 w-4" />
+                  <span>{folder.name}</span>
+                </Link>
+              </div>
+            ))
+          )}
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
@@ -100,143 +107,104 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        {isFoldersLoading ? (
-          <motion.div
-            key="skeleton"
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {Array.from({ length: 4 }).map((_, index) => (
-                <div
-                  key={index}
-                  className="border-border bg-card h-full rounded-lg border px-4 py-5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Skeleton className="h-8 w-8 rounded" />
-                    <div className="flex w-full items-center justify-between">
-                      <div className="flex-1">
-                        <Skeleton className="mb-2 h-4 w-24" />
-                        <div className="flex space-x-2">
-                          <Skeleton className="h-3 w-16" />
-                          <Skeleton className="h-3 w-3" />
-                          <Skeleton className="h-3 w-12" />
-                        </div>
-                      </div>
-                      <Skeleton className="h-8 w-2 rounded" />
+      {isPending ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="border-border bg-card h-full rounded-lg border px-4 py-5">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-8 w-8 rounded" />
+                <div className="flex w-full items-center justify-between">
+                  <div className="flex-1">
+                    <Skeleton className="mb-2 h-4 w-24" />
+                    <div className="flex space-x-2">
+                      <Skeleton className="h-3 w-16" />
+                      <Skeleton className="h-3 w-3" />
+                      <Skeleton className="h-3 w-12" />
                     </div>
                   </div>
+                  <Skeleton className="h-8 w-2 rounded" />
                 </div>
-              ))}
+              </div>
             </div>
-          </motion.div>
-        ) : foldersData && foldersData.folders.length === 0 ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              <FolderCreateDialog
-                type={type}
-                trigger={
-                  <button>
-                    <FolderCardEmpty type={type} />
-                  </button>
-                }
-              />
-            </div>
-          </motion.div>
-        ) : (
-          foldersData && (
-            <motion.div
-              key="content"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-              className="space-y-4"
-            >
-              {pinnedFolders.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {pinnedFolders.map((folder, index) => (
-                    <motion.div
-                      key={folder.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.1 }}
-                    >
-                      <FolderCard
-                        folder={folder}
-                        onMove={(folder) => {
-                          setFolderToMove(folder);
-                          setIsMovingFolder(true);
-                        }}
-                        onPin={(folderId) => void pinFolder({ folderId })}
-                        onUnpin={(folderId) => void unpinFolder({ folderId })}
-                        onSettings={(folder) => {
-                          setFolderToSettings(folder);
-                          setIsSettingsFolderOpen(true);
-                        }}
-                        onDelete={(folder) => {
-                          setFolderToDelete(folder);
-                          setIsDeletingFolder(true);
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+          ))}
+        </div>
+      ) : foldersData && foldersData.folders.length === 0 ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+          <FolderCreateDialog
+            type={type}
+            trigger={
+              <button>
+                <FolderCardEmpty type={type} />
+              </button>
+            }
+          />
+        </div>
+      ) : (
+        foldersData && (
+          <div key="content" className="space-y-4">
+            {pinnedFolders.length > 0 && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {pinnedFolders.map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onMove={(folder) => {
+                      setFolderToMove(folder);
+                      setIsMovingFolder(true);
+                    }}
+                    onPin={(folderId) => void pinFolder({ folderId })}
+                    onUnpin={(folderId) => void unpinFolder({ folderId })}
+                    onSettings={(folder) => {
+                      setFolderToSettings(folder);
+                      setIsSettingsFolderOpen(true);
+                    }}
+                    onDelete={(folder) => {
+                      setFolderToDelete(folder);
+                      setIsDeletingFolder(true);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
-              {unpinnedFolders.length > 0 && (
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                  {unpinnedFolders.slice(0, 12).map((folder, index) => (
-                    <motion.div
-                      key={folder.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ duration: 0.3, delay: index * 0.05 }}
-                    >
-                      <FolderCard
-                        folder={folder}
-                        onMove={(folder) => {
-                          setFolderToMove(folder);
-                          setIsMovingFolder(true);
-                        }}
-                        onPin={(folderId) => void pinFolder({ folderId })}
-                        onUnpin={(folderId) => void unpinFolder({ folderId })}
-                        onSettings={(folder) => {
-                          setFolderToSettings(folder);
-                          setIsSettingsFolderOpen(true);
-                        }}
-                        onDelete={(folder) => {
-                          setFolderToDelete(folder);
-                          setIsDeletingFolder(true);
-                        }}
-                      />
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+            {unpinnedFolders.length > 0 && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+                {unpinnedFolders.slice(0, 12).map((folder) => (
+                  <FolderCard
+                    key={folder.id}
+                    folder={folder}
+                    onMove={(folder) => {
+                      setFolderToMove(folder);
+                      setIsMovingFolder(true);
+                    }}
+                    onPin={(folderId) => void pinFolder({ folderId })}
+                    onUnpin={(folderId) => void unpinFolder({ folderId })}
+                    onSettings={(folder) => {
+                      setFolderToSettings(folder);
+                      setIsSettingsFolderOpen(true);
+                    }}
+                    onDelete={(folder) => {
+                      setFolderToDelete(folder);
+                      setIsDeletingFolder(true);
+                    }}
+                  />
+                ))}
+              </div>
+            )}
 
-              {foldersData.folders.length > 12 && (
-                <div className="mt-2 flex items-center justify-center">
-                  <Link
-                    className="text-muted-foreground hover:text-foreground text-sm font-medium"
-                    to={formatViewAllFoldersPath()}
-                  >
-                    View all folders
-                  </Link>
-                </div>
-              )}
-            </motion.div>
-          )
-        )}
-      </AnimatePresence>
+            {foldersData.folders.length > 12 && (
+              <div className="mt-2 flex items-center justify-center">
+                <Link
+                  className="text-muted-foreground hover:text-foreground text-sm font-medium"
+                  to={formatViewAllFoldersPath()}
+                >
+                  View all folders
+                </Link>
+              </div>
+            )}
+          </div>
+        )
+      )}
 
       <FolderMoveDialog
         foldersData={foldersData?.folders}
