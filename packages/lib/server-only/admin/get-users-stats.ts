@@ -1,54 +1,17 @@
 import { DateTime } from 'luxon';
 
 import { kyselyPrisma, prisma, sql } from '@documenso/prisma';
-import {
-  DocumentStatus,
-  SubscriptionStatus,
-  UserSecurityAuditLogType,
-} from '@documenso/prisma/client';
+import { SubscriptionStatus, UserSecurityAuditLogType } from '@documenso/prisma/client';
 
 export const getUsersCount = async () => {
   return await prisma.user.count();
 };
 
-export const getUsersWithSubscriptionsCount = async () => {
-  return await prisma.user.count({
+export const getOrganisationsWithSubscriptionsCount = async () => {
+  return await prisma.organisation.count({
     where: {
-      subscriptions: {
-        some: {
-          status: SubscriptionStatus.ACTIVE,
-        },
-      },
-    },
-  });
-};
-
-export const getUserWithAtLeastOneDocumentPerMonth = async () => {
-  return await prisma.user.count({
-    where: {
-      documents: {
-        some: {
-          createdAt: {
-            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
-          },
-        },
-      },
-    },
-  });
-};
-
-export const getUserWithAtLeastOneDocumentSignedPerMonth = async () => {
-  return await prisma.user.count({
-    where: {
-      documents: {
-        some: {
-          status: {
-            equals: DocumentStatus.COMPLETED,
-          },
-          completedAt: {
-            gte: DateTime.now().minus({ months: 1 }).toJSDate(),
-          },
-        },
+      subscription: {
+        status: SubscriptionStatus.ACTIVE,
       },
     },
   });
@@ -73,6 +36,8 @@ export const getUserWithSignedDocumentMonthlyGrowth = async () => {
         COUNT(DISTINCT "Document"."userId") as "count",
         COUNT(DISTINCT CASE WHEN "Document"."status" = 'COMPLETED' THEN "Document"."userId" END) as "signed_count"
       FROM "Document"
+      INNER JOIN "Team" ON "Document"."teamId" = "Team"."id"
+      INNER JOIN "Organisation" ON "Team"."organisationId" = "Organisation"."id"
       GROUP BY "month"
       ORDER BY "month" DESC
       LIMIT 12

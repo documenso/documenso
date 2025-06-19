@@ -3,19 +3,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
-  Check,
   CheckSquare,
   ChevronDown,
-  ChevronsUpDown,
   Contact,
   Disc,
   Hash,
-  Info,
   Mail,
   Type,
   User,
@@ -27,7 +23,6 @@ import { prop, sortBy } from 'remeda';
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -42,16 +37,13 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
+import { useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
-import { Button } from '../button';
 import { Card, CardContent } from '../card';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '../command';
 import { Form } from '../form/form';
-import { Popover, PopoverContent, PopoverTrigger } from '../popover';
+import { RecipientSelector } from '../recipient-selector';
 import { useStep } from '../stepper';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import { useToast } from '../use-toast';
 import type { TAddFieldsFormSchema } from './add-fields.types';
 import {
@@ -93,7 +85,7 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddFieldsFormPartial = ({
@@ -174,7 +166,6 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -182,9 +173,10 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedSignerStyles = useRecipientColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
@@ -407,35 +399,60 @@ export const AddFieldsFormPartial = ({
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TAddFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
+          append(newField);
+
+          return;
+        }
+
+        if (duplicateAll) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
+
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
+            }
+
+            const newField: TAddFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TAddFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          formId: nanoid(12),
-          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, toast],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -447,6 +464,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
@@ -586,7 +604,6 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -600,13 +617,12 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                    selectedSignerStyles.default.base,
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -645,15 +661,17 @@ export const AddFieldsFormPartial = ({
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
+                      onMouseEnter={() => setLastActiveField(field)}
+                      onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
                       onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
                       }}
-                      hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
                       active={activeFieldId === field.formId}
                       onFieldActivate={() => setActiveFieldId(field.formId)}
@@ -663,123 +681,12 @@ export const AddFieldsFormPartial = ({
                 })}
 
               {!hideRecipients && (
-                <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
-                        selectedSignerStyles.default.base,
-                      )}
-                    >
-                      {selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">
-                          {selectedSigner?.name} ({selectedSigner?.email})
-                        </span>
-                      )}
-
-                      {!selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">{selectedSigner?.email}</span>
-                      )}
-
-                      <ChevronsUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
-
-                  <PopoverContent className="p-0" align="start">
-                    <Command value={selectedSigner?.email}>
-                      <CommandInput />
-
-                      <CommandEmpty>
-                        <span className="text-muted-foreground inline-block px-4">
-                          <Trans>No recipient matching this description was found.</Trans>
-                        </span>
-                      </CommandEmpty>
-
-                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
-                        <CommandGroup key={roleIndex}>
-                          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
-                          </div>
-
-                          {roleRecipients.length === 0 && (
-                            <div
-                              key={`${role}-empty`}
-                              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
-                            >
-                              <Trans>No recipients with this role</Trans>
-                            </div>
-                          )}
-
-                          {roleRecipients.map((recipient) => (
-                            <CommandItem
-                              key={recipient.id}
-                              className={cn(
-                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                                getSignerColorStyles(
-                                  Math.max(
-                                    recipients.findIndex((r) => r.id === recipient.id),
-                                    0,
-                                  ),
-                                ).default.comboxBoxItem,
-                                {
-                                  'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
-                                },
-                              )}
-                              onSelect={() => {
-                                setSelectedSigner(recipient);
-                                setShowRecipientsSelector(false);
-                              }}
-                            >
-                              <span
-                                className={cn('text-foreground/70 truncate', {
-                                  'text-foreground/80': recipient === selectedSigner,
-                                })}
-                              >
-                                {recipient.name && (
-                                  <span title={`${recipient.name} (${recipient.email})`}>
-                                    {recipient.name} ({recipient.email})
-                                  </span>
-                                )}
-
-                                {!recipient.name && (
-                                  <span title={recipient.email}>{recipient.email}</span>
-                                )}
-                              </span>
-
-                              <div className="ml-auto flex items-center justify-center">
-                                {recipient.sendStatus !== SendStatus.SENT ? (
-                                  <Check
-                                    aria-hidden={recipient !== selectedSigner}
-                                    className={cn('h-4 w-4 flex-shrink-0', {
-                                      'opacity-0': recipient !== selectedSigner,
-                                      'opacity-100': recipient === selectedSigner,
-                                    })}
-                                  />
-                                ) : (
-                                  <Tooltip>
-                                    <TooltipTrigger>
-                                      <Info className="ml-2 h-4 w-4" />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent className="text-muted-foreground max-w-xs">
-                                      <Trans>
-                                        This document has already been sent to this recipient. You
-                                        can no longer edit this recipient.
-                                      </Trans>
-                                    </TooltipContent>
-                                  </Tooltip>
-                                )}
-                              </div>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      ))}
-                    </Command>
-                  </PopoverContent>
-                </Popover>
+                <RecipientSelector
+                  selectedRecipient={selectedSigner}
+                  onSelectedRecipientChange={setSelectedSigner}
+                  recipients={recipients}
+                  className="mb-12 mt-2"
+                />
               )}
 
               <Form {...form}>
@@ -795,7 +702,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -820,7 +726,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -846,7 +751,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -872,7 +776,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -898,7 +801,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -924,7 +826,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -950,7 +851,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -976,7 +876,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -1002,7 +901,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -1029,7 +927,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">

@@ -130,6 +130,7 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
     .nativeEnum(DocumentStatus)
     .describe('Filter documents by the current status')
     .optional(),
+  folderId: z.string().describe('Filter documents by folder ID').optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
 });
@@ -144,6 +145,7 @@ export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.e
   period: z.enum(['7d', '14d', '30d']).optional(),
   senderIds: z.array(z.number()).optional(),
   status: z.nativeEnum(ExtendedDocumentStatus).optional(),
+  folderId: z.string().optional(),
 });
 
 export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
@@ -188,6 +190,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 
 export const ZGetDocumentWithDetailsByIdRequestSchema = z.object({
   documentId: z.number(),
+  folderId: z.string().describe('Filter documents by folder ID').optional(),
 });
 
 export const ZGetDocumentWithDetailsByIdResponseSchema = ZDocumentSchema;
@@ -196,14 +199,15 @@ export const ZCreateDocumentRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
+  folderId: z.string().describe('The ID of the folder to create the document in').optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
-  globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-  globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
   recipients: z
     .array(
@@ -340,10 +344,3 @@ export const ZDownloadAuditLogsMutationSchema = z.object({
 export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
-
-export const ZMoveDocumentToTeamSchema = z.object({
-  documentId: z.number().describe('The ID of the document to move to a team.'),
-  teamId: z.number().describe('The ID of the team to move the document to.'),
-});
-
-export const ZMoveDocumentToTeamResponseSchema = ZDocumentLiteSchema;

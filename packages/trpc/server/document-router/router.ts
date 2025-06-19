@@ -19,16 +19,16 @@ import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
-import { moveDocumentToTeam } from '@documenso/lib/server-only/document/move-document-to-team';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { findInboxRoute } from './find-inbox';
+import { getInboxCountRoute } from './get-inbox-count';
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentV2RequestSchema,
@@ -50,20 +50,19 @@ import {
   ZGetDocumentByTokenQuerySchema,
   ZGetDocumentWithDetailsByIdRequestSchema,
   ZGetDocumentWithDetailsByIdResponseSchema,
-  ZMoveDocumentToTeamResponseSchema,
-  ZMoveDocumentToTeamSchema,
   ZResendDocumentMutationSchema,
   ZSearchDocumentsMutationSchema,
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
 } from './schema';
 import { updateDocumentRoute } from './update-document';
-import {
-  ZUpdateDocumentRequestSchema,
-  ZUpdateDocumentResponseSchema,
-} from './update-document.types';
 
 export const documentRouter = router({
+  inbox: {
+    find: findInboxRoute,
+    getCount: getInboxCountRoute,
+  },
+
   /**
    * @private
    */
@@ -112,8 +111,17 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { user, teamId } = ctx;
 
-      const { query, templateId, page, perPage, orderByDirection, orderByColumn, source, status } =
-        input;
+      const {
+        query,
+        templateId,
+        page,
+        perPage,
+        orderByDirection,
+        orderByColumn,
+        source,
+        status,
+        folderId,
+      } = input;
 
       const documents = await findDocuments({
         userId: user.id,
@@ -124,6 +132,7 @@ export const documentRouter = router({
         status,
         page,
         perPage,
+        folderId,
         orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
       });
 
@@ -152,12 +161,14 @@ export const documentRouter = router({
         status,
         period,
         senderIds,
+        folderId,
       } = input;
 
       const getStatOptions: GetStatsInput = {
         user,
         period,
         search: query,
+        folderId,
       };
 
       if (teamId) {
@@ -167,7 +178,7 @@ export const documentRouter = router({
           teamId: team.id,
           teamEmail: team.teamEmail?.email,
           senderIds,
-          currentTeamMemberRole: team.currentTeamMember?.role,
+          currentTeamMemberRole: team.currentTeamRole,
           currentUserEmail: user.email,
           userId: user.id,
         };
@@ -186,6 +197,7 @@ export const documentRouter = router({
           status,
           period,
           senderIds,
+          folderId,
           orderBy: orderByColumn
             ? { column: orderByColumn, direction: orderByDirection }
             : undefined,
@@ -217,12 +229,13 @@ export const documentRouter = router({
     .output(ZGetDocumentWithDetailsByIdResponseSchema)
     .query(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { documentId } = input;
+      const { documentId, folderId } = input;
 
       return await getDocumentWithDetailsById({
         userId: user.id,
         teamId,
         documentId,
+        folderId,
       });
     }),
 
@@ -246,7 +259,7 @@ export const documentRouter = router({
     .input(ZCreateDocumentV2RequestSchema)
     .output(ZCreateDocumentV2ResponseSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
+      const { teamId, user } = ctx;
 
       const {
         title,
@@ -258,7 +271,7 @@ export const documentRouter = router({
         meta,
       } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -295,6 +308,7 @@ export const documentRouter = router({
 
       return {
         document: createdDocument,
+        folder: createdDocument.folder,
         uploadUrl: url,
       };
     }),
@@ -315,10 +329,10 @@ export const documentRouter = router({
     // })
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { title, documentDataId, timezone } = input;
+      const { user, teamId } = ctx;
+      const { title, documentDataId, timezone, folderId } = input;
 
-      const { remaining } = await getServerLimits({ email: ctx.user.email, teamId });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -328,60 +342,18 @@ export const documentRouter = router({
       }
 
       return await createDocument({
-        userId: ctx.user.id,
+        userId: user.id,
         teamId,
         title,
         documentDataId,
         normalizePdf: true,
         timezone,
         requestMetadata: ctx.metadata,
+        folderId,
       });
     }),
 
   updateDocument: updateDocumentRoute,
-
-  /**
-   * @deprecated Delete this after updateDocument endpoint is deployed
-   */
-  setSettingsForDocument: authenticatedProcedure
-    .input(ZUpdateDocumentRequestSchema)
-    .output(ZUpdateDocumentResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId } = ctx;
-      const { documentId, data, meta = {} } = input;
-
-      const userId = ctx.user.id;
-
-      if (Object.values(meta).length > 0) {
-        await upsertDocumentMeta({
-          userId: ctx.user.id,
-          teamId,
-          documentId,
-          subject: meta.subject,
-          message: meta.message,
-          timezone: meta.timezone,
-          dateFormat: meta.dateFormat,
-          language: meta.language,
-          typedSignatureEnabled: meta.typedSignatureEnabled,
-          uploadSignatureEnabled: meta.uploadSignatureEnabled,
-          drawSignatureEnabled: meta.drawSignatureEnabled,
-          redirectUrl: meta.redirectUrl,
-          distributionMethod: meta.distributionMethod,
-          signingOrder: meta.signingOrder,
-          allowDictateNextSigner: meta.allowDictateNextSigner,
-          emailSettings: meta.emailSettings,
-          requestMetadata: ctx.metadata,
-        });
-      }
-
-      return await updateDocument({
-        userId,
-        teamId,
-        documentId,
-        data,
-        requestMetadata: ctx.metadata,
-      });
-    }),
 
   /**
    * @public
@@ -411,33 +383,6 @@ export const documentRouter = router({
       });
 
       return ZGenericSuccessResponse;
-    }),
-
-  /**
-   * @public
-   */
-  moveDocumentToTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/document/move',
-        summary: 'Move document',
-        description: 'Move a document from your personal account to a team',
-        tags: ['Document'],
-      },
-    })
-    .input(ZMoveDocumentToTeamSchema)
-    .output(ZMoveDocumentToTeamResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { documentId, teamId } = input;
-      const userId = ctx.user.id;
-
-      return await moveDocumentToTeam({
-        documentId,
-        teamId,
-        userId,
-        requestMetadata: ctx.metadata,
-      });
     }),
 
   /**

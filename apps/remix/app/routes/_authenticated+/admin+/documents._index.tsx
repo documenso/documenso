@@ -90,7 +90,7 @@ export default function AdminDocumentsPage() {
               <TooltipTrigger>
                 <Link to={`/admin/users/${row.original.user.id}`}>
                   <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                    <AvatarFallback className="text-xs text-gray-400">
+                    <AvatarFallback className="text-muted-foreground text-xs">
                       {avatarFallbackText}
                     </AvatarFallback>
                   </Avatar>
@@ -99,7 +99,7 @@ export default function AdminDocumentsPage() {
 
               <TooltipContent className="flex max-w-xs items-center gap-2">
                 <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                  <AvatarFallback className="text-xs text-gray-400">
+                  <AvatarFallback className="text-muted-foreground text-xs">
                     {avatarFallbackText}
                   </AvatarFallback>
                 </Avatar>

@@ -14,13 +14,16 @@ import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-s
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
 import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
+import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
+import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../../types/webhook-payload';
+import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
@@ -45,16 +48,12 @@ export const run = async ({
     include: {
       documentMeta: true,
       recipients: true,
-      team: {
-        select: {
-          teamGlobalSettings: {
-            select: {
-              includeSigningCertificate: true,
-            },
-          },
-        },
-      },
     },
+  });
+
+  const settings = await getTeamSettings({
+    userId: document.userId,
+    teamId: document.teamId,
   });
 
   const isComplete =
@@ -129,22 +128,32 @@ export const run = async ({
     documentData.data = documentData.initialData;
   }
 
+  if (!document.qrToken) {
+    await prisma.document.update({
+      where: {
+        id: document.id,
+      },
+      data: {
+        qrToken: prefixedId('qr'),
+      },
+    });
+  }
+
   const pdfData = await getFileServerSide(documentData);
 
-  const certificateData =
-    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
-      ? await getCertificatePdf({
-          documentId,
-          language: document.documentMeta?.language,
-        }).catch(() => null)
-      : null;
+  const certificateData = settings.includeSigningCertificate
+    ? await getCertificatePdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch(() => null)
+    : null;
 
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
     const pdfDoc = await PDFDocument.load(pdfData);
 
     // Normalize and flatten layers that could cause issues with the signature
     normalizeSignatureAppearances(pdfDoc);
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
     flattenAnnotations(pdfDoc);
 
     // Add rejection stamp if the document is rejected
@@ -167,13 +176,15 @@ export const run = async ({
 
     for (const field of fields) {
       if (field.inserted) {
-        await insertFieldInPDF(pdfDoc, field);
+        document.useLegacyFieldInsertion
+          ? await legacy_insertFieldInPDF(pdfDoc, field)
+          : await insertFieldInPDF(pdfDoc, field);
       }
     }
 
     // Re-flatten the form to handle our checkbox and radio fields that
     // create native arcoFields
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });

@@ -9,6 +9,7 @@ import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import {
   DOCUMENT_DISTRIBUTION_METHODS,
@@ -50,6 +51,10 @@ import {
 } from '@documenso/ui/primitives/form/form';
 
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
+import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '../../components/document/document-read-only-fields';
 import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
 import {
@@ -59,7 +64,6 @@ import {
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
 } from '../document-flow/document-flow-root';
-import { ShowFieldItem } from '../document-flow/show-field-item';
 import type { DocumentFlowStep } from '../document-flow/types';
 import { Input } from '../input';
 import { MultiSelectCombobox } from '../multi-select-combobox';
@@ -74,7 +78,6 @@ export type AddTemplateSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   template: TTemplate;
   currentTeamMemberRole?: TeamMemberRole;
@@ -85,13 +88,14 @@ export const AddTemplateSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  isEnterprise,
   isDocumentPdfLoaded,
   template,
   currentTeamMemberRole,
   onSubmit,
 }: AddTemplateSettingsFormProps) => {
   const { t, i18n } = useLingui();
+
+  const organisation = useCurrentOrganisation();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: template.authOptions,
@@ -103,8 +107,8 @@ export const AddTemplateSettingsFormPartial = ({
       title: template.title,
       externalId: template.externalId || undefined,
       visibility: template.visibility || '',
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
+      globalActionAuth: documentAuthOption?.globalActionAuth || [],
       meta: {
         subject: template.templateMeta?.subject ?? '',
         message: template.templateMeta?.message ?? '',
@@ -153,10 +157,13 @@ export const AddTemplateSettingsFormPartial = ({
       />
 
       <DocumentFlowFormContainerContent>
-        {isDocumentPdfLoaded &&
-          fields.map((field, index) => (
-            <ShowFieldItem key={index} field={field} recipients={recipients} />
-          ))}
+        {isDocumentPdfLoaded && (
+          <DocumentReadOnlyFields
+            showRecipientColors={true}
+            recipientIds={recipients.map((recipient) => recipient.id)}
+            fields={mapFieldsWithRecipients(fields, recipients)}
+          />
+        )}
 
         <Form {...form}>
           <fieldset
@@ -231,7 +238,11 @@ export const AddTemplateSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <DocumentGlobalAuthAccessSelect {...field} onValueChange={field.onChange} />
+                    <DocumentGlobalAuthAccessSelect
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -360,7 +371,7 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
-            {isEnterprise && (
+            {organisation.organisationClaim.flags.cfr21 && (
               <FormField
                 control={form.control}
                 name="globalActionAuth"
@@ -372,7 +383,11 @@ export const AddTemplateSettingsFormPartial = ({
                     </FormLabel>
 
                     <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                      <DocumentGlobalAuthActionSelect
+                        value={field.value}
+                        disabled={field.disabled}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}

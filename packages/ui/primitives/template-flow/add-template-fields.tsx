@@ -53,7 +53,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { getSignerColorStyles, useSignerColors } from '../../lib/signer-colors';
+import { getRecipientColorStyles, useRecipientColors } from '../../lib/recipient-colors';
 import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { Form } from '../form/form';
@@ -68,16 +68,14 @@ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type AddTemplateFieldsFormProps = {
   documentFlow: DocumentFlowStep;
-  hideRecipients?: boolean;
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddTemplateFieldsFormPartial = ({
   documentFlow,
-  hideRecipients = false,
   recipients,
   fields,
   onSubmit,
@@ -136,49 +134,69 @@ export const AddTemplateFieldsFormPartial = ({
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedSignerStyles = useRecipientColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            signerId: selectedSigner?.id ?? lastActiveField.signerId,
+            signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
+          append(newField);
+
+          return;
+        }
+
+        if (duplicateAll) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
+
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
+            }
+
+            const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              signerId: selectedSigner?.id ?? lastActiveField.signerId,
+              signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TAddTemplateFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          formId: nanoid(12),
-          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-          signerId: selectedSigner?.id ?? lastActiveField.signerId,
-          signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
-    [
-      append,
-      lastActiveField,
-      selectedSigner?.email,
-      selectedSigner?.id,
-      selectedSigner?.token,
-      toast,
-    ],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -191,6 +209,7 @@ export const AddTemplateFieldsFormPartial = ({
         append({
           ...copiedField,
           formId: nanoid(12),
+          nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
@@ -492,7 +511,6 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -505,8 +523,8 @@ export const AddTemplateFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                    selectedSignerStyles.default.base,
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
@@ -545,11 +563,11 @@ export const AddTemplateFieldsFormPartial = ({
                     onMove={(options) => onFieldMove(options, index)}
                     onRemove={() => remove(index)}
                     onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                    onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                     onAdvancedSettings={() => {
                       setCurrentField(field);
                       handleAdvancedSettings();
                     }}
-                    hideRecipients={hideRecipients}
                     active={activeFieldId === field.formId}
                     onFieldActivate={() => setActiveFieldId(field.formId)}
                     onFieldDeactivate={() => setActiveFieldId(null)}
@@ -557,99 +575,98 @@ export const AddTemplateFieldsFormPartial = ({
                 );
               })}
 
-              {!hideRecipients && (
-                <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      role="combobox"
-                      className={cn(
-                        'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
-                        selectedSignerStyles.default.base,
-                      )}
-                    >
-                      {selectedSigner?.email && (
-                        <span className="flex-1 truncate text-left">
-                          {selectedSigner?.name} ({selectedSigner?.email})
-                        </span>
-                      )}
+              <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
+                <PopoverTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    role="combobox"
+                    className={cn(
+                      'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
+                      selectedSignerStyles?.comboxBoxTrigger,
+                    )}
+                  >
+                    {selectedSigner?.email && (
+                      <span className="flex-1 truncate text-left">
+                        {selectedSigner?.name} ({selectedSigner?.email})
+                      </span>
+                    )}
 
-                      {!selectedSigner?.email && (
-                        <span className="gradie flex-1 truncate text-left">
-                          {selectedSigner?.email}
-                        </span>
-                      )}
+                    {!selectedSigner?.email && (
+                      <span className="gradie flex-1 truncate text-left">
+                        {selectedSigner?.email}
+                      </span>
+                    )}
 
-                      <ChevronsUpDown className="ml-2 h-4 w-4" />
-                    </Button>
-                  </PopoverTrigger>
+                    <ChevronsUpDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
 
-                  <PopoverContent className="p-0" align="start">
-                    <Command value={selectedSigner?.email}>
-                      <CommandInput />
+                <PopoverContent className="p-0" align="start">
+                  <Command value={selectedSigner?.email}>
+                    <CommandInput />
 
-                      <CommandEmpty>
-                        <span className="text-muted-foreground inline-block px-4">
-                          <Trans>No recipient matching this description was found.</Trans>
-                        </span>
-                      </CommandEmpty>
+                    <CommandEmpty>
+                      <span className="text-muted-foreground inline-block px-4">
+                        <Trans>No recipient matching this description was found.</Trans>
+                      </span>
+                    </CommandEmpty>
 
-                      {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
-                        <CommandGroup key={roleIndex}>
-                          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
-                            {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
+                    {/* Note: This is duplicated in `add-fields.tsx` */}
+                    {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
+                      <CommandGroup key={roleIndex}>
+                        <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                          {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
+                        </div>
+
+                        {roleRecipients.length === 0 && (
+                          <div
+                            key={`${role}-empty`}
+                            className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                          >
+                            <Trans>No recipients with this role</Trans>
                           </div>
+                        )}
 
-                          {roleRecipients.length === 0 && (
-                            <div
-                              key={`${role}-empty`}
-                              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                        {roleRecipients.map((recipient) => (
+                          <CommandItem
+                            key={recipient.id}
+                            className={cn(
+                              'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
+                              getRecipientColorStyles(
+                                Math.max(
+                                  recipients.findIndex((r) => r.id === recipient.id),
+                                  0,
+                                ),
+                              )?.comboxBoxItem,
+                            )}
+                            onSelect={() => {
+                              setSelectedSigner(recipient);
+                              setShowRecipientsSelector(false);
+                            }}
+                          >
+                            <span
+                              className={cn('text-foreground/70 truncate', {
+                                'text-foreground/80': recipient === selectedSigner,
+                              })}
                             >
-                              <Trans>No recipients with this role</Trans>
-                            </div>
-                          )}
-
-                          {roleRecipients.map((recipient) => (
-                            <CommandItem
-                              key={recipient.id}
-                              className={cn(
-                                'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                                getSignerColorStyles(
-                                  Math.max(
-                                    recipients.findIndex((r) => r.id === recipient.id),
-                                    0,
-                                  ),
-                                ).default.comboxBoxItem,
+                              {recipient.name && (
+                                <span title={`${recipient.name} (${recipient.email})`}>
+                                  {recipient.name} ({recipient.email})
+                                </span>
                               )}
-                              onSelect={() => {
-                                setSelectedSigner(recipient);
-                                setShowRecipientsSelector(false);
-                              }}
-                            >
-                              <span
-                                className={cn('text-foreground/70 truncate', {
-                                  'text-foreground/80': recipient === selectedSigner,
-                                })}
-                              >
-                                {recipient.name && (
-                                  <span title={`${recipient.name} (${recipient.email})`}>
-                                    {recipient.name} ({recipient.email})
-                                  </span>
-                                )}
 
-                                {!recipient.name && (
-                                  <span title={recipient.email}>{recipient.email}</span>
-                                )}
-                              </span>
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      ))}
-                    </Command>
-                  </PopoverContent>
-                </Popover>
-              )}
+                              {!recipient.name && (
+                                <span title={recipient.email}>{recipient.email}</span>
+                              )}
+                            </span>
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    ))}
+                  </Command>
+                </PopoverContent>
+              </Popover>
 
               <Form {...form}>
                 <div className="-mx-2 flex-1 overflow-y-auto px-2">

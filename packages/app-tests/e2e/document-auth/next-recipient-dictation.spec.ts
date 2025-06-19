@@ -16,13 +16,14 @@ import { signDirectSignaturePad, signSignaturePad } from '../fixtures/signature'
 test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dictation is enabled', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
-  const thirdSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
+  const { user: thirdSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner, thirdSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }, { signingOrder: 3 }],
     updateDocumentOptions: {
@@ -109,12 +110,13 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dict
 });
 
 test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', async ({ page }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }],
     updateDocumentOptions: {
@@ -194,12 +196,13 @@ test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', a
 });
 
 test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async ({ page }) => {
-  const user = await seedUser();
-  const firstSigner = await seedUser();
-  const secondSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: firstSigner } = await seedUser();
+  const { user: secondSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [firstSigner, secondSigner],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }],
     updateDocumentOptions: {
@@ -278,13 +281,14 @@ test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async
 test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const assistant = await seedUser();
-  const signer = await seedUser();
-  const thirdSigner = await seedUser();
+  const { user, team } = await seedUser();
+  const { user: assistant } = await seedUser();
+  const { user: signer } = await seedUser();
+  const { user: thirdSigner } = await seedUser();
 
   const { recipients, document } = await seedPendingDocumentWithFullFields({
     owner: user,
+    teamId: team.id,
     recipients: [assistant, signer, thirdSigner],
     recipientsCreateOptions: [
       { signingOrder: 1, role: RecipientRole.ASSISTANT },
@@ -315,6 +319,8 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
   await page.goto(signUrl);
   await expect(page.getByRole('heading', { name: 'Assist Document' })).toBeVisible();
 
+  await page.waitForTimeout(1000);
+
   await page.getByRole('radio', { name: assistantRecipient.name }).click();
 
   // Fill in all fields
@@ -341,10 +347,14 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByText('The next recipient to sign this document will be')).toBeVisible();
 
+  // Update next recipient
+  await page.locator('button').filter({ hasText: 'Update Recipient' }).click();
+  await page.waitForTimeout(1000);
+
   // Use dialog context to ensure we're targeting the correct form fields
   const dialog = page.getByRole('dialog');
-  await dialog.getByLabel('Name').fill('New Signer');
-  await dialog.getByLabel('Email').fill('new.signer@example.com');
+  await dialog.getByLabel('Name').fill('New Recipient');
+  await dialog.getByLabel('Email').fill('new.recipient@example.com');
 
   // Submit and verify completion
   await page.getByRole('button', { name: /Continue|Proceed/i }).click();
@@ -371,8 +381,8 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
 
     // Second recipient should be the new signer
     const updatedSigner = updatedDocument.recipients[1];
-    expect(updatedSigner.name).toBe('New Signer');
-    expect(updatedSigner.email).toBe('new.signer@example.com');
+    expect(updatedSigner.name).toBe('New Recipient');
+    expect(updatedSigner.email).toBe('new.recipient@example.com');
     expect(updatedSigner.signingOrder).toBe(2);
     expect(updatedSigner.signingStatus).toBe(SigningStatus.NOT_SIGNED);
     expect(updatedSigner.role).toBe(RecipientRole.SIGNER);

@@ -21,7 +21,7 @@ import {
 import { Form, FormControl, FormField, FormItem } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 const ZBulkSendFormSchema = z.object({
   file: z.instanceof(File),
@@ -46,7 +46,7 @@ export const TemplateBulkSendDialog = ({
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const form = useForm<TBulkSendFormSchema>({
     resolver: zodResolver(ZBulkSendFormSchema),
@@ -114,7 +114,7 @@ export const TemplateBulkSendDialog = ({
     <Dialog>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button>
+          <Button variant="outline">
             <Upload className="mr-2 h-4 w-4" />
             <Trans>Bulk Send via CSV</Trans>
           </Button>

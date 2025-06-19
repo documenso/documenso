@@ -1,7 +1,7 @@
 import sharp from 'sharp';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
-import { prisma } from '@documenso/prisma';
+import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
 
@@ -18,33 +18,33 @@ export async function loader({ params }: Route.LoaderArgs) {
     );
   }
 
-  const settings = await prisma.teamGlobalSettings.findFirst({
-    where: {
-      teamId,
-    },
+  const settings = await getTeamSettings({
+    teamId,
   });
 
-  if (!settings || !settings.brandingEnabled) {
+  if (!settings || !settings.brandingLogo) {
     return Response.json(
       {
         status: 'error',
-        message: 'Not found',
+        message: 'Logo not found',
       },
       { status: 404 },
     );
   }
 
-  if (!settings.brandingLogo) {
+  if (!settings.brandingEnabled) {
     return Response.json(
       {
         status: 'error',
-        message: 'Not found',
+        message: 'Branding is not enabled',
       },
-      { status: 404 },
+      { status: 400 },
     );
   }
 
-  const file = await getFile(JSON.parse(settings.brandingLogo)).catch(() => null);
+  const file = await getFileServerSide(JSON.parse(settings.brandingLogo)).catch((e) => {
+    console.error(e);
+  });
 
   if (!file) {
     return Response.json(

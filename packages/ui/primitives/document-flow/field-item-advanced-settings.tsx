@@ -41,7 +41,6 @@ import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radi
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
-  teamId?: number;
   title: MessageDescriptor;
   description: MessageDescriptor;
   field: FieldFormType;
@@ -229,11 +228,19 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     return (
       <div ref={ref} className="flex h-full flex-col">
         <DocumentFlowFormContainerHeader title={title} description={description} />
+
         <DocumentFlowFormContainerContent>
           {isDocumentPdfLoaded &&
-            fields.map((field, index) => (
+            fields.map((localField, index) => (
               <span key={index} className="opacity-75 active:pointer-events-none">
-                <FieldItem key={index} field={field} disabled={true} />
+                <FieldItem
+                  key={index}
+                  field={localField}
+                  disabled={true}
+                  fieldClassName={
+                    localField.formId === field.formId ? 'ring-red-400' : 'ring-neutral-200'
+                  }
+                />
               </span>
             ))}
 
@@ -303,6 +310,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
               />
             ))
             .otherwise(() => null)}
+
           {errors.length > 0 && (
             <div className="mt-4">
               <ul>
@@ -315,6 +323,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
             </div>
           )}
         </DocumentFlowFormContainerContent>
+
         <DocumentFlowFormContainerFooter className="mt-auto">
           <DocumentFlowFormContainerActions
             goNextLabel={msg`Save`}

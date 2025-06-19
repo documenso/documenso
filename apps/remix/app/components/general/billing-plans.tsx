@@ -1,91 +1,91 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Building2Icon, PlusIcon } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 
-import type { PriceIntervals } from '@documenso/ee/server-only/stripe/get-prices-by-interval';
+import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import { toHumanPrice } from '@documenso/lib/universal/stripe/to-human-price';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@documenso/ui/primitives/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
+import { Label } from '@documenso/ui/primitives/label';
+import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type Interval = keyof PriceIntervals;
-
-const INTERVALS: Interval[] = ['day', 'week', 'month', 'year'];
-
-// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-const isInterval = (value: unknown): value is Interval => INTERVALS.includes(value as Interval);
-
-const FRIENDLY_INTERVALS: Record<Interval, MessageDescriptor> = {
-  day: msg`Daily`,
-  week: msg`Weekly`,
-  month: msg`Monthly`,
-  year: msg`Yearly`,
-};
+import { ZCreateOrganisationFormSchema } from '../dialogs/organisation-create-dialog';
 
 const MotionCard = motion(Card);
 
 export type BillingPlansProps = {
-  prices: PriceIntervals;
+  plans: InternalClaimPlans;
 };
 
-export const BillingPlans = ({ prices }: BillingPlansProps) => {
-  const { _ } = useLingui();
-  const { toast } = useToast();
-
+export const BillingPlans = ({ plans }: BillingPlansProps) => {
   const isMounted = useIsMounted();
 
-  const [interval, setInterval] = useState<Interval>('month');
-  const [checkoutSessionPriceId, setCheckoutSessionPriceId] = useState<string | null>(null);
+  const [interval, setInterval] = useState<'monthlyPrice' | 'yearlyPrice'>('yearlyPrice');
 
-  const { mutateAsync: createCheckoutSession } = trpc.profile.createCheckoutSession.useMutation();
+  const pricesToDisplay = useMemo(() => {
+    const prices = [];
 
-  const onSubscribeClick = async (priceId: string) => {
-    try {
-      setCheckoutSessionPriceId(priceId);
-
-      const url = await createCheckoutSession({ priceId });
-
-      if (!url) {
-        throw new Error('Unable to create session');
+    for (const plan of Object.values(plans)) {
+      if (plan[interval] && plan[interval].isVisibleInApp) {
+        prices.push({
+          ...plan[interval],
+          memberCount: plan.memberCount,
+          claim: plan.id,
+        });
       }
-
-      window.open(url);
-    } catch (_err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while trying to create a checkout session.`),
-        variant: 'destructive',
-      });
-    } finally {
-      setCheckoutSessionPriceId(null);
     }
-  };
+
+    return prices;
+  }, [plans, interval]);
 
   return (
     <div>
-      <Tabs value={interval} onValueChange={(value) => isInterval(value) && setInterval(value)}>
+      <Tabs
+        value={interval}
+        onValueChange={(value) => setInterval(value as 'monthlyPrice' | 'yearlyPrice')}
+      >
         <TabsList>
-          {INTERVALS.map(
-            (interval) =>
-              prices[interval].length > 0 && (
-                <TabsTrigger key={interval} className="min-w-[150px]" value={interval}>
-                  {_(FRIENDLY_INTERVALS[interval])}
-                </TabsTrigger>
-              ),
-          )}
+          <TabsTrigger className="min-w-[150px]" value="monthlyPrice">
+            <Trans>Monthly</Trans>
+          </TabsTrigger>
+          <TabsTrigger className="min-w-[150px]" value="yearlyPrice">
+            <Trans>Yearly</Trans>
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-2 2xl:grid-cols-3">
         <AnimatePresence mode="wait">
-          {prices[interval].map((price) => (
+          {pricesToDisplay.map((price) => (
             <MotionCard
               key={price.id}
               initial={{ opacity: isMounted ? 0 : 1, y: isMounted ? 20 : 0 }}
@@ -96,8 +96,14 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
                 <CardTitle>{price.product.name}</CardTitle>
 
                 <div className="text-muted-foreground mt-2 text-lg font-medium">
-                  ${toHumanPrice(price.unit_amount ?? 0)} {price.currency.toUpperCase()}{' '}
-                  <span className="text-xs">per {interval}</span>
+                  {price.friendlyPrice + ' '}
+                  <span className="text-xs">
+                    {interval === 'monthlyPrice' ? (
+                      <Trans>per month</Trans>
+                    ) : (
+                      <Trans>per year</Trans>
+                    )}
+                  </span>
                 </div>
 
                 <div className="text-muted-foreground mt-1.5 text-sm">
@@ -120,19 +126,192 @@ export const BillingPlans = ({ prices }: BillingPlansProps) => {
 
                 <div className="flex-1" />
 
-                <Button
-                  className="mt-4"
-                  disabled={checkoutSessionPriceId !== null}
-                  loading={checkoutSessionPriceId === price.id}
-                  onClick={() => void onSubscribeClick(price.id)}
-                >
-                  <Trans>Subscribe</Trans>
-                </Button>
+                <BillingDialog
+                  priceId={price.id}
+                  planName={price.product.name}
+                  memberCount={price.memberCount}
+                  claim={price.claim}
+                />
               </CardContent>
             </MotionCard>
           ))}
         </AnimatePresence>
       </div>
     </div>
+  );
+};
+
+const BillingDialog = ({
+  priceId,
+  planName,
+  claim,
+}: {
+  priceId: string;
+  planName: string;
+  memberCount: number;
+  claim: string;
+}) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const { t } = useLingui();
+  const { toast } = useToast();
+
+  const organisation = useCurrentOrganisation();
+
+  const [subscriptionOption, setSubscriptionOption] = useState<'update' | 'create'>(
+    organisation.type === 'PERSONAL' && claim === INTERNAL_CLAIM_ID.INDIVIDUAL
+      ? 'update'
+      : 'create',
+  );
+
+  const [step, setStep] = useState(0);
+
+  const form = useForm({
+    resolver: zodResolver(ZCreateOrganisationFormSchema),
+    defaultValues: {
+      name: '',
+    },
+  });
+
+  const { mutateAsync: createSubscription, isPending: isCreatingSubscription } =
+    trpc.billing.subscription.create.useMutation();
+
+  const { mutateAsync: createOrganisation, isPending: isCreatingOrganisation } =
+    trpc.organisation.create.useMutation();
+
+  const isPending = isCreatingSubscription || isCreatingOrganisation;
+
+  const onSubscribeClick = async () => {
+    try {
+      let redirectUrl = '';
+
+      if (subscriptionOption === 'update') {
+        const createSubscriptionResponse = await createSubscription({
+          organisationId: organisation.id,
+          priceId,
+        });
+
+        redirectUrl = createSubscriptionResponse.redirectUrl;
+      } else {
+        const createOrganisationResponse = await createOrganisation({
+          name: form.getValues('name'),
+          priceId,
+        });
+
+        if (!createOrganisationResponse.paymentRequired) {
+          setIsOpen(false);
+          return;
+        }
+
+        redirectUrl = createOrganisationResponse.checkoutUrl;
+      }
+
+      window.location.href = redirectUrl;
+    } catch (_err) {
+      toast({
+        title: t`Something went wrong`,
+        description: t`An error occurred while trying to create a checkout session.`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={(value) => !isPending && setIsOpen(value)}>
+      <DialogTrigger asChild>
+        <Button>
+          <Trans>Subscribe</Trans>
+        </Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>
+            <Trans>Subscribe</Trans>
+          </DialogTitle>
+
+          <DialogDescription>
+            <Trans>You are about to subscribe to the {planName}</Trans>
+          </DialogDescription>
+        </DialogHeader>
+
+        {step === 0 ? (
+          <div>
+            <RadioGroup
+              className="space-y-2"
+              value={subscriptionOption}
+              onValueChange={(value) => setSubscriptionOption(value as 'update' | 'create')}
+            >
+              <div className="flex items-start space-x-3 space-y-0">
+                <RadioGroupItem value="update" id="update" />
+                <div className="space-y-1.5 leading-none">
+                  <Label htmlFor="update" className="flex items-center gap-2 font-medium">
+                    <Building2Icon className="h-4 w-4" />
+                    <Trans>Update current organisation</Trans>
+                  </Label>
+                  <p className="text-muted-foreground text-sm">
+                    <Trans>
+                      Upgrade <strong>{organisation.name}</strong> to {planName}
+                    </Trans>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start space-x-3 space-y-0">
+                <RadioGroupItem value="create" id="create" />
+                <div className="space-y-1.5 leading-none">
+                  <Label htmlFor="create" className="flex items-center gap-2 font-medium">
+                    <PlusIcon className="h-4 w-4" />
+                    <Trans>Create separate organisation</Trans>
+                  </Label>
+                  <p className="text-muted-foreground text-sm">
+                    <Trans>
+                      Create a new organisation with {planName} plan. Keep your current organisation
+                      on it's current plan
+                    </Trans>
+                  </p>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+        ) : (
+          <Form {...form}>
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>
+                    <Trans>Organisation Name</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </Form>
+        )}
+
+        <DialogFooter>
+          <DialogClose>
+            <Button disabled={isPending} variant="secondary">
+              <Trans>Close</Trans>
+            </Button>
+          </DialogClose>
+
+          {subscriptionOption === 'create' && step === 0 ? (
+            <Button className="mt-4" loading={isPending} onClick={() => setStep(1)}>
+              <Trans>Continue</Trans>
+            </Button>
+          ) : (
+            <Button className="mt-4" loading={isPending} onClick={() => void onSubscribeClick()}>
+              <Trans>Checkout</Trans>
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };

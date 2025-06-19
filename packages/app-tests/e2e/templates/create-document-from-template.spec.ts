@@ -1,35 +1,17 @@
 import { expect, test } from '@playwright/test';
 import { DocumentDataType, TeamMemberRole } from '@prisma/client';
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-import { seedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
-const enterprisePriceId = '';
-
-// Create a temporary PDF file for testing
-function createTempPdfFile() {
-  const tempDir = os.tmpdir();
-  const tempFilePath = path.join(tempDir, 'test.pdf');
-
-  // Create a simple PDF file with some content
-  const pdfContent = Buffer.from(
-    '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj 3 0 obj<</Type/Page/MediaBox[0 0 612 792]/Parent 2 0 R>>endobj\nxref\n0 4\n0000000000 65535 f\n0000000009 00000 n\n0000000052 00000 n\n0000000101 00000 n\ntrailer<</Size 4/Root 1 0 R>>\nstartxref\n178\n%%EOF',
-  );
-
-  fs.writeFileSync(tempFilePath, new Uint8Array(pdfContent));
-  return tempFilePath;
-}
+const EXAMPLE_PDF_PATH = path.join(__dirname, '../../../../assets/example.pdf');
 
 /**
  * 1. Create a template with all settings filled out
@@ -41,21 +23,13 @@ function createTempPdfFile() {
  * If you update this test please update that test as well.
  */
 test('[TEMPLATE]: should create a document from a template', async ({ page }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
-
-  const isBillingEnabled =
-    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
-
-  await seedUserSubscription({
-    userId: user.id,
-    priceId: enterprisePriceId,
-  });
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -63,15 +37,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  // Set EE action auth.
-  if (isBillingEnabled) {
-    await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-  }
 
   // Set email options.
   await page.getByRole('button', { name: 'Email Options' }).click();
@@ -97,25 +64,18 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
-  // Apply require passkey for Recipient 1.
-  if (isBillingEnabled) {
-    await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
-  }
-
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -134,10 +94,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
+
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -157,35 +115,19 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
     recipientAuth: recipientTwo.authOptions,
   });
 
-  if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
-  }
-
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
  * This is a direct copy paste of the above test but for teams.
  */
 test('[TEMPLATE]: should create a team document from a team template', async ({ page }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
-
-  const isBillingEnabled =
-    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
-
-  await seedUserSubscription({
-    userId: owner.id,
-    priceId: enterprisePriceId,
-  });
+  const template = await seedBlankTemplate(owner, team.id);
 
   await apiSignin({
     page,
@@ -198,15 +140,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  // Set EE action auth.
-  if (isBillingEnabled) {
-    await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-  }
 
   // Set email options.
   await page.getByRole('button', { name: 'Email Options' }).click();
@@ -232,13 +167,6 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
-  // Apply require passkey for Recipient 1.
-  if (isBillingEnabled) {
-    await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
-  }
-
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -250,7 +178,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -271,10 +199,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -294,12 +219,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
     recipientAuth: recipientTwo.authOptions,
   });
 
-  if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
-  }
-
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
@@ -309,70 +230,88 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 test('[TEMPLATE]: should create a document from a template with custom document', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   // Create a temporary PDF file for upload
-  const testPdfPath = createTempPdfFile();
-  const pdfContent = fs.readFileSync(testPdfPath).toString('base64');
 
-  try {
-    await apiSignin({
-      page,
-      email: user.email,
-      redirectPath: `/templates/${template.id}/edit`,
-    });
+  const pdfContent = fs.readFileSync(EXAMPLE_PDF_PATH).toString('base64');
 
-    // Set template title
-    await page.getByLabel('Title').fill('TEMPLATE_WITH_CUSTOM_DOC');
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
 
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+  // Set template title
+  await page.getByLabel('Title').fill('TEMPLATE_WITH_CUSTOM_DOC');
 
-    // Add a signer
-    await page.getByPlaceholder('Email').fill('recipient@documenso.com');
-    await page.getByPlaceholder('Name').fill('Recipient');
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+  // Add a signer
+  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient');
 
-    await page.getByRole('button', { name: 'Save template' }).click();
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
-    // Use template with custom document
-    await page.waitForURL('/templates');
-    await page.getByRole('button', { name: 'Use Template' }).click();
+  await page.getByRole('button', { name: 'Save template' }).click();
 
-    // Enable custom document upload and upload file
-    await page.getByLabel('Upload custom document').check();
-    await page.locator('input[type="file"]').setInputFiles(testPdfPath);
+  // Use template with custom document
+  await page.waitForURL(`/t/${team.url}/templates`);
+  await page.getByRole('button', { name: 'Use Template' }).click();
 
-    // Wait for upload to complete
-    await expect(page.getByText(path.basename(testPdfPath))).toBeVisible();
+  // Enable custom document upload and upload file
+  await page.getByLabel('Upload custom document').check();
 
-    // Create document with custom document data
-    await page.getByRole('button', { name: 'Create as draft' }).click();
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator('input[type=file]').evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
+  ]);
 
-    // Review that the document was created with the custom document data
-    await page.waitForURL(/documents/);
+  await fileChooser.setFiles(EXAMPLE_PDF_PATH);
 
-    const documentId = Number(page.url().split('/').pop());
+  // Wait for upload to complete
+  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
 
-    const document = await prisma.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-      },
-      include: {
-        documentData: true,
-      },
-    });
+  // Create document with custom document data
+  await page.getByRole('button', { name: 'Create as draft' }).click();
 
-    expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
-    expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
+  // Review that the document was created with the custom document data
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+
+  const documentId = Number(page.url().split('/').pop());
+
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+    },
+    include: {
+      documentData: true,
+    },
+  });
+
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
+
+  expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
     expect(document.documentData.data).toEqual(pdfContent);
     expect(document.documentData.initialData).toEqual(pdfContent);
-  } finally {
-    // Clean up the temporary file
-    fs.unlinkSync(testPdfPath);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
   }
 });
 
@@ -383,78 +322,90 @@ test('[TEMPLATE]: should create a document from a template with custom document'
 test('[TEMPLATE]: should create a team document from a template with custom document', async ({
   page,
 }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
+  const template = await seedBlankTemplate(owner, team.id);
+
+  const pdfContent = fs.readFileSync(EXAMPLE_PDF_PATH).toString('base64');
+
+  await apiSignin({
+    page,
+    email: owner.email,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+  });
+
+  // Set template title
+  await page.getByLabel('Title').fill('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
+
+  // Add a signer
+  await page.getByPlaceholder('Email').fill('recipient@documenso.com');
+  await page.getByPlaceholder('Name').fill('Recipient');
+
+  await page.getByRole('button', { name: 'Continue' }).click();
+  await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+
+  await page.getByRole('button', { name: 'Save template' }).click();
+
+  // Use template with custom document
+  await page.waitForURL(`/t/${team.url}/templates`);
+  await page.getByRole('button', { name: 'Use Template' }).click();
+
+  // Enable custom document upload and upload file
+  await page.getByLabel('Upload custom document').check();
+
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.locator('input[type=file]').evaluate((e) => {
+      if (e instanceof HTMLInputElement) {
+        e.click();
+      }
+    }),
+  ]);
+
+  await fileChooser.setFiles(EXAMPLE_PDF_PATH);
+
+  // Wait for upload to complete
+  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
+
+  // Create document with custom document data
+  await page.getByRole('button', { name: 'Create as draft' }).click();
+
+  // Review that the document was created with the custom document data
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+
+  const documentId = Number(page.url().split('/').pop());
+
+  const document = await prisma.document.findFirstOrThrow({
+    where: {
+      id: documentId,
+    },
+    include: {
+      documentData: true,
     },
   });
 
-  // Create a temporary PDF file for upload
-  const testPdfPath = createTempPdfFile();
-  const pdfContent = fs.readFileSync(testPdfPath).toString('base64');
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
 
-  try {
-    await apiSignin({
-      page,
-      email: owner.email,
-      redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
-    });
+  expect(document.teamId).toEqual(team.id);
+  expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
 
-    // Set template title
-    await page.getByLabel('Title').fill('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
-
-    // Add a signer
-    await page.getByPlaceholder('Email').fill('recipient@documenso.com');
-    await page.getByPlaceholder('Name').fill('Recipient');
-
-    await page.getByRole('button', { name: 'Continue' }).click();
-    await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Save template' }).click();
-
-    // Use template with custom document
-    await page.waitForURL(`/t/${team.url}/templates`);
-    await page.getByRole('button', { name: 'Use Template' }).click();
-
-    // Enable custom document upload and upload file
-    await page.getByLabel('Upload custom document').check();
-    await page.locator('input[type="file"]').setInputFiles(testPdfPath);
-
-    // Wait for upload to complete
-    await expect(page.getByText(path.basename(testPdfPath))).toBeVisible();
-
-    // Create document with custom document data
-    await page.getByRole('button', { name: 'Create as draft' }).click();
-
-    // Review that the document was created with the custom document data
-    await page.waitForURL(/documents/);
-
-    const documentId = Number(page.url().split('/').pop());
-
-    const document = await prisma.document.findFirstOrThrow({
-      where: {
-        id: documentId,
-      },
-      include: {
-        documentData: true,
-      },
-    });
-
-    expect(document.teamId).toEqual(team.id);
-    expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-    expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
     expect(document.documentData.data).toEqual(pdfContent);
     expect(document.documentData.initialData).toEqual(pdfContent);
-  } finally {
-    // Clean up the temporary file
-    fs.unlinkSync(testPdfPath);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
   }
 });
 
@@ -465,13 +416,13 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 test('[TEMPLATE]: should create a document from a template using template document when custom document is not enabled', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -490,7 +441,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template without custom document
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
 
   // Verify custom document upload is not checked by default
@@ -500,7 +451,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the template's document data
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -533,15 +484,11 @@ test('[TEMPLATE]: should create a document from a template using template docume
 test('[TEMPLATE]: should persist document visibility when creating from template', async ({
   page,
 }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
+  const template = await seedBlankTemplate(owner, team.id);
 
   await apiSignin({
     page,
@@ -570,16 +517,10 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Test creating document as team manager
-  await prisma.teamMember.update({
-    where: {
-      id: team.members[1].id,
-    },
-    data: {
-      role: TeamMemberRole.MANAGER,
-    },
+  const managerUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MANAGER,
   });
-
-  const managerUser = team.members[1].user;
 
   await apiSignin({
     page,
@@ -591,7 +532,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct visibility
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -606,7 +547,11 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   expect(document.teamId).toEqual(team.id);
 
   // Test that regular member cannot create document from restricted template
-  const memberUser = team.members[2].user;
+  const memberUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
   await apiSignin({
     page,
     email: memberUser.email,
