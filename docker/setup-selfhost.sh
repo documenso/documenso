@@ -255,6 +255,153 @@ download_compose_file() {
     print_success "compose.yml downloaded"
 }
 
+# Start containers and setup database
+start_and_migrate() {
+    echo ""
+    print_info "Starting Documenso"
+    echo "=================="
+    
+    # Clean up any existing containers/volumes to avoid credential conflicts
+    print_info "Cleaning up any existing containers..."
+    docker-compose down -v 2>/dev/null || true
+    
+    # Load environment variables from .env file
+    if [[ -f ".env" ]]; then
+        source .env
+    else
+        print_error ".env file not found"
+        exit 1
+    fi
+    
+    print_info "Starting Docker containers..."
+    docker-compose up -d
+    
+    print_info "Waiting for database to be ready..."
+    
+    # Wait for database container to be running first
+    max_attempts=30
+    attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if docker-compose ps database | grep -q "Up"; then
+            print_info "Database container is running"
+            break
+        fi
+        
+        if [ $attempt -eq 0 ]; then
+            echo -n "Waiting for database container"
+        fi
+        echo -n "."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    echo ""
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Database container failed to start"
+        print_info "Check logs with: docker-compose logs database"
+        exit 1
+    fi
+    
+    # Now wait for PostgreSQL to be ready with proper credentials
+    print_info "Waiting for PostgreSQL to initialize..."
+    max_attempts=60
+    attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        # Use the actual credentials from environment variables
+        if docker-compose exec -T database pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" > /dev/null 2>&1; then
+            print_success "Database is ready!"
+            break
+        fi
+        
+        if [ $attempt -eq 0 ]; then
+            echo -n "Waiting for database initialization"
+        fi
+        echo -n "."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    echo ""
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Database failed to initialize within 120 seconds"
+        print_info "Check logs with: docker-compose logs database"
+        print_info "This might be due to existing database volumes with different credentials"
+        print_info "Try running: docker-compose down -v && docker system prune -f"
+        exit 1
+    fi
+    
+    # Test database connection with actual credentials
+    print_info "Testing database connection..."
+    if docker-compose exec -T database psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SELECT 1;" > /dev/null 2>&1; then
+        print_success "Database connection successful!"
+    else
+        print_error "Database connection failed"
+        print_info "Check logs with: docker-compose logs database"
+        exit 1
+    fi
+    
+    print_info "Waiting for application container to be ready..."
+    max_attempts=30
+    attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if docker-compose ps documenso | grep -q "Up"; then
+            print_info "Application container is running"
+            break
+        fi
+        
+        if [ $attempt -eq 0 ]; then
+            echo -n "Waiting for application container"
+        fi
+        echo -n "."
+        sleep 2
+        attempt=$((attempt + 1))
+    done
+    echo ""
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Application container failed to start"
+        print_info "Check logs with: docker-compose logs documenso"
+        exit 1
+    fi
+    
+    # Wait a bit more for the application to fully initialize
+    print_info "Waiting for application to initialize..."
+    sleep 10
+    
+    print_info "Running database migrations..."
+    
+    # Run database migration with retry logic
+    max_attempts=3
+    attempt=0
+    
+    while [ $attempt -lt $max_attempts ]; do
+        if docker-compose exec -T documenso npx prisma migrate deploy --schema=./packages/prisma/schema.prisma; then
+            print_success "Database migration completed successfully!"
+            break
+        else
+            attempt=$((attempt + 1))
+            if [ $attempt -lt $max_attempts ]; then
+                print_warning "Migration failed, retrying in 10 seconds... (attempt $attempt/$max_attempts)"
+                sleep 10
+            fi
+        fi
+    done
+    
+    if [ $attempt -eq $max_attempts ]; then
+        print_error "Database migration failed after $max_attempts attempts"
+        print_info "Check logs with: docker-compose logs documenso"
+        print_info "Check database logs with: docker-compose logs database"
+        print_info "You can try running the migration manually with:"
+        print_info "docker-compose exec documenso npx prisma migrate deploy --schema=./packages/prisma/schema.prisma"
+        exit 1
+    fi
+    
+    print_success "Documenso is now running!"
+}
+
 # Main setup function
 main() {
     echo "This script will help you set up Documenso for self-hosting."
@@ -263,6 +410,7 @@ main() {
     echo "- Set up your signing certificate"
     echo "- Create environment configuration"
     echo "- Download Docker Compose file"
+    echo "- Start the containers and run database migrations"
     echo ""
     read -p "Continue? (y/n): " continue_setup
     
@@ -275,16 +423,26 @@ main() {
     setup_certificate
     create_env_file
     download_compose_file
+    start_and_migrate
     
     echo ""
-    print_success "Setup completed successfully!"
+    print_success "🎉 Documenso is now fully set up and running!"
     echo ""
-    print_info "Next steps:"
-    echo "1. Review your .env file and make any necessary adjustments"
-    echo "2. Start Documenso with: docker-compose up -d"
-    echo "3. Access your instance at: $webapp_url"
+    print_info "You can now:"
+    echo "1. Access your Documenso instance at: ${webapp_url:-your-webapp-url}"
+    echo "2. Create your first admin account by visiting the web interface"
+    echo "3. Start uploading and signing documents!"
     echo ""
-    print_info "For troubleshooting, check the logs with: docker-compose logs -f"
+    print_info "Useful commands:"
+    echo "- View logs: docker-compose logs -f"
+    echo "- Stop services: docker-compose down"
+    echo "- Restart services: docker-compose restart"
+    echo "- Update Documenso: docker-compose pull && docker-compose up -d"
+    echo ""
+    print_warning "Remember to:"
+    echo "- Keep your .env file secure and backed up"
+    echo "- Regularly backup your database"
+    echo "- Keep your certificate file secure"
 }
 
 # Run main function
