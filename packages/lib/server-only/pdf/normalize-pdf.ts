@@ -11,7 +11,7 @@ export const normalizePdf = async (pdf: Buffer) => {
   }
 
   removeOptionalContentGroups(pdfDoc);
-  flattenForm(pdfDoc);
+  await flattenForm(pdfDoc);
   flattenAnnotations(pdfDoc);
 
   return Buffer.from(await pdfDoc.save());

@@ -32,7 +32,7 @@ import { DocumentsTableActionButton } from '~/components/tables/documents-table-
 import { DocumentsTableActionDropdown } from '~/components/tables/documents-table-action-dropdown';
 import { DataTableTitle } from '~/components/tables/documents-table-title';
 import { TemplateDocumentsTableEmptyState } from '~/components/tables/template-documents-table-empty-state';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 const DOCUMENT_SOURCE_LABELS: { [key in DocumentSource]: MessageDescriptor } = {
   DOCUMENT: msg`Document`,
@@ -54,7 +54,7 @@ export const TemplatePageViewDocumentsTable = ({
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const handleStatusFilterChange = (values: string[]) => {
     startTransition(() => {

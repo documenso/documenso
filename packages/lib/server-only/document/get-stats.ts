@@ -9,7 +9,7 @@ import type { TimePeriod } from '@documenso/ui/primitives/data-table/utils/time-
 import { getDateRangeForPeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
 
 export type GetStatsInput = {
-  user: User;
+  user: Pick<User, 'id' | 'email'>;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
   period?: TimePeriod;
   search?: string;
@@ -88,7 +88,7 @@ export const getStats = async ({
 };
 
 type GetCountsOption = {
-  user: User;
+  user: Pick<User, 'id' | 'email'>;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
   search?: string;
   folderId?: string | null;
@@ -115,7 +115,6 @@ const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption)
       where: {
         userId: user.id,
         createdAt,
-        teamId: null,
         deletedAt: null,
         AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
@@ -333,7 +332,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
                 documentDeletedAt: null,
               },
             },
-            deletedAt: null,
           },
         ],
       },

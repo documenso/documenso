@@ -1,49 +1,156 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
+import { Loader } from 'lucide-react';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { DocumentSignatureType } from '@documenso/lib/constants/document';
+import { putFile } from '@documenso/lib/universal/upload/put-file';
+import { trpc } from '@documenso/trpc/react';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { TeamBrandingPreferencesForm } from '~/components/forms/team-branding-preferences-form';
-import { TeamDocumentPreferencesForm } from '~/components/forms/team-document-preferences-form';
+import {
+  BrandingPreferencesForm,
+  type TBrandingPreferencesFormSchema,
+} from '~/components/forms/branding-preferences-form';
+import {
+  DocumentPreferencesForm,
+  type TDocumentPreferencesFormSchema,
+} from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { useCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
 
-import type { Route } from './+types/settings.preferences';
-
-export async function loader({ request, params }: Route.LoaderArgs) {
-  const { user } = await getSession(request);
-
-  const team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
-
-  return {
-    team,
-  };
+export function meta() {
+  return appMetaTags('Preferences');
 }
 
-export default function TeamsSettingsPage({ loaderData }: Route.ComponentProps) {
-  const { team } = loaderData;
+export default function TeamsSettingsPage() {
+  const team = useCurrentTeam();
 
-  const { _ } = useLingui();
+  const { t } = useLingui();
+  const { toast } = useToast();
+
+  const { data: teamWithSettings, isLoading: isLoadingTeam } = trpc.team.get.useQuery({
+    teamReference: team.id,
+  });
+
+  const { mutateAsync: updateTeamSettings } = trpc.team.settings.update.useMutation();
+
+  const onDocumentPreferencesSubmit = async (data: TDocumentPreferencesFormSchema) => {
+    try {
+      const {
+        documentVisibility,
+        documentLanguage,
+        includeSenderDetails,
+        includeSigningCertificate,
+        signatureTypes,
+      } = data;
+
+      await updateTeamSettings({
+        teamId: team.id,
+        data: {
+          documentVisibility,
+          documentLanguage,
+          includeSenderDetails,
+          includeSigningCertificate,
+          ...(signatureTypes.length === 0
+            ? {
+                typedSignatureEnabled: null,
+                uploadSignatureEnabled: null,
+                drawSignatureEnabled: null,
+              }
+            : {
+                typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+                uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+                drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+              }),
+        },
+      });
+
+      toast({
+        title: t`Document preferences updated`,
+        description: t`Your document preferences have been updated`,
+      });
+    } catch (err) {
+      toast({
+        title: t`Something went wrong!`,
+        description: t`We were unable to update your document preferences at this time, please try again later`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
+    try {
+      const { brandingEnabled, brandingLogo, brandingUrl, brandingCompanyDetails } = data;
+
+      let uploadedBrandingLogo = teamWithSettings?.teamSettings?.brandingLogo;
+
+      if (brandingLogo) {
+        uploadedBrandingLogo = JSON.stringify(await putFile(brandingLogo));
+      }
+
+      if (brandingLogo === null) {
+        uploadedBrandingLogo = '';
+      }
+
+      await updateTeamSettings({
+        teamId: team.id,
+        data: {
+          brandingEnabled,
+          brandingLogo: uploadedBrandingLogo || null,
+          brandingUrl: brandingUrl || null,
+          brandingCompanyDetails: brandingCompanyDetails || null,
+        },
+      });
+
+      toast({
+        title: t`Branding preferences updated`,
+        description: t`Your branding preferences have been updated`,
+      });
+    } catch (err) {
+      toast({
+        title: t`Something went wrong`,
+        description: t`We were unable to update your branding preferences at this time, please try again later`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  if (isLoadingTeam || !teamWithSettings) {
+    return (
+      <div className="flex items-center justify-center rounded-lg py-32">
+        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="max-w-2xl">
       <SettingsHeader
-        title={_(msg`Team Preferences`)}
-        subtitle={_(msg`Here you can set preferences and defaults for your team.`)}
+        title={t`Team Preferences`}
+        subtitle={t`Here you can set preferences and defaults for your team.`}
       />
 
       <section>
-        <TeamDocumentPreferencesForm team={team} settings={team.teamGlobalSettings} />
+        <DocumentPreferencesForm
+          canInherit={true}
+          settings={teamWithSettings.teamSettings}
+          onFormSubmit={onDocumentPreferencesSubmit}
+        />
       </section>
 
       <SettingsHeader
-        title={_(msg`Branding Preferences`)}
-        subtitle={_(msg`Here you can set preferences and defaults for branding.`)}
+        title={t`Branding Preferences`}
+        subtitle={t`Here you can set preferences and defaults for branding.`}
         className="mt-8"
       />
 
       <section>
-        <TeamBrandingPreferencesForm team={team} settings={team.teamGlobalSettings} />
+        <BrandingPreferencesForm
+          canInherit={true}
+          context="Team"
+          settings={teamWithSettings.teamSettings}
+          onFormSubmit={onBrandingPreferencesFormSubmit}
+        />
       </section>
     </div>
   );

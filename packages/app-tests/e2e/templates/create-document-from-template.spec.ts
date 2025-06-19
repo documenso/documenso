@@ -5,14 +5,11 @@ import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
-import { seedUserSubscription } from '@documenso/prisma/seed/subscriptions';
-import { seedTeam } from '@documenso/prisma/seed/teams';
+import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
-
-const enterprisePriceId = '';
 
 const EXAMPLE_PDF_PATH = path.join(__dirname, '../../../../assets/example.pdf');
 
@@ -26,21 +23,13 @@ const EXAMPLE_PDF_PATH = path.join(__dirname, '../../../../assets/example.pdf');
  * If you update this test please update that test as well.
  */
 test('[TEMPLATE]: should create a document from a template', async ({ page }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
-
-  const isBillingEnabled =
-    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
-
-  await seedUserSubscription({
-    userId: user.id,
-    priceId: enterprisePriceId,
-  });
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -48,15 +37,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  // Set EE action auth.
-  if (isBillingEnabled) {
-    await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-  }
 
   // Set email options.
   await page.getByRole('button', { name: 'Email Options' }).click();
@@ -82,25 +64,18 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
-  // Apply require passkey for Recipient 1.
-  if (isBillingEnabled) {
-    await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
-  }
-
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -119,10 +94,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
+
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -142,35 +115,19 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
     recipientAuth: recipientTwo.authOptions,
   });
 
-  if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
-  }
-
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
  * This is a direct copy paste of the above test but for teams.
  */
 test('[TEMPLATE]: should create a team document from a team template', async ({ page }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
-
-  const isBillingEnabled =
-    process.env.NEXT_PUBLIC_FEATURE_BILLING_ENABLED === 'true' && enterprisePriceId;
-
-  await seedUserSubscription({
-    userId: owner.id,
-    priceId: enterprisePriceId,
-  });
+  const template = await seedBlankTemplate(owner, team.id);
 
   await apiSignin({
     page,
@@ -183,15 +140,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   // Set template document access.
   await page.getByTestId('documentAccessSelectValue').click();
-  await page.getByLabel('Require account').getByText('Require account').click();
+  await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
-
-  // Set EE action auth.
-  if (isBillingEnabled) {
-    await page.getByTestId('documentActionSelectValue').click();
-    await page.getByLabel('Require passkey').getByText('Require passkey').click();
-    await expect(page.getByTestId('documentActionSelectValue')).toContainText('Require passkey');
-  }
 
   // Set email options.
   await page.getByRole('button', { name: 'Email Options' }).click();
@@ -217,13 +167,6 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
-  // Apply require passkey for Recipient 1.
-  if (isBillingEnabled) {
-    await page.getByLabel('Show advanced settings').check();
-    await page.getByRole('combobox').first().click();
-    await page.getByLabel('Require passkey').click();
-  }
-
   await page.getByRole('button', { name: 'Continue' }).click();
   await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
@@ -235,7 +178,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -256,10 +199,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   });
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
-  expect(documentAuth.documentAuthOption.globalAccessAuth).toEqual('ACCOUNT');
-  expect(documentAuth.documentAuthOption.globalActionAuth).toEqual(
-    isBillingEnabled ? 'PASSKEY' : null,
-  );
+  expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
   expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
@@ -279,12 +219,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
     recipientAuth: recipientTwo.authOptions,
   });
 
-  if (isBillingEnabled) {
-    expect(recipientOneAuth.derivedRecipientActionAuth).toEqual('PASSKEY');
-  }
-
-  expect(recipientOneAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
-  expect(recipientTwoAuth.derivedRecipientAccessAuth).toEqual('ACCOUNT');
+  expect(recipientOneAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
+  expect(recipientTwoAuth.derivedRecipientAccessAuth).toContain('ACCOUNT');
 });
 
 /**
@@ -294,8 +230,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 test('[TEMPLATE]: should create a document from a template with custom document', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   // Create a temporary PDF file for upload
 
@@ -304,7 +240,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -323,7 +259,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template with custom document
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
 
   // Enable custom document upload and upload file
@@ -348,7 +284,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -361,10 +297,22 @@ test('[TEMPLATE]: should create a document from a template with custom document'
     },
   });
 
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
+
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
-  expect(document.documentData.data).toEqual(pdfContent);
-  expect(document.documentData.initialData).toEqual(pdfContent);
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
+    expect(document.documentData.data).toEqual(pdfContent);
+    expect(document.documentData.initialData).toEqual(pdfContent);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
+  }
 });
 
 /**
@@ -374,15 +322,11 @@ test('[TEMPLATE]: should create a document from a template with custom document'
 test('[TEMPLATE]: should create a team document from a template with custom document', async ({
   page,
 }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
+  const template = await seedBlankTemplate(owner, team.id);
 
   const pdfContent = fs.readFileSync(EXAMPLE_PDF_PATH).toString('base64');
 
@@ -433,7 +377,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -446,11 +390,23 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
     },
   });
 
+  const expectedDocumentDataType =
+    process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
+      ? DocumentDataType.S3_PATH
+      : DocumentDataType.BYTES_64;
+
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(DocumentDataType.BYTES_64);
-  expect(document.documentData.data).toEqual(pdfContent);
-  expect(document.documentData.initialData).toEqual(pdfContent);
+  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+
+  if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
+    expect(document.documentData.data).toEqual(pdfContent);
+    expect(document.documentData.initialData).toEqual(pdfContent);
+  } else {
+    // For S3, we expect the data/initialData to be the S3 path (non-empty string)
+    expect(document.documentData.data).toBeTruthy();
+    expect(document.documentData.initialData).toBeTruthy();
+  }
 });
 
 /**
@@ -460,13 +416,13 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 test('[TEMPLATE]: should create a document from a template using template document when custom document is not enabled', async ({
   page,
 }) => {
-  const user = await seedUser();
-  const template = await seedBlankTemplate(user);
+  const { user, team } = await seedUser();
+  const template = await seedBlankTemplate(user, team.id);
 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -485,7 +441,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Use template without custom document
-  await page.waitForURL('/templates');
+  await page.waitForURL(`/t/${team.url}/templates`);
   await page.getByRole('button', { name: 'Use Template' }).click();
 
   // Verify custom document upload is not checked by default
@@ -495,7 +451,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the template's document data
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -528,15 +484,11 @@ test('[TEMPLATE]: should create a document from a template using template docume
 test('[TEMPLATE]: should persist document visibility when creating from template', async ({
   page,
 }) => {
-  const { owner, ...team } = await seedTeam({
+  const { team, owner, organisation } = await seedTeam({
     createTeamMembers: 2,
   });
 
-  const template = await seedBlankTemplate(owner, {
-    createTemplateOptions: {
-      teamId: team.id,
-    },
-  });
+  const template = await seedBlankTemplate(owner, team.id);
 
   await apiSignin({
     page,
@@ -565,16 +517,10 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Save template' }).click();
 
   // Test creating document as team manager
-  await prisma.teamMember.update({
-    where: {
-      id: team.members[1].id,
-    },
-    data: {
-      role: TeamMemberRole.MANAGER,
-    },
+  const managerUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MANAGER,
   });
-
-  const managerUser = team.members[1].user;
 
   await apiSignin({
     page,
@@ -586,7 +532,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct visibility
-  await page.waitForURL(/documents/);
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
 
   const documentId = Number(page.url().split('/').pop());
 
@@ -601,7 +547,11 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   expect(document.teamId).toEqual(team.id);
 
   // Test that regular member cannot create document from restricted template
-  const memberUser = team.members[2].user;
+  const memberUser = await seedTeamMember({
+    teamId: team.id,
+    role: TeamMemberRole.MEMBER,
+  });
+
   await apiSignin({
     page,
     email: memberUser.email,

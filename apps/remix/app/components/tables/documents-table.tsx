@@ -26,7 +26,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { DocumentsTableActionButton } from './documents-table-action-button';
 import { DocumentsTableActionDropdown } from './documents-table-action-dropdown';
@@ -48,7 +48,8 @@ export function DocumentsDataTable({
   onMoveDocument,
 }: DataTableProps) {
   const { _ } = useLingui();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
+
   const [isPending, startTransition] = useTransition();
   const updateSearchParams = useUpdateSearchParams();
   const [searchParams] = useSearchParams();
@@ -240,7 +241,7 @@ export function DocumentsDataTable({
 
 type DataTableTitleProps = {
   row: DocumentsTableRow;
-  teamUrl?: string;
+  teamUrl: string;
 };
 
 export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
@@ -252,10 +253,8 @@ export const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isRecipient = !!recipient;
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
-  const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
-  const formatPath = row.folderId
-    ? `${documentsPath}/f/${row.folderId}/${row.id}`
-    : `${documentsPath}/${row.id}`;
+  const documentsPath = formatDocumentsPath(teamUrl);
+  const formatPath = `${documentsPath}/${row.id}`;
 
   return match({
     isOwner,

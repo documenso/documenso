@@ -5,9 +5,17 @@ export const getWebhooksByTeamId = async (teamId: number, userId: number) => {
     where: {
       team: {
         id: teamId,
-        members: {
+        teamGroups: {
           some: {
-            userId,
+            organisationGroup: {
+              organisationGroupMembers: {
+                some: {
+                  organisationMember: {
+                    userId,
+                  },
+                },
+              },
+            },
           },
         },
       },

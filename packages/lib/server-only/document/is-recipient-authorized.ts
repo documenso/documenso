@@ -5,6 +5,7 @@ import { match } from 'ts-pattern';
 import { prisma } from '@documenso/prisma';
 
 import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';
+import { verifyPassword } from '../2fa/verify-password';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuth, TDocumentAuthMethods } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
@@ -60,23 +61,26 @@ export const isRecipientAuthorized = async ({
     recipientAuth: recipient.authOptions,
   });
 
-  const authMethod: TDocumentAuth | null =
+  const authMethods: TDocumentAuth[] =
     type === 'ACCESS' ? derivedRecipientAccessAuth : derivedRecipientActionAuth;
 
   // Early true return when auth is not required.
-  if (!authMethod || authMethod === DocumentAuth.EXPLICIT_NONE) {
+  if (
+    authMethods.length === 0 ||
+    authMethods.some((method) => method === DocumentAuth.EXPLICIT_NONE)
+  ) {
     return true;
   }
 
   // Create auth options when none are passed for account.
-  if (!authOptions && authMethod === DocumentAuth.ACCOUNT) {
+  if (!authOptions && authMethods.some((method) => method === DocumentAuth.ACCOUNT)) {
     authOptions = {
       type: DocumentAuth.ACCOUNT,
     };
   }
 
   // Authentication required does not match provided method.
-  if (!authOptions || authOptions.type !== authMethod || !userId) {
+  if (!authOptions || !authMethods.includes(authOptions.type) || !userId) {
     return false;
   }
 
@@ -116,6 +120,15 @@ export const isRecipientAuthorized = async ({
         totpCode: token,
         window: 10, // 5 minutes worth of tokens
       });
+    })
+    .with({ type: DocumentAuth.PASSWORD }, async ({ password }) => {
+      return await verifyPassword({
+        userId,
+        password,
+      });
+    })
+    .with({ type: DocumentAuth.EXPLICIT_NONE }, () => {
+      return true;
     })
     .exhaustive();
 };
@@ -160,7 +173,7 @@ const verifyPasskey = async ({
 }: VerifyPasskeyOptions): Promise<void> => {
   const passkey = await prisma.passkey.findFirst({
     where: {
-      credentialId: Buffer.from(authenticationResponse.id, 'base64'),
+      credentialId: new Uint8Array(Buffer.from(authenticationResponse.id, 'base64')),
       userId,
     },
   });

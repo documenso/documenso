@@ -15,7 +15,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ViewedDocumentOptions = {
   token: string;
-  recipientAccessAuth?: TDocumentAccessAuthTypes | null;
+  recipientAccessAuth?: TDocumentAccessAuthTypes[];
   requestMetadata?: RequestMetadata;
 };
 
@@ -63,7 +63,7 @@ export const viewedDocument = async ({
           recipientId: recipient.id,
           recipientName: recipient.name,
           recipientRole: recipient.role,
-          accessAuth: recipientAccessAuth || undefined,
+          accessAuth: recipientAccessAuth ?? [],
         },
       }),
     });
