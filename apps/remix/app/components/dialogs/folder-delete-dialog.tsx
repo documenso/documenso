@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
@@ -11,6 +10,7 @@ import { z } from 'zod';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
 import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -32,22 +32,22 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type FolderDeleteDialogProps = {
-  folder: TFolderWithSubfolders | null;
+  folder: TFolderWithSubfolders;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDeleteDialogProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
   const { toast } = useToast();
   const { mutateAsync: deleteFolder } = trpc.folder.deleteFolder.useMutation();
 
-  const deleteMessage = _(msg`delete ${folder?.name ?? 'folder'}`);
+  const deleteMessage = t`delete ${folder.name}`;
 
   const ZDeleteFolderFormSchema = z.object({
     confirmText: z.literal(deleteMessage, {
-      errorMap: () => ({ message: _(msg`You must type '${deleteMessage}' to confirm`) }),
+      errorMap: () => ({ message: t`You must type '${deleteMessage}' to confirm` }),
     }),
   });
 
@@ -61,8 +61,6 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
   });
 
   const onFormSubmit = async () => {
-    if (!folder) return;
-
     try {
       await deleteFolder({
         id: folder.id,
@@ -71,15 +69,15 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
       onOpenChange(false);
 
       toast({
-        title: 'Folder deleted successfully',
+        title: t`Folder deleted successfully`,
       });
     } catch (err) {
       const error = AppError.parseError(err);
 
       if (error.code === AppErrorCode.NOT_FOUND) {
         toast({
-          title: 'Folder not found',
-          description: _(msg`The folder you are trying to delete does not exist.`),
+          title: t`Folder not found`,
+          description: t`The folder you are trying to delete does not exist.`,
           variant: 'destructive',
         });
 
@@ -87,8 +85,8 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
       }
 
       toast({
-        title: 'Failed to delete folder',
-        description: _(msg`An unknown error occurred while deleting the folder.`),
+        title: t`Failed to delete folder`,
+        description: t`An unknown error occurred while deleting the folder.`,
         variant: 'destructive',
       });
     }
@@ -104,53 +102,65 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Folder</DialogTitle>
+          <DialogTitle>
+            <Trans>Delete Folder</Trans>
+          </DialogTitle>
           <DialogDescription>
-            Are you sure you want to delete this folder?
-            {folder && folder._count.documents > 0 && (
-              <span className="text-destructive mt-2 block">
-                This folder contains {folder._count.documents} document(s). Deleting it will also
-                delete all documents in the folder.
-              </span>
-            )}
-            {folder && folder._count.subfolders > 0 && (
-              <span className="text-destructive mt-2 block">
-                This folder contains {folder._count.subfolders} subfolder(s). Deleting it will
-                delete all subfolders and their contents.
-              </span>
-            )}
+            <Trans>Are you sure you want to delete this folder?</Trans>
           </DialogDescription>
         </DialogHeader>
+
+        {(folder._count.documents > 0 ||
+          folder._count.templates > 0 ||
+          folder._count.subfolders > 0) && (
+          <Alert variant="destructive">
+            <AlertDescription>
+              <Trans>
+                This folder contains multiple items. Deleting it will also delete all items in the
+                folder, including nested folders and their contents.
+              </Trans>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="confirmText"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>
-                    <Trans>
-                      Confirm by typing:{' '}
-                      <span className="font-sm text-destructive font-semibold">
-                        {deleteMessage}
-                      </span>
-                    </Trans>
-                  </FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder={deleteMessage} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button variant="destructive" type="submit" disabled={!form.formState.isValid}>
-                Delete
-              </Button>
-            </DialogFooter>
+          <form onSubmit={form.handleSubmit(onFormSubmit)}>
+            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="confirmText"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      <Trans>
+                        Confirm by typing:{' '}
+                        <span className="font-sm text-destructive font-semibold">
+                          {deleteMessage}
+                        </span>
+                      </Trans>
+                    </FormLabel>
+                    <FormControl>
+                      <Input placeholder={deleteMessage} {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button
+                  variant="destructive"
+                  type="submit"
+                  disabled={!form.formState.isValid}
+                  loading={form.formState.isSubmitting}
+                >
+                  <Trans>Delete</Trans>
+                </Button>
+              </DialogFooter>
+            </fieldset>
           </form>
         </Form>
       </DialogContent>
