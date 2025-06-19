@@ -67,6 +67,16 @@ msgstr "{0, plural, one {(1 character over)} other {(# characters over)}}"
 msgid "{0, plural, one {# character over the limit} other {# characters over the limit}}"
 msgstr "{0, plural, one {# character over the limit} other {# characters over the limit}}"
 
+#. placeholder {0}: folder._count.documents
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# document} other {# documents}}"
+msgstr "{0, plural, one {# document} other {# documents}}"
+
+#. placeholder {0}: folder._count.subfolders
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# folder} other {# folders}}"
+msgstr "{0, plural, one {# folder} other {# folders}}"
+
 #. placeholder {0}: template.recipients.length
 #: apps/remix/app/routes/_recipient+/d.$token+/_index.tsx
 msgid "{0, plural, one {# recipient} other {# recipients}}"
@@ -76,6 +86,11 @@ msgstr "{0, plural, one {# recipient} other {# recipients}}"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "{0, plural, one {# team} other {# teams}}"
 msgstr "{0, plural, one {# team} other {# teams}}"
+
+#. placeholder {0}: folder._count.templates
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# template} other {# templates}}"
+msgstr "{0, plural, one {# template} other {# templates}}"
 
 #. placeholder {0}: data.length
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -1243,17 +1258,14 @@ msgstr "An unexpected error occurred."
 msgid "An unknown error occurred"
 msgstr "An unknown error occurred"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "An unknown error occurred while creating the folder."
 msgstr "An unknown error occurred while creating the folder."
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "An unknown error occurred while deleting the folder."
 msgstr "An unknown error occurred while deleting the folder."
 
-#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "An unknown error occurred while moving the folder."
 msgstr "An unknown error occurred while moving the folder."
@@ -1321,6 +1333,10 @@ msgstr "Are you sure you want to complete the document? This action cannot be un
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
 msgstr "Are you sure you want to delete the following claim?"
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Are you sure you want to delete this folder?"
+msgstr "Are you sure you want to delete this folder?"
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Are you sure you want to delete this token?"
@@ -1627,6 +1643,9 @@ msgstr "Can prepare"
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
@@ -1922,7 +1941,6 @@ msgstr "Confirm by typing <0>{deleteMessage}</0>"
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Confirm by typing: <0>{deleteMessage}</0>"
 msgstr "Confirm by typing: <0>{deleteMessage}</0>"
@@ -2066,6 +2084,7 @@ msgstr "Copy token"
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Create"
 msgstr "Create"
@@ -2135,6 +2154,14 @@ msgstr "Create Direct Signing Link"
 msgid "Create document from template"
 msgstr "Create document from template"
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Create folder"
+msgstr "Create folder"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Create Folder"
+msgstr "Create Folder"
+
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Create group"
@@ -2143,6 +2170,10 @@ msgstr "Create group"
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Create Groups"
 msgstr "Create Groups"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Create New Folder"
+msgstr "Create New Folder"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Create now"
@@ -2262,6 +2293,10 @@ msgstr "Created on {0}"
 msgid "CSV Structure"
 msgstr "CSV Structure"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "Cumulative MAU (signed in)"
+msgstr "Cumulative MAU (signed in)"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "Current"
@@ -2348,6 +2383,7 @@ msgstr "delete"
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
+#: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -2359,6 +2395,7 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Delete"
@@ -2366,10 +2403,9 @@ msgstr "Delete"
 
 #. placeholder {0}: webhook.webhookUrl
 #. placeholder {0}: token.name
-#. placeholder {0}: folder?.name ?? 'folder'
+#. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "delete {0}"
@@ -2400,6 +2436,10 @@ msgstr "Delete document"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete Document"
 msgstr "Delete Document"
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Delete Folder"
+msgstr "Delete Folder"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
@@ -2840,7 +2880,6 @@ msgid "Document will be permanently deleted"
 msgstr "Document will be permanently deleted"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
@@ -3146,6 +3185,10 @@ msgstr "Enabling the account results in the user being able to use the account a
 msgid "Enclosed Document"
 msgstr "Enclosed Document"
 
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Enter a name for your new folder. Folders help you organise your items."
+msgstr "Enter a name for your new folder. Folders help you organise your items."
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
 msgstr "Enter claim name"
@@ -3274,14 +3317,17 @@ msgstr "Expires on {0}"
 msgid "External ID"
 msgstr "External ID"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "Failed to create folder"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Failed to create subscription claim."
 msgstr "Failed to create subscription claim."
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Failed to delete folder"
+msgstr "Failed to delete folder"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
@@ -3290,6 +3336,10 @@ msgstr "Failed to delete subscription claim."
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Failed to load document"
 msgstr "Failed to load document"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Failed to move folder"
+msgstr "Failed to move folder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -3403,16 +3453,28 @@ msgstr "Fill in the details to create a new subscription claim."
 msgid "Folder"
 msgstr "Folder"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Folder created successfully"
 msgstr "Folder created successfully"
 
-#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Folder deleted successfully"
+msgstr "Folder deleted successfully"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Folder moved successfully"
+msgstr "Folder moved successfully"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Folder Name"
+msgstr "Folder Name"
+
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Folder not found"
 msgstr "Folder not found"
 
-#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 msgid "Folder updated successfully"
 msgstr "Folder updated successfully"
@@ -3650,8 +3712,15 @@ msgid "Hide additional information"
 msgstr "Hide additional information"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
+#: apps/remix/app/components/general/folder/folder-grid.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Home"
 msgstr "Home"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Home (No Folder)"
+msgstr "Home (No Folder)"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -4132,6 +4201,10 @@ msgstr "MAU (created document)"
 msgid "MAU (had document completed)"
 msgstr "MAU (had document completed)"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "MAU (signed in)"
+msgstr "MAU (signed in)"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Max"
 msgstr "Max"
@@ -4202,7 +4275,9 @@ msgstr "Monthly Active Users: Users that created at least one Document"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "Monthly Active Users: Users that had at least one of their documents completed"
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Move"
 msgstr "Move"
@@ -4214,6 +4289,10 @@ msgstr "Move \"{templateTitle}\" to a folder"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Move Document to Folder"
 msgstr "Move Document to Folder"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Move Folder"
+msgstr "Move Folder"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
@@ -4227,6 +4306,10 @@ msgstr "Move to Folder"
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Multiple access methods can be selected."
 msgstr "Multiple access methods can be selected."
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "My Folder"
+msgstr "My Folder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -4315,6 +4398,16 @@ msgstr "No"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
 msgstr "No active drafts"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "No folders found"
+msgstr "No folders found"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+msgid "No folders found matching \"{searchTerm}\""
+msgstr "No folders found matching \"{searchTerm}\""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
@@ -4625,9 +4718,17 @@ msgstr "Organisations"
 msgid "Organisations that the user is a member of."
 msgstr "Organisations that the user is a member of."
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Organise your documents"
+msgstr "Organise your documents"
+
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organise your members into groups which can be assigned to teams"
 msgstr "Organise your members into groups which can be assigned to teams"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Organise your templates"
+msgstr "Organise your templates"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Organize your documents and templates"
@@ -4803,6 +4904,10 @@ msgstr "Pick a password"
 #: apps/remix/app/components/general/user-profile-timur.tsx
 msgid "Pick any of the following agreements below and start signing to get started"
 msgstr "Pick any of the following agreements below and start signing to get started"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Pin"
+msgstr "Pin"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5379,11 +5484,6 @@ msgstr "Role"
 msgid "Roles"
 msgstr "Roles"
 
-#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
-#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
-msgid "Root (No Folder)"
-msgstr "Root (No Folder)"
-
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Rows per page"
 msgstr "Rows per page"
@@ -5435,6 +5535,14 @@ msgstr "Search by organisation ID, name, customer ID or owner email"
 msgid "Search documents..."
 msgstr "Search documents..."
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Search folders..."
+msgstr "Search folders..."
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "Search languages..."
@@ -5458,6 +5566,10 @@ msgstr "Security activity"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 msgid "Select"
 msgstr "Select"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Select a destination for this folder."
+msgstr "Select a destination for this folder."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
@@ -5663,6 +5775,7 @@ msgstr "Set up your template properties and recipient information"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
+#: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Settings"
 msgstr "Settings"
 
@@ -6360,7 +6473,6 @@ msgstr "Template title"
 msgid "Template updated successfully"
 msgstr "Template updated successfully"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
@@ -6491,12 +6603,10 @@ msgstr "The events that will trigger a webhook to be sent to your URL."
 msgid "The fields have been updated to the new field insertion method successfully"
 msgstr "The fields have been updated to the new field insertion method successfully"
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
 msgstr "The folder you are trying to delete does not exist."
 
-#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "The folder you are trying to move does not exist."
 msgstr "The folder you are trying to move does not exist."
@@ -6831,10 +6941,9 @@ msgstr "This email will be sent to the recipient who has just signed the documen
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
-#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
-msgid "This folder name is already taken."
-msgstr "This folder name is already taken."
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
+msgstr "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -7217,6 +7326,10 @@ msgstr "Unlimited"
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Unlimited documents, API and more"
 msgstr "Unlimited documents, API and more"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Unpin"
+msgstr "Unpin"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Untitled Group"
@@ -7923,7 +8036,6 @@ msgstr "We will generate signing links for you, which you can send to the recipi
 msgid "We won't send anything to notify recipients."
 msgstr "We won't send anything to notify recipients."
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "We're all empty"
@@ -8283,7 +8395,6 @@ msgstr "You have initiated the document {0} that requires you to {recipientActio
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
 msgstr "You have no webhooks yet. Your webhooks will be shown here once you create them."
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "You have not yet created any templates. To create a template please upload one."
 msgstr "You have not yet created any templates. To create a template please upload one."
@@ -8385,7 +8496,6 @@ msgstr "You have verified your email address for <0>{0}</0>."
 msgid "You must enter '{deleteMessage}' to proceed"
 msgstr "You must enter '{deleteMessage}' to proceed"
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "You must type '{deleteMessage}' to confirm"
 msgstr "You must type '{deleteMessage}' to confirm"
