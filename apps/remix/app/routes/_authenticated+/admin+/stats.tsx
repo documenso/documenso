@@ -40,8 +40,6 @@ export async function loader() {
     docStats,
     recipientStats,
     signerConversionMonthly,
-    // userWithAtLeastOneDocumentPerMonth,
-    // userWithAtLeastOneDocumentSignedPerMonth,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
   ] = await Promise.all([
