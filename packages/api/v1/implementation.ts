@@ -30,6 +30,7 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
+import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
@@ -377,6 +378,83 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         status: 404,
         body: {
           message: 'An error has occured while uploading the file',
+        },
+      };
+    }
+  }),
+
+  createTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { body } = args;
+    const { data, meta } = body;
+
+    try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Create template is not available without S3 transport.',
+          },
+        };
+      }
+
+      const dateFormat = body?.meta?.dateFormat
+        ? DATE_FORMATS.find((format) => format.value === body?.meta?.dateFormat)
+        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+
+      if (body?.meta?.dateFormat && !dateFormat) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
+          },
+        };
+      }
+
+      const timezone = body?.meta?.timezone
+        ? TIME_ZONES.find((tz) => tz === body?.meta?.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isTimeZoneValid = body?.meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+
+      if (!isTimeZoneValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid timezone. Please provide a valid timezone',
+          },
+        };
+      }
+
+      const fileName = data?.title?.endsWith('.pdf') ? data.title : `${data?.title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const templateDocumentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const template = await createTemplate({
+        title: data?.title,
+        userId: user.id,
+        teamId: team?.id,
+        templateDocumentDataId: templateDocumentData.id,
+        data,
+        meta,
+      });
+
+      return {
+        status: 200,
+        body: {
+          uploadUrl: url,
+          template,
+        },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'An error has occured while creating the template',
         },
       };
     }
