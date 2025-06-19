@@ -22,6 +22,7 @@ interface DataTableToolbarProps<TData> {
   isStatusFiltered?: boolean;
   isTimePeriodFiltered?: boolean;
   isSourceFiltered?: boolean;
+  showSourceFilter?: boolean;
 }
 
 export function DataTableToolbar<TData>({
@@ -37,6 +38,7 @@ export function DataTableToolbar<TData>({
   isStatusFiltered,
   isTimePeriodFiltered,
   isSourceFiltered,
+  showSourceFilter = true,
 }: DataTableToolbarProps<TData>) {
   const { _ } = useLingui();
   const isFiltered =
@@ -103,7 +105,7 @@ export function DataTableToolbar<TData>({
           />
         )}
 
-        {table.getColumn('source') && (
+        {showSourceFilter && table.getColumn('source') && (
           <DataTableFacetedFilter
             column={table.getColumn('source')}
             title={_(msg`Source`)}

@@ -47,6 +47,7 @@ interface DataTableProps<TData, TValue> {
   isStatusFiltered?: boolean;
   isTimePeriodFiltered?: boolean;
   isSourceFiltered?: boolean;
+  showSourceFilter?: boolean;
   skeleton?: {
     enable: boolean;
     rows: number;
@@ -83,6 +84,7 @@ export function DataTable<TData, TValue>({
   isStatusFiltered,
   isTimePeriodFiltered,
   isSourceFiltered,
+  showSourceFilter,
   emptyState,
 }: DataTableProps<TData, TValue>) {
   const { _ } = useLingui();
@@ -164,6 +166,7 @@ export function DataTable<TData, TValue>({
           isStatusFiltered={isStatusFiltered}
           isTimePeriodFiltered={isTimePeriodFiltered}
           isSourceFiltered={isSourceFiltered}
+          showSourceFilter={showSourceFilter}
         />
         {table.getRowModel().rows?.length || error?.enable || skeleton?.enable ? (
           <div className="rounded-md border">

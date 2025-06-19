@@ -89,6 +89,13 @@ export function DocumentsDataTable({
   const selectedTimePeriodValues = currentPeriod ? [currentPeriod] : [];
   const isTimePeriodFiltered = selectedTimePeriodValues.length > 0;
 
+  const handleSourceFilterChange = (values: string[]) => {
+    // Documents table doesn't have source filtering
+  };
+
+  const selectedSourceValues: string[] = [];
+  const isSourceFiltered = false;
+
   const columns = useMemo(() => {
     return [
       {
@@ -191,9 +198,13 @@ export function DocumentsDataTable({
         selectedStatusValues={selectedStatusValues}
         onTimePeriodFilterChange={handleTimePeriodFilterChange}
         selectedTimePeriodValues={selectedTimePeriodValues}
+        onSourceFilterChange={handleSourceFilterChange}
+        selectedSourceValues={selectedSourceValues}
         onResetFilters={handleResetFilters}
         isStatusFiltered={isStatusFiltered}
         isTimePeriodFiltered={isTimePeriodFiltered}
+        isSourceFiltered={isSourceFiltered}
+        showSourceFilter={false}
         error={{
           enable: isLoadingError || false,
         }}
