@@ -153,13 +153,7 @@ export const duplicateDocument = async ({
       }
     }
 
-    return await tx.document.findUniqueOrThrow({
-      where: { id: newDocument.id },
-      include: {
-        recipients: true,
-        documentMeta: true,
-      },
-    });
+    return newDocument;
   });
 
   await triggerWebhook({
