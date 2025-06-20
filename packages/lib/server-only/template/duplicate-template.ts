@@ -94,6 +94,7 @@ export const duplicateTemplate = async ({
         height: field.height,
         customText: field.customText,
         inserted: field.inserted,
+        fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
         templateId: duplicatedTemplate.id,
         recipientId: duplicatedTemplateRecipient.id,
       };
