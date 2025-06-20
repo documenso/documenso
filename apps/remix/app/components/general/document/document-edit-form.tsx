@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
@@ -12,6 +13,7 @@ import {
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
 import type { TDocument } from '@documenso/lib/types/document';
+import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -175,13 +177,17 @@ export const DocumentEditForm = ({
     try {
       const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
+      const parsedGlobalAccessAuth = z
+        .array(ZDocumentAccessAuthTypesSchema)
+        .safeParse(data.globalAccessAuth);
+
       await updateDocument({
         documentId: document.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
-          globalAccessAuth: data.globalAccessAuth ?? [],
+          globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
           globalActionAuth: data.globalActionAuth ?? [],
         },
         meta: {

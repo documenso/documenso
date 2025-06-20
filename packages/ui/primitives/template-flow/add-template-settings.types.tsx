@@ -22,7 +22,11 @@ export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),
   externalId: z.string().optional(),
   visibility: z.nativeEnum(DocumentVisibility).optional(),
-  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
+  globalAccessAuth: z
+    .array(z.union([ZDocumentAccessAuthTypesSchema, z.literal('-1')]))
+    .transform((val) => (val.length === 1 && val[0] === '-1' ? [] : val))
+    .optional()
+    .default([]),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
   meta: z.object({
     subject: z.string(),
