@@ -1,4 +1,4 @@
-import { DocumentSource, type Prisma, WebhookTriggerEvents } from '@prisma/client';
+import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -7,7 +7,7 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { prefixedId } from '../../universal/id';
+import { nanoid, prefixedId } from '../../universal/id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getDocumentWhereInput } from './get-document-by-id';
 
@@ -50,6 +50,29 @@ export const duplicateDocument = async ({
           redirectUrl: true,
         },
       },
+      recipients: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          signingOrder: true,
+        },
+      },
+      fields: {
+        select: {
+          recipientId: true,
+          type: true,
+          page: true,
+          positionX: true,
+          positionY: true,
+          width: true,
+          height: true,
+          customText: true,
+          inserted: true,
+          fieldMeta: true,
+        },
+      },
     },
   });
 
@@ -59,49 +82,84 @@ export const duplicateDocument = async ({
     });
   }
 
-  const createDocumentArguments: Prisma.DocumentCreateArgs = {
-    data: {
-      title: document.title,
-      qrToken: prefixedId('qr'),
-      user: {
-        connect: {
-          id: document.userId,
+  const createdDocument = await prisma.$transaction(async (tx) => {
+    const newDocument = await tx.document.create({
+      data: {
+        title: document.title,
+        qrToken: prefixedId('qr'),
+        user: {
+          connect: {
+            id: document.userId,
+          },
         },
-      },
-      team: {
-        connect: {
-          id: teamId,
+        team: {
+          connect: {
+            id: teamId,
+          },
         },
-      },
-      documentData: {
-        create: {
-          ...document.documentData,
-          data: document.documentData.initialData,
+        documentData: {
+          create: {
+            ...document.documentData,
+            data: document.documentData.initialData,
+          },
         },
-      },
-      documentMeta: {
-        create: {
-          ...document.documentMeta,
+        documentMeta: {
+          create: {
+            ...document.documentMeta,
+          },
         },
+        source: DocumentSource.DOCUMENT,
       },
-      source: DocumentSource.DOCUMENT,
-    },
-  };
+      include: {
+        recipients: true,
+        documentMeta: true,
+      },
+    });
 
-  if (teamId !== undefined) {
-    createDocumentArguments.data.team = {
-      connect: {
-        id: teamId,
-      },
-    };
-  }
+    if (document.recipients.length > 0) {
+      const recipientMap = new Map<number, number>();
 
-  const createdDocument = await prisma.document.create({
-    ...createDocumentArguments,
-    include: {
-      recipients: true,
-      documentMeta: true,
-    },
+      for (const recipient of document.recipients) {
+        const newRecipient = await tx.recipient.create({
+          data: {
+            documentId: newDocument.id,
+            email: recipient.email,
+            name: recipient.name,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            token: nanoid(),
+          },
+        });
+
+        recipientMap.set(recipient.id, newRecipient.id);
+      }
+
+      if (document.fields.length > 0) {
+        await tx.field.createMany({
+          data: document.fields.map((field) => ({
+            documentId: newDocument.id,
+            recipientId: recipientMap.get(field.recipientId)!,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+          })),
+        });
+      }
+    }
+
+    return await tx.document.findUniqueOrThrow({
+      where: { id: newDocument.id },
+      include: {
+        recipients: true,
+        documentMeta: true,
+      },
+    });
   });
 
   await triggerWebhook({
