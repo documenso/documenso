@@ -1,7 +1,10 @@
+import { useEffect } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Link, Outlet, redirect } from 'react-router';
 
+import { authClient } from '@documenso/auth/client';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -46,6 +49,18 @@ export default function Layout({ loaderData, params }: Route.ComponentProps) {
   const { banner } = loaderData;
 
   const { user, organisations } = useSession();
+
+  useEffect(() => {
+    const closeSession = async () => {
+      await authClient.signOut();
+    };
+
+    //@ts-expect-error - user is not defined
+    if (user?.disabled) {
+      console.log(`User profile is disabled, closing session for user: ${user.id}`);
+      void closeSession();
+    }
+  }, [user]);
 
   const teamUrl = params.teamUrl;
   const orgUrl = params.orgUrl;
