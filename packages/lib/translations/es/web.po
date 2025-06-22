@@ -1035,7 +1035,7 @@ msgstr "Un administrador ha eliminado tu documento \"{documentName}\"."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An electronic signature provided by you on our platform, achieved through clicking through to a document and entering your name, or any other electronic signing method we provide, is legally binding. It carries the same weight and enforceability as a manual signature written with ink on paper."
-msgstr "Una firma electrónica proporcionada por usted en nuestra plataforma, lograda mediante el clic en un documento e ingresando su nombre, o cualquier otro método de firma electrónica que proporcionemos, es legalmente vinculante. Tiene el mismo peso y exigibilidad que una firma manual escrita con tinta en papel."
+msgstr "Una firma electrónica proporcionada por usted en nuestra plataforma —ya sea mediante el clic en un botón, escribiendo su nombre, o cualquier otro método que proporcionemos— puede ser legalmente vinculante, siempre que las partes involucradas acepten esta forma de firma. Aunque no es emitida por una entidad certificadora oficial, tiene efectos legales conforme a las leyes aplicables si existe consentimiento y aceptación expresa."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "An email account"
@@ -6406,7 +6406,7 @@ msgstr "Gracias por completar el proceso de firma."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Gracias por usar Documenso para realizar su firma electrónica de documentos. El propósito de esta divulgación es informarle sobre el proceso, la legalidad y sus derechos con respecto al uso de firmas electrónicas en nuestra plataforma. Al optar por usar una firma electrónica, usted está aceptando los términos y condiciones descritos a continuación."
+msgstr "Gracias por usar Documenso hosteado por EnhanceBoard para realizar su firma electrónica de documentos. El propósito de esta divulgación es informarle sobre el proceso, la legalidad y sus derechos con respecto al uso de firmas electrónicas en nuestra plataforma. Al optar por usar una firma electrónica, usted está aceptando los términos y condiciones descritos a continuación."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."
