@@ -1,4 +1,6 @@
+import type { Prisma, Recipient } from '@prisma/client';
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
+import { omit } from 'remeda';
 
 import { prisma } from '@documenso/prisma';
 
@@ -40,16 +42,9 @@ export const duplicateDocument = async ({
           type: true,
         },
       },
-      documentMeta: {
-        select: {
-          message: true,
-          subject: true,
-          dateFormat: true,
-          password: true,
-          timezone: true,
-          redirectUrl: true,
-        },
-      },
+      authOptions: true,
+      visibility: true,
+      documentMeta: true,
       recipients: {
         select: {
           id: true,
@@ -57,20 +52,7 @@ export const duplicateDocument = async ({
           name: true,
           role: true,
           signingOrder: true,
-        },
-      },
-      fields: {
-        select: {
-          recipientId: true,
-          type: true,
-          page: true,
-          positionX: true,
-          positionY: true,
-          width: true,
-          height: true,
-          customText: true,
-          inserted: true,
-          fieldMeta: true,
+          fields: true,
         },
       },
     },
@@ -82,85 +64,83 @@ export const duplicateDocument = async ({
     });
   }
 
-  const createdDocument = await prisma.$transaction(async (tx) => {
-    const newDocument = await tx.document.create({
-      data: {
-        title: document.title,
-        qrToken: prefixedId('qr'),
-        user: {
-          connect: {
-            id: document.userId,
-          },
-        },
-        team: {
-          connect: {
-            id: teamId,
-          },
-        },
-        documentData: {
-          create: {
-            ...document.documentData,
-            data: document.documentData.initialData,
-          },
-        },
-        documentMeta: {
-          create: {
-            ...document.documentMeta,
-          },
-        },
-        source: DocumentSource.DOCUMENT,
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: document.documentData.type,
+      data: document.documentData.initialData,
+      initialData: document.documentData.initialData,
+    },
+  });
+
+  let documentMeta: Prisma.DocumentCreateArgs['data']['documentMeta'] | undefined = undefined;
+
+  if (document.documentMeta) {
+    documentMeta = {
+      create: {
+        ...omit(document.documentMeta, ['id', 'documentId']),
+        emailSettings: document.documentMeta.emailSettings || undefined,
       },
-      include: {
-        recipients: true,
-        documentMeta: true,
+    };
+  }
+
+  const createdDocument = await prisma.document.create({
+    data: {
+      userId: document.userId,
+      teamId: teamId,
+      title: document.title,
+      documentDataId: documentData.id,
+      authOptions: document.authOptions || undefined,
+      visibility: document.visibility,
+      qrToken: prefixedId('qr'),
+      documentMeta,
+      source: DocumentSource.DOCUMENT,
+    },
+    include: {
+      recipients: true,
+      documentMeta: true,
+    },
+  });
+
+  const recipientsToCreate = document.recipients.map((recipient) => ({
+    documentId: createdDocument.id,
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+    signingOrder: recipient.signingOrder,
+    token: nanoid(),
+    fields: {
+      createMany: {
+        data: recipient.fields.map((field) => ({
+          documentId: createdDocument.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+          fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+        })),
       },
+    },
+  }));
+
+  const recipients: Recipient[] = [];
+
+  for (const recipientData of recipientsToCreate) {
+    const newRecipient = await prisma.recipient.create({
+      data: recipientData,
     });
 
-    if (document.recipients.length > 0) {
-      const recipientMap = new Map<number, number>();
-
-      for (const recipient of document.recipients) {
-        const newRecipient = await tx.recipient.create({
-          data: {
-            documentId: newDocument.id,
-            email: recipient.email,
-            name: recipient.name,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-            token: nanoid(),
-          },
-        });
-
-        recipientMap.set(recipient.id, newRecipient.id);
-      }
-
-      if (document.fields.length > 0) {
-        await tx.field.createMany({
-          data: document.fields.map((field) => ({
-            documentId: newDocument.id,
-            recipientId: recipientMap.get(field.recipientId)!,
-            type: field.type,
-            page: field.page,
-            positionX: field.positionX,
-            positionY: field.positionY,
-            width: field.width,
-            height: field.height,
-            customText: '',
-            inserted: false,
-            fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
-          })),
-        });
-      }
-    }
-
-    return newDocument;
-  });
+    recipients.push(newRecipient);
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_CREATED,
     data: ZWebhookDocumentSchema.parse({
       ...mapDocumentToWebhookDocumentPayload(createdDocument),
-      recipients: createdDocument.recipients,
+      recipients,
       documentMeta: createdDocument.documentMeta,
     }),
     userId: userId,
