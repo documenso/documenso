@@ -25,7 +25,6 @@ export const duplicateTemplate = async ({
     include: {
       recipients: {
         select: {
-          id: true,
           email: true,
           name: true,
           role: true,

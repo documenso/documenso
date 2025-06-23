@@ -47,7 +47,6 @@ export const duplicateDocument = async ({
       documentMeta: true,
       recipients: {
         select: {
-          id: true,
           email: true,
           name: true,
           role: true,
