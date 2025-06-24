@@ -10,9 +10,10 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileDown,
+  FolderInput,
   Loader,
   MoreHorizontal,
-  MoveRight,
   Pencil,
   Share,
   Trash2,
@@ -37,10 +38,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
-import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
   row: TDocumentRow;
@@ -52,14 +52,13 @@ export const DocumentsTableActionDropdown = ({
   onMoveDocument,
 }: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -72,10 +71,8 @@ export const DocumentsTableActionDropdown = ({
   const isCurrentTeamDocument = team && row.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
-  const documentsPath = formatDocumentsPath(team?.url);
-  const formatPath = row.folderId
-    ? `${documentsPath}/f/${row.folderId}/${row.id}/edit`
-    : `${documentsPath}/${row.id}/edit`;
+  const documentsPath = formatDocumentsPath(team.url);
+  const formatPath = `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -182,7 +179,7 @@ export const DocumentsTableActionDropdown = ({
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <Download className="mr-2 h-4 w-4" />
+          <FileDown className="mr-2 h-4 w-4" />
           <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
@@ -191,17 +188,9 @@ export const DocumentsTableActionDropdown = ({
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        {/* We don't want to allow teams moving documents across at the moment. */}
-        {!team && !row.teamId && (
-          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
-            <MoveRight className="mr-2 h-4 w-4" />
-            <Trans>Move to Team</Trans>
-          </DropdownMenuItem>
-        )}
-
         {onMoveDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
-            <MoveRight className="mr-2 h-4 w-4" />
+            <FolderInput className="mr-2 h-4 w-4" />
             <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
@@ -257,14 +246,7 @@ export const DocumentsTableActionDropdown = ({
         documentTitle={row.title}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        teamId={team?.id}
         canManageDocument={canManageDocument}
-      />
-
-      <DocumentMoveDialog
-        documentId={row.id}
-        open={isMoveDialogOpen}
-        onOpenChange={setMoveDialogOpen}
       />
 
       <DocumentDuplicateDialog

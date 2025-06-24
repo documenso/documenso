@@ -7,6 +7,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
 import type { SessionValidationResult } from '../server/lib/session/session';
+import type { ActiveSession } from '../server/lib/utils/get-session';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
   TDisableTwoFactorRequestSchema,
@@ -47,6 +48,26 @@ export class AuthClient {
     window.location.href = redirectPath ?? this.signOutredirectPath;
   }
 
+  public async signOutAllSessions() {
+    await this.client['signout-all'].$post();
+  }
+
+  public async signOutSession({
+    sessionId,
+    redirectPath,
+  }: {
+    sessionId: string;
+    redirectPath?: string;
+  }) {
+    await this.client['signout-session'].$post({
+      json: { sessionId },
+    });
+
+    if (redirectPath) {
+      window.location.href = redirectPath;
+    }
+  }
+
   public async getSession() {
     const response = await this.client['session-json'].$get();
 
@@ -55,6 +76,16 @@ export class AuthClient {
     const result = await response.json();
 
     return superjson.deserialize<SessionValidationResult>(result);
+  }
+
+  public async getSessions() {
+    const response = await this.client['sessions'].$get();
+
+    await this.handleError(response);
+
+    const result = await response.json();
+
+    return superjson.deserialize<{ sessions: ActiveSession[] }>(result);
   }
 
   private async handleError<T>(response: ClientResponse<T>): Promise<void> {

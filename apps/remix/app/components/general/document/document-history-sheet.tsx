@@ -81,9 +81,13 @@ export const DocumentHistorySheet = ({
    * @param text The text to format
    * @returns The formatted text
    */
-  const formatGenericText = (text?: string | null) => {
+  const formatGenericText = (text?: string | string[] | null): string => {
     if (!text) {
       return '';
+    }
+
+    if (Array.isArray(text)) {
+      return text.map((t) => formatGenericText(t)).join(', ');
     }
 
     return (text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()).replaceAll('_', ' ');
@@ -245,11 +249,19 @@ export const DocumentHistorySheet = ({
                         values={[
                           {
                             key: 'Old',
-                            value: DOCUMENT_AUTH_TYPES[data.from || '']?.value || 'None',
+                            value: Array.isArray(data.from)
+                              ? data.from
+                                  .map((f) => DOCUMENT_AUTH_TYPES[f]?.value || 'None')
+                                  .join(', ')
+                              : DOCUMENT_AUTH_TYPES[data.from || '']?.value || 'None',
                           },
                           {
                             key: 'New',
-                            value: DOCUMENT_AUTH_TYPES[data.to || '']?.value || 'None',
+                            value: Array.isArray(data.to)
+                              ? data.to
+                                  .map((f) => DOCUMENT_AUTH_TYPES[f]?.value || 'None')
+                                  .join(', ')
+                              : DOCUMENT_AUTH_TYPES[data.to || '']?.value || 'None',
                           },
                         ]}
                       />

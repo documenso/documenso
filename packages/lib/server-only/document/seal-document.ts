@@ -24,6 +24,7 @@ import { flattenForm } from '../pdf/flatten-form';
 import { insertFieldInPDF } from '../pdf/insert-field-in-pdf';
 import { legacy_insertFieldInPDF } from '../pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../pdf/normalize-signature-appearances';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
@@ -48,15 +49,6 @@ export const sealDocument = async ({
       documentData: true,
       documentMeta: true,
       recipients: true,
-      team: {
-        select: {
-          teamGlobalSettings: {
-            select: {
-              includeSigningCertificate: true,
-            },
-          },
-        },
-      },
     },
   });
 
@@ -65,6 +57,11 @@ export const sealDocument = async ({
   if (!documentData) {
     throw new Error(`Document ${document.id} has no document data`);
   }
+
+  const settings = await getTeamSettings({
+    userId: document.userId,
+    teamId: document.teamId,
+  });
 
   const recipients = await prisma.recipient.findMany({
     where: {
@@ -116,19 +113,18 @@ export const sealDocument = async ({
   // !: Need to write the fields onto the document as a hard copy
   const pdfData = await getFileServerSide(documentData);
 
-  const certificateData =
-    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
-      ? await getCertificatePdf({
-          documentId,
-          language: document.documentMeta?.language,
-        }).catch(() => null)
-      : null;
+  const certificateData = settings.includeSigningCertificate
+    ? await getCertificatePdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch(() => null)
+    : null;
 
   const doc = await PDFDocument.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
   normalizeSignatureAppearances(doc);
-  flattenForm(doc);
+  await flattenForm(doc);
   flattenAnnotations(doc);
 
   // Add rejection stamp if the document is rejected
@@ -153,7 +149,7 @@ export const sealDocument = async ({
   }
 
   // Re-flatten post-insertion to handle fields that create arcoFields
-  flattenForm(doc);
+  await flattenForm(doc);
 
   const pdfBytes = await doc.save();
 

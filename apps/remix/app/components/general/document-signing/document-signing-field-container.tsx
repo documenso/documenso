@@ -166,7 +166,7 @@ export const DocumentSigningFieldContainer = ({
             </TooltipTrigger>
 
             <TooltipContent
-              className="border-0 bg-orange-300 fill-orange-300 font-bold text-orange-900"
+              className="border-0 bg-orange-300 fill-orange-300 text-orange-900"
               sideOffset={2}
             >
               {tooltipText && <p>{tooltipText}</p>}

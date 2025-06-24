@@ -1,14 +1,20 @@
 import { useEffect, useId } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
-import { useLingui } from '@lingui/react/macro';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { DocumentStatus, type Field, type Recipient, SendStatus } from '@prisma/client';
+import { Trans, useLingui } from '@lingui/react/macro';
+import {
+  DocumentStatus,
+  DocumentVisibility,
+  type Field,
+  type Recipient,
+  SendStatus,
+  TeamMemberRole,
+} from '@prisma/client';
 import { InfoIcon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
@@ -71,7 +77,6 @@ export type AddSettingsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
   fields: Field[];
-  isDocumentEnterprise: boolean;
   isDocumentPdfLoaded: boolean;
   document: TDocument;
   currentTeamMemberRole?: TeamMemberRole;
@@ -82,7 +87,6 @@ export const AddSettingsFormPartial = ({
   documentFlow,
   recipients,
   fields,
-  isDocumentEnterprise,
   isDocumentPdfLoaded,
   document,
   currentTeamMemberRole,
@@ -90,6 +94,8 @@ export const AddSettingsFormPartial = ({
 }: AddSettingsFormProps) => {
   const { t } = useLingui();
   const initialId = useId();
+
+  const organisation = useCurrentOrganisation();
 
   const { documentAuthOption } = extractDocumentAuthMethods({
     documentAuth: document.authOptions,
@@ -111,8 +117,8 @@ export const AddSettingsFormPartial = ({
       title: document.title,
       externalId: document.externalId || '',
       visibility: document.visibility || '',
-      globalAccessAuth: documentAuthOption?.globalAccessAuth || undefined,
-      globalActionAuth: documentAuthOption?.globalActionAuth || undefined,
+      globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
+      globalActionAuth: documentAuthOption?.globalActionAuth || [],
 
       meta: {
         timezone:
@@ -183,6 +189,12 @@ export const AddSettingsFormPartial = ({
         document.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
     )
     .otherwise(() => false);
+
+  const onFormSubmit = form.handleSubmit(onSubmit);
+
+  const onGoNextClick = () => {
+    void onFormSubmit().catch(console.error);
+  };
 
   // We almost always want to set the timezone to the user's local timezone to avoid confusion
   // when the document is signed.
@@ -267,7 +279,11 @@ export const AddSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <Select {...field} onValueChange={field.onChange}>
+                    <Select
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    >
                       <SelectTrigger className="bg-background">
                         <SelectValue />
                       </SelectTrigger>
@@ -297,7 +313,11 @@ export const AddSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <DocumentGlobalAuthAccessSelect {...field} onValueChange={field.onChange} />
+                    <DocumentGlobalAuthAccessSelect
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                    />
                   </FormControl>
                 </FormItem>
               )}
@@ -327,7 +347,7 @@ export const AddSettingsFormPartial = ({
               />
             )}
 
-            {isDocumentEnterprise && (
+            {organisation.organisationClaim.flags.cfr21 && (
               <FormField
                 control={form.control}
                 name="globalActionAuth"
@@ -339,7 +359,11 @@ export const AddSettingsFormPartial = ({
                     </FormLabel>
 
                     <FormControl>
-                      <DocumentGlobalAuthActionSelect {...field} onValueChange={field.onChange} />
+                      <DocumentGlobalAuthActionSelect
+                        value={field.value}
+                        disabled={field.disabled}
+                        onValueChange={field.onChange}
+                      />
                     </FormControl>
                   </FormItem>
                 )}
@@ -423,7 +447,7 @@ export const AddSettingsFormPartial = ({
 
                           <FormControl>
                             <Select
-                              {...field}
+                              value={field.value}
                               onValueChange={field.onChange}
                               disabled={documentHasBeenSent}
                             >
@@ -459,7 +483,7 @@ export const AddSettingsFormPartial = ({
                             <Combobox
                               className="bg-background"
                               options={TIME_ZONES}
-                              {...field}
+                              value={field.value}
                               onChange={(value) => value && field.onChange(value)}
                               disabled={documentHasBeenSent}
                             />
@@ -589,7 +613,7 @@ export const AddSettingsFormPartial = ({
           disabled={form.formState.isSubmitting}
           canGoBack={stepIndex !== 0}
           onGoBackClick={previousStep}
-          onGoNextClick={form.handleSubmit(onSubmit)}
+          onGoNextClick={onGoNextClick}
         />
       </DocumentFlowFormContainerFooter>
     </>

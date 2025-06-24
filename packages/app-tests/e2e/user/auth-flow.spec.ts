@@ -1,5 +1,6 @@
 import { type Page, expect, test } from '@playwright/test';
 
+import { prisma } from '@documenso/prisma';
 import {
   extractUserVerificationToken,
   seedTestEmail,
@@ -22,14 +23,28 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
 
   await signSignaturePad(page);
 
-  await page.getByRole('button', { name: 'Next', exact: true }).click();
-  await page.getByLabel('Public profile username').fill(Date.now().toString());
-
   await page.getByRole('button', { name: 'Complete', exact: true }).click();
 
   await page.waitForURL('/unverified-account');
 
+  // Wait to ensure token is created in the database
+  await page.waitForTimeout(2000);
+
   const { token } = await extractUserVerificationToken(email);
+
+  const team = await prisma.team.findFirstOrThrow({
+    where: {
+      organisation: {
+        members: {
+          some: {
+            user: {
+              email,
+            },
+          },
+        },
+      },
+    },
+  });
 
   await page.goto(`/verify-email/${token}`);
 
@@ -38,19 +53,19 @@ test('[USER] can sign up with email and password', async ({ page }: { page: Page
   // We now automatically redirect to the home page
   await page.getByRole('link', { name: 'Continue' }).click();
 
-  await page.waitForURL('/documents');
-
-  await expect(page).toHaveURL('/documents');
+  // Expect to be redirected to their only team.
+  await page.waitForURL(`/t/${team.url}/documents`);
+  await expect(page).toHaveURL(`/t/${team.url}/documents`);
 });
 
 test('[USER] can sign in using email and password', async ({ page }: { page: Page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
   await page.goto('/signin');
   await page.getByLabel('Email').fill(user.email);
   await page.getByLabel('Password', { exact: true }).fill('password');
   await page.getByRole('button', { name: 'Sign In' }).click();
 
-  await page.waitForURL('/documents');
-  await expect(page).toHaveURL('/documents');
+  await page.waitForURL(`/t/${team.url}/documents`);
+  await expect(page).toHaveURL(`/t/${team.url}/documents`);
 });

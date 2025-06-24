@@ -1,5 +1,5 @@
-import DocumentsPage, { meta } from '~/routes/_authenticated+/documents.f.$folderId._index';
+import DocumentPage, { meta } from './documents._index';
 
 export { meta };
 
-export default DocumentsPage;
+export default DocumentPage;

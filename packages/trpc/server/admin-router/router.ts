@@ -14,6 +14,13 @@ import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { adminProcedure, router } from '../trpc';
+import { createAdminOrganisationRoute } from './create-admin-organisation';
+import { createStripeCustomerRoute } from './create-stripe-customer';
+import { createSubscriptionClaimRoute } from './create-subscription-claim';
+import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
+import { findAdminOrganisationsRoute } from './find-admin-organisations';
+import { findSubscriptionClaimsRoute } from './find-subscription-claims';
+import { getAdminOrganisationRoute } from './get-admin-organisation';
 import {
   ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
@@ -25,8 +32,27 @@ import {
   ZAdminUpdateRecipientMutationSchema,
   ZAdminUpdateSiteSettingMutationSchema,
 } from './schema';
+import { updateAdminOrganisationRoute } from './update-admin-organisation';
+import { updateSubscriptionClaimRoute } from './update-subscription-claim';
 
 export const adminRouter = router({
+  organisation: {
+    find: findAdminOrganisationsRoute,
+    get: getAdminOrganisationRoute,
+    create: createAdminOrganisationRoute,
+    update: updateAdminOrganisationRoute,
+  },
+  claims: {
+    find: findSubscriptionClaimsRoute,
+    create: createSubscriptionClaimRoute,
+    update: updateSubscriptionClaimRoute,
+    delete: deleteSubscriptionClaimRoute,
+  },
+  stripe: {
+    createCustomer: createStripeCustomerRoute,
+  },
+
+  // Todo: migrate old routes
   findDocuments: adminProcedure.input(ZAdminFindDocumentsQuerySchema).query(async ({ input }) => {
     const { query, page, perPage } = input;
 

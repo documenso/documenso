@@ -1,12 +1,16 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
-import { Outlet, redirect } from 'react-router';
+import { Link, Outlet, redirect } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
+import { Button } from '@documenso/ui/primitives/button';
 
+import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { TeamSettingsNavDesktop } from '~/components/general/teams/team-settings-nav-desktop';
 import { TeamSettingsNavMobile } from '~/components/general/teams/team-settings-nav-mobile';
+import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 import type { Route } from './+types/settings._layout';
@@ -23,7 +27,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
     teamUrl: params.teamUrl,
   });
 
-  if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamMember.role)) {
+  if (!team || !canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole)) {
     throw redirect(`/t/${params.teamUrl}`);
   }
 }
@@ -33,6 +37,31 @@ export async function clientLoader() {
 }
 
 export default function TeamsSettingsLayout() {
+  const team = useCurrentTeam();
+
+  if (!canExecuteTeamAction('MANAGE_TEAM', team.currentTeamRole)) {
+    return (
+      <GenericErrorLayout
+        errorCode={401}
+        errorCodeMap={{
+          401: {
+            heading: msg`Unauthorized`,
+            subHeading: msg`401 Unauthorized`,
+            message: msg`You are not authorized to access this page.`,
+          },
+        }}
+        primaryButton={
+          <Button asChild>
+            <Link to={`/t/${team.url}`}>
+              <Trans>Go Back</Trans>
+            </Link>
+          </Button>
+        }
+        secondaryButton={null}
+      />
+    );
+  }
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <h1 className="text-4xl font-semibold">

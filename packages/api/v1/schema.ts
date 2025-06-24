@@ -8,7 +8,6 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-  TeamMemberRole,
   TemplateType,
 } from '@prisma/client';
 import { z } from 'zod';
@@ -120,6 +119,15 @@ export const ZUploadDocumentSuccessfulSchema = z.object({
   key: z.string(),
 });
 
+export const ZDownloadDocumentQuerySchema = z.object({
+  downloadOriginalDocument: z
+    .preprocess((val) => String(val) === 'true' || String(val) === '1', z.boolean())
+    .optional()
+    .default(false),
+});
+
+export type TDownloadDocumentQuerySchema = z.infer<typeof ZDownloadDocumentQuerySchema>;
+
 export const ZDownloadDocumentSuccessfulSchema = z.object({
   downloadUrl: z.string(),
 });
@@ -169,8 +177,16 @@ export const ZCreateDocumentMutationSchema = z.object({
     .default({}),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z
+        .union([ZDocumentAccessAuthTypesSchema, z.array(ZDocumentAccessAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
+      globalActionAuth: z
+        .union([ZDocumentActionAuthTypesSchema, z.array(ZDocumentActionAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
     })
     .optional()
     .openapi({
@@ -236,8 +252,16 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     .optional(),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z
+        .union([ZDocumentAccessAuthTypesSchema, z.array(ZDocumentAccessAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
+      globalActionAuth: z
+        .union([ZDocumentActionAuthTypesSchema, z.array(ZDocumentActionAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
@@ -309,8 +333,16 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     .optional(),
   authOptions: z
     .object({
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+      globalAccessAuth: z
+        .union([ZDocumentAccessAuthTypesSchema, z.array(ZDocumentAccessAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
+      globalActionAuth: z
+        .union([ZDocumentActionAuthTypesSchema, z.array(ZDocumentActionAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
@@ -349,7 +381,11 @@ export const ZCreateRecipientMutationSchema = z.object({
   signingOrder: z.number().nullish(),
   authOptions: z
     .object({
-      actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+      actionAuth: z
+        .union([ZRecipientActionAuthTypesSchema, z.array(ZRecipientActionAuthTypesSchema)])
+        .transform((val) => (Array.isArray(val) ? val : [val]))
+        .optional()
+        .default([]),
     })
     .optional()
     .openapi({
@@ -598,42 +634,4 @@ export const ZSuccessfulGetTemplatesResponseSchema = z.object({
 export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(1),
-});
-
-export const ZFindTeamMembersResponseSchema = z.object({
-  members: z.array(
-    z.object({
-      id: z.number(),
-      email: z.string().email(),
-      role: z.nativeEnum(TeamMemberRole),
-    }),
-  ),
-});
-
-export const ZInviteTeamMemberMutationSchema = z.object({
-  email: z
-    .string()
-    .email()
-    .transform((email) => email.toLowerCase()),
-  role: z.nativeEnum(TeamMemberRole).optional().default(TeamMemberRole.MEMBER),
-});
-
-export const ZSuccessfulInviteTeamMemberResponseSchema = z.object({
-  message: z.string(),
-});
-
-export const ZUpdateTeamMemberMutationSchema = z.object({
-  role: z.nativeEnum(TeamMemberRole),
-});
-
-export const ZSuccessfulUpdateTeamMemberResponseSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
-  role: z.nativeEnum(TeamMemberRole),
-});
-
-export const ZSuccessfulRemoveTeamMemberResponseSchema = z.object({
-  id: z.number(),
-  email: z.string().email(),
-  role: z.nativeEnum(TeamMemberRole),
 });

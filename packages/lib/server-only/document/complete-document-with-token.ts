@@ -23,6 +23,7 @@ import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
+import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendPendingEmail } from './send-pending-email';
@@ -140,6 +141,11 @@ export const completeDocumentWithToken = async ({
       },
     });
 
+    const authOptions = extractDocumentAuthMethods({
+      documentAuth: document.authOptions,
+      recipientAuth: recipient.authOptions,
+    });
+
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
@@ -154,6 +160,7 @@ export const completeDocumentWithToken = async ({
           recipientName: recipient.name,
           recipientId: recipient.id,
           recipientRole: recipient.role,
+          actionAuth: authOptions.derivedRecipientActionAuth,
         },
       }),
     });
