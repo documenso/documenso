@@ -14,7 +14,6 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { env } from '../../utils/env';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -54,7 +53,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     throw new Error('Document has no recipients');
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -117,10 +116,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           address: owner.email,
         },
       ],
-      from: {
-        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: i18n._(msg`Signing Complete!`),
       html,
       text,
@@ -194,10 +191,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             address: recipient.email,
           },
         ],
-        from: {
-          name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-          address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-        },
+        from: senderEmail,
+        replyTo: replyToEmail,
         subject:
           isDirectTemplate && document.documentMeta?.subject
             ? renderCustomEmailTemplate(document.documentMeta.subject, customEmailTemplate)

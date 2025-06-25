@@ -15,7 +15,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
@@ -80,12 +79,14 @@ export const run = async ({
     return;
   }
 
-  const { branding, settings, organisationType } = await getEmailContext({
-    source: {
-      type: 'team',
-      teamId: document.teamId,
+  const { branding, settings, organisationType, senderEmail, replyToEmail } = await getEmailContext(
+    {
+      source: {
+        type: 'team',
+        teamId: document.teamId,
+      },
     },
-  });
+  );
 
   const customEmail = document?.documentMeta;
   const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
@@ -179,10 +180,8 @@ export const run = async ({
         name: recipient.name,
         address: recipient.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: renderCustomEmailTemplate(
         documentMeta?.subject || emailSubject,
         customEmailTemplate,

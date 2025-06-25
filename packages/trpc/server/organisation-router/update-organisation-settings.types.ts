@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 
 export const ZUpdateOrganisationSettingsRequestSchema = z.object({
@@ -20,6 +21,12 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     brandingLogo: z.string().optional(),
     brandingUrl: z.string().optional(),
     brandingCompanyDetails: z.string().optional(),
+
+    // Email related settings.
+    emailId: z.string().optional(),
+    emailReplyTo: z.string().email().optional(),
+    emailReplyToName: z.string().optional(),
+    emailDocumentSettings: ZDocumentEmailSettingsSchema.optional(), // Todo: This prob won't work as expected.
   }),
 });
 

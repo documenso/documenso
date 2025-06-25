@@ -9,7 +9,6 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
@@ -46,7 +45,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     throw new Error('Document has no recipients');
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -90,10 +89,8 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       address: email,
       name,
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-    },
+    from: senderEmail,
+    replyTo: replyToEmail,
     subject: i18n._(msg`Waiting for others to complete signing.`),
     html,
     text,

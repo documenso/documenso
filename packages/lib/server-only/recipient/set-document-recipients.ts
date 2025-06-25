@@ -25,7 +25,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
@@ -71,7 +70,7 @@ export const setDocumentRecipients = async ({
     },
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
     source: {
       type: 'team',
       teamId,
@@ -316,10 +315,8 @@ export const setDocumentRecipients = async ({
             address: recipient.email,
             name: recipient.name,
           },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
+          from: senderEmail,
+          replyTo: replyToEmail,
           subject: i18n._(msg`You have been removed from a document`),
           html,
           text,

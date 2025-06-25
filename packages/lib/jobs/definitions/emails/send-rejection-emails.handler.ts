@@ -10,7 +10,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -62,7 +62,7 @@ export const run = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -97,10 +97,8 @@ export const run = async ({
         name: recipient.name,
         address: recipient.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: i18n._(msg`Document "${document.title}" - Rejection Confirmed`),
       html,
       text,
@@ -133,10 +131,7 @@ export const run = async ({
         name: documentOwner.name || '',
         address: documentOwner.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: DOCUMENSO_INTERNAL_EMAIL,
       subject: i18n._(msg`Document "${document.title}" - Rejected by ${recipient.name}`),
       html,
       text,

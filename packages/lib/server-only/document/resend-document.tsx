@@ -5,7 +5,6 @@ import { DocumentStatus, OrganisationType, RecipientRole, SigningStatus } from '
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
@@ -98,12 +97,14 @@ export const resendDocument = async ({
     return;
   }
 
-  const { branding, settings, organisationType } = await getEmailContext({
-    source: {
-      type: 'team',
-      teamId: document.teamId,
+  const { branding, settings, organisationType, senderEmail, replyToEmail } = await getEmailContext(
+    {
+      source: {
+        type: 'team',
+        teamId: document.teamId,
+      },
     },
-  });
+  );
 
   await Promise.all(
     document.recipients.map(async (recipient) => {
@@ -188,10 +189,8 @@ export const resendDocument = async ({
               address: email,
               name,
             },
-            from: {
-              name: FROM_NAME,
-              address: FROM_ADDRESS,
-            },
+            from: senderEmail,
+            replyTo: replyToEmail,
             subject: customEmail?.subject
               ? renderCustomEmailTemplate(
                   i18n._(msg`Reminder: ${customEmail.subject}`),
