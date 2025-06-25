@@ -18,9 +18,6 @@ export const supportRoute = new Hono<HonoEnv>().post(
       components: [{ componentText: { text: message } }],
     });
 
-    console.log('res', res);
-    console.log('res.error', JSON.stringify(res.error, null, 2));
-
     if (res.error) {
       return c.json({ error: res.error.message }, 500);
     }

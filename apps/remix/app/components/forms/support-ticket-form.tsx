@@ -46,6 +46,7 @@ export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
 
   const onSubmit = async (values: TSupportTicket) => {
     setIsLoading(true);
+
     try {
       const res = await fetch('/api/support', {
         method: 'POST',
@@ -65,8 +66,13 @@ export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
           title: t`Support ticket created`,
           description: t`Your support request has been submitted. We'll get back to you soon!`,
         });
-        if (onSuccess) onSuccess();
-        form.reset();
+
+        if (onSuccess) {
+          onSuccess();
+          form.reset();
+        }
+
+        setIsLoading(false);
       }
     } catch (err) {
       toast({
