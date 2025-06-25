@@ -1,6 +1,14 @@
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { Building2Icon, CreditCardIcon, GroupIcon, Settings2Icon, Users2Icon } from 'lucide-react';
+import {
+  Building2Icon,
+  CreditCardIcon,
+  GroupIcon,
+  MailIcon,
+  MailboxIcon,
+  Settings2Icon,
+  Users2Icon,
+} from 'lucide-react';
 import { FaUsers } from 'react-icons/fa6';
 import { Link, NavLink, Outlet } from 'react-router';
 
@@ -22,6 +30,8 @@ export default function SettingsLayout() {
 
   const isBillingEnabled = IS_BILLING_ENABLED();
   const organisation = useCurrentOrganisation();
+
+  const emailDomainsEnabled = organisation.organisationClaim.flags.emailDomains;
 
   const organisationSettingRoutes = [
     {
@@ -50,11 +60,31 @@ export default function SettingsLayout() {
       icon: GroupIcon,
     },
     {
+      path: `/o/${organisation.url}/settings/emails`,
+      label: t`Emails`,
+      icon: MailIcon,
+    },
+    {
+      path: `/o/${organisation.url}/settings/email-domains`,
+      label: t`Email Domains`,
+      icon: MailboxIcon,
+    },
+    {
       path: `/o/${organisation.url}/settings/billing`,
       label: t`Billing`,
       icon: CreditCardIcon,
     },
-  ].filter((route) => (isBillingEnabled ? route : !route.path.includes('/billing')));
+  ].filter((route) => {
+    if (!isBillingEnabled && route.path.includes('/billing')) {
+      return false;
+    }
+
+    if (!emailDomainsEnabled && route.path.includes('/email-domains')) {
+      return false;
+    }
+
+    return true;
+  });
 
   if (!canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole)) {
     return (

@@ -1,7 +1,16 @@
 import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Braces, Globe2Icon, GroupIcon, Key, Settings2, User, Webhook } from 'lucide-react';
+import {
+  Braces,
+  Globe2Icon,
+  GroupIcon,
+  Key,
+  MailIcon,
+  Settings2,
+  User,
+  Webhook,
+} from 'lucide-react';
 import { Link, useLocation, useParams } from 'react-router';
 
 import { cn } from '@documenso/ui/lib/utils';
@@ -17,6 +26,7 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
 
   const settingsPath = `/t/${teamUrl}/settings`;
   const preferencesPath = `/t/${teamUrl}/preferences`;
+  const emailPreferencesPath = `/t/${teamUrl}/settings/emails`;
   const publicProfilePath = `/t/${teamUrl}/settings/public-profile`;
   const membersPath = `/t/${teamUrl}/settings/members`;
   const groupsPath = `/t/${teamUrl}/settings/groups`;
@@ -55,6 +65,21 @@ export const TeamSettingsNavMobile = ({ className, ...props }: TeamSettingsNavMo
         >
           <Settings2 className="mr-2 h-5 w-5" />
           <Trans>Preferences</Trans>
+        </Button>
+      </Link>
+
+      <Link to={emailPreferencesPath}>
+        <Button
+          variant="ghost"
+          className={cn(
+            'w-full justify-start',
+            pathname?.startsWith(emailPreferencesPath) &&
+              pathname.split('/').length === 4 &&
+              'bg-secondary',
+          )}
+        >
+          <MailIcon className="mr-2 h-5 w-5" />
+          <Trans>Email Preferences</Trans>
         </Button>
       </Link>
 

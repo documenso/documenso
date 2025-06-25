@@ -468,7 +468,10 @@ model DocumentMeta {
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
-  emailSettings      Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+
+  // emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+  // emailReplyTo  String?
+  // emailId      String?
 }
 
 enum ReadStatus {
@@ -619,6 +622,9 @@ model Organisation {
 
   teams Team[]
 
+  emailDomains       EmailDomain[]
+  organisationEmails OrganisationEmail[]
+
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   ownerUserId Int
@@ -723,6 +729,7 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
@@ -736,12 +743,20 @@ model OrganisationGlobalSettings {
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
 
+  emailId String?
+  email   OrganisationEmail? @relation(fields: [emailId], references: [id])
+
+  emailReplyTo          String?
+  emailReplyToName      String?
+  emailDocumentSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+
   brandingEnabled        Boolean @default(false)
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
 }
 
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
@@ -754,6 +769,13 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+
+  emailId String?
+  email   OrganisationEmail? @relation(fields: [emailId], references: [id])
+
+  emailReplyTo          String?
+  emailReplyToName      String?
+  emailDocumentSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
 
   brandingEnabled        Boolean?
   brandingLogo           String?
@@ -951,4 +973,45 @@ model AvatarImage {
   team         Team[]
   user         User[]
   organisation Organisation[]
+}
+
+enum EmailDomainStatus {
+  PENDING
+  ACTIVE
+}
+
+model EmailDomain {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status EmailDomainStatus @default(PENDING)
+
+  selector   String @unique
+  domain     String @unique
+  publicKey  String // Todo: Flatterned, should we keep OG? We can still regenerate it.
+  privateKey String // Todo: Encrypted using primary key
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  emails OrganisationEmail[]
+}
+
+model OrganisationEmail {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  email     String   @unique
+  emailName String
+  replyTo   String?
+
+  emailDomainId String
+  emailDomain   EmailDomain @relation(fields: [emailDomainId], references: [id], onDelete: Cascade)
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  organisationGlobalSettings OrganisationGlobalSettings[]
+  teamGlobalSettings         TeamGlobalSettings[]
 }

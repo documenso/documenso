@@ -151,7 +151,7 @@ export const createDocumentV2 = async ({
           create: {
             ...meta,
             signingOrder: meta?.signingOrder || undefined,
-            emailSettings: meta?.emailSettings || undefined,
+            emailSettings: meta?.emailSettings ?? settings.emailDocumentSettings ?? undefined,
             language: meta?.language || settings.documentLanguage,
             typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
             uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,

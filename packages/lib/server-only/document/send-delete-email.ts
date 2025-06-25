@@ -10,7 +10,6 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
@@ -44,7 +43,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, replyToEmail } = await getEmailContext({
     source: {
       type: 'team',
       teamId: document.teamId,
@@ -79,10 +78,8 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       address: email,
       name: name || '',
     },
-    from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-    },
+    from: senderEmail,
+    replyTo: replyToEmail,
     subject: i18n._(msg`Document Deleted!`),
     html,
     text,

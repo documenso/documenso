@@ -19,6 +19,8 @@ export const ZClaimFlagsSchema = z.object({
 
   unlimitedDocuments: z.boolean().optional(),
 
+  emailDomains: z.boolean().optional(),
+
   embedAuthoring: z.boolean().optional(),
   embedAuthoringWhiteLabel: z.boolean().optional(),
 
@@ -49,6 +51,10 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   hidePoweredBy: {
     key: 'hidePoweredBy',
     label: 'Hide Documenso branding by',
+  },
+  emailDomains: {
+    key: 'emailDomains',
+    label: 'Email domains',
   },
   embedAuthoring: {
     key: 'embedAuthoring',
@@ -128,6 +134,7 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
       allowCustomBranding: true,
       hidePoweredBy: true,
+      emailDomains: true,
       embedAuthoring: false,
       embedAuthoringWhiteLabel: true,
       embedSigning: false,
@@ -144,6 +151,7 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
       allowCustomBranding: true,
       hidePoweredBy: true,
+      emailDomains: true,
       embedAuthoring: true,
       embedAuthoringWhiteLabel: true,
       embedSigning: true,

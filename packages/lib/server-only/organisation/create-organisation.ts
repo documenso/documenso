@@ -7,6 +7,7 @@ import { prisma } from '@documenso/prisma';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';
 import { AppErrorCode } from '../../errors/app-error';
 import { AppError } from '../../errors/app-error';
+import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../../types/document-email';
 import type { InternalClaim } from '../../types/subscription';
 import { INTERNAL_CLAIM_ID, internalClaims } from '../../types/subscription';
 import { generateDatabaseId, prefixedId } from '../../universal/id';
@@ -35,6 +36,7 @@ export const createOrganisation = async ({
       data: {
         ...generateDefaultOrganisationSettings(),
         id: generateDatabaseId('org_setting'),
+        emailDocumentSettings: JSON.stringify(DEFAULT_DOCUMENT_EMAIL_SETTINGS),
       },
     });
 
