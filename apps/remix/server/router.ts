@@ -8,6 +8,7 @@ import { jobsClient } from '@documenso/lib/jobs/client';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { filesRoute } from './api/files';
+import { supportRoute } from './api/support';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
@@ -37,6 +38,9 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.route('/api/files', filesRoute);
+
+// Support route
+app.route('/api/support', supportRoute);
 
 // API servers.
 app.route('/api/v1', tsRestHonoApp);
