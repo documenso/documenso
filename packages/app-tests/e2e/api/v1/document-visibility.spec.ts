@@ -7,6 +7,7 @@ import {
   seedCompletedDocument,
   seedPendingDocumentWithFullFields,
 } from '@documenso/prisma/seed/documents';
+import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -157,5 +158,47 @@ test.describe('Document Access API V1', () => {
 
     expect(resB.ok()).toBeFalsy();
     expect(resB.status()).toBe(401);
+  });
+
+  test('should block access to template get endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const templateA = await seedBlankTemplate(userA, teamA.id);
+
+    const resB = await request.get(`${WEBAPP_BASE_URL}/api/v1/templates/${templateA.id}`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(404);
+  });
+
+  test('should block access to template delete endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const templateA = await seedBlankTemplate(userA, teamA.id);
+
+    const resB = await request.delete(`${WEBAPP_BASE_URL}/api/v1/templates/${templateA.id}`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(404);
   });
 });
