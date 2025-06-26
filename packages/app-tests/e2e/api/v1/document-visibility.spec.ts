@@ -103,4 +103,59 @@ test.describe('Document Access API V1', () => {
     expect(resB.ok()).toBeFalsy();
     expect(resB.status()).toBe(500);
   });
+
+  test('should block access to document resend endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const { user: recipientUser } = await seedUser();
+
+    const { document: documentA, recipients } = await seedPendingDocumentWithFullFields({
+      owner: userA,
+      recipients: [recipientUser.email],
+      teamId: teamA.id,
+    });
+
+    const resB = await request.post(`${WEBAPP_BASE_URL}/api/v1/documents/${documentA.id}/resend`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        recipients: [recipients[0].id],
+      },
+    });
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(500);
+  });
+
+  test('should block access to document recipients endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const documentA = await seedBlankDocument(userA, teamA.id);
+
+    const resB = await request.post(
+      `${WEBAPP_BASE_URL}/api/v1/documents/${documentA.id}/recipients`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: { name: 'Test', email: 'test@example.com' },
+      },
+    );
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(401);
+  });
 });
