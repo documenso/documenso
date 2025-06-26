@@ -2,9 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
   seedCompletedDocument,
+  seedDraftDocument,
   seedPendingDocumentWithFullFields,
 } from '@documenso/prisma/seed/documents';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -158,6 +160,45 @@ test.describe('Document Access API V1', () => {
 
     expect(resB.ok()).toBeFalsy();
     expect(resB.status()).toBe(401);
+  });
+
+  test('should block access to document fields endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const { user: recipientUser } = await seedUser();
+
+    const documentA = await seedDraftDocument(userA, teamA.id, [recipientUser.email]);
+
+    const documentRecipient = await prisma.recipient.findFirst({
+      where: {
+        documentId: documentA.id,
+        email: recipientUser.email,
+      },
+    });
+
+    const resB = await request.post(`${WEBAPP_BASE_URL}/api/v1/documents/${documentA.id}/fields`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        recipientId: documentRecipient!.id,
+        type: 'SIGNATURE',
+        pageNumber: 1,
+        pageX: 1,
+        pageY: 1,
+        pageWidth: 1,
+        pageHeight: 1,
+      },
+    });
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(404);
   });
 
   test('should block access to template get endpoint', async ({ request }) => {
