@@ -6,6 +6,7 @@ import { BookIcon, HelpCircleIcon, Link2Icon, MailIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -24,9 +25,14 @@ export function meta() {
 
 export default function SupportPage() {
   const [open, setOpen] = useState(false);
+  const { user } = useSession();
   const currentOrganisation = useOptionalCurrentOrganisation();
 
   const subscriptionStatus = currentOrganisation?.subscription?.status;
+
+  const handleSuccess = () => {
+    setOpen(false);
+  };
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
@@ -79,49 +85,52 @@ export default function SupportPage() {
               </Trans>
             </p>
           </div>
-          <div className="rounded-lg border p-4">
-            <h2 className="flex items-center gap-2 text-lg font-bold">
-              <MailIcon className="text-muted-foreground h-5 w-5" />
-              <Link
-                to="mailto:support@documenso.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:underline"
-              >
-                <Trans>Email</Trans>
-              </Link>
-            </h2>
-
-            <p className="text-muted-foreground mt-1">
-              <Trans>
-                Send an email to <a href="mailto:support@documenso.com">support@documenso.com</a>.
-              </Trans>
-            </p>
-          </div>
           {currentOrganisation && subscriptionStatus === SubscriptionStatus.ACTIVE && (
-            <div className="rounded-lg border p-4">
-              <h2 className="flex items-center gap-2 text-lg font-bold">
-                <Link2Icon className="text-muted-foreground h-5 w-5" />
-                <Trans>Plain</Trans>
-              </h2>
-              <p className="text-muted-foreground mt-1">
-                <Dialog open={open} onOpenChange={setOpen}>
-                  <DialogTrigger asChild>
-                    <Button variant="outline" size="sm" className="mt-2">
-                      <Trans>Create a support ticket</Trans>
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
+            <>
+              <div className="rounded-lg border p-4">
+                <h2 className="flex items-center gap-2 text-lg font-bold">
+                  <MailIcon className="text-muted-foreground h-5 w-5" />
+                  <Link
+                    to="mailto:support@documenso.com"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:underline"
+                  >
+                    <Trans>Email</Trans>
+                  </Link>
+                </h2>
+
+                <p className="text-muted-foreground mt-1">
+                  <Trans>
+                    Send an email to{' '}
+                    <a href="mailto:support@documenso.com">support@documenso.com</a>.
+                  </Trans>
+                </p>
+              </div>
+              <div className="rounded-lg border p-4">
+                <h2 className="flex items-center gap-2 text-lg font-bold">
+                  <Link2Icon className="text-muted-foreground h-5 w-5" />
+                  <Trans>Plain</Trans>
+                </h2>
+                <p className="text-muted-foreground mt-1">
+                  <Dialog open={open} onOpenChange={setOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="mt-2">
                         <Trans>Create a support ticket</Trans>
-                      </DialogTitle>
-                    </DialogHeader>
-                    <SupportTicketForm onSuccess={() => setOpen(false)} />
-                  </DialogContent>
-                </Dialog>
-              </p>
-            </div>
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>
+                          <Trans>Create a support ticket</Trans>
+                        </DialogTitle>
+                      </DialogHeader>
+                      <SupportTicketForm email={user?.email} onSuccess={handleSuccess} />
+                    </DialogContent>
+                  </Dialog>
+                </p>
+              </div>
+            </>
           )}
         </div>
       </div>

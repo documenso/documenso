@@ -27,10 +27,11 @@ const ZSupportTicketSchema = z.object({
 type TSupportTicket = z.infer<typeof ZSupportTicketSchema>;
 
 export type SupportTicketFormProps = {
+  email: string;
   onSuccess?: () => void;
 };
 
-export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
+export const SupportTicketForm = ({ email, onSuccess }: SupportTicketFormProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -38,7 +39,7 @@ export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
   const form = useForm<TSupportTicket>({
     resolver: zodResolver(ZSupportTicketSchema),
     defaultValues: {
-      email: '',
+      email: email || '',
       subject: '',
       message: '',
     },
@@ -50,6 +51,7 @@ export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
     try {
       const res = await fetch('/api/support', {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),
       });
 
@@ -69,10 +71,8 @@ export const SupportTicketForm = ({ onSuccess }: SupportTicketFormProps) => {
 
         if (onSuccess) {
           onSuccess();
-          form.reset();
         }
-
-        setIsLoading(false);
+        form.reset();
       }
     } catch (err) {
       toast({
