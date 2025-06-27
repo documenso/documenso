@@ -41,6 +41,10 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
     throw new Error('Invalid token');
   }
 
+  console.log({
+    tokenId: apiToken.id,
+  });
+
   if (apiToken.expires && apiToken.expires < new Date()) {
     throw new Error('Expired token');
   }
