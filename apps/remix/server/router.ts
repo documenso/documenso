@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { rateLimiter } from 'hono-rate-limiter';
 import { contextStorage } from 'hono/context-storage';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
@@ -31,6 +32,25 @@ app.use(appContext);
  * RR7 app middleware.
  */
 app.use('*', appMiddleware);
+
+/**
+ * Rate limiting for all API routes.
+ * - 100 requests per minute per IP address
+ */
+app.use(
+  '/api/*',
+  rateLimiter({
+    windowMs: 60 * 1000, // 1 minute
+    limit: 100, // 100 requests per window
+    keyGenerator: (c) => {
+      // Use IP address for rate limiting
+      return c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown';
+    },
+    message: {
+      error: 'Too many requests, please try again later.',
+    },
+  }),
+);
 
 // Auth server.
 app.route('/api/auth', auth);
