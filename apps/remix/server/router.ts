@@ -1,4 +1,5 @@
 import { Hono } from 'hono';
+import { rateLimiter } from 'hono-rate-limiter';
 import { contextStorage } from 'hono/context-storage';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
@@ -22,6 +23,21 @@ export interface HonoEnv {
 const app = new Hono<HonoEnv>();
 
 /**
+ * Rate limiting for v1 and v2 API routes only.
+ * - 100 requests per minute per IP address
+ */
+const rateLimitMiddleware = rateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  limit: 100, // 100 requests per window
+  keyGenerator: (c) => {
+    return c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown';
+  },
+  message: {
+    error: 'Too many requests, please try again later.',
+  },
+});
+
+/**
  * Attach session and context to requests.
  */
 app.use(contextStorage());
@@ -31,6 +47,10 @@ app.use(appContext);
  * RR7 app middleware.
  */
 app.use('*', appMiddleware);
+
+// Apply rate limit to /api/v1/*
+app.use('/api/v1/*', rateLimitMiddleware);
+app.use('/api/v2/*', rateLimitMiddleware);
 
 // Auth server.
 app.route('/api/auth', auth);
