@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Bird, CheckCircle2 } from 'lucide-react';
+import { Bird, CheckCircle2, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
@@ -25,6 +25,21 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
       message: msg`There are no active drafts at the current moment. You can upload a document to start drafting.`,
       icon: CheckCircle2,
     }))
+    .with(ExtendedDocumentStatus.PENDING, () => ({
+      title: msg`No pending documents`,
+      message: msg`There are no pending documents at the moment. Documents awaiting signatures will appear here.`,
+      icon: CheckCircle2,
+    }))
+    .with(ExtendedDocumentStatus.REJECTED, () => ({
+      title: msg`No rejected documents`,
+      message: msg`There are no rejected documents. Documents that have been declined will appear here.`,
+      icon: XCircle,
+    }))
+    .with(ExtendedDocumentStatus.INBOX, () => ({
+      title: msg`Your inbox is empty`,
+      message: msg`There are no documents waiting for your action. Documents requiring your signature will appear here.`,
+      icon: CheckCircle2,
+    }))
     .with(ExtendedDocumentStatus.ALL, () => ({
       title: msg`We're all empty`,
       message: msg`You have not yet created or received any documents. To create a document please upload one.`,
@@ -38,7 +53,7 @@ export const DocumentsTableEmptyState = ({ status }: DocumentsTableEmptyStatePro
 
   return (
     <div
-      className="text-muted-foreground/60 flex h-60 flex-col items-center justify-center gap-y-4"
+      className="text-muted-foreground/60 mt-12 flex h-60 flex-col items-center justify-center gap-y-4"
       data-testid="empty-document-state"
     >
       <Icon className="h-12 w-12" strokeWidth={1.5} />
