@@ -1,7 +1,7 @@
 import type { ErrorHandlerOptions } from '@trpc/server/unstable-core-do-not-import';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { buildLogger } from '@documenso/lib/utils/logger';
+import { buildLogger } from '@documenso/lib/utils/logger-legacy';
 
 const logger = buildLogger();
 

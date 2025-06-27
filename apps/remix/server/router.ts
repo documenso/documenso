@@ -1,11 +1,15 @@
 import { Hono } from 'hono';
 import { rateLimiter } from 'hono-rate-limiter';
 import { contextStorage } from 'hono/context-storage';
+import { requestId } from 'hono/request-id';
+import type { RequestIdVariables } from 'hono/request-id';
+import type { Logger } from 'pino';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
 import { filesRoute } from './api/files';
@@ -15,8 +19,9 @@ import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
 import { reactRouterTrpcServer } from './trpc/hono-trpc-remix';
 
 export interface HonoEnv {
-  Variables: {
+  Variables: RequestIdVariables & {
     context: AppContext;
+    logger: Logger;
   };
 }
 
@@ -47,6 +52,20 @@ app.use(appContext);
  * RR7 app middleware.
  */
 app.use('*', appMiddleware);
+app.use('*', requestId());
+app.use(async (c, next) => {
+  const metadata = c.get('context').requestMetadata;
+
+  const honoLogger = logger.child({
+    requestId: c.var.requestId,
+    ipAddress: metadata.ipAddress,
+    userAgent: metadata.userAgent,
+  });
+
+  c.set('logger', honoLogger);
+
+  await next();
+});
 
 // Apply rate limit to /api/v1/*
 app.use('/api/v1/*', rateLimitMiddleware);
