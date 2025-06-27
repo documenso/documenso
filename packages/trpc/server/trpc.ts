@@ -65,7 +65,13 @@ const t = initTRPC
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+  const logger = ctx.logger.child({
+    path,
+    auth: ctx.metadata.auth,
+    source: ctx.metadata.source,
+  });
+
   const authorizationHeader = ctx.req.headers.get('authorization');
 
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
@@ -78,6 +84,11 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
     }
 
     const apiToken = await getApiTokenByToken({ token });
+
+    logger.info({
+      userId: apiToken.user.id,
+      apiTokenId: apiToken.id,
+    });
 
     return await next({
       ctx: {
@@ -110,6 +121,11 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
       message: 'Invalid session or API token.',
     });
   }
+
+  logger.info({
+    userId: ctx.user.id,
+    apiTokenId: null,
+  });
 
   return await next({
     ctx: {
