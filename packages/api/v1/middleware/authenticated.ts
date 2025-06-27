@@ -5,6 +5,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { logger } from '@documenso/lib/utils/logger';
 
 type B = {
   // appRoute: any;
@@ -61,6 +62,17 @@ export const authenticatedMiddleware = <
           name: apiToken.team?.name ?? apiToken.user.name,
         },
       };
+
+      // Todo: Get from Hono context instead.
+      logger.info({
+        ipAddress: metadata.requestMetadata.ipAddress,
+        userAgent: metadata.requestMetadata.userAgent,
+        auth: 'api',
+        source: 'apiV1',
+        path: request.url,
+        userId: apiToken.user.id,
+        apiTokenId: apiToken.id,
+      });
 
       return await handler(
         {
