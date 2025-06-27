@@ -479,4 +479,100 @@ test.describe('Document Access API V1', () => {
     expect(deleteRes.ok()).toBeFalsy();
     expect(deleteRes.status()).toBe(401);
   });
+
+  test('should block unauthorized access to documents list endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    await seedBlankDocument(userA, teamA.id);
+
+    const resB = await request.get(`${WEBAPP_BASE_URL}/api/v1/documents`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    const reqData = await resB.json();
+
+    expect(resB.ok()).toBeTruthy();
+    expect(resB.status()).toBe(200);
+    expect(reqData.documents.every((doc: { userId: number }) => doc.userId !== userA.id)).toBe(
+      true,
+    );
+    expect(reqData.documents.length).toBe(0);
+    expect(reqData.totalPages).toBe(0);
+  });
+
+  test('should block unauthorized access to templates list endpoint', async ({ request }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    await seedBlankTemplate(userA, teamA.id);
+
+    const resB = await request.get(`${WEBAPP_BASE_URL}/api/v1/templates`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    const reqData = await resB.json();
+
+    expect(resB.ok()).toBeTruthy();
+    expect(resB.status()).toBe(200);
+    expect(reqData.templates.every((tpl: { userId: number }) => tpl.userId !== userA.id)).toBe(
+      true,
+    );
+    expect(reqData.templates.length).toBe(0);
+    expect(reqData.totalPages).toBe(0);
+  });
+
+  test('should block unauthorized access to create-document-from-template endpoint', async ({
+    request,
+  }) => {
+    const { user: userA, team: teamA } = await seedUser();
+
+    const { user: userB, team: teamB } = await seedUser();
+    const { token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    });
+
+    const templateA = await seedBlankTemplate(userA, teamA.id);
+
+    const resB = await request.post(
+      `${WEBAPP_BASE_URL}/api/v1/templates/${templateA.id}/create-document`,
+      {
+        headers: {
+          Authorization: `Bearer ${tokenB}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          title: 'Should not work',
+          recipients: [{ name: 'Test user', email: 'test@example.com' }],
+          meta: {
+            subject: 'Test',
+            message: 'Test',
+            timezone: 'UTC',
+            dateFormat: 'yyyy-MM-dd',
+            redirectUrl: 'https://example.com',
+          },
+        },
+      },
+    );
+
+    expect(resB.ok()).toBeFalsy();
+    expect(resB.status()).toBe(401);
+  });
 });
