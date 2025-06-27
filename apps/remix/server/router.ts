@@ -9,6 +9,7 @@ import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
@@ -35,7 +36,11 @@ const rateLimitMiddleware = rateLimiter({
   windowMs: 60 * 1000, // 1 minute
   limit: 100, // 100 requests per window
   keyGenerator: (c) => {
-    return c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown';
+    try {
+      return getIpAddress(c.req.raw);
+    } catch (error) {
+      return 'unknown';
+    }
   },
   message: {
     error: 'Too many requests, please try again later.',
