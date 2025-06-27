@@ -72,7 +72,7 @@ export const filesRoute = new Hono<HonoEnv>()
       return c.json({ error: 'Upload failed' }, 500);
     }
   })
-  .post('/presigned-get-url', sValidator('json', ZGetPresignedGetUrlRequestSchema), async (c) => {
+  .post('/upload-pdf', sValidator('json', ZGetPresignedGetUrlRequestSchema), async (c) => {
     const { key } = await c.req.json();
 
     try {
