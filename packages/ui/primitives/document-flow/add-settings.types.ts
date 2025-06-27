@@ -11,6 +11,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
@@ -47,6 +48,16 @@ export const ZAddSettingsFormSchema = z.object({
       message: msg`At least one signature type must be enabled`.id,
     }),
   }),
+  attachments: AttachmentSchema.pick({
+    id: true,
+    label: true,
+    url: true,
+  })
+    .extend({
+      formId: z.string().min(1),
+    })
+    .array()
+    .optional(),
 });
 
 export type TAddSettingsFormSchema = z.infer<typeof ZAddSettingsFormSchema>;

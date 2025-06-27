@@ -187,6 +187,7 @@ export const DocumentEditForm = ({
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
+          attachments: data.attachments ?? [],
           globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
           globalActionAuth: data.globalActionAuth ?? [],
         },
