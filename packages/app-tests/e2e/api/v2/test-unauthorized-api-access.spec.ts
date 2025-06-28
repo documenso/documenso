@@ -3,10 +3,14 @@ import type { Team, User } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { nanoid } from '@documenso/lib/universal/id';
+import { prisma } from '@documenso/prisma';
+import { FieldType, Prisma, ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
 import {
   seedBlankDocument,
   seedCompletedDocument,
   seedDraftDocument,
+  seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -77,14 +81,77 @@ test.describe('Unauthorized Access - Document API V2', () => {
   });
 
   test('should block unauthorized access to document move endpoint', async ({ request }) => {
-    const doc = await seedCompletedDocument(userA, teamA.id, ['test@example.com']);
+    const doc = await seedDraftDocument(userA, teamA.id, []);
 
     const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/move`, {
       headers: { Authorization: `Bearer ${tokenB}` },
-      data: { id: doc.id, teamId: teamB.id },
+      data: { documentId: doc.id, teamId: teamB.id },
     });
 
     expect(res.ok()).toBeFalsy();
-    expect([404, 401, 500]).toContain(res.status());
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document distribute endpoint', async ({ request }) => {
+    const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/distribute`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { documentId: doc.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(500);
+  });
+
+  test('should block unauthorized access to document redistribute endpoint', async ({
+    request,
+  }) => {
+    const doc = await seedPendingDocument(userA, teamA.id, []);
+
+    const userRecipient = await prisma.recipient.create({
+      data: {
+        email: 'test@example.com',
+        name: 'Test',
+        token: nanoid(),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+        signedAt: null,
+        document: {
+          connect: {
+            id: doc.id,
+          },
+        },
+        fields: {
+          create: {
+            page: 1,
+            type: FieldType.NAME,
+            inserted: true,
+            customText: '',
+            positionX: new Prisma.Decimal(1),
+            positionY: new Prisma.Decimal(1),
+            width: new Prisma.Decimal(1),
+            height: new Prisma.Decimal(1),
+            documentId: doc.id,
+          },
+        },
+      },
+    });
+
+    const recipient = await prisma.recipient.findFirst({
+      where: {
+        documentId: doc.id,
+        email: userRecipient.email,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/redistribute`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { documentId: doc.id, recipients: [recipient!.id] },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(500);
   });
 });
