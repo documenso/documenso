@@ -20,6 +20,11 @@ export const DocumentSigningDisclosure = ({
         acceptance of these conditions.
       </Trans>
       <span className="mt-2 block">
+        {' '}
+        Nuestra plataforma utiliza firmas electrónicas de nivel 1, acompañadas de un sello digital
+        que garantiza la integridad y autenticidad del documento.{' '}
+      </span>
+      <span className="mt-2 block">
         <Trans>
           Read the full{' '}
           <Link
