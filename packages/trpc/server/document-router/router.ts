@@ -245,12 +245,6 @@ export const documentRouter = router({
         },
       });
 
-      if (Date.now() > 0) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'This is a test error',
-        });
-      }
-
       return await getDocumentWithDetailsById({
         userId: user.id,
         teamId,
