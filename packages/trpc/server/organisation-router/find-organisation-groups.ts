@@ -21,6 +21,12 @@ export const findOrganisationGroupsRoute = authenticatedProcedure
       input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     return await findOrganisationGroups({
       userId: user.id,
       organisationId,

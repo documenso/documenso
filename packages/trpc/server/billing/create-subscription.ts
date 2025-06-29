@@ -14,6 +14,13 @@ export const createSubscriptionRoute = authenticatedProcedure
   .mutation(async ({ ctx, input }) => {
     const { organisationId, priceId } = input;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+        priceId,
+      },
+    });
+
     const userId = ctx.user.id;
 
     if (!IS_BILLING_ENABLED()) {
