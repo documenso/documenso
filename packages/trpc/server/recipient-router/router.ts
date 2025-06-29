@@ -62,6 +62,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { recipientId } = input;
 
+      ctx.logger.info({
+        input: {
+          recipientId,
+        },
+      });
+
       return await getRecipientById({
         userId: ctx.user.id,
         teamId,
@@ -87,6 +93,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipient } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const createdRecipients = await createDocumentRecipients({
         userId: ctx.user.id,
@@ -118,6 +130,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { documentId, recipients } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await createDocumentRecipients({
         userId: ctx.user.id,
         teamId,
@@ -145,6 +163,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipient } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const updatedRecipients = await updateDocumentRecipients({
         userId: ctx.user.id,
@@ -176,6 +200,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { documentId, recipients } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await updateDocumentRecipients({
         userId: ctx.user.id,
         teamId,
@@ -203,6 +233,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { recipientId } = input;
 
+      ctx.logger.info({
+        input: {
+          recipientId,
+        },
+      });
+
       await deleteDocumentRecipient({
         userId: ctx.user.id,
         teamId,
@@ -222,6 +258,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, recipients } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       return await setDocumentRecipients({
         userId: ctx.user.id,
@@ -259,6 +301,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { recipientId } = input;
 
+      ctx.logger.info({
+        input: {
+          recipientId,
+        },
+      });
+
       return await getRecipientById({
         userId: ctx.user.id,
         teamId,
@@ -284,6 +332,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipient } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       const createdRecipients = await createTemplateRecipients({
         userId: ctx.user.id,
@@ -314,6 +368,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { templateId, recipients } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       return await createTemplateRecipients({
         userId: ctx.user.id,
         teamId,
@@ -340,6 +400,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipient } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       const updatedRecipients = await updateTemplateRecipients({
         userId: ctx.user.id,
@@ -370,6 +436,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { templateId, recipients } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       return await updateTemplateRecipients({
         userId: ctx.user.id,
         teamId,
@@ -396,6 +468,12 @@ export const recipientRouter = router({
       const { teamId } = ctx;
       const { recipientId } = input;
 
+      ctx.logger.info({
+        input: {
+          recipientId,
+        },
+      });
+
       await deleteTemplateRecipient({
         recipientId,
         userId: ctx.user.id,
@@ -414,6 +492,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, recipients } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await setTemplateRecipients({
         userId: ctx.user.id,
@@ -438,6 +522,12 @@ export const recipientRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { token, documentId, authOptions, nextSigner } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await completeDocumentWithToken({
         token,
         documentId,
@@ -455,6 +545,12 @@ export const recipientRouter = router({
     .input(ZRejectDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { token, documentId, reason } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       return await rejectDocumentWithToken({
         token,

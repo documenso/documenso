@@ -14,6 +14,12 @@ export const getOrganisationRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { organisationReference } = input;
 
+    ctx.logger.info({
+      input: {
+        organisationReference,
+      },
+    });
+
     return await getOrganisation({
       userId: ctx.user.id,
       organisationReference,

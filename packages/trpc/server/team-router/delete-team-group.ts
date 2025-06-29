@@ -19,6 +19,13 @@ export const deleteTeamGroupRoute = authenticatedProcedure
     const { teamGroupId, teamId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamGroupId,
+        teamId,
+      },
+    });
+
     const team = await prisma.team.findFirst({
       where: buildTeamWhereQuery({
         teamId,

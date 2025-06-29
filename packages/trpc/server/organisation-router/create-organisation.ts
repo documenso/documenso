@@ -23,6 +23,12 @@ export const createOrganisationRoute = authenticatedProcedure
     const { name, priceId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        priceId,
+      },
+    });
+
     // Check if user can create a free organiastion.
     if (IS_BILLING_ENABLED() && !priceId) {
       const userOrganisations = await prisma.organisation.findMany({

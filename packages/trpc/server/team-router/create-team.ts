@@ -11,6 +11,12 @@ export const createTeamRoute = authenticatedProcedure
     const { teamName, teamUrl, organisationId, inheritMembers } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     return await createTeam({
       userId: user.id,
       teamName,

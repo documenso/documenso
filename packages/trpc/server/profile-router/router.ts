@@ -23,8 +23,14 @@ export const profileRouter = router({
       });
     }),
 
-  getUser: adminProcedure.input(ZRetrieveUserByIdQuerySchema).query(async ({ input }) => {
+  getUser: adminProcedure.input(ZRetrieveUserByIdQuerySchema).query(async ({ input, ctx }) => {
     const { id } = input;
+
+    ctx.logger.info({
+      input: {
+        id,
+      },
+    });
 
     return await getUserById({ id });
   }),
@@ -52,6 +58,13 @@ export const profileRouter = router({
     .input(ZSetProfileImageMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { bytes, teamId, organisationId } = input;
+
+      ctx.logger.info({
+        input: {
+          teamId,
+          organisationId,
+        },
+      });
 
       let target: SetAvatarImageOptions['target'] = {
         type: 'user',

@@ -11,5 +11,11 @@ export const findTeamsRoute = authenticatedProcedure
     const { organisationId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     return findTeams({ userId: user.id, organisationId });
   });

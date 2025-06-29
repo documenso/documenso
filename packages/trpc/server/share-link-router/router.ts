@@ -10,6 +10,12 @@ export const shareLinkRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { documentId, token } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       if (token) {
         return await createOrGetShareLink({ documentId, token });
       }

@@ -11,6 +11,12 @@ export const deleteTeamRoute = authenticatedProcedure
     const { teamId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+      },
+    });
+
     await deleteTeam({
       userId: user.id,
       teamId,

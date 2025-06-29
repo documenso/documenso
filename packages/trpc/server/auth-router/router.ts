@@ -66,6 +66,12 @@ export const authRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { passkeyId } = input;
 
+      ctx.logger.info({
+        input: {
+          passkeyId,
+        },
+      });
+
       await deletePasskey({
         userId: ctx.user.id,
         passkeyId,
@@ -90,6 +96,12 @@ export const authRouter = router({
     .input(ZUpdatePasskeyMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { passkeyId, name } = input;
+
+      ctx.logger.info({
+        input: {
+          passkeyId,
+        },
+      });
 
       await updatePasskey({
         userId: ctx.user.id,

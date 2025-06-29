@@ -27,6 +27,13 @@ export const createTeamGroupsRoute = authenticatedProcedure
     const { teamId, groups } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+        groups,
+      },
+    });
+
     const team = await prisma.team.findFirst({
       where: buildTeamWhereQuery({
         teamId,

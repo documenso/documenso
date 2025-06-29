@@ -16,6 +16,12 @@ export const updateTeamSettingsRoute = authenticatedProcedure
     const { user } = ctx;
     const { teamId, data } = input;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+      },
+    });
+
     const {
       // Document related settings.
       documentVisibility,

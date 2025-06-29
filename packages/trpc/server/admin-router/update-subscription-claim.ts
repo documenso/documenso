@@ -12,8 +12,12 @@ import {
 export const updateSubscriptionClaimRoute = adminProcedure
   .input(ZUpdateSubscriptionClaimRequestSchema)
   .output(ZUpdateSubscriptionClaimResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { id, data } = input;
+
+    ctx.logger.info({
+      input,
+    });
 
     const existingClaim = await prisma.subscriptionClaim.findUnique({
       where: { id },

@@ -11,6 +11,12 @@ export const getSubscriptionRoute = authenticatedProcedure
   .query(async ({ ctx, input }) => {
     const { organisationId } = input;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     const userId = ctx.user.id;
 
     if (!IS_BILLING_ENABLED()) {

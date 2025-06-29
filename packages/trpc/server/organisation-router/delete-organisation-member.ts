@@ -13,6 +13,13 @@ export const deleteOrganisationMemberRoute = authenticatedProcedure
     const { organisationId, organisationMemberId } = input;
     const userId = ctx.user.id;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+        organisationMemberId,
+      },
+    });
+
     await deleteOrganisationMembers({
       userId,
       organisationId,

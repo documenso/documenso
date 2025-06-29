@@ -16,6 +16,12 @@ export const updateEmbeddingDocumentRoute = procedure
   .input(ZUpdateEmbeddingDocumentRequestSchema)
   .output(ZUpdateEmbeddingDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
+    ctx.logger.info({
+      input: {
+        documentId: input.documentId,
+      },
+    });
+
     try {
       const authorizationHeader = ctx.req.headers.get('authorization');
 

@@ -21,6 +21,12 @@ export const findOrganisationMemberInvitesRoute = authenticatedProcedure
     const { organisationId, query, page, perPage, status } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     return await findOrganisationMemberInvites({
       userId: user.id,
       organisationId,

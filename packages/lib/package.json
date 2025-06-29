@@ -23,7 +23,6 @@
     "@documenso/email": "*",
     "@documenso/prisma": "*",
     "@documenso/signing": "*",
-    "@honeybadger-io/js": "^6.10.1",
     "@lingui/core": "^5.2.0",
     "@lingui/macro": "^5.2.0",
     "@lingui/react": "^5.2.0",

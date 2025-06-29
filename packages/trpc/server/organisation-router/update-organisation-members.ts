@@ -24,6 +24,13 @@ export const updateOrganisationMemberRoute = authenticatedProcedure
     const { organisationId, organisationMemberId, data } = input;
     const userId = ctx.user.id;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+        organisationMemberId,
+      },
+    });
+
     const organisation = await prisma.organisation.findFirst({
       where: buildOrganisationWhereQuery({
         organisationId,

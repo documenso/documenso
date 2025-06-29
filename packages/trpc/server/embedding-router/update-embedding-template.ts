@@ -15,6 +15,12 @@ export const updateEmbeddingTemplateRoute = procedure
   .input(ZUpdateEmbeddingTemplateRequestSchema)
   .output(ZUpdateEmbeddingTemplateResponseSchema)
   .mutation(async ({ input, ctx }) => {
+    ctx.logger.info({
+      input: {
+        templateId: input.templateId,
+      },
+    });
+
     try {
       const authorizationHeader = ctx.req.headers.get('authorization');
 

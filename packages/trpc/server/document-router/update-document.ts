@@ -19,6 +19,12 @@ export const updateDocumentRoute = authenticatedProcedure
     const { teamId } = ctx;
     const { documentId, data, meta = {} } = input;
 
+    ctx.logger.info({
+      input: {
+        documentId,
+      },
+    });
+
     const userId = ctx.user.id;
 
     if (Object.values(meta).length > 0) {

@@ -15,6 +15,12 @@ export const apiTokenRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { tokenName, teamId, expirationDate } = input;
 
+      ctx.logger.info({
+        input: {
+          teamId,
+        },
+      });
+
       return await createApiToken({
         userId: ctx.user.id,
         teamId,
@@ -27,6 +33,13 @@ export const apiTokenRouter = router({
     .input(ZDeleteTokenByIdMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { id, teamId } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+          teamId,
+        },
+      });
 
       return await deleteTokenById({
         id,

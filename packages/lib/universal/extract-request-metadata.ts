@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { getIpAddress } from './get-ip-address';
+
 const ZIpSchema = z.string().ip();
 
 export const ZRequestMetadataSchema = z.object({
@@ -40,11 +42,13 @@ export type ApiRequestMetadata = {
 };
 
 export const extractRequestMetadata = (req: Request): RequestMetadata => {
-  const forwardedFor = req.headers.get('x-forwarded-for');
-  const ip = forwardedFor
-    ?.split(',')
-    .map((ip) => ip.trim())
-    .at(0);
+  let ip: string | undefined = undefined;
+
+  try {
+    ip = getIpAddress(req);
+  } catch {
+    // Do nothing.
+  }
 
   const parsedIp = ZIpSchema.safeParse(ip);
 

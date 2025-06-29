@@ -11,8 +11,14 @@ import {
 export const createStripeCustomerRoute = adminProcedure
   .input(ZCreateStripeCustomerRequestSchema)
   .output(ZCreateStripeCustomerResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { organisationId } = input;
+
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
 
     const organisation = await prisma.organisation.findUnique({
       where: {

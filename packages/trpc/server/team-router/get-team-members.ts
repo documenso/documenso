@@ -14,6 +14,12 @@ export const getTeamMembersRoute = authenticatedProcedure
     const { teamId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+      },
+    });
+
     return await getTeamMembers({
       userId: user.id,
       teamId,

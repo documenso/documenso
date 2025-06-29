@@ -13,6 +13,12 @@ export const findTeamMembersRoute = authenticatedProcedure
     const { teamId, query, page, perPage } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+      },
+    });
+
     return await findTeamMembers({
       userId: user.id,
       teamId,

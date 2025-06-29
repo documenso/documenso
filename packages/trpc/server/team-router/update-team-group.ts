@@ -19,6 +19,15 @@ export const updateTeamGroupRoute = authenticatedProcedure
     const { id, data } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        id,
+        data: {
+          teamRole: data.teamRole,
+        },
+      },
+    });
+
     const teamGroup = await prisma.teamGroup.findFirst({
       where: {
         id,

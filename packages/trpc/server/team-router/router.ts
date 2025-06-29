@@ -61,6 +61,12 @@ export const teamRouter = router({
     update: authenticatedProcedure
       .input(ZUpdateTeamEmailMutationSchema)
       .mutation(async ({ input, ctx }) => {
+        ctx.logger.info({
+          input: {
+            teamId: input.teamId,
+          },
+        });
+
         return await updateTeamEmail({
           userId: ctx.user.id,
           ...input,
@@ -69,39 +75,71 @@ export const teamRouter = router({
     delete: authenticatedProcedure
       .input(ZDeleteTeamEmailMutationSchema)
       .mutation(async ({ input, ctx }) => {
+        const { teamId } = input;
+
+        ctx.logger.info({
+          input: {
+            teamId,
+          },
+        });
+
         return await deleteTeamEmail({
           userId: ctx.user.id,
           userEmail: ctx.user.email,
-          ...input,
+          teamId,
         });
       }),
     verification: {
       send: authenticatedProcedure
         .input(ZCreateTeamEmailVerificationMutationSchema)
         .mutation(async ({ input, ctx }) => {
+          const { teamId, email, name } = input;
+
+          ctx.logger.info({
+            input: {
+              teamId,
+            },
+          });
+
           return await createTeamEmailVerification({
-            teamId: input.teamId,
+            teamId,
             userId: ctx.user.id,
             data: {
-              email: input.email,
-              name: input.name,
+              email,
+              name,
             },
           });
         }),
       resend: authenticatedProcedure
         .input(ZResendTeamEmailVerificationMutationSchema)
         .mutation(async ({ input, ctx }) => {
+          const { teamId } = input;
+
+          ctx.logger.info({
+            input: {
+              teamId,
+            },
+          });
+
           await resendTeamEmailVerification({
             userId: ctx.user.id,
-            ...input,
+            teamId,
           });
         }),
       delete: authenticatedProcedure
         .input(ZDeleteTeamEmailVerificationMutationSchema)
         .mutation(async ({ input, ctx }) => {
+          const { teamId } = input;
+
+          ctx.logger.info({
+            input: {
+              teamId,
+            },
+          });
+
           return await deleteTeamEmailVerification({
             userId: ctx.user.id,
-            ...input,
+            teamId,
           });
         }),
     },
