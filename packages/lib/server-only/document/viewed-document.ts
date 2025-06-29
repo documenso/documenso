@@ -27,7 +27,6 @@ export const viewedDocument = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       token,
-      readStatus: ReadStatus.NOT_OPENED,
     },
   });
 
@@ -36,6 +35,30 @@ export const viewedDocument = async ({
   }
 
   const { documentId } = recipient;
+
+  await prisma.documentAuditLog.create({
+    data: createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED,
+      documentId,
+      user: {
+        name: recipient.name,
+        email: recipient.email,
+      },
+      requestMetadata,
+      data: {
+        recipientEmail: recipient.email,
+        recipientId: recipient.id,
+        recipientName: recipient.name,
+        recipientRole: recipient.role,
+        accessAuth: recipientAccessAuth ?? [],
+      },
+    }),
+  });
+
+  // Early return if already opened.
+  if (recipient.readStatus === ReadStatus.OPENED) {
+    return;
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({

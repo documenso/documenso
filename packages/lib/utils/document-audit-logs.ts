@@ -338,6 +338,10 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Document opened`,
       identified: msg`${prefix} opened the document`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED }, () => ({
+      anonymous: msg`Document viewed`,
+      identified: msg`${prefix} viewed the document`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED }, () => ({
       anonymous: msg`Document title updated`,
       identified: msg`${prefix} updated the document title`,
