@@ -3,7 +3,7 @@ DO $$
 BEGIN  
   IF NOT EXISTS (SELECT 1 FROM "User" WHERE "email" = 'deleted-account@documenso.com') THEN  
     INSERT INTO
-      "public"."User" (
+      "User" (
         "email",
         "emailVerified",
         "password",
