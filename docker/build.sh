@@ -40,13 +40,13 @@ else
     # Add tags for both default repositories
     docker tag "documenso-base" "documenso/documenso:latest"
     docker tag "documenso-base" "documenso/documenso:$GIT_SHA"
-    docker tag "documenso-base" "ghcr.io/documenso/documenso:latest"
-    docker tag "documenso-base" "ghcr.io/documenso/documenso:$GIT_SHA"
+    docker tag "documenso-base" "ghcr.io/cosmo83/documenso:latest"
+    docker tag "documenso-base" "ghcr.io/cosmo83/documenso:$GIT_SHA"
 
     # Add version tags if available
     if [ ! -z "$APP_VERSION" ] && [ "$APP_VERSION" != "undefined" ]; then
         docker tag "documenso-base" "documenso/documenso:$APP_VERSION"
-        docker tag "documenso-base" "ghcr.io/documenso/documenso:$APP_VERSION"
+        docker tag "documenso-base" "ghcr.io/cosmo83/documenso:$APP_VERSION"
     fi
 fi
 
