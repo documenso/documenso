@@ -901,4 +901,197 @@ test.describe('Unauthorized Access - Document API V2', () => {
     expect(res.ok()).toBeFalsy();
     expect(res.status()).toBe(404);
   });
+
+  test('should block unauthorized access to template recipient get endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const templateRecipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test wuth',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const res = await request.get(
+      `${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/${templateRecipient.id}`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template recipient create endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/create`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        recipient: {
+          name: 'Test',
+          email: 'test@example.com',
+          role: RecipientRole.SIGNER,
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template recipient create-many endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(
+      `${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/create-many`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: {
+          templateId: template.id,
+          recipients: [
+            {
+              name: 'Test first recipient',
+              email: 'test-first-recipient@example.com',
+              role: RecipientRole.SIGNER,
+            },
+            {
+              name: 'Test second recipient',
+              email: 'test-second-recipient@example.com',
+              role: RecipientRole.SIGNER,
+            },
+          ],
+        },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template recipient update endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/update`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        recipient: {
+          id: recipient.id,
+          name: 'Updated test name',
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template recipient update-many endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipients = await prisma.recipient.createManyAndReturn({
+      data: [
+        {
+          templateId: template.id,
+          email: 'test@example.com',
+          name: 'Test',
+          token: nanoid(12),
+          readStatus: ReadStatus.NOT_OPENED,
+          sendStatus: SendStatus.NOT_SENT,
+          signingStatus: SigningStatus.NOT_SIGNED,
+        },
+        {
+          templateId: template.id,
+          email: 'test2@example.com',
+          name: 'Test 2',
+          token: nanoid(12),
+          readStatus: ReadStatus.NOT_OPENED,
+          sendStatus: SendStatus.NOT_SENT,
+          signingStatus: SigningStatus.NOT_SIGNED,
+        },
+      ],
+    });
+
+    const res = await request.post(
+      `${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/update-many`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: {
+          templateId: template.id,
+          recipients: [
+            {
+              id: recipients[0].id,
+              name: 'Updated test first recipient name',
+            },
+            {
+              id: recipients[1].id,
+              name: 'Updated test second recipient name',
+            },
+          ],
+        },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template recipient delete endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/delete`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { recipientId: recipient.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
 });
