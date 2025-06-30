@@ -1,7 +1,7 @@
 import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
-import { ChevronLeft, Clock9, Users2 } from 'lucide-react';
+import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -13,11 +13,9 @@ import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
-import { DocumentHistorySheet } from '~/components/general/document/document-history-sheet';
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
 import { DocumentPageViewDropdown } from '~/components/general/document/document-page-view-dropdown';
 import { DocumentPageViewInformation } from '~/components/general/document/document-page-view-information';
@@ -101,9 +99,6 @@ export default function DocumentPage() {
 
   const { recipients, documentData, documentMeta } = document;
 
-  // This was a feature flag. Leave to false since it's not ready.
-  const isDocumentHistoryEnabled = false;
-
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       {document.status === DocumentStatus.PENDING && (
@@ -154,17 +149,6 @@ export default function DocumentPage() {
             )}
           </div>
         </div>
-
-        {isDocumentHistoryEnabled && (
-          <div className="self-end">
-            <DocumentHistorySheet documentId={document.id} userId={user.id}>
-              <Button variant="outline">
-                <Clock9 className="mr-1.5 h-4 w-4" />
-                <Trans>Document history</Trans>
-              </Button>
-            </DocumentHistorySheet>
-          </div>
-        )}
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
