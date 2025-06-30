@@ -4,7 +4,7 @@ import { env } from './env';
 
 const transports: TransportTargetOptions[] = [];
 
-if (env('NEXT_PRIVATE_LOGGER_PRETTY_STDOUT')) {
+if (env('NODE_ENV') !== 'production' && !env('INTERNAL_FORCE_JSON_LOGGER')) {
   transports.push({
     target: 'pino-pretty',
     level: 'info',
