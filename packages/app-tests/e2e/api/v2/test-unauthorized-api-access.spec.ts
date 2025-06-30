@@ -5,13 +5,21 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
-import { FieldType, Prisma, ReadStatus, SendStatus, SigningStatus } from '@documenso/prisma/client';
+import {
+  FieldType,
+  Prisma,
+  ReadStatus,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@documenso/prisma/client';
 import {
   seedBlankDocument,
   seedCompletedDocument,
   seedDraftDocument,
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
+import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -416,6 +424,316 @@ test.describe('Unauthorized Access - Document API V2', () => {
     });
 
     const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/field/delete`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { fieldId: field.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field create endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/create`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        field: {
+          recipientId: recipient.id,
+          type: FieldType.TEXT,
+          pageNumber: 5735.12,
+          pageX: 936.28,
+          pageY: 594.41,
+          width: 589.39,
+          height: 122.23,
+          fieldMeta: { type: 'text', label: 'Test' },
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field get field endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const field = await prisma.field.create({
+      data: {
+        templateId: template.id,
+        recipientId: recipient.id,
+        type: FieldType.TEXT,
+        page: 1,
+        positionX: 936.28,
+        positionY: 594.41,
+        width: 589.39,
+        height: 122.23,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'text', label: 'New test field' },
+      },
+    });
+
+    const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/${field.id}`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field create-many endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const secondRecipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test2@example.com',
+        name: 'Test 2',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/create-many`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        fields: [
+          {
+            recipientId: recipient.id,
+            type: FieldType.TEXT,
+            pageNumber: 1,
+            pageX: 1,
+            pageY: 1,
+            width: 1,
+            height: 1,
+            fieldMeta: { type: 'text', label: 'Test' },
+          },
+          {
+            recipientId: secondRecipient.id,
+            type: FieldType.NUMBER,
+            pageNumber: 1,
+            pageX: 1,
+            pageY: 1,
+            width: 1,
+            height: 1,
+            fieldMeta: { type: 'number', label: 'Test 2' },
+          },
+        ],
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field update endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const field = await prisma.field.create({
+      data: {
+        templateId: template.id,
+        recipientId: recipient.id,
+        type: FieldType.TEXT,
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'text', label: 'Test field to update' },
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/update`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        field: {
+          id: field.id,
+          type: FieldType.TEXT,
+          fieldMeta: { type: 'text', label: 'Updated field' },
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field update-many endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const field = await prisma.field.createManyAndReturn({
+      data: [
+        {
+          templateId: template.id,
+          recipientId: recipient.id,
+          type: 'TEXT',
+          page: 1,
+          positionX: 1,
+          positionY: 1,
+          width: 1,
+          height: 1,
+          customText: '',
+          inserted: false,
+          fieldMeta: { type: 'text', label: 'Test field to update' },
+        },
+        {
+          templateId: template.id,
+          recipientId: recipient.id,
+          type: FieldType.NUMBER,
+          page: 1,
+          positionX: 1,
+          positionY: 1,
+          width: 1,
+          height: 1,
+          customText: '',
+          inserted: false,
+          fieldMeta: { type: 'number', label: 'Test field to update' },
+        },
+      ],
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/update-many`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        fields: [
+          {
+            id: field[0].id,
+            type: FieldType.TEXT,
+            fieldMeta: { type: 'text', label: 'Updated first field - text' },
+          },
+          {
+            id: field[1].id,
+            type: FieldType.NUMBER,
+            fieldMeta: { type: 'number', label: 'Updated second field - number' },
+          },
+        ],
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template field delete endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        email: 'test@example.com',
+        name: 'Test',
+        role: RecipientRole.SIGNER,
+        token: nanoid(12),
+        readStatus: ReadStatus.NOT_OPENED,
+        sendStatus: SendStatus.NOT_SENT,
+        signingStatus: SigningStatus.NOT_SIGNED,
+      },
+    });
+
+    const field = await prisma.field.create({
+      data: {
+        templateId: template.id,
+        recipientId: recipient.id,
+        type: 'TEXT',
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'text', label: 'Test field to delete' },
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/field/delete`, {
       headers: { Authorization: `Bearer ${tokenB}` },
       data: { fieldId: field.id },
     });
