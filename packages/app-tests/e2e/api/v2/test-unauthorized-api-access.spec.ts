@@ -741,4 +741,164 @@ test.describe('Unauthorized Access - Document API V2', () => {
     expect(res.ok()).toBeFalsy();
     expect(res.status()).toBe(404);
   });
+
+  test('should block unauthorized access to document recipient get endpoint', async ({
+    request,
+  }) => {
+    const { user: recipientUser } = await seedUser();
+
+    const doc = await seedDraftDocument(userA, teamA.id, [recipientUser]);
+
+    const recipient = await prisma.recipient.findFirst({
+      where: { documentId: doc.id },
+    });
+
+    const res = await request.get(
+      `${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/${recipient!.id}`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document recipient create endpoint', async ({
+    request,
+  }) => {
+    const doc = await seedDraftDocument(userA, teamA.id, []);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/create`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        documentId: doc.id,
+        recipient: {
+          name: 'Test',
+          email: 'test@example.com',
+          role: RecipientRole.SIGNER,
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document recipient create-many endpoint', async ({
+    request,
+  }) => {
+    const doc = await seedDraftDocument(userA, teamA.id, []);
+
+    const res = await request.post(
+      `${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/create-many`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: {
+          documentId: doc.id,
+          recipients: [
+            {
+              name: 'Test',
+              email: 'test@example.com',
+              role: RecipientRole.SIGNER,
+            },
+            {
+              name: 'Test 2',
+              email: 'test2@example.com',
+              role: RecipientRole.SIGNER,
+            },
+          ],
+        },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document recipient update endpoint', async ({
+    request,
+  }) => {
+    const { user: recipientUser } = await seedUser();
+
+    const doc = await seedDraftDocument(userA, teamA.id, [recipientUser]);
+
+    const recipient = await prisma.recipient.findFirst({
+      where: { documentId: doc.id },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/update`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        documentId: doc.id,
+        recipient: {
+          id: recipient!.id,
+          name: 'Updated recipient',
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document recipient update-many endpoint', async ({
+    request,
+  }) => {
+    const { user: firstRecipient } = await seedUser();
+    const { user: secondRecipient } = await seedUser();
+
+    const doc = await seedDraftDocument(userA, teamA.id, [firstRecipient, secondRecipient]);
+
+    const firstDocumentRecipient = await prisma.recipient.findFirst({
+      where: { documentId: doc.id, email: firstRecipient.email },
+    });
+
+    const secondDocumentRecipient = await prisma.recipient.findFirst({
+      where: { documentId: doc.id, email: secondRecipient.email },
+    });
+
+    const res = await request.post(
+      `${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/update-many`,
+      {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: {
+          documentId: doc.id,
+          recipients: [
+            {
+              id: firstDocumentRecipient!.id,
+              name: 'Updated first recipient',
+            },
+            {
+              id: secondDocumentRecipient!.id,
+              name: 'Updated second recipient',
+            },
+          ],
+        },
+      },
+    );
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to document recipient delete endpoint', async ({
+    request,
+  }) => {
+    const { user: recipientUser } = await seedUser();
+
+    const doc = await seedDraftDocument(userA, teamA.id, [recipientUser]);
+
+    const recipient = await prisma.recipient.findFirst({
+      where: { documentId: doc.id },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/recipient/delete`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { recipientId: recipient!.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
 });
