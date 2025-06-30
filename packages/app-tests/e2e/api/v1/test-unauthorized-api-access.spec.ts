@@ -15,6 +15,10 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
+test.describe.configure({
+  mode: 'parallel',
+});
+
 test.describe('Document Access API V1', () => {
   test('should block unauthorized access to documents not owned by the user', async ({
     request,
