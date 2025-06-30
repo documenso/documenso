@@ -62,6 +62,7 @@ export const documentRouter = router({
     find: findInboxRoute,
     getCount: getInboxCountRoute,
   },
+  updateDocument: updateDocumentRoute,
 
   /**
    * @private
@@ -71,6 +72,12 @@ export const documentRouter = router({
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       return await getDocumentById({
         userId: ctx.user.id,
@@ -231,6 +238,13 @@ export const documentRouter = router({
       const { teamId, user } = ctx;
       const { documentId, folderId } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+          folderId,
+        },
+      });
+
       return await getDocumentWithDetailsById({
         userId: user.id,
         teamId,
@@ -332,6 +346,12 @@ export const documentRouter = router({
       const { user, teamId } = ctx;
       const { title, documentDataId, timezone, folderId } = input;
 
+      ctx.logger.info({
+        input: {
+          folderId,
+        },
+      });
+
       const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
       if (remaining.documents <= 0) {
@@ -353,8 +373,6 @@ export const documentRouter = router({
       });
     }),
 
-  updateDocument: updateDocumentRoute,
-
   /**
    * @public
    */
@@ -372,6 +390,12 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const userId = ctx.user.id;
 
@@ -395,6 +419,13 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, signingOrder } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+          signingOrder,
+        },
+      });
 
       return await upsertDocumentMeta({
         userId: ctx.user.id,
@@ -426,6 +457,12 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, meta = {} } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       if (Object.values(meta).length > 0) {
         await upsertDocumentMeta({
@@ -474,6 +511,13 @@ export const documentRouter = router({
       const { teamId } = ctx;
       const { documentId, recipients } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+          recipients,
+        },
+      });
+
       await resendDocument({
         userId: ctx.user.id,
         teamId,
@@ -502,6 +546,12 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { documentId } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       return await duplicateDocument({
         userId: user.id,
@@ -544,6 +594,12 @@ export const documentRouter = router({
         orderByDirection,
       } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await findDocumentAuditLogs({
         userId: ctx.user.id,
         teamId,
@@ -564,6 +620,12 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const document = await getDocumentById({
         documentId,
@@ -596,6 +658,12 @@ export const documentRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const document = await getDocumentById({
         documentId,

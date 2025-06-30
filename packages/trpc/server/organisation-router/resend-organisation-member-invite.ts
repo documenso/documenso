@@ -20,6 +20,13 @@ export const resendOrganisationMemberInviteRoute = authenticatedProcedure
     const userId = ctx.user.id;
     const userName = ctx.user.name || '';
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+        invitationId,
+      },
+    });
+
     await resendOrganisationMemberInvitation({
       userId,
       userName,

@@ -8,10 +8,12 @@ import { testCredentialsHandler } from '@documenso/lib/server-only/public-api/te
 import { listDocumentsHandler } from '@documenso/lib/server-only/webhooks/zapier/list-documents';
 import { subscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/subscribe';
 import { unsubscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/unsubscribe';
+// This is a bit nasty. Todo: Extract
+import type { HonoEnv } from '@documenso/remix/server/router';
 
 // This is bad, ts-router will be created on each request.
 // But don't really have a choice here.
-export const tsRestHonoApp = new Hono();
+export const tsRestHonoApp = new Hono<HonoEnv>();
 
 tsRestHonoApp
   .get('/openapi', (c) => c.redirect('https://openapi-v1.documenso.com'))
