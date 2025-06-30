@@ -6,6 +6,7 @@ import { createApiToken } from '@documenso/lib/server-only/public-api/create-api
 import { nanoid } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentVisibility,
   FieldType,
   Prisma,
   ReadStatus,
@@ -24,11 +25,21 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
+test.describe.configure({
+  mode: 'parallel',
+});
+
 test.describe('Unauthorized Access - Document API V2', () => {
-  let userA: User, teamA: Team, userB: User, teamB: Team, tokenB: string;
+  let userA: User, teamA: Team, userB: User, teamB: Team, tokenA: string, tokenB: string;
 
   test.beforeEach(async () => {
     ({ user: userA, team: teamA } = await seedUser());
+    ({ token: tokenA } = await createApiToken({
+      userId: userA.id,
+      teamId: teamA.id,
+      tokenName: 'userA',
+      expiresIn: null,
+    }));
 
     ({ user: userB, team: teamB } = await seedUser());
     ({ token: tokenB } = await createApiToken({
@@ -88,7 +99,6 @@ test.describe('Unauthorized Access - Document API V2', () => {
     expect(res.status()).toBe(401);
   });
 
-  // fix this test
   test('should block unauthorized access to document move endpoint', async ({ request }) => {
     const doc = await seedDraftDocument(userA, teamA.id, []);
 
@@ -1089,6 +1099,222 @@ test.describe('Unauthorized Access - Document API V2', () => {
     const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/recipient/delete`, {
       headers: { Authorization: `Bearer ${tokenB}` },
       data: { recipientId: recipient.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template list endpoint', async ({ request }) => {
+    await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/template`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(res.ok()).toBeTruthy();
+    expect(res.status()).toBe(200);
+
+    const data = await res.json();
+    expect(data.data.every((doc: { userId: number }) => doc.userId !== userA.id)).toBe(true);
+  });
+
+  test('should block unauthorized access to template get endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/template/${template.id}`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template update endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/update`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        data: {
+          title: 'Updated template title',
+          visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+        },
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template duplicate endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/duplicate`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(500);
+  });
+
+  test('should block unauthorized access to template delete endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/delete`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(500);
+  });
+
+  test('should block unauthorized access to template use endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const { user: firstRecipientUser } = await seedUser();
+    const { user: secondRecipientUser } = await seedUser();
+
+    await prisma.template.update({
+      where: { id: template.id },
+      data: {
+        recipients: {
+          create: [
+            {
+              id: firstRecipientUser.id,
+              name: firstRecipientUser.name || '',
+              email: firstRecipientUser.email,
+              token: nanoid(12),
+              readStatus: ReadStatus.NOT_OPENED,
+              sendStatus: SendStatus.NOT_SENT,
+              signingStatus: SigningStatus.NOT_SIGNED,
+            },
+            {
+              id: secondRecipientUser.id,
+              name: secondRecipientUser.name || '',
+              email: secondRecipientUser.email,
+              token: nanoid(12),
+              readStatus: ReadStatus.NOT_OPENED,
+              sendStatus: SendStatus.NOT_SENT,
+              signingStatus: SigningStatus.NOT_SIGNED,
+            },
+          ],
+        },
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/use`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: {
+        templateId: template.id,
+        recipients: [
+          {
+            id: firstRecipientUser.id,
+            name: firstRecipientUser.name,
+            email: firstRecipientUser.email,
+            role: RecipientRole.SIGNER,
+          },
+          {
+            id: secondRecipientUser.id,
+            name: secondRecipientUser.name,
+            email: secondRecipientUser.email,
+            role: RecipientRole.SIGNER,
+          },
+        ],
+      },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template direct create endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/direct/create`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template direct delete endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        name: 'Test',
+        email: 'test@example.com',
+        token: nanoid(12),
+      },
+    });
+
+    await prisma.templateDirectLink.create({
+      data: {
+        templateId: template.id,
+        enabled: true,
+        token: nanoid(12),
+        directTemplateRecipientId: recipient.id,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/direct/delete`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template direct toggle endpoint', async ({
+    request,
+  }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const recipient = await prisma.recipient.create({
+      data: {
+        templateId: template.id,
+        name: 'Test',
+        email: 'test@example.com',
+        token: nanoid(12),
+      },
+    });
+
+    await prisma.templateDirectLink.create({
+      data: {
+        templateId: template.id,
+        enabled: true,
+        token: nanoid(12),
+        directTemplateRecipientId: recipient.id,
+      },
+    });
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/direct/toggle`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id, enabled: false },
+    });
+
+    expect(res.ok()).toBeFalsy();
+    expect(res.status()).toBe(404);
+  });
+
+  test('should block unauthorized access to template move endpoint', async ({ request }) => {
+    const template = await seedBlankTemplate(userA, teamA.id);
+
+    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/move`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+      data: { templateId: template.id, teamId: teamB.id },
     });
 
     expect(res.ok()).toBeFalsy();
