@@ -1,27 +1,35 @@
-import { pino } from 'pino';
+import { type TransportTargetOptions, pino } from 'pino';
 
-// const transports: TransportTargetOptions[] = [];
+import { env } from './env';
 
-// if (env('NEXT_PRIVATE_LOGGING_DEV')) {
-// transports.push({
-//   target: 'pino-pretty',
-//   level: 'info',
-// });
-// }
+const transports: TransportTargetOptions[] = [];
 
-// const loggingFilePath = env('NEXT_PRIVATE_LOGGING_FILE_PATH');
+if (env('NODE_ENV') !== 'production' && !env('INTERNAL_FORCE_JSON_LOGGER')) {
+  transports.push({
+    target: 'pino-pretty',
+    level: 'info',
+  });
+}
 
-// if (loggingFilePath) {
-//   transports.push({
-//     target: 'pino/file',
-//     level: 'info',
-//     options: {
-//       destination: loggingFilePath,
-//       mkdir: true,
-//     },
-//   });
-// }
+const loggingFilePath = env('NEXT_PRIVATE_LOGGER_FILE_PATH');
+
+if (loggingFilePath) {
+  transports.push({
+    target: 'pino/file',
+    level: 'info',
+    options: {
+      destination: loggingFilePath,
+      mkdir: true,
+    },
+  });
+}
 
 export const logger = pino({
   level: 'info',
+  transport:
+    transports.length > 0
+      ? {
+          targets: transports,
+        }
+      : undefined,
 });

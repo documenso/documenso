@@ -8,8 +8,16 @@ export const getTeamRoute = authenticatedProcedure
   .input(ZGetTeamRequestSchema)
   .output(ZGetTeamResponseSchema)
   .query(async ({ input, ctx }) => {
+    const { teamReference } = input;
+
+    ctx.logger.info({
+      input: {
+        teamReference,
+      },
+    });
+
     return await getTeam({
-      teamReference: input.teamReference,
+      teamReference,
       userId: ctx.user.id,
     });
   });

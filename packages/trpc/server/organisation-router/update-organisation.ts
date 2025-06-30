@@ -15,8 +15,13 @@ export const updateOrganisationRoute = authenticatedProcedure
   .output(ZUpdateOrganisationResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { organisationId, data } = input;
-
     const userId = ctx.user.id;
+
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
 
     // Check if organisation exists and user has access to it
     const existingOrganisation = await prisma.organisation.findFirst({

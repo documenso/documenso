@@ -10,8 +10,14 @@ import {
 export const updateAdminOrganisationRoute = adminProcedure
   .input(ZUpdateAdminOrganisationRequestSchema)
   .output(ZUpdateAdminOrganisationResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { organisationId, data } = input;
+
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
 
     const organisation = await prisma.organisation.findUnique({
       where: {

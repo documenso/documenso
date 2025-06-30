@@ -17,6 +17,12 @@ export const deleteOrganisationRoute = authenticatedProcedure
     const { organisationId } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     const organisation = await prisma.organisation.findFirst({
       where: buildOrganisationWhereQuery({
         organisationId,
