@@ -1,14 +1,14 @@
 import type { ErrorHandlerOptions } from '@trpc/server/unstable-core-do-not-import';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { buildLogger } from '@documenso/lib/utils/logger-legacy';
+import { logger } from '@documenso/lib/utils/logger';
 
-const logger = buildLogger();
+import type { TrpcContext } from '../server/context';
 
 // Parameters<NonNullable<Parameters<typeof trpcServer>[0]['onError']>>[0], // :-)
 export const handleTrpcRouterError = (
-  { error, path }: Pick<ErrorHandlerOptions<undefined>, 'error' | 'path'>,
-  source: 'trpc' | 'apiV1' | 'apiV2',
+  { error, ctx }: Pick<ErrorHandlerOptions<TrpcContext>, 'error' | 'path' | 'ctx'>,
+  _source: 'trpc' | 'apiV1' | 'apiV2',
 ) => {
   const appError = AppError.parseError(error.cause || error);
 
@@ -23,16 +23,16 @@ export const handleTrpcRouterError = (
   // not an AppError.
   const isLoggableTrpcError = !isAppError && errorCodesToAlertOn.includes(error.code);
 
-  if (isLoggableAppError || isLoggableTrpcError) {
-    console.error(error);
+  const errorLogger = (ctx?.logger || logger).child({
+    status: 'error',
+    appError: AppError.toJSON(appError),
+  });
 
-    logger.error(error, {
-      method: path,
-      context: {
-        source,
-        appError: AppError.toJSON(appError),
-      },
-    });
+  // Only fully log the error on certain conditions since some errors are expected.
+  if (isLoggableAppError || isLoggableTrpcError) {
+    errorLogger.error(error);
+  } else {
+    errorLogger.info('TRPC_ERROR_HANDLER');
   }
 };
 
