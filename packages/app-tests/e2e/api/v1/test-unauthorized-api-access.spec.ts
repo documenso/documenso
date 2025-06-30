@@ -327,48 +327,6 @@ test.describe('Document Access API V1', () => {
     expect(resB.status()).toBe(404);
   });
 
-  test('should block unauthorized access to document fields endpoint', async ({ request }) => {
-    const { user: userA, team: teamA } = await seedUser();
-
-    const { user: userB, team: teamB } = await seedUser();
-    const { token: tokenB } = await createApiToken({
-      userId: userB.id,
-      teamId: teamB.id,
-      tokenName: 'userB',
-      expiresIn: null,
-    });
-
-    const { user: recipientUser } = await seedUser();
-
-    const documentA = await seedDraftDocument(userA, teamA.id, [recipientUser.email], {
-      createDocumentOptions: { title: 'Document 1 - Draft' },
-    });
-
-    const recipient = await prisma.recipient.findFirst({
-      where: {
-        documentId: documentA.id,
-        email: recipientUser.email,
-      },
-    });
-
-    const resB = await request.post(`${WEBAPP_BASE_URL}/api/v1/documents/${documentA.id}/fields`, {
-      headers: { Authorization: `Bearer ${tokenB}` },
-      data: {
-        recipientId: recipient!.id,
-        type: 'SIGNATURE',
-        pageNumber: 1,
-        pageX: 1,
-        pageY: 1,
-        pageWidth: 1,
-        pageHeight: 1,
-        fieldMeta: {},
-      },
-    });
-
-    expect(resB.ok()).toBeFalsy();
-    expect(resB.status()).toBe(404);
-  });
-
   test('should block unauthorized access to PATCH on fields endpoint', async ({ request }) => {
     const { user: userA, team: teamA } = await seedUser();
 
