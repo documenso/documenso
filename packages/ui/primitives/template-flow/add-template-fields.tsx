@@ -29,6 +29,7 @@ import {
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -324,7 +325,7 @@ export const AddTemplateFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -336,7 +337,13 @@ export const AddTemplateFieldsFormPartial = ({
         signerId: selectedSigner.id,
         signerToken: selectedSigner.token ?? '',
         fieldMeta: undefined,
-      });
+      };
+
+      append(field);
+      if (ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(selectedField)) {
+        setCurrentField(field);
+        setShowAdvancedSettings(true);
+      }
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);

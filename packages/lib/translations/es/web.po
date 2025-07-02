@@ -313,6 +313,10 @@ msgstr "{prefix} actualizó el título del documento"
 msgid "{prefix} updated the document visibility"
 msgstr "{prefix} actualizó la visibilidad del documento"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} viewed the document"
+msgstr ""
+
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
 msgstr "{recipientActionVerb} documento"
@@ -1767,7 +1771,6 @@ msgstr "Haga clic aquí para comenzar"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Click here to retry"
 msgstr "Haga clic aquí para reintentar"
 
@@ -2749,11 +2752,6 @@ msgstr "ID externo del documento actualizado"
 msgid "Document found in your account"
 msgstr "Documento encontrado en tu cuenta"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Document history"
-msgstr "Historial de documentos"
-
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
@@ -2871,6 +2869,10 @@ msgstr "La carga de documentos está deshabilitada debido a facturas impagadas"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "Documento subido"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document viewed"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Viewed"
@@ -3712,10 +3714,6 @@ msgstr "Hola, {userName} <0>({userEmail})</0>"
 msgid "Hide"
 msgstr "Ocultar"
 
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Hide additional information"
-msgstr "Ocultar información adicional"
-
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -4139,10 +4137,10 @@ msgstr "Gestionar suscripción"
 msgid "Manage the {0} organisation"
 msgstr "Gestionar la organización {0}"
 
-#. placeholder {0}: organisation.name
+#. placeholder {1}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Manage the {0} organisation subscription"
-msgstr "Gestionar la suscripción de la organización {0}"
+msgid "Manage the {1} organisation subscription"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
@@ -5814,10 +5812,6 @@ msgstr "¡Comparte tu experiencia de firma!"
 msgid "Show"
 msgstr "Mostrar"
 
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Show additional information"
-msgstr "Mostrar información adicional"
-
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Show advanced settings"
@@ -7249,7 +7243,6 @@ msgid "Unable to join this organisation at this time."
 msgstr "No se puede unirse a esta organización en este momento."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Unable to load document history"
 msgstr "No se pudo cargar el historial del documento"
 
@@ -8018,11 +8011,8 @@ msgstr "No pudimos verificar tu correo electrónico en este momento."
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "No pudimos verificar tu correo electrónico. Si tu correo electrónico no está verificado ya, por favor inténtalo de nuevo."
 
-#: packages/ui/primitives/document-flow/add-subject.tsx
-msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
-msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
-
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
 
