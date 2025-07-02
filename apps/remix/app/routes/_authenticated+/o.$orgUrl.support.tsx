@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
-import { BookIcon, HelpCircleIcon, Link2Icon, MailIcon } from 'lucide-react';
+import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -42,8 +42,8 @@ export default function SupportPage() {
           <Trans>Support</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-1">
-          <Trans>Choose a support channel below to get help with Documenso</Trans>
+        <p className="text-muted-foreground mt-2">
+          <Trans>Your current plan includes the following support channels:</Trans>
         </p>
 
         <div className="mt-6 flex flex-col gap-4">
@@ -87,7 +87,7 @@ export default function SupportPage() {
           </div>
           {currentOrganisation && subscriptionStatus === SubscriptionStatus.ACTIVE && (
             <>
-              <div className="rounded-lg border p-4">
+              {/* <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
                   <MailIcon className="text-muted-foreground h-5 w-5" />
                   <Link
@@ -106,11 +106,11 @@ export default function SupportPage() {
                     <a href="mailto:support@documenso.com">support@documenso.com</a>.
                   </Trans>
                 </p>
-              </div>
+              </div> */}
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
                   <Link2Icon className="text-muted-foreground h-5 w-5" />
-                  <Trans>Plain</Trans>
+                  <Trans>Contact us</Trans>
                 </h2>
                 <p className="text-muted-foreground mt-1">
                   <Dialog open={open} onOpenChange={setOpen}>
