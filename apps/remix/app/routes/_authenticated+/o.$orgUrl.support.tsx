@@ -8,13 +8,6 @@ import { Link } from 'react-router';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
 
 import { SupportTicketForm } from '~/components/forms/support-ticket-form';
 import { appMetaTags } from '~/utils/meta';
@@ -24,14 +17,18 @@ export function meta() {
 }
 
 export default function SupportPage() {
-  const [open, setOpen] = useState(false);
+  const [showForm, setShowForm] = useState(false);
   const { user } = useSession();
   const currentOrganisation = useOptionalCurrentOrganisation();
 
   const subscriptionStatus = currentOrganisation?.subscription?.status;
 
   const handleSuccess = () => {
-    setOpen(false);
+    setShowForm(false);
+  };
+
+  const handleCloseForm = () => {
+    setShowForm(false);
   };
 
   return (
@@ -113,22 +110,21 @@ export default function SupportPage() {
                   <Trans>Contact us</Trans>
                 </h2>
                 <p className="text-muted-foreground mt-1">
-                  <Dialog open={open} onOpenChange={setOpen}>
-                    <DialogTrigger asChild>
-                      <Button variant="outline" size="sm" className="mt-2">
-                        <Trans>Create a support ticket</Trans>
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                      <DialogHeader>
-                        <DialogTitle>
-                          <Trans>Create a support ticket</Trans>
-                        </DialogTitle>
-                      </DialogHeader>
-                      <SupportTicketForm email={user?.email} onSuccess={handleSuccess} />
-                    </DialogContent>
-                  </Dialog>
+                  <Trans>We'll get back to you as soon as possible via email.</Trans>
                 </p>
+                <div className="mt-4">
+                  {!showForm ? (
+                    <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>
+                      <Trans>Create a support ticket</Trans>
+                    </Button>
+                  ) : (
+                    <SupportTicketForm
+                      email={user?.email}
+                      onSuccess={handleSuccess}
+                      onClose={handleCloseForm}
+                    />
+                  )}
+                </div>
               </div>
             </>
           )}

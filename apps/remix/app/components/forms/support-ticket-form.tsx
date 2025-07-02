@@ -29,9 +29,10 @@ type TSupportTicket = z.infer<typeof ZSupportTicketSchema>;
 export type SupportTicketFormProps = {
   email: string;
   onSuccess?: () => void;
+  onClose?: () => void;
 };
 
-export const SupportTicketForm = ({ email, onSuccess }: SupportTicketFormProps) => {
+export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFormProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
@@ -86,59 +87,68 @@ export const SupportTicketForm = ({ email, onSuccess }: SupportTicketFormProps) 
   };
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <fieldset disabled={isLoading} className="flex flex-col gap-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>
-                  <Trans>Email</Trans>
-                </FormLabel>
-                <FormControl>
-                  <Input type="email" autoComplete="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="subject"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>
-                  <Trans>Subject</Trans>
-                </FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="message"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel required>
-                  <Trans>Message</Trans>
-                </FormLabel>
-                <FormControl>
-                  <Textarea rows={5} {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <Button type="submit" loading={isLoading} className="mt-2 w-full">
-            <Trans>Submit</Trans>
-          </Button>
-        </fieldset>
-      </form>
-    </Form>
+    <>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
+          <fieldset disabled={isLoading} className="flex flex-col gap-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>
+                    <Trans>Email</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Input type="email" autoComplete="email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="subject"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>
+                    <Trans>Subject</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Input {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="message"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel required>
+                    <Trans>Message</Trans>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea rows={5} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <div className="mt-2 flex flex-row gap-2">
+              <Button type="submit" size="sm" loading={isLoading}>
+                <Trans>Submit</Trans>
+              </Button>
+              {onClose && (
+                <Button variant="outline" size="sm" type="button" onClick={onClose}>
+                  <Trans>Close</Trans>
+                </Button>
+              )}
+            </div>
+          </fieldset>
+        </form>
+      </Form>
+    </>
   );
 };
