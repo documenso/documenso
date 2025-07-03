@@ -303,7 +303,7 @@ export const seedDraftDocument = async (
           create: {
             page: 1,
             type: FieldType.NAME,
-            inserted: true,
+            inserted: false,
             customText: name,
             positionX: new Prisma.Decimal(1),
             positionY: new Prisma.Decimal(1),
@@ -549,7 +549,7 @@ export const seedCompletedDocument = async (
 
   const documentData = await prisma.documentData.create({
     data: {
-      type: DocumentDataType.BYTES_64,
+      type: DocumentDataType.S3_PATH,
       data: examplePdf,
       initialData: examplePdf,
     },
