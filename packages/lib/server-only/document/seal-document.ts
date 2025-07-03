@@ -117,7 +117,12 @@ export const sealDocument = async ({
     ? await getCertificatePdf({
         documentId,
         language: document.documentMeta?.language,
-      }).catch(() => null)
+      }).catch((e) => {
+        console.log('Failed to get certificate PDF');
+        console.error(e);
+
+        return null;
+      })
     : null;
 
   const doc = await PDFDocument.load(pdfData);
