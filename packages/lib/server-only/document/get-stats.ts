@@ -1,19 +1,17 @@
-import { TeamMemberRole } from '@prisma/client';
 import type { Prisma, User } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
-import { DateTime } from 'luxon';
+import { DocumentVisibility, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
 import { prisma } from '@documenso/prisma';
 import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-document-status';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TimePeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
+import { getDateRangeForPeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
 
 export type GetStatsInput = {
   user: Pick<User, 'id' | 'email'>;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
-  period?: PeriodSelectorValue;
+  period?: TimePeriod;
   search?: string;
   folderId?: string;
 };
@@ -27,14 +25,15 @@ export const getStats = async ({
 }: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
-  if (period) {
-    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+  if (period && period !== 'all-time') {
+    const dateRange = getDateRangeForPeriod(period);
 
-    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
-
-    createdAt = {
-      gte: startOfPeriod.toJSDate(),
-    };
+    if (dateRange) {
+      createdAt = {
+        gte: dateRange.start.toJSDate(),
+        lte: dateRange.end.toJSDate(),
+      };
+    }
   }
 
   const [ownerCounts, notSignedCounts, hasSignedCounts] = await (options.team
