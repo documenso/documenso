@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-10 12:05\n"
+"PO-Revision-Date: 2025-06-19 06:05\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -75,12 +75,12 @@ msgstr "{0, plural, one {# znak przekroczony} few {# znaki przekroczone} many {#
 #. placeholder {0}: folder._count.documents
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "{0, plural, one {# document} other {# documents}}"
-msgstr ""
+msgstr "{0, plural, one {# dokument} few {# dokumenty} many {# dokumentów} other {# dokumentów}}"
 
 #. placeholder {0}: folder._count.subfolders
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "{0, plural, one {# folder} other {# folders}}"
-msgstr ""
+msgstr "{0, plural, one {# folder} few {# foldery} many {# folderów} other {# folderów}}"
 
 #. placeholder {0}: template.recipients.length
 #: apps/remix/app/routes/_recipient+/d.$token+/_index.tsx
@@ -95,7 +95,7 @@ msgstr "{0, plural, one {# zespół} few {# zespoły} many {# zespołów} other 
 #. placeholder {0}: folder._count.templates
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "{0, plural, one {# template} other {# templates}}"
-msgstr ""
+msgstr "{0, plural, one {# szablon} few {# szablony} many {# szablonów} other {# szablonów}}"
 
 #. placeholder {0}: data.length
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -283,7 +283,7 @@ msgstr "{prefix} niepodpisane pole"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated a field"
-msgstr "{prefix} zaktualizowane pole"
+msgstr "Użytkownik {prefix} zaktualizował pole"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated a recipient"
@@ -312,10 +312,6 @@ msgstr "Użytkownik {prefix} zaktualizował tytuł dokumentu"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document visibility"
 msgstr "Użytkownik {prefix} zaktualizował widoczność dokumentu"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} viewed the document"
-msgstr ""
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
@@ -374,7 +370,7 @@ msgstr "{teamName} zaprosił cię do {action} {documentName}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} approved the document"
-msgstr "{userName} zatwierdził dokument"
+msgstr "Użytkownik {userName} zatwierdził dokument"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} CC'd the document"
@@ -386,15 +382,15 @@ msgstr "{userName} zakończył swoje zadanie"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} rejected the document"
-msgstr "{userName} odrzucił dokument"
+msgstr "Użytkownik {userName} odrzucił dokument"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} signed the document"
-msgstr "{userName} podpisał dokument"
+msgstr "Użytkownik {userName} podpisał dokument"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} viewed the document"
-msgstr "{userName} wyświetlił dokument"
+msgstr "Użytkownik {userName} wyświetlił dokument"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "{visibleRows, plural, one {Showing # result.} other {Showing # results.}}"
@@ -490,11 +486,11 @@ msgstr "<0>Jesteś na drodze do zakończenia przeglądania \"<1>{documentTitle}<
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "0 Free organisations left"
-msgstr "0 Wolnych organizacji pozostało"
+msgstr "Pozostało 0 darmowych organizacji"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "1 Free organisations left"
-msgstr "1 Darmowa organizacja pozostała"
+msgstr "Pozostała 1 darmowa organizacja"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "1 month"
@@ -549,7 +545,7 @@ msgstr "5 dokumentów miesięcznie"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 Documents a month"
-msgstr "5 Dokumentów miesięcznie"
+msgstr "5 dokumentów miesięcznie"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "500 Internal Server Error"
@@ -725,11 +721,11 @@ msgstr "Konto zostało usunięte"
 
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 msgid "Account disabled"
-msgstr "Konto wyłączone"
+msgstr "Konto zostało wyłączone"
 
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 msgid "Account enabled"
-msgstr "Konto włączone"
+msgstr "Konto zostało włączone"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Account Re-Authentication"
@@ -774,7 +770,7 @@ msgstr "Aktywne"
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Active sessions"
-msgstr ""
+msgstr "Aktywne sesje"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
@@ -1345,7 +1341,7 @@ msgstr "Czy na pewno chcesz usunąć następujący wniosek?"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Are you sure you want to delete this folder?"
-msgstr ""
+msgstr "Czy na pewno chcesz usunąć ten folder?"
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Are you sure you want to delete this token?"
@@ -1771,6 +1767,7 @@ msgstr "Kliknij, aby rozpocząć"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Click here to retry"
 msgstr "Kliknij tutaj, aby spróbować ponownie"
 
@@ -2164,11 +2161,11 @@ msgstr "Utwórz dokument z szablonu"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Create folder"
-msgstr ""
+msgstr "Utwórz folder"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Create Folder"
-msgstr ""
+msgstr "Utwórz folder"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
@@ -2181,7 +2178,7 @@ msgstr "Utwórz grupy"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Create New Folder"
-msgstr ""
+msgstr "Utwórz nowy folder"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Create now"
@@ -2303,11 +2300,11 @@ msgstr "Struktura CSV"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Cumulative MAU (signed in)"
-msgstr ""
+msgstr "Łączne MAU (zalogowani)"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
-msgstr ""
+msgstr "Bieżący"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -2447,7 +2444,7 @@ msgstr "Usuń dokument"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Delete Folder"
-msgstr ""
+msgstr "Usuń folder"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
@@ -2692,7 +2689,7 @@ msgstr "Dokument Zakończony!"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document created"
-msgstr "Dokument utworzony"
+msgstr "Utworzono dokument"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Document Created"
@@ -2752,6 +2749,11 @@ msgstr "Zaktualizowane ID zewnętrzne dokumentu"
 msgid "Document found in your account"
 msgstr "Dokument znaleziony na Twoim koncie"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
+#: apps/remix/app/components/general/document/document-history-sheet.tsx
+msgid "Document history"
+msgstr "Historia dokumentu"
+
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
@@ -2791,7 +2793,7 @@ msgstr "Dokument nie jest już dostępny do podpisania"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document opened"
-msgstr "Dokument otwarty"
+msgstr "Otwarto dokument"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
@@ -2827,7 +2829,7 @@ msgstr "Dokument ponownie zaplombowany"
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document sent"
-msgstr "Dokument wysłany"
+msgstr "Wysłano dokument"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Signed"
@@ -2869,10 +2871,6 @@ msgstr "Przesyłanie dokumentu wyłączone z powodu nieopłaconych faktur"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "Przesłano dokument"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "Document viewed"
-msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Viewed"
@@ -3102,11 +3100,11 @@ msgstr "Opcje e-mail"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Email resent"
-msgstr "E-mail wysłany ponownie"
+msgstr "Wysłano ponownie wiadomość"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Email sent"
-msgstr "E-mail wysłany"
+msgstr "Wysłano wiadomość"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Email sent!"
@@ -3194,7 +3192,7 @@ msgstr "Załączony dokument"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
-msgstr ""
+msgstr "Wprowadź nazwę dla nowego folderu. Foldery pomogą ci zorganizować przedmioty."
 
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
@@ -3334,7 +3332,7 @@ msgstr "Nie udało się utworzyć roszczenia subskrypcyjnego."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Failed to delete folder"
-msgstr ""
+msgstr "Nie udało się usunąć folder"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
@@ -3346,7 +3344,7 @@ msgstr "Nie udało się załadować dokumentu"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Failed to move folder"
-msgstr ""
+msgstr "Nie udało się przenieść folderu"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
@@ -3354,7 +3352,7 @@ msgstr "Nie udało się ponownie zaplombować dokumentu"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Failed to revoke session"
-msgstr ""
+msgstr "Nie udało się unieważnić sesji"
 
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
@@ -3362,7 +3360,7 @@ msgstr "Nie udało się zapisać ustawień."
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Failed to sign out all sessions"
-msgstr ""
+msgstr "Nie udało się wylogować ze wszystkich sesji"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
@@ -3427,11 +3425,11 @@ msgstr "Pole wstępnie wypełnione przez asystenta"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Field signed"
-msgstr "Pole podpisane"
+msgstr "Podpisano pole"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Field unsigned"
-msgstr "Pole niepodpisane"
+msgstr "Niepodpisano pole"
 
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Fields"
@@ -3466,15 +3464,15 @@ msgstr "Folder utworzony pomyślnie"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Folder deleted successfully"
-msgstr ""
+msgstr "Folder został pomyślnie usunięty"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Folder moved successfully"
-msgstr ""
+msgstr "Folder został pomyślnie przeniesiony"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Folder Name"
-msgstr ""
+msgstr "Nazwa foldera"
 
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -3714,6 +3712,10 @@ msgstr "Cześć, {userName} <0>({userEmail})</0>"
 msgid "Hide"
 msgstr "Ukryj"
 
+#: apps/remix/app/components/general/document/document-history-sheet.tsx
+msgid "Hide additional information"
+msgstr "Ukryj dodatkowe informacje"
+
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -3723,7 +3725,7 @@ msgstr "Dom"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Home (No Folder)"
-msgstr ""
+msgstr "Strona główna (Brak folderu)"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -3972,7 +3974,7 @@ msgstr "Ostatnie 7 dni"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Last Active"
-msgstr ""
+msgstr "Ostatnia aktywność"
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4125,7 +4127,7 @@ msgstr "Zarządzaj uprawnieniami i kontrolą dostępu"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Manage sessions"
-msgstr ""
+msgstr "Zarządzaj sesjami"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -4137,10 +4139,10 @@ msgstr "Zarządzaj subskrypcją"
 msgid "Manage the {0} organisation"
 msgstr "Zarządzaj organizacją {0}"
 
-#. placeholder {1}: organisation.name
+#. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Manage the {1} organisation subscription"
-msgstr ""
+msgid "Manage the {0} organisation subscription"
+msgstr "Zarządzaj subskrypcjami organizacji {0}"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
@@ -4206,7 +4208,7 @@ msgstr "MAU (zakończony dokument)"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "MAU (signed in)"
-msgstr ""
+msgstr "MAU (zalogowani)"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Max"
@@ -4295,7 +4297,7 @@ msgstr "Przenieś dokument do folderu"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Move Folder"
-msgstr ""
+msgstr "Przenieś folder"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
@@ -4312,7 +4314,7 @@ msgstr "Można wybrać wiele metod dostępu."
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "My Folder"
-msgstr ""
+msgstr "Mój folder"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -4405,12 +4407,12 @@ msgstr "Brak aktywnych szkiców"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "No folders found"
-msgstr ""
+msgstr "Nie znaleziono folderów"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
 msgid "No folders found matching \"{searchTerm}\""
-msgstr ""
+msgstr "Nie znaleziono folderów zgodnych z \"{searchTerm}\""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
@@ -4723,7 +4725,7 @@ msgstr "Organizacje, których użytkownik jest członkiem."
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Organise your documents"
-msgstr ""
+msgstr "Zorganizuj swoje dokumenty"
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organise your members into groups which can be assigned to teams"
@@ -4731,7 +4733,7 @@ msgstr "Zorganizuj swoich członków w grupy, które można przypisać do zespo�
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Organise your templates"
-msgstr ""
+msgstr "Zorganizuj swoje szablony"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Organize your documents and templates"
@@ -4910,7 +4912,7 @@ msgstr "Wybierz dowolną z poniższych umów i zacznij podpisywanie, aby rozpocz
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Pin"
-msgstr ""
+msgstr "Przypnij"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5466,7 +5468,7 @@ msgstr "Cofnij dostęp"
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Revoke all sessions"
-msgstr ""
+msgstr "Cofnij wszystkie sesje"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -5544,7 +5546,7 @@ msgstr "Szukaj dokumentów..."
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Search folders..."
-msgstr ""
+msgstr "Szukaj folderów..."
 
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
@@ -5572,7 +5574,7 @@ msgstr "Wybierz"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Select a destination for this folder."
-msgstr ""
+msgstr "Wybierz miejsce docelowe dla tego folderu."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
@@ -5629,7 +5631,7 @@ msgstr "Wybierz grupy"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups of members to add to the team."
-msgstr ""
+msgstr "Wybierz grupy członków do dodania do zespołu."
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
@@ -5753,11 +5755,11 @@ msgstr "Wysłano"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Session revoked"
-msgstr ""
+msgstr "Sesja odwołana"
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "Sessions have been revoked"
-msgstr ""
+msgstr "Sesje zostały odwołane"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
@@ -5811,6 +5813,10 @@ msgstr "Podziel się swoim doświadczeniem podpisywania!"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show"
 msgstr "Pokaż"
+
+#: apps/remix/app/components/general/document/document-history-sheet.tsx
+msgid "Show additional information"
+msgstr "Pokaż dodatkowe informacje"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -6627,8 +6633,7 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "Poniższy zespół został usunięty. Nie będziesz mógł już uzyskać dostępu do tego zespołu i jego dokumentów."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid ""
-"The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Grupa organizacji, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6637,14 +6642,12 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Rola organizacji, która zostanie zastosowana do wszystkich członków tej grupy."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6728,14 +6731,12 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Email zespołowy <0>{teamEmail}</0> został usunięty z następującego zespołu"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmienić nazwę lub mógł nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid ""
-"The team you are looking for may have been removed, renamed or may have never\n"
+msgid "The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony na, albo nigdy nie istniał."
 
@@ -6773,8 +6774,7 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "URL dla Documenso do wysyłania zdarzeń webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid ""
-"The user you are looking for may have been removed, renamed or may have never\n"
+msgid "The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Użytkownik, którego szukasz, mógł zostać usunięty, zmieniony nazwę lub mógł nigdy nie istnieć."
 
@@ -6930,7 +6930,7 @@ msgstr "To pole nie może być modyfikowane ani usuwane. Po udostępnieniu bezpo
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
-msgstr ""
+msgstr "Ten folder zawiera wiele elementów. Usunięcie go również usunie wszystkie elementy w folderze, w tym zagnieżdżone foldery i ich zawartość."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -7012,7 +7012,7 @@ msgstr "To będzie TYLKO przenoś funkcje flag, które są ustawione na true, ws
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
-msgstr ""
+msgstr "Zostaniesz wylogowany z wszystkich innych urządzeń. Aby dalej korzystać z konta, musisz ponownie się zalogować na tych urządzeniach."
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7241,6 +7241,7 @@ msgid "Unable to join this organisation at this time."
 msgstr "Nie można w tej chwili dołączyć do tej organizacji."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
+#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Unable to load document history"
 msgstr "Nie można załadować historii dokumentu"
 
@@ -7315,7 +7316,7 @@ msgstr "Nieograniczone dokumenty, API i więcej"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Unpin"
-msgstr ""
+msgstr "Odepnij"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Untitled Group"
@@ -7662,7 +7663,7 @@ msgstr "Wyświetl wszystkie aktywności związane z bezpieczeństwem twojego kon
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View and manage all active sessions for your account."
-msgstr ""
+msgstr "Przeglądaj i zarządzaj wszystkimi aktywnymi sesjami swojego konta."
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -8009,8 +8010,11 @@ msgstr "Nie udało się zweryfikować Twojego e-maila w tym momencie."
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "Nie udało się zweryfikować twojego e-maila. Jeśli twój e-mail nie jest jeszcze zweryfikowany, spróbuj ponownie."
 
-#: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
+msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
+msgstr "Wygenerujemy linki do podpisu dla Ciebie, które możesz wysłać do odbiorców w wybrany przez siebie sposób."
+
+#: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Wygenerujemy dla Ciebie linki do podpisania, które możesz wysłać do odbiorców za pomocą wybranej metody."
 
@@ -8724,3 +8728,4 @@ msgstr "Twój token został pomyślnie utworzony! Upewnij się, że go skopiujes
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Twoje tokeny będą tutaj wyświetlane po ich utworzeniu."
+
