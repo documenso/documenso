@@ -61,16 +61,29 @@ export const adminRouter = router({
 
   updateUser: adminProcedure
     .input(ZAdminUpdateProfileMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, name, email, roles } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+          roles,
+        },
+      });
 
       return await updateUser({ id, name, email, roles });
     }),
 
   updateRecipient: adminProcedure
     .input(ZAdminUpdateRecipientMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id, name, email } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
 
       return await updateRecipient({ id, name, email });
     }),
@@ -79,6 +92,12 @@ export const adminRouter = router({
     .input(ZAdminUpdateSiteSettingMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, enabled, data } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
 
       return await upsertSiteSetting({
         id,
@@ -90,8 +109,14 @@ export const adminRouter = router({
 
   resealDocument: adminProcedure
     .input(ZAdminResealDocumentMutationSchema)
-    .mutation(async ({ input }) => {
+    .mutation(async ({ input, ctx }) => {
       const { id } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
 
       const document = await getEntireDocument({ id });
 
@@ -100,44 +125,75 @@ export const adminRouter = router({
       return await sealDocument({ documentId: id, isResealing });
     }),
 
-  enableUser: adminProcedure.input(ZAdminEnableUserMutationSchema).mutation(async ({ input }) => {
-    const { id } = input;
+  enableUser: adminProcedure
+    .input(ZAdminEnableUserMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
 
-    const user = await getUserById({ id }).catch(() => null);
-
-    if (!user) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User not found',
+      ctx.logger.info({
+        input: {
+          id,
+        },
       });
-    }
 
-    return await enableUser({ id });
-  }),
+      const user = await getUserById({ id }).catch(() => null);
 
-  disableUser: adminProcedure.input(ZAdminDisableUserMutationSchema).mutation(async ({ input }) => {
-    const { id } = input;
+      if (!user) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'User not found',
+        });
+      }
 
-    const user = await getUserById({ id }).catch(() => null);
+      return await enableUser({ id });
+    }),
 
-    if (!user) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'User not found',
+  disableUser: adminProcedure
+    .input(ZAdminDisableUserMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
       });
-    }
 
-    return await disableUser({ id });
-  }),
+      const user = await getUserById({ id }).catch(() => null);
 
-  deleteUser: adminProcedure.input(ZAdminDeleteUserMutationSchema).mutation(async ({ input }) => {
-    const { id } = input;
+      if (!user) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'User not found',
+        });
+      }
 
-    return await deleteUser({ id });
-  }),
+      return await disableUser({ id });
+    }),
+
+  deleteUser: adminProcedure
+    .input(ZAdminDeleteUserMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
+
+      return await deleteUser({ id });
+    }),
 
   deleteDocument: adminProcedure
     .input(ZAdminDeleteDocumentMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { id, reason } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
+
       await sendDeleteEmail({ documentId: id, reason });
 
       return await superDeleteDocument({

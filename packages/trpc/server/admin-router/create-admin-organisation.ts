@@ -12,8 +12,14 @@ import {
 export const createAdminOrganisationRoute = adminProcedure
   .input(ZCreateAdminOrganisationRequestSchema)
   .output(ZCreateAdminOrganisationResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { ownerUserId, data } = input;
+
+    ctx.logger.info({
+      input: {
+        ownerUserId,
+      },
+    });
 
     const organisation = await createOrganisation({
       userId: ownerUserId,
