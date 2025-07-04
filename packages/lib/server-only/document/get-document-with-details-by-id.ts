@@ -31,6 +31,7 @@ export const getDocumentWithDetailsById = async ({
       documentData: true,
       documentMeta: true,
       recipients: true,
+      attachments: true,
       folder: true,
       fields: {
         include: {

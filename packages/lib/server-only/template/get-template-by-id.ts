@@ -28,6 +28,7 @@ export const getTemplateById = async ({
       templateMeta: true,
       recipients: true,
       fields: true,
+      attachments: true,
       user: {
         select: {
           id: true,

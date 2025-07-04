@@ -46,7 +46,9 @@ export const TemplatesTableActionDropdown = ({
   const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
 
-  const formatPath = `${templateRootPath}/${row.id}/edit`;
+  const formatPath = row.folderId
+    ? `${templateRootPath}/f/${row.folderId}/${row.id}/edit`
+    : `${templateRootPath}/${row.id}/edit`;
 
   return (
     <DropdownMenu>
