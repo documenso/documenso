@@ -11,6 +11,7 @@ import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
+import { AttachmentForm } from '~/components/forms/attachment-form';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
@@ -133,11 +134,18 @@ export default function DocumentEditPage() {
           </div>
         </div>
 
-        {document.useLegacyFieldInsertion && (
-          <div>
-            <LegacyFieldWarningPopover type="document" documentId={document.id} />
-          </div>
-        )}
+        <div>
+          {document.useLegacyFieldInsertion ? (
+            <div className="flex flex-col items-end gap-2 sm:flex-row sm:items-start">
+              <LegacyFieldWarningPopover type="document" documentId={document.id} />
+              <AttachmentForm document={document} />
+            </div>
+          ) : (
+            <div>
+              <AttachmentForm document={document} />
+            </div>
+          )}
+        </div>
       </div>
 
       <DocumentEditForm
