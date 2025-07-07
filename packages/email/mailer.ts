@@ -1,5 +1,6 @@
 import type { Transporter } from 'nodemailer';
 import { createTransport } from 'nodemailer';
+import BrevoTransport from 'nodemailer-brevo-transport';
 
 import { env } from '@documenso/lib/utils/env';
 import { ResendTransport } from '@documenso/nodemailer-resend';
@@ -11,7 +12,7 @@ import { MailChannelsTransport } from './transports/mailchannels';
  *
  * This function uses various environment variables to configure the appropriate
  * email transport mechanism. It supports multiple types of email transports,
- * including MailChannels, Resend, and different SMTP configurations.
+ * including MailChannels, Resend, Brevo, and different SMTP configurations.
  *
  * @returns {Transporter} A configured Nodemailer transporter instance.
  *
@@ -21,6 +22,8 @@ import { MailChannelsTransport } from './transports/mailchannels';
  *   - `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`: Endpoint for MailChannels (optional)
  * - **resend**: Uses ResendTransport, requiring:
  *   - `NEXT_PRIVATE_RESEND_API_KEY`: API key for Resend
+ * - **brevo**: Uses nodemailer-brevo-transport, requiring:
+ *   - `NEXT_PRIVATE_BREVO_API_KEY`: API key for Brevo (formerly Sendinblue)
  * - **smtp-api**: Uses a custom SMTP API configuration, requiring:
  *   - `NEXT_PRIVATE_SMTP_HOST`: The SMTP server host
  *   - `NEXT_PRIVATE_SMTP_APIKEY`: The API key for SMTP authentication
@@ -67,6 +70,14 @@ const getTransport = (): Transporter => {
     return createTransport(
       ResendTransport.makeTransport({
         apiKey: env('NEXT_PRIVATE_RESEND_API_KEY') || '',
+      }),
+    );
+  }
+
+  if (transport === 'brevo') {
+    return createTransport(
+      new BrevoTransport({
+        apiKey: env('NEXT_PRIVATE_BREVO_API_KEY') || '',
       }),
     );
   }

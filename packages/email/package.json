@@ -38,7 +38,8 @@
     "@react-email/text": "0.0.6",
     "nodemailer": "^6.10.1",
     "react-email": "1.9.5",
-    "resend": "2.0.0"
+    "resend": "2.0.0",
+    "nodemailer-brevo-transport": "2.2.0"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
