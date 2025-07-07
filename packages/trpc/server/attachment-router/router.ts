@@ -46,6 +46,8 @@ export const attachmentRouter = router({
       const updatedAttachments = await setDocumentAttachments({
         documentId,
         attachments,
+        user: ctx.user,
+        requestMetadata: ctx.metadata.requestMetadata,
       });
 
       return updatedAttachments;

@@ -43,6 +43,7 @@ export const DocumentSigningAttachmentsDialog = ({
               <Trans>No attachments available.</Trans>
             </span>
           )}
+
           {attachments.map((attachment, idx) => (
             <a
               key={attachment.id || idx}

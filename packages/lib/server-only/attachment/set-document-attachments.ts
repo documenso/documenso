@@ -1,18 +1,25 @@
-import type { Attachment } from '@prisma/client';
+import type { Attachment, User } from '@prisma/client';
 
+import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
 import { AppError } from '../../errors/app-error';
 import { AppErrorCode } from '../../errors/app-error';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
+import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export type CreateAttachmentsOptions = {
   documentId: number;
   attachments: Pick<Attachment, 'id' | 'label' | 'url' | 'type'>[];
+  user: Pick<User, 'id' | 'email' | 'name'>;
+  requestMetadata: RequestMetadata;
 };
 
 export const setDocumentAttachments = async ({
   documentId,
   attachments,
+  user,
+  requestMetadata,
 }: CreateAttachmentsOptions) => {
   const document = await prisma.document.findUnique({
     where: {
@@ -73,6 +80,30 @@ export const setDocumentAttachments = async ({
       });
       upsertedAttachments.push(created);
     }
+  }
+
+  const isAttachmentsSame = upsertedAttachments.every((attachment) => {
+    const existingAttachment = existingAttachments.find((a) => a.id === attachment.id);
+    return (
+      existingAttachment?.label === attachment.label &&
+      existingAttachment?.url === attachment.url &&
+      existingAttachment?.type === attachment.type
+    );
+  });
+
+  if (!isAttachmentsSame) {
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED,
+        documentId: document.id,
+        user,
+        data: {
+          from: existingAttachments,
+          to: upsertedAttachments,
+        },
+        requestMetadata,
+      }),
+    });
   }
 
   return upsertedAttachments;

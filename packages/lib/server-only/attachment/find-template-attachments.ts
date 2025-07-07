@@ -22,7 +22,5 @@ export const findTemplateAttachments = async ({
     },
   });
 
-  console.log('attachments', attachments);
-
   return attachments;
 };

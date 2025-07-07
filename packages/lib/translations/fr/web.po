@@ -1435,7 +1435,8 @@ msgstr "En assistance"
 msgid "At least one signature type must be enabled"
 msgstr "Au moins un type de signature doit être activé"
 
-#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
 msgid "Attachments"
 msgstr ""
 
@@ -4413,6 +4414,10 @@ msgstr "Non"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
 msgstr "Pas de brouillons actifs"
+
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+msgid "No attachments available."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
@@ -7650,6 +7655,10 @@ msgstr "Voir"
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "View activity"
 msgstr "Voir l'activité"
+
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+msgid "View all attachments for this document."
+msgstr ""
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "View all documents sent to and from this email address"
