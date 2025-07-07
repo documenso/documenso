@@ -23,7 +23,6 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { AttachmentSchema } from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 
 extendZodWithOpenApi(z);
 
@@ -193,13 +192,6 @@ export const ZCreateDocumentMutationSchema = z.object({
       description: 'The globalActionAuth property is only available for Enterprise accounts.',
     }),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
-  attachments: AttachmentSchema.pick({
-    id: true,
-    label: true,
-    url: true,
-  })
-    .array()
-    .optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
