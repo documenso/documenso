@@ -4,12 +4,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
-import type { TDocument } from '@documenso/lib/types/document';
 import { nanoid } from '@documenso/lib/universal/id';
 import { AttachmentType } from '@documenso/prisma/generated/types';
 import { trpc } from '@documenso/trpc/react';
-import type { TSetDocumentAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
-import { ZSetDocumentAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
+import type { TSetTemplateAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
+import { ZSetTemplateAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -31,19 +30,19 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type AttachmentFormProps = {
-  document: TDocument;
+  templateId: number;
 };
 
-export const AttachmentForm = ({ document }: AttachmentFormProps) => {
+export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
   const { toast } = useToast();
 
   const { data: attachmentsData, refetch: refetchAttachments } =
-    trpc.attachment.getAttachments.useQuery({
-      documentId: document.id,
+    trpc.attachment.getTemplateAttachments.useQuery({
+      templateId,
     });
 
-  const { mutateAsync: setDocumentAttachments } =
-    trpc.attachment.setDocumentAttachments.useMutation();
+  const { mutateAsync: setTemplateAttachments } =
+    trpc.attachment.setTemplateAttachments.useMutation();
 
   const defaultAttachments = [
     {
@@ -54,10 +53,10 @@ export const AttachmentForm = ({ document }: AttachmentFormProps) => {
     },
   ];
 
-  const form = useForm<TSetDocumentAttachmentsSchema>({
-    resolver: zodResolver(ZSetDocumentAttachmentsSchema),
+  const form = useForm<TSetTemplateAttachmentsSchema>({
+    resolver: zodResolver(ZSetTemplateAttachmentsSchema),
     defaultValues: {
-      documentId: document.id,
+      templateId,
       attachments: attachmentsData ?? defaultAttachments,
     },
   });
@@ -85,15 +84,15 @@ export const AttachmentForm = ({ document }: AttachmentFormProps) => {
   };
 
   useEffect(() => {
-    if (attachmentsData) {
+    if (attachmentsData && attachmentsData.length > 0) {
       form.setValue('attachments', attachmentsData);
     }
   }, [attachmentsData]);
 
-  const onSubmit = async (data: TSetDocumentAttachmentsSchema) => {
+  const onSubmit = async (data: TSetTemplateAttachmentsSchema) => {
     try {
-      await setDocumentAttachments({
-        documentId: document.id,
+      await setTemplateAttachments({
+        templateId,
         attachments: data.attachments,
       });
 
@@ -118,9 +117,7 @@ export const AttachmentForm = ({ document }: AttachmentFormProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm">
-          Add Attachment
-        </Button>
+        <Button variant="outline">Add Attachment</Button>
       </DialogTrigger>
       <DialogContent position="center">
         <DialogHeader>

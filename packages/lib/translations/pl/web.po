@@ -298,6 +298,10 @@ msgid "{prefix} updated the document access auth requirements"
 msgstr "{prefix} zaktualizowane wymagania dotyczące autoryzacji dostępu do dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} updated the document attachments"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document external ID"
 msgstr "{prefix} zaktualizowane ID zewnętrzne dokumentu"
 
@@ -312,6 +316,10 @@ msgstr "Użytkownik {prefix} zaktualizował tytuł dokumentu"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document visibility"
 msgstr "Użytkownik {prefix} zaktualizował widoczność dokumentu"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} viewed the document"
+msgstr ""
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
@@ -1427,6 +1435,10 @@ msgstr "Asystowanie"
 msgid "At least one signature type must be enabled"
 msgstr "Przynajmniej jeden typ podpisu musi być włączony"
 
+#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+msgid "Attachments"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Ponowne próby zapieczętowania dokumentu, przydatne po zmianie kodu w celu rozwiązania błędnego dokumentu."
@@ -1767,7 +1779,6 @@ msgstr "Kliknij, aby rozpocząć"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Click here to retry"
 msgstr "Kliknij tutaj, aby spróbować ponownie"
 
@@ -2665,6 +2676,10 @@ msgstr "Wszystkie dokumenty"
 msgid "Document Approved"
 msgstr "Dokument zatwierdzony"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document attachments updated"
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: packages/lib/server-only/document/super-delete-document.ts
 #: packages/lib/server-only/document/delete-document.ts
@@ -2748,11 +2763,6 @@ msgstr "Zaktualizowane ID zewnętrzne dokumentu"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Document found in your account"
 msgstr "Dokument znaleziony na Twoim koncie"
-
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Document history"
-msgstr "Historia dokumentu"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
@@ -2871,6 +2881,10 @@ msgstr "Przesyłanie dokumentu wyłączone z powodu nieopłaconych faktur"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "Przesłano dokument"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document viewed"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Viewed"
@@ -3711,10 +3725,6 @@ msgstr "Cześć, {userName} <0>({userEmail})</0>"
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Hide"
 msgstr "Ukryj"
-
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Hide additional information"
-msgstr "Ukryj dodatkowe informacje"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -5814,10 +5824,6 @@ msgstr "Podziel się swoim doświadczeniem podpisywania!"
 msgid "Show"
 msgstr "Pokaż"
 
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Show additional information"
-msgstr "Pokaż dodatkowe informacje"
-
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Show advanced settings"
@@ -6633,7 +6639,8 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "Poniższy zespół został usunięty. Nie będziesz mógł już uzyskać dostępu do tego zespołu i jego dokumentów."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Grupa organizacji, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6642,12 +6649,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Rola organizacji, która zostanie zastosowana do wszystkich członków tej grupy."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6731,12 +6740,14 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Email zespołowy <0>{teamEmail}</0> został usunięty z następującego zespołu"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmienić nazwę lub mógł nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony na, albo nigdy nie istniał."
 
@@ -6774,7 +6785,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "URL dla Documenso do wysyłania zdarzeń webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Użytkownik, którego szukasz, mógł zostać usunięty, zmieniony nazwę lub mógł nigdy nie istnieć."
 
@@ -7241,7 +7253,6 @@ msgid "Unable to join this organisation at this time."
 msgstr "Nie można w tej chwili dołączyć do tej organizacji."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Unable to load document history"
 msgstr "Nie można załadować historii dokumentu"
 
@@ -8010,11 +8021,8 @@ msgstr "Nie udało się zweryfikować Twojego e-maila w tym momencie."
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "Nie udało się zweryfikować twojego e-maila. Jeśli twój e-mail nie jest jeszcze zweryfikowany, spróbuj ponownie."
 
-#: packages/ui/primitives/document-flow/add-subject.tsx
-msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
-msgstr "Wygenerujemy linki do podpisu dla Ciebie, które możesz wysłać do odbiorców w wybrany przez siebie sposób."
-
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Wygenerujemy dla Ciebie linki do podpisania, które możesz wysłać do odbiorców za pomocą wybranej metody."
 
@@ -8728,4 +8736,3 @@ msgstr "Twój token został pomyślnie utworzony! Upewnij się, że go skopiujes
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Twoje tokeny będą tutaj wyświetlane po ich utworzeniu."
-

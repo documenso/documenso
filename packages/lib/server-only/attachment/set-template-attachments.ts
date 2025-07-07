@@ -6,29 +6,29 @@ import { AppError } from '../../errors/app-error';
 import { AppErrorCode } from '../../errors/app-error';
 
 export type CreateAttachmentsOptions = {
-  documentId: number;
+  templateId: number;
   attachments: Pick<Attachment, 'id' | 'label' | 'url' | 'type'>[];
 };
 
-export const setDocumentAttachments = async ({
-  documentId,
+export const setTemplateAttachments = async ({
+  templateId,
   attachments,
 }: CreateAttachmentsOptions) => {
-  const document = await prisma.document.findUnique({
+  const template = await prisma.template.findUnique({
     where: {
-      id: documentId,
+      id: templateId,
     },
   });
 
-  if (!document) {
+  if (!template) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: 'Template not found',
     });
   }
 
   const existingAttachments = await prisma.attachment.findMany({
     where: {
-      documentId,
+      templateId,
     },
   });
 
@@ -53,12 +53,13 @@ export const setDocumentAttachments = async ({
           label: attachment.label,
           url: attachment.url,
           type: attachment.type,
+          templateId,
         },
         create: {
           label: attachment.label,
           url: attachment.url,
           type: attachment.type,
-          documentId,
+          templateId,
         },
       });
       upsertedAttachments.push(updated);
@@ -68,7 +69,7 @@ export const setDocumentAttachments = async ({
           label: attachment.label,
           url: attachment.url,
           type: attachment.type,
-          documentId,
+          templateId,
         },
       });
       upsertedAttachments.push(created);

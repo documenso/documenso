@@ -2,21 +2,27 @@ import { prisma } from '@documenso/prisma';
 
 import { buildTeamWhereQuery } from '../../utils/teams';
 
-export type FindAttachmentsOptions = {
-  documentId: number;
+export type FindTemplateAttachmentsOptions = {
+  templateId: number;
   userId: number;
   teamId: number;
 };
 
-export const findAttachments = async ({ documentId, userId, teamId }: FindAttachmentsOptions) => {
+export const findTemplateAttachments = async ({
+  templateId,
+  userId,
+  teamId,
+}: FindTemplateAttachmentsOptions) => {
   const attachments = await prisma.attachment.findMany({
     where: {
-      document: {
-        id: documentId,
+      template: {
+        id: templateId,
         team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });
+
+  console.log('attachments', attachments);
 
   return attachments;
 };

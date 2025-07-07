@@ -9,6 +9,7 @@ import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
 import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
+import { AttachmentForm } from '~/components/general/template/template-attachment-form';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplateEditForm } from '~/components/general/template/template-edit-form';
 import { TemplateType } from '~/components/general/template/template-type';
@@ -89,6 +90,7 @@ export default function TemplateEditPage() {
 
         <div className="mt-2 flex items-center gap-2 sm:mt-0 sm:self-end">
           <TemplateDirectLinkDialogWrapper template={template} />
+          <AttachmentForm templateId={template.id} />
 
           {template.useLegacyFieldInsertion && (
             <div>

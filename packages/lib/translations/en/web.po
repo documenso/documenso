@@ -293,6 +293,10 @@ msgid "{prefix} updated the document access auth requirements"
 msgstr "{prefix} updated the document access auth requirements"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} updated the document attachments"
+msgstr "{prefix} updated the document attachments"
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document external ID"
 msgstr "{prefix} updated the document external ID"
 
@@ -1425,6 +1429,10 @@ msgstr "Assisting"
 #: packages/lib/types/document-meta.ts
 msgid "At least one signature type must be enabled"
 msgstr "At least one signature type must be enabled"
+
+#: apps/remix/app/components/general/document-signing/document-signing-form.tsx
+msgid "Attachments"
+msgstr "Attachments"
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
@@ -2662,6 +2670,10 @@ msgstr "Document All"
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Approved"
 msgstr "Document Approved"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document attachments updated"
+msgstr "Document attachments updated"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: packages/lib/server-only/document/super-delete-document.ts
@@ -4132,10 +4144,10 @@ msgstr "Manage subscription"
 msgid "Manage the {0} organisation"
 msgstr "Manage the {0} organisation"
 
-#. placeholder {1}: organisation.name
+#. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Manage the {1} organisation subscription"
-msgstr "Manage the {1} organisation subscription"
+msgid "Manage the {0} organisation subscription"
+msgstr "Manage the {0} organisation subscription"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."

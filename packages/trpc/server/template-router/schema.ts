@@ -14,7 +14,6 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
-import AttachmentSchema from '@documenso/prisma/generated/zod/modelSchema/AttachmentSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
 import {
@@ -156,16 +155,6 @@ export const ZUpdateTemplateRequestSchema = z.object({
         .optional(),
       type: z.nativeEnum(TemplateType).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
-      attachments: AttachmentSchema.pick({
-        id: true,
-        label: true,
-        url: true,
-      })
-        .extend({
-          formId: z.string().min(1),
-        })
-        .array()
-        .optional(),
     })
     .optional(),
   meta: z
