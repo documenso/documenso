@@ -11,6 +11,7 @@ import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
+import { AttachmentForm } from '~/components/general/document/document-attachment-form';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
@@ -99,7 +100,7 @@ export default function DocumentEditPage() {
         <Trans>Documents</Trans>
       </Link>
 
-      <div className="mt-4 flex w-full items-end justify-between">
+      <div className="mt-4 flex w-full flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex-1">
           <h1
             className="block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
@@ -133,11 +134,12 @@ export default function DocumentEditPage() {
           </div>
         </div>
 
-        {document.useLegacyFieldInsertion && (
-          <div>
+        <div className={document.useLegacyFieldInsertion ? 'flex items-center gap-2' : undefined}>
+          {document.useLegacyFieldInsertion && (
             <LegacyFieldWarningPopover type="document" documentId={document.id} />
-          </div>
-        )}
+          )}
+          <AttachmentForm documentId={document.id} />
+        </div>
       </div>
 
       <DocumentEditForm

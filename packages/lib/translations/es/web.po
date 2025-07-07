@@ -298,6 +298,10 @@ msgid "{prefix} updated the document access auth requirements"
 msgstr "{prefix} actualizó los requisitos de autorización de acceso al documento"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} updated the document attachments"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document external ID"
 msgstr "{prefix} actualizó el ID externo del documento"
 
@@ -312,6 +316,10 @@ msgstr "{prefix} actualizó el título del documento"
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document visibility"
 msgstr "{prefix} actualizó la visibilidad del documento"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} viewed the document"
+msgstr ""
 
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
@@ -1427,6 +1435,11 @@ msgstr "Asistiendo"
 msgid "At least one signature type must be enabled"
 msgstr "Al menos un tipo de firma debe estar habilitado"
 
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+msgid "Attachments"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 msgstr "Intenta sellar el documento de nuevo, útil después de que se haya producido un cambio de código para resolver un documento erróneo."
@@ -1767,7 +1780,6 @@ msgstr "Haga clic aquí para comenzar"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Click here to retry"
 msgstr "Haga clic aquí para reintentar"
 
@@ -2665,6 +2677,10 @@ msgstr "Documentar Todo"
 msgid "Document Approved"
 msgstr "Documento Aprobado"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document attachments updated"
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
 #: packages/lib/server-only/document/super-delete-document.ts
 #: packages/lib/server-only/document/delete-document.ts
@@ -2748,11 +2764,6 @@ msgstr "ID externo del documento actualizado"
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Document found in your account"
 msgstr "Documento encontrado en tu cuenta"
-
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Document history"
-msgstr "Historial de documentos"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
@@ -2871,6 +2882,10 @@ msgstr "La carga de documentos está deshabilitada debido a facturas impagadas"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "Documento subido"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document viewed"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Viewed"
@@ -3712,10 +3727,6 @@ msgstr "Hola, {userName} <0>({userEmail})</0>"
 msgid "Hide"
 msgstr "Ocultar"
 
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Hide additional information"
-msgstr "Ocultar información adicional"
-
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -4403,6 +4414,10 @@ msgstr "No"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
 msgstr "No hay borradores activos"
+
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+msgid "No attachments available."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
@@ -5814,10 +5829,6 @@ msgstr "¡Comparte tu experiencia de firma!"
 msgid "Show"
 msgstr "Mostrar"
 
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Show additional information"
-msgstr "Mostrar información adicional"
-
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Show advanced settings"
@@ -6633,7 +6644,8 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "El siguiente equipo ha sido eliminado. Ya no podrá acceder a este equipo y sus documentos"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "El grupo de organización que está buscando puede haber sido eliminado, renombrado o puede que nunca haya existido."
 
@@ -6642,12 +6654,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "El rol de organización que se aplicará a todos los miembros de este grupo."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "La organización que está buscando puede haber sido eliminada, renombrada o puede que nunca haya existido."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "La organización que está buscando puede haber sido eliminada, renombrada o puede que nunca haya existido."
 
@@ -6731,14 +6745,17 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "El correo electrónico del equipo <0>{teamEmail}</0> ha sido eliminado del siguiente equipo"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "El equipo que está buscando puede haber sido eliminado, renombrado o puede que nunca haya existido."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
-msgstr "El equipo que buscas puede haber sido eliminado, renombrado o quizás nunca\n"
+msgstr ""
+"El equipo que buscas puede haber sido eliminado, renombrado o quizás nunca\n"
 "                existió."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -6775,7 +6792,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "La URL para Documenso para enviar eventos de webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "El usuario que está buscando puede haber sido eliminado, renombrado o puede que nunca haya existido."
 
@@ -7242,7 +7260,6 @@ msgid "Unable to join this organisation at this time."
 msgstr "No se puede unirse a esta organización en este momento."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Unable to load document history"
 msgstr "No se pudo cargar el historial del documento"
 
@@ -7641,6 +7658,10 @@ msgstr "Ver"
 msgid "View activity"
 msgstr "Ver actividad"
 
+#: apps/remix/app/components/general/document-signing/document-signing-attachments-dialog.tsx
+msgid "View all attachments for this document."
+msgstr ""
+
 #: packages/email/templates/confirm-team-email.tsx
 msgid "View all documents sent to and from this email address"
 msgstr "Ver todos los documentos enviados hacia y desde esta dirección de correo electrónico"
@@ -8011,11 +8032,8 @@ msgstr "No pudimos verificar tu correo electrónico en este momento."
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "No pudimos verificar tu correo electrónico. Si tu correo electrónico no está verificado ya, por favor inténtalo de nuevo."
 
-#: packages/ui/primitives/document-flow/add-subject.tsx
-msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
-msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
-
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Generaremos enlaces de firma para ti, que podrás enviar a los destinatarios a través de tu método preferido."
 
@@ -8729,4 +8747,3 @@ msgstr "¡Tu token se creó con éxito! ¡Asegúrate de copiarlo porque no podr�
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Tus tokens se mostrarán aquí una vez que los crees."
-
