@@ -117,7 +117,7 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Add Attachment</Button>
+        <Button variant="outline">Attachments</Button>
       </DialogTrigger>
       <DialogContent position="center">
         <DialogHeader>
