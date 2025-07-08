@@ -286,6 +286,7 @@ export const DocumentSigningCheckboxField = ({
                     className="h-3 w-3"
                     id={`checkbox-${field.id}-${item.id}`}
                     checked={checkedValues.includes(itemValue)}
+                    disabled={field.fieldMeta?.readOnly}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
                   />
                   {!item.value.includes('empty-value-') && item.value && (

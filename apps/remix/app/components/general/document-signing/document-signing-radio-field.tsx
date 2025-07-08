@@ -164,6 +164,7 @@ export const DocumentSigningRadioField = ({
                 value={item.value}
                 id={`option-${field.id}-${item.id}`}
                 checked={item.checked}
+                disabled={field.fieldMeta?.readOnly}
               />
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
