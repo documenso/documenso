@@ -54,6 +54,12 @@ export const moveDocumentToFolder = async ({
     where: documentWhereClause,
   });
 
+  if (document?.userId !== userId || document?.teamId !== teamId) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You are not allowed to move this document',
+    });
+  }
+
   if (!document) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
