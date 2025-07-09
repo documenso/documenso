@@ -24,6 +24,7 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { WebhookTestDialog } from '~/components/dialogs/webhook-test-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
@@ -203,10 +204,17 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
               )}
             />
 
-            <div className="mt-4">
+            <div className="mt-4 flex gap-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
                 <Trans>Update webhook</Trans>
               </Button>
+              {webhook && (
+                <WebhookTestDialog webhook={webhook}>
+                  <Button variant="outline" disabled={!webhook.enabled}>
+                    <Trans>Test Webhook</Trans>
+                  </Button>
+                </WebhookTestDialog>
+              )}
             </div>
           </fieldset>
         </form>
