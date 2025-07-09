@@ -9,6 +9,7 @@ import { WebhookTriggerEvents } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -49,16 +50,6 @@ const ZTestWebhookFormSchema = z.object({
 });
 
 type TTestWebhookFormSchema = z.infer<typeof ZTestWebhookFormSchema>;
-
-const eventDisplayNames: Record<WebhookTriggerEvents, string> = {
-  [WebhookTriggerEvents.DOCUMENT_CREATED]: 'Document Created',
-  [WebhookTriggerEvents.DOCUMENT_SENT]: 'Document Sent',
-  [WebhookTriggerEvents.DOCUMENT_OPENED]: 'Document Opened',
-  [WebhookTriggerEvents.DOCUMENT_SIGNED]: 'Document Signed',
-  [WebhookTriggerEvents.DOCUMENT_COMPLETED]: 'Document Completed',
-  [WebhookTriggerEvents.DOCUMENT_REJECTED]: 'Document Rejected',
-  [WebhookTriggerEvents.DOCUMENT_CANCELLED]: 'Document Cancelled',
-};
 
 export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps) => {
   const { _ } = useLingui();
@@ -144,7 +135,7 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
                       <SelectContent>
                         {webhook.eventTriggers.map((event) => (
                           <SelectItem key={event} value={event}>
-                            {eventDisplayNames[event]}
+                            {toFriendlyWebhookEventName(event)}
                           </SelectItem>
                         ))}
                       </SelectContent>
