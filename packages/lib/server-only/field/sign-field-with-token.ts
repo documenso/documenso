@@ -205,10 +205,6 @@ export const signFieldWithToken = async ({
     throw new Error('Typed signatures are not allowed. Please draw your signature');
   }
 
-  if (field.fieldMeta?.readOnly) {
-    throw new Error('Field is read only');
-  }
-
   const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;
 
   return await prisma.$transaction(async (tx) => {
