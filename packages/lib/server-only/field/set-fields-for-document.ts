@@ -84,9 +84,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.recipients.find(
-      (recipient) => recipient.email.toLowerCase() === field.signerEmail.toLowerCase(),
-    );
+    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -226,10 +224,8 @@ export const setFieldsForDocument = async ({
             },
             recipient: {
               connect: {
-                documentId_email: {
-                  documentId,
-                  email: fieldSignerEmail,
-                },
+                id: field.recipientId,
+                documentId,
               },
             },
           },
@@ -330,6 +326,7 @@ type FieldData = {
   id?: number | null;
   type: FieldType;
   signerEmail: string;
+  recipientId: number;
   pageNumber: number;
   pageX: number;
   pageY: number;

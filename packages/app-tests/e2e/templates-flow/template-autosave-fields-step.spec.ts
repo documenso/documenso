@@ -33,7 +33,7 @@ const setupTemplateAndNavigateToFieldsStep = async (page: Page) => {
 };
 
 const triggerAutosave = async (page: Page) => {
-  await page.locator('#document-flow-form-container').click();
+  await page.locator('body').click({ position: { x: 0, y: 0 } });
   await page.locator('#document-flow-form-container').blur();
 
   await page.waitForTimeout(5000);

@@ -19,6 +19,8 @@ export type CreateDocumentFromTemplateLegacyOptions = {
   }[];
 };
 
+// !TODO: Make this work
+
 /**
  * Legacy server function for /api/v1
  */
@@ -123,28 +125,38 @@ export const createDocumentFromTemplateLegacy = async ({
       recipients.map(async (recipient, index) => {
         const existingRecipient = document.recipients.at(index);
 
-        return await prisma.recipient.upsert({
+        // Try to find existing recipient by email and update, otherwise create
+        const existingByEmail = await prisma.recipient.findFirst({
           where: {
-            documentId_email: {
-              documentId: document.id,
-              email: existingRecipient?.email ?? recipient.email,
-            },
-          },
-          update: {
-            name: recipient.name,
-            email: recipient.email,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-          },
-          create: {
             documentId: document.id,
-            email: recipient.email,
-            name: recipient.name,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-            token: nanoid(),
+            email: existingRecipient?.email ?? recipient.email,
           },
         });
+
+        if (existingByEmail) {
+          return await prisma.recipient.update({
+            where: {
+              id: existingByEmail.id,
+            },
+            data: {
+              name: recipient.name,
+              email: recipient.email,
+              role: recipient.role,
+              signingOrder: recipient.signingOrder,
+            },
+          });
+        } else {
+          return await prisma.recipient.create({
+            data: {
+              documentId: document.id,
+              email: recipient.email,
+              name: recipient.name,
+              role: recipient.role,
+              signingOrder: recipient.signingOrder,
+              token: nanoid(),
+            },
+          });
+        }
       }),
     );
   }

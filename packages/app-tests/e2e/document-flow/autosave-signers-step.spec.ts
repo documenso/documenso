@@ -26,7 +26,7 @@ const setupDocumentAndNavigateToSignersStep = async (page: Page) => {
 };
 
 const triggerAutosave = async (page: Page) => {
-  await page.locator('#document-flow-form-container').click();
+  await page.locator('body').click({ position: { x: 0, y: 0 } });
   await page.locator('#document-flow-form-container').blur();
 
   await page.waitForTimeout(5000);
@@ -160,9 +160,20 @@ test.describe('AutoSave Signers Step', () => {
       expect(retrievedDocumentData.documentMeta?.signingOrder).toBe('SEQUENTIAL');
       expect(retrievedDocumentData.documentMeta?.allowDictateNextSigner).toBe(true);
       expect(retrievedRecipients.length).toBe(3);
-      expect(retrievedRecipients[0].signingOrder).toBe(2);
-      expect(retrievedRecipients[1].signingOrder).toBe(3);
-      expect(retrievedRecipients[2].signingOrder).toBe(1);
+
+      const firstRecipient = retrievedRecipients.find(
+        (r) => r.email === 'recipient1@documenso.com',
+      );
+      const secondRecipient = retrievedRecipients.find(
+        (r) => r.email === 'recipient2@documenso.com',
+      );
+      const thirdRecipient = retrievedRecipients.find(
+        (r) => r.email === 'recipient3@documenso.com',
+      );
+
+      expect(firstRecipient?.signingOrder).toBe(2);
+      expect(secondRecipient?.signingOrder).toBe(3);
+      expect(thirdRecipient?.signingOrder).toBe(1);
     }).toPass();
   });
 });

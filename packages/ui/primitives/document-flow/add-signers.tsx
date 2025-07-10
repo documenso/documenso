@@ -53,6 +53,10 @@ import {
 import { SigningOrderConfirmation } from './signing-order-confirmation';
 import type { DocumentFlowStep } from './types';
 
+type AutoSaveResponse = {
+  recipients: Recipient[];
+};
+
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
@@ -60,7 +64,7 @@ export type AddSignersFormProps = {
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
-  onAutoSave: (_data: TAddSignersFormSchema) => Promise<void>;
+  onAutoSave: (_data: TAddSignersFormSchema) => Promise<AutoSaveResponse>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -208,7 +212,44 @@ export const AddSignersFormPartial = ({
 
     const formData = form.getValues();
 
-    scheduleSave(formData);
+    scheduleSave(formData, (response) => {
+      // Sync the response recipients back to form state to prevent duplicates
+      if (response?.recipients) {
+        const currentSigners = form.getValues('signers');
+        const updatedSigners = currentSigners.map((signer) => {
+          // Find the matching recipient from the response using nativeId
+          const matchingRecipient = response.recipients.find(
+            (recipient) => recipient.id === signer.nativeId,
+          );
+
+          if (matchingRecipient) {
+            // Update the signer with the server-returned data, especially the ID
+            return {
+              ...signer,
+              nativeId: matchingRecipient.id,
+            };
+          }
+
+          // For new signers without nativeId, match by email and update with server ID
+          if (!signer.nativeId) {
+            const newRecipient = response.recipients.find(
+              (recipient) => recipient.email === signer.email,
+            );
+            if (newRecipient) {
+              return {
+                ...signer,
+                nativeId: newRecipient.id,
+              };
+            }
+          }
+
+          return signer;
+        });
+
+        // Update the form state with the synced data
+        form.setValue('signers', updatedSigners, { shouldValidate: false });
+      }
+    });
   };
 
   const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
