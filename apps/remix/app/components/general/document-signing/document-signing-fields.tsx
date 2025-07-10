@@ -34,7 +34,7 @@ export const DocumentSigningFieldsInserted = ({
   textAlign = 'left',
 }: DocumentSigningFieldsInsertedProps) => {
   return (
-    <div className="flex h-full w-full items-center">
+    <div className="flex h-full w-full items-center overflow-hidden">
       <p
         className={cn(
           'text-foreground w-full text-left text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
