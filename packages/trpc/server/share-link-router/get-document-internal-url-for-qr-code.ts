@@ -14,6 +14,12 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
   .query(async ({ input, ctx }) => {
     const { documentId } = input;
 
+    ctx.logger.info({
+      input: {
+        documentId,
+      },
+    });
+
     if (!ctx.user) {
       return null;
     }
