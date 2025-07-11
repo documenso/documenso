@@ -46,16 +46,46 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
 
       {isPersonalLayoutMode && (
         <>
-          <Link to="/settings/preferences">
+          <Link to="/settings/document">
+            <Button variant="ghost" className={cn('w-full justify-start')}>
+              <Settings2Icon className="mr-2 h-5 w-5" />
+              <Trans>Preferences</Trans>
+            </Button>
+          </Link>
+
+          <Link className="w-full pl-8" to="/settings/document">
             <Button
               variant="ghost"
               className={cn(
                 'w-full justify-start',
-                pathname?.startsWith('/settings/preferences') && 'bg-secondary',
+                pathname?.startsWith('/settings/document') && 'bg-secondary',
               )}
             >
-              <Settings2Icon className="mr-2 h-5 w-5" />
-              <Trans>Preferences</Trans>
+              <Trans>Document</Trans>
+            </Button>
+          </Link>
+
+          <Link className="w-full pl-8" to="/settings/branding">
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-start',
+                pathname?.startsWith('/settings/branding') && 'bg-secondary',
+              )}
+            >
+              <Trans>Branding</Trans>
+            </Button>
+          </Link>
+
+          <Link className="w-full pl-8" to="/settings/email">
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-start',
+                pathname?.startsWith('/settings/email') && 'bg-secondary',
+              )}
+            >
+              <Trans>Email</Trans>
             </Button>
           </Link>
 

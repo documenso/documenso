@@ -41,6 +41,7 @@ export const updateTemplate = async ({
       templateMeta: true,
       team: {
         select: {
+          organisationId: true,
           organisation: {
             select: {
               organisationClaim: true,
@@ -85,6 +86,24 @@ export const updateTemplate = async ({
     globalAccessAuth: newGlobalAccessAuth,
     globalActionAuth: newGlobalActionAuth,
   });
+
+  const emailId = meta.emailId;
+
+  // Validate the emailId belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: template.team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
 
   return await prisma.template.update({
     where: {

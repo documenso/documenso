@@ -23,7 +23,7 @@ import { FieldContent } from '../../primitives/document-flow/field-content';
 
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
-  documentMeta?: DocumentMeta | TemplateMeta;
+  documentMeta?: Pick<DocumentMeta | TemplateMeta, 'dateFormat'>;
 
   showFieldStatus?: boolean;
 

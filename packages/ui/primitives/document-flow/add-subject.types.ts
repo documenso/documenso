@@ -5,6 +5,9 @@ import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-emai
 
 export const ZAddSubjectFormSchema = z.object({
   meta: z.object({
+    emailId: z.string().nullable(),
+    emailReplyTo: z.string().email().optional(),
+    // emailReplyName: z.string().optional(),
     subject: z.string(),
     message: z.string(),
     distributionMethod: z

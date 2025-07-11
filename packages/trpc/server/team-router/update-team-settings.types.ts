@@ -1,7 +1,13 @@
 import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+
+import {
+  ZDocumentMetaDateFormatSchema,
+  ZDocumentMetaTimezoneSchema,
+} from '../document-router/schema';
 
 /**
  * Null = Inherit from organisation.
@@ -13,6 +19,8 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     // Document related settings.
     documentVisibility: z.nativeEnum(DocumentVisibility).nullish(),
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).nullish(),
+    documentTimezone: ZDocumentMetaTimezoneSchema.nullish(),
+    documentDateFormat: ZDocumentMetaDateFormatSchema.nullish(),
     includeSenderDetails: z.boolean().nullish(),
     includeSigningCertificate: z.boolean().nullish(),
     typedSignatureEnabled: z.boolean().nullish(),
@@ -24,6 +32,12 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     brandingLogo: z.string().nullish(),
     brandingUrl: z.string().nullish(),
     brandingCompanyDetails: z.string().nullish(),
+
+    // Email related settings.
+    emailId: z.string().nullish(),
+    emailReplyTo: z.string().email().nullish(),
+    // emailReplyToName: z.string().nullish(),
+    emailDocumentSettings: ZDocumentEmailSettingsSchema.nullish(),
   }),
 });
 

@@ -278,7 +278,8 @@ export const DocumentEditForm = ({
   };
 
   const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
-    const { subject, message, distributionMethod, emailSettings } = data.meta;
+    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } =
+      data.meta;
 
     try {
       await sendDocument({
@@ -287,7 +288,9 @@ export const DocumentEditForm = ({
           subject,
           message,
           distributionMethod,
-          emailSettings,
+          emailId,
+          emailReplyTo,
+          emailSettings: emailSettings,
         },
       });
 

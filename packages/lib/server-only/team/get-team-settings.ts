@@ -33,5 +33,13 @@ export const getTeamSettings = async ({ userId, teamId }: GetTeamSettingsOptions
   const organisationSettings = team.organisation.organisationGlobalSettings;
   const teamSettings = team.teamGlobalSettings;
 
+  // Override branding settings if inherit is enabled.
+  if (teamSettings.brandingEnabled === null) {
+    teamSettings.brandingEnabled = organisationSettings.brandingEnabled;
+    teamSettings.brandingLogo = organisationSettings.brandingLogo;
+    teamSettings.brandingUrl = organisationSettings.brandingUrl;
+    teamSettings.brandingCompanyDetails = organisationSettings.brandingCompanyDetails;
+  }
+
   return extractDerivedTeamSettings(organisationSettings, teamSettings);
 };

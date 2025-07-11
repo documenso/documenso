@@ -55,6 +55,8 @@ export const ZTemplateSchema = TemplateSchema.pick({
     redirectUrl: true,
     language: true,
     emailSettings: true,
+    emailId: true,
+    emailReplyTo: true,
   }).nullable(),
   directLink: TemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({

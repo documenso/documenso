@@ -54,15 +54,7 @@ export const ZDocumentEmailSettingsSchema = z
       .default(true),
   })
   .strip()
-  .catch(() => ({
-    recipientSigningRequest: true,
-    recipientRemoved: true,
-    recipientSigned: true,
-    documentPending: true,
-    documentCompleted: true,
-    documentDeleted: true,
-    ownerDocumentCompleted: true,
-  }));
+  .catch(() => ({ ...DEFAULT_DOCUMENT_EMAIL_SETTINGS }));
 
 export type TDocumentEmailSettings = z.infer<typeof ZDocumentEmailSettingsSchema>;
 
@@ -87,4 +79,14 @@ export const extractDerivedDocumentEmailSettings = (
     documentDeleted: false,
     ownerDocumentCompleted: emailSettings.ownerDocumentCompleted,
   };
+};
+
+export const DEFAULT_DOCUMENT_EMAIL_SETTINGS: TDocumentEmailSettings = {
+  recipientSigningRequest: true,
+  recipientRemoved: true,
+  recipientSigned: true,
+  documentPending: true,
+  documentCompleted: true,
+  documentDeleted: true,
+  ownerDocumentCompleted: true,
 };

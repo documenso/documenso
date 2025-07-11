@@ -15,8 +15,10 @@ type ComboboxProps = {
   options: string[];
   value: string | null;
   onChange: (_value: string | null) => void;
+  triggerPlaceholder?: string;
   placeholder?: string;
   disabled?: boolean;
+  testId?: string;
 };
 
 const Combobox = ({
@@ -25,7 +27,9 @@ const Combobox = ({
   value,
   onChange,
   disabled = false,
+  triggerPlaceholder,
   placeholder,
+  testId,
 }: ComboboxProps) => {
   const { _ } = useLingui();
 
@@ -47,8 +51,9 @@ const Combobox = ({
           aria-expanded={open}
           className={cn('my-2 w-full justify-between', className)}
           disabled={disabled}
+          data-testid={testId}
         >
-          {value ? value : placeholderValue}
+          {value ? value : triggerPlaceholder || placeholderValue}
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>

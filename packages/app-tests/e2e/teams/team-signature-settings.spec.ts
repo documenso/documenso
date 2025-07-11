@@ -15,7 +15,7 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
 
   const document = await seedTeamDocumentWithMeta(team);
@@ -45,17 +45,17 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
 
   const allTabs = ['Type', 'Upload', 'Draw'];
   const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
-    await page.goto(`/t/${team.url}/settings/preferences`);
+    await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
@@ -112,17 +112,17 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
 
   const allTabs = ['Type', 'Upload', 'Draw'];
   const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
-    await page.goto(`/t/${team.url}/settings/preferences`);
+    await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();

@@ -205,12 +205,18 @@ export const diffDocumentMetaChanges = (
   const oldTimezone = oldData?.timezone ?? '';
   const oldPassword = oldData?.password ?? null;
   const oldRedirectUrl = oldData?.redirectUrl ?? '';
+  const oldEmailId = oldData?.emailId || null;
+  const oldEmailReplyTo = oldData?.emailReplyTo || null;
+  const oldEmailSettings = oldData?.emailSettings || null;
 
   const newDateFormat = newData?.dateFormat ?? '';
   const newMessage = newData?.message ?? '';
   const newSubject = newData?.subject ?? '';
   const newTimezone = newData?.timezone ?? '';
   const newRedirectUrl = newData?.redirectUrl ?? '';
+  const newEmailId = newData?.emailId || null;
+  const newEmailReplyTo = newData?.emailReplyTo || null;
+  const newEmailSettings = newData?.emailSettings || null;
 
   if (oldDateFormat !== newDateFormat) {
     diffs.push({
@@ -255,6 +261,30 @@ export const diffDocumentMetaChanges = (
   if (oldPassword !== newData.password) {
     diffs.push({
       type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
+    });
+  }
+
+  if (oldEmailId !== newEmailId) {
+    diffs.push({
+      type: DOCUMENT_META_DIFF_TYPE.EMAIL_ID,
+      from: oldEmailId,
+      to: newEmailId,
+    });
+  }
+
+  if (oldEmailReplyTo !== newEmailReplyTo) {
+    diffs.push({
+      type: DOCUMENT_META_DIFF_TYPE.EMAIL_REPLY_TO,
+      from: oldEmailReplyTo,
+      to: newEmailReplyTo,
+    });
+  }
+
+  if (!isDeepEqual(oldEmailSettings, newEmailSettings)) {
+    diffs.push({
+      type: DOCUMENT_META_DIFF_TYPE.EMAIL_SETTINGS,
+      from: JSON.stringify(oldEmailSettings),
+      to: JSON.stringify(newEmailSettings),
     });
   }
 

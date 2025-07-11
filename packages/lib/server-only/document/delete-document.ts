@@ -10,7 +10,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
@@ -151,11 +150,13 @@ const handleDocumentOwnerDelete = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
     source: {
       type: 'team',
       teamId: document.teamId,
     },
+    meta: document.documentMeta || null,
   });
 
   // Soft delete completed documents.
@@ -232,28 +233,24 @@ const handleDocumentOwnerDelete = async ({
         assetBaseUrl,
       });
 
-      const lang = document.documentMeta?.language ?? settings.documentLanguage;
-
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang, branding }),
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
         renderEmailWithI18N(template, {
-          lang,
+          lang: emailLanguage,
           branding,
           plainText: true,
         }),
       ]);
 
-      const i18n = await getI18nInstance(lang);
+      const i18n = await getI18nInstance(emailLanguage);
 
       await mailer.sendMail({
         to: {
           address: recipient.email,
           name: recipient.name,
         },
-        from: {
-          name: FROM_NAME,
-          address: FROM_ADDRESS,
-        },
+        from: senderEmail,
+        replyTo: replyToEmail,
         subject: i18n._(msg`Document Cancelled`),
         html,
         text,

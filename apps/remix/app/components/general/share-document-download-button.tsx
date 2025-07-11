@@ -28,10 +28,6 @@ export const ShareDocumentDownloadButton = ({
     try {
       setIsDownloading(true);
 
-      await new Promise((resolve) => {
-        setTimeout(resolve, 4000);
-      });
-
       await downloadPDF({ documentData, fileName: title });
     } catch (err) {
       toast({

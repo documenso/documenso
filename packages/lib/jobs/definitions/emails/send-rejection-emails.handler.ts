@@ -10,7 +10,7 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { DOCUMENSO_INTERNAL_EMAIL } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -52,7 +52,7 @@ export const run = async ({
     }),
   ]);
 
-  const { documentMeta, user: documentOwner } = document;
+  const { user: documentOwner } = document;
 
   const isEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
@@ -62,16 +62,16 @@ export const run = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
     source: {
       type: 'team',
       teamId: document.teamId,
     },
+    meta: document.documentMeta || null,
   });
 
-  const lang = documentMeta?.language ?? settings.documentLanguage;
-
-  const i18n = await getI18nInstance(lang);
+  const i18n = await getI18nInstance(emailLanguage);
 
   // Send confirmation email to the recipient who rejected
   await io.runTask('send-rejection-confirmation-email', async () => {
@@ -84,9 +84,9 @@ export const run = async ({
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(recipientTemplate, { lang, branding }),
+      renderEmailWithI18N(recipientTemplate, { lang: emailLanguage, branding }),
       renderEmailWithI18N(recipientTemplate, {
-        lang,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
@@ -97,10 +97,8 @@ export const run = async ({
         name: recipient.name,
         address: recipient.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: i18n._(msg`Document "${document.title}" - Rejection Confirmed`),
       html,
       text,
@@ -120,9 +118,9 @@ export const run = async ({
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(ownerTemplate, { lang, branding }),
+      renderEmailWithI18N(ownerTemplate, { lang: emailLanguage, branding }),
       renderEmailWithI18N(ownerTemplate, {
-        lang,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
@@ -133,10 +131,7 @@ export const run = async ({
         name: documentOwner.name || '',
         address: documentOwner.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: DOCUMENSO_INTERNAL_EMAIL, // Purposefully using internal email here.
       subject: i18n._(msg`Document "${document.title}" - Rejected by ${recipient.name}`),
       html,
       text,
