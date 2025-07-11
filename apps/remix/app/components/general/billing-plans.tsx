@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -97,7 +97,7 @@ export const BillingPlans = ({
         <AnimatePresence mode="wait">
           {pricesToDisplay.map((price) => {
             const planId = price.claim.toLowerCase().replace('claim_', '');
-            const isSelected = selectedPlan && planId === selectedPlan;
+            const isSelected = selectedPlan && planId === selectedPlan?.toLowerCase();
 
             return (
               <MotionCard
@@ -176,7 +176,13 @@ const BillingDialog = ({
   isFromPricingPage?: boolean;
   interval: 'monthlyPrice' | 'yearlyPrice';
 }) => {
-  const [isOpen, setIsOpen] = useState(isSelected && isFromPricingPage);
+  const [isOpen, setIsOpen] = useState(false);
+
+  useEffect(() => {
+    if (isSelected && isFromPricingPage) {
+      setIsOpen(true);
+    }
+  }, [isSelected, isFromPricingPage]);
 
   const { t } = useLingui();
   const { toast } = useToast();
