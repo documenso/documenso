@@ -8,7 +8,7 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
+test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   const { user, organisation, team } = await seedUser({
     isPersonalOrganisation: false,
   });
@@ -16,7 +16,7 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/o/${organisation.url}/settings/preferences`,
+    redirectPath: `/o/${organisation.url}/settings/document`,
   });
 
   // Update document preferences.
@@ -34,16 +34,6 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
-  // Update branding.
-  await page.getByTestId('enable-branding').click();
-  await page.getByRole('option', { name: 'Yes' }).click();
-  await page.getByRole('textbox', { name: 'Brand Website' }).click();
-  await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://documenso.com');
-  await page.getByRole('textbox', { name: 'Brand Details' }).click();
-  await page.getByRole('textbox', { name: 'Brand Details' }).fill('BrandDetails');
-  await page.getByRole('button', { name: 'Update' }).nth(1).click();
-  await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
-
   const teamSettings = await getTeamSettings({
     teamId: team.id,
   });
@@ -56,12 +46,9 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   expect(teamSettings.typedSignatureEnabled).toEqual(true);
   expect(teamSettings.uploadSignatureEnabled).toEqual(false);
   expect(teamSettings.drawSignatureEnabled).toEqual(false);
-  expect(teamSettings.brandingEnabled).toEqual(true);
-  expect(teamSettings.brandingUrl).toEqual('https://documenso.com');
-  expect(teamSettings.brandingCompanyDetails).toEqual('BrandDetails');
 
   // Edit the team settings
-  await page.goto(`/t/${team.url}/settings/preferences`);
+  await page.goto(`/t/${team.url}/settings/document`);
 
   await page
     .getByRole('group')
@@ -110,4 +97,226 @@ test('[ORGANISATIONS]: manage preferences', async ({ page }) => {
   expect(documentMeta.uploadSignatureEnabled).toEqual(false);
   expect(documentMeta.drawSignatureEnabled).toEqual(false);
   expect(documentMeta.language).toEqual('pl');
+});
+
+test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
+  const { user, organisation, team } = await seedUser({
+    isPersonalOrganisation: false,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/o/${organisation.url}/settings/branding`,
+  });
+
+  // Update branding preferences.
+  await page.getByTestId('enable-branding').click();
+  await page.getByRole('option', { name: 'Yes' }).click();
+  await page.getByRole('textbox', { name: 'Brand Website' }).click();
+  await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://documenso.com');
+  await page.getByRole('textbox', { name: 'Brand Details' }).click();
+  await page.getByRole('textbox', { name: 'Brand Details' }).fill('BrandDetails');
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
+
+  const teamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings have inherited these values.
+  expect(teamSettings.brandingEnabled).toEqual(true);
+  expect(teamSettings.brandingUrl).toEqual('https://documenso.com');
+  expect(teamSettings.brandingCompanyDetails).toEqual('BrandDetails');
+
+  // Edit the team branding settings
+  await page.goto(`/t/${team.url}/settings/branding`);
+
+  // Override team settings with different values
+  await page.getByTestId('enable-branding').click();
+  await page.getByRole('option', { name: 'Yes' }).click();
+  await page.getByRole('textbox', { name: 'Brand Website' }).click();
+  await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://example.com');
+  await page.getByRole('textbox', { name: 'Brand Details' }).click();
+  await page.getByRole('textbox', { name: 'Brand Details' }).fill('UpdatedBrandDetails');
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
+
+  const updatedTeamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings have overridden the organisation values.
+  expect(updatedTeamSettings.brandingEnabled).toEqual(true);
+  expect(updatedTeamSettings.brandingUrl).toEqual('https://example.com');
+  expect(updatedTeamSettings.brandingCompanyDetails).toEqual('UpdatedBrandDetails');
+
+  // Test inheritance by setting team back to inherit from organisation
+  await page.getByTestId('enable-branding').click();
+  await page.getByRole('option', { name: 'Inherit from organisation' }).click();
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your branding preferences have been updated').first()).toBeVisible();
+
+  await page.waitForTimeout(2000);
+
+  const inheritedTeamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings now inherit from organisation again.
+  expect(inheritedTeamSettings.brandingEnabled).toEqual(true);
+  expect(inheritedTeamSettings.brandingUrl).toEqual('https://documenso.com');
+  expect(inheritedTeamSettings.brandingCompanyDetails).toEqual('BrandDetails');
+
+  // Verify that a document can be created successfully with the branding settings
+  const document = await seedTeamDocumentWithMeta(team);
+
+  // Confirm the document was created successfully with the team's branding settings
+  expect(document).toBeDefined();
+  expect(document.teamId).toEqual(team.id);
+});
+
+test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
+  const { user, organisation, team } = await seedUser({
+    isPersonalOrganisation: false,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    redirectPath: `/o/${organisation.url}/settings/email`,
+  });
+
+  // Update email preferences at organisation level.
+  // Set reply to email
+  await page.getByRole('textbox', { name: 'Reply to email' }).click();
+  await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@documenso.com');
+
+  // Update email document settings by enabling/disabling some checkboxes
+  await page.getByRole('checkbox', { name: 'Send recipient signed email' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Send document pending email' }).uncheck();
+  await page.getByRole('checkbox', { name: 'Send document deleted email' }).uncheck();
+
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
+
+  const teamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings have inherited these values.
+  expect(teamSettings.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(teamSettings.emailDocumentSettings).toEqual({
+    recipientSigningRequest: true,
+    recipientRemoved: true,
+    recipientSigned: false, // unchecked
+    documentPending: false, // unchecked
+    documentCompleted: true,
+    documentDeleted: false, // unchecked
+    ownerDocumentCompleted: true,
+  });
+
+  // Edit the team email settings
+  await page.goto(`/t/${team.url}/settings/email`);
+
+  // Override team settings with different values
+  await page.getByRole('textbox', { name: 'Reply to email' }).click();
+  await page.getByRole('textbox', { name: 'Reply to email' }).fill('team@example.com');
+
+  // Change email document settings inheritance to controlled
+  await page.getByRole('combobox').filter({ hasText: 'Inherit from organisation' }).click();
+  await page.getByRole('option', { name: 'Override organisation settings' }).click();
+
+  // Update some email settings
+  await page.getByRole('checkbox', { name: 'Send recipient signing request email' }).uncheck();
+  await page
+    .getByRole('checkbox', { name: 'Send document completed email', exact: true })
+    .uncheck();
+  await page
+    .getByRole('checkbox', { name: 'Send document completed email to the owner' })
+    .uncheck();
+
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
+
+  const updatedTeamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings have overridden the organisation values.
+  expect(updatedTeamSettings.emailReplyTo).toEqual('team@example.com');
+  expect(updatedTeamSettings.emailDocumentSettings).toEqual({
+    recipientSigned: true,
+    recipientSigningRequest: false,
+    recipientRemoved: true,
+    documentPending: true,
+    documentCompleted: false,
+    documentDeleted: true,
+    ownerDocumentCompleted: false,
+  });
+
+  // Verify that a document can be created successfully with the team email settings
+  const teamOverrideDocument = await seedTeamDocumentWithMeta(team);
+
+  const teamOverrideDocumentMeta = await prisma.documentMeta.findFirstOrThrow({
+    where: {
+      documentId: teamOverrideDocument.id,
+    },
+  });
+
+  expect(teamOverrideDocumentMeta.emailReplyTo).toEqual('team@example.com');
+  expect(teamOverrideDocumentMeta.emailSettings).toEqual({
+    recipientSigned: true,
+    recipientSigningRequest: false,
+    recipientRemoved: true,
+    documentPending: true,
+    documentCompleted: false,
+    documentDeleted: true,
+    ownerDocumentCompleted: false,
+  });
+
+  // Test inheritance by setting team back to inherit from organisation
+  await page.getByRole('textbox', { name: 'Reply to email' }).fill('');
+  await page.getByRole('combobox').filter({ hasText: 'Override organisation settings' }).click();
+  await page.getByRole('option', { name: 'Inherit from organisation' }).click();
+  await page.getByRole('button', { name: 'Update' }).first().click();
+  await expect(page.getByText('Your email preferences have been updated').first()).toBeVisible();
+
+  await page.waitForTimeout(1000);
+
+  const inheritedTeamSettings = await getTeamSettings({
+    teamId: team.id,
+  });
+
+  // Check that the team settings now inherit from organisation again.
+  expect(inheritedTeamSettings.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(inheritedTeamSettings.emailDocumentSettings).toEqual({
+    recipientSigningRequest: true,
+    recipientRemoved: true,
+    recipientSigned: false,
+    documentPending: false,
+    documentCompleted: true,
+    documentDeleted: false,
+    ownerDocumentCompleted: true,
+  });
+
+  // Verify that a document can be created successfully with the email settings
+  const document = await seedTeamDocumentWithMeta(team);
+
+  const documentMeta = await prisma.documentMeta.findFirstOrThrow({
+    where: {
+      documentId: document.id,
+    },
+  });
+
+  expect(documentMeta.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(documentMeta.emailSettings).toEqual({
+    recipientSigningRequest: true,
+    recipientRemoved: true,
+    recipientSigned: false,
+    documentPending: false,
+    documentCompleted: true,
+    documentDeleted: false,
+    ownerDocumentCompleted: true,
+  });
 });

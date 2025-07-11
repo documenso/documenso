@@ -5,6 +5,7 @@ import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//Tem
 import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from '../team/get-team-settings';
 
@@ -60,12 +61,9 @@ export const createTemplate = async ({
       teamId,
       folderId: folderId,
       templateMeta: {
-        create: {
-          language: settings.documentLanguage,
-          typedSignatureEnabled: settings.typedSignatureEnabled,
-          uploadSignatureEnabled: settings.uploadSignatureEnabled,
-          drawSignatureEnabled: settings.drawSignatureEnabled,
-        },
+        create: extractDerivedDocumentMeta(settings, {
+          // Currently no override meta available
+        }),
       },
     },
   });

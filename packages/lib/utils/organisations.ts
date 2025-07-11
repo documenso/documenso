@@ -7,11 +7,14 @@ import {
 
 import type { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
 import {
   LOWEST_ORGANISATION_ROLE,
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
 } from '../constants/organisations';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
+import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
 
 export const isPersonalLayout = (organisations: Pick<Organisation, 'type'>[]) => {
   return organisations.length === 1 && organisations[0].type === 'PERSONAL';
@@ -113,6 +116,9 @@ export const generateDefaultOrganisationSettings = (): Omit<
   return {
     documentVisibility: DocumentVisibility.EVERYONE,
     documentLanguage: 'en',
+    documentTimezone: DEFAULT_DOCUMENT_TIME_ZONE,
+    documentDateFormat: DEFAULT_DOCUMENT_DATE_FORMAT,
+
     includeSenderDetails: true,
     includeSigningCertificate: true,
 
@@ -124,5 +130,10 @@ export const generateDefaultOrganisationSettings = (): Omit<
     brandingLogo: '',
     brandingUrl: '',
     brandingCompanyDetails: '',
+
+    emailId: null,
+    emailReplyTo: null,
+    // emailReplyToName: null,
+    emailDocumentSettings: DEFAULT_DOCUMENT_EMAIL_SETTINGS,
   };
 };

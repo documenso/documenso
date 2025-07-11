@@ -477,6 +477,8 @@ export const documentRouter = router({
           distributionMethod: meta.distributionMethod,
           emailSettings: meta.emailSettings,
           language: meta.language,
+          emailId: meta.emailId,
+          emailReplyTo: meta.emailReplyTo,
           requestMetadata: ctx.metadata,
         });
       }

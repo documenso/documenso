@@ -11,6 +11,7 @@
   "documents": "Documents",
   "templates": "Templates",
   "branding": "Branding",
+  "email-domains": "Email Domains",
   "direct-links": "Direct Signing Links",
   "-- Legal Overview": {
     "type": "separator",

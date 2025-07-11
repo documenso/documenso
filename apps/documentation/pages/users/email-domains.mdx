@@ -1,0 +1,116 @@
+import { Callout, Steps } from 'nextra/components';
+
+# Email Domains
+
+Email Domains allow you to send emails to recipients from your own domain instead of the default Documenso email address.
+
+<Callout type="warning">
+  **Platform and Enterprise Only**: Email Domains is only available to Platform and Enterprise
+  customers.
+</Callout>
+
+## Prerequisites
+
+Before setting up Email Domains, ensure you have:
+
+- A Platform or Enterprise subscription
+- Access to your domain's DNS settings
+- Access to your Documenso organisation as a manager or admin
+
+<Steps>
+
+### Access Email Domains Settings
+
+Navigate to your Organisation settings and locate the Email Domains section
+
+![Email Domains settings page](/email-domains/email-domains-settings-page.webp)
+
+### Add a New Domain
+
+Click on the "Add Email Domain" to begin the setup process.
+
+### Configure DNS Records
+
+After adding your domain, Documenso will provide you with the following required DNS records that need to be configured on your domain:
+
+- **SPF Record**: Specifies which servers are authorized to send emails from your domain
+- **DKIM Record**: Provides email authentication and prevents tampering
+
+![DNS configuration instructions](/email-domains/email-domains-record.webp)
+
+<Callout type="info">
+  If you already have a SPF record configured, you will need to update it to include Amazon SES as
+  an authorised server instead of creating a new record.
+</Callout>
+
+Configure these records in your domain's DNS settings according to their specific instructions.
+
+### Verify Domain Configuration
+
+Once you've added the DNS records, return to the Documenso Email Domains settings and click the "Verify" button.
+Documenso will check if the DNS records are properly configured. If successful, the domain will be marked as "Active".
+
+![Domain verification process](/email-domains/email-domain-sync.webp)
+
+<Callout type="info">
+  Please note that it may take up to 48 hours for the DNS records to propagate.
+</Callout>
+
+</Steps>
+
+## Domain Management
+
+### Multiple Domains
+
+You can configure multiple email domains for different purposes:
+
+- **Primary domain**: For general document sending
+- **Regional domains**: For different geographic regions
+- **Department domains**: For specific departments or teams
+
+### Domain Status
+
+Each domain will have a status indicator:
+
+- **Active**: Domain is verified and ready to send emails
+- **Pending**: DNS records are being verified
+- **Failed**: DNS verification failed, requires attention
+- **Suspended**: Domain has been temporarily suspended
+
+### Domain Settings
+
+For each domain, you can configure:
+
+- **From name**: The display name that appears in the "From" field
+- **Reply-to address**: Where replies should be directed
+- **Bounce handling**: How to handle bounced emails
+- **Spam filtering**: Advanced spam protection settings
+
+## Emails
+
+Todo:
+
+1. Manage domain
+2. Add email
+3. Configure it as default email in Email settings
+
+## Troubleshooting
+
+### Common Issues
+
+**DNS Verification Fails**
+
+- Double-check all DNS record values
+- Ensure records are added to the correct domain
+- Wait for DNS propagation (up to 48 hours)
+
+**Emails Not Delivering**
+
+- Check domain reputation and blacklist status
+- Verify SPF, DKIM, and DMARC records
+- Review bounce and spam reports
+
+<Callout type="info">
+  For additional support with Email Domains configuration, contact our support team at
+  support@documenso.com.
+</Callout>

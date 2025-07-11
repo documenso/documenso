@@ -15,6 +15,7 @@ import {
 import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { getTeamById } from '../team/get-team';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -114,13 +115,9 @@ export const createDocument = async ({
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            language: settings.documentLanguage,
-            timezone: timezone,
-            typedSignatureEnabled: settings.typedSignatureEnabled,
-            uploadSignatureEnabled: settings.uploadSignatureEnabled,
-            drawSignatureEnabled: settings.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, {
+            timezone,
+          }),
         },
       },
     });
