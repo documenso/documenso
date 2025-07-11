@@ -20,6 +20,8 @@ export function meta() {
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { isAuthenticated } = await getOptionalSession(request);
+  const url = new URL(request.url);
+  const redirectParam = url.searchParams.get('redirect');
 
   // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
@@ -27,6 +29,9 @@ export async function loader({ request }: Route.LoaderArgs) {
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
   if (isAuthenticated) {
+    if (redirectParam) {
+      throw redirect(redirectParam);
+    }
     throw redirect('/');
   }
 
@@ -34,11 +39,12 @@ export async function loader({ request }: Route.LoaderArgs) {
     isGoogleSSOEnabled,
     isOIDCSSOEnabled,
     oidcProviderLabel,
+    redirectTo: redirectParam,
   };
 }
 
 export default function SignIn({ loaderData }: Route.ComponentProps) {
-  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData;
+  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel, redirectTo } = loaderData;
 
   return (
     <div className="w-screen max-w-lg px-4">
@@ -56,6 +62,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
           isGoogleSSOEnabled={isGoogleSSOEnabled}
           isOIDCSSOEnabled={isOIDCSSOEnabled}
           oidcProviderLabel={oidcProviderLabel}
+          returnTo={redirectTo || undefined}
         />
 
         {env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
