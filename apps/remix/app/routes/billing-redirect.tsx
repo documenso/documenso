@@ -9,7 +9,9 @@ import type { Route } from './+types/billing-redirect';
 export async function loader({ request }: Route.LoaderArgs) {
   const session = await getOptionalSession(request);
   if (!session.isAuthenticated) {
-    throw redirect('/signin');
+    const currentUrl = new URL(request.url);
+    const redirectParam = encodeURIComponent(currentUrl.pathname + currentUrl.search);
+    throw redirect(`/signin?redirect=${redirectParam}`);
   }
 
   const url = new URL(request.url);
