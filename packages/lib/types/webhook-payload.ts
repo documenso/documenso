@@ -1,4 +1,4 @@
-import type { Document, DocumentMeta, Recipient } from '@prisma/client';
+import type { Document, DocumentMeta, Recipient, WebhookTriggerEvents } from '@prisma/client';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -86,6 +86,13 @@ export const ZWebhookDocumentSchema = z.object({
 
 export type TWebhookRecipient = z.infer<typeof ZWebhookRecipientSchema>;
 export type TWebhookDocument = z.infer<typeof ZWebhookDocumentSchema>;
+
+export type WebhookPayload = {
+  event: WebhookTriggerEvents;
+  payload: TWebhookDocument;
+  createdAt: string;
+  webhookEndpoint: string;
+};
 
 export const mapDocumentToWebhookDocumentPayload = (
   document: Document & {
