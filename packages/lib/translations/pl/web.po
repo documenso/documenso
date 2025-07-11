@@ -18,6 +18,11 @@ msgstr ""
 "X-Crowdin-File: web.po\n"
 "X-Crowdin-File-ID: 8\n"
 
+#. js-lingui-explicit-id
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "/+Z5u4"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid " Enable direct link signing"
 msgstr " Włącz podpisywanie linku bezpośredniego"
@@ -1004,7 +1009,7 @@ msgstr "Wszystkie linki do podpisania zostały skopiowane do schowka."
 msgid "All templates"
 msgstr "Wszystkie szablony"
 
-#: apps/remix/app/components/general/period-selector.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 msgid "All Time"
 msgstr "Cały czas"
 
@@ -1278,14 +1283,6 @@ msgstr "Wystąpił nieznany błąd podczas przenoszenia folderu."
 #: apps/remix/app/routes/_authenticated+/inbox.tsx
 msgid "Any documents that you have been invited to will appear here"
 msgstr "Wszystkie dokumenty, do których zostałeś zaproszony, pojawią się tutaj"
-
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
-msgid "Any Source"
-msgstr "Jakiekolwiek źródło"
-
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
-msgid "Any Status"
-msgstr "Jakikolwiek status"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
@@ -1752,6 +1749,10 @@ msgstr "Zgłoszenia"
 msgid "Clear file"
 msgstr "Wyczyść plik"
 
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
+msgid "Clear filter"
+msgstr ""
+
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
 msgstr "Wyczyść filtry"
@@ -1848,9 +1849,9 @@ msgid "Complete Viewing"
 msgstr "Zakończ wyświetlanie"
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 #: packages/lib/constants/document.ts
 #: packages/email/template-components/template-document-self-signed.tsx
 #: packages/email/template-components/template-document-recipient-signed.tsx
@@ -2524,7 +2525,7 @@ msgid "Direct link"
 msgstr "Link bezpośredni"
 
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 msgid "Direct Link"
 msgstr "Bezpośredni link"
 
@@ -2950,8 +2951,8 @@ msgstr "Pobierz oryginał"
 msgid "Download Template CSV"
 msgstr "Pobierz szablon CSV"
 
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 #: packages/lib/constants/document.ts
 msgid "Draft"
 msgstr "Szkic"
@@ -3588,9 +3589,25 @@ msgstr "Powrót do domu"
 msgid "Go to document"
 msgstr "Przejdź do dokumentu"
 
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to first page"
+msgstr ""
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to last page"
+msgstr ""
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to next page"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Go to owner"
 msgstr "Przejdź do właściciela"
+
+#: packages/ui/primitives/data-table-pagination.tsx
+msgid "Go to previous page"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Go to team"
@@ -3779,6 +3796,7 @@ msgstr "Jeśli Twoja aplikacja uwierzytelniająca nie obsługuje kodów QR, moż
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 msgid "Inbox"
 msgstr "Skrzynka odbiorcza"
 
@@ -3960,18 +3978,6 @@ msgstr "Etykieta"
 msgid "Language"
 msgstr "Język"
 
-#: apps/remix/app/components/general/period-selector.tsx
-msgid "Last 14 days"
-msgstr "Ostatnie 14 dni"
-
-#: apps/remix/app/components/general/period-selector.tsx
-msgid "Last 30 days"
-msgstr "Ostatnie 30 dni"
-
-#: apps/remix/app/components/general/period-selector.tsx
-msgid "Last 7 days"
-msgstr "Ostatnie 7 dni"
-
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Last Active"
 msgstr "Ostatnia aktywność"
@@ -3980,6 +3986,14 @@ msgstr "Ostatnia aktywność"
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 msgid "Last modified"
 msgstr "Ostatnia modyfikacja"
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Last Month"
+msgstr ""
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Last Quarter"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Last updated"
@@ -3996,6 +4010,14 @@ msgstr "Ostatnia aktualizacja o"
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 msgid "Last used"
 msgstr "Ostatnie użycie"
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Last Week"
+msgstr ""
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Last Year"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Leaderboard"
@@ -4404,6 +4426,42 @@ msgstr "Nie"
 msgid "No active drafts"
 msgstr "Brak aktywnych szkiców"
 
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No completed documents"
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents created from this template have been completed yet. Completed documents will appear here once all recipients have signed."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents created from this template have been rejected. Documents that have been declined will appear here."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents created from this template match the current filters. Try adjusting your search criteria."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents found"
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents have been created from this template yet. Use this template to create your first document."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents in inbox"
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No documents yet"
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "No draft documents"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "No folders found"
@@ -4422,6 +4480,11 @@ msgstr "Nie są wymagane żadne dalsze działania z Twojej strony w tym momencie
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
 msgstr "Nie znaleziono organizacji"
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "No pending documents"
+msgstr ""
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "No public profile templates found"
@@ -4452,6 +4515,11 @@ msgstr "Brak odbiorców"
 msgid "No recipients with this role"
 msgstr "Brak odbiorców z tą rolą"
 
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "No rejected documents"
+msgstr ""
+
 #: packages/ui/components/document/document-global-auth-action-select.tsx
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "No restrictions"
@@ -4462,8 +4530,14 @@ msgid "No results found"
 msgstr "Nie znaleziono wyników"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
+#: packages/ui/primitives/data-table/data-table-faceted-filter.tsx
 msgid "No results found."
 msgstr "Brak wyników."
+
+#: packages/ui/primitives/data-table/data-table.tsx
+#: packages/ui/primitives/data-table/data-table.tsx
+msgid "No results."
+msgstr ""
 
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "No signature field found"
@@ -4842,15 +4916,19 @@ msgstr "Hasło zostało zaktualizowane"
 msgid "Password updated!"
 msgstr "Hasło zaktualizowane!"
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Past"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Payment overdue"
 msgstr "Płatność zaległa"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 #: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/lib/constants/document.ts
 msgid "Pending"
@@ -5081,6 +5159,10 @@ msgstr "Wstępnie sformatowany szablon CSV z przykładowymi danymi."
 msgid "Preferences"
 msgstr "Preferencje"
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Present"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Preview"
 msgstr "Podgląd"
@@ -5294,6 +5376,7 @@ msgstr "Odrzuć dokument"
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 #: packages/lib/constants/document.ts
 msgid "Rejected"
 msgstr "Odrzucony"
@@ -5398,6 +5481,7 @@ msgstr "Wyślij ponownie weryfikację"
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/forms/organisation-update-form.tsx
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
 msgid "Reset"
 msgstr "Resetuj"
 
@@ -5537,6 +5621,7 @@ msgid "Search by organisation ID, name, customer ID or owner email"
 msgstr "Wyszukaj według ID organizacji, nazwy, ID klienta lub adresu e-mail właściciela"
 
 #: apps/remix/app/components/general/document/document-search.tsx
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
 msgid "Search documents..."
 msgstr "Szukaj dokumentów..."
 
@@ -5671,6 +5756,10 @@ msgstr "Wybierz członków do włączenia do tej grupy"
 #: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
 msgid "Select triggers"
 msgstr "Wybierz wyzwalacze"
+
+#: packages/ui/primitives/data-table/data-table-faceted-filter.tsx
+msgid "selected"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
@@ -6121,6 +6210,7 @@ msgid "Something went wrong!"
 msgstr "Coś poszło nie tak!"
 
 #: packages/ui/primitives/data-table.tsx
+#: packages/ui/primitives/data-table/data-table.tsx
 msgid "Something went wrong."
 msgstr "Coś poszło nie tak."
 
@@ -6143,6 +6233,7 @@ msgstr "Przepraszamy, nie mogliśmy pobrać certyfikatu. Proszę spróbować pon
 
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
 msgid "Source"
 msgstr "Źródło"
 
@@ -6157,6 +6248,7 @@ msgstr "Statystyki"
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
 msgid "Status"
 msgstr "Stan"
 
@@ -6428,9 +6520,9 @@ msgstr "Zespoły, do których obecnie przypisana jest ta grupa organizacji"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
+#: packages/ui/primitives/data-table/data/data.tsx
 msgid "Template"
 msgstr "Szablon"
 
@@ -6798,6 +6890,30 @@ msgstr "Brak aktywnych szkiców. Prześlij, aby utworzyć."
 msgid "There are no completed documents yet. Documents that you have created or received will appear here once completed."
 msgstr "Brak zakończonych dokumentów. Utworzone lub odebrane dokumentu pojawią się tutaj, gdy zostaną zakończone."
 
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "There are no documents from this template waiting for your action. Documents requiring your signature will appear here."
+msgstr ""
+
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "There are no documents waiting for your action. Documents requiring your signature will appear here."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "There are no draft documents created from this template. Use this template to create a new document."
+msgstr ""
+
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "There are no pending documents at the moment. Documents awaiting signatures will appear here."
+msgstr ""
+
+#: apps/remix/app/components/tables/template-documents-table-empty-state.tsx
+msgid "There are no pending documents created from this template. Documents awaiting signatures will appear here."
+msgstr ""
+
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "There are no rejected documents. Documents that have been declined will appear here."
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "There was an error uploading your file. Please try again."
 msgstr "Wystąpił błąd podczas przesyłania pliku. Proszę spróbować ponownie."
@@ -6944,6 +7060,10 @@ msgstr "To jest roszczenie, z którym pierwotnie została utworzona ta organizac
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
 msgstr "Ten link jest nieprawidłowy lub wygasł. Proszę skontaktować się ze swoim zespołem, aby ponownie wysłać weryfikację."
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "This Month"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "This organisation, and any associated data will be permanently deleted."
 msgstr "Ta organizacja oraz wszelkie powiązane dane zostaną trwale usunięte."
@@ -6955,6 +7075,10 @@ msgstr "Ten klucz dostępu został już zarejestrowany."
 #: apps/remix/app/components/forms/signin.tsx
 msgid "This passkey is not configured for this application. Please login and add one in the user settings."
 msgstr "Ten klucz dostępu nie jest skonfigurowany dla tej aplikacji. Proszę zalogować się i dodać jeden w ustawieniach użytkownika."
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "This Quarter"
+msgstr ""
 
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "This recipient can no longer be modified as they have signed a field, or completed the document."
@@ -6994,6 +7118,10 @@ msgstr "Ten token jest nieprawidłowy lub wygasł. Proszę skontaktować się ze
 msgid "This URL is already in use."
 msgstr "Ten URL jest już używany."
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "This Week"
+msgstr ""
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This will be sent to all recipients if a pending document has been deleted."
 msgstr "To zostanie wysłane do wszystkich odbiorców, jeśli oczekujący dokument został usunięty."
@@ -7014,10 +7142,18 @@ msgstr "To będzie TYLKO przenoś funkcje flag, które są ustawione na true, ws
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
 msgstr "Zostaniesz wylogowany z wszystkich innych urządzeń. Aby dalej korzystać z konta, musisz ponownie się zalogować na tych urządzeniach."
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "This Year"
+msgstr ""
+
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 msgid "Time"
 msgstr "Czas"
+
+#: packages/ui/primitives/data-table/data-table-toolbar.tsx
+msgid "Time Period"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Time zone"
@@ -7092,6 +7228,10 @@ msgstr "Aby skorzystać z naszej usługi podpisu elektronicznego, musisz mieć d
 #: apps/remix/app/components/embed/embed-authentication-required.tsx
 msgid "To view this document you need to be signed into your account, please sign in to continue."
 msgstr "Aby zobaczyć ten dokument, musisz być zalogowany na swoje konto, proszę zaloguj się, aby kontynuować."
+
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Today"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Toggle the switch to hide your profile from the public."
@@ -8137,6 +8277,10 @@ msgstr "Rocznie"
 msgid "Yes"
 msgstr "Tak"
 
+#: packages/ui/primitives/data-table/data/data.tsx
+msgid "Yesterday"
+msgstr ""
+
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 #: packages/lib/utils/document-audit-logs.ts
@@ -8625,6 +8769,10 @@ msgstr "Twój adres e-mail jest aktualnie używany przez zespół <0>{0}</0> ({1
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your existing tokens"
 msgstr "Istniejące tokeny"
+
+#: apps/remix/app/components/tables/documents-table-empty-state.tsx
+msgid "Your inbox is empty"
+msgstr ""
 
 #: apps/remix/app/components/forms/reset-password.tsx
 #: apps/remix/app/components/forms/password.tsx
