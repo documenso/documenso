@@ -1,6 +1,7 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
+import { useSearchParams } from 'react-router';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
@@ -19,8 +20,13 @@ export function meta() {
 
 export default function TeamsSettingBillingPage() {
   const { _, i18n } = useLingui();
+  const [searchParams] = useSearchParams();
 
   const organisation = useCurrentOrganisation();
+
+  const selectedPlan = searchParams.get('plan');
+  const selectedCycle = searchParams.get('cycle') as 'monthly' | 'yearly' | null;
+  const source = searchParams.get('source');
 
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
     trpc.billing.subscription.get.useQuery({
@@ -48,8 +54,21 @@ export default function TeamsSettingBillingPage() {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     (stripeSubscription?.items.data[0].price.product as Stripe.Product | undefined)?.name;
 
+  const isFromPricingPage = source === 'pricing';
+
   return (
     <div>
+      {isFromPricingPage && selectedPlan && !subscription && (
+        <div className="bg-muted mb-4 rounded-lg p-4">
+          <p className="text-sm">
+            <Trans>
+              Select a plan below to upgrade <strong>{organisation.name}</strong> to the{' '}
+              {selectedPlan} plan
+            </Trans>
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-row items-end justify-between">
         <div>
           <h3 className="text-2xl font-semibold">
@@ -134,7 +153,14 @@ export default function TeamsSettingBillingPage() {
 
       <hr className="my-4" />
 
-      {!subscription && canManageBilling && <BillingPlans plans={plans} />}
+      {!subscription && canManageBilling && (
+        <BillingPlans
+          plans={plans}
+          selectedPlan={selectedPlan}
+          selectedCycle={selectedCycle}
+          isFromPricingPage={source === 'pricing'}
+        />
+      )}
 
       <section className="mt-6">
         <OrganisationBillingInvoicesTable

@@ -44,12 +44,22 @@ const MotionCard = motion(Card);
 
 export type BillingPlansProps = {
   plans: InternalClaimPlans;
+  selectedPlan?: string | null;
+  selectedCycle?: 'monthly' | 'yearly' | null;
+  isFromPricingPage?: boolean;
 };
 
-export const BillingPlans = ({ plans }: BillingPlansProps) => {
+export const BillingPlans = ({
+  plans,
+  selectedPlan,
+  selectedCycle,
+  isFromPricingPage,
+}: BillingPlansProps) => {
   const isMounted = useIsMounted();
 
-  const [interval, setInterval] = useState<'monthlyPrice' | 'yearlyPrice'>('yearlyPrice');
+  const [interval, setInterval] = useState<'monthlyPrice' | 'yearlyPrice'>(
+    selectedCycle === 'monthly' ? 'monthlyPrice' : 'yearlyPrice',
+  );
 
   const pricesToDisplay = useMemo(() => {
     const prices = [];
@@ -85,56 +95,65 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
 
       <div className="mt-8 grid gap-8 lg:grid-cols-2 2xl:grid-cols-3">
         <AnimatePresence mode="wait">
-          {pricesToDisplay.map((price) => (
-            <MotionCard
-              key={price.id}
-              initial={{ opacity: isMounted ? 0 : 1, y: isMounted ? 20 : 0 }}
-              animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
-              exit={{ opacity: 0, transition: { duration: 0.3 } }}
-            >
-              <CardContent className="flex h-full flex-col p-6">
-                <CardTitle>{price.product.name}</CardTitle>
+          {pricesToDisplay.map((price) => {
+            const planId = price.claim.toLowerCase().replace('claim_', '');
+            const isSelected = selectedPlan && planId === selectedPlan;
 
-                <div className="text-muted-foreground mt-2 text-lg font-medium">
-                  {price.friendlyPrice + ' '}
-                  <span className="text-xs">
-                    {interval === 'monthlyPrice' ? (
-                      <Trans>per month</Trans>
-                    ) : (
-                      <Trans>per year</Trans>
-                    )}
-                  </span>
-                </div>
+            return (
+              <MotionCard
+                key={price.id}
+                initial={{ opacity: isMounted ? 0 : 1, y: isMounted ? 20 : 0 }}
+                animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                exit={{ opacity: 0, transition: { duration: 0.3 } }}
+                className={isSelected ? 'ring-primary ring-2' : ''}
+              >
+                <CardContent className="flex h-full flex-col p-6">
+                  <CardTitle>{price.product.name}</CardTitle>
 
-                <div className="text-muted-foreground mt-1.5 text-sm">
-                  {price.product.description}
-                </div>
-
-                {price.product.features && price.product.features.length > 0 && (
-                  <div className="text-muted-foreground mt-4">
-                    <div className="text-sm font-medium">Includes:</div>
-
-                    <ul className="mt-1 divide-y text-sm">
-                      {price.product.features.map((feature, index) => (
-                        <li key={index} className="py-2">
-                          {feature.name}
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="text-muted-foreground mt-2 text-lg font-medium">
+                    {price.friendlyPrice + ' '}
+                    <span className="text-xs">
+                      {interval === 'monthlyPrice' ? (
+                        <Trans>per month</Trans>
+                      ) : (
+                        <Trans>per year</Trans>
+                      )}
+                    </span>
                   </div>
-                )}
 
-                <div className="flex-1" />
+                  <div className="text-muted-foreground mt-1.5 text-sm">
+                    {price.product.description}
+                  </div>
 
-                <BillingDialog
-                  priceId={price.id}
-                  planName={price.product.name}
-                  memberCount={price.memberCount}
-                  claim={price.claim}
-                />
-              </CardContent>
-            </MotionCard>
-          ))}
+                  {price.product.features && price.product.features.length > 0 && (
+                    <div className="text-muted-foreground mt-4">
+                      <div className="text-sm font-medium">Includes:</div>
+
+                      <ul className="mt-1 divide-y text-sm">
+                        {price.product.features.map((feature, index) => (
+                          <li key={index} className="py-2">
+                            {feature.name}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="flex-1" />
+
+                  <BillingDialog
+                    priceId={price.id}
+                    planName={price.product.name}
+                    memberCount={price.memberCount}
+                    claim={price.claim}
+                    isSelected={isSelected || false}
+                    isFromPricingPage={isFromPricingPage}
+                    interval={interval}
+                  />
+                </CardContent>
+              </MotionCard>
+            );
+          })}
         </AnimatePresence>
       </div>
     </div>
@@ -145,13 +164,19 @@ const BillingDialog = ({
   priceId,
   planName,
   claim,
+  isSelected,
+  isFromPricingPage,
+  interval,
 }: {
   priceId: string;
   planName: string;
   memberCount: number;
   claim: string;
+  isSelected?: boolean;
+  isFromPricingPage?: boolean;
+  interval: 'monthlyPrice' | 'yearlyPrice';
 }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(isSelected && isFromPricingPage);
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -227,11 +252,13 @@ const BillingDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
-            <Trans>Subscribe</Trans>
+            <Trans>
+              Subscribe to {planName} {interval === 'monthlyPrice' ? '(Monthly)' : '(Yearly)'}
+            </Trans>
           </DialogTitle>
 
           <DialogDescription>
-            <Trans>You are about to subscribe to the {planName}</Trans>
+            <Trans>Choose how to proceed with your subscription</Trans>
           </DialogDescription>
         </DialogHeader>
 
