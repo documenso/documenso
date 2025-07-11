@@ -6,6 +6,7 @@ import type {
 } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
 
 export const isDocumentCompleted = (document: Pick<Document, 'status'> | DocumentStatus) => {
@@ -36,7 +37,7 @@ export const extractDerivedDocumentMeta = (
   // since there is custom work there which allows 3 overrides.
   return {
     language: meta.language || settings.documentLanguage,
-    timezone: meta.timezone || settings.documentTimezone,
+    timezone: meta.timezone || settings.documentTimezone || DEFAULT_DOCUMENT_TIME_ZONE,
     dateFormat: meta.dateFormat || settings.documentDateFormat,
     message: meta.message || null,
     subject: meta.subject || null,
