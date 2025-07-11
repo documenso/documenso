@@ -9,8 +9,12 @@ import {
 export const createSubscriptionClaimRoute = adminProcedure
   .input(ZCreateSubscriptionClaimRequestSchema)
   .output(ZCreateSubscriptionClaimResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { name, teamCount, memberCount, flags } = input;
+
+    ctx.logger.info({
+      input,
+    });
 
     await prisma.subscriptionClaim.create({
       data: {

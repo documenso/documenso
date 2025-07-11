@@ -16,6 +16,12 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     const { user } = ctx;
     const { organisationId, data } = input;
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     const {
       // Document related settings.
       documentVisibility,

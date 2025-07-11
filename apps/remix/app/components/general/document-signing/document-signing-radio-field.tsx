@@ -41,6 +41,7 @@ export const DocumentSigningRadioField = ({
   const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const parsedFieldMeta = ZRadioFieldMeta.parse(field.fieldMeta);
+  const isReadOnly = parsedFieldMeta.readOnly;
   const values = parsedFieldMeta.values?.map((item) => ({
     ...item,
     value: item.value.length > 0 ? item.value : `empty-value-${item.id}`,
@@ -164,6 +165,7 @@ export const DocumentSigningRadioField = ({
                 value={item.value}
                 id={`option-${field.id}-${item.id}`}
                 checked={item.checked}
+                disabled={isReadOnly}
               />
               {!item.value.includes('empty-value-') && item.value && (
                 <Label
@@ -187,6 +189,7 @@ export const DocumentSigningRadioField = ({
                 value={item.value}
                 id={`option-${field.id}-${item.id}`}
                 checked={item.value === field.customText}
+                disabled={isReadOnly}
               />
               {!item.value.includes('empty-value-') && item.value && (
                 <Label

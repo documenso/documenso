@@ -10,6 +10,7 @@ import { useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { AUTO_SIGNABLE_FIELD_TYPES } from '@documenso/lib/constants/autosign';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
@@ -29,13 +30,6 @@ import { DocumentSigningDisclosure } from '~/components/general/document-signing
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
-
-const AUTO_SIGNABLE_FIELD_TYPES: string[] = [
-  FieldType.NAME,
-  FieldType.INITIALS,
-  FieldType.EMAIL,
-  FieldType.DATE,
-];
 
 // The action auth types that are not allowed to be auto signed
 //

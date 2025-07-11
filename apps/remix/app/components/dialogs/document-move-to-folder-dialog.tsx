@@ -1,11 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderIcon, HomeIcon, Loader2 } from 'lucide-react';
+import { FolderIcon, HomeIcon, Loader2, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
@@ -31,6 +31,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -61,6 +62,8 @@ export const DocumentMoveToFolderDialog = ({
   const navigate = useNavigate();
   const team = useCurrentTeam();
 
+  const [searchTerm, setSearchTerm] = useState('');
+
   const form = useForm<TMoveDocumentFormSchema>({
     resolver: zodResolver(ZMoveDocumentFormSchema),
     defaultValues: {
@@ -83,6 +86,7 @@ export const DocumentMoveToFolderDialog = ({
   useEffect(() => {
     if (!open) {
       form.reset();
+      setSearchTerm('');
     } else {
       form.reset({ folderId: currentFolderId });
     }
@@ -131,6 +135,10 @@ export const DocumentMoveToFolderDialog = ({
     }
   };
 
+  const filteredFolders = folders?.data.filter((folder) =>
+    folder.name.toLowerCase().includes(searchTerm.toLowerCase()),
+  );
+
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -144,8 +152,18 @@ export const DocumentMoveToFolderDialog = ({
           </DialogDescription>
         </DialogHeader>
 
+        <div className="relative">
+          <Search className="text-muted-foreground absolute left-2 top-3 h-4 w-4" />
+          <Input
+            placeholder={_(msg`Search folders...`)}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 flex flex-col gap-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
             <FormField
               control={form.control}
               name="folderId"
@@ -154,8 +172,9 @@ export const DocumentMoveToFolderDialog = ({
                   <FormLabel>
                     <Trans>Folder</Trans>
                   </FormLabel>
+
                   <FormControl>
-                    <div className="space-y-2">
+                    <div className="max-h-96 space-y-2 overflow-y-auto">
                       {isFoldersLoading ? (
                         <div className="flex h-10 items-center justify-center">
                           <Loader2 className="h-4 w-4 animate-spin" />
@@ -170,10 +189,10 @@ export const DocumentMoveToFolderDialog = ({
                             disabled={currentFolderId === null}
                           >
                             <HomeIcon className="mr-2 h-4 w-4" />
-                            <Trans>Root (No Folder)</Trans>
+                            <Trans>Home (No Folder)</Trans>
                           </Button>
 
-                          {folders?.data.map((folder) => (
+                          {filteredFolders?.map((folder) => (
                             <Button
                               key={folder.id}
                               type="button"
@@ -186,6 +205,12 @@ export const DocumentMoveToFolderDialog = ({
                               {folder.name}
                             </Button>
                           ))}
+
+                          {searchTerm && filteredFolders?.length === 0 && (
+                            <div className="text-muted-foreground px-2 py-2 text-center text-sm">
+                              <Trans>No folders found</Trans>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>
