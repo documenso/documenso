@@ -42,6 +42,8 @@ export default function OrganisationSettingsDocumentPage() {
       const {
         documentVisibility,
         documentLanguage,
+        documentTimezone,
+        documentDateFormat,
         includeSenderDetails,
         includeSigningCertificate,
         signatureTypes,
@@ -50,6 +52,7 @@ export default function OrganisationSettingsDocumentPage() {
       if (
         documentVisibility === null ||
         documentLanguage === null ||
+        documentDateFormat === null ||
         includeSenderDetails === null ||
         includeSigningCertificate === null
       ) {
@@ -61,6 +64,8 @@ export default function OrganisationSettingsDocumentPage() {
         data: {
           documentVisibility,
           documentLanguage,
+          documentTimezone,
+          documentDateFormat,
           includeSenderDetails,
           includeSigningCertificate,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),

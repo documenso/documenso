@@ -4,30 +4,26 @@ import { Callout, Steps } from 'nextra/components';
 
 Email Domains allow you to send emails to recipients from your own domain instead of the default Documenso email address.
 
-<Callout type="warning">
+<Callout type="info">
   **Platform and Enterprise Only**: Email Domains is only available to Platform and Enterprise
   customers.
 </Callout>
 
-## Prerequisites
+## Creating Email Domains
 
-Before setting up Email Domains, ensure you have:
+Before setting up email domains, ensure you have:
 
 - A Platform or Enterprise subscription
 - Access to your domain's DNS settings
-- Access to your Documenso organisation as a manager or admin
+- Access to your Documenso organisation as an admin or manager
 
 <Steps>
 
 ### Access Email Domains Settings
 
-Navigate to your Organisation settings and locate the Email Domains section
+Navigate to your Organisation email domains settings page and click the "Add Email Domain" button.
 
 ![Email Domains settings page](/email-domains/email-domains-settings-page.webp)
-
-### Add a New Domain
-
-Click on the "Add Email Domain" to begin the setup process.
 
 ### Configure DNS Records
 
@@ -39,16 +35,16 @@ After adding your domain, Documenso will provide you with the following required
 ![DNS configuration instructions](/email-domains/email-domains-record.webp)
 
 <Callout type="info">
-  If you already have a SPF record configured, you will need to update it to include Amazon SES as
-  an authorised server instead of creating a new record.
+  If you already have an SPF record configured, you will need to update it to include Amazon SES as
+  an authorized server instead of creating a new record.
 </Callout>
 
 Configure these records in your domain's DNS settings according to their specific instructions.
 
 ### Verify Domain Configuration
 
-Once you've added the DNS records, return to the Documenso Email Domains settings and click the "Verify" button.
-Documenso will check if the DNS records are properly configured. If successful, the domain will be marked as "Active".
+Once you've added the DNS records, return to the Documenso email domains settings page and click the "Verify" button.
+This will trigger a verification process which will check if the DNS records are properly configured. If successful, the domain will be marked as "Active".
 
 ![Domain verification process](/email-domains/email-domain-sync.webp)
 
@@ -58,41 +54,41 @@ Documenso will check if the DNS records are properly configured. If successful, 
 
 </Steps>
 
-## Domain Management
+## Creating Emails
 
-### Multiple Domains
+Once your email domain has been configured, you can create multiple email addresses which your members can use when sending documents to recipients.
 
-You can configure multiple email domains for different purposes:
+<Steps>
 
-- **Primary domain**: For general document sending
-- **Regional domains**: For different geographic regions
-- **Department domains**: For specific departments or teams
+### Select the Email Domain You Want to Use
 
-### Domain Status
+Navigate to the email domains settings page and click "Manage" on the domain you want to use.
 
-Each domain will have a status indicator:
+![Email Domains settings page](/email-domains/email-domains-manage.webp)
 
-- **Active**: Domain is verified and ready to send emails
-- **Pending**: DNS records are being verified
-- **Failed**: DNS verification failed, requires attention
-- **Suspended**: Domain has been temporarily suspended
+### Add a New Email
 
-### Domain Settings
+Click on the "Add Email" button to begin the setup process.
 
-For each domain, you can configure:
+![Create email](/email-domains/email-domains-manage-create-email.webp)
 
-- **From name**: The display name that appears in the "From" field
-- **Reply-to address**: Where replies should be directed
-- **Bounce handling**: How to handle bounced emails
-- **Spam filtering**: Advanced spam protection settings
+### Use Email
 
-## Emails
+Once you have added an email, you can configure it to be the default email on either the:
 
-Todo:
+- Organisation email preferences page
+- Team email preferences page
 
-1. Manage domain
-2. Add email
-3. Configure it as default email in Email settings
+When a draft document is created, it will inherit the email configured on the team if set, otherwise it will inherit the email configured in the organisation.
+
+You can also configure the email address directly on the document to override the default email if required.
+
+</Steps>
+
+## Notes
+
+- If you change the default email, it will not retroactively update any existing documents with the old default email.
+- If the email domain becomes invalid, all emails using that domain will fail to send.
 
 ## Troubleshooting
 

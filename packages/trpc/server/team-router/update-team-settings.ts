@@ -28,6 +28,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       // Document related settings.
       documentVisibility,
       documentLanguage,
+      documentTimezone,
+      documentDateFormat,
       includeSenderDetails,
       includeSigningCertificate,
       typedSignatureEnabled,
@@ -88,6 +90,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             // Document related settings.
             documentVisibility,
             documentLanguage,
+            documentTimezone,
+            documentDateFormat,
             includeSenderDetails,
             includeSigningCertificate,
             typedSignatureEnabled,

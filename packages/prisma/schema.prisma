@@ -736,7 +736,7 @@ model OrganisationGlobalSettings {
 
   documentVisibility DocumentVisibility @default(EVERYONE)
   documentLanguage   String             @default("en")
-  documentTimezone   String             @default("Etc/UTC")
+  documentTimezone   String? // Nullable to allow using local timezones if not set.
   documentDateFormat String             @default("yyyy-MM-dd hh:mm a")
 
   includeSenderDetails      Boolean @default(true)

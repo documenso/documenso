@@ -55,7 +55,7 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
     await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
@@ -122,7 +122,7 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();

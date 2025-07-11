@@ -13,7 +13,6 @@ import {
   ORGANISATION_MEMBER_ROLE_HIERARCHY,
   ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
 } from '../constants/organisations';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
 
 export const isPersonalLayout = (organisations: Pick<Organisation, 'type'>[]) => {
@@ -116,7 +115,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
   return {
     documentVisibility: DocumentVisibility.EVERYONE,
     documentLanguage: 'en',
-    documentTimezone: DEFAULT_DOCUMENT_TIME_ZONE,
+    documentTimezone: null, // Null means local timezone.
     documentDateFormat: DEFAULT_DOCUMENT_DATE_FORMAT,
 
     includeSenderDetails: true,

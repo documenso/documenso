@@ -24,12 +24,21 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Only managers and above can' }).click();
   await page.getByRole('combobox').filter({ hasText: 'English' }).click();
   await page.getByRole('option', { name: 'German' }).click();
-  await page.getByTestId('signature-types-combobox').click();
+
+  // Set default timezone
+  await page.getByRole('combobox').filter({ hasText: 'Local timezone' }).click();
+  await page.getByRole('option', { name: 'Australia/Perth' }).click();
+
+  // Set default date
+  await page.getByRole('combobox').filter({ hasText: 'yyyy-MM-dd hh:mm a' }).click();
+  await page.getByRole('option', { name: 'DD/MM/YYYY' }).click();
+
+  await page.getByTestId('signature-types-trigger').click();
   await page.getByRole('option', { name: 'Draw' }).click();
   await page.getByRole('option', { name: 'Upload' }).click();
-  await page.getByRole('combobox').nth(3).click();
+  await page.getByTestId('include-sender-details-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
-  await page.getByRole('combobox').filter({ hasText: 'Yes' }).click();
+  await page.getByTestId('include-signing-certificate-trigger').click();
   await page.getByRole('option', { name: 'No' }).click();
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
@@ -41,6 +50,8 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   // Check that the team settings have inherited these values.
   expect(teamSettings.documentVisibility).toEqual(DocumentVisibility.MANAGER_AND_ABOVE);
   expect(teamSettings.documentLanguage).toEqual('de');
+  expect(teamSettings.documentTimezone).toEqual('Australia/Perth');
+  expect(teamSettings.documentDateFormat).toEqual('dd/MM/yyyy hh:mm a');
   expect(teamSettings.includeSenderDetails).toEqual(false);
   expect(teamSettings.includeSigningCertificate).toEqual(false);
   expect(teamSettings.typedSignatureEnabled).toEqual(true);
@@ -50,22 +61,19 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   // Edit the team settings
   await page.goto(`/t/${team.url}/settings/document`);
 
-  await page
-    .getByRole('group')
-    .locator('div')
-    .filter({
-      hasText: 'Default Document Visibility',
-    })
-    .getByRole('combobox')
-    .click();
+  await page.getByTestId('document-visibility-trigger').click();
   await page.getByRole('option', { name: 'Everyone can access and view' }).click();
-  await page
-    .getByRole('group')
-    .locator('div')
-    .filter({ hasText: 'Default Document Language' })
-    .getByRole('combobox')
-    .click();
+  await page.getByTestId('document-language-trigger').click();
   await page.getByRole('option', { name: 'Polish' }).click();
+
+  // Override team timezone settings
+  await page.getByTestId('document-timezone-trigger').click();
+  await page.getByRole('option', { name: 'Europe/London' }).click();
+
+  // Override team date format settings
+  await page.getByTestId('document-date-format-trigger').click();
+  await page.getByRole('option', { name: 'MM/DD/YYYY' }).click();
+
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
 
@@ -76,6 +84,8 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   // Check that the team settings have inherited/overriden the correct values.
   expect(updatedTeamSettings.documentVisibility).toEqual(DocumentVisibility.EVERYONE);
   expect(updatedTeamSettings.documentLanguage).toEqual('pl');
+  expect(updatedTeamSettings.documentTimezone).toEqual('Europe/London');
+  expect(updatedTeamSettings.documentDateFormat).toEqual('MM/dd/yyyy hh:mm a');
   expect(updatedTeamSettings.includeSenderDetails).toEqual(false);
   expect(updatedTeamSettings.includeSigningCertificate).toEqual(false);
   expect(updatedTeamSettings.typedSignatureEnabled).toEqual(true);
@@ -97,6 +107,8 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(documentMeta.uploadSignatureEnabled).toEqual(false);
   expect(documentMeta.drawSignatureEnabled).toEqual(false);
   expect(documentMeta.language).toEqual('pl');
+  expect(documentMeta.timezone).toEqual('Europe/London');
+  expect(documentMeta.dateFormat).toEqual('MM/dd/yyyy hh:mm a');
 });
 
 test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {

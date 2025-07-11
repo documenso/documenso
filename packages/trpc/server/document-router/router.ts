@@ -367,7 +367,7 @@ export const documentRouter = router({
         title,
         documentDataId,
         normalizePdf: true,
-        timezone,
+        userTimezone: timezone,
         requestMetadata: ctx.metadata,
         folderId,
       });

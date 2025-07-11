@@ -4,6 +4,11 @@ import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 
+import {
+  ZDocumentMetaDateFormatSchema,
+  ZDocumentMetaTimezoneSchema,
+} from '../document-router/schema';
+
 /**
  * Null = Inherit from organisation.
  * Undefined = Do nothing
@@ -14,7 +19,8 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     // Document related settings.
     documentVisibility: z.nativeEnum(DocumentVisibility).nullish(),
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).nullish(),
-
+    documentTimezone: ZDocumentMetaTimezoneSchema.nullish(),
+    documentDateFormat: ZDocumentMetaDateFormatSchema.nullish(),
     includeSenderDetails: z.boolean().nullish(),
     includeSigningCertificate: z.boolean().nullish(),
     typedSignatureEnabled: z.boolean().nullish(),

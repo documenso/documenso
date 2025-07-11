@@ -23,7 +23,7 @@ ADD COLUMN     "emailReplyTo" TEXT;
 
 -- AlterTable
 ALTER TABLE "OrganisationGlobalSettings" ADD COLUMN     "documentDateFormat" TEXT NOT NULL DEFAULT 'yyyy-MM-dd hh:mm a',
-ADD COLUMN     "documentTimezone" TEXT NOT NULL DEFAULT 'Etc/UTC',
+ADD COLUMN     "documentTimezone" TEXT,
 ADD COLUMN     "emailId" TEXT,
 ADD COLUMN     "emailReplyTo" TEXT;
 

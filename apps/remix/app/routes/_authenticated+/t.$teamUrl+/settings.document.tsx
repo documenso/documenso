@@ -34,6 +34,8 @@ export default function TeamsSettingsPage() {
       const {
         documentVisibility,
         documentLanguage,
+        documentTimezone,
+        documentDateFormat,
         includeSenderDetails,
         includeSigningCertificate,
         signatureTypes,
@@ -44,6 +46,8 @@ export default function TeamsSettingsPage() {
         data: {
           documentVisibility,
           documentLanguage,
+          documentTimezone,
+          documentDateFormat,
           includeSenderDetails,
           includeSigningCertificate,
           ...(signatureTypes.length === 0
