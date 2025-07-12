@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-19 06:05\n"
+"PO-Revision-Date: 2025-07-09 00:14\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -24,7 +24,7 @@ msgstr " Włącz podpisywanie linku bezpośredniego"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
-msgstr "Akceptowane dokumenty .PDF (maks. {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
+msgstr "Akceptowane dokumenty .PDF (maks. {APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB)"
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
@@ -38,15 +38,15 @@ msgstr "Dokument \"{documentName}\" został usunięty przez administratora."
 
 #: packages/email/template-components/template-document-pending.tsx
 msgid "“{documentName}” has been signed"
-msgstr "Dokument \"{documentName}\" został podpisany"
+msgstr "Dokument „{documentName}” został podpisany"
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
-msgstr "Dokument \"{documentName}\" został podpisany przez wszystkich podpisujących"
+msgstr "Dokument „{documentName}” został podpisany przez wszystkich podpisujących"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "\"{documentTitle}\" has been successfully deleted"
-msgstr "Dokument \"{documentTitle}\" został usunięty"
+msgstr "Dokument „{documentTitle}” został usunięty"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
@@ -249,7 +249,7 @@ msgstr "Użytkownik {prefix} otworzył dokument"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} prefilled a field"
-msgstr "{prefix} wstępnie wypełnił pole"
+msgstr "Użytkownik {prefix} wstępnie wypełnił pole"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} removed a field"
@@ -299,7 +299,7 @@ msgstr "{prefix} zaktualizowane wymagania dotyczące autoryzacji dostępu do dok
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document external ID"
-msgstr "{prefix} zaktualizowane ID zewnętrzne dokumentu"
+msgstr "Użytkownik {prefix} zaktualizował identyfikator zewnętrzny dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} updated the document signing auth requirements"
@@ -378,7 +378,7 @@ msgstr "{userName} dodał CC do dokumentu"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} completed their task"
-msgstr "{userName} zakończył swoje zadanie"
+msgstr "Użytkownik {userName} zakończył swoje zadanie"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{userName} rejected the document"
@@ -809,11 +809,11 @@ msgstr "Dodaj autoryzator, aby służył jako dodatkowa metoda uwierzytelniania 
 
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "Add an external ID to the document. This can be used to identify the document in external systems."
-msgstr "Dodaj zewnętrzny ID do dokumentu. Może być używany do identyfikacji dokumentu w zewnętrznych systemach."
+msgstr "Dodaj identyfikator zewnętrzny dokumentu. Może być używany do identyfikacji dokumentu w zewnętrznych systemach."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Add an external ID to the template. This can be used to identify in external systems."
-msgstr "Dodaj zewnętrzny ID do szablonu. Może być używany do identyfikacji w systemach zewnętrznych."
+msgstr "Dodaj identyfikator zewnętrzny szablonu. Może być używany do identyfikacji w zewnętrznych systemach."
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 msgid "Add another option"
@@ -1038,7 +1038,7 @@ msgstr "Pozwala na uwierzytelnianie za pomocą biometrii, menedżerów haseł, k
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Already have an account? <0>Sign in instead</0>"
-msgstr "Masz już konto? <0>Zaloguj się zamiast tego</0>"
+msgstr "Masz już konto? <0>Zaloguj się</0>"
 
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 msgid "Amount"
@@ -1585,7 +1585,7 @@ msgstr "Kontynuując z Twoim podpisem elektronicznym, przyjmujesz i zgadzasz si�
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "By proceeding, you agree to our <0>Terms of Service</0> and <1>Privacy Policy</1>."
-msgstr "Kontynuując, zgadzasz się na nasze <0>Warunki korzystania z usługi</0> oraz <1>Politykę prywatności</1>."
+msgstr "Kontynuując, akceptujesz nasz <0>Regulamin</0> i <1>Politykę prywatności</1>."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "By using the electronic signature feature, you are consenting to conduct transactions and receive disclosures electronically. You acknowledge that your electronic signature on documents is binding and that you accept the terms outlined in the documents you are signing."
@@ -1676,7 +1676,7 @@ msgstr "Nie można usunąć dokumentu"
 
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Cannot remove signer"
-msgstr "Nie można usunąć sygnatariusza"
+msgstr "Nie można usunąć podpisującego"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "Cc"
@@ -2256,7 +2256,7 @@ msgstr "Utwórz swoje konto i zacznij korzystać z nowoczesnego podpisywania dok
 
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
-msgstr "Utwórz swoje konto i zacznij korzystać z nowoczesnego podpisywania dokumentów. Otwarty i piękny podpis jest w zasięgu ręki."
+msgstr "Utwórz  konto i zacznij korzystać z nowoczesnego podpisywania dokumentów. Otwarty i piękny podpis jest w zasięgu ręki."
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
@@ -2675,7 +2675,7 @@ msgstr "Dokument anulowany"
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document completed"
-msgstr "Dokument ukończony"
+msgstr "Zakończono dokument"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 #: packages/ui/components/document/document-email-checkboxes.tsx
@@ -2718,7 +2718,7 @@ msgstr "Tworzenie dokumentu"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document deleted"
-msgstr "Dokument usunięty"
+msgstr "Usunięto dokument"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Document deleted email"
@@ -2743,7 +2743,7 @@ msgstr "Dokument zduplikowany"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document external ID updated"
-msgstr "Zaktualizowane ID zewnętrzne dokumentu"
+msgstr "Zaktualizowano identyfikator zewnętrzny dokumentu"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Document found in your account"
@@ -2785,7 +2785,7 @@ msgstr "Dokument przeniesiony"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Document moved to team"
-msgstr "Dokument przeniesiony do zespołu"
+msgstr "Przeniesiono dokument do zespołu"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document no longer available to sign"
@@ -3208,7 +3208,7 @@ msgstr "Wprowadź szczegóły swojej marki"
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Enter your email"
-msgstr "Wprowadź swój adres e-mail"
+msgstr "Wpisz adres e-mail"
 
 #: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx
 msgid "Enter your email address to receive the completed document."
@@ -3216,7 +3216,7 @@ msgstr "Wprowadź swój adres e-mail, aby otrzymać ukończony dokument."
 
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Enter your name"
-msgstr "Wprowadź swoje imię"
+msgstr "Wpisz nazwę"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Enter your password"
@@ -3320,7 +3320,7 @@ msgstr "Wygasa {0}"
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
 msgid "External ID"
-msgstr "Zewnętrzny ID"
+msgstr "Identyfikator zewnętrzny"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
@@ -3332,7 +3332,7 @@ msgstr "Nie udało się utworzyć roszczenia subskrypcyjnego."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Failed to delete folder"
-msgstr "Nie udało się usunąć folder"
+msgstr "Nie udało się usunąć folderu"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
@@ -3421,7 +3421,7 @@ msgstr "Zastępczy tekst pola"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Field prefilled by assistant"
-msgstr "Pole wstępnie wypełnione przez asystenta"
+msgstr "Wstępnie wypełniono pole przez asystenta"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Field signed"
@@ -3464,15 +3464,15 @@ msgstr "Folder utworzony pomyślnie"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Folder deleted successfully"
-msgstr "Folder został pomyślnie usunięty"
+msgstr "Folder został usunięty"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Folder moved successfully"
-msgstr "Folder został pomyślnie przeniesiony"
+msgstr "Folder został przeniesiony"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Folder Name"
-msgstr "Nazwa foldera"
+msgstr "Nazwa folderu"
 
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -3521,7 +3521,7 @@ msgstr "Darmowy"
 
 #: packages/ui/primitives/document-flow/types.ts
 msgid "Free Signature"
-msgstr "Podpis wolny"
+msgstr "Swobodny podpis"
 
 #: apps/remix/app/components/general/document-signing/document-signing-name-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
@@ -3725,7 +3725,7 @@ msgstr "Dom"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Home (No Folder)"
-msgstr "Strona główna (Brak folderu)"
+msgstr "Strona główna (brak folderu)"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -4708,7 +4708,7 @@ msgstr "Zespoły organizacyjne"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/organisation-update-form.tsx
 msgid "Organisation URL"
-msgstr "URL organizacji"
+msgstr "Adres URL organizacji"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/organisations.tsx
@@ -4908,7 +4908,7 @@ msgstr "Wybierz hasło"
 
 #: apps/remix/app/components/general/user-profile-timur.tsx
 msgid "Pick any of the following agreements below and start signing to get started"
-msgstr "Wybierz dowolną z poniższych umów i zacznij podpisywanie, aby rozpocząć"
+msgstr "Wybierz umowę i zacznij podpisywanie"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Pin"
@@ -5296,7 +5296,7 @@ msgstr "Odrzuć dokument"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/document.ts
 msgid "Rejected"
-msgstr "Odrzucony"
+msgstr "Odrzucono"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx
 msgid "Rejection Confirmed"
@@ -5959,15 +5959,15 @@ msgstr "Podpisy pojawią się po ukończeniu dokumentu"
 #: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "Signed"
-msgstr "Podpisano"
+msgstr "Podpisał"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "Signer"
-msgstr "Sygnatariusz"
+msgstr "Podpisujący"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Signer Events"
-msgstr "Wydarzenia sygnatariusza"
+msgstr "Zdarzenia podpisujących"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "Signers"
@@ -6653,7 +6653,7 @@ msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa 
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
-msgstr "Strona, której szukasz, została przeniesiona, usunięta, zmieniona lub mogła nigdy nie istnieć."
+msgstr "Strona została przeniesiona, usunięta, zmieniona lub mogła nie istnieć."
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "The profile link has been copied to your clipboard"
@@ -7445,7 +7445,7 @@ msgstr "Ulepsz"
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Upgrade <0>{0}</0> to {planName}"
-msgstr "Uaktualnij <0>{0}</0> do {planName}"
+msgstr "Ulepsz <0>{0}</0> do {planName}"
 
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
@@ -7724,7 +7724,7 @@ msgstr "Wyświetl zespoły"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: packages/lib/constants/recipient-roles.ts
 msgid "Viewed"
-msgstr "Wyświetlono"
+msgstr "Wyświetlił"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "Viewer"
@@ -8070,7 +8070,7 @@ msgstr "Witaj"
 
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Welcome back, we are lucky to have you."
-msgstr "Witamy z powrotem, mamy szczęście, że mamy cię."
+msgstr "Witaj ponownie. Mamy szczęście, że Cię mamy."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
