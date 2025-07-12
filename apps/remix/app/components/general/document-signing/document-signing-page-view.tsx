@@ -72,7 +72,8 @@ export const DocumentSigningPageView = ({
   }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
-  const targetSigner = recipient.role === RecipientRole.ASSISTANT ? (selectedSigner ?? null) : null;
+  const targetSigner =
+    recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
