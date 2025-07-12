@@ -89,12 +89,31 @@ setup_certificate() {
             fi
         done
         
-        read -p "Does your certificate have a passphrase? (y/n): " has_passphrase
-        if [[ $has_passphrase =~ ^[Yy]$ ]]; then
-            read -s -p "Enter certificate passphrase: " cert_passphrase
+        # Certificate password is required
+        print_warning "Your certificate MUST have a password to work correctly"
+        print_info "Certificates without passwords will cause 'Failed to get private key bags' errors"
+        
+        while true; do
+            read -s -p "Enter your certificate password: " cert_passphrase
             echo ""
+            
+            if [[ -z "$cert_passphrase" ]]; then
+                print_error "Password cannot be empty"
+                print_info "If your certificate doesn't have a password, you'll need to:"
+                print_info "1. Create a new certificate with a password, OR"
+                print_info "2. Re-export your existing certificate with a password"
+                echo ""
+                read -p "Do you want to generate a new certificate instead? (y/n): " generate_new
+                if [[ $generate_new =~ ^[Yy]$ ]]; then
+                    generate_self_signed_cert
+                    return
+                fi
+                continue
+            fi
+            
             export CERT_PASSPHRASE="$cert_passphrase"
-        fi
+            break
+        done
     else
         print_warning "You need a .p12 certificate to sign documents."
         print_info "You can:"
@@ -134,15 +153,43 @@ generate_self_signed_cert() {
     openssl req -new -x509 -key private.key -out certificate.crt -days 365 -subj "/C=$country_code/ST=$state/L=$city/O=$org_name/emailAddress=$email"
     
     # Create .p12 file
-    read -s -p "Enter a passphrase for the certificate (or press Enter for no passphrase): " cert_passphrase
-    echo ""
+    print_info "Creating P12 certificate file..."
+    print_warning "IMPORTANT: A certificate password is required to prevent signing failures"
     
-    if [[ -n "$cert_passphrase" ]]; then
-        openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -password "pass:$cert_passphrase"
-        export CERT_PASSPHRASE="$cert_passphrase"
-    else
-        openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt -password pass:
-    fi
+    # Require password for certificate to prevent "Failed to get private key bags" error
+    while true; do
+        read -s -p "Enter a password for the certificate (minimum 4 characters): " cert_passphrase
+        echo ""
+        
+        if [[ -z "$cert_passphrase" ]]; then
+            print_error "Password is required. Certificates without passwords cause signing failures."
+            continue
+        fi
+        
+        if [[ ${#cert_passphrase} -lt 4 ]]; then
+            print_error "Password must be at least 4 characters long"
+            continue
+        fi
+        
+        read -s -p "Confirm password: " cert_passphrase_confirm
+        echo ""
+        
+        if [[ "$cert_passphrase" != "$cert_passphrase_confirm" ]]; then
+            print_error "Passwords do not match"
+            continue
+        fi
+        
+        break
+    done
+    
+    openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+        -password "pass:$cert_passphrase" \
+        -keypbe PBE-SHA1-3DES \
+        -certpbe PBE-SHA1-3DES \
+        -macalg sha1
+    
+    export CERT_PASSPHRASE="$cert_passphrase"
+    print_success "Certificate created with passphrase"
     
     # Copy to expected location
     print_info "Installing certificate (requires sudo password)..."
@@ -273,6 +320,9 @@ start_and_migrate() {
         exit 1
     fi
     
+    print_info "Pulling latest Docker images..."
+    docker-compose pull
+    
     print_info "Starting Docker containers..."
     docker-compose up -d
     
@@ -378,7 +428,7 @@ start_and_migrate() {
     attempt=0
     
     while [ $attempt -lt $max_attempts ]; do
-        if docker-compose exec -T documenso npx prisma migrate deploy --schema=./packages/prisma/schema.prisma; then
+        if docker-compose exec -T documenso npx prisma migrate deploy --schema=../../packages/prisma/schema.prisma; then
             print_success "Database migration completed successfully!"
             break
         else
@@ -395,7 +445,7 @@ start_and_migrate() {
         print_info "Check logs with: docker-compose logs documenso"
         print_info "Check database logs with: docker-compose logs database"
         print_info "You can try running the migration manually with:"
-        print_info "docker-compose exec documenso npx prisma migrate deploy --schema=./packages/prisma/schema.prisma"
+        print_info "docker-compose exec documenso npx prisma migrate deploy --schema=../../packages/prisma/schema.prisma"
         exit 1
     fi
     
@@ -437,7 +487,7 @@ main() {
     echo "- View logs: docker-compose logs -f"
     echo "- Stop services: docker-compose down"
     echo "- Restart services: docker-compose restart"
-    echo "- Update Documenso: docker-compose pull && docker-compose up -d"
+    echo "- Update Documenso: docker-compose pull && docker-compose up -d --force-recreate"
     echo ""
     print_warning "Remember to:"
     echo "- Keep your .env file secure and backed up"
