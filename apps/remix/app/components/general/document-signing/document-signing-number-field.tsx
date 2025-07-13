@@ -62,7 +62,7 @@ export const DocumentSigningNumberField = ({
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const defaultValue = parsedFieldMeta?.value;
-  const [localNumber, setLocalNumber] = useState(
+  const [localNumber, setLocalNumber] = useState(() =>
     parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '',
   );
 
@@ -219,7 +219,7 @@ export const DocumentSigningNumberField = ({
   }, [showNumberModal]);
 
   useEffect(() => {
-    if (!field.inserted && parsedFieldMeta?.readOnly && defaultValue) {
+    if (!field.inserted && defaultValue) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
