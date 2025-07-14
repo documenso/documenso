@@ -1,5 +1,8 @@
 import { prisma } from '@documenso/prisma';
 
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type GetWebhookByIdOptions = {
   id: string;
   userId: number;
@@ -10,23 +13,11 @@ export const getWebhookById = async ({ id, userId, teamId }: GetWebhookByIdOptio
   return await prisma.webhook.findFirstOrThrow({
     where: {
       id,
-      userId,
-      team: {
-        id: teamId,
-        teamGroups: {
-          some: {
-            organisationGroup: {
-              organisationGroupMembers: {
-                some: {
-                  organisationMember: {
-                    userId,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+        roles: TEAM_MEMBER_ROLE_PERMISSIONS_MAP.MANAGE_TEAM,
+      }),
     },
   });
 };
