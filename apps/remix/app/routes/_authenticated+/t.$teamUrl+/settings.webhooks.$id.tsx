@@ -2,13 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
+import { Link } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
 import { ZEditWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -21,9 +22,12 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 import { PasswordInput } from '@documenso/ui/primitives/password-input';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { WebhookTestDialog } from '~/components/dialogs/webhook-test-dialog';
+import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { WebhookMultiSelectCombobox } from '~/components/general/webhook-multiselect-combobox';
 import { useCurrentTeam } from '~/providers/team';
@@ -92,25 +96,45 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
     }
   };
 
+  if (isLoading) {
+    return <SpinnerBox className="py-32" />;
+  }
+
+  // Todo: Update UI, currently out of place.
+  if (!webhook) {
+    return (
+      <GenericErrorLayout
+        errorCode={404}
+        errorCodeMap={{
+          404: {
+            heading: msg`Webhook not found`,
+            subHeading: msg`404 Webhook not found`,
+            message: msg`The webhook you are looking for may have been removed, renamed or may have never
+                    existed.`,
+          },
+        }}
+        primaryButton={
+          <Button asChild>
+            <Link to={`/t/${team.url}/settings/webhooks`}>
+              <Trans>Go back</Trans>
+            </Link>
+          </Button>
+        }
+        secondaryButton={null}
+      />
+    );
+  }
+
   return (
-    <div>
+    <div className="max-w-2xl">
       <SettingsHeader
         title={_(msg`Edit webhook`)}
         subtitle={_(msg`On this page, you can edit the webhook and its settings.`)}
       />
 
-      {isLoading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-white/50">
-          <Loader className="h-8 w-8 animate-spin text-gray-500" />
-        </div>
-      )}
-
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <fieldset
-            className="flex h-full max-w-xl flex-col gap-y-6"
-            disabled={form.formState.isSubmitting}
-          >
+          <fieldset className="flex h-full flex-col gap-y-6" disabled={form.formState.isSubmitting}>
             <div className="flex flex-col-reverse gap-4 md:flex-row">
               <FormField
                 control={form.control}
@@ -203,7 +227,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
               )}
             />
 
-            <div className="mt-4">
+            <div className="flex justify-end gap-4">
               <Button type="submit" loading={form.formState.isSubmitting}>
                 <Trans>Update webhook</Trans>
               </Button>
@@ -211,6 +235,30 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
           </fieldset>
         </form>
       </Form>
+
+      <Alert
+        className="mt-6 flex flex-col items-center justify-between gap-4 p-6 md:flex-row"
+        variant="neutral"
+      >
+        <div>
+          <AlertTitle>
+            <Trans>Test Webhook</Trans>
+          </AlertTitle>
+          <AlertDescription className="mr-2">
+            <Trans>
+              Send a test webhook with sample data to verify your integration is working correctly.
+            </Trans>
+          </AlertDescription>
+        </div>
+
+        <div className="flex-shrink-0">
+          <WebhookTestDialog webhook={webhook}>
+            <Button variant="outline" disabled={!webhook.enabled}>
+              <Trans>Test Webhook</Trans>
+            </Button>
+          </WebhookTestDialog>
+        </div>
+      </Alert>
     </div>
   );
 }
