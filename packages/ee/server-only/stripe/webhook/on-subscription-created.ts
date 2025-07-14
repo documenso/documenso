@@ -81,17 +81,34 @@ export const onSubscriptionCreated = async ({ subscription }: OnSubscriptionCrea
 
   const status = match(subscription.status)
     .with('active', () => SubscriptionStatus.ACTIVE)
+    .with('trialing', () => SubscriptionStatus.ACTIVE)
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
 
-  await prisma.subscription.create({
-    data: {
+  const periodEnd =
+    subscription.status === 'trialing' && subscription.trial_end
+      ? new Date(subscription.trial_end * 1000)
+      : new Date(subscription.current_period_end * 1000);
+
+  await prisma.subscription.upsert({
+    where: {
+      organisationId,
+    },
+    create: {
       organisationId,
       status,
       customerId,
       planId: subscription.id,
       priceId: subscription.items.data[0].price.id,
-      periodEnd: new Date(subscription.current_period_end * 1000),
+      periodEnd,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+    update: {
+      status,
+      customerId,
+      planId: subscription.id,
+      priceId: subscription.items.data[0].price.id,
+      periodEnd,
       cancelAtPeriodEnd: subscription.cancel_at_period_end,
     },
   });
@@ -172,14 +189,17 @@ const handleOrganisationUpdate = async ({ customerId, claim }: HandleOrganisatio
   }
 
   // Todo: logging
-  if (organisation.subscription) {
-    console.error('Organisation already has a subscription');
+  if (
+    organisation.subscription &&
+    organisation.subscription.status !== SubscriptionStatus.INACTIVE
+  ) {
+    console.error('Organisation already has an active subscription');
 
     // This should never happen
     throw Response.json(
       {
         success: false,
-        message: `Organisation already has a subscription`,
+        message: `Organisation already has an active subscription`,
       } satisfies StripeWebhookResponse,
       { status: 500 },
     );

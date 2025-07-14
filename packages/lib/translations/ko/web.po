@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-10 02:27\n"
+"PO-Revision-Date: 2025-06-19 06:05\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -72,6 +72,16 @@ msgstr "{0, plural, other {(#자 초과)}}"
 msgid "{0, plural, one {# character over the limit} other {# characters over the limit}}"
 msgstr "{0, plural, other {#자 제한 초과}}"
 
+#. placeholder {0}: folder._count.documents
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# document} other {# documents}}"
+msgstr "{0, plural, other {# 문서}}"
+
+#. placeholder {0}: folder._count.subfolders
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# folder} other {# folders}}"
+msgstr "{0, plural, other {# 폴더}}"
+
 #. placeholder {0}: template.recipients.length
 #: apps/remix/app/routes/_recipient+/d.$token+/_index.tsx
 msgid "{0, plural, one {# recipient} other {# recipients}}"
@@ -81,6 +91,11 @@ msgstr "{0, plural, other {#명의 수신자}}"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "{0, plural, one {# team} other {# teams}}"
 msgstr ""
+
+#. placeholder {0}: folder._count.templates
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "{0, plural, one {# template} other {# templates}}"
+msgstr "{0, plural, other {# 템플릿}}"
 
 #. placeholder {0}: data.length
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
@@ -752,6 +767,11 @@ msgstr "행동들"
 msgid "Active"
 msgstr "활성화됨"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Active sessions"
+msgstr "활성 세션"
+
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Active Subscriptions"
 msgstr "활성 구독"
@@ -818,12 +838,12 @@ msgid "Add group roles"
 msgstr "그룹 역할 추가"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add groups"
 msgstr "그룹 추가"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Add members"
 msgstr "멤버 추가"
 
@@ -1243,17 +1263,14 @@ msgstr "예상치 못한 오류가 발생했습니다."
 msgid "An unknown error occurred"
 msgstr "알 수 없는 오류가 발생했습니다"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "An unknown error occurred while creating the folder."
 msgstr "폴더를 생성하는 동안 알 수 없는 오류가 발생했습니다."
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "An unknown error occurred while deleting the folder."
 msgstr "폴더를 삭제하는 동안 알 수 없는 오류가 발생했습니다."
 
-#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "An unknown error occurred while moving the folder."
 msgstr "폴더를 이동하는 동안 알 수 없는 오류가 발생했습니다."
@@ -1321,6 +1338,10 @@ msgstr "문서를 완료하시겠습니까? 이 작업은 되돌릴 수 없습�
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
 msgstr "정말 이 클레임을 삭제하시겠습니까?"
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Are you sure you want to delete this folder?"
+msgstr "이 폴더를 삭제하시겠습니까?"
 
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
 msgid "Are you sure you want to delete this token?"
@@ -1614,6 +1635,7 @@ msgstr "준비 가능"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
@@ -1626,6 +1648,9 @@ msgstr "준비 가능"
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-duplicate-dialog.tsx
@@ -1921,7 +1946,6 @@ msgstr "확인을 위해 입력하세요 <0>{deleteMessage}</0>"
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Confirm by typing: <0>{deleteMessage}</0>"
 msgstr "확인을 위해 입력하세요: <0>{deleteMessage}</0>"
@@ -2065,6 +2089,7 @@ msgstr "토큰 복사"
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "Create"
 msgstr "만들기"
@@ -2134,6 +2159,14 @@ msgstr "직접 서명 링크 생성"
 msgid "Create document from template"
 msgstr "템플릿에서 문서 생성"
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Create folder"
+msgstr "폴더 만들기"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Create Folder"
+msgstr "폴더 생성"
+
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Create group"
@@ -2142,6 +2175,10 @@ msgstr "그룹 생성"
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Create Groups"
 msgstr "그룹 생성"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Create New Folder"
+msgstr "새 폴더 생성"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Create now"
@@ -2221,6 +2258,7 @@ msgstr "계정을 만들고 최첨단 문서 서명을 사용해보세요．"
 msgid "Create your account and start using state-of-the-art document signing. Open and beautiful signing is within your grasp."
 msgstr "계정을 만들고 최첨단 문서 서명을 사용해보세요． 개방적이고 아름다운 서명은 당신의 손 안에 있습니다．"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -2259,6 +2297,14 @@ msgstr "{0}에 생성됨"
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "CSV Structure"
 msgstr "CSV 구조"
+
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "Cumulative MAU (signed in)"
+msgstr "누적 MAU (로그인 완료)"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Current"
+msgstr "현재"
 
 #: apps/remix/app/components/forms/password.tsx
 msgid "Current Password"
@@ -2342,6 +2388,7 @@ msgstr "삭제"
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
+#: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -2353,6 +2400,7 @@ msgstr "삭제"
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Delete"
@@ -2360,10 +2408,9 @@ msgstr "삭제"
 
 #. placeholder {0}: webhook.webhookUrl
 #. placeholder {0}: token.name
-#. placeholder {0}: folder?.name ?? 'folder'
+#. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "delete {0}"
@@ -2394,6 +2441,10 @@ msgstr "문서 삭제"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete Document"
 msgstr "문서 삭제"
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Delete Folder"
+msgstr "폴더 삭제"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Delete organisation"
@@ -2453,6 +2504,7 @@ msgid "Details"
 msgstr "세부 정보"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Device"
 msgstr "장치"
@@ -2833,7 +2885,6 @@ msgid "Document will be permanently deleted"
 msgstr "문서가 영구적으로 삭제될 것입니다"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
@@ -3139,6 +3190,10 @@ msgstr "계정을 활성화하면 사용자가 다시 계정을 사용할 수 �
 msgid "Enclosed Document"
 msgstr "첨부 문서"
 
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Enter a name for your new folder. Folders help you organise your items."
+msgstr "새 폴더의 이름을 입력하세요. 폴더는 항목을 정리하는 데 도움을 줍니다."
+
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
 msgstr "클레임 이름 입력"
@@ -3179,6 +3234,7 @@ msgstr "엔터프라이즈"
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -3221,6 +3277,7 @@ msgstr "엔터프라이즈"
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
@@ -3265,14 +3322,17 @@ msgstr "{0}에 만료됨"
 msgid "External ID"
 msgstr "외부 ID"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "폴더 생성에 실패했습니다"
 
 #: apps/remix/app/components/dialogs/claim-create-dialog.tsx
 msgid "Failed to create subscription claim."
 msgstr "구독 클레임 생성에 실패했습니다."
+
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Failed to delete folder"
+msgstr "폴더 삭제 실패"
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Failed to delete subscription claim."
@@ -3282,13 +3342,25 @@ msgstr "구독 클레임 삭제에 실패했습니다."
 msgid "Failed to load document"
 msgstr "문서 로드에 실패했습니다"
 
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Failed to move folder"
+msgstr "폴더 이동 실패"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Failed to reseal document"
 msgstr "문서 걸쇠 잠금 실패"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Failed to revoke session"
+msgstr "세션을 취소하는 데 실패했습니다"
+
 #: packages/ui/primitives/document-flow/field-item-advanced-settings.tsx
 msgid "Failed to save settings."
 msgstr "설정 저장 실패．"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Failed to sign out all sessions"
+msgstr "모든 세션에서 로그아웃에 실패했습니다."
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
 msgid "Failed to update document"
@@ -3386,16 +3458,28 @@ msgstr "새로운 구독 클레임을 만들기 위한 세부 정보를 입력�
 msgid "Folder"
 msgstr "폴더"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Folder created successfully"
 msgstr "폴더가 성공적으로 생성되었습니다"
 
-#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "Folder deleted successfully"
+msgstr "폴더가 성공적으로 삭제되었습니다"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Folder moved successfully"
+msgstr "폴더가 성공적으로 이동되었습니다"
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "Folder Name"
+msgstr "폴더 이름"
+
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Folder not found"
 msgstr "폴더를 찾을 수 없습니다"
 
-#: apps/remix/app/components/dialogs/template-folder-settings-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
 msgid "Folder updated successfully"
 msgstr "폴더가 성공적으로 업데이트되었습니다"
@@ -3633,8 +3717,15 @@ msgid "Hide additional information"
 msgstr "추가 정보 숨기기"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
+#: apps/remix/app/components/general/folder/folder-grid.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Home"
 msgstr "홈"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Home (No Folder)"
+msgstr "홈 (폴더 없음)"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -3747,7 +3838,6 @@ msgstr "잘못된 코드입니다． 다시 시도해 주세요．"
 msgid "Invalid email"
 msgstr "잘못된 이메일"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
 msgstr "잘못된 링크"
@@ -3811,6 +3901,7 @@ msgid "Invoice"
 msgstr "송장"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 msgid "IP Address"
 msgstr "IP 주소"
@@ -3880,6 +3971,10 @@ msgstr "지난 30일"
 #: apps/remix/app/components/general/period-selector.tsx
 msgid "Last 7 days"
 msgstr "지난 7일"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Last Active"
+msgstr "마지막 활동"
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
@@ -4030,6 +4125,10 @@ msgstr "패스키 관리"
 msgid "Manage permissions and access controls"
 msgstr "권한 및 접근 제어 관리"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "Manage sessions"
+msgstr "세션 관리"
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Manage subscription"
@@ -4107,6 +4206,10 @@ msgstr "MAU (생성된 문서)"
 msgid "MAU (had document completed)"
 msgstr "MAU (문서 완료)"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "MAU (signed in)"
+msgstr "MAU (로그인 완료)"
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Max"
 msgstr "최대"
@@ -4177,7 +4280,9 @@ msgstr "월간 활성 사용자: 최소 하나의 문서를 생성한 사용자"
 msgid "Monthly Active Users: Users that had at least one of their documents completed"
 msgstr "월간 활성 사용자: 최소 한 개의 문서가 완료된 사용자"
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Move"
 msgstr "이동"
@@ -4189,6 +4294,10 @@ msgstr "\"{templateTitle}\"를 폴더로 이동"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Move Document to Folder"
 msgstr "문서를 폴더로 이동"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Move Folder"
+msgstr "폴더 이동"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Move Template to Folder"
@@ -4202,6 +4311,10 @@ msgstr "폴더로 이동"
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Multiple access methods can be selected."
 msgstr "다중 접근 방법을 선택할 수 있습니다."
+
+#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
+msgid "My Folder"
+msgstr "내 폴더"
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
@@ -4290,6 +4403,16 @@ msgstr "아니요"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "No active drafts"
 msgstr "활성화된 초안이 없음"
+
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "No folders found"
+msgstr "폴더를 찾을 수 없습니다"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+msgid "No folders found matching \"{searchTerm}\""
+msgstr "'{searchTerm}'와 일치하는 폴더를 찾을 수 없습니다"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/components/embed/embed-document-rejected.tsx
@@ -4600,9 +4723,17 @@ msgstr "조직들"
 msgid "Organisations that the user is a member of."
 msgstr "이 사용자가 멤버로 있는 조직들."
 
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Organise your documents"
+msgstr "문서를 정리하세요"
+
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organise your members into groups which can be assigned to teams"
 msgstr "멤버들을 팀에 할당할 수 있는 그룹으로 구성하세요"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Organise your templates"
+msgstr "템플릿을 정리하세요"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Organize your documents and templates"
@@ -4778,6 +4909,10 @@ msgstr "비밀번호 설정"
 #: apps/remix/app/components/general/user-profile-timur.tsx
 msgid "Pick any of the following agreements below and start signing to get started"
 msgstr "다음의 동의서 중 하나를 선택하고 서명을 시작하여 시작하세요"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Pin"
+msgstr "고정"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5305,7 +5440,6 @@ msgstr "문서 보유"
 msgid "Retry"
 msgstr "다시 시도"
 
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.decline.$token.tsx
@@ -5321,6 +5455,7 @@ msgstr "홈으로 돌아가기"
 msgid "Return to sign in"
 msgstr "로그인 화면으로 돌아가기"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke"
 msgstr "취소"
@@ -5328,6 +5463,12 @@ msgstr "취소"
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Revoke access"
 msgstr "접근 권한 취소"
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Revoke all sessions"
+msgstr "모든 세션 취소"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -5347,11 +5488,6 @@ msgstr "역할"
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 msgid "Roles"
 msgstr "역할들"
-
-#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
-#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
-msgid "Root (No Folder)"
-msgstr "루트 (폴더 없음)"
 
 #: packages/ui/primitives/data-table-pagination.tsx
 msgid "Rows per page"
@@ -5404,6 +5540,14 @@ msgstr "조직 ID, 이름, 고객 ID 또는 소유자 이메일로 검색"
 msgid "Search documents..."
 msgstr "문서 검색…"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+#: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "Search folders..."
+msgstr "폴더 검색..."
+
 #: packages/ui/components/common/language-switcher-dialog.tsx
 msgid "Search languages..."
 msgstr "언어 검색…"
@@ -5427,6 +5571,10 @@ msgstr "보안 활동"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 msgid "Select"
 msgstr "선택"
+
+#: apps/remix/app/components/dialogs/folder-move-dialog.tsx
+msgid "Select a destination for this folder."
+msgstr "이 폴더의 목적지를 선택하세요."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Select a folder to move this document to."
@@ -5482,6 +5630,10 @@ msgid "Select groups"
 msgstr "그룹 선택"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
+msgid "Select groups of members to add to the team."
+msgstr "팀에 추가할 구성원 그룹을 선택하세요."
+
+#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups to add to this team"
 msgstr "이 팀에 추가할 그룹 선택"
 
@@ -5492,7 +5644,6 @@ msgid "Select members"
 msgstr "멤버 선택"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select members or groups of members to add to the team."
 msgstr "팀에 추가할 멤버 또는 멤버 그룹을 선택하세요."
 
@@ -5602,6 +5753,14 @@ msgstr "보내는 중…"
 msgid "Sent"
 msgstr "보냈음"
 
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+msgid "Session revoked"
+msgstr "세션이 해제되었습니다."
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "Sessions have been revoked"
+msgstr "세션이 취소되었습니다."
+
 #: apps/remix/app/components/general/claim-account.tsx
 msgid "Set a password"
 msgstr "비밀번호 설정"
@@ -5621,6 +5780,7 @@ msgstr "템플릿 속성과 수신자 정보를 설정하세요"
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
+#: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Settings"
 msgstr "설정"
 
@@ -6318,7 +6478,6 @@ msgstr "템플릿 제목"
 msgid "Template updated successfully"
 msgstr "템플릿이 성공적으로 업데이트되었습니다"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
@@ -6449,12 +6608,10 @@ msgstr "URL로 전송될 웹훅을 트리거할 이벤트입니다．"
 msgid "The fields have been updated to the new field insertion method successfully"
 msgstr "필드가 새로운 필드 삽입 방법으로 성공적으로 업데이트되었습니다"
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "The folder you are trying to delete does not exist."
 msgstr "삭제하려는 폴더가 존재하지 않습니다."
 
-#: apps/remix/app/components/dialogs/template-folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "The folder you are trying to move does not exist."
 msgstr "이동하려는 폴더가 존재하지 않습니다."
@@ -6771,10 +6928,9 @@ msgstr "다른 수신자가 아직 서명하지 않았을 경우 문서에 서�
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "이 필드는 수정되거나 삭제될 수 없습니다． 이 템플릿의 직접 링크를 공유하거나 공개 프로필에 추가하면, 누구나 이름과 이메일을 입력하고 할당된 필드를 기입할 수 있습니다．"
 
-#: apps/remix/app/components/dialogs/template-folder-create-dialog.tsx
-#: apps/remix/app/components/dialogs/folder-create-dialog.tsx
-msgid "This folder name is already taken."
-msgstr "이 폴더 이름은 이미 사용 중입니다."
+#: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
+msgid "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
+msgstr "이 폴더에는 여러 항목이 포함되어 있습니다. 삭제하면 중첩 폴더 및 그 내용물을 포함한 모든 항목이 삭제됩니다."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -6783,10 +6939,6 @@ msgstr "이 문서를 서명할 준비가 되면 수신자에게 이렇게 도�
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This is the claim that this organisation was initially created with. Any feature flag changes to this claim will be backported into this organisation."
 msgstr "이것이 조직 초기 설립 당시의 클레임입니다. 이 클레임으로의 기능 플래그 변경은 조직에 백포팅됩니다."
-
-#: apps/remix/app/routes/_unauthenticated+/team.verify.transfer.$token.tsx
-msgid "This link is invalid or has expired."
-msgstr "이 링크는 유효하지 않거나 만료되었습니다."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "This link is invalid or has expired. Please contact your team to resend a verification."
@@ -6857,6 +7009,10 @@ msgstr "문서가 완전히 완료된 후 문서 소유자에게 이것이 발�
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
 msgstr "기능 플래그 기본 설정은 사실의 경우에만 백포팅됩니다. 초기 클레임에 비활성화된 사항은 백포팅되지 않습니다."
+
+#: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
+msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
+msgstr "이 작업은 다른 모든 기기에서 로그아웃됩니다. 계정을 계속 사용하려면 해당 기기에서 다시 로그인해야 합니다."
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
@@ -7144,6 +7300,9 @@ msgstr "미완료"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Unknown"
 msgstr "알 수 없음"
 
@@ -7154,6 +7313,10 @@ msgstr "무제한"
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Unlimited documents, API and more"
 msgstr "무제한 문서, API 및 기타"
+
+#: apps/remix/app/components/general/folder/folder-card.tsx
+msgid "Unpin"
+msgstr "고정 해제"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Untitled Group"
@@ -7496,6 +7659,11 @@ msgstr "모든 관련 문서 보기"
 #: apps/remix/app/routes/_authenticated+/settings+/security.activity.tsx
 msgid "View all security activity related to your account."
 msgstr "귀하의 계정과 관련된 모든 보안 활동 보기．"
+
+#: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
+#: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
+msgid "View and manage all active sessions for your account."
+msgstr "계정의 모든 활성 세션을 보고 관리하십시오."
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
@@ -7855,7 +8023,6 @@ msgstr "저희가 서명 링크를 생성해드리며, 원하시는 방법으로
 msgid "We won't send anything to notify recipients."
 msgstr "수신자에게 알리기 위해 아무것도 보내지 않습니다．"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "We're all empty"
@@ -8215,7 +8382,6 @@ msgstr "귀하에게 {recipientActionVerb}을 요구하는 문서 {0}을 시작�
 msgid "You have no webhooks yet. Your webhooks will be shown here once you create them."
 msgstr "아직 웹훅이 없습니다．웹훅을 만들면 여기에 표시됩니다．"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.f.$folderId._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates._index.tsx
 msgid "You have not yet created any templates. To create a template please upload one."
 msgstr "아직 템플릿을 생성하지 않았습니다．템플릿을 만들려면 하나를 업로드하세요．"
@@ -8317,7 +8483,6 @@ msgstr "<0>{0}</0>에 대한 이메일 주소를 확인했습니다．"
 msgid "You must enter '{deleteMessage}' to proceed"
 msgstr "계속하려면 '{deleteMessage}'을(를) 입력해야 합니다"
 
-#: apps/remix/app/components/dialogs/template-folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "You must type '{deleteMessage}' to confirm"
 msgstr "확인을 위해 '{deleteMessage}'를 입력해야 합니다"

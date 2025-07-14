@@ -83,8 +83,14 @@ export const onSubscriptionUpdated = async ({
 
   const status = match(subscription.status)
     .with('active', () => SubscriptionStatus.ACTIVE)
+    .with('trialing', () => SubscriptionStatus.ACTIVE)
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
+
+  const periodEnd =
+    subscription.status === 'trialing' && subscription.trial_end
+      ? new Date(subscription.trial_end * 1000)
+      : new Date(subscription.current_period_end * 1000);
 
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
@@ -96,7 +102,7 @@ export const onSubscriptionUpdated = async ({
         status: status,
         planId: subscription.id,
         priceId: subscription.items.data[0].price.id,
-        periodEnd: new Date(subscription.current_period_end * 1000),
+        periodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       },
     });
