@@ -153,20 +153,13 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
               </div>
 
               <DialogFooter>
-                <div className="flex w-full flex-nowrap gap-4">
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    className="flex-1"
-                    onClick={() => setOpen(false)}
-                  >
-                    <Trans>Cancel</Trans>
-                  </Button>
+                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
 
-                  <Button type="submit" className="flex-1" loading={form.formState.isSubmitting}>
-                    <Trans>Send Test Webhook</Trans>
-                  </Button>
-                </div>
+                <Button type="submit" loading={form.formState.isSubmitting}>
+                  <Trans>Send Test Webhook</Trans>
+                </Button>
               </DialogFooter>
             </fieldset>
           </form>
