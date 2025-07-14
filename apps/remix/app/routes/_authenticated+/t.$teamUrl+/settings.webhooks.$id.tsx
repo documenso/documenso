@@ -204,10 +204,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
               )}
             />
 
-            <div className="mt-4 flex gap-4">
-              <Button type="submit" loading={form.formState.isSubmitting}>
-                <Trans>Update webhook</Trans>
-              </Button>
+            <div className="mt-4 flex justify-end gap-4">
               {webhook && (
                 <WebhookTestDialog webhook={webhook}>
                   <Button variant="outline" disabled={!webhook.enabled}>
@@ -215,6 +212,10 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
                   </Button>
                 </WebhookTestDialog>
               )}
+
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                <Trans>Update webhook</Trans>
+              </Button>
             </div>
           </fieldset>
         </form>
