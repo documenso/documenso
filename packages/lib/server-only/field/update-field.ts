@@ -48,7 +48,6 @@ export const updateField = async ({
       id: fieldId,
       document: {
         id: documentId,
-        userId,
         team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
