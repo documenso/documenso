@@ -5,27 +5,26 @@ import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import type { TimePeriod } from '@documenso/ui/primitives/data-table/utils/time-filters';
 
 import { DocumentVisibility } from '../../types/document-visibility';
 import { type FindResultResponse } from '../../types/search-params';
 import { maskRecipientTokensForDocument } from '../../utils/mask-recipient-tokens-for-document';
 import { getTeamById } from '../team/get-team';
 
-export type PeriodSelectorValue = '' | '7d' | '14d' | '30d';
-
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
   templateId?: number;
   source?: DocumentSource;
-  status?: ExtendedDocumentStatus;
+  status?: ExtendedDocumentStatus[];
   page?: number;
   perPage?: number;
   orderBy?: {
     column: keyof Omit<Document, 'document'>;
     direction: 'asc' | 'desc';
   };
-  period?: PeriodSelectorValue;
+  period?: TimePeriod;
   senderIds?: number[];
   query?: string;
   folderId?: string;
@@ -36,7 +35,7 @@ export const findDocuments = async ({
   teamId,
   templateId,
   source,
-  status = ExtendedDocumentStatus.ALL,
+  status = [ExtendedDocumentStatus.ALL],
   page = 1,
   perPage = 10,
   orderBy,
@@ -106,10 +105,30 @@ export const findDocuments = async ({
     },
   ];
 
-  let filters: Prisma.DocumentWhereInput | null = findDocumentsFilter(status, user, folderId);
+  let filters: Prisma.DocumentWhereInput | null = null;
+
+  if (status.length === 1) {
+    filters = findDocumentsFilter(status[0], user, folderId);
+  } else if (status.length > 1) {
+    const statusFilters = status
+      .map((s) => findDocumentsFilter(s, user, folderId))
+      .filter((filter): filter is Prisma.DocumentWhereInput => filter !== null);
+    if (statusFilters.length > 0) {
+      filters = { OR: statusFilters };
+    }
+  }
 
   if (team) {
-    filters = findTeamDocumentsFilter(status, team, visibilityFilters, folderId);
+    if (status.length === 1) {
+      filters = findTeamDocumentsFilter(status[0], team, visibilityFilters, folderId);
+    } else if (status.length > 1) {
+      const statusFilters = status
+        .map((s) => findTeamDocumentsFilter(s, team, visibilityFilters, folderId))
+        .filter((filter): filter is Prisma.DocumentWhereInput => filter !== null);
+      if (statusFilters.length > 0) {
+        filters = { OR: statusFilters };
+      }
+    }
   }
 
   if (filters === null) {
@@ -197,13 +216,73 @@ export const findDocuments = async ({
     AND: whereAndClause,
   };
 
-  if (period) {
-    const daysAgo = parseInt(period.replace(/d$/, ''), 10);
+  if (period && period !== 'all-time') {
+    const now = DateTime.now();
 
-    const startOfPeriod = DateTime.now().minus({ days: daysAgo }).startOf('day');
+    const { startDate, endDate } = match(period)
+      .with('today', () => ({
+        startDate: now.startOf('day'),
+        endDate: now.startOf('day').plus({ days: 1 }),
+      }))
+      .with('yesterday', () => {
+        const yesterday = now.minus({ days: 1 });
+        return {
+          startDate: yesterday.startOf('day'),
+          endDate: yesterday.startOf('day').plus({ days: 1 }),
+        };
+      })
+      .with('this-week', () => ({
+        startDate: now.startOf('week'),
+        endDate: now.startOf('week').plus({ weeks: 1 }),
+      }))
+      .with('last-week', () => {
+        const lastWeek = now.minus({ weeks: 1 });
+        return {
+          startDate: lastWeek.startOf('week'),
+          endDate: lastWeek.startOf('week').plus({ weeks: 1 }),
+        };
+      })
+      .with('this-month', () => ({
+        startDate: now.startOf('month'),
+        endDate: now.startOf('month').plus({ months: 1 }),
+      }))
+      .with('last-month', () => {
+        const lastMonth = now.minus({ months: 1 });
+        return {
+          startDate: lastMonth.startOf('month'),
+          endDate: lastMonth.startOf('month').plus({ months: 1 }),
+        };
+      })
+      .with('this-quarter', () => ({
+        startDate: now.startOf('quarter'),
+        endDate: now.startOf('quarter').plus({ quarters: 1 }),
+      }))
+      .with('last-quarter', () => {
+        const lastQuarter = now.minus({ quarters: 1 });
+        return {
+          startDate: lastQuarter.startOf('quarter'),
+          endDate: lastQuarter.startOf('quarter').plus({ quarters: 1 }),
+        };
+      })
+      .with('this-year', () => ({
+        startDate: now.startOf('year'),
+        endDate: now.startOf('year').plus({ years: 1 }),
+      }))
+      .with('last-year', () => {
+        const lastYear = now.minus({ years: 1 });
+        return {
+          startDate: lastYear.startOf('year'),
+          endDate: lastYear.startOf('year').plus({ years: 1 }),
+        };
+      })
+      .otherwise(() => ({
+        startDate: now.startOf('day'),
+        endDate: now.startOf('day').plus({ days: 1 }),
+      }));
 
     whereClause.createdAt = {
-      gte: startOfPeriod.toJSDate(),
+      gte: startDate.toJSDate(),
+      lt: endDate.toJSDate(),
     };
   }
 
