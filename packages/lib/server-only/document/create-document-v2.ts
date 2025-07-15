@@ -24,6 +24,7 @@ import {
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { buildTeamWhereQuery } from '../../utils/teams';
@@ -148,15 +149,7 @@ export const createDocumentV2 = async ({
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            ...meta,
-            signingOrder: meta?.signingOrder || undefined,
-            emailSettings: meta?.emailSettings || undefined,
-            language: meta?.language || settings.documentLanguage,
-            typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
-            uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
-            drawSignatureEnabled: meta?.drawSignatureEnabled ?? settings.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, meta),
         },
       },
     });

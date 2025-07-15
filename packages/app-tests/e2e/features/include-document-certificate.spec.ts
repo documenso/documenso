@@ -244,7 +244,7 @@ test.describe('Signing Certificate Tests', () => {
     await apiSignin({
       page,
       email: owner.email,
-      redirectPath: `/t/${team.url}/settings/preferences`,
+      redirectPath: `/t/${team.url}/settings/document`,
     });
 
     await page

@@ -8,7 +8,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../../constants/organisations';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -56,7 +55,8 @@ export const run = async ({
     },
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'organisation',
       organisationId: organisation.id,
@@ -80,29 +80,24 @@ export const run = async ({
           organisationUrl: organisation.url,
         });
 
-        const lang = settings.documentLanguage;
-
         // !: Replace with the actual language of the recipient later
         const [html, text] = await Promise.all([
           renderEmailWithI18N(emailContent, {
-            lang,
+            lang: emailLanguage,
             branding,
           }),
           renderEmailWithI18N(emailContent, {
-            lang,
+            lang: emailLanguage,
             branding,
             plainText: true,
           }),
         ]);
 
-        const i18n = await getI18nInstance(lang);
+        const i18n = await getI18nInstance(emailLanguage);
 
         await mailer.sendMail({
           to: member.user.email,
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
+          from: senderEmail,
           subject: i18n._(msg`A new member has joined your organisation`),
           html,
           text,

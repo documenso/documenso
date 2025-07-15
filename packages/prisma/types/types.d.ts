@@ -18,6 +18,7 @@ declare global {
     type DocumentFormValues = TDocumentFormValues;
     type DocumentAuthOptions = TDocumentAuthOptions;
     type DocumentEmailSettings = TDocumentEmailSettings;
+    type DocumentEmailSettingsNullable = TDocumentEmailSettings | null;
 
     type RecipientAuthOptions = TRecipientAuthOptions;
 

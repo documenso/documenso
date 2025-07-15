@@ -5,7 +5,6 @@ import { Link } from 'react-router';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { putFile } from '@documenso/lib/universal/upload/put-file';
 import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
@@ -17,21 +16,19 @@ import {
   BrandingPreferencesForm,
   type TBrandingPreferencesFormSchema,
 } from '~/components/forms/branding-preferences-form';
-import {
-  DocumentPreferencesForm,
-  type TDocumentPreferencesFormSchema,
-} from '~/components/forms/document-preferences-form';
 import { SettingsHeader } from '~/components/general/settings-header';
+import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Preferences');
+  return appMetaTags('Branding Preferences');
 }
 
-export default function OrganisationSettingsPreferencesPage() {
+export default function OrganisationSettingsBrandingPage() {
   const { organisations } = useSession();
 
   const organisation = useCurrentOrganisation();
+  const team = useOptionalCurrentTeam();
 
   const { t } = useLingui();
   const { toast } = useToast();
@@ -45,51 +42,6 @@ export default function OrganisationSettingsPreferencesPage() {
 
   const { mutateAsync: updateOrganisationSettings } =
     trpc.organisation.settings.update.useMutation();
-
-  const onDocumentPreferencesFormSubmit = async (data: TDocumentPreferencesFormSchema) => {
-    try {
-      const {
-        documentVisibility,
-        documentLanguage,
-        includeSenderDetails,
-        includeSigningCertificate,
-        signatureTypes,
-      } = data;
-
-      if (
-        documentVisibility === null ||
-        documentLanguage === null ||
-        includeSenderDetails === null ||
-        includeSigningCertificate === null
-      ) {
-        throw new Error('Should not be possible.');
-      }
-
-      await updateOrganisationSettings({
-        organisationId: organisation.id,
-        data: {
-          documentVisibility,
-          documentLanguage,
-          includeSenderDetails,
-          includeSigningCertificate,
-          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
-          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-        },
-      });
-
-      toast({
-        title: t`Document preferences updated`,
-        description: t`Your document preferences have been updated`,
-      });
-    } catch (err) {
-      toast({
-        title: t`Something went wrong!`,
-        description: t`We were unable to update your document preferences at this time, please try again later`,
-        variant: 'destructive',
-      });
-    }
-  };
 
   const onBrandingPreferencesFormSubmit = async (data: TBrandingPreferencesFormSchema) => {
     try {
@@ -132,32 +84,21 @@ export default function OrganisationSettingsPreferencesPage() {
     );
   }
 
-  const settingsHeaderText = isPersonalLayoutMode ? t`Preferences` : t`Organisation Preferences`;
+  const settingsHeaderText = t`Branding Preferences`;
+
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general preferences`
-    : t`Here you can set preferences and defaults for your organisation. Teams will inherit these settings by default.`;
+    ? t`Here you can set your general branding preferences`
+    : team
+      ? t`Here you can set branding preferences for your team`
+      : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
     <div className="max-w-2xl">
       <SettingsHeader title={settingsHeaderText} subtitle={settingsHeaderSubtitle} />
 
-      <section>
-        <DocumentPreferencesForm
-          canInherit={false}
-          settings={organisationWithSettings.organisationGlobalSettings}
-          onFormSubmit={onDocumentPreferencesFormSubmit}
-        />
-      </section>
-
       {organisationWithSettings.organisationClaim.flags.allowCustomBranding ||
       !IS_BILLING_ENABLED() ? (
         <section>
-          <SettingsHeader
-            title={t`Branding Preferences`}
-            subtitle={t`Here you can set preferences and defaults for branding.`}
-            className="mt-8"
-          />
-
           <BrandingPreferencesForm
             context="Organisation"
             settings={organisationWithSettings.organisationGlobalSettings}

@@ -164,6 +164,8 @@ export const ZUpdateTemplateRequestSchema = z.object({
       timezone: ZDocumentMetaTimezoneSchema.optional(),
       dateFormat: ZDocumentMetaDateFormatSchema.optional(),
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+      emailId: z.string().nullish(),
+      emailReplyTo: z.string().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),

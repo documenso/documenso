@@ -5,7 +5,6 @@ import { msg } from '@lingui/core/macro';
 import { mailer } from '@documenso/email/mailer';
 import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { prisma } from '@documenso/prisma';
 
@@ -27,7 +26,8 @@ export type DeleteTeamEmailOptions = {
  * The user must either be part of the team with the required permissions, or the owner of the email.
  */
 export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamEmailOptions) => {
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'team',
       teamId,
@@ -82,24 +82,19 @@ export const deleteTeamEmail = async ({ userId, userEmail, teamId }: DeleteTeamE
       teamUrl: team.url,
     });
 
-    const lang = settings.documentLanguage;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang, branding }),
-      renderEmailWithI18N(template, { lang, branding, plainText: true }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance(lang);
+    const i18n = await getI18nInstance(emailLanguage);
 
     await mailer.sendMail({
       to: {
         address: team.organisation.owner.email,
         name: team.organisation.owner.name ?? '',
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
       subject: i18n._(msg`Team email has been revoked for ${team.name}`),
       html,
       text,

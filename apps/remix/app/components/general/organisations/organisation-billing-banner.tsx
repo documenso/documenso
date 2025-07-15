@@ -30,7 +30,7 @@ export const OrganisationBillingBanner = () => {
   const organisation = useOptionalCurrentOrganisation();
 
   const { mutateAsync: manageSubscription, isPending } =
-    trpc.billing.subscription.manage.useMutation();
+    trpc.enterprise.billing.subscription.manage.useMutation();
 
   const handleCreatePortal = async (organisationId: string) => {
     try {

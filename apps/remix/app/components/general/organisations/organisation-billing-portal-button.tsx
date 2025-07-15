@@ -21,7 +21,7 @@ export const OrganisationBillingPortalButton = ({
   const { toast } = useToast();
 
   const { mutateAsync: manageSubscription, isPending } =
-    trpc.billing.subscription.manage.useMutation();
+    trpc.enterprise.billing.subscription.manage.useMutation();
 
   const canManageBilling = canExecuteOrganisationAction(
     'MANAGE_BILLING',

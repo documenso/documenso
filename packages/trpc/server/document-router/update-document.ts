@@ -44,6 +44,8 @@ export const updateDocumentRoute = authenticatedProcedure
         distributionMethod: meta.distributionMethod,
         signingOrder: meta.signingOrder,
         allowDictateNextSigner: meta.allowDictateNextSigner,
+        emailId: meta.emailId,
+        emailReplyTo: meta.emailReplyTo,
         emailSettings: meta.emailSettings,
         requestMetadata: ctx.metadata,
       });

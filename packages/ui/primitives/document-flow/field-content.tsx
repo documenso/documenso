@@ -27,7 +27,7 @@ type FieldIconProps = {
     fieldMeta?: TFieldMetaSchema | null;
     signature?: Signature | null;
   };
-  documentMeta?: DocumentMeta | TemplateMeta;
+  documentMeta?: Pick<DocumentMeta | TemplateMeta, 'dateFormat'>;
 };
 
 /**

@@ -3,6 +3,7 @@ import { DocumentSource, type RecipientRole } from '@prisma/client';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from '../team/get-team-settings';
 
@@ -78,18 +79,7 @@ export const createDocumentFromTemplateLegacy = async ({
         })),
       },
       documentMeta: {
-        create: {
-          subject: template.templateMeta?.subject,
-          message: template.templateMeta?.message,
-          timezone: template.templateMeta?.timezone,
-          dateFormat: template.templateMeta?.dateFormat,
-          redirectUrl: template.templateMeta?.redirectUrl,
-          signingOrder: template.templateMeta?.signingOrder ?? undefined,
-          language: template.templateMeta?.language || settings.documentLanguage,
-          typedSignatureEnabled: template.templateMeta?.typedSignatureEnabled,
-          uploadSignatureEnabled: template.templateMeta?.uploadSignatureEnabled,
-          drawSignatureEnabled: template.templateMeta?.drawSignatureEnabled,
-        },
+        create: extractDerivedDocumentMeta(settings, template.templateMeta),
       },
     },
 
