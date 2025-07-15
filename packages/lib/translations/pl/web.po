@@ -313,6 +313,10 @@ msgstr "Użytkownik {prefix} zaktualizował tytuł dokumentu"
 msgid "{prefix} updated the document visibility"
 msgstr "Użytkownik {prefix} zaktualizował widoczność dokumentu"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} viewed the document"
+msgstr ""
+
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
 msgstr "{recipientActionVerb} dokument"
@@ -538,6 +542,10 @@ msgstr "404 Zespół nie znaleziony"
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "404 User not found"
 msgstr "404 Użytkownik nie znaleziony"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "404 Webhook not found"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 documents a month"
@@ -1614,6 +1622,7 @@ msgstr "Może przygotować"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -1767,7 +1776,6 @@ msgstr "Kliknij, aby rozpocząć"
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Click here to retry"
 msgstr "Kliknij tutaj, aby spróbować ponownie"
 
@@ -2749,11 +2757,6 @@ msgstr "Zaktualizowano identyfikator zewnętrzny dokumentu"
 msgid "Document found in your account"
 msgstr "Dokument znaleziony na Twoim koncie"
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Document history"
-msgstr "Historia dokumentu"
-
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
@@ -2871,6 +2874,10 @@ msgstr "Przesyłanie dokumentu wyłączone z powodu nieopłaconych faktur"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Document uploaded"
 msgstr "Przesłano dokument"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Document viewed"
+msgstr ""
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Document Viewed"
@@ -3292,6 +3299,10 @@ msgstr "Błąd"
 msgid "Error uploading file"
 msgstr "Błąd przesyłania pliku"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Event Type"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Everyone can access and view the document"
 msgstr "Każdy może uzyskać dostęp do dokumentu i go wyświetlić"
@@ -3554,6 +3565,7 @@ msgid "Global recipient action authentication"
 msgstr "Globalne uwierzytelnianie akcji odbiorcy"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Go back"
@@ -3711,10 +3723,6 @@ msgstr "Cześć, {userName} <0>({userEmail})</0>"
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Hide"
 msgstr "Ukryj"
-
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Hide additional information"
-msgstr "Ukryj dodatkowe informacje"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
@@ -5163,10 +5171,6 @@ msgstr "Wartości radiowe"
 msgid "Read only"
 msgstr "Tylko do odczytu"
 
-#: apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
-msgid "Read only field"
-msgstr "Pole tylko do odczytu"
-
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "Przeczytaj pełne <0>ujawnienie podpisu</0>."
@@ -5679,6 +5683,11 @@ msgstr "Wybierz wyzwalacze"
 msgid "Send"
 msgstr "Wyślij"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send a test webhook with sample data to verify your integration is working correctly."
+msgstr ""
+
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Send confirmation email"
 msgstr "Wyślij e-mail potwierdzający"
@@ -5734,6 +5743,10 @@ msgstr "Wyślij e-mail z prośbą o podpisanie przez odbiorcę"
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Send reminder"
 msgstr "Wyślij przypomnienie"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send Test Webhook"
+msgstr ""
 
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
@@ -5813,10 +5826,6 @@ msgstr "Podziel się swoim doświadczeniem podpisywania!"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Show"
 msgstr "Pokaż"
-
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
-msgid "Show additional information"
-msgstr "Pokaż dodatkowe informacje"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -6491,6 +6500,20 @@ msgstr "Szablony"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Szablony pozwalają na szybkie generowanie dokumentów z wypełnionymi odbiorcami i polami."
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test Webhook"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook failed"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook sent"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -6633,7 +6656,8 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "Poniższy zespół został usunięty. Nie będziesz mógł już uzyskać dostępu do tego zespołu i jego dokumentów."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Grupa organizacji, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6642,12 +6666,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Rola organizacji, która zostanie zastosowana do wszystkich członków tej grupy."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Organizacja, której szukasz, mogła zostać usunięta, zmieniona nazwa lub mogła nigdy nie istnieć."
 
@@ -6731,12 +6757,14 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Email zespołowy <0>{teamEmail}</0> został usunięty z następującego zespołu"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmienić nazwę lub mógł nigdy nie istnieć."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Zespół, którego szukasz, mógł zostać usunięty, zmieniony na, albo nigdy nie istniał."
 
@@ -6747,6 +6775,10 @@ msgstr "Szablon został pomyślnie przeniesiony."
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "The template will be removed from your profile"
 msgstr "Szablon zostanie usunięty z Twojego profilu"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "The test webhook has been successfully sent to your endpoint."
+msgstr ""
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "The token was copied to your clipboard."
@@ -6774,7 +6806,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "URL dla Documenso do wysyłania zdarzeń webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Użytkownik, którego szukasz, mógł zostać usunięty, zmieniony nazwę lub mógł nigdy nie istnieć."
 
@@ -6789,6 +6822,12 @@ msgstr "Webhook został pomyślnie zaktualizowany."
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "The webhook was successfully created."
 msgstr "Webhook został pomyślnie utworzony."
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
+msgstr ""
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
@@ -7241,7 +7280,6 @@ msgid "Unable to join this organisation at this time."
 msgstr "Nie można w tej chwili dołączyć do tej organizacji."
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
-#: apps/remix/app/components/general/document/document-history-sheet.tsx
 msgid "Unable to load document history"
 msgstr "Nie można załadować historii dokumentu"
 
@@ -7806,6 +7844,10 @@ msgstr "Nie udało nam się zaktualizować organizacji. Spróbuj ponownie."
 msgid "We encountered an error while removing the direct template link. Please try again later."
 msgstr "Wystąpił błąd podczas usuwania bezpośredniego linku do szablonu. Proszę spróbować ponownie później."
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "We encountered an error while sending the test webhook. Please check your endpoint and try again."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "We encountered an error while updating the webhook. Please try again later."
 msgstr "Natknęliśmy się na błąd podczas aktualizacji webhooka. Proszę spróbuj ponownie później."
@@ -8010,11 +8052,8 @@ msgstr "Nie udało się zweryfikować Twojego e-maila w tym momencie."
 msgid "We were unable to verify your email. If your email is not verified already, please try again."
 msgstr "Nie udało się zweryfikować twojego e-maila. Jeśli twój e-mail nie jest jeszcze zweryfikowany, spróbuj ponownie."
 
-#: packages/ui/primitives/document-flow/add-subject.tsx
-msgid "We will generate signing links for with you, which you can send to the recipients through your method of choice."
-msgstr "Wygenerujemy linki do podpisu dla Ciebie, które możesz wysłać do odbiorców w wybrany przez siebie sposób."
-
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "We will generate signing links for you, which you can send to the recipients through your method of choice."
 msgstr "Wygenerujemy dla Ciebie linki do podpisania, które możesz wysłać do odbiorców za pomocą wybranej metody."
 
@@ -8049,9 +8088,14 @@ msgid "Webhook deleted"
 msgstr "Webhook usunięty"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "Webhook not found"
+msgstr ""
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "Webhook updated"
 msgstr "Webhook zaktualizowany"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Webhook URL"
 msgstr "URL webhooka"
@@ -8728,4 +8772,3 @@ msgstr "Twój token został pomyślnie utworzony! Upewnij się, że go skopiujes
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Twoje tokeny będą tutaj wyświetlane po ich utworzeniu."
-
