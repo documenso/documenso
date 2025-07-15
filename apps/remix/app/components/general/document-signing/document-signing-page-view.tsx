@@ -72,9 +72,11 @@ export const DocumentSigningPageView = ({
   }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
+  const targetSigner =
+    recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   return (
-    <DocumentSigningRecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
+    <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl">
         <h1
           className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
