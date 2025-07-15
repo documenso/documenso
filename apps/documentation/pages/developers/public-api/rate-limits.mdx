@@ -22,21 +22,6 @@ Documenso enforces rate limits on all API endpoints to ensure service stability.
   seconds before retrying.
 </Callout>
 
-### Retry Example
-
-```javascript
-async function makeAPIRequest(url, options, retries = 3) {
-  const response = await fetch(url, options);
-
-  if (response.status === 429 && retries > 0) {
-    await new Promise((resolve) => setTimeout(resolve, 60000)); // Wait 60s
-    return makeAPIRequest(url, options, retries - 1);
-  }
-
-  return response;
-}
-```
-
 ## Resource Limits
 
 Beyond HTTP rate limits, your account has usage limits based on your subscription plan.
@@ -58,30 +43,6 @@ When you exceed a resource limit:
   "error": "You have reached your document limit for this month. Please upgrade your plan.",
   "code": "LIMIT_EXCEEDED",
   "statusCode": 400
-}
-```
-
-### Check Your Limits
-
-```bash
-curl -X GET "https://app.documenso.com/api/limits" \
-  -H "Authorization: Bearer YOUR_API_TOKEN"
-```
-
-Response:
-
-```json
-{
-  "remaining": {
-    "documents": 3,
-    "recipients": 8,
-    "directTemplates": 1
-  },
-  "quota": {
-    "documents": 5,
-    "recipients": 10,
-    "directTemplates": 3
-  }
 }
 ```
 
