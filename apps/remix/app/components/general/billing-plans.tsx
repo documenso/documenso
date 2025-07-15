@@ -10,7 +10,9 @@ import { useForm } from 'react-hook-form';
 import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent, CardTitle } from '@documenso/ui/primitives/card';
@@ -49,7 +51,11 @@ export type BillingPlansProps = {
 export const BillingPlans = ({ plans }: BillingPlansProps) => {
   const isMounted = useIsMounted();
 
+  const { organisations } = useSession();
+
   const [interval, setInterval] = useState<'monthlyPrice' | 'yearlyPrice'>('yearlyPrice');
+
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const pricesToDisplay = useMemo(() => {
     const prices = [];
@@ -126,12 +132,18 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
 
                 <div className="flex-1" />
 
-                <BillingDialog
-                  priceId={price.id}
-                  planName={price.product.name}
-                  memberCount={price.memberCount}
-                  claim={price.claim}
-                />
+                {isPersonalLayoutMode && price.claim === INTERNAL_CLAIM_ID.INDIVIDUAL ? (
+                  <IndividualPersonalLayoutCheckoutButton priceId={price.id}>
+                    <Trans>Subscribe</Trans>
+                  </IndividualPersonalLayoutCheckoutButton>
+                ) : (
+                  <BillingDialog
+                    priceId={price.id}
+                    planName={price.product.name}
+                    memberCount={price.memberCount}
+                    claim={price.claim}
+                  />
+                )}
               </CardContent>
             </MotionCard>
           ))}
@@ -313,5 +325,50 @@ const BillingDialog = ({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+/**
+ * Custom checkout button for individual organisations in personal layout mode.
+ *
+ * This is so they don't create an additional organisation which is not needed since
+ * it will clutter up the UI for them with unnecessary organisations.
+ */
+export const IndividualPersonalLayoutCheckoutButton = ({
+  priceId,
+  children,
+}: {
+  priceId: string;
+  children: React.ReactNode;
+}) => {
+  const { t } = useLingui();
+  const { toast } = useToast();
+  const { organisations } = useSession();
+
+  const { mutateAsync: createSubscription, isPending } =
+    trpc.billing.subscription.create.useMutation();
+
+  const onSubscribeClick = async () => {
+    try {
+      const createSubscriptionResponse = await createSubscription({
+        organisationId: organisations[0].id,
+        priceId,
+        isPersonalLayoutMode: true,
+      });
+
+      window.location.href = createSubscriptionResponse.redirectUrl;
+    } catch (_err) {
+      toast({
+        title: t`Something went wrong`,
+        description: t`An error occurred while trying to create a checkout session.`,
+        variant: 'destructive',
+      });
+    }
+  };
+
+  return (
+    <Button loading={isPending} onClick={() => void onSubscribeClick()}>
+      {children}
+    </Button>
   );
 };
