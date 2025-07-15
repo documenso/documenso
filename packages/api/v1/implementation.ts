@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { DocumentDataType, SigningStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentDataType, SigningStatus } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
@@ -27,9 +27,7 @@ import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-rec
 import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
-import { updateRecipient } from '@documenso/lib/server-only/recipient/update-recipient';
-import { createTeamMemberInvites } from '@documenso/lib/server-only/team/create-team-member-invites';
-import { deleteTeamMembers } from '@documenso/lib/server-only/team/delete-team-members';
+import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
@@ -52,6 +50,7 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { ApiContractV1 } from './contract';
@@ -78,8 +77,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  getDocument: authenticatedMiddleware(async (args, user, team) => {
+  getDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -140,8 +145,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: documentId } = args.params;
+    const { downloadOriginalDocument } = args.query;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
@@ -177,7 +189,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (!isDocumentCompleted(document.status)) {
+      if (!downloadOriginalDocument && !isDocumentCompleted(document.status)) {
         return {
           status: 400,
           body: {
@@ -186,7 +198,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { url } = await getPresignGetUrl(document.documentData.data);
+      const { url } = await getPresignGetUrl(
+        downloadOriginalDocument ? document.documentData.initialData : document.documentData.data,
+      );
 
       return {
         status: 200,
@@ -202,8 +216,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  deleteDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -255,7 +275,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -380,8 +400,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  deleteTemplate: authenticatedMiddleware(async (args, user, team) => {
+  deleteTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: templateId } = args.params;
+
+    logger.info({
+      input: {
+        id: templateId,
+      },
+    });
 
     try {
       const deletedTemplate = await deleteTemplate({
@@ -404,8 +430,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  getTemplate: authenticatedMiddleware(async (args, user, team) => {
+  getTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: templateId } = args.params;
+
+    logger.info({
+      input: {
+        id: templateId,
+      },
+    });
 
     try {
       const template = await getTemplateById({
@@ -461,201 +493,223 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body, params } = args;
+  createDocumentFromTemplate: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
-
-    if (remaining.documents <= 0) {
-      return {
-        status: 400,
-        body: {
-          message: 'You have reached the maximum number of documents allowed for this month',
+      logger.info({
+        input: {
+          templateId: params.templateId,
         },
-      };
-    }
-
-    const templateId = Number(params.templateId);
-
-    const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
-
-    const document = await createDocumentFromTemplateLegacy({
-      templateId,
-      userId: user.id,
-      teamId: team?.id,
-      recipients: body.recipients,
-    });
-
-    let documentDataId = document.documentDataId;
-
-    if (body.formValues) {
-      const pdf = await getFileServerSide(document.documentData);
-
-      const prefilled = await insertFormValuesInPdf({
-        pdf: Buffer.from(pdf),
-        formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFileServerSide({
-        name: fileName,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(prefilled),
-      });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
-      documentDataId = newDocumentData.id;
-    }
-
-    await updateDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team?.id,
-      data: {
-        title: fileName,
-        externalId: body.externalId || null,
-        formValues: body.formValues,
-        documentData: {
-          connect: {
-            id: documentDataId,
+      if (remaining.documents <= 0) {
+        return {
+          status: 400,
+          body: {
+            message: 'You have reached the maximum number of documents allowed for this month',
           },
-        },
-      },
-    });
+        };
+      }
 
-    if (body.meta) {
-      await upsertDocumentMeta({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        ...body.meta,
-        requestMetadata: metadata,
-      });
-    }
+      const templateId = Number(params.templateId);
 
-    if (body.authOptions) {
-      await updateDocumentSettings({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        data: body.authOptions,
-        requestMetadata: metadata,
-      });
-    }
+      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
-    return {
-      status: 200,
-      body: {
-        documentId: document.id,
-        recipients: document.recipients.map((recipient) => ({
-          recipientId: recipient.id,
-          name: recipient.name,
-          email: recipient.email,
-          token: recipient.token,
-          role: recipient.role,
-          signingOrder: recipient.signingOrder,
-
-          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-        })),
-      },
-    };
-  }),
-
-  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body, params } = args;
-
-    const { remaining } = await getServerLimits({ email: user.email, teamId: team?.id });
-
-    if (remaining.documents <= 0) {
-      return {
-        status: 400,
-        body: {
-          message: 'You have reached the maximum number of documents allowed for this month',
-        },
-      };
-    }
-
-    const templateId = Number(params.templateId);
-
-    let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
-
-    try {
-      document = await createDocumentFromTemplate({
+      const document = await createDocumentFromTemplateLegacy({
         templateId,
-        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
-        prefillFields: body.prefillFields,
-        override: {
-          title: body.title,
-          ...body.meta,
-        },
-        requestMetadata: metadata,
-      });
-    } catch (err) {
-      return AppError.toRestAPIError(err);
-    }
-
-    if (body.formValues) {
-      const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
-
-      const pdf = await getFileServerSide(document.documentData);
-
-      const prefilled = await insertFormValuesInPdf({
-        pdf: Buffer.from(pdf),
-        formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFileServerSide({
-        name: fileName,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(prefilled),
-      });
+      let documentDataId = document.documentDataId;
+
+      if (body.formValues) {
+        const pdf = await getFileServerSide(document.documentData);
+
+        const prefilled = await insertFormValuesInPdf({
+          pdf: Buffer.from(pdf),
+          formValues: body.formValues,
+        });
+
+        const newDocumentData = await putPdfFileServerSide({
+          name: fileName,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(prefilled),
+        });
+
+        documentDataId = newDocumentData.id;
+      }
 
       await updateDocument({
         documentId: document.id,
         userId: user.id,
         teamId: team?.id,
         data: {
+          title: fileName,
+          externalId: body.externalId || null,
           formValues: body.formValues,
           documentData: {
             connect: {
-              id: newDocumentData.id,
+              id: documentDataId,
             },
           },
         },
       });
-    }
 
-    if (body.authOptions) {
-      await updateDocumentSettings({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        data: body.authOptions,
-        requestMetadata: metadata,
+      if (body.meta) {
+        await upsertDocumentMeta({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          ...body.meta,
+          requestMetadata: metadata,
+        });
+      }
+
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: body.authOptions,
+          requestMetadata: metadata,
+        });
+      }
+
+      return {
+        status: 200,
+        body: {
+          documentId: document.id,
+          recipients: document.recipients.map((recipient) => ({
+            recipientId: recipient.id,
+            name: recipient.name,
+            email: recipient.email,
+            token: recipient.token,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
+        },
+      };
+    },
+  ),
+
+  generateDocumentFromTemplate: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { body, params } = args;
+
+      logger.info({
+        input: {
+          templateId: params.templateId,
+        },
       });
-    }
 
-    return {
-      status: 200,
-      body: {
-        documentId: document.id,
-        recipients: document.recipients.map((recipient) => ({
-          recipientId: recipient.id,
-          name: recipient.name,
-          email: recipient.email,
-          token: recipient.token,
-          role: recipient.role,
-          signingOrder: recipient.signingOrder,
-          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-        })),
-      },
-    };
-  }),
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
-  sendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+      if (remaining.documents <= 0) {
+        return {
+          status: 400,
+          body: {
+            message: 'You have reached the maximum number of documents allowed for this month',
+          },
+        };
+      }
+
+      const templateId = Number(params.templateId);
+
+      let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
+
+      try {
+        document = await createDocumentFromTemplate({
+          templateId,
+          externalId: body.externalId || null,
+          userId: user.id,
+          teamId: team?.id,
+          recipients: body.recipients,
+          prefillFields: body.prefillFields,
+          override: {
+            title: body.title,
+            ...body.meta,
+          },
+          requestMetadata: metadata,
+        });
+      } catch (err) {
+        return AppError.toRestAPIError(err);
+      }
+
+      if (body.formValues) {
+        const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
+
+        const pdf = await getFileServerSide(document.documentData);
+
+        const prefilled = await insertFormValuesInPdf({
+          pdf: Buffer.from(pdf),
+          formValues: body.formValues,
+        });
+
+        const newDocumentData = await putPdfFileServerSide({
+          name: fileName,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(prefilled),
+        });
+
+        await updateDocument({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: {
+            formValues: body.formValues,
+            documentData: {
+              connect: {
+                id: newDocumentData.id,
+              },
+            },
+          },
+        });
+      }
+
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: body.authOptions,
+          requestMetadata: metadata,
+        });
+      }
+
+      return {
+        status: 200,
+        body: {
+          documentId: document.id,
+          recipients: document.recipients.map((recipient) => ({
+            recipientId: recipient.id,
+            name: recipient.name,
+            email: recipient.email,
+            token: recipient.token,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
+        },
+      };
+    },
+  ),
+
+  sendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { sendEmail, sendCompletionEmails } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -728,9 +782,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  resendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  resendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { recipients } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       await resendDocument({
@@ -757,9 +817,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  createRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  createRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -818,7 +884,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             name,
             role,
             signingOrder,
-            actionAuth: authOptions?.actionAuth ?? null,
+            actionAuth: authOptions?.actionAuth ?? [],
           },
         ],
         requestMetadata: metadata,
@@ -848,9 +914,16 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  updateRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  updateRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, recipientId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+        recipientId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -876,18 +949,24 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedRecipient = await updateRecipient({
-      documentId: Number(documentId),
-      recipientId: Number(recipientId),
+    const updatedRecipient = await updateDocumentRecipients({
       userId: user.id,
-      teamId: team?.id,
-      email,
-      name,
-      role,
-      signingOrder,
-      actionAuth: authOptions?.actionAuth,
-      requestMetadata: metadata.requestMetadata,
-    }).catch(() => null);
+      teamId: team.id,
+      documentId: Number(documentId),
+      recipients: [
+        {
+          id: Number(recipientId),
+          email,
+          name,
+          role,
+          signingOrder,
+          actionAuth: authOptions?.actionAuth ?? [],
+        },
+      ],
+      requestMetadata: metadata,
+    })
+      .then(({ recipients }) => recipients[0])
+      .catch(null);
 
     if (!updatedRecipient) {
       return {
@@ -908,8 +987,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  deleteRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, recipientId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+        recipientId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -962,25 +1048,22 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  createField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  createField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
+
     const fields = Array.isArray(args.body) ? args.body : [args.body];
 
     const document = await prisma.document.findFirst({
       select: { id: true, status: true },
       where: {
         id: Number(documentId),
-        ...(team?.id
-          ? {
-              team: {
-                id: team.id,
-                members: { some: { userId: user.id } },
-              },
-            }
-          : {
-              userId: user.id,
-              teamId: null,
-            }),
+        team: buildTeamWhereQuery({ teamId: team.id, userId: user.id }),
       },
     });
 
@@ -1133,10 +1216,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  updateField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  updateField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, fieldId } = args.params;
     const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
       args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+        fieldId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -1224,12 +1314,20 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  deleteField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, fieldId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+        fieldId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
       userId: user.id,
+      teamId: team.id,
     });
 
     if (!document) {
@@ -1254,7 +1352,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       userId: user.id,
       teamId: team?.id,
       fieldId: Number(fieldId),
-      documentId: Number(documentId),
     }).catch(() => null);
 
     if (!field) {
@@ -1319,272 +1416,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     };
   }),
-
-  findTeamMembers: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId } = args.params;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const members = await prisma.teamMember.findMany({
-      where: {
-        teamId: team.id,
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    return {
-      status: 200,
-      body: {
-        members: members.map((member) => ({
-          id: member.id,
-          email: member.user.email,
-          role: member.role,
-        })),
-      },
-    };
-  }),
-
-  inviteTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId } = args.params;
-
-    const { email, role } = args.body;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const hasAlreadyBeenInvited = await prisma.teamMember.findFirst({
-      where: {
-        teamId: team.id,
-        user: {
-          email,
-        },
-      },
-    });
-
-    if (hasAlreadyBeenInvited) {
-      return {
-        status: 400,
-        body: {
-          message: 'This user has already been invited to the team',
-        },
-      };
-    }
-
-    await createTeamMemberInvites({
-      userId: user.id,
-      userName: user.name ?? '',
-      teamId: team.id,
-      invitations: [
-        {
-          email,
-          role,
-        },
-      ],
-    });
-
-    return {
-      status: 200,
-      body: {
-        message: 'An invite has been sent to the member',
-      },
-    };
-  }),
-
-  updateTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId, memberId } = args.params;
-
-    const { role } = args.body;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const member = await prisma.teamMember.findFirst({
-      where: {
-        id: Number(memberId),
-        teamId: team.id,
-      },
-    });
-
-    if (!member) {
-      return {
-        status: 404,
-        body: {
-          message: 'The provided member id does not exist.',
-        },
-      };
-    }
-
-    const updatedMember = await prisma.teamMember.update({
-      where: {
-        id: member.id,
-      },
-      data: {
-        role,
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    return {
-      status: 200,
-      body: {
-        id: updatedMember.id,
-        email: updatedMember.user.email,
-        role: updatedMember.role,
-      },
-    };
-  }),
-
-  removeTeamMember: authenticatedMiddleware(async (args, user, team) => {
-    const { id: teamId, memberId } = args.params;
-
-    if (team?.id !== Number(teamId)) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const self = await prisma.teamMember.findFirst({
-      where: {
-        userId: user.id,
-        teamId: team.id,
-      },
-    });
-
-    if (self?.role !== TeamMemberRole.ADMIN) {
-      return {
-        status: 403,
-        body: {
-          message: 'You are not authorized to perform actions against this team.',
-        },
-      };
-    }
-
-    const member = await prisma.teamMember.findFirst({
-      where: {
-        id: Number(memberId),
-        teamId: Number(teamId),
-      },
-      include: {
-        user: true,
-      },
-    });
-
-    if (!member) {
-      return {
-        status: 404,
-        body: {
-          message: 'Member not found',
-        },
-      };
-    }
-
-    if (team.ownerUserId === member.userId) {
-      return {
-        status: 403,
-        body: {
-          message: 'You cannot remove the owner of the team',
-        },
-      };
-    }
-
-    if (member.userId === user.id) {
-      return {
-        status: 403,
-        body: {
-          message: 'You cannot remove yourself from the team',
-        },
-      };
-    }
-
-    await deleteTeamMembers({
-      userId: user.id,
-      teamId: team.id,
-      teamMemberIds: [member.id],
-    });
-
-    return {
-      status: 200,
-      body: {
-        id: member.id,
-        email: member.user.email,
-        role: member.role,
-      },
-    };
-  }),
 });
 
 const updateDocument = async ({
@@ -1596,26 +1427,13 @@ const updateDocument = async ({
   documentId: number;
   data: Prisma.DocumentUpdateInput;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }) => {
   return await prisma.document.update({
     where: {
       id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      userId,
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     data: {
       ...data,

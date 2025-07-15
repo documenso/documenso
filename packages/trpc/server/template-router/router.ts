@@ -21,7 +21,6 @@ import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/de
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 
@@ -43,8 +42,6 @@ import {
   ZFindTemplatesResponseSchema,
   ZGetTemplateByIdRequestSchema,
   ZGetTemplateByIdResponseSchema,
-  ZMoveTemplateToTeamRequestSchema,
-  ZMoveTemplateToTeamResponseSchema,
   ZToggleTemplateDirectLinkRequestSchema,
   ZToggleTemplateDirectLinkResponseSchema,
   ZUpdateTemplateRequestSchema,
@@ -70,6 +67,12 @@ export const templateRouter = router({
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
 
+      ctx.logger.info({
+        input: {
+          folderId: input.folderId,
+        },
+      });
+
       return await findTemplates({
         userId: ctx.user.id,
         teamId,
@@ -94,6 +97,12 @@ export const templateRouter = router({
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await getTemplateById({
         id: templateId,
@@ -121,13 +130,20 @@ export const templateRouter = router({
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, templateDocumentDataId } = input;
+      const { title, templateDocumentDataId, folderId } = input;
+
+      ctx.logger.info({
+        input: {
+          folderId,
+        },
+      });
 
       return await createTemplate({
         userId: ctx.user.id,
         teamId,
         title,
         templateDocumentDataId,
+        folderId,
       });
     }),
 
@@ -148,8 +164,13 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, data, meta } = input;
-
       const userId = ctx.user.id;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await updateTemplate({
         userId,
@@ -178,6 +199,12 @@ export const templateRouter = router({
       const { teamId } = ctx;
       const { templateId } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       return await duplicateTemplate({
         userId: ctx.user.id,
         teamId,
@@ -202,8 +229,13 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
-
       const userId = ctx.user.id;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       await deleteTemplate({ userId, id: templateId, teamId });
 
@@ -230,7 +262,13 @@ export const templateRouter = router({
       const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
         input;
 
-      const limits = await getServerLimits({ email: ctx.user.email, teamId });
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
+      const limits = await getServerLimits({ userId: ctx.user.id, teamId });
 
       if (limits.remaining.documents === 0) {
         throw new Error('You have reached your document limit.');
@@ -293,6 +331,12 @@ export const templateRouter = router({
         templateUpdatedAt,
       } = input;
 
+      ctx.logger.info({
+        input: {
+          directTemplateToken,
+        },
+      });
+
       return await createDocumentFromDirectTemplate({
         directRecipientName,
         directRecipientEmail,
@@ -332,9 +376,16 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+          directRecipientId,
+        },
+      });
+
       const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
 
-      const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
+      const limits = await getServerLimits({ userId: ctx.user.id, teamId: template.teamId });
 
       if (limits.remaining.directTemplates === 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -366,6 +417,12 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       await deleteTemplateDirectLink({ userId, teamId, templateId });
 
       return ZGenericSuccessResponse;
@@ -392,33 +449,13 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
-      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
-    }),
-
-  /**
-   * @public
-   */
-  moveTemplateToTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/move',
-        summary: 'Move template',
-        description: 'Move a template to a team',
-        tags: ['Template'],
-      },
-    })
-    .input(ZMoveTemplateToTeamRequestSchema)
-    .output(ZMoveTemplateToTeamResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
-      const userId = ctx.user.id;
-
-      return await moveTemplateToTeam({
-        templateId,
-        teamId,
-        userId,
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
       });
+
+      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
     }),
 
   /**
@@ -429,6 +466,13 @@ export const templateRouter = router({
     .mutation(async ({ ctx, input }) => {
       const { templateId, teamId, csv, sendImmediately } = input;
       const { user } = ctx;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+          teamId,
+        },
+      });
 
       if (csv.length > 4 * 1024 * 1024) {
         throw new TRPCError({

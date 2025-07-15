@@ -47,9 +47,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   // Ensure typesafety when we add more options.
-  const isAccessAuthValid = match(derivedRecipientAccessAuth)
+  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
     .with(DocumentAccessAuth.ACCOUNT, () => Boolean(session.user))
-    .with(null, () => true)
+    .with(undefined, () => true)
     .exhaustive();
 
   if (!isAccessAuthValid) {
@@ -60,7 +60,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   return superLoaderJson({
     isAccessAuthValid: true,
-    template,
+    template: {
+      ...template,
+      folder: null,
+    },
     directTemplateRecipient,
   } as const);
 }

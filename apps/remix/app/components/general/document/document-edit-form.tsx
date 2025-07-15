@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
+import { z } from 'zod';
 
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
@@ -12,6 +13,7 @@ import {
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
 import type { TDocument } from '@documenso/lib/types/document';
+import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -29,13 +31,12 @@ import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentEditFormProps = {
   className?: string;
   initialDocument: TDocument;
   documentRootPath: string;
-  isDocumentEnterprise: boolean;
 };
 
 type EditDocumentStep = 'settings' | 'signers' | 'fields' | 'subject';
@@ -45,7 +46,6 @@ export const DocumentEditForm = ({
   className,
   initialDocument,
   documentRootPath,
-  isDocumentEnterprise,
 }: DocumentEditFormProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -53,7 +53,7 @@ export const DocumentEditForm = ({
   const navigate = useNavigate();
 
   const [searchParams] = useSearchParams();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDocumentPdfLoaded, setIsDocumentPdfLoaded] = useState(false);
 
@@ -177,14 +177,18 @@ export const DocumentEditForm = ({
     try {
       const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
 
+      const parsedGlobalAccessAuth = z
+        .array(ZDocumentAccessAuthTypesSchema)
+        .safeParse(data.globalAccessAuth);
+
       await updateDocument({
         documentId: document.id,
         data: {
           title: data.title,
           externalId: data.externalId || null,
           visibility: data.visibility,
-          globalAccessAuth: data.globalAccessAuth ?? null,
-          globalActionAuth: data.globalActionAuth ?? null,
+          globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
+          globalActionAuth: data.globalActionAuth ?? [],
         },
         meta: {
           timezone,
@@ -229,7 +233,7 @@ export const DocumentEditForm = ({
           recipients: data.signers.map((signer) => ({
             ...signer,
             // Explicitly set to null to indicate we want to remove auth if required.
-            actionAuth: signer.actionAuth || null,
+            actionAuth: signer.actionAuth ?? [],
           })),
         }),
       ]);
@@ -355,10 +359,9 @@ export const DocumentEditForm = ({
               key={recipients.length}
               documentFlow={documentFlow.settings}
               document={document}
-              currentTeamMemberRole={team?.currentTeamMember?.role}
+              currentTeamMemberRole={team.currentTeamRole}
               recipients={recipients}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               onSubmit={onAddSettingsFormSubmit}
             />
@@ -370,7 +373,6 @@ export const DocumentEditForm = ({
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
-              isDocumentEnterprise={isDocumentEnterprise}
               onSubmit={onAddSignersFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
@@ -382,7 +384,7 @@ export const DocumentEditForm = ({
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
-              teamId={team?.id}
+              teamId={team.id}
             />
 
             <AddSubjectFormPartial

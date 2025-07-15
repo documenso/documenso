@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { DocumentStatus, RecipientRole } from '@prisma/client';
 import {
   CheckCircle,
@@ -11,9 +10,10 @@ import {
   Download,
   Edit,
   EyeIcon,
+  FileDown,
+  FolderInput,
   Loader,
   MoreHorizontal,
-  MoveRight,
   Pencil,
   Share,
   Trash2,
@@ -22,6 +22,7 @@ import { Link } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
@@ -37,29 +38,27 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
-import { DocumentMoveDialog } from '~/components/dialogs/document-move-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentsTableActionDropdownProps = {
-  row: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
-  };
+  row: TDocumentRow;
+  onMoveDocument?: () => void;
 };
 
-export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdownProps) => {
+export const DocumentsTableActionDropdown = ({
+  row,
+  onMoveDocument,
+}: DocumentsTableActionDropdownProps) => {
   const { user } = useSession();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
-  const [isMoveDialogOpen, setMoveDialogOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -72,7 +71,8 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
   const isCurrentTeamDocument = team && row.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
-  const documentsPath = formatDocumentsPath(team?.url);
+  const documentsPath = formatDocumentsPath(team.url);
+  const formatPath = `${documentsPath}/${row.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
@@ -167,7 +167,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
-          <Link to={`${documentsPath}/${row.id}/edit`}>
+          <Link to={formatPath}>
             <Edit className="mr-2 h-4 w-4" />
             <Trans>Edit</Trans>
           </Link>
@@ -179,7 +179,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <Download className="mr-2 h-4 w-4" />
+          <FileDown className="mr-2 h-4 w-4" />
           <Trans>Download Original</Trans>
         </DropdownMenuItem>
 
@@ -188,11 +188,10 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        {/* We don't want to allow teams moving documents across at the moment. */}
-        {!team && !row.teamId && (
-          <DropdownMenuItem onClick={() => setMoveDialogOpen(true)}>
-            <MoveRight className="mr-2 h-4 w-4" />
-            <Trans>Move to Team</Trans>
+        {onMoveDocument && (
+          <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
+            <FolderInput className="mr-2 h-4 w-4" />
+            <Trans>Move to Folder</Trans>
           </DropdownMenuItem>
         )}
 
@@ -247,14 +246,7 @@ export const DocumentsTableActionDropdown = ({ row }: DocumentsTableActionDropdo
         documentTitle={row.title}
         open={isDeleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        teamId={team?.id}
         canManageDocument={canManageDocument}
-      />
-
-      <DocumentMoveDialog
-        documentId={row.id}
-        open={isMoveDialogOpen}
-        onOpenChange={setMoveDialogOpen}
       />
 
       <DocumentDuplicateDialog

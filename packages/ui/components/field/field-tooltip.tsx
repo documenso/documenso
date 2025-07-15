@@ -38,6 +38,14 @@ interface FieldToolTipProps extends VariantProps<typeof tooltipVariants> {
 export function FieldToolTip({ children, color, className = '', field }: FieldToolTipProps) {
   const coords = useFieldPageCoords(field);
 
+  const onTooltipContentClick = () => {
+    const $fieldEl = document.querySelector<HTMLButtonElement>(`#field-${field.id} > button`);
+
+    if ($fieldEl) {
+      $fieldEl.click();
+    }
+  };
+
   return createPortal(
     <div
       className={cn('pointer-events-none absolute')}
@@ -52,7 +60,11 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
         <Tooltip delayDuration={0} open={!field.inserted || !field.fieldMeta}>
           <TooltipTrigger className="absolute inset-0 w-full"></TooltipTrigger>
 
-          <TooltipContent className={tooltipVariants({ color, className })} sideOffset={2}>
+          <TooltipContent
+            className={tooltipVariants({ color, className })}
+            sideOffset={2}
+            onClick={onTooltipContentClick}
+          >
             {children}
             <TooltipArrow />
           </TooltipContent>

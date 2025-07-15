@@ -1,33 +1,36 @@
 import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
-import type { Team, TeamGlobalSettings } from '@prisma/client';
-import { TeamMemberRole } from '@prisma/client';
+import type { DocumentVisibility } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
+import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { getTeamById } from '../team/get-team';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   title: string;
   externalId?: string | null;
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentDataId: string;
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
   timezone?: string;
   requestMetadata: ApiRequestMetadata;
+  folderId?: string;
 };
 
 export const createDocument = async ({
@@ -40,52 +43,36 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
+  folderId,
 }: CreateDocumentOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    include: {
-      teamMembers: {
-        select: {
-          teamId: true,
-        },
-      },
-    },
+  const team = await getTeamById({ userId, teamId });
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
   });
 
-  if (
-    teamId !== undefined &&
-    !user.teamMembers.some((teamMember) => teamMember.teamId === teamId)
-  ) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Team not found',
-    });
-  }
+  let folderVisibility: DocumentVisibility | undefined;
 
-  let team: (Team & { teamGlobalSettings: TeamGlobalSettings | null }) | null = null;
-  let userTeamRole: TeamMemberRole | undefined;
-
-  if (teamId) {
-    const teamWithUserRole = await prisma.team.findFirstOrThrow({
+  if (folderId) {
+    const folder = await prisma.folder.findFirst({
       where: {
-        id: teamId,
+        id: folderId,
+        userId,
+        teamId,
       },
-      include: {
-        teamGlobalSettings: true,
-        members: {
-          where: {
-            userId: userId,
-          },
-          select: {
-            role: true,
-          },
-        },
+      select: {
+        visibility: true,
       },
     });
 
-    team = teamWithUserRole;
-    userTeamRole = teamWithUserRole.members[0]?.role;
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+
+    folderVisibility = folder.visibility;
   }
 
   if (normalizePdf) {
@@ -115,23 +102,24 @@ export const createDocument = async ({
     const document = await tx.document.create({
       data: {
         title,
+        qrToken: prefixedId('qr'),
         externalId,
         documentDataId,
         userId,
         teamId,
-        visibility: determineDocumentVisibility(
-          team?.teamGlobalSettings?.documentVisibility,
-          userTeamRole ?? TeamMemberRole.MEMBER,
-        ),
+        folderId,
+        visibility:
+          folderVisibility ??
+          determineDocumentVisibility(settings.documentVisibility, team.currentTeamRole),
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
           create: {
-            language: team?.teamGlobalSettings?.documentLanguage,
+            language: settings.documentLanguage,
             timezone: timezone,
-            typedSignatureEnabled: team?.teamGlobalSettings?.typedSignatureEnabled ?? true,
-            uploadSignatureEnabled: team?.teamGlobalSettings?.uploadSignatureEnabled ?? true,
-            drawSignatureEnabled: team?.teamGlobalSettings?.drawSignatureEnabled ?? true,
+            typedSignatureEnabled: settings.typedSignatureEnabled,
+            uploadSignatureEnabled: settings.uploadSignatureEnabled,
+            drawSignatureEnabled: settings.drawSignatureEnabled,
           },
         },
       },

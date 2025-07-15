@@ -2,6 +2,7 @@ import type { I18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { DocumentAuditLog, DocumentMeta, Field, Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
 import type {
@@ -106,7 +107,7 @@ export const diffRecipientChanges = (
   const newActionAuth =
     newAuthOptions?.actionAuth === undefined ? oldActionAuth : newAuthOptions.actionAuth;
 
-  if (oldAccessAuth !== newAccessAuth) {
+  if (!isDeepEqual(oldAccessAuth, newAccessAuth)) {
     diffs.push({
       type: RECIPIENT_DIFF_TYPE.ACCESS_AUTH,
       from: oldAccessAuth ?? '',
@@ -114,7 +115,7 @@ export const diffRecipientChanges = (
     });
   }
 
-  if (oldActionAuth !== newActionAuth) {
+  if (!isDeepEqual(oldActionAuth, newActionAuth)) {
     diffs.push({
       type: RECIPIENT_DIFF_TYPE.ACTION_AUTH,
       from: oldActionAuth ?? '',
@@ -336,6 +337,10 @@ export const formatDocumentAuditLogAction = (
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED }, () => ({
       anonymous: msg`Document opened`,
       identified: msg`${prefix} opened the document`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED }, () => ({
+      anonymous: msg`Document viewed`,
+      identified: msg`${prefix} viewed the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED }, () => ({
       anonymous: msg`Document title updated`,

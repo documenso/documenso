@@ -1,32 +1,26 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type GetTemplateByIdOptions = {
   id: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
+  folderId?: string | null;
 };
 
-export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
+export const getTemplateById = async ({
+  id,
+  userId,
+  teamId,
+  folderId = null,
+}: GetTemplateByIdOptions) => {
   const template = await prisma.template.findFirst({
     where: {
       id,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery({ teamId, userId }),
+      ...(folderId ? { folderId } : {}),
     },
     include: {
       directLink: true,
@@ -41,6 +35,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
           email: true,
         },
       },
+      folder: true,
     },
   });
 

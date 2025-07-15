@@ -85,7 +85,7 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddFieldsFormPartial = ({
@@ -166,7 +166,6 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -400,35 +399,60 @@ export const AddFieldsFormPartial = ({
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TAddFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
+          append(newField);
+
+          return;
+        }
+
+        if (duplicateAll) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
+
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
+            }
+
+            const newField: TAddFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TAddFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          formId: nanoid(12),
-          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, toast],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -440,6 +464,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
@@ -579,7 +604,6 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -637,10 +661,13 @@ export const AddFieldsFormPartial = ({
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
+                      onMouseEnter={() => setLastActiveField(field)}
+                      onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
                       onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();

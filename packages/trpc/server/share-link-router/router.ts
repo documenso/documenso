@@ -1,6 +1,7 @@
 import { createOrGetShareLink } from '@documenso/lib/server-only/share/create-or-get-share-link';
 
 import { procedure, router } from '../trpc';
+import { getDocumentInternalUrlForQRCodeRoute } from './get-document-internal-url-for-qr-code';
 import { ZCreateOrGetShareLinkMutationSchema } from './schema';
 
 export const shareLinkRouter = router({
@@ -8,6 +9,12 @@ export const shareLinkRouter = router({
     .input(ZCreateOrGetShareLinkMutationSchema)
     .mutation(async ({ ctx, input }) => {
       const { documentId, token } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       if (token) {
         return await createOrGetShareLink({ documentId, token });
@@ -21,4 +28,6 @@ export const shareLinkRouter = router({
 
       return await createOrGetShareLink({ documentId, userId: ctx.user.id });
     }),
+
+  getDocumentInternalUrlForQRCode: getDocumentInternalUrlForQRCodeRoute,
 });

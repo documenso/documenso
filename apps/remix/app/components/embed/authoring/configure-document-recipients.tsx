@@ -57,7 +57,7 @@ export const ConfigureDocumentRecipients = ({
     name: 'signers',
   });
 
-  const { getValues, watch } = useFormContext<TConfigureEmbedFormSchema>();
+  const { getValues, watch, setValue } = useFormContext<TConfigureEmbedFormSchema>();
 
   const signingOrder = watch('meta.signingOrder');
 
@@ -67,13 +67,16 @@ export const ConfigureDocumentRecipients = ({
 
   const onAddSigner = useCallback(() => {
     const signerNumber = signers.length + 1;
+    const recipientSigningOrder =
+      signers.length > 0 ? (signers[signers.length - 1]?.signingOrder || 0) + 1 : 1;
 
     appendSigner({
       formId: nanoid(8),
       name: isTemplate ? `Recipient ${signerNumber}` : '',
       email: isTemplate ? `recipient.${signerNumber}@document.com` : '',
       role: RecipientRole.SIGNER,
-      signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder || 0) + 1 : 1,
+      signingOrder:
+        signingOrder === DocumentSigningOrder.SEQUENTIAL ? recipientSigningOrder : undefined,
     });
   }, [appendSigner, signers]);
 
@@ -103,7 +106,7 @@ export const ConfigureDocumentRecipients = ({
       // Update signing order for each item
       const updatedSigners = remainingSigners.map((s: SignerItem, idx: number) => ({
         ...s,
-        signingOrder: idx + 1,
+        signingOrder: signingOrder === DocumentSigningOrder.SEQUENTIAL ? idx + 1 : undefined,
       }));
 
       // Update the form
@@ -123,7 +126,7 @@ export const ConfigureDocumentRecipients = ({
       const currentSigners = getValues('signers');
       const updatedSigners = currentSigners.map((signer: SignerItem, index: number) => ({
         ...signer,
-        signingOrder: index + 1,
+        signingOrder: signingOrder === DocumentSigningOrder.SEQUENTIAL ? index + 1 : undefined,
       }));
 
       // Update the form with new ordering
@@ -131,6 +134,16 @@ export const ConfigureDocumentRecipients = ({
     },
     [move, replace, getValues],
   );
+
+  const onSigningOrderChange = (signingOrder: DocumentSigningOrder) => {
+    setValue('meta.signingOrder', signingOrder);
+
+    if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+      signers.forEach((_signer, index) => {
+        setValue(`signers.${index}.signingOrder`, index + 1);
+      });
+    }
+  };
 
   return (
     <div>
@@ -152,11 +165,11 @@ export const ConfigureDocumentRecipients = ({
                 {...field}
                 id="signingOrder"
                 checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                onCheckedChange={(checked) => {
-                  field.onChange(
+                onCheckedChange={(checked) =>
+                  onSigningOrderChange(
                     checked ? DocumentSigningOrder.SEQUENTIAL : DocumentSigningOrder.PARALLEL,
-                  );
-                }}
+                  )
+                }
                 disabled={isSubmitting}
               />
             </FormControl>
@@ -184,6 +197,7 @@ export const ConfigureDocumentRecipients = ({
                 disabled={isSubmitting || !isSigningOrderEnabled}
               />
             </FormControl>
+
             <div className="flex items-center">
               <FormLabel
                 htmlFor="allowDictateNextSigner"
@@ -227,13 +241,14 @@ export const ConfigureDocumentRecipients = ({
                   key={signer.id}
                   draggableId={signer.id}
                   index={index}
-                  isDragDisabled={!isSigningOrderEnabled || isSubmitting}
+                  isDragDisabled={!isSigningOrderEnabled || isSubmitting || signer.disabled}
                 >
                   {(provided, snapshot) => (
-                    <div
+                    <fieldset
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
+                      disabled={signer.disabled}
                       className={cn('py-1', {
                         'bg-widget-foreground pointer-events-none rounded-md pt-2':
                           snapshot.isDragging,
@@ -349,7 +364,7 @@ export const ConfigureDocumentRecipients = ({
                                   {...field}
                                   isAssistantEnabled={isSigningOrderEnabled}
                                   onValueChange={field.onChange}
-                                  disabled={isSubmitting || snapshot.isDragging}
+                                  disabled={isSubmitting || snapshot.isDragging || signer.disabled}
                                 />
                               </FormControl>
                               <FormMessage />
@@ -360,13 +375,18 @@ export const ConfigureDocumentRecipients = ({
                         <Button
                           type="button"
                           variant="ghost"
-                          disabled={isSubmitting || signers.length === 1 || snapshot.isDragging}
+                          disabled={
+                            isSubmitting ||
+                            signers.length === 1 ||
+                            snapshot.isDragging ||
+                            signer.disabled
+                          }
                           onClick={() => removeSigner(index)}
                         >
                           <Trash className="h-4 w-4" />
                         </Button>
                       </motion.div>
-                    </div>
+                    </fieldset>
                   )}
                 </Draggable>
               ))}
