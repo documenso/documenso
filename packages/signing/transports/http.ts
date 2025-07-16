@@ -9,9 +9,13 @@ export type SignWithHttpOptions = {
 };
 
 export const signWithHttp = async ({ pdf }: SignWithHttpOptions) => {
-  const { pdf: pdfWithPlaceholder } = updateSigningPlaceholder({
-    pdf: await addSigningPlaceholder({ pdf }),
-  });
+  const skipPlaceholder = env('NEXT_PRIVATE_SIGNING_HTTP_SKIP_PLACEHOLDER') === 'true';
+
+  const pdfToSign = skipPlaceholder
+    ? pdf
+    : updateSigningPlaceholder({
+        pdf: await addSigningPlaceholder({ pdf }),
+      }).pdf;
 
   const serverUrl = env('NEXT_PRIVATE_SIGNING_HTTP_SERVER_URL');
   const authToken = env('NEXT_PRIVATE_SIGNING_HTTP_AUTH_TOKEN');
@@ -21,7 +25,7 @@ export const signWithHttp = async ({ pdf }: SignWithHttpOptions) => {
   }
 
   return await signWithHttpNative({
-    content: pdfWithPlaceholder,
+    content: pdfToSign,
     serverUrl,
     authToken,
     timestampServer: env('NEXT_PRIVATE_SIGNING_TIMESTAMP_SERVER') || undefined,
