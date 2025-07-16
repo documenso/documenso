@@ -1432,7 +1432,6 @@ const updateDocument = async ({
   return await prisma.document.update({
     where: {
       id: documentId,
-      userId,
       team: buildTeamWhereQuery({ teamId, userId }),
     },
     data: {

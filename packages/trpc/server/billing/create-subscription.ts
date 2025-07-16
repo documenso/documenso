@@ -12,7 +12,7 @@ import { ZCreateSubscriptionRequestSchema } from './create-subscription.types';
 export const createSubscriptionRoute = authenticatedProcedure
   .input(ZCreateSubscriptionRequestSchema)
   .mutation(async ({ ctx, input }) => {
-    const { organisationId, priceId } = input;
+    const { organisationId, priceId, isPersonalLayoutMode } = input;
 
     ctx.logger.info({
       input: {
@@ -70,10 +70,14 @@ export const createSubscriptionRoute = authenticatedProcedure
       });
     }
 
+    const returnUrl = isPersonalLayoutMode
+      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`
+      : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
+
     const redirectUrl = await createCheckoutSession({
       customerId,
       priceId,
-      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`,
+      returnUrl,
     });
 
     if (!redirectUrl) {
