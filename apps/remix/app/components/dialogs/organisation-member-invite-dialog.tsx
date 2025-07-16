@@ -13,7 +13,7 @@ import { z } from 'zod';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { IS_BILLING_ENABLED, SUPPORT_EMAIL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
 import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
@@ -303,8 +303,8 @@ export const OrganisationMemberInviteDialog = ({
               <AlertDescription>
                 <Trans>
                   Your plan does not support inviting members. Please upgrade or your plan or
-                  contact sales at <a href="mailto:support@documenso.com">support@documenso.com</a>{' '}
-                  if you would like to discuss your options.
+                  contact sales at <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a> if you
+                  would like to discuss your options.
                 </Trans>
               </AlertDescription>
             </Alert>
