@@ -1,5 +1,6 @@
 import { adminRouter } from './admin-router/router';
 import { apiTokenRouter } from './api-token-router/router';
+import { attachmentRouter } from './attachment-router/router';
 import { authRouter } from './auth-router/router';
 import { billingRouter } from './billing/router';
 import { documentRouter } from './document-router/router';
@@ -31,6 +32,7 @@ export const appRouter = router({
   template: templateRouter,
   webhook: webhookRouter,
   embeddingPresign: embeddingPresignRouter,
+  attachment: attachmentRouter,
 });
 
 export type AppRouter = typeof appRouter;
