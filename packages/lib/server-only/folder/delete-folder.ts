@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
 export interface DeleteFolderOptions {
@@ -18,8 +19,10 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
-      userId,
-      teamId,
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+      }),
     },
     include: {
       documents: true,
