@@ -538,6 +538,10 @@ msgstr "404 Team not found"
 msgid "404 User not found"
 msgstr "404 User not found"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "404 Webhook not found"
+msgstr "404 Webhook not found"
+
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 documents a month"
 msgstr "5 documents a month"
@@ -1613,6 +1617,7 @@ msgstr "Can prepare"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -3289,6 +3294,10 @@ msgstr "Error"
 msgid "Error uploading file"
 msgstr "Error uploading file"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Event Type"
+msgstr "Event Type"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Everyone can access and view the document"
 msgstr "Everyone can access and view the document"
@@ -3551,6 +3560,7 @@ msgid "Global recipient action authentication"
 msgstr "Global recipient action authentication"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Go back"
@@ -4132,10 +4142,10 @@ msgstr "Manage subscription"
 msgid "Manage the {0} organisation"
 msgstr "Manage the {0} organisation"
 
-#. placeholder {1}: organisation.name
+#. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Manage the {1} organisation subscription"
-msgstr "Manage the {1} organisation subscription"
+msgid "Manage the {0} organisation subscription"
+msgstr "Manage the {0} organisation subscription"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
@@ -5156,10 +5166,6 @@ msgstr "Radio values"
 msgid "Read only"
 msgstr "Read only"
 
-#: apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
-msgid "Read only field"
-msgstr "Read only field"
-
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
 msgstr "Read the full <0>signature disclosure</0>."
@@ -5672,6 +5678,11 @@ msgstr "Select triggers"
 msgid "Send"
 msgstr "Send"
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send a test webhook with sample data to verify your integration is working correctly."
+msgstr "Send a test webhook with sample data to verify your integration is working correctly."
+
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Send confirmation email"
 msgstr "Send confirmation email"
@@ -5727,6 +5738,10 @@ msgstr "Send recipient signing request email"
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Send reminder"
 msgstr "Send reminder"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send Test Webhook"
+msgstr "Send Test Webhook"
 
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
@@ -6480,6 +6495,20 @@ msgstr "Templates"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test Webhook"
+msgstr "Test Webhook"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook failed"
+msgstr "Test webhook failed"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook sent"
+msgstr "Test webhook sent"
+
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -6752,6 +6781,10 @@ msgstr "The template has been moved successfully."
 msgid "The template will be removed from your profile"
 msgstr "The template will be removed from your profile"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "The test webhook has been successfully sent to your endpoint."
+msgstr "The test webhook has been successfully sent to your endpoint."
+
 #: apps/remix/app/components/forms/token.tsx
 msgid "The token was copied to your clipboard."
 msgstr "The token was copied to your clipboard."
@@ -6796,6 +6829,14 @@ msgstr "The webhook has been updated successfully."
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "The webhook was successfully created."
 msgstr "The webhook was successfully created."
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
+msgstr ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
@@ -7812,6 +7853,10 @@ msgstr "We couldn't update the organisation. Please try again."
 msgid "We encountered an error while removing the direct template link. Please try again later."
 msgstr "We encountered an error while removing the direct template link. Please try again later."
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "We encountered an error while sending the test webhook. Please check your endpoint and try again."
+msgstr "We encountered an error while sending the test webhook. Please check your endpoint and try again."
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "We encountered an error while updating the webhook. Please try again later."
 msgstr "We encountered an error while updating the webhook. Please try again later."
@@ -8052,9 +8097,14 @@ msgid "Webhook deleted"
 msgstr "Webhook deleted"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "Webhook not found"
+msgstr "Webhook not found"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "Webhook updated"
 msgstr "Webhook updated"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Webhook URL"
 msgstr "Webhook URL"
