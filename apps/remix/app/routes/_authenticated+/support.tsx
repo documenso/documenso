@@ -1,11 +1,9 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { SubscriptionStatus } from '@prisma/client';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
-import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -19,7 +17,15 @@ export function meta() {
 export default function SupportPage() {
   const [showForm, setShowForm] = useState(false);
   const { user } = useSession();
-  const currentOrganisation = useOptionalCurrentOrganisation();
+  const { organisations } = useSession();
+  const [searchParams] = useSearchParams();
+  const org = searchParams.get('org');
+
+  let currentOrganisation;
+
+  if (org) {
+    currentOrganisation = organisations.find((organisation) => organisation.id === org);
+  }
 
   const subscriptionStatus = currentOrganisation?.subscription?.status;
 
@@ -75,35 +81,20 @@ export default function SupportPage() {
             <p className="text-muted-foreground mt-1">
               <Trans>
                 Join our community on{' '}
-                <a href="https://documen.so/discord" target="_blank" rel="noopener noreferrer">
+                <Link
+                  to="https://documen.so/discord"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
                   Discord
-                </a>{' '}
+                </Link>{' '}
                 for community support and discussion.
               </Trans>
             </p>
           </div>
-          {currentOrganisation && subscriptionStatus === SubscriptionStatus.ACTIVE && (
+          {currentOrganisation && subscriptionStatus && (
             <>
-              {/* <div className="rounded-lg border p-4">
-                <h2 className="flex items-center gap-2 text-lg font-bold">
-                  <MailIcon className="text-muted-foreground h-5 w-5" />
-                  <Link
-                    to="mailto:support@documenso.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="hover:underline"
-                  >
-                    <Trans>Email</Trans>
-                  </Link>
-                </h2>
-
-                <p className="text-muted-foreground mt-1">
-                  <Trans>
-                    Send an email to{' '}
-                    <a href="mailto:support@documenso.com">support@documenso.com</a>.
-                  </Trans>
-                </p>
-              </div> */}
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
                   <Link2Icon className="text-muted-foreground h-5 w-5" />

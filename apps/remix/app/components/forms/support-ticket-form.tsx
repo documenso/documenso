@@ -5,6 +5,7 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -37,6 +38,8 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
+  const { mutateAsync: submitSupportTicket } = trpc.profile.submitSupportTicket.useMutation();
+
   const form = useForm<TSupportTicket>({
     resolver: zodResolver(ZSupportTicketSchema),
     defaultValues: {
@@ -50,31 +53,18 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/support', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+      await submitSupportTicket(values);
+
+      toast({
+        title: t`Support ticket created`,
+        description: t`Your support request has been submitted. We'll get back to you soon!`,
       });
 
-      const data = await res.json();
-
-      if (data.error) {
-        toast({
-          title: t`Failed to create support ticket`,
-          description: data.error || t`An error occurred. Please try again later.`,
-          variant: 'destructive',
-        });
-      } else {
-        toast({
-          title: t`Support ticket created`,
-          description: t`Your support request has been submitted. We'll get back to you soon!`,
-        });
-
-        if (onSuccess) {
-          onSuccess();
-        }
-        form.reset();
+      if (onSuccess) {
+        onSuccess();
       }
+
+      form.reset();
     } catch (err) {
       toast({
         title: t`Failed to create support ticket`,

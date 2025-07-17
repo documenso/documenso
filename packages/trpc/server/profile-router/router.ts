@@ -3,6 +3,7 @@ import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-im
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
 import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { submitSupportTicket } from '@documenso/lib/server-only/user/submit-support-ticket';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
 import { adminProcedure, authenticatedProcedure, router } from '../trpc';
@@ -10,6 +11,7 @@ import {
   ZFindUserSecurityAuditLogsSchema,
   ZRetrieveUserByIdQuerySchema,
   ZSetProfileImageMutationSchema,
+  ZSubmitSupportTicketMutationSchema,
   ZUpdateProfileMutationSchema,
 } from './schema';
 
@@ -89,6 +91,18 @@ export const profileRouter = router({
         target,
         bytes,
         requestMetadata: ctx.metadata,
+      });
+    }),
+
+  submitSupportTicket: authenticatedProcedure
+    .input(ZSubmitSupportTicketMutationSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { email, subject, message } = input;
+
+      return await submitSupportTicket({
+        email,
+        subject,
+        message,
       });
     }),
 });
