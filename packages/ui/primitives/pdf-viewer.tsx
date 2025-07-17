@@ -226,8 +226,6 @@ export const PDFViewer = ({
                     <PDFPage
                       pageNumber={i + 1}
                       width={width}
-                      renderAnnotationLayer={false}
-                      renderTextLayer={false}
                       loading={() => ''}
                       onClick={(e) => onDocumentPageClick(e, i + 1)}
                     />
