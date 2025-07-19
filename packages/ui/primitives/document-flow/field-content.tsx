@@ -38,13 +38,8 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
 
   const { type, fieldMeta } = field;
 
-  // Only render checkbox if values exist, otherwise render the empty checkbox field content.
-  if (
-    field.type === FieldType.CHECKBOX &&
-    field.fieldMeta?.type === 'checkbox' &&
-    field.fieldMeta.values &&
-    field.fieldMeta.values.length > 0
-  ) {
+  // Render checkbox layout for checkbox fields, even if no values exist yet
+  if (field.type === FieldType.CHECKBOX && field.fieldMeta?.type === 'checkbox') {
     let checkedValues: string[] = [];
 
     try {
@@ -55,8 +50,32 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
       console.error(err);
     }
 
+    // If no values exist yet, show a placeholder checkbox
+    if (!field.fieldMeta.values || field.fieldMeta.values.length === 0) {
+      return (
+        <div
+          className={cn(
+            'flex gap-1 py-0.5',
+            field.fieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+          )}
+        >
+          <div className="flex items-center">
+            <Checkbox className="h-3 w-3" disabled />
+            <Label className="text-foreground ml-1.5 text-xs font-normal opacity-50">
+              Checkbox option
+            </Label>
+          </div>
+        </div>
+      );
+    }
+
     return (
-      <div className="flex flex-col gap-y-1 py-0.5">
+      <div
+        className={cn(
+          'flex gap-1 py-0.5',
+          field.fieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+        )}
+      >
         {field.fieldMeta.values.map((item, index) => (
           <div key={index} className="flex items-center">
             <Checkbox
