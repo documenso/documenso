@@ -240,35 +240,79 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       }));
 
       const selected: string[] = fromCheckboxValue(field.customText);
+      const direction = meta.data.direction ?? 'vertical';
 
       const topPadding = 12;
       const leftCheckboxPadding = 8;
       const leftCheckboxLabelPadding = 12;
       const checkboxSpaceY = 13;
 
-      for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * checkboxSpaceY + topPadding;
+      if (direction === 'horizontal') {
+        // Horizontal layout: arrange checkboxes side by side with wrapping
+        let currentX = leftCheckboxPadding;
+        let currentY = topPadding;
+        const maxWidth = pageWidth - fieldX - leftCheckboxPadding * 2;
 
-        const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
+        for (const [index, item] of (values ?? []).entries()) {
+          const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
-        if (selected.includes(item.value)) {
-          checkbox.check();
+          if (selected.includes(item.value)) {
+            checkbox.check();
+          }
+
+          const labelText = item.value.includes('empty-value-') ? '' : item.value;
+          const labelWidth = font.widthOfTextAtSize(labelText, 12);
+          const itemWidth = leftCheckboxLabelPadding + labelWidth + 16; // checkbox + padding + label + margin
+
+          // Check if item fits on current line, if not wrap to next line
+          if (currentX + itemWidth > maxWidth && index > 0) {
+            currentX = leftCheckboxPadding;
+            currentY += checkboxSpaceY;
+          }
+
+          page.drawText(labelText, {
+            x: fieldX + currentX + leftCheckboxLabelPadding,
+            y: pageHeight - (fieldY + currentY),
+            size: 12,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
+
+          checkbox.addToPage(page, {
+            x: fieldX + currentX,
+            y: pageHeight - (fieldY + currentY),
+            height: 8,
+            width: 8,
+          });
+
+          currentX += itemWidth;
         }
+      } else {
+        // Vertical layout: original behavior
+        for (const [index, item] of (values ?? []).entries()) {
+          const offsetY = index * checkboxSpaceY + topPadding;
 
-        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
-          y: pageHeight - (fieldY + offsetY),
-          size: 12,
-          font,
-          rotate: degrees(pageRotationInDegrees),
-        });
+          const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
-        checkbox.addToPage(page, {
-          x: fieldX + leftCheckboxPadding,
-          y: pageHeight - (fieldY + offsetY),
-          height: 8,
-          width: 8,
-        });
+          if (selected.includes(item.value)) {
+            checkbox.check();
+          }
+
+          page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
+            x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
+            y: pageHeight - (fieldY + offsetY),
+            size: 12,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
+
+          checkbox.addToPage(page, {
+            x: fieldX + leftCheckboxPadding,
+            y: pageHeight - (fieldY + offsetY),
+            height: 8,
+            width: 8,
+          });
+        }
       }
     })
     .with({ type: FieldType.RADIO }, (field) => {

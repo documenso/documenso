@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 
@@ -10,7 +10,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     width: 0,
   });
 
-  const calculateBounds = () => {
+  const calculateBounds = useCallback(() => {
     const $el =
       typeof elementOrSelector === 'string'
         ? document.querySelector<HTMLElement>(elementOrSelector)
@@ -32,11 +32,11 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
       width,
       height,
     };
-  };
+  }, [elementOrSelector, withScroll]);
 
   useEffect(() => {
     setBounds(calculateBounds());
-  }, [calculateBounds]);
+  }, []);
 
   useEffect(() => {
     const onResize = () => {
@@ -48,7 +48,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, [calculateBounds]);
+  }, []);
 
   useEffect(() => {
     const $el =
@@ -69,7 +69,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     return () => {
       observer.disconnect();
     };
-  }, [calculateBounds]);
+  }, []);
 
   return bounds;
 };
