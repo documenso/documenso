@@ -88,8 +88,6 @@ export const FieldItem = ({
     `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
   );
 
-  console.log({ $pageBounds });
-
   const signerStyles = useRecipientColors(recipientIndex);
 
   const isDevMode = searchParams.get('devmode') === 'true';

@@ -226,7 +226,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       },
     )
     .with({ type: FieldType.CHECKBOX }, (field) => {
-      console.log('====== FOUND CHECKBOX FIELD ======');
       const meta = ZCheckboxFieldMeta.safeParse(field.fieldMeta);
 
       if (!meta.success) {
@@ -249,7 +248,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       const checkboxSpaceY = 13;
 
       if (direction === 'horizontal') {
-        console.log('horizontal', field);
         // Horizontal layout: arrange checkboxes side by side with wrapping
         let currentX = leftCheckboxPadding;
         let currentY = topPadding;
