@@ -56,8 +56,12 @@ export const onSubscriptionUpdated = async ({
     );
   }
 
-  if (organisation.subscription?.planId !== subscription.id) {
-    console.error('[WARNING]: Organisation has two subscriptions');
+  if (
+    organisation.subscription &&
+    organisation.subscription.status !== SubscriptionStatus.INACTIVE &&
+    organisation.subscription.planId !== subscription.id
+  ) {
+    console.error('[WARNING]: Organisation might have two subscriptions');
   }
 
   const previousItem = previousAttributes?.items?.data[0];
@@ -112,10 +116,9 @@ export const onSubscriptionUpdated = async ({
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
       where: {
-        planId: subscription.id,
+        organisationId: organisation.id,
       },
       data: {
-        organisationId: organisation.id,
         status: status,
         planId: subscription.id,
         priceId: subscription.items.data[0].price.id,
