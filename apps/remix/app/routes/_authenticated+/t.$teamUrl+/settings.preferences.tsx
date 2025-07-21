@@ -41,6 +41,7 @@ export default function TeamsSettingsPage() {
         documentLanguage,
         includeSenderDetails,
         includeSigningCertificate,
+        includeAuditLog,
         signatureTypes,
       } = data;
 
@@ -51,6 +52,7 @@ export default function TeamsSettingsPage() {
           documentLanguage,
           includeSenderDetails,
           includeSigningCertificate,
+          includeAuditLog,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,

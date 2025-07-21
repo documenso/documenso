@@ -53,6 +53,7 @@ export default function OrganisationSettingsPreferencesPage() {
         documentLanguage,
         includeSenderDetails,
         includeSigningCertificate,
+        includeAuditLog,
         signatureTypes,
       } = data;
 
@@ -60,7 +61,8 @@ export default function OrganisationSettingsPreferencesPage() {
         documentVisibility === null ||
         documentLanguage === null ||
         includeSenderDetails === null ||
-        includeSigningCertificate === null
+        includeSigningCertificate === null ||
+        includeAuditLog === null
       ) {
         throw new Error('Should not be possible.');
       }
@@ -72,6 +74,7 @@ export default function OrganisationSettingsPreferencesPage() {
           documentLanguage,
           includeSenderDetails,
           includeSigningCertificate,
+          includeAuditLog,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),

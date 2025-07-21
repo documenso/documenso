@@ -9,6 +9,7 @@ import { signPdf } from '@documenso/signing';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
+import { getAuditLogPdf } from '../../../server-only/htmltopdf/get-audit-log';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
@@ -148,6 +149,13 @@ export const run = async ({
       }).catch(() => null)
     : null;
 
+  const auditLogData = settings.includeAuditLog
+    ? await getAuditLogPdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch(() => null)
+    : null;
+
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
     const pdfDoc = await PDFDocument.load(pdfData);
 
@@ -170,6 +178,16 @@ export const run = async ({
       );
 
       certificatePages.forEach((page) => {
+        pdfDoc.addPage(page);
+      });
+    }
+
+    if (auditLogData) {
+      const auditLogDoc = await PDFDocument.load(auditLogData);
+
+      const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
+
+      auditLogPages.forEach((page) => {
         pdfDoc.addPage(page);
       });
     }

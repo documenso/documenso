@@ -731,6 +731,7 @@ model OrganisationGlobalSettings {
   documentLanguage          String             @default("en")
   includeSenderDetails      Boolean            @default(true)
   includeSigningCertificate Boolean            @default(true)
+  includeAuditLog           Boolean            @default(true)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -750,6 +751,7 @@ model TeamGlobalSettings {
   documentLanguage          String?
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
+  includeAuditLog           Boolean?
 
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
