@@ -73,11 +73,11 @@ export const getAuditLogPdf = async ({ documentId, language }: GetAuditLogPdfOpt
           white-space: normal !important;
           line-height: 1.2 !important;
         }
-        th:nth-child(1) { width: 12%; }
-        th:nth-child(2) { width: 18%; }
-        th:nth-child(3) { width: 40%; }
-        th:nth-child(4) { width: 15%; }
-        th:nth-child(5) { width: 15%; }
+        th:nth-child(1) { width: 15%; }
+        th:nth-child(2) { width: 20%; }
+        th:nth-child(3) { width: 25%; }
+        th:nth-child(4) { width: 20%; }
+        th:nth-child(5) { width: 20%; }
       }
     `,
   });
