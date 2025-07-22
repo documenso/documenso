@@ -19,6 +19,7 @@ import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
+import { isUserEnterprise } from '@documenso/lib/server-only/user/is-user-enterprise';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
@@ -40,6 +41,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (!token) {
     throw new Response('Not Found', { status: 404 });
   }
+
+  const isEnterprise = user?.id
+    ? await isUserEnterprise({ userId: user.id }).catch(() => false)
+    : false;
 
   const [document, recipient, fields, completedFields] = await Promise.all([
     getDocumentAndSenderByToken({
@@ -116,6 +121,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       isDocumentAccessValid: false,
       recipientEmail: recipient.email,
       recipientHasAccount,
+      isEnterprise,
     } as const);
   }
 
@@ -153,6 +159,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     recipientSignature,
     isRecipientsTurn,
     includeSenderDetails: settings.includeSenderDetails,
+    isEnterprise,
   } as const);
 }
 
@@ -181,6 +188,7 @@ export default function SigningPage() {
     allRecipients,
     includeSenderDetails,
     recipientWithFields,
+    isEnterprise,
   } = data;
 
   if (document.deletedAt || document.status === DocumentStatus.REJECTED) {
@@ -246,6 +254,7 @@ export default function SigningPage() {
         documentAuthOptions={document.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterprise}
       >
         <DocumentSigningPageView
           recipient={recipientWithFields}
@@ -255,6 +264,7 @@ export default function SigningPage() {
           isRecipientsTurn={isRecipientsTurn}
           allRecipients={allRecipients}
           includeSenderDetails={includeSenderDetails}
+          isEnterprise={isEnterprise}
         />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>

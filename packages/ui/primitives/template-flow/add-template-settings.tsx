@@ -371,28 +371,27 @@ export const AddTemplateSettingsFormPartial = ({
               )}
             />
 
-            {organisation.organisationClaim.flags.cfr21 && (
-              <FormField
-                control={form.control}
-                name="globalActionAuth"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex flex-row items-center">
-                      <Trans>Recipient action authentication</Trans>
-                      <DocumentGlobalAuthActionTooltip />
-                    </FormLabel>
+            <FormField
+              control={form.control}
+              name="globalActionAuth"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="flex flex-row items-center">
+                    <Trans>Recipient action authentication</Trans>
+                    <DocumentGlobalAuthActionTooltip />
+                  </FormLabel>
 
-                    <FormControl>
-                      <DocumentGlobalAuthActionSelect
-                        value={field.value}
-                        disabled={field.disabled}
-                        onValueChange={field.onChange}
-                      />
-                    </FormControl>
-                  </FormItem>
-                )}
-              />
-            )}
+                  <FormControl>
+                    <DocumentGlobalAuthActionSelect
+                      value={field.value}
+                      disabled={field.disabled}
+                      onValueChange={field.onChange}
+                      isDocumentEnterprise={organisation.organisationClaim.flags.cfr21}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
 
             {distributionMethod === DocumentDistributionMethod.EMAIL && (
               <Accordion type="multiple">

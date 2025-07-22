@@ -37,3 +37,23 @@ export const getOrganisationClaimByTeamId = async ({ teamId }: { teamId: number 
 
   return organisationClaim;
 };
+
+export const getOrganisationClaimByUserId = async ({ userId }: { userId: number }) => {
+  const organisationClaim = await prisma.organisationClaim.findFirst({
+    where: {
+      organisation: {
+        members: {
+          some: {
+            userId: userId,
+          },
+        },
+      },
+    },
+  });
+
+  if (!organisationClaim) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
+  }
+
+  return organisationClaim;
+};

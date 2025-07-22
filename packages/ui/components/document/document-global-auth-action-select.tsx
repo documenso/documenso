@@ -4,7 +4,11 @@ import { Trans } from '@lingui/react/macro';
 import { InfoIcon } from 'lucide-react';
 
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
-import { DocumentActionAuth, DocumentAuth } from '@documenso/lib/types/document-auth';
+import {
+  DocumentActionAuth,
+  DocumentAuth,
+  NonEnterpriseDocumentActionAuth,
+} from '@documenso/lib/types/document-auth';
 import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
@@ -14,6 +18,7 @@ export interface DocumentGlobalAuthActionSelectProps {
   onValueChange?: (value: string[]) => void;
   disabled?: boolean;
   placeholder?: string;
+  isDocumentEnterprise?: boolean;
 }
 
 export const DocumentGlobalAuthActionSelect = ({
@@ -22,8 +27,15 @@ export const DocumentGlobalAuthActionSelect = ({
   onValueChange,
   disabled,
   placeholder,
+  isDocumentEnterprise,
 }: DocumentGlobalAuthActionSelectProps) => {
   const { _ } = useLingui();
+
+  const authTypes = isDocumentEnterprise
+    ? Object.values(DocumentActionAuth).filter((auth) => auth !== DocumentAuth.ACCOUNT)
+    : Object.values(NonEnterpriseDocumentActionAuth).filter(
+        (auth) => auth !== DocumentAuth.EXPLICIT_NONE,
+      );
 
   // Convert auth types to MultiSelect options
   const authOptions: Option[] = [
@@ -31,12 +43,10 @@ export const DocumentGlobalAuthActionSelect = ({
       value: '-1',
       label: _(msg`No restrictions`),
     },
-    ...Object.values(DocumentActionAuth)
-      .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-      .map((authType) => ({
-        value: authType,
-        label: DOCUMENT_AUTH_TYPES[authType].value,
-      })),
+    ...authTypes.map((authType) => ({
+      value: authType,
+      label: DOCUMENT_AUTH_TYPES[authType].value,
+    })),
   ];
 
   // Convert string array to Option array for MultiSelect

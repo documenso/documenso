@@ -71,3 +71,18 @@ export const ZFindPasskeysQuerySchema = ZFindSearchParamsSchema.extend({
 });
 
 export type TSignUpMutationSchema = z.infer<typeof ZSignUpMutationSchema>;
+
+export const ZSendEmailVerificationMutationSchema = z.object({
+  recipientId: z.number().optional(),
+});
+
+export type TSendEmailVerificationMutationSchema = z.infer<
+  typeof ZSendEmailVerificationMutationSchema
+>;
+
+export const ZVerifyEmailCodeMutationSchema = z.object({
+  code: z.string().min(6).max(6),
+  recipientId: z.number().optional(),
+});
+
+export type TVerifyEmailCodeMutationSchema = z.infer<typeof ZVerifyEmailCodeMutationSchema>;
