@@ -228,6 +228,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'checkbox',
         label: field.label,
         values: newValues,
+        direction: checkboxMeta.direction ?? 'vertical',
       };
 
       return meta;
