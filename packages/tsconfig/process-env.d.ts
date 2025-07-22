@@ -15,6 +15,8 @@ declare namespace NodeJS {
     NEXT_PRIVATE_ENCRYPTION_KEY: string;
     NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: string;
 
+    NEXT_PRIVATE_LOGGER_FILE_PATH?: string;
+
     NEXT_PRIVATE_STRIPE_API_KEY: string;
     NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET: string;
 
@@ -76,8 +78,6 @@ declare namespace NodeJS {
     INNGEST_SIGNING_KEY?: string;
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
-
-    NEXT_PRIVATE_LOGGER_HONEY_BADGER_API_KEY?: string;
 
     POSTGRES_URL?: string;
     DATABASE_URL?: string;

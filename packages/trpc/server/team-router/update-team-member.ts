@@ -22,6 +22,13 @@ export const updateTeamMemberRoute = authenticatedProcedure
     const { teamId, memberId, data } = input;
     const userId = ctx.user.id;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+        memberId,
+      },
+    });
+
     const team = await prisma.team.findFirst({
       where: {
         AND: [

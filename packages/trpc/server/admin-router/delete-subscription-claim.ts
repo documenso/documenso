@@ -10,8 +10,14 @@ import {
 export const deleteSubscriptionClaimRoute = adminProcedure
   .input(ZDeleteSubscriptionClaimRequestSchema)
   .output(ZDeleteSubscriptionClaimResponseSchema)
-  .mutation(async ({ input }) => {
+  .mutation(async ({ input, ctx }) => {
     const { id } = input;
+
+    ctx.logger.info({
+      input: {
+        id,
+      },
+    });
 
     const existingClaim = await prisma.subscriptionClaim.findFirst({
       where: {

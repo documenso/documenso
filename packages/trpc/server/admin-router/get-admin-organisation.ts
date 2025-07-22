@@ -10,8 +10,14 @@ import {
 export const getAdminOrganisationRoute = adminProcedure
   .input(ZGetAdminOrganisationRequestSchema)
   .output(ZGetAdminOrganisationResponseSchema)
-  .query(async ({ input }) => {
+  .query(async ({ input, ctx }) => {
     const { organisationId } = input;
+
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
 
     return await getAdminOrganisation({
       organisationId,

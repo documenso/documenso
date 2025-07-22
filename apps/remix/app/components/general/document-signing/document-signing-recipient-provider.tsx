@@ -38,11 +38,6 @@ export const DocumentSigningRecipientProvider = ({
   recipient,
   targetSigner = null,
 }: DocumentSigningRecipientProviderProps) => {
-  // console.log({
-  //   recipient,
-  //   targetSigner,
-  //   isAssistantMode: !!targetSigner,
-  // });
   return (
     <DocumentSigningRecipientContext.Provider
       value={{
