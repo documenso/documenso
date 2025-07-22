@@ -9,12 +9,17 @@ import {
   DocumentAuth,
   NonEnterpriseDocumentActionAuth,
 } from '@documenso/lib/types/document-auth';
-import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
 export interface DocumentGlobalAuthActionSelectProps {
   value?: string[];
-  defaultValue?: string[];
   onValueChange?: (value: string[]) => void;
   disabled?: boolean;
   placeholder?: string;
@@ -23,7 +28,6 @@ export interface DocumentGlobalAuthActionSelectProps {
 
 export const DocumentGlobalAuthActionSelect = ({
   value,
-  defaultValue,
   onValueChange,
   disabled,
   placeholder,
@@ -37,47 +41,33 @@ export const DocumentGlobalAuthActionSelect = ({
         (auth) => auth !== DocumentAuth.EXPLICIT_NONE,
       );
 
-  // Convert auth types to MultiSelect options
-  const authOptions: Option[] = [
-    {
-      value: '-1',
-      label: _(msg`No restrictions`),
-    },
-    ...authTypes.map((authType) => ({
-      value: authType,
-      label: DOCUMENT_AUTH_TYPES[authType].value,
-    })),
-  ];
+  const selectedValue = value?.[0] || '';
 
-  // Convert string array to Option array for MultiSelect
-  const selectedOptions =
-    (value
-      ?.map((val) => authOptions.find((option) => option.value === val))
-      .filter(Boolean) as Option[]) || [];
-
-  // Convert default value to Option array
-  const defaultOptions =
-    (defaultValue
-      ?.map((val) => authOptions.find((option) => option.value === val))
-      .filter(Boolean) as Option[]) || [];
-
-  const handleChange = (options: Option[]) => {
-    const values = options.map((option) => option.value);
-    onValueChange?.(values);
+  const handleChange = (newValue: string) => {
+    if (newValue === '-1') {
+      onValueChange?.([]);
+    } else {
+      onValueChange?.([newValue]);
+    }
   };
 
   return (
-    <MultiSelect
-      value={selectedOptions}
-      defaultOptions={defaultOptions}
-      options={authOptions}
-      onChange={handleChange}
-      disabled={disabled}
-      placeholder={placeholder || _(msg`Select authentication methods`)}
-      className="bg-background text-muted-foreground"
-      hideClearAllButton={false}
-      data-testid="documentActionSelectValue"
-    />
+    <Select value={selectedValue || '-1'} onValueChange={handleChange} disabled={disabled}>
+      <SelectTrigger
+        className="bg-background text-muted-foreground"
+        data-testid="documentActionSelectValue"
+      >
+        <SelectValue placeholder={placeholder || _(msg`Select authentication method`)} />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="-1">{_(msg`No restrictions`)}</SelectItem>
+        {authTypes.map((authType) => (
+          <SelectItem key={authType} value={authType}>
+            {DOCUMENT_AUTH_TYPES[authType].value}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 };
 
@@ -96,14 +86,14 @@ export const DocumentGlobalAuthActionTooltip = () => (
 
       <p>
         <Trans>
-          The authentication methods required for recipients to sign the signature field.
+          The authentication method required for recipients to sign the signature field.
         </Trans>
       </p>
 
       <p>
         <Trans>
-          These can be overriden by setting the authentication requirements directly on each
-          recipient in the next step. Multiple methods can be selected.
+          This can be overridden by setting the authentication requirements directly on each
+          recipient in the next step.
         </Trans>
       </p>
 
