@@ -131,7 +131,7 @@ export const sealDocument = async ({
         documentId,
         language: document.documentMeta?.language,
       }).catch((e) => {
-        console.log('Failed to get audit log PDF');
+        console.log('Failed to get audit logs PDF');
         console.error(e);
 
         return null;

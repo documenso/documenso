@@ -368,7 +368,7 @@ export const DocumentPreferencesForm = ({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel>
-                  <Trans>Include the Audit Log in the Document</Trans>
+                  <Trans>Include the Audit Logs in the Document</Trans>
                 </FormLabel>
 
                 <FormControl>
@@ -403,8 +403,9 @@ export const DocumentPreferencesForm = ({
 
                 <FormDescription>
                   <Trans>
-                    Controls whether the audit log will be included in the document when it is
-                    downloaded. The audit log can still be downloaded from the logs page separately.
+                    Controls whether the audit logs will be included in the document when it is
+                    downloaded. The audit logs can still be downloaded from the logs page
+                    separately.
                   </Trans>
                 </FormDescription>
               </FormItem>
