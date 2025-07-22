@@ -17,6 +17,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -61,8 +62,10 @@ export const createDocument = async ({
     const folder = await prisma.folder.findFirst({
       where: {
         id: folderId,
-        userId,
-        teamId,
+        team: buildTeamWhereQuery({
+          teamId,
+          userId,
+        }),
       },
       select: {
         visibility: true,

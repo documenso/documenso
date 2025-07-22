@@ -53,14 +53,7 @@ export const resendDocument = async ({
   const document = await prisma.document.findUnique({
     where: documentWhereInput,
     include: {
-      recipients: {
-        where: {
-          id: {
-            in: recipients,
-          },
-          signingStatus: SigningStatus.NOT_SIGNED,
-        },
-      },
+      recipients: true,
       documentMeta: true,
       team: {
         select: {
@@ -89,6 +82,11 @@ export const resendDocument = async ({
     throw new Error('Can not send completed document');
   }
 
+  const recipientsToRemind = document.recipients.filter(
+    (recipient) =>
+      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+  );
+
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
   ).recipientSigningRequest;
@@ -108,7 +106,7 @@ export const resendDocument = async ({
     });
 
   await Promise.all(
-    document.recipients.map(async (recipient) => {
+    recipientsToRemind.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }

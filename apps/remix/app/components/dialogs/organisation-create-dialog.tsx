@@ -19,6 +19,7 @@ import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { parseMessageDescriptorMacro } from '@documenso/lib/utils/i18n';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { ZCreateOrganisationRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation.types';
 import { cn } from '@documenso/ui/lib/utils';
@@ -46,6 +47,8 @@ import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { IndividualPersonalLayoutCheckoutButton } from '../general/billing-plans';
+
 export type OrganisationCreateDialogProps = {
   trigger?: React.ReactNode;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
@@ -59,10 +62,11 @@ export type TCreateOrganisationFormSchema = z.infer<typeof ZCreateOrganisationFo
 export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
-  const { refreshSession } = useSession();
+  const { refreshSession, organisations } = useSession();
 
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
+  const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const actionSearchParam = searchParams?.get('action');
 
@@ -133,6 +137,13 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
     form.reset();
   }, [open, form]);
 
+  const isIndividualPlan = (priceId: string) => {
+    return (
+      plansData?.plans[INTERNAL_CLAIM_ID.INDIVIDUAL]?.monthlyPrice?.id === priceId ||
+      plansData?.plans[INTERNAL_CLAIM_ID.INDIVIDUAL]?.yearlyPrice?.id === priceId
+    );
+  };
+
   return (
     <Dialog
       {...props}
@@ -177,9 +188,15 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
                     <Trans>Cancel</Trans>
                   </Button>
 
-                  <Button type="submit" onClick={() => setStep('create')}>
-                    <Trans>Continue</Trans>
-                  </Button>
+                  {isIndividualPlan(selectedPriceId) && isPersonalLayoutMode ? (
+                    <IndividualPersonalLayoutCheckoutButton priceId={selectedPriceId}>
+                      <Trans>Checkout</Trans>
+                    </IndividualPersonalLayoutCheckoutButton>
+                  ) : (
+                    <Button type="submit" onClick={() => setStep('create')}>
+                      <Trans>Continue</Trans>
+                    </Button>
+                  )}
                 </DialogFooter>
               </fieldset>
             </>
@@ -306,7 +323,11 @@ const BillingPlanForm = ({
   }, [value]);
 
   const onBillingPeriodChange = (billingPeriod: 'monthlyPrice' | 'yearlyPrice') => {
-    const plan = dynamicPlans.find((plan) => plan[billingPeriod]?.id === value);
+    const plan = dynamicPlans.find(
+      (plan) =>
+        // Purposely using the opposite billing period to get the correct plan.
+        plan[billingPeriod === 'monthlyPrice' ? 'yearlyPrice' : 'monthlyPrice']?.id === value,
+    );
 
     setBillingPeriod(billingPeriod);
 

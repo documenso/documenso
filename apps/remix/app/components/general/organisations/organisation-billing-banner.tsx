@@ -5,18 +5,23 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { AlertTriangle } from 'lucide-react';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -86,7 +91,7 @@ export const OrganisationBillingBanner = () => {
             className={cn({
               'text-yellow-900 hover:bg-yellow-100 dark:hover:bg-yellow-500':
                 subscriptionStatus === SubscriptionStatus.PAST_DUE,
-              'text-destructive-foreground hover:bg-destructive-foreground hover:text-white':
+              'text-destructive-foreground hover:bg-destructive hover:text-white':
                 subscriptionStatus === SubscriptionStatus.INACTIVE,
             })}
             disabled={isPending}
@@ -99,38 +104,78 @@ export const OrganisationBillingBanner = () => {
       </div>
 
       <Dialog open={isOpen} onOpenChange={(value) => !isPending && setIsOpen(value)}>
-        <DialogContent>
-          <DialogTitle>
-            <Trans>Payment overdue</Trans>
-          </DialogTitle>
+        {match(subscriptionStatus)
+          .with(SubscriptionStatus.PAST_DUE, () => (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <Trans>Payment overdue</Trans>
+                </DialogTitle>
 
-          {match(subscriptionStatus)
-            .with(SubscriptionStatus.PAST_DUE, () => (
-              <DialogDescription>
-                <Trans>
-                  Your payment for teams is overdue. Please settle the payment to avoid any service
-                  disruptions.
-                </Trans>
-              </DialogDescription>
-            ))
-            .with(SubscriptionStatus.INACTIVE, () => (
-              <DialogDescription>
-                <Trans>
-                  Due to an unpaid invoice, your team has been restricted. Please settle the payment
-                  to restore full access to your team.
-                </Trans>
-              </DialogDescription>
-            ))
-            .otherwise(() => null)}
+                <DialogDescription>
+                  <Trans>
+                    Your payment is overdue. Please settle the payment to avoid any service
+                    disruptions.
+                  </Trans>
+                </DialogDescription>
+              </DialogHeader>
 
-          {canExecuteOrganisationAction('MANAGE_BILLING', organisation.currentOrganisationRole) && (
-            <DialogFooter>
-              <Button loading={isPending} onClick={async () => handleCreatePortal(organisation.id)}>
-                <Trans>Resolve payment</Trans>
-              </Button>
-            </DialogFooter>
-          )}
-        </DialogContent>
+              {canExecuteOrganisationAction(
+                'MANAGE_BILLING',
+                organisation.currentOrganisationRole,
+              ) && (
+                <DialogFooter>
+                  <Button
+                    loading={isPending}
+                    onClick={async () => handleCreatePortal(organisation.id)}
+                  >
+                    <Trans>Resolve payment</Trans>
+                  </Button>
+                </DialogFooter>
+              )}
+            </DialogContent>
+          ))
+          .with(SubscriptionStatus.INACTIVE, () => (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>
+                  <Trans>Subscription invalid</Trans>
+                </DialogTitle>
+
+                <DialogDescription>
+                  <Trans>
+                    Your plan is no longer valid. Please subscribe to a new plan to continue using
+                    Documenso.
+                  </Trans>
+                </DialogDescription>
+              </DialogHeader>
+
+              <Alert variant="neutral">
+                <AlertDescription>
+                  <Trans>
+                    If there is any issue with your subscription, please contact us at{' '}
+                    <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>.
+                  </Trans>
+                </AlertDescription>
+              </Alert>
+
+              {canExecuteOrganisationAction(
+                'MANAGE_BILLING',
+                organisation.currentOrganisationRole,
+              ) && (
+                <DialogFooter>
+                  <DialogClose asChild>
+                    <Button asChild>
+                      <Link to={`/o/${organisation.url}/settings/billing`}>
+                        <Trans>Manage Billing</Trans>
+                      </Link>
+                    </Button>
+                  </DialogClose>
+                </DialogFooter>
+              )}
+            </DialogContent>
+          ))
+          .otherwise(() => null)}
       </Dialog>
     </>
   );

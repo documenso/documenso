@@ -12,3 +12,5 @@ export const NEXT_PRIVATE_INTERNAL_WEBAPP_URL =
 export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED') === 'true';
 
 export const API_V2_BETA_URL = '/api/v2-beta';
+
+export const SUPPORT_EMAIL = 'support@documenso.com';
