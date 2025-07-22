@@ -77,7 +77,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">{_(msg`Version History`)}</h1>
+        <h1 className="my-8 text-2xl font-bold">{_(msg`Audit Log`)}</h1>
       </div>
 
       <Card>
