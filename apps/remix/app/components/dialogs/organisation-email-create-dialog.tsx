@@ -45,7 +45,7 @@ export type OrganisationEmailCreateDialogProps = {
 
 const ZCreateOrganisationEmailFormSchema = ZCreateOrganisationEmailRequestSchema.pick({
   emailName: true,
-  emailPrefix: true,
+  email: true,
   // replyTo: true,
 });
 
@@ -65,7 +65,7 @@ export const OrganisationEmailCreateDialog = ({
     resolver: zodResolver(ZCreateOrganisationEmailFormSchema),
     defaultValues: {
       emailName: '',
-      emailPrefix: '',
+      email: '',
       // replyTo: '',
     },
   });
@@ -161,7 +161,7 @@ export const OrganisationEmailCreateDialog = ({
 
               <FormField
                 control={form.control}
-                name="emailPrefix"
+                name="email"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel required>
@@ -169,17 +169,24 @@ export const OrganisationEmailCreateDialog = ({
                     </FormLabel>
                     <FormControl>
                       <div className="relative flex items-center gap-2">
-                        <Input {...field} placeholder="support" />
+                        <Input
+                          {...field}
+                          value={field.value.split('@')[0]}
+                          onChange={(e) => {
+                            field.onChange(e.target.value + '@' + emailDomain.domain);
+                          }}
+                          placeholder="support"
+                        />
                         <div className="bg-muted text-muted-foreground absolute bottom-0 right-0 top-0 flex items-center rounded-r-md border px-3 py-2 text-sm">
                           @{emailDomain.domain}
                         </div>
                       </div>
                     </FormControl>
                     <FormMessage />
-                    {!form.formState.errors.emailPrefix && (
+                    {!form.formState.errors.email && (
                       <span className="text-foreground/50 text-xs font-normal">
                         {field.value ? (
-                          `${field.value}@${emailDomain.domain}`
+                          field.value
                         ) : (
                           <Trans>
                             The part before the @ symbol (e.g., "support" for support@

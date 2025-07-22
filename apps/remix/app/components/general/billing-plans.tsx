@@ -346,7 +346,7 @@ export const IndividualPersonalLayoutCheckoutButton = ({
   const { organisations } = useSession();
 
   const { mutateAsync: createSubscription, isPending } =
-    trpc.billing.subscription.create.useMutation();
+    trpc.enterprise.billing.subscription.create.useMutation();
 
   const onSubscribeClick = async () => {
     try {
