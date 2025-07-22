@@ -27,6 +27,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { downloadDocumentRoute } from './download-document';
 import { findInboxRoute } from './find-inbox';
 import { getInboxCountRoute } from './get-inbox-count';
 import {
@@ -63,6 +64,7 @@ export const documentRouter = router({
     getCount: getInboxCountRoute,
   },
   updateDocument: updateDocumentRoute,
+  downloadDocument: downloadDocumentRoute,
 
   /**
    * @private
