@@ -74,11 +74,6 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
-export const ZCreateTemplateV2ResponseSchema = z.object({
-  template: ZTemplateSchema,
-  uploadUrl: z.string().min(1),
-});
-
 export const ZCreateTemplateMutationSchema = z.object({
   title: z.string().min(1).trim(),
   templateDocumentDataId: z.string().min(1),
@@ -172,6 +167,9 @@ export const ZDeleteTemplateMutationSchema = z.object({
   templateId: z.number(),
 });
 
+/**
+ * Note: This is the same between V1 and V2. Be careful when updating this schema and think of the consequences.
+ */
 export const ZCreateTemplateV2RequestSchema = z.object({
   title: ZTemplateTitleSchema,
   folderId: z.string().optional(),
@@ -183,6 +181,14 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   publicDescription: ZTemplatePublicDescriptionSchema.optional(),
   type: z.nativeEnum(TemplateType).optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),
+});
+
+/**
+ * Note: This is the same between V1 and V2. Be careful when updating this schema and think of the consequences.
+ */
+export const ZCreateTemplateV2ResponseSchema = z.object({
+  template: ZTemplateSchema,
+  uploadUrl: z.string().min(1),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({

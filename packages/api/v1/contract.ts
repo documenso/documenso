@@ -1,6 +1,11 @@
 import { initContract } from '@ts-rest/core';
 
 import {
+  ZCreateTemplateV2RequestSchema,
+  ZCreateTemplateV2ResponseSchema,
+} from '@documenso/trpc/server/template-router/schema';
+
+import {
   ZAuthorizationHeadersSchema,
   ZCreateDocumentFromTemplateMutationResponseSchema,
   ZCreateDocumentFromTemplateMutationSchema,
@@ -8,8 +13,6 @@ import {
   ZCreateDocumentMutationSchema,
   ZCreateFieldMutationSchema,
   ZCreateRecipientMutationSchema,
-  ZCreateTemplateMutationResponseSchema,
-  ZCreateTemplateMutationSchema,
   ZDeleteDocumentMutationSchema,
   ZDeleteFieldMutationSchema,
   ZDeleteRecipientMutationSchema,
@@ -92,9 +95,9 @@ export const ApiContractV1 = c.router(
     createTemplate: {
       method: 'POST',
       path: '/api/v1/templates',
-      body: ZCreateTemplateMutationSchema,
+      body: ZCreateTemplateV2RequestSchema,
       responses: {
-        200: ZCreateTemplateMutationResponseSchema,
+        200: ZCreateTemplateV2ResponseSchema,
         401: ZUnsuccessfulResponseSchema,
         404: ZUnsuccessfulResponseSchema,
       },

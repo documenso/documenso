@@ -3,7 +3,6 @@ import {
   DocumentDataType,
   DocumentDistributionMethod,
   DocumentSigningOrder,
-  DocumentVisibility,
   FieldType,
   ReadStatus,
   RecipientRole,
@@ -24,12 +23,6 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import {
-  ZTemplateMetaUpsertSchema,
-  ZTemplatePublicDescriptionSchema,
-  ZTemplatePublicTitleSchema,
-  ZTemplateTitleSchema,
-} from '@documenso/trpc/server/template-router/schema';
 
 extendZodWithOpenApi(z);
 
@@ -634,29 +627,3 @@ export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(1),
 });
-
-export const ZCreateTemplateMutationSchema = z.object({
-  data: z.object({
-    title: ZTemplateTitleSchema,
-    folderId: z.string().optional(),
-    externalId: z.string().nullish(),
-    visibility: z.nativeEnum(DocumentVisibility).optional(),
-    globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
-    globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
-    publicTitle: ZTemplatePublicTitleSchema.optional(),
-    publicDescription: ZTemplatePublicDescriptionSchema.optional(),
-    type: z.nativeEnum(TemplateType).optional(),
-  }),
-  meta: ZTemplateMetaUpsertSchema.optional(),
-});
-
-export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
-
-export const ZCreateTemplateMutationResponseSchema = z.object({
-  uploadUrl: z.string().min(1),
-  template: ZTemplateSchema,
-});
-
-export type TCreateTemplateMutationResponseSchema = z.infer<
-  typeof ZCreateTemplateMutationResponseSchema
->;

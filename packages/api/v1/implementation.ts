@@ -403,7 +403,18 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
   createTemplate: authenticatedMiddleware(async (args, user, team) => {
     const { body } = args;
-    const { data, meta } = body;
+    const {
+      title,
+      folderId,
+      externalId,
+      visibility,
+      globalAccessAuth,
+      globalActionAuth,
+      publicTitle,
+      publicDescription,
+      type,
+      meta,
+    } = body;
 
     try {
       if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
@@ -415,11 +426,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const dateFormat = body?.meta?.dateFormat
-        ? DATE_FORMATS.find((format) => format.value === body?.meta?.dateFormat)
+      const dateFormat = meta?.dateFormat
+        ? DATE_FORMATS.find((format) => format.value === meta?.dateFormat)
         : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
 
-      if (body?.meta?.dateFormat && !dateFormat) {
+      if (meta?.dateFormat && !dateFormat) {
         return {
           status: 400,
           body: {
@@ -428,11 +439,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const timezone = body?.meta?.timezone
-        ? TIME_ZONES.find((tz) => tz === body?.meta?.timezone)
+      const timezone = meta?.timezone
+        ? TIME_ZONES.find((tz) => tz === meta?.timezone)
         : DEFAULT_DOCUMENT_TIME_ZONE;
 
-      const isTimeZoneValid = body?.meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+      const isTimeZoneValid = meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
 
       if (!isTimeZoneValid) {
         return {
@@ -443,7 +454,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const fileName = data?.title?.endsWith('.pdf') ? data.title : `${data?.title}.pdf`;
+      const fileName = title?.endsWith('.pdf') ? title : `${title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
 
@@ -452,19 +463,35 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         type: DocumentDataType.S3_PATH,
       });
 
-      const template = await createTemplate({
+      const createdTemplate = await createTemplate({
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
         templateDocumentDataId: templateDocumentData.id,
-        data,
+        data: {
+          title,
+          folderId,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          publicTitle,
+          publicDescription,
+          type,
+        },
         meta,
+      });
+
+      const fullTemplate = await getTemplateById({
+        id: createdTemplate.id,
+        userId: user.id,
+        teamId: team.id,
       });
 
       return {
         status: 200,
         body: {
           uploadUrl: url,
-          template,
+          template: fullTemplate,
         },
       };
     } catch (err) {
