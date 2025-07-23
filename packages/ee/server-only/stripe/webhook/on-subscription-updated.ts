@@ -1,8 +1,9 @@
-import { SubscriptionStatus } from '@prisma/client';
+import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
 import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
+import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
 import { prisma } from '@documenso/prisma';
 
 export type OnSubscriptionUpdatedOptions = {
@@ -55,8 +56,12 @@ export const onSubscriptionUpdated = async ({
     );
   }
 
-  if (organisation.subscription?.planId !== subscription.id) {
-    console.error('[WARNING]: Organisation has two subscriptions');
+  if (
+    organisation.subscription &&
+    organisation.subscription.status !== SubscriptionStatus.INACTIVE &&
+    organisation.subscription.planId !== subscription.id
+  ) {
+    console.error('[WARNING]: Organisation might have two subscriptions');
   }
 
   const previousItem = previousAttributes?.items?.data[0];
@@ -83,20 +88,41 @@ export const onSubscriptionUpdated = async ({
 
   const status = match(subscription.status)
     .with('active', () => SubscriptionStatus.ACTIVE)
+    .with('trialing', () => SubscriptionStatus.ACTIVE)
     .with('past_due', () => SubscriptionStatus.PAST_DUE)
     .otherwise(() => SubscriptionStatus.INACTIVE);
+
+  const periodEnd =
+    subscription.status === 'trialing' && subscription.trial_end
+      ? new Date(subscription.trial_end * 1000)
+      : new Date(subscription.current_period_end * 1000);
+
+  // Migrate the organisation type if it is no longer an individual plan.
+  if (
+    updatedSubscriptionClaim.id !== INTERNAL_CLAIM_ID.INDIVIDUAL &&
+    updatedSubscriptionClaim.id !== INTERNAL_CLAIM_ID.FREE &&
+    organisation.type === OrganisationType.PERSONAL
+  ) {
+    await prisma.organisation.update({
+      where: {
+        id: organisation.id,
+      },
+      data: {
+        type: OrganisationType.ORGANISATION,
+      },
+    });
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.subscription.update({
       where: {
-        planId: subscription.id,
+        organisationId: organisation.id,
       },
       data: {
-        organisationId: organisation.id,
         status: status,
         planId: subscription.id,
         priceId: subscription.items.data[0].price.id,
-        periodEnd: new Date(subscription.current_period_end * 1000),
+        periodEnd,
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       },
     });

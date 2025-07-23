@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -40,7 +41,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
-export type FolderSettingsDialogProps = {
+export type FolderUpdateDialogProps = {
   folder: TFolderWithSubfolders | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -53,12 +54,8 @@ export const ZUpdateFolderFormSchema = z.object({
 
 export type TUpdateFolderFormSchema = z.infer<typeof ZUpdateFolderFormSchema>;
 
-export const FolderSettingsDialog = ({
-  folder,
-  isOpen,
-  onOpenChange,
-}: FolderSettingsDialogProps) => {
-  const { _ } = useLingui();
+export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdateDialogProps) => {
+  const { t } = useLingui();
   const team = useOptionalCurrentTeam();
 
   const { toast } = useToast();
@@ -84,7 +81,9 @@ export const FolderSettingsDialog = ({
   }, [folder, form]);
 
   const onFormSubmit = async (data: TUpdateFolderFormSchema) => {
-    if (!folder) return;
+    if (!folder) {
+      return;
+    }
 
     try {
       await updateFolder({
@@ -96,7 +95,7 @@ export const FolderSettingsDialog = ({
       });
 
       toast({
-        title: _(msg`Folder updated successfully`),
+        title: t`Folder updated successfully`,
       });
 
       onOpenChange(false);
@@ -105,7 +104,7 @@ export const FolderSettingsDialog = ({
 
       if (error.code === AppErrorCode.NOT_FOUND) {
         toast({
-          title: _(msg`Folder not found`),
+          title: t`Folder not found`,
         });
       }
     }
@@ -115,8 +114,12 @@ export const FolderSettingsDialog = ({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Folder Settings</DialogTitle>
-          <DialogDescription>Manage the settings for this folder.</DialogDescription>
+          <DialogTitle>
+            <Trans>Folder Settings</Trans>
+          </DialogTitle>
+          <DialogDescription>
+            <Trans>Manage the settings for this folder.</Trans>
+          </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
@@ -126,7 +129,9 @@ export const FolderSettingsDialog = ({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Name</FormLabel>
+                  <FormLabel>
+                    <Trans>Name</Trans>
+                  </FormLabel>
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
@@ -141,19 +146,25 @@ export const FolderSettingsDialog = ({
                 name="visibility"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Visibility</FormLabel>
+                    <FormLabel>
+                      <Trans>Visibility</Trans>
+                    </FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select visibility" />
+                          <SelectValue placeholder={t`Select visibility`} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value={DocumentVisibility.EVERYONE}>Everyone</SelectItem>
-                        <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
-                          Managers and above
+                        <SelectItem value={DocumentVisibility.EVERYONE}>
+                          <Trans>Everyone</Trans>
                         </SelectItem>
-                        <SelectItem value={DocumentVisibility.ADMIN}>Admins only</SelectItem>
+                        <SelectItem value={DocumentVisibility.MANAGER_AND_ABOVE}>
+                          <Trans>Managers and above</Trans>
+                        </SelectItem>
+                        <SelectItem value={DocumentVisibility.ADMIN}>
+                          <Trans>Admins only</Trans>
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -163,7 +174,15 @@ export const FolderSettingsDialog = ({
             )}
 
             <DialogFooter>
-              <Button type="submit">Save Changes</Button>
+              <DialogClose asChild>
+                <Button variant="secondary">
+                  <Trans>Cancel</Trans>
+                </Button>
+              </DialogClose>
+
+              <Button type="submit" loading={form.formState.isSubmitting}>
+                <Trans>Update</Trans>
+              </Button>
             </DialogFooter>
           </form>
         </Form>

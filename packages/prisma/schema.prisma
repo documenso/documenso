@@ -894,7 +894,7 @@ model Template {
   documents   Document[]
   attachments Attachment[]
 
-  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   folderId String?
 
   @@unique([templateDocumentDataId])
