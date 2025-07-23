@@ -1,6 +1,11 @@
 import { initContract } from '@ts-rest/core';
 
 import {
+  ZCreateTemplateV2RequestSchema,
+  ZCreateTemplateV2ResponseSchema,
+} from '@documenso/trpc/server/template-router/schema';
+
+import {
   ZAuthorizationHeadersSchema,
   ZCreateDocumentFromTemplateMutationResponseSchema,
   ZCreateDocumentFromTemplateMutationSchema,
@@ -85,6 +90,18 @@ export const ApiContractV1 = c.router(
         404: ZUnsuccessfulResponseSchema,
       },
       summary: 'Upload a new document and get a presigned URL',
+    },
+
+    createTemplate: {
+      method: 'POST',
+      path: '/api/v1/templates',
+      body: ZCreateTemplateV2RequestSchema,
+      responses: {
+        200: ZCreateTemplateV2ResponseSchema,
+        401: ZUnsuccessfulResponseSchema,
+        404: ZUnsuccessfulResponseSchema,
+      },
+      summary: 'Create a new template and get a presigned URL',
     },
 
     deleteTemplate: {
