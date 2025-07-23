@@ -59,9 +59,10 @@ model User {
   ownedOrganisations Organisation[]
   organisationMember OrganisationMember[]
 
-  twoFactorSecret      String?
-  twoFactorEnabled     Boolean @default(false)
-  twoFactorBackupCodes String?
+  twoFactorSecret            String?
+  twoFactorEnabled           Boolean                         @default(false)
+  twoFactorBackupCodes       String?
+  twoFactorEmailVerification UserTwoFactorEmailVerification?
 
   folders   Folder[]
   documents Document[]
@@ -951,4 +952,13 @@ model AvatarImage {
   team         Team[]
   user         User[]
   organisation Organisation[]
+}
+
+model UserTwoFactorEmailVerification {
+  userId           Int      @id
+  verificationCode String
+  expiresAt        DateTime
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

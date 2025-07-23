@@ -109,6 +109,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         })
       : [];
 
+  const isEnterpriseDocument = Boolean(organisationClaim);
+
   return superLoaderJson({
     token,
     user,
@@ -119,6 +121,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     completedFields,
     hidePoweredBy,
     allowEmbedSigningWhitelabel,
+    isEnterpriseDocument,
   });
 }
 
@@ -133,6 +136,7 @@ export default function EmbedSignDocumentPage() {
     completedFields,
     hidePoweredBy,
     allowEmbedSigningWhitelabel,
+    isEnterpriseDocument,
   } = useSuperLoaderData<typeof loader>();
 
   return (
@@ -148,6 +152,7 @@ export default function EmbedSignDocumentPage() {
         documentAuthOptions={document.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterpriseDocument}
       >
         <EmbedSignDocumentClientPage
           token={token}

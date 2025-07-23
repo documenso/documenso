@@ -156,7 +156,7 @@ export const TemplateEditForm = ({
 
       toast({
         title: _(msg`Error`),
-        description: _(msg`An error occurred while updating the document settings.`),
+        description: _(msg`An error occurred while updating the template settings.`),
         variant: 'destructive',
       });
     }

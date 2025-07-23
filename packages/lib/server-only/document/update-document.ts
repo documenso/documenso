@@ -1,5 +1,4 @@
-import { DocumentVisibility } from '@prisma/client';
-import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -117,13 +116,6 @@ export const updateDocument = async ({
     data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
   const newGlobalActionAuth =
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
-
-  // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth.length > 0 && !document.team.organisation.organisationClaim.flags.cfr21) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
-    });
-  }
 
   const isTitleSame = data.title === undefined || data.title === document.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
