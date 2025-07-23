@@ -41,10 +41,6 @@ export const downloadDocumentRoute = authenticatedProcedure
       documentId,
       userId: user.id,
       teamId,
-    }).catch(() => {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Document not found',
-      });
     });
 
     if (!document.documentData) {
