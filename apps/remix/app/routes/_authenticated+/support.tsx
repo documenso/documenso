@@ -5,6 +5,7 @@ import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { SupportTicketForm } from '~/components/forms/support-ticket-form';
@@ -93,7 +94,7 @@ export default function SupportPage() {
               </Trans>
             </p>
           </div>
-          {currentOrganisation && subscriptionStatus && (
+          {currentOrganisation && IS_BILLING_ENABLED() && subscriptionStatus && (
             <>
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">

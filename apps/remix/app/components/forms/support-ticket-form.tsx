@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
@@ -36,7 +34,6 @@ export type SupportTicketFormProps = {
 export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFormProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
-  const [isLoading, setIsLoading] = useState(false);
 
   const { mutateAsync: submitSupportTicket } = trpc.profile.submitSupportTicket.useMutation();
 
@@ -49,9 +46,9 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
     },
   });
 
-  const onSubmit = async (values: TSupportTicket) => {
-    setIsLoading(true);
+  const isLoading = form.formState.isLoading;
 
+  const onSubmit = async (values: TSupportTicket) => {
     try {
       await submitSupportTicket(values);
 
@@ -71,8 +68,6 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
         description: t`An error occurred. Please try again later.`,
         variant: 'destructive',
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
