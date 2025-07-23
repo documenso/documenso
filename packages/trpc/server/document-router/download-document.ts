@@ -1,5 +1,4 @@
 import { DocumentDataType } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
@@ -91,8 +90,7 @@ export const downloadDocumentRoute = authenticatedProcedure
         version,
       });
 
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
         message: 'Failed to generate download URL',
       });
     }

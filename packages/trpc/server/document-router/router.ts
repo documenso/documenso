@@ -1,5 +1,4 @@
 import { DocumentDataType } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
@@ -636,8 +635,7 @@ export const documentRouter = router({
       }).catch(() => null);
 
       if (!document || (teamId && document.teamId !== teamId)) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
           message: 'You do not have access to this document.',
         });
       }
