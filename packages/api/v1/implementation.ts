@@ -453,7 +453,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       const template = await createTemplate({
-        title: data?.title,
         userId: user.id,
         teamId: team?.id,
         templateDocumentDataId: templateDocumentData.id,

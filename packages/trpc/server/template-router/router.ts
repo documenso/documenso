@@ -146,9 +146,11 @@ export const templateRouter = router({
       return await createTemplate({
         userId: ctx.user.id,
         teamId,
-        title,
         templateDocumentDataId,
-        folderId,
+        data: {
+          title,
+          folderId,
+        },
       });
     }),
 
@@ -174,9 +176,20 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
 
-      const { data, meta } = input;
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
+        meta,
+      } = input;
 
-      const fileName = data?.title.endsWith('.pdf') ? data?.title : `${data?.title}.pdf`;
+      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
 
       const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
 
@@ -188,9 +201,18 @@ export const templateRouter = router({
       const createdTemplate = await createTemplate({
         userId: user.id,
         teamId,
-        title: data?.title,
         templateDocumentDataId: templateDocumentData.id,
-        data,
+        data: {
+          title,
+          folderId,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          publicTitle,
+          publicDescription,
+          type,
+        },
         meta,
       });
 

@@ -33,7 +33,9 @@ export const createEmbeddingTemplateRoute = procedure
       // First create the template
       const template = await createTemplate({
         userId: apiToken.userId,
-        title,
+        data: {
+          title,
+        },
         templateDocumentDataId: documentDataId,
         teamId: apiToken.teamId ?? undefined,
       });

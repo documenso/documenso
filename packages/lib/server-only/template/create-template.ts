@@ -3,7 +3,6 @@ import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
 import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//TemplateSchema';
-import type { TCreateTemplateMutationSchema } from '@documenso/trpc/server/template-router/schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
@@ -11,10 +10,13 @@ import { createDocumentAuthOptions } from '../../utils/document-auth';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from '../team/get-team-settings';
 
-export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
+export type CreateTemplateOptions = {
   userId: number;
   teamId: number;
-  data?: {
+  templateDocumentDataId: string;
+  data: {
+    title: string;
+    folderId?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
@@ -22,7 +24,6 @@ export type CreateTemplateOptions = TCreateTemplateMutationSchema & {
     publicTitle?: string;
     publicDescription?: string;
     type?: Template['type'];
-    useLegacyFieldInsertion?: boolean;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
@@ -32,14 +33,14 @@ export const ZCreateTemplateResponseSchema = TemplateSchema;
 export type TCreateTemplateResponse = z.infer<typeof ZCreateTemplateResponseSchema>;
 
 export const createTemplate = async ({
-  title,
   userId,
   teamId,
   templateDocumentDataId,
-  folderId,
-  data = {},
+  data,
   meta = {},
 }: CreateTemplateOptions) => {
+  const { title, folderId } = data;
+
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({ teamId, userId }),
   });
@@ -75,16 +76,15 @@ export const createTemplate = async ({
       userId,
       templateDocumentDataId,
       folderId,
-      externalId: data?.externalId,
-      useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
-      visibility: data?.visibility ?? settings.documentVisibility,
+      externalId: data.externalId,
+      visibility: data.visibility ?? settings.documentVisibility,
       authOptions: createDocumentAuthOptions({
-        globalAccessAuth: data?.globalAccessAuth || [],
-        globalActionAuth: data?.globalActionAuth || [],
+        globalAccessAuth: data.globalAccessAuth || [],
+        globalActionAuth: data.globalActionAuth || [],
       }),
-      publicTitle: data?.publicTitle,
-      publicDescription: data?.publicDescription,
-      type: data?.type,
+      publicTitle: data.publicTitle,
+      publicDescription: data.publicDescription,
+      type: data.type,
       templateMeta: {
         create: {
           ...meta,
