@@ -4,19 +4,25 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError } from '../../errors/app-error';
 import { AppErrorCode } from '../../errors/app-error';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type CreateAttachmentsOptions = {
   templateId: number;
   attachments: Pick<Attachment, 'id' | 'label' | 'url' | 'type'>[];
+  userId: number;
+  teamId: number;
 };
 
 export const setTemplateAttachments = async ({
   templateId,
   attachments,
+  userId,
+  teamId,
 }: CreateAttachmentsOptions) => {
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
   });
 
@@ -46,34 +52,22 @@ export const setTemplateAttachments = async ({
   const upsertedAttachments: Attachment[] = [];
 
   for (const attachment of attachments) {
-    if (attachment.id) {
-      const updated = await prisma.attachment.upsert({
-        where: { id: attachment.id },
-        update: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-          templateId,
-        },
-        create: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-          templateId,
-        },
-      });
-      upsertedAttachments.push(updated);
-    } else {
-      const created = await prisma.attachment.create({
-        data: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-          templateId,
-        },
-      });
-      upsertedAttachments.push(created);
-    }
+    const updated = await prisma.attachment.upsert({
+      where: { id: attachment.id, templateId: template.id },
+      update: {
+        label: attachment.label,
+        url: attachment.url,
+        type: attachment.type,
+        templateId,
+      },
+      create: {
+        label: attachment.label,
+        url: attachment.url,
+        type: attachment.type,
+        templateId,
+      },
+    });
+    upsertedAttachments.push(updated);
   }
 
   return upsertedAttachments;

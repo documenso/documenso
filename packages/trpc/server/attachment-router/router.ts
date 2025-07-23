@@ -47,6 +47,7 @@ export const attachmentRouter = router({
         documentId,
         attachments,
         user: ctx.user,
+        teamId: ctx.teamId,
         requestMetadata: ctx.metadata.requestMetadata,
       });
 
@@ -81,6 +82,8 @@ export const attachmentRouter = router({
 
       const updatedAttachments = await setTemplateAttachments({
         templateId,
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
         attachments,
       });
 

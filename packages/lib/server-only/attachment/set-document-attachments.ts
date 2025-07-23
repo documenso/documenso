@@ -7,11 +7,13 @@ import { AppError } from '../../errors/app-error';
 import { AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type CreateAttachmentsOptions = {
   documentId: number;
   attachments: Pick<Attachment, 'id' | 'label' | 'url' | 'type'>[];
   user: Pick<User, 'id' | 'email' | 'name'>;
+  teamId: number;
   requestMetadata: RequestMetadata;
 };
 
@@ -19,11 +21,13 @@ export const setDocumentAttachments = async ({
   documentId,
   attachments,
   user,
+  teamId,
   requestMetadata,
 }: CreateAttachmentsOptions) => {
   const document = await prisma.document.findUnique({
     where: {
       id: documentId,
+      team: buildTeamWhereQuery({ teamId, userId: user.id }),
     },
   });
 
@@ -53,33 +57,21 @@ export const setDocumentAttachments = async ({
   const upsertedAttachments: Attachment[] = [];
 
   for (const attachment of attachments) {
-    if (attachment.id) {
-      const updated = await prisma.attachment.upsert({
-        where: { id: attachment.id },
-        update: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-        },
-        create: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-          documentId,
-        },
-      });
-      upsertedAttachments.push(updated);
-    } else {
-      const created = await prisma.attachment.create({
-        data: {
-          label: attachment.label,
-          url: attachment.url,
-          type: attachment.type,
-          documentId,
-        },
-      });
-      upsertedAttachments.push(created);
-    }
+    const updated = await prisma.attachment.upsert({
+      where: { id: attachment.id, documentId: document.id },
+      update: {
+        label: attachment.label,
+        url: attachment.url,
+        type: attachment.type,
+      },
+      create: {
+        label: attachment.label,
+        url: attachment.url,
+        type: attachment.type,
+        documentId,
+      },
+    });
+    upsertedAttachments.push(updated);
   }
 
   const isAttachmentsSame = upsertedAttachments.every((attachment) => {
