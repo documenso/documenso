@@ -8,7 +8,7 @@ msgstr ""
 "Language: it\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-06-19 06:05\n"
+"PO-Revision-Date: 2025-07-14 04:19\n"
 "Last-Translator: \n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -2301,7 +2301,7 @@ msgstr "Struttura CSV"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Cumulative MAU (signed in)"
-msgstr ""
+msgstr "MAU cumulativi (autenticati)"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
@@ -4230,7 +4230,7 @@ msgstr "MAU (ha completato il documento)"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "MAU (signed in)"
-msgstr ""
+msgstr "MAU (autenticati)"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Max"

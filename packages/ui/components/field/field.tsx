@@ -3,7 +3,9 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { type Field, FieldType } from '@prisma/client';
 import { createPortal } from 'react-dom';
 
+import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 
 import type { RecipientColorStyles } from '../../lib/recipient-colors';
@@ -23,6 +25,11 @@ export function FieldContainerPortal({
   const alternativePortalRoot = document.getElementById('document-field-portal-root');
 
   const coords = useFieldPageCoords(field);
+  const $pageBounds = useElementBounds(
+    `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
+  );
+
+  const maxWidth = $pageBounds?.width ? $pageBounds.width - coords.x : undefined;
 
   const isCheckboxOrRadioField = field.type === 'CHECKBOX' || field.type === 'RADIO';
 
@@ -32,10 +39,14 @@ export function FieldContainerPortal({
     const bounds = {
       top: `${coords.y}px`,
       left: `${coords.x}px`,
-      ...(!isCheckboxOrRadioField && {
-        height: `${coords.height}px`,
-        width: `${coords.width}px`,
-      }),
+      ...(!isCheckboxOrRadioField
+        ? {
+            height: `${coords.height}px`,
+            width: `${coords.width}px`,
+          }
+        : {
+            maxWidth: `${maxWidth}px`,
+          }),
     };
 
     if (portalBounds) {
@@ -44,7 +55,7 @@ export function FieldContainerPortal({
     }
 
     return bounds;
-  }, [coords, isCheckboxOrRadioField]);
+  }, [coords, maxWidth, isCheckboxOrRadioField]);
 
   return createPortal(
     <div className={cn('absolute', className)} style={style}>

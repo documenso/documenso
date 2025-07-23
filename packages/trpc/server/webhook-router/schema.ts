@@ -38,3 +38,11 @@ export const ZDeleteWebhookRequestSchema = z.object({
 });
 
 export type TDeleteWebhookRequestSchema = z.infer<typeof ZDeleteWebhookRequestSchema>;
+
+export const ZTriggerTestWebhookRequestSchema = z.object({
+  id: z.string(),
+  event: z.nativeEnum(WebhookTriggerEvents),
+  teamId: z.number(),
+});
+
+export type TTriggerTestWebhookRequestSchema = z.infer<typeof ZTriggerTestWebhookRequestSchema>;

@@ -1,9 +1,8 @@
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
+import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
-
-const SUPPORT_EMAIL = 'support@documenso.com';
 
 export default function SignatureDisclosure() {
   return (

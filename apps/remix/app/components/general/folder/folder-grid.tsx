@@ -13,7 +13,7 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
-import { FolderSettingsDialog } from '~/components/dialogs/folder-settings-dialog';
+import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
 import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
@@ -219,7 +219,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         }}
       />
 
-      <FolderSettingsDialog
+      <FolderUpdateDialog
         folder={folderToSettings}
         isOpen={isSettingsFolderOpen}
         onOpenChange={(open) => {

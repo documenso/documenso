@@ -54,7 +54,7 @@ export default function WebhookPage() {
         </div>
       )}
       {webhooks && webhooks.length > 0 && (
-        <div className="mt-4 flex max-w-xl flex-col gap-y-4">
+        <div className="mt-4 flex max-w-2xl flex-col gap-y-4">
           {webhooks?.map((webhook) => (
             <div
               key={webhook.id}

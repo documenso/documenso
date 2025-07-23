@@ -2,6 +2,8 @@ import type { WebhookTriggerEvents } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export type GetAllWebhooksByEventTriggerOptions = {
   event: WebhookTriggerEvents;
   userId: number;
@@ -19,22 +21,10 @@ export const getAllWebhooksByEventTrigger = async ({
       eventTriggers: {
         has: event,
       },
-      team: {
-        id: teamId,
-        teamGroups: {
-          some: {
-            organisationGroup: {
-              organisationGroupMembers: {
-                some: {
-                  organisationMember: {
-                    userId,
-                  },
-                },
-              },
-            },
-          },
-        },
-      },
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+      }),
     },
   });
 };

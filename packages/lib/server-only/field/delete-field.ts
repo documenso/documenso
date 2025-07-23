@@ -26,7 +26,6 @@ export const deleteField = async ({
       id: fieldId,
       document: {
         id: documentId,
-        userId,
         team: buildTeamWhereQuery({ teamId, userId }),
       },
     },

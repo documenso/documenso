@@ -129,6 +129,7 @@ const getDefaultState = (fieldType: FieldType): FieldMeta => {
         validationLength: 0,
         required: false,
         readOnly: false,
+        direction: 'vertical',
       };
     case FieldType.DROPDOWN:
       return {
