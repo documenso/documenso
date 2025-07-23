@@ -323,7 +323,7 @@ export const documentRouter = router({
 
       return {
         document: createdDocument,
-        folder: createdDocument.folder,
+        folder: createdDocument.folder, // Todo: Remove this prior to api-v2 release.
         uploadUrl: url,
       };
     }),
