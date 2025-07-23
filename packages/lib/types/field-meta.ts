@@ -96,6 +96,7 @@ export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
     .optional(),
   validationRule: z.string().optional(),
   validationLength: z.number().optional(),
+  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
 });
 
 export type TCheckboxFieldMeta = z.infer<typeof ZCheckboxFieldMeta>;
