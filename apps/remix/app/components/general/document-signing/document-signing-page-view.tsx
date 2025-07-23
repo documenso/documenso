@@ -80,7 +80,7 @@ export const DocumentSigningPageView = ({
 
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
-      <div className="mx-auto flex w-full max-w-screen-xl flex-col px-6">
+      <div className="mx-auto w-full max-w-screen-xl px-6">
         <h1
           className="block max-w-[20rem] truncate text-2xl font-semibold sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}
