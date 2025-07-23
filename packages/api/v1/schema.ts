@@ -25,20 +25,10 @@ import {
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import {
-  ZDocumentMetaDateFormatSchema,
-  ZDocumentMetaDistributionMethodSchema,
-  ZDocumentMetaDrawSignatureEnabledSchema,
-  ZDocumentMetaLanguageSchema,
-  ZDocumentMetaMessageSchema,
-  ZDocumentMetaRedirectUrlSchema,
-  ZDocumentMetaSubjectSchema,
-  ZDocumentMetaTimezoneSchema,
-  ZDocumentMetaTypedSignatureEnabledSchema,
-  ZDocumentMetaUploadSignatureEnabledSchema,
-} from '@documenso/trpc/server/document-router/schema';
-import {
-  MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH,
-  MAX_TEMPLATE_PUBLIC_TITLE_LENGTH,
+  ZTemplateMetaUpsertSchema,
+  ZTemplatePublicDescriptionSchema,
+  ZTemplatePublicTitleSchema,
+  ZTemplateTitleSchema,
 } from '@documenso/trpc/server/template-router/schema';
 
 extendZodWithOpenApi(z);
@@ -647,50 +637,17 @@ export const ZGetTemplatesQuerySchema = z.object({
 
 export const ZCreateTemplateMutationSchema = z.object({
   data: z.object({
-    title: z.string().min(1).trim(),
+    title: ZTemplateTitleSchema,
     folderId: z.string().optional(),
     externalId: z.string().nullish(),
     visibility: z.nativeEnum(DocumentVisibility).optional(),
     globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional().default([]),
     globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional().default([]),
-    publicTitle: z
-      .string()
-      .trim()
-      .min(1)
-      .max(MAX_TEMPLATE_PUBLIC_TITLE_LENGTH)
-      .describe(
-        'The title of the template that will be displayed to the public. Only applicable for public templates.',
-      )
-      .optional(),
-    publicDescription: z
-      .string()
-      .trim()
-      .min(1)
-      .max(MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH)
-      .describe(
-        'The description of the template that will be displayed to the public. Only applicable for public templates.',
-      )
-      .optional(),
+    publicTitle: ZTemplatePublicTitleSchema.optional(),
+    publicDescription: ZTemplatePublicDescriptionSchema.optional(),
     type: z.nativeEnum(TemplateType).optional(),
-    useLegacyFieldInsertion: z.boolean().optional(),
   }),
-  meta: z
-    .object({
-      subject: ZDocumentMetaSubjectSchema.optional(),
-      message: ZDocumentMetaMessageSchema.optional(),
-      timezone: ZDocumentMetaTimezoneSchema.optional(),
-      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
-      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
-      emailSettings: ZDocumentEmailSettingsSchema.optional(),
-      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
-      language: ZDocumentMetaLanguageSchema.optional(),
-      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
-      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
-      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
-      signingOrder: z.nativeEnum(DocumentSigningOrder).optional(),
-      allowDictateNextSigner: z.boolean().optional(),
-    })
-    .optional(),
+  meta: ZTemplateMetaUpsertSchema.optional(),
 });
 
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
