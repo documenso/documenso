@@ -3,6 +3,7 @@ import * as React from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import type { Column } from '@tanstack/react-table';
 import { Check } from 'lucide-react';
 
@@ -83,7 +84,9 @@ export function DataTableFacetedFilter<TData, TValue>({
       <PopoverContent className="w-[200px] p-0" align="start">
         <Command>
           <CommandList>
-            <CommandEmpty>{_(msg`No results found.`)}</CommandEmpty>
+            <CommandEmpty>
+              <Trans>No results found.</Trans>
+            </CommandEmpty>
             <CommandGroup>
               {options.map((option) => {
                 const isSelected = selectedValuesSet.has(option.value);

@@ -1,5 +1,5 @@
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
 import { UAParser } from 'ua-parser-js';
@@ -41,11 +41,21 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
     <Table overflowHidden>
       <TableHeader>
         <TableRow>
-          <TableHead>{_(msg`Time`)}</TableHead>
-          <TableHead>{_(msg`User`)}</TableHead>
-          <TableHead>{_(msg`Action`)}</TableHead>
-          <TableHead>{_(msg`IP Address`)}</TableHead>
-          <TableHead>{_(msg`Browser`)}</TableHead>
+          <TableHead>
+            <Trans>Time</Trans>
+          </TableHead>
+          <TableHead>
+            <Trans>User</Trans>
+          </TableHead>
+          <TableHead>
+            <Trans>Action</Trans>
+          </TableHead>
+          <TableHead>
+            <Trans>IP Address</Trans>
+          </TableHead>
+          <TableHead>
+            <Trans>Browser</Trans>
+          </TableHead>
         </TableRow>
       </TableHeader>
 

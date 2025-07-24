@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
@@ -45,8 +46,8 @@ export const DocumentDownloadButton = ({
       setIsLoading(false);
 
       toast({
-        title: _('Something went wrong'),
-        description: _('An error occurred while downloading your document.'),
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
         variant: 'destructive',
       });
     }

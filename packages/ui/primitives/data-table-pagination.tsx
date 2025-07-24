@@ -1,5 +1,3 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import type { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -23,8 +21,6 @@ export function DataTablePagination<TData>({
   table,
   additionalInformation = 'VisibleCount',
 }: DataTablePaginationProps<TData>) {
-  const { _ } = useLingui();
-
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-4 px-2">
       <div className="text-muted-foreground flex-1 text-sm">
@@ -90,7 +86,9 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(0)}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">{_(msg`Go to first page`)}</span>
+            <Trans>
+              <span className="sr-only">Go to first page</span>
+            </Trans>
             <ChevronsLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -99,7 +97,9 @@ export function DataTablePagination<TData>({
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            <span className="sr-only">{_(msg`Go to previous page`)}</span>
+            <Trans>
+              <span className="sr-only">Go to previous page</span>
+            </Trans>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button
@@ -108,7 +108,9 @@ export function DataTablePagination<TData>({
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">{_(msg`Go to next page`)}</span>
+            <Trans>
+              <span className="sr-only">Go to next page</span>
+            </Trans>
             <ChevronRight className="h-4 w-4" />
           </Button>
           <Button
@@ -117,7 +119,9 @@ export function DataTablePagination<TData>({
             onClick={() => table.setPageIndex(table.getPageCount() - 1)}
             disabled={!table.getCanNextPage()}
           >
-            <span className="sr-only">{_(msg`Go to last page`)}</span>
+            <Trans>
+              <span className="sr-only">Go to last page</span>
+            </Trans>
             <ChevronsRight className="h-4 w-4" />
           </Button>
         </div>
