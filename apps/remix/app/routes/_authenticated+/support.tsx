@@ -17,8 +17,7 @@ export function meta() {
 
 export default function SupportPage() {
   const [showForm, setShowForm] = useState(false);
-  const { user } = useSession();
-  const { organisations } = useSession();
+  const { user, organisations } = useSession();
   const [searchParams] = useSearchParams();
   const org = searchParams.get('org');
 
