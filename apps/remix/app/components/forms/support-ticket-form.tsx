@@ -35,7 +35,8 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const { mutateAsync: submitSupportTicket } = trpc.profile.submitSupportTicket.useMutation();
+  const { mutateAsync: submitSupportTicket, isPending } =
+    trpc.profile.submitSupportTicket.useMutation();
 
   const form = useForm<TSupportTicket>({
     resolver: zodResolver(ZSupportTicketSchema),
@@ -46,7 +47,7 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
     },
   });
 
-  const isLoading = form.formState.isLoading;
+  const isLoading = form.formState.isLoading || isPending;
 
   const onSubmit = async (values: TSupportTicket) => {
     try {
