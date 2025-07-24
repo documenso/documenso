@@ -80,6 +80,22 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       });
     }
 
+    // Validate that the email ID belongs to the organisation.
+    if (emailId) {
+      const email = await prisma.organisationEmail.findFirst({
+        where: {
+          id: emailId,
+          organisationId: team.organisationId,
+        },
+      });
+
+      if (!email) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Email not found',
+        });
+      }
+    }
+
     await prisma.team.update({
       where: {
         id: teamId,
