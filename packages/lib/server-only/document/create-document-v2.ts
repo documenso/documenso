@@ -135,6 +135,24 @@ export const createDocumentV2 = async ({
 
   const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
 
+  const emailId = meta?.emailId;
+
+  // Validate that the email ID belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
