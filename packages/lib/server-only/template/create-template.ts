@@ -6,6 +6,7 @@ import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema//Tem
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions } from '../../utils/document-auth';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -69,6 +70,24 @@ export const createTemplate = async ({
     teamId,
   });
 
+  const emailId = meta.emailId;
+
+  // Validate that the email ID belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
+
   return await prisma.template.create({
     data: {
       title,
@@ -86,14 +105,7 @@ export const createTemplate = async ({
       publicDescription: data.publicDescription,
       type: data.type,
       templateMeta: {
-        create: {
-          ...meta,
-          language: meta?.language ?? settings.documentLanguage,
-          typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
-          uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
-          drawSignatureEnabled: meta?.drawSignatureEnabled ?? settings.drawSignatureEnabled,
-          emailSettings: meta?.emailSettings || undefined,
-        },
+        create: extractDerivedDocumentMeta(settings, meta),
       },
     },
   });

@@ -58,6 +58,9 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'REDIRECT_URL',
   'SUBJECT',
   'TIMEZONE',
+  'EMAIL_ID',
+  'EMAIL_REPLY_TO',
+  'EMAIL_SETTINGS',
 ]);
 
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
@@ -109,6 +112,9 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
       z.literal(DOCUMENT_META_DIFF_TYPE.REDIRECT_URL),
       z.literal(DOCUMENT_META_DIFF_TYPE.SUBJECT),
       z.literal(DOCUMENT_META_DIFF_TYPE.TIMEZONE),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_ID),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_REPLY_TO),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_SETTINGS),
     ]),
     from: z.string().nullable(),
     to: z.string().nullable(),
