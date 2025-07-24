@@ -13,7 +13,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { AppError } from '../../../errors/app-error';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -162,24 +161,23 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    const { branding, settings } = await getEmailContext({
+    const { branding, emailLanguage, senderEmail } = await getEmailContext({
+      emailType: 'INTERNAL',
       source: {
         type: 'team',
         teamId,
       },
     });
 
-    const lang = template.templateMeta?.language ?? settings.documentLanguage;
-
-    const i18n = await getI18nInstance(lang);
+    const i18n = await getI18nInstance(emailLanguage);
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(completionTemplate, {
-        lang,
+        lang: emailLanguage,
         branding,
       }),
       renderEmailWithI18N(completionTemplate, {
-        lang,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
@@ -190,10 +188,7 @@ export const run = async ({
         name: user.name || '',
         address: user.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
       subject: i18n._(msg`Bulk Send Complete: ${template.title}`),
       html,
       text,

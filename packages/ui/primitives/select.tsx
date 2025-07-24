@@ -1,7 +1,10 @@
 import * as React from 'react';
 
 import * as SelectPrimitive from '@radix-ui/react-select';
-import { Check, ChevronDown } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { Check, ChevronDown, Loader } from 'lucide-react';
+
+import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 
 import { cn } from '../lib/utils';
 
@@ -13,20 +16,33 @@ const SelectValue = SelectPrimitive.Value;
 
 const SelectTrigger = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Trigger>,
-  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger> & {
+    loading?: boolean;
+  }
+>(({ className, children, loading, ...props }, ref) => (
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
       'border-input ring-offset-background placeholder:text-muted-foreground focus:ring-ring flex h-10 w-full items-center justify-between rounded-md border bg-transparent px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
       className,
     )}
+    disabled={loading || props.disabled}
     {...props}
   >
-    {children}
-    <SelectPrimitive.Icon asChild>
-      <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Icon>
+    <AnimatePresence>
+      {loading ? (
+        <div className="flex w-full items-center justify-center">
+          <Loader className="h-5 w-5 animate-spin text-gray-500 dark:text-gray-100" />
+        </div>
+      ) : (
+        <AnimateGenericFadeInOut className="flex w-full justify-between">
+          {children}
+          <SelectPrimitive.Icon asChild>
+            <ChevronDown className="h-4 w-4 opacity-50" />
+          </SelectPrimitive.Icon>
+        </AnimateGenericFadeInOut>
+      )}
+    </AnimatePresence>
   </SelectPrimitive.Trigger>
 ));
 

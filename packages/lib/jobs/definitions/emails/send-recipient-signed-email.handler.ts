@@ -8,7 +8,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -71,17 +70,18 @@ export const run = async ({
     return;
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'team',
       teamId: document.teamId,
     },
+    meta: document.documentMeta || null,
   });
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
-  const lang = document.documentMeta?.language ?? settings.documentLanguage;
-  const i18n = await getI18nInstance(lang);
+  const i18n = await getI18nInstance(emailLanguage);
 
   const template = createElement(DocumentRecipientSignedEmailTemplate, {
     documentName: document.title,
@@ -92,9 +92,9 @@ export const run = async ({
 
   await io.runTask('send-recipient-signed-email', async () => {
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang, branding }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
       renderEmailWithI18N(template, {
-        lang,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
@@ -105,10 +105,7 @@ export const run = async ({
         name: owner.name ?? '',
         address: owner.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
       subject: i18n._(msg`${recipientReference} has signed "${document.title}"`),
       html,
       text,

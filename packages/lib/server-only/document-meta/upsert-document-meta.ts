@@ -23,6 +23,8 @@ export type CreateDocumentMetaOptions = {
   password?: string;
   dateFormat?: string;
   redirectUrl?: string;
+  emailId?: string | null;
+  emailReplyTo?: string | null;
   emailSettings?: TDocumentEmailSettings;
   signingOrder?: DocumentSigningOrder;
   allowDictateNextSigner?: boolean;
@@ -46,6 +48,8 @@ export const upsertDocumentMeta = async ({
   redirectUrl,
   signingOrder,
   allowDictateNextSigner,
+  emailId,
+  emailReplyTo,
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
@@ -54,7 +58,7 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
+  const { documentWhereInput, team } = await getDocumentWhereInput({
     documentId,
     userId,
     teamId,
@@ -75,6 +79,22 @@ export const upsertDocumentMeta = async ({
 
   const { documentMeta: originalDocumentMeta } = document;
 
+  // Validate the emailId belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const upsertedDocumentMeta = await tx.documentMeta.upsert({
       where: {
@@ -90,6 +110,8 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         allowDictateNextSigner,
+        emailId,
+        emailReplyTo,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
@@ -106,6 +128,8 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         allowDictateNextSigner,
+        emailId,
+        emailReplyTo,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
