@@ -9,6 +9,7 @@ export const VALID_DATE_FORMAT_VALUES = [
   'yyyy-MM-dd',
   'dd/MM/yyyy hh:mm a',
   'MM/dd/yyyy hh:mm a',
+  'dd.MM.yyyy HH:mm',
   'yyyy-MM-dd HH:mm',
   'yy-MM-dd hh:mm a',
   'yyyy-MM-dd HH:mm:ss',
@@ -39,6 +40,11 @@ export const DATE_FORMATS = [
     key: 'MMDDYYYY',
     label: 'MM/DD/YYYY',
     value: 'MM/dd/yyyy hh:mm a',
+  },
+  {
+    key: 'DDMMYYYYHHMM',
+    label: 'DD.MM.YYYY HH:mm',
+    value: 'dd.MM.yyyy HH:mm',
   },
   {
     key: 'YYYYMMDDHHmm',
