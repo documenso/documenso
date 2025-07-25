@@ -41,6 +41,30 @@ export const DocumentAuditLogDownloadButton = ({
 
       const onLoaded = () => {
         if (iframe.contentDocument?.readyState === 'complete') {
+          const style = iframe.contentDocument.createElement('style');
+          style.textContent = `
+            @media print {
+              table {
+                width: 100% !important;
+                table-layout: fixed !important;
+                font-size: 10px !important;
+              }
+              th, td {
+                padding: 4px !important;
+                word-wrap: break-word !important;
+                overflow-wrap: break-word !important;
+                white-space: normal !important;
+                line-height: 1.2 !important;
+              }
+              th:nth-child(1) { width: 15%; }
+              th:nth-child(2) { width: 20%; }
+              th:nth-child(3) { width: 25%; }
+              th:nth-child(4) { width: 20%; }
+              th:nth-child(5) { width: 20%; }
+            }
+          `;
+          iframe.contentDocument.head.appendChild(style);
+
           iframe.contentWindow?.print();
 
           iframe.contentWindow?.addEventListener('afterprint', () => {

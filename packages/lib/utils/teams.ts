@@ -170,6 +170,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
 
     includeSenderDetails: null,
     includeSigningCertificate: null,
+    includeAuditLog: null,
 
     typedSignatureEnabled: null,
     uploadSignatureEnabled: null,

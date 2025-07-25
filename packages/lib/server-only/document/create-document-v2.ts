@@ -212,7 +212,7 @@ export const createDocumentV2 = async ({
       }),
     );
 
-    // Todo: Is it necessary to create a full audit log with all fields and recipients audit logs?
+    // Todo: Is it necessary to create a full audit logs with all fields and recipients audit logs?
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
