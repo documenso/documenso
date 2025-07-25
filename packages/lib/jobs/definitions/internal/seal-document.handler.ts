@@ -146,14 +146,24 @@ export const run = async ({
     ? await getCertificatePdf({
         documentId,
         language: document.documentMeta?.language,
-      }).catch(() => null)
+      }).catch((e) => {
+        console.log('Failed to get certificate PDF');
+        console.error(e);
+
+        return null;
+      })
     : null;
 
   const auditLogData = settings.includeAuditLog
     ? await getAuditLogPdf({
         documentId,
         language: document.documentMeta?.language,
-      }).catch(() => null)
+      }).catch((e) => {
+        console.log('Failed to get audit logs PDF');
+        console.error(e);
+
+        return null;
+      })
     : null;
 
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
