@@ -4,6 +4,8 @@ import { prisma } from '@documenso/prisma';
 
 import { EMAIL_VERIFICATION_STATE } from '../../constants/email';
 import { jobsClient } from '../../jobs/client';
+import { logger } from '../../utils/logger';
+import { autoAssignUserToOrganisations } from '../organisation/domain-organisation';
 
 export type VerifyEmailProps = {
   token: string;
@@ -95,6 +97,18 @@ export const verifyEmail = async ({ token }: VerifyEmailProps) => {
 
   if (!updatedUser) {
     throw new Error('Something went wrong while verifying your email. Please try again.');
+  }
+
+  // Auto-assign user to organisations based on email domain
+  try {
+    await autoAssignUserToOrganisations(updatedUser.id, updatedUser.email);
+  } catch (error) {
+    // Log error but don't fail email verification - auto-assignment is optional
+    logger.error('Error during auto-assignment to organisations', {
+      userId: updatedUser.id,
+      email: updatedUser.email,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
   }
 
   return {

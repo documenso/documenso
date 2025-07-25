@@ -4,7 +4,9 @@ import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { autoAssignUserToOrganisations } from '@documenso/lib/server-only/organisation/domain-organisation';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { logger } from '@documenso/lib/utils/logger';
 import { prisma } from '@documenso/prisma';
 
 import type { OAuthClientOptions } from '../../config';
@@ -151,6 +153,20 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       }
     });
 
+    // Auto-assign user to organisations based on email domain if they just verified their email
+    if (!userWithSameEmail.emailVerified) {
+      try {
+        await autoAssignUserToOrganisations(userWithSameEmail.id, userWithSameEmail.email);
+      } catch (error) {
+        // Log error but don't fail OIDC login - auto-assignment is optional
+        logger.error('Error during OIDC auto-assignment for existing user', {
+          userId: userWithSameEmail.id,
+          email: userWithSameEmail.email,
+          error: error instanceof Error ? error.message : 'Unknown error',
+        });
+      }
+    }
+
     await onAuthorize({ userId: userWithSameEmail.id }, c);
 
     return c.redirect(redirectPath, 302);
@@ -186,6 +202,18 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     // Todo: (RR7) Add logging.
     console.error(err);
   });
+
+  // Auto-assign user to organisations based on email domain
+  try {
+    await autoAssignUserToOrganisations(createdUser.id, createdUser.email);
+  } catch (error) {
+    // Log error but don't fail OIDC login - auto-assignment is optional
+    logger.error('Error during OIDC auto-assignment to organisations', {
+      userId: createdUser.id,
+      email: createdUser.email,
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+  }
 
   await onAuthorize({ userId: createdUser.id }, c);
 

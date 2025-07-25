@@ -21,6 +21,7 @@ import {
   DocumentPreferencesForm,
   type TDocumentPreferencesFormSchema,
 } from '~/components/forms/document-preferences-form';
+import { DomainAccessSettingsForm } from '~/components/forms/domain-access-settings-form';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
@@ -162,6 +163,8 @@ export default function OrganisationSettingsPreferencesPage() {
             context="Organisation"
             settings={organisationWithSettings.organisationGlobalSettings}
             onFormSubmit={onBrandingPreferencesFormSubmit}
+            organisationId={organisation.id}
+            showDomainSection={!isPersonalLayoutMode}
           />
         </section>
       ) : (

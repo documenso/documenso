@@ -626,6 +626,23 @@ model Organisation {
 
   organisationGlobalSettingsId String                     @unique
   organisationGlobalSettings   OrganisationGlobalSettings @relation(fields: [organisationGlobalSettingsId], references: [id])
+
+  domainAccess OrganisationDomainAccess[]
+}
+
+model OrganisationDomainAccess {
+  id             String       @id @default(cuid())
+  organisationId String
+  domain         String       // lowercase, normalized domain
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  @@unique([organisationId, domain])
+  @@index([domain])
+  @@index([organisationId])
+  @@index([createdAt])
 }
 
 model OrganisationMember {
@@ -642,6 +659,8 @@ model OrganisationMember {
   organisationGroupMembers OrganisationGroupMember[]
 
   @@unique([userId, organisationId])
+  @@index([organisationId])
+  @@index([userId])
 }
 
 model OrganisationMemberInvite {
@@ -943,6 +962,8 @@ model BackgroundJobTask {
   jobId         String
   backgroundJob BackgroundJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
 }
+
+
 
 model AvatarImage {
   id    String @id @default(cuid())

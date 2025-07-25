@@ -3,6 +3,7 @@ import { encodeBase32LowerCaseNoPadding, encodeHexLowerCase } from '@oslojs/enco
 import { type Session, type User, UserSecurityAuditLogType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { performLoginDomainAssignment } from '@documenso/lib/server-only/organisation/login-domain-assignment';
 import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
@@ -73,6 +74,23 @@ export const createSession = async (
       type: UserSecurityAuditLogType.SIGN_IN,
     },
   });
+
+  // Check for domain-based auto-assignment on login (background task)
+  // This handles existing users when new domain configurations are added
+  prisma.user
+    .findUnique({
+      where: { id: userId },
+      select: { email: true },
+    })
+    .then((user) => {
+      if (user?.email) {
+        return performLoginDomainAssignment(userId, user.email);
+      }
+    })
+    .catch((error) => {
+      // Log error but don't fail session creation
+      console.error('Login domain assignment error:', error);
+    });
 
   return session;
 };

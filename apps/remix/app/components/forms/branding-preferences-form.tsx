@@ -29,6 +29,8 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 
+import { DomainAccessSettingsForm } from './domain-access-settings-form';
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 
@@ -58,6 +60,8 @@ export type BrandingPreferencesFormProps = {
   settings: SettingsSubset;
   onFormSubmit: (data: TBrandingPreferencesFormSchema) => Promise<void>;
   context: 'Team' | 'Organisation';
+  organisationId?: string;
+  showDomainSection?: boolean;
 };
 
 export function BrandingPreferencesForm({
@@ -65,6 +69,8 @@ export function BrandingPreferencesForm({
   settings,
   onFormSubmit,
   context,
+  organisationId,
+  showDomainSection = false,
 }: BrandingPreferencesFormProps) {
   const { t } = useLingui();
 
@@ -296,6 +302,24 @@ export function BrandingPreferencesForm({
                 </FormItem>
               )}
             />
+
+            {/* Brand Domain Section */}
+            {showDomainSection && organisationId && (
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-foreground text-sm font-medium">
+                    <Trans>Brand Domain</Trans>
+                  </h4>
+                  <p className="text-muted-foreground text-xs">
+                    <Trans>
+                      Configure email domains that will automatically assign new users to this
+                      organisation.
+                    </Trans>
+                  </p>
+                </div>
+                <DomainAccessSettingsForm organisationId={organisationId} />
+              </div>
+            )}
 
             <FormField
               control={form.control}

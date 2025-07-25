@@ -1,5 +1,6 @@
 import { router } from '../trpc';
 import { acceptOrganisationMemberInviteRoute } from './accept-organisation-member-invite';
+import { addOrganisationDomainRoute } from './add-organisation-domain';
 import { createOrganisationRoute } from './create-organisation';
 import { createOrganisationGroupRoute } from './create-organisation-group';
 import { createOrganisationMemberInvitesRoute } from './create-organisation-member-invites';
@@ -16,7 +17,10 @@ import { getOrganisationRoute } from './get-organisation';
 import { getOrganisationMemberInvitesRoute } from './get-organisation-member-invites';
 import { getOrganisationSessionRoute } from './get-organisation-session';
 import { getOrganisationsRoute } from './get-organisations';
+import { getPotentialDomainUsersRoute } from './get-potential-domain-users';
 import { leaveOrganisationRoute } from './leave-organisation';
+import { listOrganisationDomainsRoute } from './list-organisation-domains';
+import { removeOrganisationDomainRoute } from './remove-organisation-domain';
 import { resendOrganisationMemberInviteRoute } from './resend-organisation-member-invite';
 import { updateOrganisationRoute } from './update-organisation';
 import { updateOrganisationGroupRoute } from './update-organisation-group';
@@ -53,6 +57,12 @@ export const organisationRouter = router({
   },
   settings: {
     update: updateOrganisationSettingsRoute,
+  },
+  domain: {
+    add: addOrganisationDomainRoute,
+    remove: removeOrganisationDomainRoute,
+    list: listOrganisationDomainsRoute,
+    getPotentialUsers: getPotentialDomainUsersRoute,
   },
   internal: {
     getOrganisationSession: getOrganisationSessionRoute,
