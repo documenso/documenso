@@ -56,18 +56,36 @@ export const TemplatePageViewDocumentsTable = ({
 
   const team = useCurrentTeam();
 
-  const handleStatusFilterChange = (values: string[]) => {
-    startTransition(() => {
-      if (values.length === 0) {
-        updateSearchParams({ status: undefined, page: undefined });
-      } else {
-        updateSearchParams({ status: values.join(','), page: undefined });
-      }
-    });
+  const createFilterHandler = (paramName: string, isSingleValue = false) => {
+    return (values: string[]) => {
+      startTransition(() => {
+        if (values.length === 0) {
+          updateSearchParams({ [paramName]: undefined, page: undefined });
+        } else {
+          const value = isSingleValue ? values[0] : values.join(',');
+          updateSearchParams({ [paramName]: value, page: undefined });
+        }
+      });
+    };
   };
 
-  const currentStatus = searchParams.get('status');
-  const selectedStatusValues = currentStatus ? currentStatus.split(',').filter(Boolean) : [];
+  const getFilterValues = (paramName: string, isSingleValue = false): string[] => {
+    const value = searchParams.get(paramName);
+    if (!value) return [];
+    return isSingleValue ? [value] : value.split(',').filter(Boolean);
+  };
+
+  const handleStatusFilterChange = createFilterHandler('status');
+  const handleTimePeriodFilterChange = createFilterHandler('period', true);
+  const handleSourceFilterChange = createFilterHandler('source');
+
+  const selectedStatusValues = getFilterValues('status');
+  const selectedTimePeriodValues = getFilterValues('period', true);
+  const selectedSourceValues = getFilterValues('source');
+
+  const isStatusFiltered = selectedStatusValues.length > 0;
+  const isTimePeriodFiltered = selectedTimePeriodValues.length > 0;
+  const isSourceFiltered = selectedSourceValues.length > 0;
 
   const handleResetFilters = () => {
     startTransition(() => {
@@ -79,36 +97,6 @@ export const TemplatePageViewDocumentsTable = ({
       });
     });
   };
-
-  const isStatusFiltered = selectedStatusValues.length > 0;
-
-  const handleTimePeriodFilterChange = (values: string[]) => {
-    startTransition(() => {
-      if (values.length === 0) {
-        updateSearchParams({ period: undefined, page: undefined });
-      } else {
-        updateSearchParams({ period: values[0], page: undefined });
-      }
-    });
-  };
-
-  const currentPeriod = searchParams.get('period');
-  const selectedTimePeriodValues = currentPeriod ? [currentPeriod] : [];
-  const isTimePeriodFiltered = selectedTimePeriodValues.length > 0;
-
-  const handleSourceFilterChange = (values: string[]) => {
-    startTransition(() => {
-      if (values.length === 0) {
-        updateSearchParams({ source: undefined, page: undefined });
-      } else {
-        updateSearchParams({ source: values.join(','), page: undefined });
-      }
-    });
-  };
-
-  const currentSource = searchParams.get('source');
-  const selectedSourceValues = currentSource ? currentSource.split(',').filter(Boolean) : [];
-  const isSourceFiltered = selectedSourceValues.length > 0;
 
   const sourceParam = searchParams.get('source');
   const statusParam = searchParams.get('status');
