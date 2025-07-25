@@ -23,8 +23,15 @@ export const duplicateTemplate = async ({
       team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
-      recipients: true,
-      fields: true,
+      recipients: {
+        select: {
+          email: true,
+          name: true,
+          role: true,
+          signingOrder: true,
+          fields: true,
+        },
+      },
       templateDocumentData: true,
       templateMeta: true,
     },
@@ -59,13 +66,8 @@ export const duplicateTemplate = async ({
       teamId,
       title: template.title + ' (copy)',
       templateDocumentDataId: documentData.id,
-      recipients: {
-        create: template.recipients.map((recipient) => ({
-          email: recipient.email,
-          name: recipient.name,
-          token: nanoid(),
-        })),
-      },
+      authOptions: template.authOptions || undefined,
+      visibility: template.visibility,
       templateMeta,
     },
     include: {
@@ -73,32 +75,36 @@ export const duplicateTemplate = async ({
     },
   });
 
-  await prisma.field.createMany({
-    data: template.fields.map((field) => {
-      const recipient = template.recipients.find((recipient) => recipient.id === field.recipientId);
+  const recipientsToCreate = template.recipients.map((recipient) => ({
+    templateId: duplicatedTemplate.id,
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+    signingOrder: recipient.signingOrder,
+    token: nanoid(),
+    fields: {
+      createMany: {
+        data: recipient.fields.map((field) => ({
+          templateId: duplicatedTemplate.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+          fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+        })),
+      },
+    },
+  }));
 
-      const duplicatedTemplateRecipient = duplicatedTemplate.recipients.find(
-        (doc) => doc.email === recipient?.email,
-      );
-
-      if (!duplicatedTemplateRecipient) {
-        throw new Error('Recipient not found.');
-      }
-
-      return {
-        type: field.type,
-        page: field.page,
-        positionX: field.positionX,
-        positionY: field.positionY,
-        width: field.width,
-        height: field.height,
-        customText: field.customText,
-        inserted: field.inserted,
-        templateId: duplicatedTemplate.id,
-        recipientId: duplicatedTemplateRecipient.id,
-      };
-    }),
-  });
+  for (const recipientData of recipientsToCreate) {
+    await prisma.recipient.create({
+      data: recipientData,
+    });
+  }
 
   return duplicatedTemplate;
 };

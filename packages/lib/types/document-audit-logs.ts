@@ -33,6 +33,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
   'DOCUMENT_OPENED', // When the document is opened by a recipient.
+  'DOCUMENT_VIEWED', // When the document is viewed by a recipient.
   'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
@@ -57,6 +58,9 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'REDIRECT_URL',
   'SUBJECT',
   'TIMEZONE',
+  'EMAIL_ID',
+  'EMAIL_REPLY_TO',
+  'EMAIL_SETTINGS',
 ]);
 
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
@@ -108,6 +112,9 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
       z.literal(DOCUMENT_META_DIFF_TYPE.REDIRECT_URL),
       z.literal(DOCUMENT_META_DIFF_TYPE.SUBJECT),
       z.literal(DOCUMENT_META_DIFF_TYPE.TIMEZONE),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_ID),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_REPLY_TO),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_SETTINGS),
     ]),
     from: z.string().nullable(),
     to: z.string().nullable(),
@@ -439,6 +446,22 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
 });
 
 /**
+ * Event: Document viewed.
+ */
+export const ZDocumentAuditLogEventDocumentViewedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED),
+  data: ZBaseRecipientDataSchema.extend({
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
+  }),
+});
+
+/**
  * Event: Document recipient completed the document (the recipient has fully actioned and completed their required steps for the document).
  */
 export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
@@ -601,6 +624,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
+    ZDocumentAuditLogEventDocumentViewedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
     ZDocumentAuditLogEventDocumentRecipientRejectedSchema,
     ZDocumentAuditLogEventDocumentSentSchema,

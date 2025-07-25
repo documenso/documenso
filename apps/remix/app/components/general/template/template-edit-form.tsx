@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
+import { z } from 'zod';
 
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
@@ -10,6 +11,7 @@ import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
+import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -125,14 +127,18 @@ export const TemplateEditForm = ({
   const saveSettingsData = async (data: TAddTemplateSettingsFormSchema) => {
     const { signatureTypes } = data.meta;
 
+    const parsedGlobalAccessAuth = z
+      .array(ZDocumentAccessAuthTypesSchema)
+      .safeParse(data.globalAccessAuth);
+
     return updateTemplateSettings({
       templateId: template.id,
       data: {
         title: data.title,
         externalId: data.externalId || null,
         visibility: data.visibility,
-        globalAccessAuth: data.globalAccessAuth ?? null,
-        globalActionAuth: data.globalActionAuth ?? null,
+        globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
+        globalActionAuth: data.globalActionAuth ?? [],
       },
       meta: {
         ...data.meta,

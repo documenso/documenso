@@ -54,7 +54,7 @@ export const DocumentSigningNumberField = ({
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
-  const { recipient, targetSigner, isAssistantMode } = useDocumentSigningRecipientContext();
+  const { recipient, isAssistantMode } = useDocumentSigningRecipientContext();
 
   const [showNumberModal, setShowNumberModal] = useState(false);
 
@@ -62,8 +62,8 @@ export const DocumentSigningNumberField = ({
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const defaultValue = parsedFieldMeta?.value;
-  const [localNumber, setLocalNumber] = useState(
-    parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0',
+  const [localNumber, setLocalNumber] = useState(() =>
+    parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '',
   );
 
   const initialErrors: ValidationErrors = {
@@ -213,16 +213,13 @@ export const DocumentSigningNumberField = ({
 
   useEffect(() => {
     if (!showNumberModal) {
-      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '0');
+      setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '');
       setErrors(initialErrors);
     }
   }, [showNumberModal]);
 
   useEffect(() => {
-    if (
-      (!field.inserted && defaultValue && localNumber) ||
-      (!field.inserted && parsedFieldMeta?.readOnly && defaultValue)
-    ) {
+    if (!field.inserted && defaultValue) {
       void executeActionAuthProcedure({
         onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
         actionTarget: field.type,
@@ -318,7 +315,7 @@ export const DocumentSigningNumberField = ({
                 variant="secondary"
                 onClick={() => {
                   setShowNumberModal(false);
-                  setLocalNumber('');
+                  setLocalNumber(parsedFieldMeta?.value ? String(parsedFieldMeta.value) : '');
                 }}
               >
                 <Trans>Cancel</Trans>

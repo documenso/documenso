@@ -13,6 +13,12 @@ export const updateTeamRoute = authenticatedProcedure
 
     const { name, url, profileBio, profileEnabled } = data;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+      },
+    });
+
     if (name || url) {
       await updateTeam({
         userId: ctx.user.id,

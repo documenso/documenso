@@ -20,6 +20,13 @@ export const findTeamGroupsRoute = authenticatedProcedure
     const { teamId, types, query, page, perPage, teamGroupId, organisationRoles } = input;
     const { user } = ctx;
 
+    ctx.logger.info({
+      input: {
+        teamId,
+        teamGroupId,
+      },
+    });
+
     return await findTeamGroups({
       userId: user.id,
       teamId,

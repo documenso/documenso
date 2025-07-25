@@ -8,6 +8,7 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 import { useSearchParams } from 'react-router';
 
+import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
@@ -81,7 +82,11 @@ export const FieldItem = ({
     pageWidth: defaultWidth || 0,
   });
   const [settingsActive, setSettingsActive] = useState(false);
-  const $el = useRef(null);
+  const $el = useRef<HTMLDivElement>(null);
+
+  const $pageBounds = useElementBounds(
+    `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`,
+  );
 
   const signerStyles = useRecipientColors(recipientIndex);
 
@@ -233,9 +238,10 @@ export const FieldItem = ({
       default={{
         x: coords.pageX,
         y: coords.pageY,
-        height: fixedSize ? '' : coords.pageHeight,
-        width: fixedSize ? '' : coords.pageWidth,
+        height: fixedSize ? 'auto' : coords.pageHeight,
+        width: fixedSize ? 'auto' : coords.pageWidth,
       }}
+      maxWidth={fixedSize && $pageBounds?.width ? $pageBounds.width - coords.pageX : undefined}
       bounds={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.pageNumber}"]`}
       onDragStart={() => onFieldActivate?.()}
       onResizeStart={() => onFieldActivate?.()}

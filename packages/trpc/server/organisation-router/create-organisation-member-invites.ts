@@ -14,6 +14,12 @@ export const createOrganisationMemberInvitesRoute = authenticatedProcedure
     const userId = ctx.user.id;
     const userName = ctx.user.name || '';
 
+    ctx.logger.info({
+      input: {
+        organisationId,
+      },
+    });
+
     await createOrganisationMemberInvites({
       userId,
       userName,

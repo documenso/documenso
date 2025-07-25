@@ -62,6 +62,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { fieldId } = input;
 
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
       return await getFieldById({
         userId: ctx.user.id,
         teamId,
@@ -87,6 +93,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, field } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const createdFields = await createDocumentFields({
         userId: ctx.user.id,
@@ -118,6 +130,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { documentId, fields } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await createDocumentFields({
         userId: ctx.user.id,
         teamId,
@@ -145,6 +163,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, field } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       const updatedFields = await updateDocumentFields({
         userId: ctx.user.id,
@@ -176,6 +200,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { documentId, fields } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
+
       return await updateDocumentFields({
         userId: ctx.user.id,
         teamId,
@@ -203,6 +233,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { fieldId } = input;
 
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
       await deleteDocumentField({
         userId: ctx.user.id,
         teamId,
@@ -224,6 +260,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { documentId, fields } = input;
+
+      ctx.logger.info({
+        input: {
+          documentId,
+        },
+      });
 
       return await setFieldsForDocument({
         documentId,
@@ -263,6 +305,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { templateId, field } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       const createdFields = await createTemplateFields({
         userId: ctx.user.id,
         teamId,
@@ -293,6 +341,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { fieldId } = input;
 
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
       return await getFieldById({
         userId: ctx.user.id,
         teamId,
@@ -318,6 +372,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, fields } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await createTemplateFields({
         userId: ctx.user.id,
@@ -345,6 +405,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, field } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       const updatedFields = await updateTemplateFields({
         userId: ctx.user.id,
@@ -375,6 +441,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { templateId, fields } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       return await updateTemplateFields({
         userId: ctx.user.id,
         teamId,
@@ -401,6 +473,12 @@ export const fieldRouter = router({
       const { teamId } = ctx;
       const { fieldId } = input;
 
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
       await deleteTemplateField({
         userId: ctx.user.id,
         teamId,
@@ -421,6 +499,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, fields } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await setFieldsForTemplate({
         templateId,
@@ -448,6 +532,12 @@ export const fieldRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { token, fieldId, value, isBase64, authOptions } = input;
 
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
+
       return await signFieldWithToken({
         token,
         fieldId,
@@ -466,6 +556,12 @@ export const fieldRouter = router({
     .input(ZRemovedSignedFieldWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { token, fieldId } = input;
+
+      ctx.logger.info({
+        input: {
+          fieldId,
+        },
+      });
 
       return await removeSignedFieldWithToken({
         token,

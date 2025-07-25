@@ -30,6 +30,7 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
+import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
@@ -77,8 +78,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  getDocument: authenticatedMiddleware(async (args, user, team) => {
+  getDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -139,9 +146,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  downloadSignedDocument: authenticatedMiddleware(async (args, user, team) => {
+  downloadSignedDocument: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: documentId } = args.params;
     const { downloadOriginalDocument } = args.query;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
@@ -204,8 +217,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  deleteDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -382,8 +401,117 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  deleteTemplate: authenticatedMiddleware(async (args, user, team) => {
+  createTemplate: authenticatedMiddleware(async (args, user, team) => {
+    const { body } = args;
+    const {
+      title,
+      folderId,
+      externalId,
+      visibility,
+      globalAccessAuth,
+      globalActionAuth,
+      publicTitle,
+      publicDescription,
+      type,
+      meta,
+    } = body;
+
+    try {
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Create template is not available without S3 transport.',
+          },
+        };
+      }
+
+      const dateFormat = meta?.dateFormat
+        ? DATE_FORMATS.find((format) => format.value === meta?.dateFormat)
+        : DATE_FORMATS.find((format) => format.value === DEFAULT_DOCUMENT_DATE_FORMAT);
+
+      if (meta?.dateFormat && !dateFormat) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid date format. Please provide a valid date format',
+          },
+        };
+      }
+
+      const timezone = meta?.timezone
+        ? TIME_ZONES.find((tz) => tz === meta?.timezone)
+        : DEFAULT_DOCUMENT_TIME_ZONE;
+
+      const isTimeZoneValid = meta?.timezone ? TIME_ZONES.includes(String(timezone)) : true;
+
+      if (!isTimeZoneValid) {
+        return {
+          status: 400,
+          body: {
+            message: 'Invalid timezone. Please provide a valid timezone',
+          },
+        };
+      }
+
+      const fileName = title?.endsWith('.pdf') ? title : `${title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const templateDocumentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const createdTemplate = await createTemplate({
+        userId: user.id,
+        teamId: team.id,
+        templateDocumentDataId: templateDocumentData.id,
+        data: {
+          title,
+          folderId,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          publicTitle,
+          publicDescription,
+          type,
+        },
+        meta,
+      });
+
+      const fullTemplate = await getTemplateById({
+        id: createdTemplate.id,
+        userId: user.id,
+        teamId: team.id,
+      });
+
+      return {
+        status: 200,
+        body: {
+          uploadUrl: url,
+          template: fullTemplate,
+        },
+      };
+    } catch (err) {
+      return {
+        status: 404,
+        body: {
+          message: 'An error has occured while creating the template',
+        },
+      };
+    }
+  }),
+
+  deleteTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: templateId } = args.params;
+
+    logger.info({
+      input: {
+        id: templateId,
+      },
+    });
 
     try {
       const deletedTemplate = await deleteTemplate({
@@ -406,8 +534,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  getTemplate: authenticatedMiddleware(async (args, user, team) => {
+  getTemplate: authenticatedMiddleware(async (args, user, team, { logger }) => {
     const { id: templateId } = args.params;
+
+    logger.info({
+      input: {
+        id: templateId,
+      },
+    });
 
     try {
       const template = await getTemplateById({
@@ -463,201 +597,223 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  createDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body, params } = args;
+  createDocumentFromTemplate: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { body, params } = args;
 
-    const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
-
-    if (remaining.documents <= 0) {
-      return {
-        status: 400,
-        body: {
-          message: 'You have reached the maximum number of documents allowed for this month',
+      logger.info({
+        input: {
+          templateId: params.templateId,
         },
-      };
-    }
-
-    const templateId = Number(params.templateId);
-
-    const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
-
-    const document = await createDocumentFromTemplateLegacy({
-      templateId,
-      userId: user.id,
-      teamId: team?.id,
-      recipients: body.recipients,
-    });
-
-    let documentDataId = document.documentDataId;
-
-    if (body.formValues) {
-      const pdf = await getFileServerSide(document.documentData);
-
-      const prefilled = await insertFormValuesInPdf({
-        pdf: Buffer.from(pdf),
-        formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFileServerSide({
-        name: fileName,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(prefilled),
-      });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
-      documentDataId = newDocumentData.id;
-    }
-
-    await updateDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team?.id,
-      data: {
-        title: fileName,
-        externalId: body.externalId || null,
-        formValues: body.formValues,
-        documentData: {
-          connect: {
-            id: documentDataId,
+      if (remaining.documents <= 0) {
+        return {
+          status: 400,
+          body: {
+            message: 'You have reached the maximum number of documents allowed for this month',
           },
-        },
-      },
-    });
+        };
+      }
 
-    if (body.meta) {
-      await upsertDocumentMeta({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        ...body.meta,
-        requestMetadata: metadata,
-      });
-    }
+      const templateId = Number(params.templateId);
 
-    if (body.authOptions) {
-      await updateDocumentSettings({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        data: body.authOptions,
-        requestMetadata: metadata,
-      });
-    }
+      const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
-    return {
-      status: 200,
-      body: {
-        documentId: document.id,
-        recipients: document.recipients.map((recipient) => ({
-          recipientId: recipient.id,
-          name: recipient.name,
-          email: recipient.email,
-          token: recipient.token,
-          role: recipient.role,
-          signingOrder: recipient.signingOrder,
-
-          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-        })),
-      },
-    };
-  }),
-
-  generateDocumentFromTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
-    const { body, params } = args;
-
-    const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
-
-    if (remaining.documents <= 0) {
-      return {
-        status: 400,
-        body: {
-          message: 'You have reached the maximum number of documents allowed for this month',
-        },
-      };
-    }
-
-    const templateId = Number(params.templateId);
-
-    let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
-
-    try {
-      document = await createDocumentFromTemplate({
+      const document = await createDocumentFromTemplateLegacy({
         templateId,
-        externalId: body.externalId || null,
         userId: user.id,
         teamId: team?.id,
         recipients: body.recipients,
-        prefillFields: body.prefillFields,
-        override: {
-          title: body.title,
-          ...body.meta,
-        },
-        requestMetadata: metadata,
-      });
-    } catch (err) {
-      return AppError.toRestAPIError(err);
-    }
-
-    if (body.formValues) {
-      const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
-
-      const pdf = await getFileServerSide(document.documentData);
-
-      const prefilled = await insertFormValuesInPdf({
-        pdf: Buffer.from(pdf),
-        formValues: body.formValues,
       });
 
-      const newDocumentData = await putPdfFileServerSide({
-        name: fileName,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(prefilled),
-      });
+      let documentDataId = document.documentDataId;
+
+      if (body.formValues) {
+        const pdf = await getFileServerSide(document.documentData);
+
+        const prefilled = await insertFormValuesInPdf({
+          pdf: Buffer.from(pdf),
+          formValues: body.formValues,
+        });
+
+        const newDocumentData = await putPdfFileServerSide({
+          name: fileName,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(prefilled),
+        });
+
+        documentDataId = newDocumentData.id;
+      }
 
       await updateDocument({
         documentId: document.id,
         userId: user.id,
         teamId: team?.id,
         data: {
+          title: fileName,
+          externalId: body.externalId || null,
           formValues: body.formValues,
           documentData: {
             connect: {
-              id: newDocumentData.id,
+              id: documentDataId,
             },
           },
         },
       });
-    }
 
-    if (body.authOptions) {
-      await updateDocumentSettings({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        data: body.authOptions,
-        requestMetadata: metadata,
+      if (body.meta) {
+        await upsertDocumentMeta({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          ...body.meta,
+          requestMetadata: metadata,
+        });
+      }
+
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: body.authOptions,
+          requestMetadata: metadata,
+        });
+      }
+
+      return {
+        status: 200,
+        body: {
+          documentId: document.id,
+          recipients: document.recipients.map((recipient) => ({
+            recipientId: recipient.id,
+            name: recipient.name,
+            email: recipient.email,
+            token: recipient.token,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
+        },
+      };
+    },
+  ),
+
+  generateDocumentFromTemplate: authenticatedMiddleware(
+    async (args, user, team, { logger, metadata }) => {
+      const { body, params } = args;
+
+      logger.info({
+        input: {
+          templateId: params.templateId,
+        },
       });
-    }
 
-    return {
-      status: 200,
-      body: {
-        documentId: document.id,
-        recipients: document.recipients.map((recipient) => ({
-          recipientId: recipient.id,
-          name: recipient.name,
-          email: recipient.email,
-          token: recipient.token,
-          role: recipient.role,
-          signingOrder: recipient.signingOrder,
-          signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
-        })),
-      },
-    };
-  }),
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
 
-  sendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+      if (remaining.documents <= 0) {
+        return {
+          status: 400,
+          body: {
+            message: 'You have reached the maximum number of documents allowed for this month',
+          },
+        };
+      }
+
+      const templateId = Number(params.templateId);
+
+      let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
+
+      try {
+        document = await createDocumentFromTemplate({
+          templateId,
+          externalId: body.externalId || null,
+          userId: user.id,
+          teamId: team?.id,
+          recipients: body.recipients,
+          prefillFields: body.prefillFields,
+          override: {
+            title: body.title,
+            ...body.meta,
+          },
+          requestMetadata: metadata,
+        });
+      } catch (err) {
+        return AppError.toRestAPIError(err);
+      }
+
+      if (body.formValues) {
+        const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
+
+        const pdf = await getFileServerSide(document.documentData);
+
+        const prefilled = await insertFormValuesInPdf({
+          pdf: Buffer.from(pdf),
+          formValues: body.formValues,
+        });
+
+        const newDocumentData = await putPdfFileServerSide({
+          name: fileName,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(prefilled),
+        });
+
+        await updateDocument({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: {
+            formValues: body.formValues,
+            documentData: {
+              connect: {
+                id: newDocumentData.id,
+              },
+            },
+          },
+        });
+      }
+
+      if (body.authOptions) {
+        await updateDocumentSettings({
+          documentId: document.id,
+          userId: user.id,
+          teamId: team?.id,
+          data: body.authOptions,
+          requestMetadata: metadata,
+        });
+      }
+
+      return {
+        status: 200,
+        body: {
+          documentId: document.id,
+          recipients: document.recipients.map((recipient) => ({
+            recipientId: recipient.id,
+            name: recipient.name,
+            email: recipient.email,
+            token: recipient.token,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+          })),
+        },
+      };
+    },
+  ),
+
+  sendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { sendEmail, sendCompletionEmails } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       const document = await getDocumentById({
@@ -730,9 +886,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  resendDocument: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  resendDocument: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { recipients } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     try {
       await resendDocument({
@@ -759,9 +921,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  createRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  createRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -850,9 +1018,16 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  updateRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  updateRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, recipientId } = args.params;
     const { name, email, role, authOptions, signingOrder } = args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+        recipientId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -916,8 +1091,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  deleteRecipient: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteRecipient: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, recipientId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+        recipientId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -970,8 +1152,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  createField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  createField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+      },
+    });
+
     const fields = Array.isArray(args.body) ? args.body : [args.body];
 
     const document = await prisma.document.findFirst({
@@ -1131,10 +1320,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  updateField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  updateField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, fieldId } = args.params;
     const { recipientId, type, pageNumber, pageWidth, pageHeight, pageX, pageY, fieldMeta } =
       args.body;
+
+    logger.info({
+      input: {
+        id: documentId,
+        fieldId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -1222,8 +1418,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     };
   }),
 
-  deleteField: authenticatedMiddleware(async (args, user, team, { metadata }) => {
+  deleteField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
     const { id: documentId, fieldId } = args.params;
+
+    logger.info({
+      input: {
+        id: documentId,
+        fieldId,
+      },
+    });
 
     const document = await getDocumentById({
       documentId: Number(documentId),
@@ -1333,7 +1536,6 @@ const updateDocument = async ({
   return await prisma.document.update({
     where: {
       id: documentId,
-      userId,
       team: buildTeamWhereQuery({ teamId, userId }),
     },
     data: {

@@ -9,7 +9,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
@@ -43,11 +42,13 @@ export const run = async ({
     },
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
     source: {
       type: 'team',
       teamId: document.teamId,
     },
+    meta: document.documentMeta || null,
   });
 
   const { documentMeta, user: documentOwner } = document;
@@ -59,9 +60,7 @@ export const run = async ({
     return;
   }
 
-  const lang = documentMeta?.language ?? settings.documentLanguage;
-
-  const i18n = await getI18nInstance(lang);
+  const i18n = await getI18nInstance(emailLanguage);
 
   // Send cancellation emails to all recipients who have been sent the document or viewed it
   const recipientsToNotify = document.recipients.filter(
@@ -82,9 +81,9 @@ export const run = async ({
         });
 
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang, branding }),
+          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
           renderEmailWithI18N(template, {
-            lang,
+            lang: emailLanguage,
             branding,
             plainText: true,
           }),
@@ -95,10 +94,8 @@ export const run = async ({
             name: recipient.name,
             address: recipient.email,
           },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
+          from: senderEmail,
+          replyTo: replyToEmail,
           subject: i18n._(msg`Document "${document.title}" Cancelled`),
           html,
           text,

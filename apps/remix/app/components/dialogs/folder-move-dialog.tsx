@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
+import { Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
-import { FolderIcon, HomeIcon } from 'lucide-react';
+import { FolderIcon, HomeIcon, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -27,6 +27,7 @@ import {
   FormItem,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
+import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type FolderMoveDialogProps = {
@@ -48,9 +49,10 @@ export const FolderMoveDialog = ({
   isOpen,
   onOpenChange,
 }: FolderMoveDialogProps) => {
-  const { _ } = useLingui();
-
+  const { t } = useLingui();
   const { toast } = useToast();
+  const [searchTerm, setSearchTerm] = useState('');
+
   const { mutateAsync: moveFolder } = trpc.folder.moveFolder.useMutation();
 
   const form = useForm<TMoveFolderFormSchema>({
@@ -72,15 +74,15 @@ export const FolderMoveDialog = ({
       onOpenChange(false);
 
       toast({
-        title: 'Folder moved successfully',
+        title: t`Folder moved successfully`,
       });
     } catch (err) {
       const error = AppError.parseError(err);
 
       if (error.code === AppErrorCode.NOT_FOUND) {
         toast({
-          title: 'Folder not found',
-          description: _(msg`The folder you are trying to move does not exist.`),
+          title: t`Folder not found`,
+          description: t`The folder you are trying to move does not exist.`,
           variant: 'destructive',
         });
 
@@ -88,8 +90,8 @@ export const FolderMoveDialog = ({
       }
 
       toast({
-        title: 'Failed to move folder',
-        description: _(msg`An unknown error occurred while moving the folder.`),
+        title: t`Failed to move folder`,
+        description: t`An unknown error occurred while moving the folder.`,
         variant: 'destructive',
       });
     }
@@ -98,69 +100,91 @@ export const FolderMoveDialog = ({
   useEffect(() => {
     if (!isOpen) {
       form.reset();
+      setSearchTerm('');
     }
   }, [isOpen, form]);
 
-  // Filter out the current folder and only show folders of the same type
+  // Filter out the current folder, only show folders of the same type, and filter by search term
   const filteredFolders = foldersData?.filter(
-    (f) => f.id !== folder?.id && f.type === folder?.type,
+    (f) =>
+      f.id !== folder?.id &&
+      f.type === folder?.type &&
+      (searchTerm === '' || f.name.toLowerCase().includes(searchTerm.toLowerCase())),
   );
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Move Folder</DialogTitle>
-          <DialogDescription>Select a destination for this folder.</DialogDescription>
+          <DialogTitle>
+            <Trans>Move Folder</Trans>
+          </DialogTitle>
+          <DialogDescription>
+            <Trans>Select a destination for this folder.</Trans>
+          </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onFormSubmit)} className="space-y-4 py-4">
-            <FormField
-              control={form.control}
-              name="targetFolderId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <div className="space-y-2">
-                      <Button
-                        type="button"
-                        variant={!field.value ? 'default' : 'outline'}
-                        className="w-full justify-start"
-                        disabled={!folder?.parentId}
-                        onClick={() => field.onChange(null)}
-                      >
-                        <HomeIcon className="mr-2 h-4 w-4" />
-                        Root
-                      </Button>
 
-                      {filteredFolders &&
-                        filteredFolders.map((f) => (
-                          <Button
-                            key={f.id}
-                            type="button"
-                            disabled={f.id === folder?.parentId}
-                            variant={field.value === f.id ? 'default' : 'outline'}
-                            className="w-full justify-start"
-                            onClick={() => field.onChange(f.id)}
-                          >
-                            <FolderIcon className="mr-2 h-4 w-4" />
-                            {f.name}
-                          </Button>
-                        ))}
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <DialogFooter>
-              <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
-                Move Folder
-              </Button>
-            </DialogFooter>
+        <div className="relative">
+          <Search className="text-muted-foreground absolute left-2 top-3 h-4 w-4" />
+          <Input
+            placeholder={t`Search folders...`}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-8"
+          />
+        </div>
+
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onFormSubmit)}>
+            <fieldset disabled={form.formState.isSubmitting} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="targetFolderId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormControl>
+                      <div className="max-h-96 space-y-2 overflow-y-auto">
+                        <Button
+                          type="button"
+                          variant={!field.value ? 'default' : 'outline'}
+                          className="w-full justify-start"
+                          disabled={!folder?.parentId}
+                          onClick={() => field.onChange(null)}
+                        >
+                          <HomeIcon className="mr-2 h-4 w-4" />
+                          <Trans>Home</Trans>
+                        </Button>
+
+                        {filteredFolders &&
+                          filteredFolders.map((f) => (
+                            <Button
+                              key={f.id}
+                              type="button"
+                              disabled={f.id === folder?.parentId}
+                              variant={field.value === f.id ? 'default' : 'outline'}
+                              className="w-full justify-start"
+                              onClick={() => field.onChange(f.id)}
+                            >
+                              <FolderIcon className="mr-2 h-4 w-4" />
+                              {f.name}
+                            </Button>
+                          ))}
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button type="submit" loading={form.formState.isSubmitting}>
+                  <Trans>Move</Trans>
+                </Button>
+              </DialogFooter>
+            </fieldset>
           </form>
         </Form>
       </DialogContent>
