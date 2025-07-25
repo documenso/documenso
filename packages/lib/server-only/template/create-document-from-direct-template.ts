@@ -3,7 +3,6 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import type { Field, Signature } from '@prisma/client';
 import {
-  DocumentSigningOrder,
   DocumentSource,
   DocumentStatus,
   FieldType,
@@ -25,8 +24,6 @@ import type { TSignFieldWithTokenMutationSchema } from '@documenso/trpc/server/f
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { TRecipientActionAuthTypes } from '../../types/document-auth';
@@ -38,6 +35,7 @@ import {
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { isRequiredField } from '../../utils/advanced-fields-helpers';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -45,7 +43,6 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
-import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
@@ -116,7 +113,8 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, settings, senderEmail, emailLanguage } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'team',
       teamId: template.teamId,
@@ -169,13 +167,7 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = template.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-
-  const metaTimezone = template.templateMeta?.timezone || DEFAULT_DOCUMENT_TIME_ZONE;
-  const metaDateFormat = template.templateMeta?.dateFormat || DEFAULT_DOCUMENT_DATE_FORMAT;
-  const metaEmailMessage = template.templateMeta?.message || '';
-  const metaEmailSubject = template.templateMeta?.subject || '';
-  const metaLanguage = template.templateMeta?.language ?? settings.documentLanguage;
-  const metaSigningOrder = template.templateMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, template.templateMeta);
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -234,7 +226,9 @@ export const createDocumentFromDirectTemplate = async ({
       const typedSignature = isSignatureField && !isBase64 ? value : undefined;
 
       if (templateField.type === FieldType.DATE) {
-        customText = DateTime.now().setZone(metaTimezone).toFormat(metaDateFormat);
+        customText = DateTime.now()
+          .setZone(derivedDocumentMeta.timezone)
+          .toFormat(derivedDocumentMeta.dateFormat);
       }
 
       if (isSignatureField && !signatureImageAsBase64 && !typedSignature) {
@@ -318,18 +312,7 @@ export const createDocumentFromDirectTemplate = async ({
           },
         },
         documentMeta: {
-          create: {
-            timezone: metaTimezone,
-            dateFormat: metaDateFormat,
-            message: metaEmailMessage,
-            subject: metaEmailSubject,
-            language: metaLanguage,
-            signingOrder: metaSigningOrder,
-            distributionMethod: template.templateMeta?.distributionMethod,
-            typedSignatureEnabled: template.templateMeta?.typedSignatureEnabled,
-            uploadSignatureEnabled: template.templateMeta?.uploadSignatureEnabled,
-            drawSignatureEnabled: template.templateMeta?.drawSignatureEnabled,
-          },
+          create: derivedDocumentMeta,
         },
       },
       include: {
@@ -589,11 +572,11 @@ export const createDocumentFromDirectTemplate = async ({
     });
 
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(emailTemplate, { lang: metaLanguage, branding }),
-      renderEmailWithI18N(emailTemplate, { lang: metaLanguage, branding, plainText: true }),
+      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding }),
+      renderEmailWithI18N(emailTemplate, { lang: emailLanguage, branding, plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance(metaLanguage);
+    const i18n = await getI18nInstance(emailLanguage);
 
     await mailer.sendMail({
       to: [
@@ -602,10 +585,7 @@ export const createDocumentFromDirectTemplate = async ({
           address: templateOwner.email,
         },
       ],
-      from: {
-        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-      },
+      from: senderEmail,
       subject: i18n._(msg`Document created from direct template`),
       html,
       text,
