@@ -38,7 +38,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      'bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-50 backdrop-blur-sm transition-all duration-100',
+      'bg-background/40 sm:bg-background/80 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=open]:fade-in fixed inset-0 z-50 backdrop-blur-[2px] transition-all duration-100 sm:backdrop-blur-sm',
       className,
     )}
     {...props}
@@ -57,7 +57,7 @@ const DialogContent = React.forwardRef<
   }
 >(
   (
-    { className, children, overlayClassName, position = 'start', hideClose = false, ...props },
+    { className, children, overlayClassName, position = 'end', hideClose = false, ...props },
     ref,
   ) => (
     <DialogPortal position={position}>
@@ -65,7 +65,7 @@ const DialogContent = React.forwardRef<
       <DialogPrimitive.Content
         ref={ref}
         className={cn(
-          'bg-background animate-in data-[state=open]:fade-in-90 sm:zoom-in-90 data-[state=open]:slide-in-from-bottom-10 data-[state=open]:sm:slide-in-from-bottom-0 fixed z-50 grid w-full gap-4 rounded-b-lg border p-6 shadow-lg sm:max-w-lg sm:rounded-lg',
+          'bg-background animate-in data-[state=open]:fade-in-90 sm:zoom-in-90 data-[state=open]:slide-in-from-bottom-10 data-[state=open]:sm:slide-in-from-bottom-0 fixed z-50 grid w-full gap-4 rounded-t-xl border p-6 shadow-lg sm:max-w-lg sm:rounded-lg',
           className,
         )}
         {...props}
