@@ -87,7 +87,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
   const { mutateAsync: createOrganisation } = trpc.organisation.create.useMutation();
 
-  const { data: plansData } = trpc.billing.plans.get.useQuery(undefined, {
+  const { data: plansData } = trpc.enterprise.billing.plans.get.useQuery(undefined, {
     enabled: IS_BILLING_ENABLED(),
   });
 

@@ -15,6 +15,7 @@ import {
 import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
@@ -30,6 +31,7 @@ export type CreateDocumentOptions = {
   formValues?: Record<string, string | number | boolean>;
   normalizePdf?: boolean;
   timezone?: string;
+  userTimezone?: string;
   requestMetadata: ApiRequestMetadata;
   folderId?: string;
 };
@@ -44,6 +46,7 @@ export const createDocument = async ({
   formValues,
   requestMetadata,
   timezone,
+  userTimezone,
   folderId,
 }: CreateDocumentOptions) => {
   const team = await getTeamById({ userId, teamId });
@@ -101,6 +104,10 @@ export const createDocument = async ({
     }
   }
 
+  // userTimezone is last because it's always passed in regardless of the organisation/team settings
+  // for uploads from the frontend
+  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
@@ -117,13 +124,9 @@ export const createDocument = async ({
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            language: settings.documentLanguage,
-            timezone: timezone,
-            typedSignatureEnabled: settings.typedSignatureEnabled,
-            uploadSignatureEnabled: settings.uploadSignatureEnabled,
-            drawSignatureEnabled: settings.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, {
+            timezone: timezoneToUse,
+          }),
         },
       },
     });

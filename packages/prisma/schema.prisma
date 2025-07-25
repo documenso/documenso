@@ -468,7 +468,10 @@ model DocumentMeta {
 
   language           String                     @default("en")
   distributionMethod DocumentDistributionMethod @default(EMAIL)
-  emailSettings      Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+
+  emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+  emailReplyTo  String?
+  emailId       String?
 }
 
 enum ReadStatus {
@@ -619,6 +622,9 @@ model Organisation {
 
   teams Team[]
 
+  emailDomains       EmailDomain[]
+  organisationEmails OrganisationEmail[]
+
   avatarImage AvatarImage? @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
 
   ownerUserId Int
@@ -723,18 +729,29 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
 
-  documentVisibility        DocumentVisibility @default(EVERYONE)
-  documentLanguage          String             @default("en")
-  includeSenderDetails      Boolean            @default(true)
-  includeSigningCertificate Boolean            @default(true)
+  documentVisibility DocumentVisibility @default(EVERYONE)
+  documentLanguage   String             @default("en")
+  documentTimezone   String? // Nullable to allow using local timezones if not set.
+  documentDateFormat String             @default("yyyy-MM-dd hh:mm a")
+
+  includeSenderDetails      Boolean @default(true)
+  includeSigningCertificate Boolean @default(true)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+
+  emailId String?
+  email   OrganisationEmail? @relation(fields: [emailId], references: [id])
+
+  emailReplyTo          String?
+  // emailReplyToName      String? // Placeholder for future feature.
+  emailDocumentSettings Json /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
 
   brandingEnabled        Boolean @default(false)
   brandingLogo           String  @default("")
@@ -742,18 +759,29 @@ model OrganisationGlobalSettings {
   brandingCompanyDetails String  @default("")
 }
 
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
 
-  documentVisibility        DocumentVisibility?
-  documentLanguage          String?
+  documentVisibility DocumentVisibility?
+  documentLanguage   String?
+  documentTimezone   String?
+  documentDateFormat String?
+
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
 
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+
+  emailId String?
+  email   OrganisationEmail? @relation(fields: [emailId], references: [id])
+
+  emailReplyTo          String?
+  // emailReplyToName      String? // Placeholder for future feature.
+  emailDocumentSettings Json? /// [DocumentEmailSettingsNullable] @zod.custom.use(ZDocumentEmailSettingsSchema)
 
   brandingEnabled        Boolean?
   brandingLogo           String?
@@ -829,11 +857,14 @@ model TemplateMeta {
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
 
-  templateId    Int      @unique
-  template      Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
-  redirectUrl   String?
-  language      String   @default("en")
+  templateId  Int      @unique
+  template    Template @relation(fields: [templateId], references: [id], onDelete: Cascade)
+  redirectUrl String?
+  language    String   @default("en")
+
   emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
+  emailReplyTo  String?
+  emailId       String?
 }
 
 /// @zod.import(["import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';"])
@@ -951,4 +982,46 @@ model AvatarImage {
   team         Team[]
   user         User[]
   organisation Organisation[]
+}
+
+enum EmailDomainStatus {
+  PENDING
+  ACTIVE
+}
+
+model EmailDomain {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status EmailDomainStatus @default(PENDING)
+
+  selector   String @unique
+  domain     String @unique
+  publicKey  String
+  privateKey String
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  emails OrganisationEmail[]
+}
+
+model OrganisationEmail {
+  id        String   @id
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String @unique
+  emailName String
+  // replyTo   String?
+
+  emailDomainId String
+  emailDomain   EmailDomain @relation(fields: [emailDomainId], references: [id], onDelete: Cascade)
+
+  organisationId String
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
+
+  organisationGlobalSettings OrganisationGlobalSettings[]
+  teamGlobalSettings         TeamGlobalSettings[]
 }

@@ -26,16 +26,25 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       // Document related settings.
       documentVisibility,
       documentLanguage,
+      documentTimezone,
+      documentDateFormat,
       includeSenderDetails,
       includeSigningCertificate,
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+
       // Branding related settings.
       brandingEnabled,
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+
+      // Email related settings.
+      emailId,
+      emailReplyTo,
+      // emailReplyToName,
+      emailDocumentSettings,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -59,6 +68,22 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'You do not have permission to update this organisation.',
       });
+    }
+
+    // Validate that the email ID belongs to the organisation.
+    if (emailId) {
+      const email = await prisma.organisationEmail.findFirst({
+        where: {
+          id: emailId,
+          organisationId,
+        },
+      });
+
+      if (!email) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Email not found',
+        });
+      }
     }
 
     const derivedTypedSignatureEnabled =
@@ -88,6 +113,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             // Document related settings.
             documentVisibility,
             documentLanguage,
+            documentTimezone,
+            documentDateFormat,
             includeSenderDetails,
             includeSigningCertificate,
             typedSignatureEnabled,
@@ -99,6 +126,12 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+
+            // Email related settings.
+            emailId,
+            emailReplyTo,
+            // emailReplyToName,
+            emailDocumentSettings,
           },
         },
       },
