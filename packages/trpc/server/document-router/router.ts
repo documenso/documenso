@@ -27,6 +27,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { findDocumentAttachmentsRoute } from './find-document-attachments';
 import { findInboxRoute } from './find-inbox';
 import { getInboxCountRoute } from './get-inbox-count';
 import {
@@ -55,6 +56,7 @@ import {
   ZSetSigningOrderForDocumentMutationSchema,
   ZSuccessResponseSchema,
 } from './schema';
+import { setDocumentAttachmentsRoute } from './set-document-attachments';
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
@@ -63,6 +65,10 @@ export const documentRouter = router({
     getCount: getInboxCountRoute,
   },
   updateDocument: updateDocumentRoute,
+  attachments: {
+    find: findDocumentAttachmentsRoute,
+    set: setDocumentAttachmentsRoute,
+  },
 
   /**
    * @private
