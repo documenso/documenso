@@ -333,6 +333,32 @@ enum DocumentVisibility {
   ADMIN
 }
 
+// Only "LINK" is supported for now. 
+// All other attachment types are not yet supported.
+enum AttachmentType {
+  FILE
+  VIDEO
+  AUDIO
+  IMAGE
+  LINK
+  OTHER
+}
+
+model Attachment {
+  id        String         @id @default(uuid())
+  type      AttachmentType @default(LINK)
+  label     String
+  url       String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @default(now()) @updatedAt
+
+  documentId Int?
+  document   Document? @relation(fields: [documentId], references: [id], onDelete: Cascade)
+
+  templateId Int?
+  template   Template? @relation(fields: [templateId], references: [id], onDelete: Cascade)
+}
+
 enum FolderType {
   DOCUMENT
   TEMPLATE
@@ -391,14 +417,15 @@ model Document {
   templateId     Int?
   source         DocumentSource
 
-  useLegacyFieldInsertion Boolean @default(false)
+  auditLogs               DocumentAuditLog[]
+  attachments             Attachment[]
+  useLegacyFieldInsertion Boolean            @default(false)
 
   documentData DocumentData @relation(fields: [documentDataId], references: [id], onDelete: Cascade)
   template     Template?    @relation(fields: [templateId], references: [id], onDelete: SetNull)
 
-  auditLogs DocumentAuditLog[]
-  folder    Folder?            @relation(fields: [folderId], references: [id], onDelete: SetNull)
-  folderId  String?
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId String?
 
   @@unique([documentDataId])
   @@index([userId])
@@ -892,10 +919,11 @@ model Template {
 
   templateDocumentData DocumentData @relation(fields: [templateDocumentDataId], references: [id], onDelete: Cascade)
 
-  recipients Recipient[]
-  fields     Field[]
-  directLink TemplateDirectLink?
-  documents  Document[]
+  recipients  Recipient[]
+  fields      Field[]
+  directLink  TemplateDirectLink?
+  documents   Document[]
+  attachments Attachment[]
 
   folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
   folderId String?
