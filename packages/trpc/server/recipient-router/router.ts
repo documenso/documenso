@@ -5,6 +5,7 @@ import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/c
 import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
 import { deleteTemplateRecipient } from '@documenso/lib/server-only/recipient/delete-template-recipient';
 import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
+import { getRecipientSuggestions } from '@documenso/lib/server-only/recipient/get-recipient-suggestions';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
@@ -26,6 +27,8 @@ import {
   ZDeleteTemplateRecipientRequestSchema,
   ZGetRecipientRequestSchema,
   ZGetRecipientResponseSchema,
+  ZGetRecipientSuggestionsRequestSchema,
+  ZGetRecipientSuggestionsResponseSchema,
   ZRejectDocumentWithTokenMutationSchema,
   ZSetDocumentRecipientsRequestSchema,
   ZSetDocumentRecipientsResponseSchema,
@@ -558,5 +561,31 @@ export const recipientRouter = router({
         reason,
         requestMetadata: ctx.metadata.requestMetadata,
       });
+    }),
+  /**
+   * @private
+   */
+  getRecipientSuggestions: authenticatedProcedure
+    .input(ZGetRecipientSuggestionsRequestSchema)
+    .output(ZGetRecipientSuggestionsResponseSchema)
+    .query(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { query } = input;
+
+      ctx.logger.info({
+        input: {
+          query,
+        },
+      });
+
+      const suggestions = await getRecipientSuggestions({
+        userId: user.id,
+        teamId,
+        query,
+      });
+
+      return {
+        suggestions,
+      };
     }),
 });
