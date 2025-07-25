@@ -186,7 +186,7 @@ const BillingDialog = ({
   });
 
   const { mutateAsync: createSubscription, isPending: isCreatingSubscription } =
-    trpc.billing.subscription.create.useMutation();
+    trpc.enterprise.billing.subscription.create.useMutation();
 
   const { mutateAsync: createOrganisation, isPending: isCreatingOrganisation } =
     trpc.organisation.create.useMutation();
@@ -346,7 +346,7 @@ export const IndividualPersonalLayoutCheckoutButton = ({
   const { organisations } = useSession();
 
   const { mutateAsync: createSubscription, isPending } =
-    trpc.billing.subscription.create.useMutation();
+    trpc.enterprise.billing.subscription.create.useMutation();
 
   const onSubscribeClick = async () => {
     try {

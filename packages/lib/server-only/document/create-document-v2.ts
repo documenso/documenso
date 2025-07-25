@@ -24,6 +24,7 @@ import {
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { buildTeamWhereQuery } from '../../utils/teams';
@@ -134,6 +135,24 @@ export const createDocumentV2 = async ({
 
   const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
 
+  const emailId = meta?.emailId;
+
+  // Validate that the email ID belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
@@ -148,15 +167,7 @@ export const createDocumentV2 = async ({
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            ...meta,
-            signingOrder: meta?.signingOrder || undefined,
-            emailSettings: meta?.emailSettings || undefined,
-            language: meta?.language || settings.documentLanguage,
-            typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
-            uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
-            drawSignatureEnabled: meta?.drawSignatureEnabled ?? settings.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, meta),
         },
       },
     });

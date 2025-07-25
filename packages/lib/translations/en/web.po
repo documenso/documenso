@@ -116,6 +116,7 @@ msgstr "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}
 #. placeholder {0}: route.label
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 msgid "{0}"
 msgstr "{0}"
@@ -152,7 +153,7 @@ msgstr "{0} of {1} row(s) selected."
 #. placeholder {0}: user.name || user.email
 #. placeholder {1}: document.team.name
 #. placeholder {2}: document.title
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
 
@@ -512,6 +513,10 @@ msgstr "3 months"
 msgid "401 Unauthorized"
 msgstr "401 Unauthorized"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "404 Email domain not found"
+msgstr "404 Email domain not found"
+
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "404 not found"
 msgstr "404 not found"
@@ -537,6 +542,10 @@ msgstr "404 Team not found"
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "404 User not found"
 msgstr "404 User not found"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "404 Webhook not found"
+msgstr "404 Webhook not found"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "5 documents a month"
@@ -743,6 +752,8 @@ msgstr "Acknowledgment"
 msgid "Action"
 msgstr "Action"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
@@ -753,6 +764,7 @@ msgstr "Action"
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
@@ -763,6 +775,7 @@ msgstr "Actions"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Active"
 msgstr "Active"
 
@@ -778,6 +791,10 @@ msgstr "Active Subscriptions"
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add"
 msgstr "Add"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
+msgstr "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
 
 #: packages/ui/primitives/document-dropzone.tsx
 msgid "Add a document"
@@ -823,9 +840,21 @@ msgstr "Add another option"
 msgid "Add another value"
 msgstr "Add another value"
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Add Custom Email Domain"
+msgstr "Add Custom Email Domain"
+
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "Add email"
 msgstr "Add email"
+
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Add Email"
+msgstr "Add Email"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Add Email Domain"
+msgstr "Add Email Domain"
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
@@ -865,6 +894,10 @@ msgstr "Add myself"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "Add Myself"
 msgstr "Add Myself"
+
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Add Organisation Email"
+msgstr "Add Organisation Email"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
@@ -912,6 +945,10 @@ msgstr "Add the people who will sign the document."
 msgid "Add the recipients to create the document with"
 msgstr "Add the recipients to create the document with"
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Add these DNS records to verify your domain ownership"
+msgstr "Add these DNS records to verify your domain ownership"
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Additional brand information to display at the bottom of emails"
 msgstr "Additional brand information to display at the bottom of emails"
@@ -933,6 +970,10 @@ msgstr "Admin panel"
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Admin Panel"
 msgstr "Admin Panel"
+
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Admins only"
+msgstr "Admins only"
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
@@ -977,6 +1018,10 @@ msgstr "All documents have been processed. Any new documents that are sent or re
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
 msgstr "All documents related to the electronic signing process will be provided to you electronically through our platform or via email. It is your responsibility to ensure that your email address is current and that you can receive and open our emails."
+
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "All email domains have been synced successfully"
+msgstr "All email domains have been synced successfully"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
@@ -1059,6 +1104,10 @@ msgstr "An email account"
 msgid "An email containing an invitation will be sent to each member."
 msgstr "An email containing an invitation will be sent to each member."
 
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "An email with this address already exists."
+msgstr "An email with this address already exists."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -1068,6 +1117,7 @@ msgstr "An email containing an invitation will be sent to each member."
 #: apps/remix/app/components/forms/reset-password.tsx
 #: apps/remix/app/components/forms/password.tsx
 #: apps/remix/app/components/forms/avatar-image.tsx
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "An error occurred"
 msgstr "An error occurred"
 
@@ -1197,6 +1247,7 @@ msgid "An error occurred while signing the document."
 msgstr "An error occurred while signing the document."
 
 #: apps/remix/app/components/general/billing-plans.tsx
+#: apps/remix/app/components/general/billing-plans.tsx
 msgid "An error occurred while trying to create a checkout session."
 msgstr "An error occurred while trying to create a checkout session."
 
@@ -1254,6 +1305,10 @@ msgstr "An unexpected error occurred."
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
@@ -1287,10 +1342,9 @@ msgid "Any Status"
 msgstr "Any Status"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 msgid "API Tokens"
 msgstr "API Tokens"
 
@@ -1373,6 +1427,8 @@ msgstr "Are you sure you wish to delete this team?"
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Are you sure?"
 msgstr "Are you sure?"
@@ -1512,18 +1568,25 @@ msgstr "Brand Details"
 msgid "Brand Website"
 msgstr "Brand Website"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
+#: apps/remix/app/components/general/settings-nav-desktop.tsx
+msgid "Branding"
+msgstr "Branding"
+
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Branding Logo"
 msgstr "Branding Logo"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
+#: apps/remix/app/components/general/settings-nav-mobile.tsx
 msgid "Branding Preferences"
 msgstr "Branding Preferences"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Branding preferences updated"
 msgstr "Branding preferences updated"
 
@@ -1613,6 +1676,7 @@ msgstr "Can prepare"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -1644,9 +1708,15 @@ msgstr "Can prepare"
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
@@ -1711,6 +1781,7 @@ msgid "Checkbox values"
 msgstr "Checkbox values"
 
 #: apps/remix/app/components/general/billing-plans.tsx
+#: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Checkout"
 msgstr "Checkout"
@@ -1799,6 +1870,7 @@ msgstr "Click to insert field"
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 #: packages/ui/primitives/document-flow/missing-signature-field-dialog.tsx
 msgid "Close"
 msgstr "Close"
@@ -1938,6 +2010,7 @@ msgid "Confirm"
 msgstr "Confirm"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Confirm by typing <0>{deleteMessage}</0>"
 msgstr "Confirm by typing <0>{deleteMessage}</0>"
@@ -2016,6 +2089,10 @@ msgstr "Continue by viewing the document."
 msgid "Continue to login"
 msgstr "Continue to login"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Controls the default email settings when new documents or templates are created"
+msgstr "Controls the default email settings when new documents or templates are created"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
 msgstr "Controls the default language of an uploaded document. This will be used as the language in email communications with the recipients."
@@ -2053,6 +2130,9 @@ msgstr "Copied"
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Copied to clipboard"
@@ -2099,6 +2179,11 @@ msgstr "Create a <0>free account</0> to access your signed documents at any time
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Create a new account"
 msgstr "Create a new account"
+
+#. placeholder {0}: emailDomain.domain
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Create a new email address for your organisation using the domain <0>{0}</0>."
+msgstr "Create a new email address for your organisation using the domain <0>{0}</0>."
 
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Create a new organisation with {planName} plan. Keep your current organisation on it's current plan"
@@ -2156,6 +2241,10 @@ msgstr "Create Direct Signing Link"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Create document from template"
 msgstr "Create document from template"
+
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Create Email"
+msgstr "Create Email"
 
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "Create folder"
@@ -2320,9 +2409,13 @@ msgstr "Current recipients:"
 msgid "Currently all organisation members can access this team"
 msgstr "Currently all organisation members can access this team"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 msgid "Currently branding can only be configured for Teams and above plans."
 msgstr "Currently branding can only be configured for Teams and above plans."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+msgid "Currently email domains can only be configured for Platform and above plans."
+msgstr "Currently email domains can only be configured for Platform and above plans."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Custom Organisation Groups"
@@ -2360,6 +2453,10 @@ msgid "Decline"
 msgstr "Decline"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Date Format"
+msgstr "Default Date Format"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Document Language"
 msgstr "Default Document Language"
 
@@ -2367,9 +2464,21 @@ msgstr "Default Document Language"
 msgid "Default Document Visibility"
 msgstr "Default Document Visibility"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Default Email"
+msgstr "Default Email"
+
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Default Email Settings"
+msgstr "Default Email Settings"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
 msgstr "Default Signature Settings"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Time Zone"
+msgstr "Default Time Zone"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
@@ -2384,6 +2493,7 @@ msgstr "delete"
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -2396,6 +2506,8 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
@@ -2413,6 +2525,10 @@ msgstr "Delete"
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "delete {0}"
 msgstr "delete {0}"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+msgid "delete {emailDomain}"
+msgstr "delete {emailDomain}"
 
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 msgid "delete {teamName}"
@@ -2439,6 +2555,19 @@ msgstr "Delete document"
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete Document"
 msgstr "Delete Document"
+
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
+msgid "Delete email"
+msgstr "Delete email"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+msgid "Delete email domain"
+msgstr "Delete email domain"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "Delete Email Domain"
+msgstr "Delete Email Domain"
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Delete Folder"
@@ -2560,6 +2689,10 @@ msgstr "Direct template link deleted"
 msgid "Direct template link usage exceeded ({0}/{1})"
 msgstr "Direct template link usage exceeded ({0}/{1})"
 
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
+msgid "Direction"
+msgstr "Direction"
+
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Disable"
@@ -2600,6 +2733,11 @@ msgstr "Disabling direct link signing will prevent anyone from accessing the lin
 msgid "Disabling the user results in the user not being able to use the account. It also disables all the related contents such as subscription, webhooks, teams, and API keys."
 msgstr "Disabling the user results in the user not being able to use the account. It also disables all the related contents such as subscription, webhooks, teams, and API keys."
 
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Display Name"
+msgstr "Display Name"
+
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Display your name and email in documents"
 msgstr "Display your name and email in documents"
@@ -2611,6 +2749,14 @@ msgstr "Distribute Document"
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Distribution Method"
 msgstr "Distribution Method"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "DKIM records generated. Please add the DNS records to verify your domain."
+msgstr "DKIM records generated. Please add the DNS records to verify your domain."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "DNS Records"
+msgstr "DNS Records"
 
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 msgid "Do you want to delete this template?"
@@ -2624,7 +2770,10 @@ msgstr "Do you want to duplicate this template?"
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 msgstr "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
+#: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Document"
 msgstr "Document"
@@ -2796,8 +2945,14 @@ msgstr "Document pending"
 msgid "Document pending email"
 msgstr "Document pending email"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
+#: apps/remix/app/components/general/settings-nav-mobile.tsx
+msgid "Document Preferences"
+msgstr "Document Preferences"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Document preferences updated"
 msgstr "Document preferences updated"
 
@@ -2911,6 +3066,22 @@ msgstr "Documents that require your attention will appear here"
 msgid "Documents Viewed"
 msgstr "Documents Viewed"
 
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Domain"
+msgstr "Domain"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Domain Added"
+msgstr "Domain Added"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Domain already in use"
+msgstr "Domain already in use"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Domain Name"
+msgstr "Domain Name"
+
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 msgid "Don't have an account? <0>Sign up</0>"
@@ -2990,10 +3161,6 @@ msgstr "Dropdown"
 msgid "Dropdown options"
 msgstr "Dropdown options"
 
-#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
-msgid "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
-msgstr "Due to an unpaid invoice, your team has been restricted. Please settle the payment to restore full access to your team."
-
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -3037,10 +3204,14 @@ msgstr "Electronic Signature Disclosure"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
+#: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-email-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx
@@ -3076,12 +3247,17 @@ msgid "Email address"
 msgstr "Email address"
 
 #: apps/remix/app/components/forms/signup.tsx
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "Email Address"
 msgstr "Email Address"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Email already confirmed"
 msgstr "Email already confirmed"
+
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Email already exists"
+msgstr "Email already exists"
 
 #: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx
 msgid "Email cannot already exist in the template"
@@ -3091,13 +3267,51 @@ msgstr "Email cannot already exist in the template"
 msgid "Email Confirmed!"
 msgstr "Email Confirmed!"
 
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "Email Created"
+msgstr "Email Created"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "Email domain not found"
+msgstr "Email domain not found"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "Email Domain Settings"
+msgstr "Email Domain Settings"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+msgid "Email Domains"
+msgstr "Email Domains"
+
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Email domains synced"
+msgstr "Email domains synced"
+
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Email Options"
 msgstr "Email Options"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+#: apps/remix/app/components/general/settings-nav-mobile.tsx
+msgid "Email Preferences"
+msgstr "Email Preferences"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+msgid "Email preferences updated"
+msgstr "Email preferences updated"
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Email resent"
 msgstr "Email resent"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+msgid "Email Sender"
+msgstr "Email Sender"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "Email sent"
@@ -3114,6 +3328,11 @@ msgstr "Email verification has been removed"
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
 msgid "Email verification has been resent"
 msgstr "Email verification has been resent"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Emails"
+msgstr "Emails"
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Embedding, 5 members included and more"
@@ -3194,6 +3413,10 @@ msgstr "Enter a name for your new folder. Folders help you organise your items."
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
 msgstr "Enter claim name"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Enter the domain you want to use for sending emails (without http:// or www)"
+msgstr "Enter the domain you want to use for sending emails (without http:// or www)"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 msgid "Enter your 2FA code"
@@ -3277,6 +3500,7 @@ msgstr "Enterprise"
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
@@ -3288,6 +3512,14 @@ msgstr "Error"
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Error uploading file"
 msgstr "Error uploading file"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Event Type"
+msgstr "Event Type"
+
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Everyone"
+msgstr "Everyone"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Everyone can access and view the document"
@@ -3471,13 +3703,17 @@ msgstr "Folder moved successfully"
 msgid "Folder Name"
 msgstr "Folder Name"
 
-#: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "Folder not found"
 msgstr "Folder not found"
 
-#: apps/remix/app/components/dialogs/folder-settings-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Folder Settings"
+msgstr "Folder Settings"
+
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 msgid "Folder updated successfully"
 msgstr "Folder updated successfully"
 
@@ -3533,14 +3769,17 @@ msgstr "Full Name"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "General"
 msgstr "General"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Generate DKIM Records"
+msgstr "Generate DKIM Records"
 
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Generate Links"
@@ -3551,6 +3790,8 @@ msgid "Global recipient action authentication"
 msgstr "Global recipient action authentication"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Go back"
@@ -3622,9 +3863,8 @@ msgid "Group Name"
 msgstr "Group Name"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/tables/organisation-members-table.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Groups"
 msgstr "Groups"
@@ -3658,6 +3898,10 @@ msgstr "Having an assistant as the last signer means they will be unable to take
 msgid "Help complete the document for other signers."
 msgstr "Help complete the document for other signers."
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+msgid "Here you can add email domains to your organisation."
+msgstr "Here you can add email domains to your organisation."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.general.tsx
 msgid "Here you can edit your organisation details."
 msgstr "Here you can edit your organisation details."
@@ -3670,22 +3914,33 @@ msgstr "Here you can edit your personal details."
 msgid "Here you can manage your password and security settings."
 msgstr "Here you can manage your password and security settings."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+msgid "Here you can set branding preferences for your organisation. Teams will inherit these settings by default."
+msgstr "Here you can set branding preferences for your organisation. Teams will inherit these settings by default."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+msgid "Here you can set branding preferences for your team"
+msgstr "Here you can set branding preferences for your team"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+msgid "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
+msgstr "Here you can set document preferences for your organisation. Teams will inherit these settings by default."
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Here you can set preferences and defaults for branding."
 msgstr "Here you can set preferences and defaults for branding."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-msgid "Here you can set preferences and defaults for your organisation. Teams will inherit these settings by default."
-msgstr "Here you can set preferences and defaults for your organisation. Teams will inherit these settings by default."
-
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Here you can set preferences and defaults for your team."
 msgstr "Here you can set preferences and defaults for your team."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-msgid "Here you can set your general preferences"
-msgstr "Here you can set your general preferences"
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+msgid "Here you can set your general branding preferences"
+msgstr "Here you can set your general branding preferences"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+msgid "Here you can set your general document preferences"
+msgstr "Here you can set your general document preferences"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Here's how it works:"
@@ -3719,6 +3974,10 @@ msgstr "Home"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "Home (No Folder)"
 msgstr "Home (No Folder)"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
+msgid "Horizontal"
+msgstr "Horizontal"
 
 #: packages/lib/constants/recipient-roles.ts
 msgid "I am a signer of this document"
@@ -3757,6 +4016,10 @@ msgstr "ID"
 msgid "ID copied to clipboard"
 msgstr "ID copied to clipboard"
 
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
+msgstr "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
+
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "If you do not want to use the authenticator prompted, you can close it, which will then display the next available authenticator."
 msgstr "If you do not want to use the authenticator prompted, you can close it, which will then display the next available authenticator."
@@ -3792,6 +4055,10 @@ msgstr "Information"
 msgid "Inherit authentication method"
 msgstr "Inherit authentication method"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -3999,6 +4266,7 @@ msgstr "Leaderboard"
 msgid "Leave"
 msgstr "Leave"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
@@ -4057,6 +4325,10 @@ msgstr "Loading Document..."
 msgid "Loading..."
 msgstr "Loading..."
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Local timezone"
+msgstr "Local timezone"
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-page.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 #: apps/remix/app/components/general/direct-template/direct-template-signing-auth-page.tsx
@@ -4089,6 +4361,10 @@ msgstr "Manage and view template"
 #: apps/remix/app/components/general/organisations/organisation-billing-portal-button.tsx
 msgid "Manage billing"
 msgstr "Manage billing"
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "Manage Billing"
+msgstr "Manage Billing"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Manage details for this public template"
@@ -4132,10 +4408,10 @@ msgstr "Manage subscription"
 msgid "Manage the {0} organisation"
 msgstr "Manage the {0} organisation"
 
-#. placeholder {1}: organisation.name
+#. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "Manage the {1} organisation subscription"
-msgstr "Manage the {1} organisation subscription"
+msgid "Manage the {0} organisation subscription"
+msgstr "Manage the {0} organisation subscription"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups._index.tsx
 msgid "Manage the custom groups of members for your organisation."
@@ -4157,6 +4433,10 @@ msgstr "Manage the members of your team."
 msgid "Manage the members or invite new members."
 msgstr "Manage the members or invite new members."
 
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Manage the settings for this folder."
+msgstr "Manage the settings for this folder."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.teams.tsx
 msgid "Manage the teams in this organisation."
 msgstr "Manage the teams in this organisation."
@@ -4164,6 +4444,10 @@ msgstr "Manage the teams in this organisation."
 #: apps/remix/app/routes/_authenticated+/admin+/users._index.tsx
 msgid "Manage users"
 msgstr "Manage users"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "Manage your email domain settings."
+msgstr "Manage your email domain settings."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Manage your organisation group settings."
@@ -4181,6 +4465,10 @@ msgstr "Manage your site settings here"
 #: packages/lib/constants/organisations-translations.ts
 msgid "Manager"
 msgstr "Manager"
+
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Managers and above"
+msgstr "Managers and above"
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Mark as viewed"
@@ -4232,18 +4520,20 @@ msgstr "Member Since"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/tables/team-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Members"
 msgstr "Members"
 
-#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
+msgid "Message"
+msgstr "Message"
+
+#: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 msgid "Message <0>(Optional)</0>"
 msgstr "Message <0>(Optional)</0>"
 
@@ -4309,6 +4599,7 @@ msgstr "Multiple access methods can be selected."
 msgid "My Folder"
 msgstr "My Folder"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
@@ -4326,6 +4617,7 @@ msgstr "My Folder"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
@@ -4576,6 +4868,10 @@ msgstr "Once enabled, you can select any active recipient to be a direct link si
 msgid "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 msgstr "Once you have scanned the QR code or entered the code manually, enter the code provided by your authenticator app below."
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Once you update your DNS records, it may take up to 48 hours for it to be propogated. Once the DNS propagation is complete you will need to come back and press the \"Sync\" domains button"
+msgstr "Once you update your DNS records, it may take up to 48 hours for it to be propogated. Once the DNS propagation is complete you will need to come back and press the \"Sync\" domains button"
+
 #: packages/lib/constants/template.ts
 msgid "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
 msgstr "Once your template is set up, share the link anywhere you want. The person who opens the link will be able to enter their information in the direct link recipient field and complete any other fields assigned to them."
@@ -4673,10 +4969,6 @@ msgstr "Organisation Name"
 msgid "Organisation not found"
 msgstr "Organisation not found"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-msgid "Organisation Preferences"
-msgstr "Organisation Preferences"
-
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "Organisation role"
 msgstr "Organisation role"
@@ -4735,6 +5027,10 @@ msgstr "Organize your documents and templates"
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Otherwise, the document will be created as a draft."
+
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Override organisation settings"
+msgstr "Override organisation settings"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
@@ -4841,6 +5137,7 @@ msgid "Payment overdue"
 msgstr "Payment overdue"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
@@ -5033,6 +5330,10 @@ msgstr "Please review the document before signing."
 msgid "Please select a PDF file"
 msgstr "Please select a PDF file"
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "Please try a different domain."
+msgstr "Please try a different domain."
+
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Please try again and make sure you enter the correct email address."
 msgstr "Please try again and make sure you enter the correct email address."
@@ -5064,13 +5365,10 @@ msgstr "Please upload a logo"
 msgid "Pre-formatted CSV template with example data."
 msgstr "Pre-formatted CSV template with example data."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
-#: apps/remix/app/components/general/settings-nav-mobile.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
 #: apps/remix/app/components/general/app-command-menu.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 msgid "Preferences"
 msgstr "Preferences"
 
@@ -5125,10 +5423,9 @@ msgid "Public"
 msgstr "Public"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 msgid "Public Profile"
 msgstr "Public Profile"
 
@@ -5155,10 +5452,6 @@ msgstr "Radio values"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Read only"
 msgstr "Read only"
-
-#: apps/remix/app/components/general/document-signing/document-signing-field-container.tsx
-msgid "Read only field"
-msgstr "Read only field"
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "Read the full <0>signature disclosure</0>."
@@ -5252,6 +5545,18 @@ msgstr "Recipients metrics"
 msgid "Recipients will still retain their copy of the document"
 msgstr "Recipients will still retain their copy of the document"
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Record Name"
+msgstr "Record Name"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Record Type"
+msgstr "Record Type"
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Record Value"
+msgstr "Record Value"
+
 #: apps/remix/app/components/forms/2fa/recovery-code-list.tsx
 msgid "Recovery code copied"
 msgstr "Recovery code copied"
@@ -5304,23 +5609,24 @@ msgid "Remembered your password? <0>Sign In</0>"
 msgstr "Remembered your password? <0>Sign In</0>"
 
 #. placeholder {0}: customEmail.subject
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 msgid "Reminder: {0}"
 msgstr "Reminder: {0}"
 
 #. placeholder {0}: document.team.name
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 msgid "Reminder: {0} invited you to {recipientActionVerb} a document"
 msgstr "Reminder: {0} invited you to {recipientActionVerb} a document"
 
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 msgid "Reminder: Please {recipientActionVerb} this document"
 msgstr "Reminder: Please {recipientActionVerb} this document"
 
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 msgid "Reminder: Please {recipientActionVerb} your document"
 msgstr "Reminder: Please {recipientActionVerb} your document"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/components/tables/team-members-table.tsx
 #: apps/remix/app/components/tables/team-groups-table.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
@@ -5338,6 +5644,11 @@ msgstr "Reminder: Please {recipientActionVerb} your document"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 msgid "Remove"
 msgstr "Remove"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Remove email domain"
+msgstr "Remove email domain"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
@@ -5361,6 +5672,15 @@ msgstr "Remove team member"
 #: apps/remix/app/components/forms/password.tsx
 msgid "Repeat Password"
 msgstr "Repeat Password"
+
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "Reply to email"
+msgstr "Reply to email"
+
+#: packages/ui/primitives/template-flow/add-template-settings.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
+msgid "Reply To Email"
+msgstr "Reply To Email"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/radio-field.tsx
@@ -5593,6 +5913,10 @@ msgstr "Select a template you'd like to display on your public profile"
 msgid "Select a template you'd like to display on your team's public profile"
 msgstr "Select a template you'd like to display on your team's public profile"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Select a time zone"
+msgstr "Select a time zone"
+
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Select access methods"
 msgstr "Select access methods"
@@ -5617,6 +5941,10 @@ msgstr "Select authentication methods"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 msgid "Select default option"
 msgstr "Select default option"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
+msgid "Select direction"
+msgstr "Select direction"
 
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 msgid "Select groups"
@@ -5665,12 +5993,21 @@ msgstr "Select the members to include in this group"
 msgid "Select triggers"
 msgstr "Select triggers"
 
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Select visibility"
+msgstr "Select visibility"
+
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/send-document-action-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Send"
 msgstr "Send"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send a test webhook with sample data to verify your integration is working correctly."
+msgstr "Send a test webhook with sample data to verify your integration is working correctly."
 
 #: apps/remix/app/components/forms/send-confirmation-email.tsx
 msgid "Send confirmation email"
@@ -5727,6 +6064,10 @@ msgstr "Send recipient signing request email"
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Send reminder"
 msgstr "Send reminder"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Send Test Webhook"
+msgstr "Send Test Webhook"
 
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
@@ -6035,9 +6376,9 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
@@ -6047,6 +6388,7 @@ msgstr "Some signers have not been assigned a signature field. Please assign at 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/general/share-document-download-button.tsx
+#: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
@@ -6104,8 +6446,10 @@ msgstr "Something went wrong while sending the confirmation email."
 msgid "Something went wrong while updating the team billing subscription, please contact support."
 msgstr "Something went wrong while updating the team billing subscription, please contact support."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Something went wrong!"
 msgstr "Something went wrong!"
 
@@ -6141,6 +6485,7 @@ msgstr "Stats"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
@@ -6165,12 +6510,16 @@ msgstr "Stripe customer created successfully"
 msgid "Stripe Customer ID"
 msgstr "Stripe Customer ID"
 
+#: packages/ui/primitives/document-flow/add-subject.tsx
+msgid "Subject"
+msgstr "Subject"
+
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
-#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Subject <0>(Optional)</0>"
 msgstr "Subject <0>(Optional)</0>"
 
+#: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Subscribe"
@@ -6196,6 +6545,10 @@ msgstr "Subscription claim updated successfully."
 #: apps/remix/app/routes/_authenticated+/admin+/claims.tsx
 msgid "Subscription Claims"
 msgstr "Subscription Claims"
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "Subscription invalid"
+msgstr "Subscription invalid"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
@@ -6239,6 +6592,9 @@ msgstr "Subscription Claims"
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
@@ -6256,6 +6612,14 @@ msgstr "Successfully created: {successCount}"
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Summary:"
 msgstr "Summary:"
+
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Sync"
+msgstr "Sync"
+
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "Sync Email Domains"
+msgstr "Sync Email Domains"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "System Requirements"
@@ -6371,10 +6735,6 @@ msgstr "Team Only"
 msgid "Team only templates are not linked anywhere and are visible only to your team."
 msgstr "Team only templates are not linked anywhere and are visible only to your team."
 
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
-msgid "Team Preferences"
-msgstr "Team Preferences"
-
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
@@ -6480,6 +6840,20 @@ msgstr "Templates"
 msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 msgstr "Templates allow you to quickly generate documents with pre-filled recipients and fields."
 
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test Webhook"
+msgstr "Test Webhook"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook failed"
+msgstr "Test webhook failed"
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "Test webhook sent"
+msgstr "Test webhook sent"
+
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
@@ -6541,11 +6915,20 @@ msgstr "The authentication methods required for recipients to view the document.
 msgid "The content to show in the banner, HTML is allowed"
 msgstr "The content to show in the banner, HTML is allowed"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "The default email to use when sending emails to recipients"
+msgstr "The default email to use when sending emails to recipients"
+
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "The direct link has been copied to your clipboard"
 msgstr "The direct link has been copied to your clipboard"
+
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "The display name for this email address"
+msgstr "The display name for this email address"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "The document has been moved successfully."
@@ -6584,6 +6967,18 @@ msgstr "The document will be immediately sent to recipients if this is checked."
 msgid "The document's name"
 msgstr "The document's name"
 
+#: apps/remix/app/components/forms/email-preferences-form.tsx
+msgid "The email address which will show up in the \"Reply To\" field in emails"
+msgstr "The email address which will show up in the \"Reply To\" field in emails"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid ""
+"The email domain you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
+msgstr ""
+"The email domain you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
+
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The email or password provided is incorrect"
 msgstr "The email or password provided is incorrect"
@@ -6621,6 +7016,10 @@ msgstr "The following errors occurred:"
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "The following team has been deleted. You will no longer be able to access this team and its documents"
 
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "The organisation email has been created successfully."
+msgstr "The organisation email has been created successfully."
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid ""
 "The organisation group you are looking for may have been removed, renamed or may have never\n"
@@ -6652,6 +7051,11 @@ msgstr ""
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
 msgstr "The page you are looking for was moved, removed, renamed or might never have existed."
+
+#. placeholder {0}: emailDomain.domain
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "The part before the @ symbol (e.g., \"support\" for support@{0})"
+msgstr "The part before the @ symbol (e.g., \"support\" for support@{0})"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "The profile link has been copied to your clipboard"
@@ -6752,6 +7156,10 @@ msgstr "The template has been moved successfully."
 msgid "The template will be removed from your profile"
 msgstr "The template will be removed from your profile"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "The test webhook has been successfully sent to your endpoint."
+msgstr "The test webhook has been successfully sent to your endpoint."
+
 #: apps/remix/app/components/forms/token.tsx
 msgid "The token was copied to your clipboard."
 msgstr "The token was copied to your clipboard."
@@ -6796,6 +7204,14 @@ msgstr "The webhook has been updated successfully."
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "The webhook was successfully created."
 msgstr "The webhook was successfully created."
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
+msgstr ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
@@ -6936,8 +7352,8 @@ msgid "This field cannot be modified or deleted. When you share this template's 
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
-msgid "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
-msgstr "This folder contains multiple items. Deleting it will also delete all items in the folder, including nested folders and their contents."
+msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
+msgstr "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "This is how the document will reach the recipients once the document is ready for signing."
@@ -7013,9 +7429,17 @@ msgstr "This will be sent to all recipients once the document has been fully com
 msgid "This will be sent to the document owner once the document has been fully completed."
 msgstr "This will be sent to the document owner once the document has been fully completed."
 
+#: apps/remix/app/components/tables/organisation-email-domains-table.tsx
+msgid "This will check and sync the status of all email domains for this organisation"
+msgstr "This will check and sync the status of all email domains for this organisation"
+
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
 msgstr "This will ONLY backport feature flags which are set to true, anything disabled in the initial claim will not be backported"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "This will remove all emails associated with this email domain"
+msgstr "This will remove all emails associated with this email domain"
 
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
@@ -7329,12 +7753,14 @@ msgid "Untitled Group"
 msgstr "Untitled Group"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/forms/public-profile-form.tsx
+#: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
@@ -7342,6 +7768,8 @@ msgstr "Untitled Group"
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Update"
@@ -7351,7 +7779,8 @@ msgstr "Update"
 msgid "Update Banner"
 msgstr "Update Banner"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains._index.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
 msgid "Update Billing"
 msgstr "Update Billing"
 
@@ -7362,6 +7791,10 @@ msgstr "Update Claim"
 #: apps/remix/app/components/general/billing-plans.tsx
 msgid "Update current organisation"
 msgstr "Update current organisation"
+
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+msgid "Update email"
+msgstr "Update email"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Update Fields"
@@ -7605,6 +8038,10 @@ msgstr "Verification Email Sent"
 msgid "Verification email sent successfully."
 msgstr "Verification email sent successfully."
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
+msgid "Verify Domain"
+msgstr "Verify Domain"
+
 #: apps/remix/app/components/general/verify-email-banner.tsx
 msgid "Verify Now"
 msgstr "Verify Now"
@@ -7628,6 +8065,10 @@ msgstr "Verify your team email address"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 msgid "Version History"
 msgstr "Version History"
+
+#: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
+msgid "Vertical"
+msgstr "Vertical"
 
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -7674,6 +8115,10 @@ msgstr "View and manage all active sessions for your account."
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "View Codes"
 msgstr "View Codes"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "View DNS Records"
+msgstr "View DNS Records"
 
 #: packages/email/templates/document-created-from-direct-template.tsx
 msgid "View document"
@@ -7725,6 +8170,10 @@ msgstr "View Recovery Codes"
 msgid "View teams"
 msgstr "View teams"
 
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
+msgid "View the DNS records for this email domain"
+msgstr "View the DNS records for this email domain"
+
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
@@ -7743,6 +8192,10 @@ msgstr "Viewers"
 #: packages/lib/constants/recipient-roles.ts
 msgid "Viewing"
 msgstr "Viewing"
+
+#: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+msgid "Visibility"
+msgstr "Visibility"
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Waiting"
@@ -7808,9 +8261,17 @@ msgstr "We couldn't update the group. Please try again."
 msgid "We couldn't update the organisation. Please try again."
 msgstr "We couldn't update the organisation. Please try again."
 
+#: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
+msgid "We encountered an error while creating the email. Please try again later."
+msgstr "We encountered an error while creating the email. Please try again later."
+
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "We encountered an error while removing the direct template link. Please try again later."
 msgstr "We encountered an error while removing the direct template link. Please try again later."
+
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
+msgid "We encountered an error while sending the test webhook. Please check your endpoint and try again."
+msgstr "We encountered an error while sending the test webhook. Please check your endpoint and try again."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "We encountered an error while updating the webhook. Please try again later."
@@ -7824,6 +8285,10 @@ msgstr "We encountered an unknown error while attempting to add team members. Pl
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "We encountered an unknown error while attempting to add this email. Please try again later."
 msgstr "We encountered an unknown error while attempting to add this email. Please try again later."
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
+msgid "We encountered an unknown error while attempting to add your domain. Please try again later."
+msgstr "We encountered an unknown error while attempting to add your domain. Please try again later."
 
 #: apps/remix/app/components/dialogs/organisation-group-create-dialog.tsx
 msgid "We encountered an unknown error while attempting to create a group. Please try again later."
@@ -7873,6 +8338,14 @@ msgstr "We encountered an unknown error while attempting to invite organisation 
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 msgid "We encountered an unknown error while attempting to leave this organisation. Please try again later."
 msgstr "We encountered an unknown error while attempting to leave this organisation. Please try again later."
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+msgid "We encountered an unknown error while attempting to remove this email domain. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this email domain. Please try again later."
+
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
+msgid "We encountered an unknown error while attempting to remove this email. Please try again later."
+msgstr "We encountered an unknown error while attempting to remove this email. Please try again later."
 
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
@@ -7993,15 +8466,20 @@ msgstr "We were unable to setup two-factor authentication for your account. Plea
 msgid "We were unable to submit this document at this time. Please try again later."
 msgstr "We were unable to submit this document at this time. Please try again later."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "We were unable to update your branding preferences at this time, please try again later"
 msgstr "We were unable to update your branding preferences at this time, please try again later"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "We were unable to update your document preferences at this time, please try again later"
 msgstr "We were unable to update your document preferences at this time, please try again later"
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+msgid "We were unable to update your email preferences at this time, please try again later"
+msgstr "We were unable to update your email preferences at this time, please try again later"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
@@ -8052,18 +8530,22 @@ msgid "Webhook deleted"
 msgstr "Webhook deleted"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
+msgid "Webhook not found"
+msgstr "Webhook not found"
+
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "Webhook updated"
 msgstr "Webhook updated"
 
+#: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Webhook URL"
 msgstr "Webhook URL"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
 #: apps/remix/app/components/general/settings-nav-mobile.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-mobile.tsx
-#: apps/remix/app/components/general/teams/team-settings-nav-desktop.tsx
 msgid "Webhooks"
 msgstr "Webhooks"
 
@@ -8175,6 +8657,16 @@ msgstr "You are about to leave the following organisation."
 msgid "You are about to remove default access to this team for all organisation members. Any members not explicitly added to this team will no longer have access."
 msgstr "You are about to remove default access to this team for all organisation members. Any members not explicitly added to this team will no longer have access."
 
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+msgid "You are about to remove the email domain <0>{emailDomain}</0> from <1>{0}</1>. All emails associated with this domain will be deleted."
+msgstr "You are about to remove the email domain <0>{emailDomain}</0> from <1>{0}</1>. All emails associated with this domain will be deleted."
+
+#. placeholder {0}: organisation.name
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
+msgid "You are about to remove the following email from <0>{0}</0>."
+msgstr "You are about to remove the following email from <0>{0}</0>."
+
 #. placeholder {0}: team.name
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
@@ -8209,6 +8701,11 @@ msgstr "You are about to subscribe to the {planName}"
 msgid "You are currently on the <0>Free Plan</0>."
 msgstr "You are currently on the <0>Free Plan</0>."
 
+#. placeholder {0}: organisationEmail.email
+#: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
+msgid "You are currently updating <0>{0}</0>"
+msgstr "You are currently updating <0>{0}</0>"
+
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You are currently updating <0>{memberName}.</0>"
 msgstr "You are currently updating <0>{memberName}.</0>"
@@ -8224,6 +8721,10 @@ msgstr "You are currently updating the <0>{passkeyName}</0> passkey."
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
 msgstr "You are currently updating the <0>{teamGroupName}</0> team group."
+
+#: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+msgid "You are not allowed to move this document."
+msgstr "You are not allowed to move this document."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
@@ -8257,6 +8758,11 @@ msgstr "You can copy and share these links to recipients so they can action the 
 #: apps/remix/app/components/general/teams/team-inherit-member-alert.tsx
 msgid "You can enable access to allow all organisation members to access this team by default."
 msgstr "You can enable access to allow all organisation members to access this team by default."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+msgid "You can manage your email preferences here"
+msgstr "You can manage your email preferences here"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
@@ -8376,7 +8882,7 @@ msgid "You have declined the invitation from <0>{0}</0> to join their organisati
 msgstr "You have declined the invitation from <0>{0}</0> to join their organisation."
 
 #. placeholder {0}: `"${document.title}"`
-#: packages/lib/server-only/document/resend-document.tsx
+#: packages/lib/server-only/document/resend-document.ts
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "You have initiated the document {0} that requires you to {recipientActionVerb} it."
 msgstr "You have initiated the document {0} that requires you to {recipientActionVerb} it."
@@ -8399,8 +8905,8 @@ msgid "You have reached the maximum limit of {0} direct templates. <0>Upgrade yo
 msgstr "You have reached the maximum limit of {0} direct templates. <0>Upgrade your account to continue!</0>"
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
-msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>support@documenso.com</0> if you would like to adjust your plan."
-msgstr "You have reached the maximum number of teams for your plan. Please contact sales at <0>support@documenso.com</0> if you would like to adjust your plan."
+msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to adjust your plan."
+msgstr "You have reached the maximum number of teams for your plan. Please contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to adjust your plan."
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
@@ -8437,6 +8943,14 @@ msgstr "You have successfully left this organisation."
 #: apps/remix/app/components/forms/signup.tsx
 msgid "You have successfully registered. Please verify your account by clicking on the link you received in the email."
 msgstr "You have successfully registered. Please verify your account by clicking on the link you received in the email."
+
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
+msgid "You have successfully removed this email domain from the organisation."
+msgstr "You have successfully removed this email domain from the organisation."
+
+#: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
+msgid "You have successfully removed this email from the organisation."
+msgstr "You have successfully removed this email from the organisation."
 
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
 msgid "You have successfully removed this group from the organisation."
@@ -8486,6 +9000,7 @@ msgstr "You have verified your email address for <0>{0}</0>."
 msgid "You must enter '{deleteMessage}' to proceed"
 msgstr "You must enter '{deleteMessage}' to proceed"
 
+#: apps/remix/app/components/dialogs/organisation-email-domain-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "You must type '{deleteMessage}' to confirm"
 msgstr "You must type '{deleteMessage}' to confirm"
@@ -8534,8 +9049,8 @@ msgstr "Your banner has been updated successfully."
 msgid "Your brand website URL"
 msgstr "Your brand website URL"
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.branding.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Your branding preferences have been updated"
 msgstr "Your branding preferences have been updated"
 
@@ -8602,8 +9117,8 @@ msgstr "Your document has been uploaded successfully."
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "Your document has been uploaded successfully. You will be redirected to the template page."
 
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.preferences.tsx
-#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.preferences.tsx
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.document.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.document.tsx
 msgid "Your document preferences have been updated"
 msgstr "Your document preferences have been updated"
 
@@ -8624,6 +9139,11 @@ msgstr "Your email has been successfully confirmed! You can now use all features
 #: apps/remix/app/components/general/teams/team-email-usage.tsx
 msgid "Your email is currently being used by team <0>{0}</0> ({1})."
 msgstr "Your email is currently being used by team <0>{0}</0> ({1})."
+
+#: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.email.tsx
+msgid "Your email preferences have been updated"
+msgstr "Your email preferences have been updated"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your existing tokens"
@@ -8656,16 +9176,20 @@ msgid "Your password has been updated."
 msgstr "Your password has been updated."
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
-msgid "Your payment for teams is overdue. Please settle the payment to avoid any service disruptions."
-msgstr "Your payment for teams is overdue. Please settle the payment to avoid any service disruptions."
+msgid "Your payment is overdue. Please settle the payment to avoid any service disruptions."
+msgstr "Your payment is overdue. Please settle the payment to avoid any service disruptions."
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Your personal organisation"
 msgstr "Your personal organisation"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
-msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>support@documenso.com</0> if you would like to discuss your options."
-msgstr "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>support@documenso.com</0> if you would like to discuss your options."
+msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to discuss your options."
+msgstr "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to discuss your options."
+
+#: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
+msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
+msgstr "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."

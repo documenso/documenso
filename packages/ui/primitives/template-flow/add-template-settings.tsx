@@ -21,6 +21,7 @@ import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-emai
 import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
+import { trpc } from '@documenso/trpc/react';
 import type { TDocumentMetaDateFormat } from '@documenso/trpc/server/document-router/schema';
 import {
   DocumentGlobalAuthAccessSelect,
@@ -120,6 +121,8 @@ export const AddTemplateSettingsFormPartial = ({
           template.templateMeta?.distributionMethod || DocumentDistributionMethod.EMAIL,
         redirectUrl: template.templateMeta?.redirectUrl ?? '',
         language: template.templateMeta?.language ?? 'en',
+        emailId: template.templateMeta?.emailId ?? null,
+        emailReplyTo: template.templateMeta?.emailReplyTo ?? undefined,
         emailSettings: ZDocumentEmailSettingsSchema.parse(template?.templateMeta?.emailSettings),
         signatureTypes: extractTeamSignatureSettings(template?.templateMeta),
       },
@@ -130,6 +133,14 @@ export const AddTemplateSettingsFormPartial = ({
 
   const distributionMethod = form.watch('meta.distributionMethod');
   const emailSettings = form.watch('meta.emailSettings');
+
+  const { data: emailData, isLoading: isLoadingEmails } =
+    trpc.enterprise.organisation.email.find.useQuery({
+      organisationId: organisation.id,
+      perPage: 100,
+    });
+
+  const emails = emailData?.data || [];
 
   const canUpdateVisibility = match(currentTeamMemberRole)
     .with(TeamMemberRole.ADMIN, () => true)
@@ -403,6 +414,68 @@ export const AddTemplateSettingsFormPartial = ({
 
                   <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
                     <div className="flex flex-col space-y-6">
+                      {organisation.organisationClaim.flags.emailDomains && (
+                        <FormField
+                          control={form.control}
+                          name="meta.emailId"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>Email Sender</Trans>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Select
+                                  {...field}
+                                  value={field.value === null ? '-1' : field.value}
+                                  onValueChange={(value) =>
+                                    field.onChange(value === '-1' ? null : value)
+                                  }
+                                >
+                                  <SelectTrigger
+                                    loading={isLoadingEmails}
+                                    className="bg-background"
+                                  >
+                                    <SelectValue />
+                                  </SelectTrigger>
+
+                                  <SelectContent>
+                                    {emails.map((email) => (
+                                      <SelectItem key={email.id} value={email.id}>
+                                        {email.email}
+                                      </SelectItem>
+                                    ))}
+
+                                    <SelectItem value={'-1'}>Documenso</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
+                      <FormField
+                        control={form.control}
+                        name="meta.emailReplyTo"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>
+                              <Trans>Reply To Email</Trans>{' '}
+                              <span className="text-muted-foreground">(Optional)</span>
+                            </FormLabel>
+
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <FormField
                         control={form.control}
                         name="meta.subject"
@@ -428,22 +501,27 @@ export const AddTemplateSettingsFormPartial = ({
                         name="meta.message"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>
-                              <Trans>
-                                Message <span className="text-muted-foreground">(Optional)</span>
-                              </Trans>
+                            <FormLabel className="flex flex-row items-center">
+                              <Trans>Message</Trans>{' '}
+                              <span className="text-muted-foreground">(Optional)</span>
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <InfoIcon className="mx-2 h-4 w-4" />
+                                </TooltipTrigger>
+                                <TooltipContent className="text-muted-foreground p-4">
+                                  <DocumentSendEmailMessageHelper />
+                                </TooltipContent>
+                              </Tooltip>
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="bg-background h-32 resize-none" {...field} />
+                              <Textarea className="bg-background h-16 resize-none" {...field} />
                             </FormControl>
 
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-
-                      <DocumentSendEmailMessageHelper />
 
                       <DocumentEmailCheckboxes
                         value={emailSettings}
