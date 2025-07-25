@@ -8,8 +8,8 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { nanoid } from '@documenso/lib/universal/id';
 import { AttachmentType } from '@documenso/prisma/generated/types';
 import { trpc } from '@documenso/trpc/react';
-import type { TSetDocumentAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
-import { ZSetDocumentAttachmentsSchema } from '@documenso/trpc/server/attachment-router/schema';
+import type { TSetDocumentAttachmentsSchema } from '@documenso/trpc/server/document-router/set-document-attachments.types';
+import { ZSetDocumentAttachmentsSchema } from '@documenso/trpc/server/document-router/set-document-attachments.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -39,12 +39,11 @@ export const AttachmentForm = ({ documentId }: AttachmentFormProps) => {
   const { toast } = useToast();
 
   const { data: attachmentsData, refetch: refetchAttachments } =
-    trpc.attachment.getDocumentAttachments.useQuery({
+    trpc.document.attachments.find.useQuery({
       documentId,
     });
 
-  const { mutateAsync: setDocumentAttachments } =
-    trpc.attachment.setDocumentAttachments.useMutation();
+  const { mutateAsync: setDocumentAttachments } = trpc.document.attachments.set.useMutation();
 
   const defaultAttachments = [
     {

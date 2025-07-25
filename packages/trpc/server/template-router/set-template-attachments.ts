@@ -1,10 +1,31 @@
 import type { Attachment } from '@prisma/client';
 
+import { AppError } from '@documenso/lib/errors/app-error';
+import { AppErrorCode } from '@documenso/lib/errors/app-error';
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
-import { AppError } from '../../errors/app-error';
-import { AppErrorCode } from '../../errors/app-error';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { authenticatedProcedure } from '../trpc';
+import {
+  ZSetTemplateAttachmentsResponseSchema,
+  ZSetTemplateAttachmentsSchema,
+} from './set-template-attachments.types';
+
+export const setTemplateAttachmentsRoute = authenticatedProcedure
+  .input(ZSetTemplateAttachmentsSchema)
+  .output(ZSetTemplateAttachmentsResponseSchema)
+  .mutation(async ({ input, ctx }) => {
+    const { templateId, attachments } = input;
+
+    const updatedAttachments = await setTemplateAttachments({
+      templateId,
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      attachments,
+    });
+
+    return updatedAttachments;
+  });
 
 export type CreateAttachmentsOptions = {
   templateId: number;
