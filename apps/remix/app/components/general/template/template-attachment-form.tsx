@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
@@ -35,6 +36,7 @@ export type AttachmentFormProps = {
 
 export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
   const { toast } = useToast();
+  const { t } = useLingui();
 
   const { data: attachmentsData, refetch: refetchAttachments } =
     trpc.attachment.getTemplateAttachments.useQuery({
@@ -97,8 +99,8 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
       });
 
       toast({
-        title: 'Attachment(s) updated',
-        description: 'The attachment(s) have been updated successfully',
+        title: t`Attachment(s) updated`,
+        description: t`The attachment(s) have been updated successfully`,
       });
 
       await refetchAttachments();
@@ -106,8 +108,8 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
       console.error(error);
 
       toast({
-        title: 'Something went wrong',
-        description: 'We encountered an unknown error while attempting to create the attachments.',
+        title: t`Something went wrong`,
+        description: t`We encountered an unknown error while attempting to create the attachments.`,
         variant: 'destructive',
         duration: 5000,
       });
@@ -117,11 +119,15 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Attachments</Button>
+        <Button variant="outline">
+          <Trans>Attachments</Trans>
+        </Button>
       </DialogTrigger>
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>Attachments</DialogTitle>
+          <DialogTitle>
+            <Trans>Attachments</Trans>
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
@@ -133,9 +139,11 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
                     name={`attachments.${index}.label`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel required>Label</FormLabel>
+                        <FormLabel required>
+                          <Trans>Label</Trans>
+                        </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="Attachment label" />
+                          <Input {...field} placeholder={t`Attachment label`} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -147,9 +155,11 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
                     name={`attachments.${index}.url`}
                     render={({ field }) => (
                       <FormItem className="flex-1">
-                        <FormLabel required>URL</FormLabel>
+                        <FormLabel required>
+                          <Trans>URL</Trans>
+                        </FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder="https://..." />
+                          <Input {...field} placeholder={t`https://...`} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -169,9 +179,11 @@ export const AttachmentForm = ({ templateId }: AttachmentFormProps) => {
             </fieldset>
             <DialogFooter className="mt-4">
               <Button type="button" variant="outline" onClick={onAddAttachment}>
-                Add
+                <Trans>Add</Trans>
               </Button>
-              <Button type="submit">Save</Button>
+              <Button type="submit">
+                <Trans>Save</Trans>
+              </Button>
             </DialogFooter>
           </form>
         </Form>
