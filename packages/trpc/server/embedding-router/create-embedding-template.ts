@@ -79,16 +79,31 @@ export const createEmbeddingTemplateRoute = procedure
 
       // Update the template meta if needed
       if (meta) {
+        const upsertMetaData = {
+          subject: meta.subject,
+          message: meta.message,
+          timezone: meta.timezone,
+          dateFormat: meta.dateFormat,
+          distributionMethod: meta.distributionMethod,
+          signingOrder: meta.signingOrder,
+          redirectUrl: meta.redirectUrl,
+          language: meta.language,
+          typedSignatureEnabled: meta.typedSignatureEnabled,
+          drawSignatureEnabled: meta.drawSignatureEnabled,
+          uploadSignatureEnabled: meta.uploadSignatureEnabled,
+          emailSettings: meta.emailSettings,
+        };
+
         await prisma.templateMeta.upsert({
           where: {
             templateId: template.id,
           },
           create: {
             templateId: template.id,
-            ...meta,
+            ...upsertMetaData,
           },
           update: {
-            ...meta,
+            ...upsertMetaData,
           },
         });
       }

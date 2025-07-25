@@ -1,3 +1,5 @@
+import { Prisma } from '@prisma/client';
+
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
@@ -26,6 +28,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       // Document related settings.
       documentVisibility,
       documentLanguage,
+      documentTimezone,
+      documentDateFormat,
       includeSenderDetails,
       includeSigningCertificate,
       typedSignatureEnabled,
@@ -37,6 +41,12 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       brandingLogo,
       brandingUrl,
       brandingCompanyDetails,
+
+      // Email related settings.
+      emailId,
+      emailReplyTo,
+      // emailReplyToName,
+      emailDocumentSettings,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -70,6 +80,22 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       });
     }
 
+    // Validate that the email ID belongs to the organisation.
+    if (emailId) {
+      const email = await prisma.organisationEmail.findFirst({
+        where: {
+          id: emailId,
+          organisationId: team.organisationId,
+        },
+      });
+
+      if (!email) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Email not found',
+        });
+      }
+    }
+
     await prisma.team.update({
       where: {
         id: teamId,
@@ -80,6 +106,8 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             // Document related settings.
             documentVisibility,
             documentLanguage,
+            documentTimezone,
+            documentDateFormat,
             includeSenderDetails,
             includeSigningCertificate,
             typedSignatureEnabled,
@@ -91,6 +119,13 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             brandingLogo,
             brandingUrl,
             brandingCompanyDetails,
+
+            // Email related settings.
+            emailId,
+            emailReplyTo,
+            // emailReplyToName,
+            emailDocumentSettings:
+              emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
           },
         },
       },

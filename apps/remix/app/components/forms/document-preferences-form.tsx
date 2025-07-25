@@ -8,17 +8,24 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
 import {
   SUPPORTED_LANGUAGES,
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
+import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
+import {
+  type TDocumentMetaDateFormat,
+  ZDocumentMetaTimezoneSchema,
+} from '@documenso/trpc/server/document-router/schema';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
+import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
   Form,
   FormControl,
@@ -44,6 +51,8 @@ import {
 export type TDocumentPreferencesFormSchema = {
   documentVisibility: DocumentVisibility | null;
   documentLanguage: (typeof SUPPORTED_LANGUAGE_CODES)[number] | null;
+  documentTimezone: string | null;
+  documentDateFormat: TDocumentMetaDateFormat | null;
   includeSenderDetails: boolean | null;
   includeSigningCertificate: boolean | null;
   signatureTypes: DocumentSignatureType[];
@@ -53,6 +62,8 @@ type SettingsSubset = Pick<
   TeamGlobalSettings,
   | 'documentVisibility'
   | 'documentLanguage'
+  | 'documentTimezone'
+  | 'documentDateFormat'
   | 'includeSenderDetails'
   | 'includeSigningCertificate'
   | 'typedSignatureEnabled'
@@ -81,6 +92,8 @@ export const DocumentPreferencesForm = ({
   const ZDocumentPreferencesFormSchema = z.object({
     documentVisibility: z.nativeEnum(DocumentVisibility).nullable(),
     documentLanguage: z.enum(SUPPORTED_LANGUAGE_CODES).nullable(),
+    documentTimezone: z.string().nullable(),
+    documentDateFormat: ZDocumentMetaTimezoneSchema.nullable(),
     includeSenderDetails: z.boolean().nullable(),
     includeSigningCertificate: z.boolean().nullable(),
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
@@ -94,6 +107,9 @@ export const DocumentPreferencesForm = ({
       documentLanguage: isValidLanguageCode(settings.documentLanguage)
         ? settings.documentLanguage
         : null,
+      documentTimezone: settings.documentTimezone,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      documentDateFormat: settings.documentDateFormat as TDocumentMetaDateFormat | null,
       includeSenderDetails: settings.includeSenderDetails,
       includeSigningCertificate: settings.includeSigningCertificate,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
@@ -124,7 +140,10 @@ export const DocumentPreferencesForm = ({
                       value={field.value === null ? '-1' : field.value}
                       onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                     >
-                      <SelectTrigger className="bg-background text-muted-foreground">
+                      <SelectTrigger
+                        className="bg-background text-muted-foreground"
+                        data-testid="document-visibility-trigger"
+                      >
                         <SelectValue />
                       </SelectTrigger>
 
@@ -171,7 +190,10 @@ export const DocumentPreferencesForm = ({
                     value={field.value === null ? '-1' : field.value}
                     onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
                   >
-                    <SelectTrigger className="bg-background text-muted-foreground">
+                    <SelectTrigger
+                      className="bg-background text-muted-foreground"
+                      data-testid="document-language-trigger"
+                    >
                       <SelectValue />
                     </SelectTrigger>
 
@@ -201,6 +223,72 @@ export const DocumentPreferencesForm = ({
 
           <FormField
             control={form.control}
+            name="documentDateFormat"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Default Date Format</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <Select
+                    value={field.value === null ? '-1' : field.value}
+                    onValueChange={(value) => field.onChange(value === '-1' ? null : value)}
+                  >
+                    <SelectTrigger data-testid="document-date-format-trigger">
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {DATE_FORMATS.map((format) => (
+                        <SelectItem key={format.key} value={format.value}>
+                          {format.label}
+                        </SelectItem>
+                      ))}
+
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="documentTimezone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Default Time Zone</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <Combobox
+                    triggerPlaceholder={
+                      canInherit ? t`Inherit from organisation` : t`Local timezone`
+                    }
+                    placeholder={t`Select a time zone`}
+                    options={TIME_ZONES}
+                    value={field.value}
+                    onChange={(value) => field.onChange(value)}
+                    testId="document-timezone-trigger"
+                  />
+                </FormControl>
+
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="signatureTypes"
             render={({ field }) => (
               <FormItem className="flex-1">
@@ -222,7 +310,7 @@ export const DocumentPreferencesForm = ({
                     emptySelectionPlaceholder={
                       canInherit ? t`Inherit from organisation` : t`Select signature types`
                     }
-                    testId="signature-types-combobox"
+                    testId="signature-types-trigger"
                   />
                 </FormControl>
 
@@ -257,7 +345,10 @@ export const DocumentPreferencesForm = ({
                         field.onChange(value === 'true' ? true : value === 'false' ? false : null)
                       }
                     >
-                      <SelectTrigger className="bg-background text-muted-foreground">
+                      <SelectTrigger
+                        className="bg-background text-muted-foreground"
+                        data-testid="include-sender-details-trigger"
+                      >
                         <SelectValue />
                       </SelectTrigger>
 
@@ -325,7 +416,10 @@ export const DocumentPreferencesForm = ({
                       field.onChange(value === 'true' ? true : value === 'false' ? false : null)
                     }
                   >
-                    <SelectTrigger className="bg-background text-muted-foreground">
+                    <SelectTrigger
+                      className="bg-background text-muted-foreground"
+                      data-testid="include-signing-certificate-trigger"
+                    >
                       <SelectValue />
                     </SelectTrigger>
 
