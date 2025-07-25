@@ -24,6 +24,35 @@ Each organisation can contain multiple teams, and each team can have multiple me
 - **Access Control**: Define roles and groups across the entire organisation
 - **Group Management**: Create custom groups to organise members and control team access
 - **Global Settings**: Apply consistent settings across all teams in your organisation
+- **Domain Auto-Assignment**: Automatically add new users to your organisation based on their email domain
+
+## Domain Auto-Assignment
+
+Domain auto-assignment allows you to automatically add new users to your organisation when they sign up with email addresses from specific domains you control. This is particularly useful for companies that want to ensure all employees with company email addresses are automatically included in the organisation.
+
+### How Domain Auto-Assignment Works
+
+1. **Configure Domain**: Organisation administrators add approved domains (e.g., "yourcompany.com") to the organisation settings
+2. **User Signup**: A new user signs up with an email address from your configured domain (e.g., "alice@yourcompany.com")
+3. **Email Verification**: The user verifies their email address through the standard verification process
+4. **Automatic Assignment**: Once verified, the user is automatically added to your organisation as a "Member"
+
+<Callout type="info">
+  Auto-assignment only occurs after email verification to ensure the user controls the email
+  address.
+</Callout>
+
+### Benefits of Domain Auto-Assignment
+
+- **Streamlined Onboarding**: No need to manually invite every employee
+- **Automatic Coverage**: Ensures all company users are included in your organisation
+- **Reduced Administrative Overhead**: Eliminates the need to track and invite individual users
+- **Consistent Access**: All domain users automatically receive organisation-level settings and branding
+
+<Callout type="warning">
+  Only organisation administrators can configure domain auto-assignment. Ensure you only add domains
+  that your organisation legitimately controls.
+</Callout>
 
 ## Create a new organisation
 
@@ -55,11 +84,14 @@ Once your organisation is established, you can create teams to organise your wor
 
 1. **Use groups effectively**: Leverage groups to simplify permission management
 2. **Set default settings**: Configure organisation-wide settings for consistency
+3. **Configure domain auto-assignment**: Set up email domains to automatically include company users
+4. **Review member permissions**: Regularly audit organisation member roles and access
 
 ## What's next?
 
 - [Create Your First Team](/users/organisations/teams)
 - [Invite Organisation Members](/users/organisations/members)
 - [Create Organisation Groups](/users/organisations/groups)
+- [Configure Domain Auto-Assignment](#domain-auto-assignment)
 - [Manage Default Settings](/users/documents/document-preferences)
 - [Manage Default Branding](/users/branding)

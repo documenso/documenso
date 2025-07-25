@@ -622,3 +622,107 @@ For API V2, you need to make a `POST` request to the `/api/v2-beta/template/use`
 ```
 
 Check out the endpoint in the [API V2 documentation](https://openapi.documenso.com/reference#tag/template/POST/template/use).
+
+## Organisation Domain Management
+
+Organisation domain management allows you to configure email domains for automatic user assignment to your organisation. When users sign up with matching email domains, they will be automatically added as members to your organisation.
+
+<Callout type="info">
+  Domain management is only available for organisation administrators and requires appropriate
+  permissions.
+</Callout>
+
+### Add Domain to Organisation
+
+Add a domain to your organisation for automatic user assignment.
+
+**Endpoint:** `POST /api/v1/organisation/{organisationId}/domain`
+
+**Request Body:**
+
+```json
+{
+  "domain": "example.com"
+}
+```
+
+**Parameters:**
+
+- `domain` _(required)_ - The domain name to add (e.g., "example.com")
+
+**Response:**
+
+```json
+{
+  "id": "123",
+  "domain": "example.com",
+  "createdAt": "2024-01-15T10:30:00Z",
+  "updatedAt": "2024-01-15T10:30:00Z"
+}
+```
+
+### List Organisation Domains
+
+Retrieve all domains configured for your organisation.
+
+**Endpoint:** `GET /api/v1/organisation/{organisationId}/domains`
+
+**Query Parameters:**
+
+- `page` _(optional)_ - Page number for pagination (default: 1)
+- `perPage` _(optional)_ - Number of results per page (default: 20, max: 100)
+
+**Response:**
+
+```json
+{
+  "domains": [
+    {
+      "id": "123",
+      "domain": "example.com",
+      "createdAt": "2024-01-15T10:30:00Z",
+      "updatedAt": "2024-01-15T10:30:00Z"
+    }
+  ],
+  "totalCount": 1,
+  "currentPage": 1,
+  "totalPages": 1,
+  "hasNextPage": false
+}
+```
+
+### Remove Domain from Organisation
+
+Remove a domain from your organisation to stop automatic user assignment.
+
+**Endpoint:** `DELETE /api/v1/organisation/{organisationId}/domain/{domainId}`
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Domain successfully removed"
+}
+```
+
+### Domain Auto-Assignment Behavior
+
+When a user signs up with an email address matching a configured domain:
+
+1. **User Registration**: User completes normal signup process
+2. **Email Verification**: User verifies their email address
+3. **Auto-Assignment**: User is automatically added to the organisation as a "Member"
+4. **Notification**: User receives welcome notification (if configured)
+
+**Important Notes:**
+
+- Auto-assignment only occurs after email verification
+- Users are assigned the "Member" role by default
+- If multiple organisations have the same domain, the user is assigned to the first matching organisation
+- Existing organisation members will not be duplicated if they verify an email with a matching domain
+
+<Callout type="warning">
+  Domain validation is performed to ensure security. Only valid domain names are accepted, and
+  domains with suspicious patterns may be rejected.
+</Callout>

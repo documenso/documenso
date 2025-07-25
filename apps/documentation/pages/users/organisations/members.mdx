@@ -28,9 +28,13 @@ You can assign different permissions to organisation members by using roles. The
   access it by default as well.
 </Callout>
 
-## Invite Organisation Members
+## Adding Members to Your Organisation
 
-To invite organisation members, you need to be an organisation owner, admin or manager.
+There are two ways to add members to your organisation:
+
+### Manual Invitation
+
+To manually invite organisation members, you need to be an organisation owner, admin or manager.
 
 1. Open the menu switcher top right
 2. Hover over your new organisation and click the settings icon
@@ -51,6 +55,34 @@ The table below shows how the CSV file should be structured:
 | org-manager@documenso.com | Manager |
 | org-member@documenso.com  | Member  |
 
+### Domain Auto-Assignment
+
+Domain auto-assignment provides an automated way to add members to your organisation. When you configure specific email domains, users who sign up with matching email addresses will be automatically added to your organisation.
+
+#### How Auto-Assignment Works
+
+1. **Domain Configuration**: Organisation administrators configure approved domains (e.g., "yourcompany.com")
+2. **User Registration**: A user signs up with a matching email address (e.g., "john@yourcompany.com")
+3. **Email Verification**: The user completes the standard email verification process
+4. **Automatic Membership**: The verified user is automatically added as an "Organisation Member"
+
+<Callout type="info">
+  Users added through domain auto-assignment are always assigned the "Member" role by default. You
+  can change their role after they join if needed.
+</Callout>
+
+#### Benefits of Domain Auto-Assignment
+
+- **Seamless Onboarding**: New employees are automatically included without manual intervention
+- **Consistent Coverage**: Ensures all users with company email addresses are part of the organisation
+- **Reduced Administration**: Eliminates the need to track and invite individual users
+- **Immediate Access**: Auto-assigned users immediately receive organisation settings and branding
+
+<Callout type="warning">
+  Domain auto-assignment only works after email verification to ensure security. Only configure
+  domains that your organisation legitimately controls.
+</Callout>
+
 <Callout type="info">
   The basic team plan includes 5 organisation members. Going over the 5 members will charge your
   organisation according to the seat plan pricing.
@@ -60,6 +92,17 @@ The table below shows how the CSV file should be structured:
 
 On the same page, you can change the organisation member's roles or remove them from the organisation.
 
+### Member Sources
+
+Organisation members can be added through:
+
+- **Manual Invitation**: Explicitly invited by administrators
+- **Domain Auto-Assignment**: Automatically added based on email domain verification
+- **Direct Addition**: Added directly by organisation administrators
+
+You can identify how a member joined your organisation through the member management interface.
+
 ## What's next?
 
 - [Use groups to organise your members](/users/organisations/groups)
+- [Configure domain auto-assignment](/users/organisations#domain-auto-assignment)
