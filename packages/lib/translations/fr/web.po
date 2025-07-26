@@ -20,7 +20,7 @@ msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid " Enable direct link signing"
-msgstr " Activer la signature par lien direct"
+msgstr " Activer la signature de lien direct"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
@@ -42,7 +42,7 @@ msgstr "« {documentName} » a été signé"
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
-msgstr "« {documentName} » a été signé par tous les signataires"
+msgstr "“{documentName}” a été signé par tous les signataires"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "\"{documentTitle}\" has been successfully deleted"
@@ -50,7 +50,7 @@ msgstr "\"{documentTitle}\" a été supprimé avec succès"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
-msgstr "\"{placeholderEmail}\" représentant \"Team Name\" vous a invité à signer \"example document\"."
+msgstr "\"{placeholderEmail}\" au nom de \"Team Name\" vous a invité à signer \"example document\"."
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
@@ -411,7 +411,7 @@ msgstr "<0>Cliquez pour importer</0> ou faites glisser et déposez"
 
 #: packages/ui/components/document/document-signature-settings-tooltip.tsx
 msgid "<0>Drawn</0> - A signature that is drawn using a mouse or stylus."
-msgstr "<0>Dessinée</0> - Une signature dessinée en utilisant une souris ou un stylet."
+msgstr "<0>Signée</0> - Une signature dessinée en utilisant une souris ou un stylet."
 
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "<0>Email</0> - The recipient will be emailed the document to sign, approve, etc."
@@ -465,11 +465,11 @@ msgstr "<0>Expéditeur :</0> Tous"
 
 #: packages/ui/components/document/document-signature-settings-tooltip.tsx
 msgid "<0>Typed</0> - A signature that is typed using a keyboard."
-msgstr "<0>Écrite</0> - Une signature écrite à l'aide d'un clavier."
+msgstr "<0>Tappée</0> - Une signature tapée à l'aide d'un clavier."
 
 #: packages/ui/components/document/document-signature-settings-tooltip.tsx
 msgid "<0>Uploaded</0> - A signature that is uploaded from a file."
-msgstr "<0>Importée</0> - Une signature importée à partir d'un fichier."
+msgstr "<0>Téléchargée</0> - Une signature téléchargée à partir d'un fichier."
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "<0>You are about to complete approving <1>\"{documentTitle}\"</1>.</0><2/> Are you sure?"
@@ -1020,7 +1020,7 @@ msgstr "Autoriser les destinataires du document à répondre directement à cett
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Allow signers to dictate next signer"
-msgstr "Permettre aux signataires de désigner le prochain signataire"
+msgstr "Permettre aux signataires de dicter le prochain signataire"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -1333,7 +1333,7 @@ msgstr "Approval en cours"
 
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
 msgid "Are you sure you want to complete the document? This action cannot be undone. Please ensure that you have completed prefilling all relevant fields before proceeding."
-msgstr "Êtes-vous sûr de vouloir finaliser le document ? Cette action ne peut être annulée. Veuillez vous assurer d'avoir pré-rempli tous les champs pertinents avant de continuer."
+msgstr "Êtes-vous sûr de vouloir terminer le document ? Cette action ne peut être annulée. Veuillez vous assurer d'avoir pré-rempli tous les champs pertinents avant de procéder."
 
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 msgid "Are you sure you want to delete the following claim?"
@@ -1840,7 +1840,7 @@ msgstr "Compléter la signature"
 
 #: apps/remix/app/components/general/document-signing/document-signing-form.tsx
 msgid "Complete the fields for the following signers. Once reviewed, they will inform you if any modifications are needed."
-msgstr "Complétez les champs pour les signataires suivants. Une fois vérifiés, ils vous informeront si des modifications sont nécessaires."
+msgstr "Complétez les champs pour les signataires suivants. Une fois révisés, ils vous informeront si des modifications sont nécessaires."
 
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -3655,7 +3655,7 @@ msgstr "t'a invité à voir ce document"
 #: packages/ui/primitives/document-flow/add-signers.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
-msgstr "Avoir un assistant comme dernier signataire signifie qu'il ne pourra rien faire car il n'y a pas d'autres signataires à assister."
+msgstr "Avoir un assistant comme dernier signataire signifie qu'il ne pourra prendre aucune mesure car il n'y a pas de signataires ultérieurs à assister."
 
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
 msgid "Help complete the document for other signers."
@@ -5185,7 +5185,7 @@ msgstr "Raison de l'annulation: {cancellationReason}"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Reason for rejection: "
-msgstr "Raison du rejet : "
+msgstr "Raison du rejet: "
 
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "Reason for rejection: {rejectionReason}"
@@ -5940,7 +5940,7 @@ msgstr "La signature est trop petite"
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Signature Pad cannot be empty."
-msgstr "Le champ de signature ne peut pas être vide."
+msgstr "Le Pad de Signature ne peut pas être vide."
 
 #: packages/ui/components/document/document-signature-settings-tooltip.tsx
 msgid "Signature types"
@@ -7453,7 +7453,7 @@ msgstr "Mettez à niveau votre plan pour importer plus de documents"
 
 #: packages/lib/constants/document.ts
 msgid "Upload"
-msgstr "Importer"
+msgstr "Télécharger"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
@@ -8092,7 +8092,7 @@ msgstr "Ce que vous pouvez faire avec les équipes :"
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "When enabled, signers can choose who should sign next in the sequence instead of following the predefined order."
-msgstr "Lorsqu'il est activé, les signataires peuvent choisir qui doit signer ensuite au lieu de suivre l'ordre prédéfini."
+msgstr "Lorsqu'il est activé, les signataires peuvent choisir qui doit signer ensuite dans la séquence au lieu de suivre l'ordre prédéfini."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "When you click continue, you will be prompted to add the first available authenticator on your system."
