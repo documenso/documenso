@@ -168,7 +168,7 @@ test('[TEAMS]: can rename a document folder', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await page.getByLabel('Name').fill('Team Archive');
-  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await page.getByRole('button', { name: 'Update' }).click();
 
   await expect(page.getByText('Team Archive')).toBeVisible();
 });
@@ -470,7 +470,7 @@ test('[TEAMS]: can rename a template folder', async ({ page }) => {
   await page.getByRole('menuitem', { name: 'Settings' }).click();
 
   await page.getByLabel('Name').fill('Updated Team Template Folder');
-  await page.getByRole('button', { name: 'Save Changes' }).click();
+  await page.getByRole('button', { name: 'Update' }).click();
 
   await expect(page.getByText('Updated Team Template Folder')).toBeVisible();
 });

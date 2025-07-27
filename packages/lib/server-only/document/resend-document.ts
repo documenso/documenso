@@ -5,7 +5,6 @@ import { DocumentStatus, OrganisationType, RecipientRole, SigningStatus } from '
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
@@ -54,14 +53,7 @@ export const resendDocument = async ({
   const document = await prisma.document.findUnique({
     where: documentWhereInput,
     include: {
-      recipients: {
-        where: {
-          id: {
-            in: recipients,
-          },
-          signingStatus: SigningStatus.NOT_SIGNED,
-        },
-      },
+      recipients: true,
       documentMeta: true,
       team: {
         select: {
@@ -90,6 +82,11 @@ export const resendDocument = async ({
     throw new Error('Can not send completed document');
   }
 
+  const recipientsToRemind = document.recipients.filter(
+    (recipient) =>
+      recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
+  );
+
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
     document.documentMeta,
   ).recipientSigningRequest;
@@ -98,21 +95,23 @@ export const resendDocument = async ({
     return;
   }
 
-  const { branding, settings, organisationType } = await getEmailContext({
-    source: {
-      type: 'team',
-      teamId: document.teamId,
-    },
-  });
+  const { branding, emailLanguage, organisationType, senderEmail, replyToEmail } =
+    await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: document.teamId,
+      },
+      meta: document.documentMeta || null,
+    });
 
   await Promise.all(
-    document.recipients.map(async (recipient) => {
+    recipientsToRemind.map(async (recipient) => {
       if (recipient.role === RecipientRole.CC) {
         return;
       }
 
-      const lang = document.documentMeta?.language ?? settings.documentLanguage;
-      const i18n = await getI18nInstance(lang);
+      const i18n = await getI18nInstance(emailLanguage);
 
       const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -171,11 +170,11 @@ export const resendDocument = async ({
 
       const [html, text] = await Promise.all([
         renderEmailWithI18N(template, {
-          lang,
+          lang: emailLanguage,
           branding,
         }),
         renderEmailWithI18N(template, {
-          lang,
+          lang: emailLanguage,
           branding,
           plainText: true,
         }),
@@ -188,10 +187,8 @@ export const resendDocument = async ({
               address: email,
               name,
             },
-            from: {
-              name: FROM_NAME,
-              address: FROM_ADDRESS,
-            },
+            from: senderEmail,
+            replyTo: replyToEmail,
             subject: customEmail?.subject
               ? renderCustomEmailTemplate(
                   i18n._(msg`Reminder: ${customEmail.subject}`),
