@@ -29,6 +29,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { findTemplateAttachmentsRoute } from './find-template-attachments';
 import {
   ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -52,8 +53,14 @@ import {
   ZUpdateTemplateRequestSchema,
   ZUpdateTemplateResponseSchema,
 } from './schema';
+import { setTemplateAttachmentsRoute } from './set-template-attachments';
 
 export const templateRouter = router({
+  attachments: {
+    find: findTemplateAttachmentsRoute,
+    set: setTemplateAttachmentsRoute,
+  },
+
   /**
    * @public
    */
