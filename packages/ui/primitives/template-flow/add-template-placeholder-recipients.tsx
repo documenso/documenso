@@ -14,7 +14,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX } from '@documenso/lib/constants/template';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
@@ -339,10 +339,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
     form.setValue('allowDictateNextSigner', false);
   }, [form]);
 
-  const isSignerEmailPlaceholder = (email: string) => {
-    return TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX.test(email);
-  };
-
   return (
     <>
       <DocumentFlowFormContainerHeader
@@ -552,7 +548,9 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                         placeholder={_(msg`Email`)}
                                         {...field}
                                         value={
-                                          isSignerEmailPlaceholder(field.value) ? '' : field.value
+                                          isTemplateRecipientEmailPlaceholder(field.value)
+                                            ? ''
+                                            : field.value
                                         }
                                         disabled={
                                           field.disabled ||
