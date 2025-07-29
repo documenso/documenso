@@ -537,7 +537,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                     })}
                                   >
                                     {!showAdvancedSettings && index === 0 && (
-                                      <FormLabel required>
+                                      <FormLabel>
                                         <Trans>Email</Trans>
                                       </FormLabel>
                                     )}
