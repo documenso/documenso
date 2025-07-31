@@ -57,7 +57,6 @@ export const getAuditLogPdf = async ({ documentId, language }: GetAuditLogPdfOpt
     timeout: 10_000,
   });
 
-  // Inject CSS to ensure audit log cards fit properly in PDF
   await page.addStyleTag({
     content: `
       @media print {
@@ -66,7 +65,6 @@ export const getAuditLogPdf = async ({ documentId, language }: GetAuditLogPdfOpt
         }
         
         .audit-log-card {
-          border: 1px solid #e5e7eb !important;
           box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important;
           page-break-inside: avoid !important;
           break-inside: avoid !important;

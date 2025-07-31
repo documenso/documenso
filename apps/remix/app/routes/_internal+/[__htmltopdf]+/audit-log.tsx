@@ -80,11 +80,11 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="mb-6 border-b pb-4">
-        <h1 className="text-xl font-semibold">{_(msg`Audit Log`)}</h1>
+        <h1 className="text-background text-xl font-semibold">{_(msg`Audit Log`)}</h1>
       </div>
 
       <Card>
-        <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
+        <CardContent className="text-background grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
             <span className="font-medium">{_(msg`Document ID`)}</span>
 
