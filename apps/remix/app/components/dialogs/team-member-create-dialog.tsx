@@ -6,6 +6,7 @@ import { TeamMemberRole } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -151,7 +152,16 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                   <TooltipContent className="text-muted-foreground z-[99999] max-w-xs">
                     <Trans>
                       To be able to add members to a team, you must first add them to the
-                      organisation.
+                      organisation. For more information, please see the{' '}
+                      <Link
+                        to="https://docs.documenso.com/users/organisations/members"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-documenso-700 hover:text-documenso-600 hover:underline"
+                      >
+                        documentation
+                      </Link>
+                      .
                     </Trans>
                   </TooltipContent>
                 </Tooltip>
