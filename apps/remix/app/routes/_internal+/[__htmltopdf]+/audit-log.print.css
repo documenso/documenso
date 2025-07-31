@@ -1,0 +1,61 @@
+@media print {
+  @page {
+    margin: 2rem 0 0 0;
+    size: A4;
+  }
+
+  html,
+  body {
+    margin: 0;
+    padding: 1rem;
+  }
+
+  /* Hide browser headers and footers */
+  @page :first {
+    margin-top: 2rem;
+  }
+
+  @page :left {
+    margin-left: 0;
+  }
+
+  @page :right {
+    margin-right: 0;
+  }
+
+  /* Ensure audit log cards don't get cut off */
+  .audit-log-card {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    margin-top: 1rem !important;
+    margin-bottom: 1rem !important;
+  }
+
+  /* Add extra top margin for cards that start on new pages */
+  .audit-log-card:first-of-type {
+    margin-top: 0 !important;
+  }
+
+  /* Ensure proper spacing for the main container */
+  .print-provider {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Target the audit log container specifically */
+  .audit-log-container {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+
+  /* Ensure cards that start on new pages have proper spacing */
+  .audit-log-card:first-child {
+    margin-top: 0 !important;
+  }
+
+  /* Add extra top padding to the first card specifically */
+  .audit-log-container .audit-log-card:first-child {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+  }
+}
