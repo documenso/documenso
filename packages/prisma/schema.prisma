@@ -734,13 +734,13 @@ model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
 
-  documentVisibility DocumentVisibility @default(EVERYONE)
-  documentLanguage   String             @default("en")
-  documentTimezone   String? // Nullable to allow using local timezones if not set.
-  documentDateFormat String             @default("yyyy-MM-dd hh:mm a")
-
-  includeSenderDetails      Boolean @default(true)
-  includeSigningCertificate Boolean @default(true)
+  documentVisibility        DocumentVisibility @default(EVERYONE)
+  documentLanguage          String             @default("en")
+  includeSenderDetails      Boolean            @default(true)
+  includeSigningCertificate Boolean            @default(true)
+  includeAuditLog           Boolean            @default(false)
+  documentTimezone          String? // Nullable to allow using local timezones if not set.
+  documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -771,6 +771,7 @@ model TeamGlobalSettings {
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
+  includeAuditLog           Boolean?
 
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?

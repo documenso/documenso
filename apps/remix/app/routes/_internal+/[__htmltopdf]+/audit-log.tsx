@@ -16,6 +16,9 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { InternalAuditLogTable } from '~/components/tables/internal-audit-log-table';
 
 import type { Route } from './+types/audit-log';
+import stylesheet from './audit-log.print.css?url';
+
+export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const d = new URL(request.url).searchParams.get('d');
@@ -76,12 +79,12 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
-      <div className="flex items-center">
-        <h1 className="my-8 text-2xl font-bold">{_(msg`Version History`)}</h1>
+      <div className="mb-6 border-b pb-4">
+        <h1 className="text-background text-xl font-semibold">{_(msg`Audit Log`)}</h1>
       </div>
 
       <Card>
-        <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
+        <CardContent className="text-background grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
             <span className="font-medium">{_(msg`Document ID`)}</span>
 
@@ -157,11 +160,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
         </CardContent>
       </Card>
 
-      <Card className="mt-8">
-        <CardContent className="p-0">
-          <InternalAuditLogTable logs={auditLogs} />
-        </CardContent>
-      </Card>
+      <div className="mt-8">
+        <InternalAuditLogTable logs={auditLogs} />
+      </div>
 
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">

@@ -7,14 +7,7 @@ import { UAParser } from 'ua-parser-js';
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import type { TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
 import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@documenso/ui/primitives/table';
+import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type AuditLogDataTableProps = {
   logs: TDocumentAuditLog[];
@@ -33,63 +26,95 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
 
   const parser = new UAParser();
 
-  const uppercaseFistLetter = (text: string) => {
-    return text.charAt(0).toUpperCase() + text.slice(1);
-  };
-
   return (
-    <Table overflowHidden>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{_(msg`Time`)}</TableHead>
-          <TableHead>{_(msg`User`)}</TableHead>
-          <TableHead>{_(msg`Action`)}</TableHead>
-          <TableHead>{_(msg`IP Address`)}</TableHead>
-          <TableHead>{_(msg`Browser`)}</TableHead>
-        </TableRow>
-      </TableHeader>
+    <div className="audit-log-container space-y-4">
+      {logs.map((log, index) => {
+        parser.setUA(log.userAgent || '');
+        const browserInfo = parser.getResult();
+        const formattedAction = formatDocumentAuditLogAction(_, log);
 
-      <TableBody className="print:text-xs">
-        {logs.map((log, i) => (
-          <TableRow className="break-inside-avoid" key={i}>
-            <TableCell>
-              {DateTime.fromJSDate(log.createdAt)
-                .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toLocaleString(dateFormat)}
-            </TableCell>
+        return (
+          <Card
+            key={index}
+            // Add top margin for the first card to ensure it's not cut off from the 2nd page onwards
+            className={`audit-log-card border shadow-sm ${index > 0 ? 'print:mt-8' : ''}`}
+            style={{
+              pageBreakInside: 'avoid',
+              breakInside: 'avoid',
+            }}
+          >
+            <CardContent className="p-4">
+              <div className="audit-log-grid grid grid-cols-12 gap-4">
+                <div className="audit-log-section col-span-4 space-y-3">
+                  <div>
+                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
+                      {_(msg`Event Type`)}
+                    </div>
+                    <div className="text-background audit-log-value mt-1 text-sm font-medium">
+                      {log.type.replace(/_/g, ' ')}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
+                      {_(msg`Timestamp`)}
+                    </div>
+                    <div className="text-background audit-log-value mt-1 text-sm">
+                      {DateTime.fromJSDate(log.createdAt)
+                        .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                        .toLocaleString(dateFormat)}
+                    </div>
+                  </div>
+                  <div>
+                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
+                      {_(msg`IP Address`)}
+                    </div>
+                    <div className="text-background audit-log-value mt-1 font-mono text-sm">
+                      {log.ipAddress || 'N/A'}
+                    </div>
+                  </div>
+                </div>
 
-            <TableCell>
-              {log.name || log.email ? (
-                <div>
-                  {log.name && (
-                    <p className="break-all" title={log.name}>
-                      {log.name}
-                    </p>
-                  )}
+                <div className="audit-log-section col-span-4">
+                  <div className="text-background audit-log-label mb-2 text-xs font-medium uppercase tracking-wide">
+                    {_(msg`Action`)}
+                  </div>
+                  <div className="text-background audit-log-value break-words text-sm leading-relaxed">
+                    {formattedAction.description}
+                  </div>
+                </div>
 
-                  {log.email && (
-                    <p className="text-muted-foreground break-all" title={log.email}>
-                      {log.email}
-                    </p>
+                <div className="audit-log-section col-span-4">
+                  <div className="text-background audit-log-label mb-2 text-xs font-medium uppercase tracking-wide">
+                    {_(msg`User`)}
+                  </div>
+                  {log.name || log.email ? (
+                    <div className="space-y-1">
+                      {log.name && (
+                        <div
+                          className="text-background audit-log-value break-words text-sm font-medium"
+                          title={log.name}
+                        >
+                          {log.name}
+                        </div>
+                      )}
+                      {log.email && (
+                        <div
+                          className="text-muted-foreground audit-log-value break-words text-sm"
+                          title={log.email}
+                        >
+                          {log.email}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="text-muted-foreground audit-log-value text-sm">N/A</div>
                   )}
                 </div>
-              ) : (
-                <p>N/A</p>
-              )}
-            </TableCell>
-
-            <TableCell>
-              {uppercaseFistLetter(formatDocumentAuditLogAction(_, log).description)}
-            </TableCell>
-
-            <TableCell>{log.ipAddress}</TableCell>
-
-            <TableCell>
-              {log.userAgent ? parser.setUA(log.userAgent).getBrowser().name : 'N/A'}
-            </TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      })}
+    </div>
   );
 };
