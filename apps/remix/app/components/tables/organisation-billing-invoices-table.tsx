@@ -25,7 +25,7 @@ export const OrganisationBillingInvoicesTable = ({
 }: OrganisationBillingInvoicesTableProps) => {
   const { _ } = useLingui();
 
-  const { data, isLoading, isLoadingError } = trpc.billing.invoices.get.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.enterprise.billing.invoices.get.useQuery(
     {
       organisationId,
     },

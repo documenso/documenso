@@ -9,7 +9,6 @@ import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/str
 import { mailer } from '@documenso/email/mailer';
 import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
@@ -190,7 +189,8 @@ export const sendOrganisationMemberInviteEmail = async ({
     organisationName: organisation.name,
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'organisation',
       organisationId: organisation.id,
@@ -199,24 +199,21 @@ export const sendOrganisationMemberInviteEmail = async ({
 
   const [html, text] = await Promise.all([
     renderEmailWithI18N(template, {
-      lang: settings.documentLanguage,
+      lang: emailLanguage,
       branding,
     }),
     renderEmailWithI18N(template, {
-      lang: settings.documentLanguage,
+      lang: emailLanguage,
       branding,
       plainText: true,
     }),
   ]);
 
-  const i18n = await getI18nInstance(settings.documentLanguage);
+  const i18n = await getI18nInstance(emailLanguage);
 
   await mailer.sendMail({
     to: email,
-    from: {
-      name: FROM_NAME,
-      address: FROM_ADDRESS,
-    },
+    from: senderEmail,
     subject: i18n._(msg`You have been invited to join ${organisation.name} on Documenso`),
     html,
     text,
