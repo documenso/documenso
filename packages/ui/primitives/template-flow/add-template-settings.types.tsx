@@ -49,7 +49,10 @@ export const ZAddTemplateSettingsFormSchema = z.object({
       .optional()
       .default('en'),
     emailId: z.string().nullable(),
-    emailReplyTo: z.string().optional(),
+    emailReplyTo: z.preprocess(
+      (val) => (val === '' ? undefined : val),
+      z.string().email().optional(),
+    ),
     emailSettings: ZDocumentEmailSettingsSchema,
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
