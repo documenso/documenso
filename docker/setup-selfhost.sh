@@ -56,6 +56,38 @@ setup_certificate() {
     print_info "Certificate Setup"
     echo "=================="
     
+    print_info "Choose certificate setup method:"
+    echo "1. Use existing .p12 certificate file (host-based)"
+    echo "2. Generate self-signed certificate inside Docker container (recommended)"
+    echo "3. Generate self-signed certificate (host-based)"
+    echo ""
+    
+    while true; do
+        read -p "Enter your choice (1-3): " cert_choice
+        case $cert_choice in
+            1)
+                setup_existing_certificate
+                break
+                ;;
+            2)
+                setup_container_certificate
+                break
+                ;;
+            3)
+                generate_self_signed_cert
+                break
+                ;;
+            *)
+                print_error "Invalid choice. Please enter 1, 2, or 3."
+                ;;
+        esac
+    done
+}
+
+# Setup existing certificate (original method)
+setup_existing_certificate() {
+    print_info "Using existing certificate file..."
+    
     read -p "Do you have a .p12 certificate file? (y/n): " has_cert
     
     if [[ $has_cert =~ ^[Yy]$ ]]; then
@@ -129,6 +161,8 @@ setup_certificate() {
             exit 1
         fi
     fi
+    
+    export CERT_METHOD="host"
 }
 
 # Generate self-signed certificate
@@ -203,6 +237,7 @@ generate_self_signed_cert() {
     cd - > /dev/null
     rm -rf "$TEMP_DIR"
     
+    export CERT_METHOD="host"
     print_success "Self-signed certificate generated and installed"
     print_warning "Note: Self-signed certificates won't show as 'trusted' in PDF readers like Adobe"
 }
@@ -273,9 +308,15 @@ NEXT_PRIVATE_SMTP_FROM_NAME=$smtp_from_name
 NEXT_PRIVATE_SMTP_FROM_ADDRESS=$smtp_from_address
 
 # Certificate Configuration
-NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
 EOF
 
+    # Add certificate configuration based on method
+    if [[ "${CERT_METHOD:-host}" == "container" ]]; then
+        echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/app/certs/cert.p12" >> .env
+    else
+        echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12" >> .env
+    fi
+    
     if [[ -n "${CERT_PASSPHRASE:-}" ]]; then
         echo "NEXT_PRIVATE_SIGNING_PASSPHRASE=$CERT_PASSPHRASE" >> .env
     fi
@@ -283,23 +324,182 @@ EOF
     print_success ".env file created successfully"
 }
 
-# Download docker-compose file
-download_compose_file() {
+# Generate docker-compose file
+generate_compose_file() {
     echo ""
     print_info "Docker Compose Setup"
     echo "===================="
     
     if [[ -f "compose.yml" ]]; then
         print_warning "compose.yml already exists"
-        read -p "Do you want to download the latest version? (y/n): " download_new
-        if [[ ! $download_new =~ ^[Yy]$ ]]; then
+        read -p "Do you want to regenerate it? (y/n): " regenerate
+        if [[ ! $regenerate =~ ^[Yy]$ ]]; then
             return
         fi
     fi
     
-    print_info "Downloading Docker Compose file..."
-    curl -o compose.yml https://raw.githubusercontent.com/documenso/documenso/main/docker/production/compose.yml
-    print_success "compose.yml downloaded"
+    print_info "Generating Docker Compose file..."
+    
+    # Generate compose file based on certificate method
+    if [[ "${CERT_METHOD:-host}" == "container" ]]; then
+        generate_container_compose
+    else
+        generate_host_compose
+    fi
+    
+    print_success "compose.yml generated"
+}
+
+# Generate compose file for container-based certificates
+generate_container_compose() {
+    cat > compose.yml << 'EOF'
+name: documenso-production
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:?err}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:?err}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  documenso:
+    image: documenso/documenso:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - PORT=${PORT:-3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?err}
+      - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?err}
+      - NEXT_PRIVATE_GOOGLE_CLIENT_ID=${NEXT_PRIVATE_GOOGLE_CLIENT_ID}
+      - NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET}
+      - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL:?err}
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-http://localhost:$PORT}
+      - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL:?err}
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:-${NEXT_PRIVATE_DATABASE_URL}}
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT:-database}
+      - NEXT_PRIVATE_UPLOAD_ENDPOINT=${NEXT_PRIVATE_UPLOAD_ENDPOINT}
+      - NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=${NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE}
+      - NEXT_PRIVATE_UPLOAD_REGION=${NEXT_PRIVATE_UPLOAD_REGION}
+      - NEXT_PRIVATE_UPLOAD_BUCKET=${NEXT_PRIVATE_UPLOAD_BUCKET}
+      - NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=${NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID}
+      - NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=${NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY}
+      - NEXT_PRIVATE_SMTP_TRANSPORT=${NEXT_PRIVATE_SMTP_TRANSPORT:?err}
+      - NEXT_PRIVATE_SMTP_HOST=${NEXT_PRIVATE_SMTP_HOST}
+      - NEXT_PRIVATE_SMTP_PORT=${NEXT_PRIVATE_SMTP_PORT}
+      - NEXT_PRIVATE_SMTP_USERNAME=${NEXT_PRIVATE_SMTP_USERNAME}
+      - NEXT_PRIVATE_SMTP_PASSWORD=${NEXT_PRIVATE_SMTP_PASSWORD}
+      - NEXT_PRIVATE_SMTP_APIKEY_USER=${NEXT_PRIVATE_SMTP_APIKEY_USER}
+      - NEXT_PRIVATE_SMTP_APIKEY=${NEXT_PRIVATE_SMTP_APIKEY}
+      - NEXT_PRIVATE_SMTP_SECURE=${NEXT_PRIVATE_SMTP_SECURE}
+      - NEXT_PRIVATE_SMTP_FROM_NAME=${NEXT_PRIVATE_SMTP_FROM_NAME:?err}
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=${NEXT_PRIVATE_SMTP_FROM_ADDRESS:?err}
+      - NEXT_PRIVATE_SMTP_SERVICE=${NEXT_PRIVATE_SMTP_SERVICE}
+      - NEXT_PRIVATE_RESEND_API_KEY=${NEXT_PRIVATE_RESEND_API_KEY}
+      - NEXT_PRIVATE_MAILCHANNELS_API_KEY=${NEXT_PRIVATE_MAILCHANNELS_API_KEY}
+      - NEXT_PRIVATE_MAILCHANNELS_ENDPOINT=${NEXT_PRIVATE_MAILCHANNELS_ENDPOINT}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN=${NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR=${NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY=${NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY}
+      - NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT}
+      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+      - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/app/certs/cert.p12
+      - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
+      - NODE_ENV=production
+    ports:
+      - ${PORT:-3000}:${PORT:-3000}
+    volumes:
+      - documenso_certs:/app/certs
+
+volumes:
+  database:
+  documenso_certs:
+EOF
+}
+
+# Generate compose file for host-based certificates
+generate_host_compose() {
+    cat > compose.yml << 'EOF'
+name: documenso-production
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:?err}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:?err}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  documenso:
+    image: documenso/documenso:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      - PORT=${PORT:-3000}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?err}
+      - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
+      - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?err}
+      - NEXT_PRIVATE_GOOGLE_CLIENT_ID=${NEXT_PRIVATE_GOOGLE_CLIENT_ID}
+      - NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET}
+      - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL:?err}
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-http://localhost:$PORT}
+      - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL:?err}
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:-${NEXT_PRIVATE_DATABASE_URL}}
+      - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT:-database}
+      - NEXT_PRIVATE_UPLOAD_ENDPOINT=${NEXT_PRIVATE_UPLOAD_ENDPOINT}
+      - NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=${NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE}
+      - NEXT_PRIVATE_UPLOAD_REGION=${NEXT_PRIVATE_UPLOAD_REGION}
+      - NEXT_PRIVATE_UPLOAD_BUCKET=${NEXT_PRIVATE_UPLOAD_BUCKET}
+      - NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=${NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID}
+      - NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=${NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY}
+      - NEXT_PRIVATE_SMTP_TRANSPORT=${NEXT_PRIVATE_SMTP_TRANSPORT:?err}
+      - NEXT_PRIVATE_SMTP_HOST=${NEXT_PRIVATE_SMTP_HOST}
+      - NEXT_PRIVATE_SMTP_PORT=${NEXT_PRIVATE_SMTP_PORT}
+      - NEXT_PRIVATE_SMTP_USERNAME=${NEXT_PRIVATE_SMTP_USERNAME}
+      - NEXT_PRIVATE_SMTP_PASSWORD=${NEXT_PRIVATE_SMTP_PASSWORD}
+      - NEXT_PRIVATE_SMTP_APIKEY_USER=${NEXT_PRIVATE_SMTP_APIKEY_USER}
+      - NEXT_PRIVATE_SMTP_APIKEY=${NEXT_PRIVATE_SMTP_APIKEY}
+      - NEXT_PRIVATE_SMTP_SECURE=${NEXT_PRIVATE_SMTP_SECURE}
+      - NEXT_PRIVATE_SMTP_FROM_NAME=${NEXT_PRIVATE_SMTP_FROM_NAME:?err}
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=${NEXT_PRIVATE_SMTP_FROM_ADDRESS:?err}
+      - NEXT_PRIVATE_SMTP_SERVICE=${NEXT_PRIVATE_SMTP_SERVICE}
+      - NEXT_PRIVATE_RESEND_API_KEY=${NEXT_PRIVATE_RESEND_API_KEY}
+      - NEXT_PRIVATE_MAILCHANNELS_API_KEY=${NEXT_PRIVATE_MAILCHANNELS_API_KEY}
+      - NEXT_PRIVATE_MAILCHANNELS_ENDPOINT=${NEXT_PRIVATE_MAILCHANNELS_ENDPOINT}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN=${NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR=${NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR}
+      - NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY=${NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY}
+      - NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT}
+      - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+      - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
+      - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
+    ports:
+      - ${PORT:-3000}:${PORT:-3000}
+    volumes:
+      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+
+volumes:
+  database:
+EOF
 }
 
 # Start containers and setup database
@@ -324,7 +524,7 @@ start_and_migrate() {
     docker-compose pull
     
     print_info "Starting Docker containers..."
-    docker-compose up -d
+    docker-compose up -d 2> >(grep -v 'WARN.*variable is not set. Defaulting to a blank string')
     
     print_info "Waiting for database to be ready..."
     
@@ -452,6 +652,112 @@ start_and_migrate() {
     print_success "Documenso is now running!"
 }
 
+# Generate self-signed certificate inside container
+setup_container_certificate() {
+    print_info "Generating self-signed certificate inside Docker container..."
+    print_info "This method creates certificates inside the container to avoid permission issues."
+    echo ""
+    
+    # Collect certificate info
+    read -p "Organization Name (e.g., Your Company): " org_name
+    read -p "Country Code (2 letters, e.g., US): " country_code
+    read -p "State/Province: " state
+    read -p "City: " city
+    read -p "Email Address: " email
+    
+    export CERT_ORG="$org_name"
+    export CERT_COUNTRY="$country_code"
+    export CERT_STATE="$state"
+    export CERT_CITY="$city"
+    export CERT_EMAIL="$email"
+    
+    # Get certificate password
+    while true; do
+        read -s -p "Enter a password for the certificate (minimum 4 characters): " cert_passphrase
+        echo ""
+        
+        if [[ -z "$cert_passphrase" ]]; then
+            print_error "Password is required for certificate security."
+            continue
+        fi
+        
+        if [[ ${#cert_passphrase} -lt 4 ]]; then
+            print_error "Password must be at least 4 characters long"
+            continue
+        fi
+        
+        read -s -p "Confirm password: " cert_passphrase_confirm
+        echo ""
+        
+        if [[ "$cert_passphrase" != "$cert_passphrase_confirm" ]]; then
+            print_error "Passwords do not match"
+            continue
+        fi
+        
+        export CERT_PASSPHRASE="$cert_passphrase"
+        break
+    done
+    
+    export CERT_METHOD="container"
+    print_success "Self-signed certificate configuration completed"
+    print_warning "Note: Self-signed certificates won't show as 'trusted' in PDF readers like Adobe"
+}
+
+# Setup certificates inside container
+setup_container_certificates() {
+    echo ""
+    print_info "Creating certificate inside container..."
+    echo "======================================="
+    
+    print_info "Generating self-signed certificate inside container..."
+    docker-compose exec --user root documenso sh -c "
+        mkdir -p /app/certs
+        cd /app/certs
+        
+        # Generate private key
+        openssl genrsa -out private.key 2048
+        
+        # Generate certificate
+        openssl req -new -x509 -key private.key -out certificate.crt -days 365 -subj '/C=$CERT_COUNTRY/ST=$CERT_STATE/L=$CERT_CITY/O=$CERT_ORG/emailAddress=$CERT_EMAIL'
+        
+        # Create PKCS12 certificate with compatible format
+        openssl pkcs12 -export -out cert.p12 \
+            -inkey private.key \
+            -in certificate.crt \
+            -name 'documenso' \
+            -password 'pass:$CERT_PASSPHRASE' \
+            -keypbe PBE-SHA1-3DES \
+            -certpbe PBE-SHA1-3DES \
+            -macalg sha1
+        
+        # Set correct ownership
+        chown 1001:1001 cert.p12 certificate.crt private.key
+        chmod 644 cert.p12 certificate.crt private.key
+        
+        # Clean up intermediate files
+        rm private.key certificate.crt
+    "
+    print_success "Self-signed certificate created inside container"
+    
+    # Verify certificate was created correctly
+    print_info "Verifying certificate..."
+    if docker-compose exec -T documenso test -f /app/certs/cert.p12; then
+        print_success "Certificate verification passed"
+    else
+        print_error "Certificate verification failed"
+        exit 1
+    fi
+    
+    # Restart documenso to pick up the new certificate
+    print_info "Restarting Documenso to load certificate..."
+    docker-compose restart documenso 2> >(grep -v 'WARN.*variable is not set. Defaulting to a blank string')
+    
+    # Wait for restart
+    sleep 5
+    
+    print_success "Certificate setup completed successfully"
+}
+
 # Main setup function
 main() {
     echo "This script will help you set up Documenso for self-hosting."
@@ -472,8 +778,13 @@ main() {
     check_dependencies
     setup_certificate
     create_env_file
-    download_compose_file
+    generate_compose_file
     start_and_migrate
+    
+    # Setup container certificates if needed
+    if [[ "${CERT_METHOD:-host}" == "container" ]]; then
+        setup_container_certificates
+    fi
     
     echo ""
     print_success "🎉 Documenso is now fully set up and running!"

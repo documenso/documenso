@@ -145,14 +145,26 @@ chmod +x setup-selfhost.sh
 
 This script will guide you through:
 
-- Certificate setup (existing file or generating a new one)
+- **Certificate setup options:**
+  - Use existing .p12 certificate file (host-based)
+  - Create certificate inside Docker container (recommended - avoids permission issues)
+  - Generate self-signed certificate (host-based)
 - Environment variable configuration
-- Docker Compose file download
-- Proper file permissions
+- Docker Compose file generation with proper volume configuration
+- Proper file permissions and ownership
+
+**Container-based certificates** are recommended as they:
+
+- Avoid file permission issues between host and container
+- Use Docker volumes for persistence
+- Create certificates with compatible formats (PBE-SHA1-3DES)
+- Simplify deployment and maintenance
 
 #### Option B: Manual Certificate Setup
 
-If you prefer to set up manually, follow these steps:
+If you prefer to set up manually, you can choose between host-based or container-based certificates:
+
+**Host-based Certificate Setup (Traditional):**
 
 1. **Place your certificate file** in a accessible location on your host system
 2. **Set proper permissions:**
@@ -176,6 +188,62 @@ If you prefer to set up manually, follow these steps:
    ```bash
    NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
    NEXT_PRIVATE_SIGNING_PASSPHRASE=your_passphrase_if_any
+   ```
+
+**Container-based Certificate Setup (Recommended):**
+
+1. **Use Docker volumes** in your `compose.yml` file:
+
+   ```yaml
+   services:
+     documenso:
+       # ... other configuration
+       volumes:
+         - documenso_certs:/app/certs
+
+   volumes:
+     documenso_certs:
+   ```
+
+2. **Create certificate inside container** after starting services:
+
+   ```bash
+   # Start the services first
+   docker-compose up -d
+
+   # Create certificate inside container
+   docker-compose exec --user root documenso sh -c "
+     mkdir -p /app/certs
+     cd /app/certs
+
+     # Generate private key
+     openssl genrsa -out private.key 2048
+
+     # Generate certificate (adjust subject as needed)
+     openssl req -new -x509 -key private.key -out certificate.crt -days 365
+
+     # Create PKCS12 with compatible format
+     openssl pkcs12 -export -out cert.p12 \
+       -inkey private.key \
+       -in certificate.crt \
+       -name 'documenso' \
+       -keypbe PBE-SHA1-3DES \
+       -certpbe PBE-SHA1-3DES \
+       -macalg sha1
+
+     # Set proper ownership
+     chown 1001:1001 cert.p12
+     chmod 644 cert.p12
+   "
+
+   # Restart to load certificate
+   docker-compose restart documenso
+   ```
+
+3. **Add certificate configuration** to your `.env` file:
+   ```bash
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/app/certs/cert.p12
+   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_passphrase
    ```
 
 <Callout type="info">
