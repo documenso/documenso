@@ -24,8 +24,8 @@ export const AutocompleteInput = ({
   placeholder,
   disabled,
   loading,
-  onChange,
-  onSelect,
+  onSearchQueryChange,
+  onSuggestionSelect,
   suggestions = [],
 }: AutocompleteInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,39 +36,38 @@ export const AutocompleteInput = ({
 
   const showSuggestions = isOpen && value.length > minTypedQueryLength && !loading;
   const hasResults = suggestions.length > 0;
-  const showNoResults = isOpen && !loading && !hasResults && value.length > minTypedQueryLength;
+  const showNoResults = isOpen && !loading && !hasResults;
 
-  const handleFocus = useCallback(() => {
+  const handleFocus = () => {
     if (value.length > minTypedQueryLength) {
       setIsOpen(true);
     }
-  }, [value.length, minTypedQueryLength]);
+  };
 
-  const handleChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      onChange?.(event);
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    onSearchQueryChange?.(event);
 
-      const newValue = event.target.value;
-      if (newValue.length > minTypedQueryLength) {
-        setIsOpen(true);
-        setSelectedIndex(-1);
-      } else {
-        setIsOpen(false);
-        setSelectedIndex(-1);
-      }
-    },
-    [onChange, minTypedQueryLength],
-  );
+    const newValue = event.target.value;
 
-  const handleSelectItem = useCallback(
-    (suggestion: Pick<Recipient, 'email' | 'name'>) => {
+    if (newValue.length > minTypedQueryLength) {
+      setIsOpen(true);
+      setSelectedIndex(-1);
+    } else {
       setIsOpen(false);
       setSelectedIndex(-1);
-      onSelect?.(suggestion);
-      inputRef.current?.focus();
-    },
-    [onSelect],
-  );
+    }
+  };
+
+  const handleSelectItem = (suggestion: Pick<Recipient, 'email' | 'name'>) => {
+    setIsOpen(false);
+    setSelectedIndex(-1);
+
+    onSuggestionSelect?.(suggestion);
+
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -100,7 +99,7 @@ export const AutocompleteInput = ({
   );
 
   return (
-    <Popover open={showSuggestions || showNoResults} onOpenChange={setIsOpen}>
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverAnchor asChild>
         <Input
           ref={inputRef}
