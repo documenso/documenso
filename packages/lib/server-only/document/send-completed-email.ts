@@ -59,7 +59,7 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { user: owner } = document;

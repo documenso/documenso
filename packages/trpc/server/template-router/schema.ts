@@ -65,7 +65,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().nullish(),
+  emailReplyTo: z.string().email().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),

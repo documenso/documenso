@@ -59,7 +59,7 @@ type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
    * Force meta options as a typesafe way to ensure developers don't forget to
    * pass it in if it is available.
    */
-  meta: EmailMetaOption | null;
+  meta: EmailMetaOption | null | undefined;
 };
 
 type GetEmailContextOptions = InternalGetEmailContextOptions | RecipientGetEmailContextOptions;
@@ -104,7 +104,7 @@ export const getEmailContext = async (
   }
 
   const replyToEmail = meta?.emailReplyTo || emailContext.settings.emailReplyTo || undefined;
-  const senderEmailId = meta?.emailId || emailContext.settings.emailId;
+  const senderEmailId = meta?.emailId === null ? null : emailContext.settings.emailId;
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
 
