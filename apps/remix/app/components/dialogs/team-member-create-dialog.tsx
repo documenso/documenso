@@ -4,7 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
+import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -39,6 +41,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -140,8 +143,28 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
         {match(step)
           .with('SELECT', () => (
             <DialogHeader>
-              <DialogTitle>
+              <DialogTitle className="flex flex-row items-center">
                 <Trans>Add members</Trans>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <InfoIcon className="mx-2 h-4 w-4" />
+                  </TooltipTrigger>
+                  <TooltipContent className="text-muted-foreground z-[99999] max-w-xs">
+                    <Trans>
+                      To be able to add members to a team, you must first add them to the
+                      organisation. For more information, please see the{' '}
+                      <Link
+                        to="https://docs.documenso.com/users/organisations/members"
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-documenso-700 hover:text-documenso-600 hover:underline"
+                      >
+                        documentation
+                      </Link>
+                      .
+                    </Trans>
+                  </TooltipContent>
+                </Tooltip>
               </DialogTitle>
 
               <DialogDescription>
