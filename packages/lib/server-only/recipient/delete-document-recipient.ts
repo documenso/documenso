@@ -130,7 +130,7 @@ export const deleteDocumentRecipient = async ({
         type: 'team',
         teamId: document.teamId,
       },
-      meta: document.documentMeta || null,
+      meta: document.documentMeta,
     });
 
     const [html, text] = await Promise.all([

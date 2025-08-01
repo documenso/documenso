@@ -62,7 +62,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
       emailId: z.string().nullish(),
-      emailReplyTo: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),
