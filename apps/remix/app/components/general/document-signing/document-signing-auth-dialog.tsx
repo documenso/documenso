@@ -43,6 +43,7 @@ export const DocumentSigningAuthDialog = ({
   title,
   description,
   availableAuthTypes,
+  actionTarget,
   open,
   onOpenChange,
   onReauthFormSubmit,
@@ -107,15 +108,32 @@ export const DocumentSigningAuthDialog = ({
                 >
                   <ChevronLeftIcon className="h-4 w-4" />
                 </Button>
-                <span>{title || <Trans>Sign field</Trans>}</span>
+                <span>
+                  {title ||
+                    (actionTarget === 'DOCUMENT' ? (
+                      <Trans>Sign document</Trans>
+                    ) : (
+                      <Trans>Sign field</Trans>
+                    ))}
+                </span>
               </div>
             )}
             {(!selectedAuthType || validAuthTypes.length === 1) &&
-              (title || <Trans>Sign field</Trans>)}
+              (title ||
+                (actionTarget === 'DOCUMENT' ? (
+                  <Trans>Sign document</Trans>
+                ) : (
+                  <Trans>Sign field</Trans>
+                )))}
           </DialogTitle>
 
           <DialogDescription>
-            {description || <Trans>Reauthentication is required to sign this field</Trans>}
+            {description || (
+              <Trans>
+                Reauthentication is required to sign this{' '}
+                {actionTarget === 'DOCUMENT' ? 'document' : 'field'}
+              </Trans>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -180,6 +198,7 @@ export const DocumentSigningAuthDialog = ({
             ))
             .with({ documentAuthType: DocumentAuth.TWO_FACTOR_AUTH }, () => (
               <DocumentSigningAuth2FA
+                actionTarget={actionTarget === 'DOCUMENT' ? 'DOCUMENT' : 'FIELD'}
                 open={open}
                 onOpenChange={onOpenChange}
                 onReauthFormSubmit={onReauthFormSubmit}
