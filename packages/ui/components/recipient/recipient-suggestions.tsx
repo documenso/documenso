@@ -13,8 +13,8 @@ export type AutocompleteInputProps = {
   placeholder?: string;
   disabled?: boolean;
   loading?: boolean;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSelect?: (suggestion: Pick<Recipient, 'email' | 'name'>) => void;
+  onSearchQueryChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSuggestionSelect?: (suggestion: Pick<Recipient, 'email' | 'name'>) => void;
   suggestions?: Pick<Recipient, 'email' | 'name'>[];
 };
 

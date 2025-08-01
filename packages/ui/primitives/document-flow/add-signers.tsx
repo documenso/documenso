@@ -608,10 +608,10 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         suggestions={recipientSuggestions?.results}
-                                        onSelect={(suggestion) =>
+                                        onSuggestionSelect={(suggestion) =>
                                           handleSuggestionSelect(index, suggestion)
                                         }
-                                        onChange={(e) => {
+                                        onSearchQueryChange={(e) => {
                                           field.onChange(e);
                                           setRecipientSearchQuery(e.target.value);
                                         }}
