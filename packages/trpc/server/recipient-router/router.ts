@@ -585,7 +585,7 @@ export const recipientRouter = router({
       });
 
       return {
-        suggestions,
+        results: suggestions,
       };
     }),
 });

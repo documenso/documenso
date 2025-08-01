@@ -240,7 +240,7 @@ export const ZGetRecipientSuggestionsRequestSchema = z.object({
 });
 
 export const ZGetRecipientSuggestionsResponseSchema = z.object({
-  suggestions: z.array(
+  results: z.array(
     z.object({
       name: z.string(),
       email: z.string().email(),

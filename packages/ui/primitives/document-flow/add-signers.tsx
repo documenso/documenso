@@ -14,11 +14,13 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -28,6 +30,7 @@ import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
 } from '../../components/document/document-read-only-fields';
+import { AutocompleteInput } from '../../components/recipient/recipient-suggestions';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -71,6 +74,8 @@ export const AddSignersFormPartial = ({
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { user } = useSession();
+  const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+  const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
 
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
@@ -78,6 +83,15 @@ export const AddSignersFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const organisation = useCurrentOrganisation();
+
+  const { data: recipientSuggestions, isLoading } = trpc.recipient.getRecipientSuggestions.useQuery(
+    {
+      query: debouncedRecipientSearchQuery,
+    },
+    {
+      enabled: debouncedRecipientSearchQuery.length > 1,
+    },
+  );
 
   const defaultRecipients = [
     {
@@ -241,6 +255,11 @@ export const AddSignersFormPartial = ({
     if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
       onAddSigner();
     }
+  };
+
+  const handleSuggestionSelect = (index: number, suggestion: Pick<Recipient, 'email' | 'name'>) => {
+    setValue(`signers.${index}.email`, suggestion.email);
+    setValue(`signers.${index}.name`, suggestion.name || '');
   };
 
   const onDragEnd = useCallback(
@@ -579,7 +598,7 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <AutocompleteInput
                                         type="email"
                                         placeholder={_(msg`Email`)}
                                         {...field}
@@ -588,7 +607,15 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
-                                        onKeyDown={onKeyDown}
+                                        suggestions={recipientSuggestions?.results}
+                                        onSelect={(suggestion) =>
+                                          handleSuggestionSelect(index, suggestion)
+                                        }
+                                        onChange={(e) => {
+                                          field.onChange(e);
+                                          setRecipientSearchQuery(e.target.value);
+                                        }}
+                                        loading={isLoading}
                                       />
                                     </FormControl>
 
