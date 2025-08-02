@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-07-18 02:41\n"
+"PO-Revision-Date: 2025-08-01 10:05\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -3979,7 +3979,7 @@ msgstr "Ostatnia aktywność"
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 msgid "Last modified"
-msgstr "Ostatnia modyfikacja"
+msgstr "Zmodyfikowano"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Last updated"
@@ -3995,7 +3995,7 @@ msgstr "Ostatnia aktualizacja o"
 
 #: apps/remix/app/components/tables/settings-security-passkey-table.tsx
 msgid "Last used"
-msgstr "Ostatnie użycie"
+msgstr "Użyto"
 
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Leaderboard"
@@ -6158,7 +6158,7 @@ msgstr "Statystyki"
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 msgid "Status"
-msgstr "Stan"
+msgstr "Status"
 
 #: packages/ui/primitives/document-flow/document-flow-root.tsx
 msgid "Step <0>{step} of {maxStep}</0>"
@@ -7501,7 +7501,7 @@ msgstr "Prześlij swoje logo (maks. 5 MB, JPG, PNG lub WebP)"
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 msgid "Uploaded by"
-msgstr "Przesłane przez"
+msgstr "Przesłano przez"
 
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Uploaded file is too large"
