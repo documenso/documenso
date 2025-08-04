@@ -136,7 +136,7 @@ export default function DocumentPage() {
                   position="bottom"
                 >
                   <span>
-                    <Trans>{recipients.length} Recipient(s)</Trans>
+                    <Plural one="1 Recipient" other="# Recipients" value={recipients.length} />
                   </span>
                 </StackAvatarsWithTooltip>
               </div>
