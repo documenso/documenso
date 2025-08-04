@@ -1,0 +1,61 @@
+import { Trans } from '@lingui/react/macro';
+
+import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
+
+import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
+
+import type { Route } from './+types/organisation-insights.$id';
+
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const { id } = params;
+  const url = new URL(request.url);
+
+  const page = Number(url.searchParams.get('page')) || 1;
+  const perPage = Number(url.searchParams.get('perPage')) || 10;
+  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as
+    | 'last30days'
+    | 'last90days'
+    | 'lastYear'
+    | 'allTime';
+  const view = (url.searchParams.get('view') || 'teams') as 'teams' | 'users' | 'documents';
+
+  const insights = await getOrganisationDetailedInsights({
+    organisationId: id,
+    page,
+    perPage,
+    dateRange,
+    view,
+  });
+
+  return {
+    organisationId: id,
+    insights,
+    page,
+    perPage,
+    dateRange,
+    view,
+  };
+}
+
+export default function OrganisationInsights({ loaderData }: Route.ComponentProps) {
+  const { organisationId, insights, page, perPage, dateRange, view } = loaderData;
+
+  return (
+    <div>
+      <div className="flex items-center justify-between">
+        <h2 className="text-4xl font-semibold">
+          <Trans>Organisation Insights</Trans>
+        </h2>
+      </div>
+      <div className="mt-8">
+        <OrganisationInsightsTable
+          insights={insights}
+          page={page}
+          perPage={perPage}
+          dateRange={dateRange}
+          view={view}
+        />
+      </div>
+    </div>
+  );
+}
