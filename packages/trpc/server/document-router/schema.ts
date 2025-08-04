@@ -295,7 +295,7 @@ export const ZDistributeDocumentRequestSchema = z.object({
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
       emailId: z.string().nullish(),
-      emailReplyTo: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),

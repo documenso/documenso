@@ -46,7 +46,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { status, user } = document;

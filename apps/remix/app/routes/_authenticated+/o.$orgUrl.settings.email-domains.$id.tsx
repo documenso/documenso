@@ -171,7 +171,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
         <OrganisationEmailDomainRecordsDialog
           records={records}
           trigger={
-            <Button variant="secondary">
+            <Button variant="outline">
               <Trans>View DNS Records</Trans>
             </Button>
           }
