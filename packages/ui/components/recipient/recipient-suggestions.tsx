@@ -128,24 +128,25 @@ export const AutocompleteInput = ({
                   Loading suggestions...
                 </div>
               )}
-              {hasResults &&
-                suggestions.map((suggestion, index) => (
-                  <CommandItem
-                    key={suggestion.email}
-                    id={`suggestion-${index}`}
-                    onSelect={() => handleSelectItem(suggestion)}
-                    className={cn('cursor-pointer', index === selectedIndex && 'bg-accent')}
-                    role="option"
-                    aria-selected={index === selectedIndex}
-                  >
-                    {suggestion.name} ({suggestion.email})
-                  </CommandItem>
-                ))}
-              {!loading && showNoResults && (
+              {hasResults && !loading
+                ? suggestions.map((suggestion, index) => (
+                    <CommandItem
+                      key={suggestion.email}
+                      id={`suggestion-${index}`}
+                      onSelect={() => handleSelectItem(suggestion)}
+                      className={cn('cursor-pointer', index === selectedIndex && 'bg-accent')}
+                      role="option"
+                      aria-selected={index === selectedIndex}
+                    >
+                      {suggestion.name} ({suggestion.email})
+                    </CommandItem>
+                  ))
+                : null}
+              {showNoResults ? (
                 <div className="text-muted-foreground px-2 py-1.5 text-sm">
                   No suggestions found
                 </div>
-              )}
+              ) : null}
             </CommandGroup>
           </CommandList>
         </Command>

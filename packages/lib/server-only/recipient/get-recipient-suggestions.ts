@@ -16,9 +16,8 @@ export const getRecipientSuggestions = async ({
   query = '',
 }: GetRecipientSuggestionsOptions) => {
   const trimmedQuery = query.trim();
-  const limit = 5;
 
-  const recipientFilter: Prisma.RecipientWhereInput = trimmedQuery
+  const nameEmailFilter = trimmedQuery
     ? {
         OR: [
           {
@@ -42,7 +41,7 @@ export const getRecipientSuggestions = async ({
       document: {
         team: buildTeamWhereQuery({ teamId, userId }),
       },
-      ...recipientFilter,
+      ...nameEmailFilter,
     },
     select: {
       name: true,
@@ -59,8 +58,51 @@ export const getRecipientSuggestions = async ({
         createdAt: 'desc',
       },
     },
-    take: limit,
+    take: 5,
   });
+
+  if (teamId) {
+    const teamMembers = await prisma.organisationMember.findMany({
+      where: {
+        user: {
+          ...nameEmailFilter,
+          NOT: { id: userId },
+        },
+        organisationGroupMembers: {
+          some: {
+            group: {
+              teamGroups: {
+                some: { teamId },
+              },
+            },
+          },
+        },
+      },
+      include: {
+        user: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
+      },
+      take: 1,
+    });
+
+    const recipientEmails = new Set(recipients.map((r) => r.email));
+    const uniqueTeamMember = teamMembers
+      .filter((member) => !recipientEmails.has(member.user.email))
+      .map((member) => ({
+        email: member.user.email,
+        name: member.user.name,
+      }))[0];
+
+    if (uniqueTeamMember) {
+      const mixedSuggestions = [...recipients.slice(0, 4), uniqueTeamMember];
+
+      return mixedSuggestions;
+    }
+  }
 
   return recipients;
 };
