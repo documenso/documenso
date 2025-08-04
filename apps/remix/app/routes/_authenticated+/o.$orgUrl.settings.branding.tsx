@@ -87,9 +87,9 @@ export default function OrganisationSettingsBrandingPage() {
   const settingsHeaderText = t`Branding Preferences`;
 
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general branding preferences`
+    ? t`Here you can set your general branding preferences.`
     : team
-      ? t`Here you can set branding preferences for your team`
+      ? t`Here you can set branding preferences for your team.`
       : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (
