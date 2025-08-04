@@ -293,7 +293,7 @@ export const DocumentPreferencesForm = ({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormLabel className="flex flex-row items-center">
-                  <Trans>Default Signature Settings</Trans>
+                  <Trans>Default Allowed Signature Types</Trans>
                   <DocumentSignatureSettingsTooltip />
                 </FormLabel>
 
