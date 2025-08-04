@@ -27,10 +27,7 @@ export function DataTablePagination<TData>({
         {match(additionalInformation)
           .with('SelectedCount', () => (
             <span>
-              <Trans>
-                {table.getFilteredSelectedRowModel().rows.length} of{' '}
-                {table.getFilteredRowModel().rows.length} row(s) selected.
-              </Trans>
+              <Plural one="{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row selected." other="{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} rows selected." value={table.getFilteredRowModel().rows.length} />
             </span>
           ))
           .with('VisibleCount', () => {
