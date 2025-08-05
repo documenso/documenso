@@ -24,6 +24,7 @@ import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import type { Suggestion } from '@documenso/ui/components/recipient/recipient-suggestions';
 import { cn } from '@documenso/ui/lib/utils';
 
 import {
@@ -84,14 +85,17 @@ export const AddSignersFormPartial = ({
 
   const organisation = useCurrentOrganisation();
 
-  const { data: recipientSuggestions, isLoading } = trpc.recipient.getRecipientSuggestions.useQuery(
-    {
-      query: debouncedRecipientSearchQuery,
-    },
-    {
-      enabled: debouncedRecipientSearchQuery.length > 1,
-    },
-  );
+  const { data: recipientSuggestionsData, isLoading } =
+    trpc.recipient.getRecipientSuggestions.useQuery(
+      {
+        query: debouncedRecipientSearchQuery,
+      },
+      {
+        enabled: debouncedRecipientSearchQuery.length > 1,
+      },
+    );
+
+  const recipientSuggestions = recipientSuggestionsData?.results || [];
 
   const defaultRecipients = [
     {
@@ -251,7 +255,7 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const handleSuggestionSelect = (index: number, suggestion: Pick<Recipient, 'email' | 'name'>) => {
+  const handleSuggestionSelect = (index: number, suggestion: Suggestion) => {
     setValue(`signers.${index}.email`, suggestion.email);
     setValue(`signers.${index}.name`, suggestion.name || '');
   };
@@ -601,7 +605,7 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
-                                        suggestions={recipientSuggestions?.results}
+                                        suggestions={recipientSuggestions}
                                         onSuggestionSelect={(suggestion) =>
                                           handleSuggestionSelect(index, suggestion)
                                         }
@@ -647,7 +651,7 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
-                                        suggestions={recipientSuggestions?.results}
+                                        suggestions={recipientSuggestions}
                                         onSuggestionSelect={(suggestion) =>
                                           handleSuggestionSelect(index, suggestion)
                                         }

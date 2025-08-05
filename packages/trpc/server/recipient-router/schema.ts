@@ -236,13 +236,13 @@ export type TRejectDocumentWithTokenMutationSchema = z.infer<
 >;
 
 export const ZGetRecipientSuggestionsRequestSchema = z.object({
-  query: z.string().optional(),
+  query: z.string().default(''),
 });
 
 export const ZGetRecipientSuggestionsResponseSchema = z.object({
   results: z.array(
     z.object({
-      name: z.string(),
+      name: z.string().nullable(),
       email: z.string().email(),
     }),
   ),

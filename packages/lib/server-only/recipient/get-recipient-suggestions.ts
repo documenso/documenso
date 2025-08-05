@@ -7,13 +7,13 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 export type GetRecipientSuggestionsOptions = {
   userId: number;
   teamId?: number;
-  query?: string;
+  query: string;
 };
 
 export const getRecipientSuggestions = async ({
   userId,
   teamId,
-  query = '',
+  query,
 }: GetRecipientSuggestionsOptions) => {
   const trimmedQuery = query.trim();
 

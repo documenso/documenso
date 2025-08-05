@@ -1,11 +1,15 @@
 import { useCallback, useRef, useState } from 'react';
 
-import type { Recipient } from '@documenso/prisma/client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Input } from '@documenso/ui/primitives/input';
 import { Popover, PopoverAnchor, PopoverContent } from '@documenso/ui/primitives/popover';
 
 import { Command, CommandGroup, CommandItem, CommandList } from '../../primitives/command';
+
+export type Suggestion = {
+  email: string;
+  name: string | null;
+};
 
 export type AutocompleteInputProps = {
   type: 'email' | 'text';
@@ -14,8 +18,8 @@ export type AutocompleteInputProps = {
   disabled?: boolean;
   loading?: boolean;
   onSearchQueryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSuggestionSelect: (suggestion: Pick<Recipient, 'email' | 'name'>) => void;
-  suggestions: Pick<Recipient, 'email' | 'name'>[];
+  onSuggestionSelect: (suggestion: Suggestion) => void;
+  suggestions: Suggestion[];
 };
 
 export const AutocompleteInput = ({
@@ -58,7 +62,7 @@ export const AutocompleteInput = ({
     }
   };
 
-  const handleSelectItem = (suggestion: Pick<Recipient, 'email' | 'name'>) => {
+  const handleSelectItem = (suggestion: Suggestion) => {
     setIsOpen(false);
     setSelectedIndex(-1);
 
