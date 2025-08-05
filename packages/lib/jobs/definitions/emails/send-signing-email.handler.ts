@@ -86,7 +86,7 @@ export const run = async ({
         type: 'team',
         teamId: document.teamId,
       },
-      meta: document.documentMeta || null,
+      meta: document.documentMeta,
     });
 
   const customEmail = document?.documentMeta;

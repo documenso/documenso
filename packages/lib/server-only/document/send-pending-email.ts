@@ -51,7 +51,7 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
