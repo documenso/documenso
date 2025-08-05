@@ -6,6 +6,8 @@ import { PenIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
+import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
 export type TemplatePageViewRecipientsProps = {
@@ -53,8 +55,18 @@ export const TemplatePageViewRecipients = ({
         {recipients.map((recipient) => (
           <li key={recipient.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
             <AvatarWithText
-              avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-              primaryText={<p className="text-muted-foreground text-sm">{recipient.email}</p>}
+              avatarFallback={
+                isTemplateRecipientEmailPlaceholder(recipient.email)
+                  ? extractInitials(recipient.name)
+                  : recipient.email.slice(0, 1).toUpperCase()
+              }
+              primaryText={
+                isTemplateRecipientEmailPlaceholder(recipient.email) ? (
+                  <p className="text-muted-foreground text-sm">{recipient.name}</p>
+                ) : (
+                  <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                )
+              }
               secondaryText={
                 <p className="text-muted-foreground/70 text-xs">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
