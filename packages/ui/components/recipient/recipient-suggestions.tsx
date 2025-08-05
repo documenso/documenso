@@ -26,7 +26,7 @@ export const AutocompleteInput = ({
   loading,
   onSearchQueryChange,
   onSuggestionSelect,
-  suggestions,
+  suggestions = [],
 }: AutocompleteInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);

@@ -251,12 +251,6 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
-      onAddSigner();
-    }
-  };
-
   const handleSuggestionSelect = (index: number, suggestion: Pick<Recipient, 'email' | 'name'>) => {
     setValue(`signers.${index}.email`, suggestion.email);
     setValue(`signers.${index}.name`, suggestion.name || '');
@@ -644,7 +638,8 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <AutocompleteInput
+                                        type="text"
                                         placeholder={_(msg`Name`)}
                                         {...field}
                                         disabled={
@@ -652,7 +647,15 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
-                                        onKeyDown={onKeyDown}
+                                        suggestions={recipientSuggestions?.results}
+                                        onSuggestionSelect={(suggestion) =>
+                                          handleSuggestionSelect(index, suggestion)
+                                        }
+                                        onSearchQueryChange={(e) => {
+                                          field.onChange(e);
+                                          setRecipientSearchQuery(e.target.value);
+                                        }}
+                                        loading={isLoading}
                                       />
                                     </FormControl>
 
