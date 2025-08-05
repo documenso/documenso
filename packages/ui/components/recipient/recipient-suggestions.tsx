@@ -13,9 +13,9 @@ export type AutocompleteInputProps = {
   placeholder?: string;
   disabled?: boolean;
   loading?: boolean;
-  onSearchQueryChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onSuggestionSelect?: (suggestion: Pick<Recipient, 'email' | 'name'>) => void;
-  suggestions?: Pick<Recipient, 'email' | 'name'>[];
+  onSearchQueryChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onSuggestionSelect: (suggestion: Pick<Recipient, 'email' | 'name'>) => void;
+  suggestions: Pick<Recipient, 'email' | 'name'>[];
 };
 
 export const AutocompleteInput = ({
@@ -26,7 +26,7 @@ export const AutocompleteInput = ({
   loading,
   onSearchQueryChange,
   onSuggestionSelect,
-  suggestions = [],
+  suggestions,
 }: AutocompleteInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
@@ -45,7 +45,7 @@ export const AutocompleteInput = ({
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    onSearchQueryChange?.(event);
+    onSearchQueryChange(event);
 
     const newValue = event.target.value;
 
@@ -62,7 +62,7 @@ export const AutocompleteInput = ({
     setIsOpen(false);
     setSelectedIndex(-1);
 
-    onSuggestionSelect?.(suggestion);
+    onSuggestionSelect(suggestion);
 
     if (inputRef.current) {
       inputRef.current.focus();
