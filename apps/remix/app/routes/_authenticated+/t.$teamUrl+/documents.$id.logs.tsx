@@ -170,7 +170,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
             <ul className="text-muted-foreground list-inside list-disc">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>
-                  <span className="-ml-2">{formatRecipientText(recipient)}</span>
+                  <span>{formatRecipientText(recipient)}</span>
                 </li>
               ))}
             </ul>
