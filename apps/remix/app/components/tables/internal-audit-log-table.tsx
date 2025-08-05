@@ -1,12 +1,17 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { DateTime } from 'luxon';
 import type { DateTimeFormatOptions } from 'luxon';
+import { DateTime } from 'luxon';
+import { P, match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
 
 import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
-import type { TDocumentAuditLog } from '@documenso/lib/types/document-audit-logs';
+import {
+  DOCUMENT_AUDIT_LOG_TYPE,
+  type TDocumentAuditLog,
+} from '@documenso/lib/types/document-audit-logs';
 import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
+import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
 export type AuditLogDataTableProps = {
@@ -19,6 +24,24 @@ const dateFormat: DateTimeFormatOptions = {
 };
 
 /**
+ * Get the color indicator for the audit log type
+ */
+
+const getAuditLogIndicatorColor = (type: string) =>
+  match(type)
+    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED, () => 'bg-green-500')
+    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => 'bg-red-500')
+    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT, () => 'bg-orange-500')
+    .with(
+      P.union(
+        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+        DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+      ),
+      () => 'bg-blue-500',
+    )
+    .otherwise(() => 'bg-muted');
+
+/**
  * DO NOT USE TRANS. YOU MUST USE _ FOR THIS FILE AND ALL CHILDREN COMPONENTS.
  */
 export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
@@ -27,88 +50,81 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
   const parser = new UAParser();
 
   return (
-    <div className="audit-log-container space-y-4">
+    <div className="space-y-4">
       {logs.map((log, index) => {
         parser.setUA(log.userAgent || '');
-        const browserInfo = parser.getResult();
         const formattedAction = formatDocumentAuditLogAction(_, log);
+        const userAgentInfo = parser.getResult();
 
         return (
           <Card
             key={index}
             // Add top margin for the first card to ensure it's not cut off from the 2nd page onwards
-            className={`audit-log-card border shadow-sm ${index > 0 ? 'print:mt-8' : ''}`}
+            className={`border shadow-sm ${index > 0 ? 'print:mt-8' : ''}`}
             style={{
               pageBreakInside: 'avoid',
               breakInside: 'avoid',
             }}
           >
             <CardContent className="p-4">
-              <div className="audit-log-grid grid grid-cols-12 gap-4">
-                <div className="audit-log-section col-span-4 space-y-3">
+              {/* Header Section with indicator, event type, and timestamp */}
+              <div className="mb-3 flex items-start justify-between">
+                <div className="flex items-baseline gap-3">
+                  <div
+                    className={cn(`h-2 w-2 rounded-full`, getAuditLogIndicatorColor(log.type))}
+                  />
+
                   <div>
-                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
-                      {_(msg`Event Type`)}
-                    </div>
-                    <div className="text-background audit-log-value mt-1 text-sm font-medium">
+                    <div className="text-muted-foreground text-sm font-medium uppercase tracking-wide print:text-[8pt]">
                       {log.type.replace(/_/g, ' ')}
                     </div>
-                  </div>
-                  <div>
-                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
-                      {_(msg`Timestamp`)}
-                    </div>
-                    <div className="text-background audit-log-value mt-1 text-sm">
-                      {DateTime.fromJSDate(log.createdAt)
-                        .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                        .toLocaleString(dateFormat)}
-                    </div>
-                  </div>
-                  <div>
-                    <div className="text-background audit-log-label text-xs font-medium uppercase tracking-wide">
-                      {_(msg`IP Address`)}
-                    </div>
-                    <div className="text-background audit-log-value mt-1 font-mono text-sm">
-                      {log.ipAddress || 'N/A'}
+
+                    <div className="text-foreground text-sm font-medium print:text-[8pt]">
+                      {formattedAction.description}
                     </div>
                   </div>
                 </div>
 
-                <div className="audit-log-section col-span-4">
-                  <div className="text-background audit-log-label mb-2 text-xs font-medium uppercase tracking-wide">
-                    {_(msg`Action`)}
-                  </div>
-                  <div className="text-background audit-log-value break-words text-sm leading-relaxed">
-                    {formattedAction.description}
-                  </div>
+                <div className="text-muted-foreground text-sm print:text-[8pt]">
+                  {DateTime.fromJSDate(log.createdAt)
+                    .setLocale(APP_I18N_OPTIONS.defaultLocale)
+                    .toLocaleString(dateFormat)}
                 </div>
+              </div>
 
-                <div className="audit-log-section col-span-4">
-                  <div className="text-background audit-log-label mb-2 text-xs font-medium uppercase tracking-wide">
+              {/* Main Action Line */}
+              <div className="mb-4"></div>
+
+              <hr className="my-4" />
+
+              {/* Details Section - Two column layout */}
+              <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs print:text-[6pt]">
+                <div>
+                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
                     {_(msg`User`)}
                   </div>
-                  {log.name || log.email ? (
-                    <div className="space-y-1">
-                      {log.name && (
-                        <div
-                          className="text-background audit-log-value break-words text-sm font-medium"
-                          title={log.name}
-                        >
-                          {log.name}
-                        </div>
-                      )}
-                      {log.email && (
-                        <div
-                          className="text-muted-foreground audit-log-value break-words text-sm"
-                          title={log.email}
-                        >
-                          {log.email}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="text-muted-foreground audit-log-value text-sm">N/A</div>
-                  )}
+
+                  <div className="text-foreground mt-1 font-mono">{log.email || 'N/A'}</div>
+                </div>
+
+                <div className="text-right">
+                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
+                    {_(msg`IP Address`)}
+                  </div>
+
+                  <div className="text-foreground mt-1 font-mono">{log.ipAddress || 'N/A'}</div>
+                </div>
+
+                <div className="col-span-2">
+                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
+                    {_(msg`User Agent`)}
+                  </div>
+
+                  <div className="text-foreground mt-1">
+                    {log.userAgent
+                      ? `${userAgentInfo.browser.name} ${userAgentInfo.browser.version} on ${userAgentInfo.os.name}`
+                      : 'N/A'}
+                  </div>
                 </div>
               </div>
             </CardContent>

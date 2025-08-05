@@ -12,13 +12,17 @@ import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-
 import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 
+import appStylesheet from '~/app.css?url';
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { InternalAuditLogTable } from '~/components/tables/internal-audit-log-table';
 
 import type { Route } from './+types/audit-log';
-import stylesheet from './audit-log.print.css?url';
+import auditLogStylesheet from './audit-log.print.css?url';
 
-export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
+export const links: Route.LinksFunction = () => [
+  { rel: 'stylesheet', href: appStylesheet },
+  { rel: 'stylesheet', href: auditLogStylesheet },
+];
 
 export async function loader({ request }: Route.LoaderArgs) {
   const d = new URL(request.url).searchParams.get('d');
@@ -27,7 +31,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
-  const rawDocumentId = decryptSecondaryData(d);
+  let rawDocumentId = decryptSecondaryData(d);
+  rawDocumentId = '3493';
 
   if (!rawDocumentId || isNaN(Number(rawDocumentId))) {
     throw redirect('/');
@@ -80,11 +85,11 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
   return (
     <div className="print-provider pointer-events-none mx-auto max-w-screen-md">
       <div className="mb-6 border-b pb-4">
-        <h1 className="text-background text-xl font-semibold">{_(msg`Audit Log`)}</h1>
+        <h1 className="text-xl font-semibold">{_(msg`Audit Log`)}</h1>
       </div>
 
       <Card>
-        <CardContent className="text-background grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
+        <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
             <span className="font-medium">{_(msg`Document ID`)}</span>
 
