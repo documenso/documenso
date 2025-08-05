@@ -24,7 +24,7 @@ export default function TeamsSettingBillingPage() {
   const organisation = useCurrentOrganisation();
 
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
-    trpc.billing.subscription.get.useQuery({
+    trpc.enterprise.billing.subscription.get.useQuery({
       organisationId: organisation.id,
     });
 

@@ -368,7 +368,7 @@ export const documentRouter = router({
         title,
         documentDataId,
         normalizePdf: true,
-        timezone,
+        userTimezone: timezone,
         requestMetadata: ctx.metadata,
         folderId,
       });
@@ -478,6 +478,8 @@ export const documentRouter = router({
           distributionMethod: meta.distributionMethod,
           emailSettings: meta.emailSettings,
           language: meta.language,
+          emailId: meta.emailId,
+          emailReplyTo: meta.emailReplyTo,
           requestMetadata: ctx.metadata,
         });
       }

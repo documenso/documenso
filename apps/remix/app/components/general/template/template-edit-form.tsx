@@ -143,6 +143,7 @@ export const TemplateEditForm = ({
         },
         meta: {
           ...data.meta,
+          emailReplyTo: data.meta.emailReplyTo || null,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),

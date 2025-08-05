@@ -294,6 +294,8 @@ export const ZDistributeDocumentRequestSchema = z.object({
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
+      emailId: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),

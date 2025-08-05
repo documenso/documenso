@@ -6,6 +6,8 @@ import {
   CreditCardIcon,
   Globe2Icon,
   Lock,
+  MailIcon,
+  PaletteIcon,
   Settings2Icon,
   User,
   Users,
@@ -48,16 +50,42 @@ export const SettingsMobileNav = ({ className, ...props }: SettingsMobileNavProp
 
       {isPersonalLayoutMode && (
         <>
-          <Link to="/settings/preferences">
+          <Link to="/settings/document">
             <Button
               variant="ghost"
               className={cn(
                 'w-full justify-start',
-                pathname?.startsWith('/settings/preferences') && 'bg-secondary',
+                pathname?.startsWith('/settings/document') && 'bg-secondary',
               )}
             >
               <Settings2Icon className="mr-2 h-5 w-5" />
-              <Trans>Preferences</Trans>
+              <Trans>Document Preferences</Trans>
+            </Button>
+          </Link>
+
+          <Link to="/settings/branding">
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-start',
+                pathname?.startsWith('/settings/branding') && 'bg-secondary',
+              )}
+            >
+              <PaletteIcon className="mr-2 h-5 w-5" />
+              <Trans>Branding Preferences</Trans>
+            </Button>
+          </Link>
+
+          <Link to="/settings/email">
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-start',
+                pathname?.startsWith('/settings/email') && 'bg-secondary',
+              )}
+            >
+              <MailIcon className="mr-2 h-5 w-5" />
+              <Trans>Email Preferences</Trans>
             </Button>
           </Link>
 
