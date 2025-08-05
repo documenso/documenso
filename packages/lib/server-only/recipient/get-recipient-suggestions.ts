@@ -86,21 +86,22 @@ export const getRecipientSuggestions = async ({
           },
         },
       },
-      take: 1,
+      take: 5,
     });
 
-    const recipientEmails = new Set(recipients.map((r) => r.email));
-    const uniqueTeamMember = teamMembers
-      .filter((member) => !recipientEmails.has(member.user.email))
-      .map((member) => ({
-        email: member.user.email,
-        name: member.user.name,
-      }))[0];
+    const uniqueTeamMember = teamMembers.find(
+      (member) => !recipients.some((r) => r.email === member.user.email),
+    );
 
     if (uniqueTeamMember) {
-      const mixedSuggestions = [...recipients.slice(0, 4), uniqueTeamMember];
+      const teamMemberSuggestion = {
+        email: uniqueTeamMember.user.email,
+        name: uniqueTeamMember.user.name,
+      };
 
-      return mixedSuggestions;
+      const allSuggestions = [...recipients.slice(0, 4), teamMemberSuggestion];
+
+      return allSuggestions;
     }
   }
 
