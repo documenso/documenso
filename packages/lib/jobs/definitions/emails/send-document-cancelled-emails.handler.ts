@@ -48,7 +48,7 @@ export const run = async ({
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { documentMeta, user: documentOwner } = document;

@@ -289,7 +289,7 @@ export const DocumentEditForm = ({
           message,
           distributionMethod,
           emailId,
-          emailReplyTo,
+          emailReplyTo: emailReplyTo || null,
           emailSettings: emailSettings,
         },
       });
