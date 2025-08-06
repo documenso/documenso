@@ -86,7 +86,7 @@ export const AddSignersFormPartial = ({
   const organisation = useCurrentOrganisation();
 
   const { data: recipientSuggestionsData, isLoading } =
-    trpc.recipient.getRecipientSuggestions.useQuery(
+    trpc.recipient.recipientSuggestions.find.useQuery(
       {
         query: debouncedRecipientSearchQuery,
       },

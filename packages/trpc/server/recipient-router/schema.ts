@@ -234,24 +234,3 @@ export const ZRejectDocumentWithTokenMutationSchema = z.object({
 export type TRejectDocumentWithTokenMutationSchema = z.infer<
   typeof ZRejectDocumentWithTokenMutationSchema
 >;
-
-export const ZGetRecipientSuggestionsRequestSchema = z.object({
-  query: z.string().default(''),
-});
-
-export const ZGetRecipientSuggestionsResponseSchema = z.object({
-  results: z.array(
-    z.object({
-      name: z.string().nullable(),
-      email: z.string().email(),
-    }),
-  ),
-});
-
-export type TGetRecipientSuggestionsRequestSchema = z.infer<
-  typeof ZGetRecipientSuggestionsRequestSchema
->;
-
-export type TGetRecipientSuggestionsResponseSchema = z.infer<
-  typeof ZGetRecipientSuggestionsResponseSchema
->;

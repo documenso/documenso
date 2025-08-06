@@ -1,8 +1,7 @@
 import { Prisma } from '@prisma/client';
 
+import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
-
-import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type GetRecipientSuggestionsOptions = {
   userId: number;

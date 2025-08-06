@@ -5,7 +5,6 @@ import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/c
 import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
 import { deleteTemplateRecipient } from '@documenso/lib/server-only/recipient/delete-template-recipient';
 import { getRecipientById } from '@documenso/lib/server-only/recipient/get-recipient-by-id';
-import { getRecipientSuggestions } from '@documenso/lib/server-only/recipient/get-recipient-suggestions';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
@@ -13,6 +12,7 @@ import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/u
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
   ZCreateDocumentRecipientRequestSchema,
@@ -27,8 +27,6 @@ import {
   ZDeleteTemplateRecipientRequestSchema,
   ZGetRecipientRequestSchema,
   ZGetRecipientResponseSchema,
-  ZGetRecipientSuggestionsRequestSchema,
-  ZGetRecipientSuggestionsResponseSchema,
   ZRejectDocumentWithTokenMutationSchema,
   ZSetDocumentRecipientsRequestSchema,
   ZSetDocumentRecipientsResponseSchema,
@@ -45,6 +43,10 @@ import {
 } from './schema';
 
 export const recipientRouter = router({
+  recipientSuggestions: {
+    find: findRecipientSuggestionsRoute,
+  },
+
   /**
    * @public
    */
@@ -561,31 +563,5 @@ export const recipientRouter = router({
         reason,
         requestMetadata: ctx.metadata.requestMetadata,
       });
-    }),
-  /**
-   * @private
-   */
-  getRecipientSuggestions: authenticatedProcedure
-    .input(ZGetRecipientSuggestionsRequestSchema)
-    .output(ZGetRecipientSuggestionsResponseSchema)
-    .query(async ({ input, ctx }) => {
-      const { teamId, user } = ctx;
-      const { query } = input;
-
-      ctx.logger.info({
-        input: {
-          query,
-        },
-      });
-
-      const suggestions = await getRecipientSuggestions({
-        userId: user.id,
-        teamId,
-        query,
-      });
-
-      return {
-        results: suggestions,
-      };
     }),
 });
