@@ -22,6 +22,8 @@ export type AutocompleteInputProps = {
   suggestions: Suggestion[];
 };
 
+const minTypedQueryLength = 1;
+
 export const AutocompleteInput = ({
   type,
   value,
@@ -33,20 +35,13 @@ export const AutocompleteInput = ({
   suggestions = [],
 }: AutocompleteInputProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedIndex, setSelectedIndex] = useState(-1);
-  const minTypedQueryLength = 1;
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const showSuggestions = isOpen && value.length > minTypedQueryLength && !loading;
   const hasResults = suggestions.length > 0;
   const showNoResults = isOpen && !loading && !hasResults;
-
-  const handleFocus = () => {
-    if (value.length > minTypedQueryLength) {
-      setIsOpen(true);
-    }
-  };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onSearchQueryChange(event);
@@ -55,16 +50,16 @@ export const AutocompleteInput = ({
 
     if (newValue.length > minTypedQueryLength) {
       setIsOpen(true);
-      setSelectedIndex(-1);
+      setSelectedSuggestionIndex(-1);
     } else {
       setIsOpen(false);
-      setSelectedIndex(-1);
+      setSelectedSuggestionIndex(-1);
     }
   };
 
   const handleSelectItem = (suggestion: Suggestion) => {
     setIsOpen(false);
-    setSelectedIndex(-1);
+    setSelectedSuggestionIndex(-1);
 
     onSuggestionSelect(suggestion);
 
@@ -79,27 +74,28 @@ export const AutocompleteInput = ({
 
       if (event.key === 'Escape') {
         setIsOpen(false);
-        setSelectedIndex(-1);
+        setSelectedSuggestionIndex(-1);
       }
 
       if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        setSelectedIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
+        setSelectedSuggestionIndex((prev) => (prev < suggestions.length - 1 ? prev + 1 : 0));
       }
 
       if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
+        setSelectedSuggestionIndex((prev) => (prev > 0 ? prev - 1 : suggestions.length - 1));
       }
 
       if (event.key === 'Enter') {
-        if (selectedIndex >= 0 && suggestions[selectedIndex]) {
-          event.preventDefault();
-          handleSelectItem(suggestions[selectedIndex]);
+        if (selectedSuggestionIndex >= 0 && suggestions[selectedSuggestionIndex]) {
+          handleSelectItem(suggestions[selectedSuggestionIndex]);
+        }
+
+        if (suggestions.length === 1) {
+          handleSelectItem(suggestions[0]);
         }
       }
     },
-    [showSuggestions, hasResults, suggestions, selectedIndex, handleSelectItem],
+    [showSuggestions, hasResults, suggestions, selectedSuggestionIndex, handleSelectItem],
   );
 
   return (
@@ -114,7 +110,6 @@ export const AutocompleteInput = ({
           disabled={disabled}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
-          onFocus={handleFocus}
         />
       </PopoverAnchor>
 
@@ -138,9 +133,12 @@ export const AutocompleteInput = ({
                       key={suggestion.email}
                       id={`suggestion-${index}`}
                       onSelect={() => handleSelectItem(suggestion)}
-                      className={cn('cursor-pointer', index === selectedIndex && 'bg-accent')}
+                      className={cn(
+                        'cursor-pointer',
+                        index === selectedSuggestionIndex && 'bg-accent',
+                      )}
                       role="option"
-                      aria-selected={index === selectedIndex}
+                      aria-selected={index === selectedSuggestionIndex}
                     >
                       {suggestion.name} ({suggestion.email})
                     </CommandItem>
