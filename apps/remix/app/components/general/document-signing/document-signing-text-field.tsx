@@ -227,19 +227,8 @@ export const DocumentSigningTextField = ({
 
   const parsedField = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : undefined;
 
-  const labelDisplay =
-    parsedField?.label && parsedField.label.length < 20
-      ? parsedField.label
-      : parsedField?.label
-        ? parsedField?.label.substring(0, 20) + '...'
-        : undefined;
-
-  const textDisplay =
-    parsedField?.text && parsedField.text.length < 20
-      ? parsedField.text
-      : parsedField?.text
-        ? parsedField?.text.substring(0, 20) + '...'
-        : undefined;
+  const labelDisplay = parsedField?.label;
+  const textDisplay = parsedField?.text;
 
   const fieldDisplayName = labelDisplay ? labelDisplay : textDisplay;
   const charactersRemaining = (parsedFieldMeta?.characterLimit ?? 0) - (localText.length ?? 0);
