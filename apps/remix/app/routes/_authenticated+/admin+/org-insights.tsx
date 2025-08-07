@@ -1,13 +1,14 @@
 import { Trans } from '@lingui/react/macro';
 
-import { getSigningVolume } from '@documenso/lib/server-only/admin/get-signing-volume';
+import { getOrganisationInsights } from '@documenso/lib/server-only/admin/get-signing-volume';
 
+import { DateRangeFilter } from '~/components/filters/date-range-filter';
 import {
-  AdminLeaderboardTable,
-  type SigningVolume,
-} from '~/components/tables/admin-leaderboard-table';
+  AdminOrganisationOverviewTable,
+  type OrganisationOverview,
+} from '~/components/tables/admin-organisation-overview-table';
 
-import type { Route } from './+types/leaderboard';
+import type { Route } from './+types/org-insights';
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);
@@ -27,44 +28,58 @@ export async function loader({ request }: Route.LoaderArgs) {
   const page = Number(url.searchParams.get('page')) || 1;
   const perPage = Number(url.searchParams.get('perPage')) || 10;
   const search = url.searchParams.get('search') || '';
+  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as
+    | 'last30days'
+    | 'last90days'
+    | 'lastYear'
+    | 'allTime';
 
-  const { leaderboard, totalPages } = await getSigningVolume({
+  const { organisations, totalPages } = await getOrganisationInsights({
     search,
     page,
     perPage,
     sortBy,
     sortOrder,
+    dateRange,
   });
 
-  const typedSigningVolume: SigningVolume[] = leaderboard.map((item) => ({
-    ...item,
+  const typedOrganisations: OrganisationOverview[] = organisations.map((item) => ({
+    id: String(item.id),
     name: item.name || '',
+    signingVolume: item.signingVolume,
     createdAt: item.createdAt || new Date(),
+    planId: item.customerId || '',
+    subscriptionStatus: item.subscriptionStatus,
+    teamCount: item.teamCount || 0,
+    memberCount: item.memberCount || 0,
   }));
 
   return {
-    signingVolume: typedSigningVolume,
+    organisations: typedOrganisations,
     totalPages,
     page,
     perPage,
     sortBy,
     sortOrder,
+    dateRange,
   };
 }
 
-export default function Leaderboard({ loaderData }: Route.ComponentProps) {
-  const { signingVolume, totalPages, page, perPage, sortBy, sortOrder } = loaderData;
+export default function Organisations({ loaderData }: Route.ComponentProps) {
+  const { organisations, totalPages, page, perPage, sortBy, sortOrder, dateRange } = loaderData;
 
   return (
     <div>
-      <div className="flex items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-4xl font-semibold">
-          <Trans>Signing Volume</Trans>
+          <Trans>Organisation Insights</Trans>
         </h2>
+        <DateRangeFilter currentRange={dateRange} />
       </div>
+
       <div className="mt-8">
-        <AdminLeaderboardTable
-          signingVolume={signingVolume}
+        <AdminOrganisationOverviewTable
+          organisations={organisations}
           totalPages={totalPages}
           page={page}
           perPage={perPage}
