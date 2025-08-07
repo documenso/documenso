@@ -95,7 +95,7 @@ export const setDocumentRecipients = async ({
       type: 'team',
       teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const recipientsHaveActionAuth = recipients.some(

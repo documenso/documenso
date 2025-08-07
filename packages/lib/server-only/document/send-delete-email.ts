@@ -49,7 +49,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { email, name } = document.user;

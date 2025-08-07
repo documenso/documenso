@@ -77,7 +77,7 @@ export const manageSubscriptionRoute = authenticatedProcedure
     // If the customer ID is still missing create a new customer.
     if (!customerId) {
       const customer = await createCustomer({
-        name: organisation.name,
+        name: organisation.owner.name || organisation.owner.email,
         email: organisation.owner.email,
       });
 
