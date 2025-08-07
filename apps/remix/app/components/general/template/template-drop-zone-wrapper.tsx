@@ -55,11 +55,7 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
         duration: 5000,
       });
 
-      await navigate(
-        folderId
-          ? `${formatTemplatesPath(team.url)}/f/${folderId}/${id}/edit`
-          : `${formatTemplatesPath(team.url)}/${id}/edit`,
-      );
+      await navigate(`${formatTemplatesPath(team.url)}/${id}/edit`);
     } catch {
       toast({
         title: _(msg`Something went wrong`),
