@@ -1,3 +1,4 @@
+import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
@@ -23,11 +24,7 @@ export const acceptOrganisationInvitation = async ({
     include: {
       organisation: {
         include: {
-          groups: {
-            include: {
-              teamGroups: true,
-            },
-          },
+          groups: true,
         },
       },
     },
@@ -45,6 +42,9 @@ export const acceptOrganisationInvitation = async ({
     where: {
       email: organisationMemberInvite.email,
     },
+    select: {
+      id: true,
+    },
   });
 
   if (!user) {
@@ -55,10 +55,49 @@ export const acceptOrganisationInvitation = async ({
 
   const { organisation } = organisationMemberInvite;
 
-  const organisationGroupToUse = organisation.groups.find(
+  const isUserPartOfOrganisation = await prisma.organisationMember.findFirst({
+    where: {
+      userId: user.id,
+      organisationId: organisation.id,
+    },
+  });
+
+  if (isUserPartOfOrganisation) {
+    return;
+  }
+
+  await addUserToOrganisation({
+    userId: user.id,
+    organisationId: organisation.id,
+    organisationGroups: organisation.groups,
+    organisationMemberRole: organisationMemberInvite.organisationRole,
+  });
+
+  await prisma.organisationMemberInvite.update({
+    where: {
+      id: organisationMemberInvite.id,
+    },
+    data: {
+      status: OrganisationMemberInviteStatus.ACCEPTED,
+    },
+  });
+};
+
+export const addUserToOrganisation = async ({
+  userId,
+  organisationId,
+  organisationGroups,
+  organisationMemberRole,
+}: {
+  userId: number;
+  organisationId: string;
+  organisationGroups: OrganisationGroup[];
+  organisationMemberRole: OrganisationMemberRole;
+}) => {
+  const organisationGroupToUse = organisationGroups.find(
     (group) =>
       group.type === OrganisationGroupType.INTERNAL_ORGANISATION &&
-      group.organisationRole === organisationMemberInvite.organisationRole,
+      group.organisationRole === organisationMemberRole,
   );
 
   if (!organisationGroupToUse) {
@@ -72,8 +111,8 @@ export const acceptOrganisationInvitation = async ({
       await tx.organisationMember.create({
         data: {
           id: generateDatabaseId('member'),
-          userId: user.id,
-          organisationId: organisation.id,
+          userId,
+          organisationId,
           organisationGroupMembers: {
             create: {
               id: generateDatabaseId('group_member'),
@@ -83,20 +122,11 @@ export const acceptOrganisationInvitation = async ({
         },
       });
 
-      await tx.organisationMemberInvite.update({
-        where: {
-          id: organisationMemberInvite.id,
-        },
-        data: {
-          status: OrganisationMemberInviteStatus.ACCEPTED,
-        },
-      });
-
       await jobs.triggerJob({
         name: 'send.organisation-member-joined.email',
         payload: {
-          organisationId: organisation.id,
-          memberUserId: user.id,
+          organisationId,
+          memberUserId: userId,
         },
       });
     },
