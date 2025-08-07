@@ -6,6 +6,7 @@ import {
   GroupIcon,
   MailboxIcon,
   Settings2Icon,
+  ShieldCheckIcon,
   Users2Icon,
 } from 'lucide-react';
 import { FaUsers } from 'react-icons/fa6';
@@ -76,6 +77,11 @@ export default function SettingsLayout() {
       path: `/o/${organisation.url}/settings/groups`,
       label: t`Groups`,
       icon: GroupIcon,
+    },
+    {
+      path: `/o/${organisation.url}/settings/sso`,
+      label: t`SSO`,
+      icon: ShieldCheckIcon,
     },
     {
       path: `/o/${organisation.url}/settings/billing`,

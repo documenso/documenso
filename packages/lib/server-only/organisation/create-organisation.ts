@@ -46,6 +46,16 @@ export const createOrganisation = async ({
       },
     });
 
+    const organisationAuthenticationPortal = await tx.organisationAuthenticationPortal.create({
+      data: {
+        id: generateDatabaseId('org_sso'),
+        enabled: false,
+        clientId: '',
+        clientSecret: '',
+        wellKnownUrl: '',
+      },
+    });
+
     const orgIdAndUrl = prefixedId('org');
 
     const organisation = await tx.organisation
@@ -58,6 +68,7 @@ export const createOrganisation = async ({
           ownerUserId: userId,
           organisationGlobalSettingsId: organisationSetting.id,
           organisationClaimId: organisationClaim.id,
+          organisationAuthenticationPortalId: organisationAuthenticationPortal.id,
           groups: {
             create: ORGANISATION_INTERNAL_GROUPS.map((group) => ({
               ...group,
