@@ -17,6 +17,7 @@ import { domainRegex } from '@documenso/trpc/server/enterprise-router/create-org
 import type { TGetOrganisationAuthenticationPortalResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-authentication-portal.types';
 import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from '@documenso/trpc/server/enterprise-router/update-organisation-authentication-portal.types';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -409,6 +410,15 @@ const SSOProviderForm = ({ authenticationPortal }: SSOProviderFormProps) => {
               </FormItem>
             )}
           />
+
+          <Alert variant="warning">
+            <AlertDescription>
+              <Trans>
+                Please note that anyone who signs in through your portal will be added to your
+                organisation as a member.
+              </Trans>
+            </AlertDescription>
+          </Alert>
 
           <div className="flex justify-end gap-2">
             <Button loading={form.formState.isSubmitting} type="submit">

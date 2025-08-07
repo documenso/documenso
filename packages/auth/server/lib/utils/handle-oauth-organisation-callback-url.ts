@@ -28,7 +28,10 @@ export const handleOAuthOrganisationCallbackUrl = async (
 
   const { email, name, sub, accessToken, accessTokenExpiresAt, idToken } = await validateOauth({
     c,
-    clientOptions,
+    clientOptions: {
+      ...clientOptions,
+      bypassEmailVerification: true, // Bypass for organisation OIDC because we manually verify the email.
+    },
   });
 
   const allowedDomains = organisation.organisationAuthenticationPortal.allowedDomains;
