@@ -9,7 +9,7 @@ import { signPdf } from '@documenso/signing';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
-import { getAuditLogPdf } from '../../../server-only/htmltopdf/get-audit-log';
+import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
@@ -155,7 +155,7 @@ export const run = async ({
     : null;
 
   const auditLogData = settings.includeAuditLog
-    ? await getAuditLogPdf({
+    ? await getAuditLogsPdf({
         documentId,
         language: document.documentMeta?.language,
       }).catch((e) => {

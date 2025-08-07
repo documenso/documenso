@@ -44,6 +44,26 @@ const getAuditLogIndicatorColor = (type: string) =>
 /**
  * DO NOT USE TRANS. YOU MUST USE _ FOR THIS FILE AND ALL CHILDREN COMPONENTS.
  */
+
+const formatUserAgent = (userAgent: string | null | undefined, userAgentInfo: UAParser.IResult) => {
+  if (!userAgent) {
+    return msg`N/A`;
+  }
+
+  const browser = userAgentInfo.browser.name;
+  const version = userAgentInfo.browser.version;
+  const os = userAgentInfo.os.name;
+
+  // If we can parse meaningful browser info, format it nicely
+  if (browser && os) {
+    const browserInfo = version ? `${browser} ${version}` : browser;
+
+    return msg`${browserInfo} on ${os}`;
+  }
+
+  return msg`${userAgent}`;
+};
+
 export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
   const { _ } = useLingui();
 
@@ -92,9 +112,6 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
                 </div>
               </div>
 
-              {/* Main Action Line */}
-              <div className="mb-4"></div>
-
               <hr className="my-4" />
 
               {/* Details Section - Two column layout */}
@@ -121,9 +138,7 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
                   </div>
 
                   <div className="text-foreground mt-1">
-                    {log.userAgent
-                      ? `${userAgentInfo.browser.name} ${userAgentInfo.browser.version} on ${userAgentInfo.os.name}`
-                      : 'N/A'}
+                    {_(formatUserAgent(log.userAgent, userAgentInfo))}
                   </div>
                 </div>
               </div>

@@ -17,7 +17,7 @@ import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
-import { getAuditLogPdf } from '../htmltopdf/get-audit-log';
+import { getAuditLogsPdf } from '../htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../pdf/flatten-annotations';
@@ -127,7 +127,7 @@ export const sealDocument = async ({
     : null;
 
   const auditLogData = settings.includeAuditLog
-    ? await getAuditLogPdf({
+    ? await getAuditLogsPdf({
         documentId,
         language: document.documentMeta?.language,
       }).catch((e) => {
