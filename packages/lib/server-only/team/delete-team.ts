@@ -7,7 +7,6 @@ import { uniqueBy } from 'remeda';
 import { mailer } from '@documenso/email/mailer';
 import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
@@ -130,28 +129,24 @@ export const sendTeamDeleteEmail = async ({
     teamUrl: team.url,
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'organisation',
       organisationId,
     },
   });
 
-  const lang = settings.documentLanguage;
-
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang, branding }),
-    renderEmailWithI18N(template, { lang, branding, plainText: true }),
+    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+    renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
   ]);
 
-  const i18n = await getI18nInstance(lang);
+  const i18n = await getI18nInstance(emailLanguage);
 
   await mailer.sendMail({
     to: email,
-    from: {
-      name: FROM_NAME,
-      address: FROM_ADDRESS,
-    },
+    from: senderEmail,
     subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),
     html,
     text,

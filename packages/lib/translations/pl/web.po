@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-07-14 18:04\n"
+"PO-Revision-Date: 2025-07-18 02:41\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -3832,7 +3832,7 @@ msgstr "Statystyki instancji"
 
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 msgid "Invalid code. Please try again."
-msgstr "Nieprawidłowy kod. Proszę spróbuj ponownie."
+msgstr "Kod jest nieprawidłowy. Spróbuj ponownie."
 
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
@@ -4947,7 +4947,7 @@ msgstr "Proszę sprawdzić plik CSV i upewnić się, że jest zgodny z naszym fo
 
 #: apps/remix/app/components/embed/embed-document-waiting-for-turn.tsx
 msgid "Please check with the parent application for more information."
-msgstr "Sprawdź, proszę, aplikację nadrzędną po więcej informacji."
+msgstr "Sprawdź aplikację nadrzędną, aby uzyskać więcej informacji."
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Please check your email for updates."
@@ -4955,7 +4955,7 @@ msgstr "Proszę sprawdzić swój email w celu aktualizacji."
 
 #: apps/remix/app/routes/_unauthenticated+/reset-password.$token.tsx
 msgid "Please choose your new password"
-msgstr "Proszę wybrać nowe hasło"
+msgstr "Wybierz nowe hasło"
 
 #: apps/remix/app/routes/embed+/v1+/authoring+/template.edit.$id.tsx
 #: apps/remix/app/routes/embed+/v1+/authoring+/document.edit.$id.tsx
@@ -5065,7 +5065,7 @@ msgstr "Wpisz <0>{0}</0>, aby potwierdzić."
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
-msgstr "Proszę przesłać logo"
+msgstr "Prześlij logo"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Pre-formatted CSV template with example data."

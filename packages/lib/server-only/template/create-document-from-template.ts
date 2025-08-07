@@ -1,6 +1,5 @@
-import type { DocumentDistributionMethod } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import {
-  DocumentSigningOrder,
   DocumentSource,
   type Field,
   type Recipient,
@@ -40,6 +39,7 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
   createDocumentAuthOptions,
@@ -378,7 +378,7 @@ export const createDocumentFromTemplate = async ({
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
-          create: {
+          create: extractDerivedDocumentMeta(settings, {
             subject: override?.subject || template.templateMeta?.subject,
             message: override?.message || template.templateMeta?.message,
             timezone: override?.timezone || template.templateMeta?.timezone,
@@ -387,13 +387,8 @@ export const createDocumentFromTemplate = async ({
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
             distributionMethod:
               override?.distributionMethod || template.templateMeta?.distributionMethod,
-            // last `undefined` is due to JsonValue's
-            emailSettings:
-              override?.emailSettings || template.templateMeta?.emailSettings || undefined,
-            signingOrder:
-              override?.signingOrder ||
-              template.templateMeta?.signingOrder ||
-              DocumentSigningOrder.PARALLEL,
+            emailSettings: override?.emailSettings || template.templateMeta?.emailSettings,
+            signingOrder: override?.signingOrder || template.templateMeta?.signingOrder,
             language:
               override?.language || template.templateMeta?.language || settings.documentLanguage,
             typedSignatureEnabled:
@@ -403,10 +398,8 @@ export const createDocumentFromTemplate = async ({
             drawSignatureEnabled:
               override?.drawSignatureEnabled ?? template.templateMeta?.drawSignatureEnabled,
             allowDictateNextSigner:
-              override?.allowDictateNextSigner ??
-              template.templateMeta?.allowDictateNextSigner ??
-              false,
-          },
+              override?.allowDictateNextSigner ?? template.templateMeta?.allowDictateNextSigner,
+          }),
         },
         recipients: {
           createMany: {
