@@ -1,5 +1,7 @@
 import { type TransportTargetOptions, pino } from 'pino';
 
+import type { BaseApiLog } from '../types/api-logs';
+import { extractRequestMetadata } from '../universal/extract-request-metadata';
 import { env } from './env';
 
 const transports: TransportTargetOptions[] = [];
@@ -33,3 +35,31 @@ export const logger = pino({
         }
       : undefined,
 });
+
+export const logDocumentAccess = ({
+  request,
+  documentId,
+  userId,
+}: {
+  request: Request;
+  documentId: number;
+  userId: number;
+}) => {
+  const metadata = extractRequestMetadata(request);
+
+  const data: BaseApiLog = {
+    ipAddress: metadata.ipAddress,
+    userAgent: metadata.userAgent,
+    path: new URL(request.url).pathname,
+    auth: 'session',
+    source: 'app',
+    userId,
+  };
+
+  logger.info({
+    ...data,
+    input: {
+      documentId,
+    },
+  });
+};

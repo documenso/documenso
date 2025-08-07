@@ -9,6 +9,7 @@ import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
@@ -77,6 +78,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (isDocumentCompleted(document.status)) {
     throw redirect(`${documentRootPath}/${documentId}`);
   }
+
+  logDocumentAccess({
+    request,
+    documentId,
+    userId: user.id,
+  });
 
   return superLoaderJson({
     document: {

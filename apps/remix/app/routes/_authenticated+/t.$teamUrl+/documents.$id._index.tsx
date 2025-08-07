@@ -10,6 +10,7 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
@@ -82,6 +83,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   if (!document || !document.documentData || !canAccessDocument) {
     throw redirect(documentRootPath);
   }
+
+  logDocumentAccess({
+    request,
+    documentId,
+    userId: user.id,
+  });
 
   return superLoaderJson({
     document,
