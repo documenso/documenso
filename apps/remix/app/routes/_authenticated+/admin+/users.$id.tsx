@@ -24,6 +24,7 @@ import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminOrganisationCreateDialog } from '~/components/dialogs/admin-organisation-create-dialog';
+import { AdminUserTwoFactorDialog } from '~/components/dialogs/admin-reset-2fa';
 import { AdminUserDeleteDialog } from '~/components/dialogs/admin-user-delete-dialog';
 import { AdminUserDisableDialog } from '~/components/dialogs/admin-user-disable-dialog';
 import { AdminUserEnableDialog } from '~/components/dialogs/admin-user-enable-dialog';
@@ -219,10 +220,11 @@ const AdminUserPage = ({ user }: { user: User }) => {
         />
       </div>
 
-      <div className="mt-16 flex flex-col items-center gap-4">
-        {user && <AdminUserDeleteDialog user={user} />}
+      <div className="mt-16 flex flex-col gap-4">
+        {user && user.twoFactorEnabled && <AdminUserTwoFactorDialog user={user} />}
         {user && user.disabled && <AdminUserEnableDialog userToEnable={user} />}
         {user && !user.disabled && <AdminUserDisableDialog userToDisable={user} />}
+        {user && <AdminUserDeleteDialog user={user} />}
       </div>
     </div>
   );
