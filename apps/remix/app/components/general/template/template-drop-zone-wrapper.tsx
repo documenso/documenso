@@ -15,7 +15,7 @@ import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export interface TemplateDropZoneWrapperProps {
   children: ReactNode;
@@ -27,7 +27,7 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
   const { toast } = useToast();
   const { folderId } = useParams();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const navigate = useNavigate();
 
@@ -39,11 +39,11 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
     try {
       setIsLoading(true);
 
-      const response = await putPdfFile(file);
+      const documentData = await putPdfFile(file);
 
       const { id } = await createTemplate({
         title: file.name,
-        templateDocumentDataId: response.id,
+        templateDocumentDataId: documentData.id,
         folderId: folderId ?? undefined,
       });
 
@@ -57,8 +57,8 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
 
       await navigate(
         folderId
-          ? `${formatTemplatesPath(team?.url)}/f/${folderId}/${id}/edit`
-          : `${formatTemplatesPath(team?.url)}/${id}/edit`,
+          ? `${formatTemplatesPath(team.url)}/f/${folderId}/${id}/edit`
+          : `${formatTemplatesPath(team.url)}/${id}/edit`,
       );
     } catch {
       toast({
