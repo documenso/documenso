@@ -49,15 +49,24 @@ type DocumentSignatureTypeData = {
 
 export const DOCUMENT_SIGNATURE_TYPES = {
   [DocumentSignatureType.DRAW]: {
-    label: msg`Draw`,
+    label: msg({
+      message: `Draw`,
+      context: `Draw signatute type`,
+    }),
     value: DocumentSignatureType.DRAW,
   },
   [DocumentSignatureType.TYPE]: {
-    label: msg`Type`,
+    label: msg({
+      message: `Type`,
+      context: `Type signatute type`,
+    }),
     value: DocumentSignatureType.TYPE,
   },
   [DocumentSignatureType.UPLOAD]: {
-    label: msg`Upload`,
+    label: msg({
+      message: `Upload`,
+      context: `Upload signatute type`,
+    }),
     value: DocumentSignatureType.UPLOAD,
   },
 } satisfies Record<DocumentSignatureType, DocumentSignatureTypeData>;

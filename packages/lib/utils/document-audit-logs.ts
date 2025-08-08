@@ -329,11 +329,17 @@ export const formatDocumentAuditLogAction = (
       identified: msg`${prefix} updated a recipient`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED }, () => ({
-      anonymous: msg`Document created`,
+      anonymous: msg({
+        message: `Document created`,
+        context: `Audit log format`,
+      }),
       identified: msg`${prefix} created the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED }, () => ({
-      anonymous: msg`Document deleted`,
+      anonymous: msg({
+        message: `Document deleted`,
+        context: `Audit log format`,
+      }),
       identified: msg`${prefix} deleted the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
@@ -381,7 +387,10 @@ export const formatDocumentAuditLogAction = (
       identified: msg`${prefix} updated the document external ID`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT }, () => ({
-      anonymous: msg`Document sent`,
+      anonymous: msg({
+        message: `Document sent`,
+        context: `Audit log format`,
+      }),
       identified: msg`${prefix} sent the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM }, () => ({
@@ -420,8 +429,14 @@ export const formatDocumentAuditLogAction = (
         : msg`${prefix} sent an email to ${data.recipientEmail}`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED }, () => ({
-      anonymous: msg`Document completed`,
-      identified: msg`Document completed`,
+      anonymous: msg({
+        message: `Document completed`,
+        context: `Audit log format`,
+      }),
+      identified: msg({
+        message: `Document completed`,
+        context: `Audit log format`,
+      }),
     }))
     .exhaustive();
 

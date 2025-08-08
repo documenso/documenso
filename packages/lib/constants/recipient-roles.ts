@@ -4,39 +4,114 @@ import { RecipientRole } from '@prisma/client';
 
 export const RECIPIENT_ROLES_DESCRIPTION = {
   [RecipientRole.APPROVER]: {
-    actionVerb: msg`Approve`,
-    actioned: msg`Approved`,
-    progressiveVerb: msg`Approving`,
-    roleName: msg`Approver`,
-    roleNamePlural: msg`Approvers`,
+    actionVerb: msg({
+      message: `Approve`,
+      context: `Recipient role action verb`,
+    }),
+    actioned: msg({
+      message: `Approved`,
+      context: `Recipient role actioned`,
+    }),
+    progressiveVerb: msg({
+      message: `Approving`,
+      context: `Recipient role progressive verb`,
+    }),
+    roleName: msg({
+      message: `Approver`,
+      context: `Recipient role name`,
+    }),
+    roleNamePlural: msg({
+      message: `Approvers`,
+      context: `Recipient role plural name`,
+    }),
   },
   [RecipientRole.CC]: {
-    actionVerb: msg`CC`,
-    actioned: msg`CC'd`,
-    progressiveVerb: msg`CC`,
-    roleName: msg`Cc`,
-    roleNamePlural: msg`Ccers`,
+    actionVerb: msg({
+      message: `CC`,
+      context: `Recipient role action verb`,
+    }),
+    actioned: msg({
+      message: `CC'd`,
+      context: `Recipient role actioned`,
+    }),
+    progressiveVerb: msg({
+      message: `CC`,
+      context: `Recipient role progressive verb`,
+    }),
+    roleName: msg({
+      message: `Cc`,
+      context: `Recipient role name`,
+    }),
+    roleNamePlural: msg({
+      message: `Ccers`,
+      context: `Recipient role plural name`,
+    }),
   },
   [RecipientRole.SIGNER]: {
-    actionVerb: msg`Sign`,
-    actioned: msg`Signed`,
-    progressiveVerb: msg`Signing`,
-    roleName: msg`Signer`,
-    roleNamePlural: msg`Signers`,
+    actionVerb: msg({
+      message: `Sign`,
+      context: `Recipient role action verb`,
+    }),
+    actioned: msg({
+      message: `Signed`,
+      context: `Recipient role actioned`,
+    }),
+    progressiveVerb: msg({
+      message: `Signing`,
+      context: `Recipient role progressive verb`,
+    }),
+    roleName: msg({
+      message: `Signer`,
+      context: `Recipient role name`,
+    }),
+    roleNamePlural: msg({
+      message: `Signers`,
+      context: `Recipient role plural name`,
+    }),
   },
   [RecipientRole.VIEWER]: {
-    actionVerb: msg`View`,
-    actioned: msg`Viewed`,
-    progressiveVerb: msg`Viewing`,
-    roleName: msg`Viewer`,
-    roleNamePlural: msg`Viewers`,
+    actionVerb: msg({
+      message: `View`,
+      context: `Recipient role action verb`,
+    }),
+    actioned: msg({
+      message: `Viewed`,
+      context: `Recipient role actioned`,
+    }),
+    progressiveVerb: msg({
+      message: `Viewing`,
+      context: `Recipient role progressive verb`,
+    }),
+    roleName: msg({
+      message: `Viewer`,
+      context: `Recipient role name`,
+    }),
+    roleNamePlural: msg({
+      message: `Viewers`,
+      context: `Recipient role plural name`,
+    }),
   },
   [RecipientRole.ASSISTANT]: {
-    actionVerb: msg`Assist`,
-    actioned: msg`Assisted`,
-    progressiveVerb: msg`Assisting`,
-    roleName: msg`Assistant`,
-    roleNamePlural: msg`Assistants`,
+    actionVerb: msg({
+      message: `Assist`,
+      context: `Recipient role action verb`,
+    }),
+    actioned: msg({
+      message: `Assisted`,
+      context: `Recipient role actioned`,
+    }),
+    progressiveVerb: msg({
+      message: `Assisting`,
+      context: `Recipient role progressive verb`,
+    }),
+    roleName: msg({
+      message: `Assistant`,
+      context: `Recipient role name`,
+    }),
+    roleNamePlural: msg({
+      message: `Assistants`,
+      context: `Recipient role plural name`,
+    }),
   },
 } satisfies Record<keyof typeof RecipientRole, unknown>;
 
