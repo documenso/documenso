@@ -48,6 +48,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       user,
       hidePoweredBy: false,
       allowWhitelabelling: false,
+      isEnterprise: false,
     });
   }
 
@@ -55,17 +56,19 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const allowWhitelabelling = organisationClaim.flags.embedSigningWhiteLabel;
   const hidePoweredBy = organisationClaim.flags.hidePoweredBy;
+  const isEnterprise = Boolean(organisationClaim.flags.cfr21);
 
   return superLoaderJson({
     envelopes,
     user,
     hidePoweredBy,
     allowWhitelabelling,
+    isEnterprise,
   });
 }
 
 export default function MultisignPage() {
-  const { envelopes, user, hidePoweredBy, allowWhitelabelling } =
+  const { envelopes, user, hidePoweredBy, allowWhitelabelling, isEnterprise } =
     useSuperLoaderData<typeof loader>();
   const revalidator = useRevalidator();
 
@@ -264,6 +267,7 @@ export default function MultisignPage() {
             documentAuthOptions={selectedDocument.authOptions}
             recipient={selectedRecipient}
             user={user}
+            isEnterprise={isEnterprise}
           >
             <DocumentSigningRecipientProvider recipient={selectedRecipient} targetSigner={null}>
               <MultiSignDocumentSigningView

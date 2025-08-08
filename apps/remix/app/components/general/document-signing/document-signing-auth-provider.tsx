@@ -42,6 +42,7 @@ export type DocumentSigningAuthContextValue = {
   setPreferredPasskeyId: (_value: string | null) => void;
   user?: SessionUser | null;
   refetchPasskeys: () => Promise<void>;
+  isEnterprise: boolean;
 };
 
 const DocumentSigningAuthContext = createContext<DocumentSigningAuthContextValue | null>(null);
@@ -65,6 +66,7 @@ export interface DocumentSigningAuthProviderProps {
   recipient: Recipient;
   user?: SessionUser | null;
   children: React.ReactNode;
+  isEnterprise: boolean;
 }
 
 export const DocumentSigningAuthProvider = ({
@@ -72,6 +74,7 @@ export const DocumentSigningAuthProvider = ({
   recipient: initialRecipient,
   user,
   children,
+  isEnterprise,
 }: DocumentSigningAuthProviderProps) => {
   const [documentAuthOptions, setDocumentAuthOptions] = useState(initialDocumentAuthOptions);
   const [recipient, setRecipient] = useState(initialRecipient);
@@ -144,8 +147,13 @@ export const DocumentSigningAuthProvider = ({
   }, [derivedRecipientActionAuth, user, recipient]);
 
   const executeActionAuthProcedure = async (options: ExecuteActionAuthProcedureOptions) => {
-    // Directly run callback if no auth required.
-    if (!derivedRecipientActionAuth || options.actionTarget !== FieldType.SIGNATURE) {
+    // Determine if authentication is required based on enterprise status and action target.
+    const requiresAuthTrigger = isEnterprise
+      ? derivedRecipientActionAuth && options.actionTarget === FieldType.SIGNATURE
+      : derivedRecipientActionAuth && options.actionTarget === 'DOCUMENT';
+
+    // Directly run callback if no auth trigger is needed.
+    if (!requiresAuthTrigger) {
       await options.onReauthFormSubmit();
       return;
     }
@@ -205,6 +213,7 @@ export const DocumentSigningAuthProvider = ({
         preferredPasskeyId,
         setPreferredPasskeyId,
         refetchPasskeys,
+        isEnterprise,
       }}
     >
       {children}
@@ -225,6 +234,8 @@ export const DocumentSigningAuthProvider = ({
 type ExecuteActionAuthProcedureOptions = Omit<
   DocumentSigningAuthDialogProps,
   'open' | 'onOpenChange' | 'documentAuthType' | 'recipientRole' | 'availableAuthTypes'
->;
+> & {
+  actionTarget: FieldType | 'DOCUMENT';
+};
 
 DocumentSigningAuthProvider.displayName = 'DocumentSigningAuthProvider';
