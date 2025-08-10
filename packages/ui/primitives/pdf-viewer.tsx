@@ -72,6 +72,7 @@ export const PDFViewer = ({
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const memoizedData = useMemo(
     () => ({ type: documentData.type, data: documentData.data }),
@@ -120,7 +121,7 @@ export const PDFViewer = ({
   };
 
   useEffect(() => {
-    if ($el.current) {
+    if ($el.current && !isLoading) {
       const $current = $el.current;
 
       const { width } = $current.getBoundingClientRect();
@@ -135,11 +136,17 @@ export const PDFViewer = ({
 
       window.addEventListener('resize', onResize);
 
+      // This set timeout basically ensure that the canvas that is being rendered take proper width instead of default width it takes when the page loads. This is more of a react component lifecycle issue and this is for a bypass.
+      setTimeout(() => {
+        onResize();
+        setIsVisible(true);
+      }, 100);
+
       return () => {
         window.removeEventListener('resize', onResize);
       };
     }
-  }, []);
+  }, [isLoading]);
 
   useEffect(() => {
     const fetchDocumentBytes = async () => {
@@ -179,9 +186,13 @@ export const PDFViewer = ({
         <>
           <PDFDocument
             file={documentBytes.buffer}
-            className={cn('w-full overflow-hidden rounded', {
-              'h-[80vh] max-h-[60rem]': numPages === 0,
-            })}
+            className={cn(
+              'w-full overflow-hidden rounded',
+              {
+                'h-[80vh] max-h-[60rem]': numPages === 0,
+              },
+              isVisible ? 'opacity-100' : 'opacity-0',
+            )}
             onLoadSuccess={(d) => onDocumentLoaded(d)}
             // Uploading a invalid document causes an error which doesn't appear to be handled by the `error` prop.
             // Therefore we add some additional custom error handling.
