@@ -445,7 +445,6 @@ export const formatDocumentAuditLogAction = (
       identified: msg`${prefix} sent the document`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_MOVED_TO_TEAM }, () => ({
-      anonymous: msg`Document moved to team`,
       anonymous: msg({
         message: `Document moved to team`,
         context: `Audit log format`,
