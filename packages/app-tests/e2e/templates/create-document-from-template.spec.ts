@@ -268,7 +268,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
+    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
       if (e instanceof HTMLInputElement) {
         e.click();
       }
@@ -361,7 +361,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.locator('input[type=file]').evaluate((e) => {
+    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
       if (e instanceof HTMLInputElement) {
         e.click();
       }
