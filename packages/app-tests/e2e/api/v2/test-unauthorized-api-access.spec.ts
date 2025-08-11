@@ -1178,12 +1178,6 @@ test.describe('Unauthorized Access - Document API V2', () => {
     const { user: firstRecipientUser } = await seedUser();
     const { user: secondRecipientUser } = await seedUser();
 
-    console.log({
-      templateId: template.id,
-      recipientAId: firstRecipientUser.id,
-      recipientBId: secondRecipientUser.id,
-    });
-
     const updatedTemplate = await prisma.template.update({
       where: { id: template.id },
       data: {
