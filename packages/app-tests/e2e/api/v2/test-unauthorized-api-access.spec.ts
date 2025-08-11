@@ -1178,13 +1178,18 @@ test.describe('Unauthorized Access - Document API V2', () => {
     const { user: firstRecipientUser } = await seedUser();
     const { user: secondRecipientUser } = await seedUser();
 
-    await prisma.template.update({
+    console.log({
+      templateId: template.id,
+      recipientAId: firstRecipientUser.id,
+      recipientBId: secondRecipientUser.id,
+    });
+
+    const updatedTemplate = await prisma.template.update({
       where: { id: template.id },
       data: {
         recipients: {
           create: [
             {
-              id: firstRecipientUser.id,
               name: firstRecipientUser.name || '',
               email: firstRecipientUser.email,
               token: nanoid(12),
@@ -1193,7 +1198,6 @@ test.describe('Unauthorized Access - Document API V2', () => {
               signingStatus: SigningStatus.NOT_SIGNED,
             },
             {
-              id: secondRecipientUser.id,
               name: secondRecipientUser.name || '',
               email: secondRecipientUser.email,
               token: nanoid(12),
@@ -1204,7 +1208,21 @@ test.describe('Unauthorized Access - Document API V2', () => {
           ],
         },
       },
+      include: {
+        recipients: true,
+      },
     });
+
+    const recipientAId = updatedTemplate.recipients.find(
+      (recipient) => recipient.email === firstRecipientUser.email,
+    )?.id;
+    const recipientBId = updatedTemplate.recipients.find(
+      (recipient) => recipient.email === secondRecipientUser.email,
+    )?.id;
+
+    if (!recipientAId || !recipientBId) {
+      throw new Error('Recipient IDs not found');
+    }
 
     const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/use`, {
       headers: { Authorization: `Bearer ${tokenB}` },
@@ -1212,13 +1230,13 @@ test.describe('Unauthorized Access - Document API V2', () => {
         templateId: template.id,
         recipients: [
           {
-            id: firstRecipientUser.id,
+            id: recipientAId,
             name: firstRecipientUser.name,
             email: firstRecipientUser.email,
             role: RecipientRole.SIGNER,
           },
           {
-            id: secondRecipientUser.id,
+            id: recipientBId,
             name: secondRecipientUser.name,
             email: secondRecipientUser.email,
             role: RecipientRole.SIGNER,
