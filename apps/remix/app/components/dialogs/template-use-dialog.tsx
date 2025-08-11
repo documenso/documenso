@@ -484,6 +484,7 @@ export function TemplateUseDialog({
 
                                 <input
                                   type="file"
+                                  data-testid="template-use-dialog-file-input"
                                   className="absolute h-full w-full opacity-0"
                                   accept=".pdf,application/pdf"
                                   onChange={(e) => {
