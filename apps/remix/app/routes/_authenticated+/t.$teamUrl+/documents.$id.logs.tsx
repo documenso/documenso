@@ -11,6 +11,7 @@ import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Card } from '@documenso/ui/primitives/card';
 
@@ -57,6 +58,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     documentId,
     userId: user.id,
     teamId: team?.id,
+  });
+
+  logDocumentAccess({
+    request,
+    documentId,
+    userId: user.id,
   });
 
   return {
@@ -170,7 +177,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
             <ul className="text-muted-foreground list-inside list-disc">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>
-                  <span className="-ml-2">{formatRecipientText(recipient)}</span>
+                  <span>{formatRecipientText(recipient)}</span>
                 </li>
               ))}
             </ul>

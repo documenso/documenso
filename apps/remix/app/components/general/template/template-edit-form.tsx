@@ -142,6 +142,7 @@ export const TemplateEditForm = ({
       },
       meta: {
         ...data.meta,
+        emailReplyTo: data.meta.emailReplyTo || null,
         typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
         uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
         drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
@@ -153,6 +154,7 @@ export const TemplateEditForm = ({
   const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
     try {
       await saveSettingsData(data);
+
       setStep('signers');
     } catch (err) {
       console.error(err);
@@ -201,6 +203,7 @@ export const TemplateEditForm = ({
   ) => {
     try {
       await saveTemplatePlaceholderData(data);
+
       setStep('fields');
     } catch (err) {
       toast({

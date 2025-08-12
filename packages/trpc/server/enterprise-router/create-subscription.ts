@@ -54,7 +54,7 @@ export const createSubscriptionRoute = authenticatedProcedure
 
     if (!customerId) {
       const customer = await createCustomer({
-        name: organisation.name,
+        name: organisation.owner.name || organisation.owner.email,
         email: organisation.owner.email,
       });
 
