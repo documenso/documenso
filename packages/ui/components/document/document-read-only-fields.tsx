@@ -7,6 +7,7 @@ import { SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -20,6 +21,18 @@ import { PopoverHover } from '@documenso/ui/primitives/popover';
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { FieldContent } from '../../primitives/document-flow/field-content';
+
+const getRecipientDisplayText = (recipient: { name: string; email: string }) => {
+  if (recipient.name && !isTemplateRecipientEmailPlaceholder(recipient.email)) {
+    return `${recipient.name} (${recipient.email})`;
+  }
+
+  if (recipient.name && isTemplateRecipientEmailPlaceholder(recipient.email)) {
+    return recipient.name;
+  }
+
+  return recipient.email;
+};
 
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
@@ -145,9 +158,7 @@ export const DocumentReadOnlyFields = ({
                     </p>
 
                     <p className="text-muted-foreground mt-1 text-center text-xs">
-                      {field.recipient.name
-                        ? `${field.recipient.name} (${field.recipient.email})`
-                        : field.recipient.email}{' '}
+                      {getRecipientDisplayText(field.recipient)}
                     </p>
 
                     <button
