@@ -48,7 +48,7 @@ export const AdminUserResetTwoFactorDialog = ({
       });
 
       toast({
-        title: _(msg`Two-Factor Authentication Reset`),
+        title: _(msg`2FA Reset`),
         description: _(msg`The user's two factor authentication has been reset successfully.`),
         duration: 5000,
       });
@@ -95,8 +95,8 @@ export const AdminUserResetTwoFactorDialog = ({
           <AlertTitle>Reset Two Factor Authentication</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Reset the users Two Factor Authentication. This action is irreversible and will
-              disable Two Factor Authentication for the user.
+              Reset the users two factor authentication. This action is irreversible and will
+              disable two factor authentication for the user.
             </Trans>
           </AlertDescription>
         </div>
@@ -105,7 +105,7 @@ export const AdminUserResetTwoFactorDialog = ({
           <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
               <Button variant="destructive">
-                <Trans>Reset Two Factor Authentication</Trans>
+                <Trans>Reset 2FA</Trans>
               </Button>
             </DialogTrigger>
 
@@ -147,7 +147,7 @@ export const AdminUserResetTwoFactorDialog = ({
                   onClick={onResetTwoFactor}
                   loading={isResettingTwoFactor}
                 >
-                  <Trans>Reset Two Factor Authentication</Trans>
+                  <Trans>Reset 2FA</Trans>
                 </Button>
               </DialogFooter>
             </DialogContent>
