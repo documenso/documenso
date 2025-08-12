@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { User } from '@prisma/client';
+import { useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -22,30 +23,38 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-export type AdminUserTwoFactorDialogProps = {
+export type AdminUserResetTwoFactorDialogProps = {
   className?: string;
   user: User;
 };
 
-export const AdminUserTwoFactorDialog = ({ className, user }: AdminUserTwoFactorDialogProps) => {
+export const AdminUserResetTwoFactorDialog = ({
+  className,
+  user,
+}: AdminUserResetTwoFactorDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const { revalidate } = useRevalidator();
   const [email, setEmail] = useState('');
+  const [open, setOpen] = useState(false);
 
-  const { mutateAsync: reset2FA, isPending: isResetting2FA } =
-    trpc.admin.user.reset2FA.useMutation();
+  const { mutateAsync: resetTwoFactor, isPending: isResettingTwoFactor } =
+    trpc.admin.user.resetTwoFactor.useMutation();
 
-  const onReset2FA = async () => {
+  const onResetTwoFactor = async () => {
     try {
-      await reset2FA({
+      await resetTwoFactor({
         id: user.id,
       });
 
       toast({
         title: _(msg`Two-Factor Authentication Reset`),
-        description: _(msg`The user's 2FA has been reset successfully.`),
+        description: _(msg`The user's two factor authentication has been reset successfully.`),
         duration: 5000,
       });
+
+      await revalidate();
+      setOpen(false);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -53,9 +62,11 @@ export const AdminUserTwoFactorDialog = ({ className, user }: AdminUserTwoFactor
         .with(AppErrorCode.NOT_FOUND, () => msg`User not found.`)
         .with(
           AppErrorCode.UNAUTHORIZED,
-          () => msg`You are not authorized to reset 2FA for this user.`,
+          () => msg`You are not authorized to reset two factor authentcation for this user.`,
         )
-        .otherwise(() => msg`An error occurred while resetting 2FA for the user.`);
+        .otherwise(
+          () => msg`An error occurred while resetting two factor authentication for the user.`,
+        );
 
       toast({
         title: _(msg`Error`),
@@ -66,6 +77,14 @@ export const AdminUserTwoFactorDialog = ({ className, user }: AdminUserTwoFactor
     }
   };
 
+  const handleOpenChange = (newOpen: boolean) => {
+    setOpen(newOpen);
+
+    if (!newOpen) {
+      setEmail('');
+    }
+  };
+
   return (
     <div className={className}>
       <Alert
@@ -73,26 +92,27 @@ export const AdminUserTwoFactorDialog = ({ className, user }: AdminUserTwoFactor
         variant="neutral"
       >
         <div>
-          <AlertTitle>Reset 2FA</AlertTitle>
+          <AlertTitle>Reset Two Factor Authentication</AlertTitle>
           <AlertDescription className="mr-2">
             <Trans>
-              Reset the users 2FA. This action is irreversible and will disable 2FA for the user.
+              Reset the users Two Factor Authentication. This action is irreversible and will
+              disable Two Factor Authentication for the user.
             </Trans>
           </AlertDescription>
         </div>
 
         <div className="flex-shrink-0">
-          <Dialog>
+          <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
               <Button variant="destructive">
-                <Trans>Reset 2FA</Trans>
+                <Trans>Reset Two Factor Authentication</Trans>
               </Button>
             </DialogTrigger>
 
             <DialogContent>
               <DialogHeader className="space-y-4">
                 <DialogTitle>
-                  <Trans>Reset 2FA</Trans>
+                  <Trans>Reset Two Factor Authentication</Trans>
                 </DialogTitle>
               </DialogHeader>
 
@@ -124,10 +144,10 @@ export const AdminUserTwoFactorDialog = ({ className, user }: AdminUserTwoFactor
                 <Button
                   variant="destructive"
                   disabled={email !== user.email}
-                  onClick={onReset2FA}
-                  loading={isResetting2FA}
+                  onClick={onResetTwoFactor}
+                  loading={isResettingTwoFactor}
                 >
-                  <Trans>Reset 2FA</Trans>
+                  <Trans>Reset Two Factor Authentication</Trans>
                 </Button>
               </DialogFooter>
             </DialogContent>

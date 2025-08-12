@@ -3,13 +3,13 @@ import { prisma } from '@documenso/prisma';
 
 import { adminProcedure } from '../trpc';
 import {
-  ZReset2FARequestSchema,
-  ZReset2FAResponseSchema,
+  ZResetTwoFactorRequestSchema,
+  ZResetTwoFactorResponseSchema,
 } from './reset-two-factor-authentication.types';
 
-export const reset2FARoute = adminProcedure
-  .input(ZReset2FARequestSchema)
-  .output(ZReset2FAResponseSchema)
+export const resetTwoFactorRoute = adminProcedure
+  .input(ZResetTwoFactorRequestSchema)
+  .output(ZResetTwoFactorResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { id } = input;
 
@@ -19,14 +19,14 @@ export const reset2FARoute = adminProcedure
       },
     });
 
-    return await reset2FA({ id });
+    return await resetTwoFactor({ id });
   });
 
-export type Reset2FAOptions = {
+export type ResetTwoFactorOptions = {
   id: number;
 };
 
-export const reset2FA = async ({ id }: Reset2FAOptions) => {
+export const resetTwoFactor = async ({ id }: ResetTwoFactorOptions) => {
   const user = await prisma.user.findFirst({
     where: {
       id,
