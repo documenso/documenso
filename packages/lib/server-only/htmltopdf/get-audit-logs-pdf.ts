@@ -6,13 +6,13 @@ import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constant
 import { env } from '../../utils/env';
 import { encryptSecondaryData } from '../crypto/encrypt';
 
-export type GetCertificatePdfOptions = {
+export type GetAuditLogsPdfOptions = {
   documentId: number;
   // eslint-disable-next-line @typescript-eslint/ban-types
   language?: SupportedLanguageCodes | (string & {});
 };
 
-export const getCertificatePdf = async ({ documentId, language }: GetCertificatePdfOptions) => {
+export const getAuditLogsPdf = async ({ documentId, language }: GetAuditLogsPdfOptions) => {
   const { chromium } = await import('playwright');
 
   const encryptedId = encryptSecondaryData({
@@ -46,13 +46,13 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   await page.context().addCookies([
     {
-      name: 'lang',
+      name: 'language',
       value: lang,
       url: NEXT_PUBLIC_WEBAPP_URL(),
     },
   ]);
 
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
+  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encryptedId}`, {
     waitUntil: 'networkidle',
     timeout: 10_000,
   });
