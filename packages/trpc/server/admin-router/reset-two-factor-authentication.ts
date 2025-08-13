@@ -11,25 +11,25 @@ export const resetTwoFactorRoute = adminProcedure
   .input(ZResetTwoFactorRequestSchema)
   .output(ZResetTwoFactorResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { id } = input;
+    const { userId } = input;
 
     ctx.logger.info({
       input: {
-        id,
+        userId,
       },
     });
 
-    return await resetTwoFactor({ id });
+    return await resetTwoFactor({ userId });
   });
 
 export type ResetTwoFactorOptions = {
-  id: number;
+  userId: number;
 };
 
-export const resetTwoFactor = async ({ id }: ResetTwoFactorOptions) => {
+export const resetTwoFactor = async ({ userId }: ResetTwoFactorOptions) => {
   const user = await prisma.user.findFirst({
     where: {
-      id,
+      id: userId,
     },
   });
 

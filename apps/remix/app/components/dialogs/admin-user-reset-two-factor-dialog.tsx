@@ -44,7 +44,7 @@ export const AdminUserResetTwoFactorDialog = ({
   const onResetTwoFactor = async () => {
     try {
       await resetTwoFactor({
-        id: user.id,
+        userId: user.id,
       });
 
       toast({
