@@ -8,7 +8,7 @@ import {
   type OrganisationOverview,
 } from '~/components/tables/admin-organisation-overview-table';
 
-import type { Route } from './+types/org-insights';
+import type { Route } from './+types/organisation-insights._index';
 
 export async function loader({ request }: Route.LoaderArgs) {
   const url = new URL(request.url);

@@ -118,7 +118,7 @@ export default function AdminLayout() {
             )}
             asChild
           >
-            <Link to="/admin/org-insights">
+            <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
               <Trans>Organisation Insights</Trans>
             </Link>
