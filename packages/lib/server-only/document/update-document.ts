@@ -1,5 +1,6 @@
 import { DocumentVisibility } from '@prisma/client';
 import { DocumentStatus, TeamMemberRole } from '@prisma/client';
+import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -128,9 +129,11 @@ export const updateDocument = async ({
   const isTitleSame = data.title === undefined || data.title === document.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
   const isGlobalAccessSame =
-    documentGlobalAccessAuth === undefined || documentGlobalAccessAuth === newGlobalAccessAuth;
+    documentGlobalAccessAuth === undefined ||
+    isDeepEqual(documentGlobalAccessAuth, newGlobalAccessAuth);
   const isGlobalActionSame =
-    documentGlobalActionAuth === undefined || documentGlobalActionAuth === newGlobalActionAuth;
+    documentGlobalActionAuth === undefined ||
+    isDeepEqual(documentGlobalActionAuth, newGlobalActionAuth);
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === document.visibility;
 

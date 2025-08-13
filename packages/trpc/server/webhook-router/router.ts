@@ -3,6 +3,7 @@ import { deleteWebhookById } from '@documenso/lib/server-only/webhooks/delete-we
 import { editWebhook } from '@documenso/lib/server-only/webhooks/edit-webhook';
 import { getWebhookById } from '@documenso/lib/server-only/webhooks/get-webhook-by-id';
 import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-team-id';
+import { triggerTestWebhook } from '@documenso/lib/server-only/webhooks/trigger-test-webhook';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -11,6 +12,7 @@ import {
   ZEditWebhookRequestSchema,
   ZGetTeamWebhooksRequestSchema,
   ZGetWebhookByIdRequestSchema,
+  ZTriggerTestWebhookRequestSchema,
 } from './schema';
 
 export const webhookRouter = router({
@@ -102,6 +104,27 @@ export const webhookRouter = router({
       return await editWebhook({
         id,
         data,
+        userId: ctx.user.id,
+        teamId,
+      });
+    }),
+
+  testWebhook: authenticatedProcedure
+    .input(ZTriggerTestWebhookRequestSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { id, event, teamId } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+          event,
+          teamId,
+        },
+      });
+
+      return await triggerTestWebhook({
+        id,
+        event,
         userId: ctx.user.id,
         teamId,
       });

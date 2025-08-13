@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Trans } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
+import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -20,6 +21,7 @@ import type { CompletedField } from '@documenso/lib/types/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
@@ -62,6 +64,7 @@ export const DocumentSigningPageView = ({
   const { documentData, documentMeta } = document;
 
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
+  const [isExpanded, setIsExpanded] = useState(false);
 
   let senderName = document.user.name ?? '';
   let senderEmail = `(${document.user.email})`;
@@ -72,18 +75,20 @@ export const DocumentSigningPageView = ({
   }
 
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
+  const targetSigner =
+    recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   return (
-    <DocumentSigningRecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
-      <div className="mx-auto w-full max-w-screen-xl">
+    <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
+      <div className="mx-auto w-full max-w-screen-xl sm:px-6">
         <h1
-          className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
+          className="block max-w-[20rem] truncate text-2xl font-semibold sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}
         >
           {document.title}
         </h1>
 
-        <div className="mt-2.5 flex flex-wrap items-center justify-between gap-x-6">
+        <div className="mt-1.5 flex flex-wrap items-center justify-between gap-y-2 sm:mt-2.5 sm:gap-y-0">
           <div className="max-w-[50ch]">
             <span className="text-muted-foreground truncate" title={senderName}>
               {senderName} {senderEmail}
@@ -133,26 +138,79 @@ export const DocumentSigningPageView = ({
           <DocumentSigningRejectDialog document={document} token={recipient.token} />
         </div>
 
-        <div className="mt-8 grid grid-cols-12 gap-y-8 lg:gap-x-8 lg:gap-y-0">
-          <Card
-            className="col-span-12 rounded-xl before:rounded-xl lg:col-span-7 xl:col-span-8"
-            gradient
-          >
-            <CardContent className="p-2">
-              <PDFViewer key={documentData.id} documentData={documentData} document={document} />
-            </CardContent>
-          </Card>
+        <div className="relative mt-4 flex w-full flex-col gap-x-6 gap-y-8 sm:mt-8 md:flex-row lg:gap-x-8 lg:gap-y-0">
+          <div className="flex-1">
+            <Card className="rounded-xl before:rounded-xl" gradient>
+              <CardContent className="p-2">
+                <PDFViewer key={documentData.id} documentData={documentData} document={document} />
+              </CardContent>
+            </Card>
+          </div>
 
-          <div className="col-span-12 lg:col-span-5 xl:col-span-4">
-            <DocumentSigningForm
-              document={document}
-              recipient={recipient}
-              fields={fields}
-              redirectUrl={documentMeta?.redirectUrl}
-              isRecipientsTurn={isRecipientsTurn}
-              allRecipients={allRecipients}
-              setSelectedSignerId={setSelectedSignerId}
-            />
+          <div
+            key={isExpanded ? 'expanded' : 'collapsed'}
+            className="group/document-widget fixed bottom-6 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-4 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
+            data-expanded={isExpanded || undefined}
+          >
+            <div className="border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
+              <div className="flex items-center justify-between gap-x-2">
+                <h3 className="text-foreground text-xl font-semibold md:text-2xl">
+                  {match(recipient.role)
+                    .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
+                    .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
+                    .with(RecipientRole.APPROVER, () => <Trans>Approve Document</Trans>)
+                    .with(RecipientRole.ASSISTANT, () => <Trans>Assist Document</Trans>)
+                    .otherwise(() => null)}
+                </h3>
+
+                <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
+                  {isExpanded ? (
+                    <LucideChevronDown
+                      className="text-muted-foreground h-5 w-5"
+                      onClick={() => setIsExpanded(false)}
+                    />
+                  ) : (
+                    <LucideChevronUp
+                      className="text-muted-foreground h-5 w-5"
+                      onClick={() => setIsExpanded(true)}
+                    />
+                  )}
+                </Button>
+              </div>
+
+              <div className="hidden group-data-[expanded]/document-widget:block md:block">
+                <p className="text-muted-foreground mt-2 text-sm">
+                  {match(recipient.role)
+                    .with(RecipientRole.VIEWER, () => (
+                      <Trans>Please mark as viewed to complete.</Trans>
+                    ))
+                    .with(RecipientRole.SIGNER, () => (
+                      <Trans>Please review the document before signing.</Trans>
+                    ))
+                    .with(RecipientRole.APPROVER, () => (
+                      <Trans>Please review the document before approving.</Trans>
+                    ))
+                    .with(RecipientRole.ASSISTANT, () => (
+                      <Trans>Complete the fields for the following signers.</Trans>
+                    ))
+                    .otherwise(() => null)}
+                </p>
+
+                <hr className="border-border mb-8 mt-4" />
+              </div>
+
+              <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
+                <DocumentSigningForm
+                  document={document}
+                  recipient={recipient}
+                  fields={fields}
+                  redirectUrl={documentMeta?.redirectUrl}
+                  isRecipientsTurn={isRecipientsTurn}
+                  allRecipients={allRecipients}
+                  setSelectedSignerId={setSelectedSignerId}
+                />
+              </div>
+            </div>
           </div>
         </div>
 

@@ -1,6 +1,13 @@
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import { Building2Icon, CreditCardIcon, GroupIcon, Settings2Icon, Users2Icon } from 'lucide-react';
+import {
+  Building2Icon,
+  CreditCardIcon,
+  GroupIcon,
+  MailboxIcon,
+  Settings2Icon,
+  Users2Icon,
+} from 'lucide-react';
 import { FaUsers } from 'react-icons/fa6';
 import { Link, NavLink, Outlet } from 'react-router';
 
@@ -30,9 +37,30 @@ export default function SettingsLayout() {
       icon: Building2Icon,
     },
     {
-      path: `/o/${organisation.url}/settings/preferences`,
+      path: `/o/${organisation.url}/settings/document`,
       label: t`Preferences`,
       icon: Settings2Icon,
+      hideHighlight: true,
+    },
+    {
+      path: `/o/${organisation.url}/settings/document`,
+      label: t`Document`,
+      isSubNav: true,
+    },
+    {
+      path: `/o/${organisation.url}/settings/branding`,
+      label: t`Branding`,
+      isSubNav: true,
+    },
+    {
+      path: `/o/${organisation.url}/settings/email`,
+      label: t`Email`,
+      isSubNav: true,
+    },
+    {
+      path: `/o/${organisation.url}/settings/email-domains`,
+      label: t`Email Domains`,
+      icon: MailboxIcon,
     },
     {
       path: `/o/${organisation.url}/settings/teams`,
@@ -54,7 +82,20 @@ export default function SettingsLayout() {
       label: t`Billing`,
       icon: CreditCardIcon,
     },
-  ].filter((route) => (isBillingEnabled ? route : !route.path.includes('/billing')));
+  ].filter((route) => {
+    if (!isBillingEnabled && route.path.includes('/billing')) {
+      return false;
+    }
+
+    if (
+      (!isBillingEnabled || !organisation.organisationClaim.flags.emailDomains) &&
+      route.path.includes('/email-domains')
+    ) {
+      return false;
+    }
+
+    return true;
+  });
 
   if (!canExecuteOrganisationAction('MANAGE_ORGANISATION', organisation.currentOrganisationRole)) {
     return (
@@ -93,12 +134,18 @@ export default function SettingsLayout() {
           )}
         >
           {organisationSettingRoutes.map((route) => (
-            <NavLink to={route.path} className="group w-full justify-start" key={route.path}>
+            <NavLink
+              to={route.path}
+              className={cn('group w-full justify-start', route.isSubNav && 'pl-8')}
+              key={route.path}
+            >
               <Button
                 variant="ghost"
-                className="group-aria-[current]:bg-secondary w-full justify-start"
+                className={cn('w-full justify-start', {
+                  'group-aria-[current]:bg-secondary': !route.hideHighlight,
+                })}
               >
-                <route.icon className="mr-2 h-5 w-5" />
+                {route.icon && <route.icon className="mr-2 h-5 w-5" />}
                 <Trans>{route.label}</Trans>
               </Button>
             </NavLink>

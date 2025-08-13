@@ -207,7 +207,9 @@ export const seedTeamTemplateWithMeta = async (team: Team) => {
   const ownerUser = organisation.owner;
 
   const template = await createTemplate({
-    title: `[TEST] Template ${nanoid(8)} - Draft`,
+    data: {
+      title: `[TEST] Template ${nanoid(8)} - Draft`,
+    },
     userId: ownerUser.id,
     teamId: team.id,
     templateDocumentDataId: documentData.id,

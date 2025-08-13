@@ -1,5 +1,4 @@
-import { TRPCError } from '@trpc/server';
-
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createFolder } from '@documenso/lib/server-only/folder/create-folder';
 import { deleteFolder } from '@documenso/lib/server-only/folder/delete-folder';
 import { findFolders } from '@documenso/lib/server-only/folder/find-folders';
@@ -137,8 +136,7 @@ export const folderRouter = router({
             type,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Parent folder not found',
           });
         }
@@ -248,8 +246,7 @@ export const folderRouter = router({
           type: currentFolder.type,
         });
       } catch (error) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
+        throw new AppError(AppErrorCode.NOT_FOUND, {
           message: 'Parent folder not found',
         });
       }
@@ -294,8 +291,7 @@ export const folderRouter = router({
             type: FolderType.DOCUMENT,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Folder not found',
           });
         }
@@ -340,8 +336,7 @@ export const folderRouter = router({
             type: FolderType.TEMPLATE,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Folder not found',
           });
         }
