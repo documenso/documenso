@@ -47,12 +47,16 @@ export const createOrganisation = async ({
       });
     }
 
-    const customer = await createCustomer({
+    customerIdToUse = await createCustomer({
       name: user.name || user.email,
       email: user.email,
-    });
+    })
+      .then((customer) => customer.id)
+      .catch((err) => {
+        console.error(err);
 
-    customerIdToUse = customer.id;
+        return undefined;
+      });
   }
 
   return await prisma.$transaction(async (tx) => {
