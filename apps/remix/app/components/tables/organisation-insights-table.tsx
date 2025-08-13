@@ -59,12 +59,12 @@ export const OrganisationInsightsTable = ({
     {
       header: _(msg`Members`),
       accessorKey: 'memberCount',
-      cell: ({ row }) => row.getValue('memberCount'),
+      cell: ({ row }) => Number(row.getValue('memberCount')),
     },
     {
       header: _(msg`Documents`),
       accessorKey: 'documentCount',
-      cell: ({ row }) => row.getValue('documentCount'),
+      cell: ({ row }) => Number(row.getValue('documentCount')),
     },
     {
       header: _(msg`Created`),
@@ -87,12 +87,12 @@ export const OrganisationInsightsTable = ({
     {
       header: _(msg`Documents Created`),
       accessorKey: 'documentCount',
-      cell: ({ row }) => row.getValue('documentCount'),
+      cell: ({ row }) => Number(row.getValue('documentCount')),
     },
     {
       header: _(msg`Documents Signed`),
       accessorKey: 'signedDocumentCount',
-      cell: ({ row }) => row.getValue('signedDocumentCount'),
+      cell: ({ row }) => Number(row.getValue('signedDocumentCount')),
     },
     {
       header: _(msg`Joined`),
@@ -170,14 +170,12 @@ export const OrganisationInsightsTable = ({
     value: number;
     subtitle?: string;
   }) => (
-    <div className="bg-card rounded-lg border p-4">
-      <div className="flex items-center space-x-2">
-        <Icon className="text-muted-foreground h-5 w-5" />
-        <div className="flex-1">
-          <p className="text-muted-foreground text-sm font-medium">{title}</p>
-          <p className="text-2xl font-bold">{value}</p>
-          {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
-        </div>
+    <div className="bg-card flex items-start gap-x-2 rounded-lg border px-4 py-3">
+      <Icon className="text-muted-foreground h-4 w-4 items-start" />
+      <div className="-mt-0.5 space-y-1">
+        <p className="text-muted-foreground text-sm font-medium">{title}</p>
+        <p className="text-2xl font-bold">{value}</p>
+        {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
       </div>
     </div>
   );

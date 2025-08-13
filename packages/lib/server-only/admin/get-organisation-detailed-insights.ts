@@ -122,12 +122,16 @@ async function getTeamInsights(
     .leftJoin('Document as d', (join) =>
       join.onRef('t.id', '=', 'd.teamId').on('d.deletedAt', 'is', null),
     )
+    .leftJoin('TeamGroup as tg', 'tg.teamId', 't.id')
+    .leftJoin('OrganisationGroup as og', 'og.id', 'tg.organisationGroupId')
+    .leftJoin('OrganisationGroupMember as ogm', 'ogm.groupId', 'og.id')
+    .leftJoin('OrganisationMember as om', 'om.id', 'ogm.organisationMemberId')
     .where('t.organisationId', '=', organisationId)
     .select([
       't.id as id',
       't.name as name',
       't.createdAt as createdAt',
-      sql<number>`0`.as('memberCount'),
+      sql<number>`COUNT(DISTINCT om."userId")`.as('memberCount'),
       sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL ${dateFilter} THEN d.id END)`.as(
         'documentCount',
       ),
@@ -163,14 +167,20 @@ async function getUserInsights(
   const usersQuery = kyselyPrisma.$kysely
     .selectFrom('OrganisationMember as om')
     .innerJoin('User as u', 'u.id', 'om.userId')
+    .leftJoin('Document as d', (join) =>
+      join.onRef('d.userId', '=', 'u.id').on('d.deletedAt', 'is', null),
+    )
+    .leftJoin('Recipient as r', (join) =>
+      join.onRef('r.email', '=', 'u.email').on('r.signedAt', 'is not', null),
+    )
     .where('om.organisationId', '=', organisationId)
     .select([
       'u.id as id',
       'u.name as name',
       'u.email as email',
       'u.createdAt as createdAt',
-      sql<number>`0`.as('documentCount'),
-      sql<number>`0`.as('signedDocumentCount'),
+      sql<number>`COUNT(DISTINCT d.id)`.as('documentCount'),
+      sql<number>`COUNT(DISTINCT r.id)`.as('signedDocumentCount'),
     ])
     .groupBy(['u.id', 'u.name', 'u.email', 'u.createdAt'])
     .orderBy('u.createdAt', 'desc')
