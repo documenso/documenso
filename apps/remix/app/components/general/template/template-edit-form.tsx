@@ -124,32 +124,36 @@ export const TemplateEditForm = ({
     },
   });
 
-  const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
+  const saveSettingsData = async (data: TAddTemplateSettingsFormSchema) => {
     const { signatureTypes } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
       .safeParse(data.globalAccessAuth);
 
+    return updateTemplateSettings({
+      templateId: template.id,
+      data: {
+        title: data.title,
+        externalId: data.externalId || null,
+        visibility: data.visibility,
+        globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
+        globalActionAuth: data.globalActionAuth ?? [],
+      },
+      meta: {
+        ...data.meta,
+        emailReplyTo: data.meta.emailReplyTo || null,
+        typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+        uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+        drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+        language: isValidLanguageCode(data.meta.language) ? data.meta.language : undefined,
+      },
+    });
+  };
+
+  const onAddSettingsFormSubmit = async (data: TAddTemplateSettingsFormSchema) => {
     try {
-      await updateTemplateSettings({
-        templateId: template.id,
-        data: {
-          title: data.title,
-          externalId: data.externalId || null,
-          visibility: data.visibility,
-          globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
-          globalActionAuth: data.globalActionAuth ?? [],
-        },
-        meta: {
-          ...data.meta,
-          emailReplyTo: data.meta.emailReplyTo || null,
-          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
-          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-          language: isValidLanguageCode(data.meta.language) ? data.meta.language : undefined,
-        },
-      });
+      await saveSettingsData(data);
 
       setStep('signers');
     } catch (err) {
@@ -163,24 +167,42 @@ export const TemplateEditForm = ({
     }
   };
 
+  const onAddSettingsFormAutoSave = async (data: TAddTemplateSettingsFormSchema) => {
+    try {
+      await saveSettingsData(data);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the template settings.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const saveTemplatePlaceholderData = async (data: TAddTemplatePlacholderRecipientsFormSchema) => {
+    return Promise.all([
+      updateTemplateSettings({
+        templateId: template.id,
+        meta: {
+          signingOrder: data.signingOrder,
+          allowDictateNextSigner: data.allowDictateNextSigner,
+        },
+      }),
+
+      setRecipients({
+        templateId: template.id,
+        recipients: data.signers,
+      }),
+    ]);
+  };
+
   const onAddTemplatePlaceholderFormSubmit = async (
     data: TAddTemplatePlacholderRecipientsFormSchema,
   ) => {
     try {
-      await Promise.all([
-        updateTemplateSettings({
-          templateId: template.id,
-          meta: {
-            signingOrder: data.signingOrder,
-            allowDictateNextSigner: data.allowDictateNextSigner,
-          },
-        }),
-
-        setRecipients({
-          templateId: template.id,
-          recipients: data.signers,
-        }),
-      ]);
+      await saveTemplatePlaceholderData(data);
 
       setStep('fields');
     } catch (err) {
@@ -192,12 +214,46 @@ export const TemplateEditForm = ({
     }
   };
 
+  const onAddTemplatePlaceholderFormAutoSave = async (
+    data: TAddTemplatePlacholderRecipientsFormSchema,
+  ) => {
+    try {
+      await saveTemplatePlaceholderData(data);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the template placeholders.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const saveFieldsData = async (data: TAddTemplateFieldsFormSchema) => {
+    return addTemplateFields({
+      templateId: template.id,
+      fields: data.fields,
+    });
+  };
+
+  const onAddFieldsFormAutoSave = async (data: TAddTemplateFieldsFormSchema) => {
+    try {
+      await saveFieldsData(data);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the template fields.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onAddFieldsFormSubmit = async (data: TAddTemplateFieldsFormSchema) => {
     try {
-      await addTemplateFields({
-        templateId: template.id,
-        fields: data.fields,
-      });
+      await saveFieldsData(data);
 
       // Clear all field data from localStorage
       for (let i = 0; i < localStorage.length; i++) {
@@ -270,11 +326,12 @@ export const TemplateEditForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSettingsFormSubmit}
+              onAutoSave={onAddSettingsFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
             <AddTemplatePlaceholderRecipientsFormPartial
-              key={recipients.length}
+              key={template.id}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               fields={fields}
@@ -282,15 +339,17 @@ export const TemplateEditForm = ({
               allowDictateNextSigner={template.templateMeta?.allowDictateNextSigner}
               templateDirectLink={template.directLink}
               onSubmit={onAddTemplatePlaceholderFormSubmit}
+              onAutoSave={onAddTemplatePlaceholderFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
             <AddTemplateFieldsFormPartial
-              key={fields.length}
+              key={template.id}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              onAutoSave={onAddFieldsFormAutoSave}
               teamId={team?.id}
             />
           </Stepper>
