@@ -25,8 +25,8 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
   await page.getByRole('option').filter({ hasText: 'Require account' }).click();
   await expect(page.getByTestId('documentAccessSelectValue')).toContainText('Require account');
 
-  // Action auth should NOT be visible.
-  await expect(page.getByTestId('documentActionSelectValue')).not.toBeVisible();
+  // Action auth should now be visible for all users
+  await expect(page.getByTestId('documentActionSelectValue')).toBeVisible();
 
   // Save the settings by going to the next step.
   await page.getByRole('button', { name: 'Continue' }).click();
