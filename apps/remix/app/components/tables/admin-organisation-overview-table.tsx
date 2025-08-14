@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
+import { Link } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -11,16 +12,20 @@ import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 import { Input } from '@documenso/ui/primitives/input';
 
-export type SigningVolume = {
-  id: number;
+export type OrganisationOverview = {
+  id: string;
   name: string;
   signingVolume: number;
   createdAt: Date;
-  planId: string;
+  customerId: string;
+  subscriptionStatus?: string;
+  isActive?: boolean;
+  teamCount?: number;
+  memberCount?: number;
 };
 
-type LeaderboardTableProps = {
-  signingVolume: SigningVolume[];
+type OrganisationOverviewTableProps = {
+  organisations: OrganisationOverview[];
   totalPages: number;
   perPage: number;
   page: number;
@@ -28,14 +33,14 @@ type LeaderboardTableProps = {
   sortOrder: 'asc' | 'desc';
 };
 
-export const AdminLeaderboardTable = ({
-  signingVolume,
+export const AdminOrganisationOverviewTable = ({
+  organisations,
   totalPages,
   perPage,
   page,
   sortBy,
   sortOrder,
-}: LeaderboardTableProps) => {
+}: OrganisationOverviewTableProps) => {
   const { _, i18n } = useLingui();
 
   const [isPending, startTransition] = useTransition();
@@ -67,17 +72,16 @@ export const AdminLeaderboardTable = ({
         cell: ({ row }) => {
           return (
             <div>
-              <a
+              <Link
                 className="text-primary underline"
-                href={`https://dashboard.stripe.com/subscriptions/${row.original.planId}`}
-                target="_blank"
+                to={`/admin/organisation-insights/${row.original.id}`}
               >
                 {row.getValue('name')}
-              </a>
+              </Link>
             </div>
           );
         },
-        size: 250,
+        size: 240,
       },
       {
         header: () => (
@@ -85,7 +89,7 @@ export const AdminLeaderboardTable = ({
             className="flex cursor-pointer items-center"
             onClick={() => handleColumnSort('signingVolume')}
           >
-            {_(msg`Signing Volume`)}
+            <span className="whitespace-nowrap">{_(msg`Document Volume`)}</span>
             {sortBy === 'signingVolume' ? (
               sortOrder === 'asc' ? (
                 <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -99,6 +103,23 @@ export const AdminLeaderboardTable = ({
         ),
         accessorKey: 'signingVolume',
         cell: ({ row }) => <div>{Number(row.getValue('signingVolume'))}</div>,
+        size: 160,
+      },
+      {
+        header: () => {
+          return <div>{_(msg`Teams`)}</div>;
+        },
+        accessorKey: 'teamCount',
+        cell: ({ row }) => <div>{Number(row.original.teamCount) || 0}</div>,
+        size: 120,
+      },
+      {
+        header: () => {
+          return <div>{_(msg`Members`)}</div>;
+        },
+        accessorKey: 'memberCount',
+        cell: ({ row }) => <div>{Number(row.original.memberCount) || 0}</div>,
+        size: 160,
       },
       {
         header: () => {
@@ -107,7 +128,7 @@ export const AdminLeaderboardTable = ({
               className="flex cursor-pointer items-center"
               onClick={() => handleColumnSort('createdAt')}
             >
-              {_(msg`Created`)}
+              <span className="whitespace-nowrap">{_(msg`Created`)}</span>
               {sortBy === 'createdAt' ? (
                 sortOrder === 'asc' ? (
                   <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -121,9 +142,10 @@ export const AdminLeaderboardTable = ({
           );
         },
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt),
+        cell: ({ row }) => i18n.date(new Date(row.original.createdAt)),
+        size: 120,
       },
-    ] satisfies DataTableColumnDef<SigningVolume>[];
+    ] satisfies DataTableColumnDef<OrganisationOverview>[];
   }, [sortOrder, sortBy]);
 
   useEffect(() => {
@@ -169,13 +191,13 @@ export const AdminLeaderboardTable = ({
       <Input
         className="my-6 flex flex-row gap-4"
         type="text"
-        placeholder={_(msg`Search by name or email`)}
+        placeholder={_(msg`Search by organisation name`)}
         value={searchString}
         onChange={handleChange}
       />
       <DataTable
         columns={columns}
-        data={signingVolume}
+        data={organisations}
         perPage={perPage}
         currentPage={page}
         totalPages={totalPages}
