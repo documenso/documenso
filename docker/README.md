@@ -18,27 +18,69 @@ This setup includes a PostgreSQL database and the Documenso application. You wil
 3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
 
 ```
+# Generate random secrets (you can use: openssl rand -hex 32)
 NEXTAUTH_SECRET="<your-secret>"
 NEXT_PRIVATE_ENCRYPTION_KEY="<your-key>"
 NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-secondary-key>"
+
+# Your application URL
 NEXT_PUBLIC_WEBAPP_URL="<your-url>"
+
+# SMTP Configuration
 NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
 NEXT_PRIVATE_SMTP_HOST="<your-host>"
 NEXT_PRIVATE_SMTP_PORT=<your-port>
 NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
 NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
+NEXT_PRIVATE_SMTP_FROM_NAME="<your-from-name>"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-from-email>"
+
+# Certificate passphrase (required)
+NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
 ```
 
-4. Update the volume binding for the cert file in the `compose.yml` file to point to your own key file:
+4. Set up your signing certificate. You have three options:
 
-Since the `cert.p12` file is required for signing and encrypting documents, you will need to provide your own key file. Update the volume binding in the `compose.yml` file to point to your key file:
+   **Option A: Generate Certificate Inside Container (Recommended)**
+   
+   Start your containers first, then generate a self-signed certificate:
+   ```bash
+   # Start containers
+   docker-compose up -d
+   
+   # Generate certificate inside container
+   docker exec -it documenso-production-documenso-1 bash -c "
+     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+       -keyout /tmp/private.key \
+       -out /tmp/certificate.crt \
+       -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
+     openssl pkcs12 -export -out /app/certs/cert.p12 \
+       -inkey /tmp/private.key -in /tmp/certificate.crt \
+       -passout pass:your_password_here && \
+     rm /tmp/private.key /tmp/certificate.crt
+   "
+   
+   # Restart container
+   docker-compose restart documenso
+   ```
+   
+   **Option B: Use Existing Certificate**
+   
+   If you have an existing `.p12` certificate, update the volume binding in `compose.yml`:
+   ```yaml
+   volumes:
+     - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
+   ```
+   
+   **Option C: Use Base64-Encoded Certificate**
+   
+   Encode your certificate and add it to `.env`:
+   ```bash
+   base64 -i /path/to/your/cert.p12 -o cert_base64.txt
+   echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
+   ```
 
-```yaml
-volumes:
-  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
-```
-
-1. Run the following command to start the containers:
+5. Run the following command to start the containers:
 
 ```
 docker-compose --env-file ./.env up -d
@@ -46,7 +88,7 @@ docker-compose --env-file ./.env up -d
 
 This will start the PostgreSQL database and the Documenso application containers.
 
-5. Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+6. Access the Documenso application by visiting `http://localhost:3000` in your web browser.
 
 ## Option 2: Standalone Docker Container
 
@@ -69,23 +111,24 @@ docker pull ghcr.io/documenso/documenso
 ```
 docker run -d \
   -p 3000:3000 \
-  -e NEXTAUTH_SECRET="<your-nextauth-secret>"
-  -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>"
-  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>"
-  -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>"
-  -e NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000"
-  -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>"
-  -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
-  -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
-  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
-  -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
+  -e NEXTAUTH_SECRET="<your-nextauth-secret>" \
+  -e NEXT_PRIVATE_ENCRYPTION_KEY="<your-next-private-encryption-key>" \
+  -e NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="<your-next-private-encryption-secondary-key>" \
+  -e NEXT_PUBLIC_WEBAPP_URL="<your-next-public-webapp-url>" \
+  -e NEXT_PRIVATE_INTERNAL_WEBAPP_URL="http://localhost:3000" \
+  -e NEXT_PRIVATE_DATABASE_URL="<your-next-private-database-url>" \
+  -e NEXT_PRIVATE_DIRECT_DATABASE_URL="<your-next-private-database-url>" \
+  -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>" \
+  -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>" \
+  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>" \
+  -e NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>" \
+  -v /path/to/your/cert.p12:/opt/documenso/cert.p12:ro \
   documenso/documenso
 ```
 
 Replace the placeholders with your actual database and SMTP details.
 
-1. Access the Documenso application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+3. Access the Documenso application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
 
 ## Success
 

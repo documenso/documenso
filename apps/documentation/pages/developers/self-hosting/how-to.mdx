@@ -125,48 +125,49 @@ NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
   This is the most common source of issues for self-hosters. Please follow these steps carefully.
 </Callout>
 
-The `cert.p12` file is required to sign and encrypt documents. You have two options:
+The `cert.p12` file is required to sign and encrypt documents. You have three options:
 
-#### Option A: Use the Automated Setup Script (Recommended)
+#### Option A: Generate Certificate Inside Container (Recommended)
 
-Download and run our setup script that handles certificate configuration automatically:
+This method avoids file permission issues by creating the certificate directly inside the Docker container:
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/documenso/documenso/main/docker/setup-selfhost.sh | bash
-```
+1. Start your containers:
 
-Or download and run separately:
+   ```bash
+   docker-compose up -d
+   ```
 
-```bash
-curl -o setup-selfhost.sh https://raw.githubusercontent.com/documenso/documenso/main/docker/setup-selfhost.sh
-chmod +x setup-selfhost.sh
-./setup-selfhost.sh
-```
+2. Generate a self-signed certificate inside the container:
 
-This script will guide you through:
+   ```bash
+   docker exec -it documenso-production-documenso-1 bash -c "
+     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+       -keyout /tmp/private.key \
+       -out /tmp/certificate.crt \
+       -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
+     openssl pkcs12 -export -out /app/certs/cert.p12 \
+       -inkey /tmp/private.key -in /tmp/certificate.crt \
+       -passout pass:your_password_here && \
+     rm /tmp/private.key /tmp/certificate.crt
+   "
+   ```
 
-- **Certificate setup options:**
-  - Use existing .p12 certificate file (host-based)
-  - Create certificate inside Docker container (recommended - avoids permission issues)
-  - Generate self-signed certificate (host-based)
-- Environment variable configuration
-- Docker Compose file generation with proper volume configuration
-- Proper file permissions and ownership
+3. Add the certificate passphrase to your `.env` file:
 
-**Container-based certificates** are recommended as they:
+   ```bash
+   NEXT_PRIVATE_SIGNING_PASSPHRASE="your_password_here"
+   ```
 
-- Avoid file permission issues between host and container
-- Use Docker volumes for persistence
-- Create certificates with compatible formats (PBE-SHA1-3DES)
-- Simplify deployment and maintenance
+4. Restart the container to apply changes:
+   ```bash
+   docker-compose restart documenso
+   ```
 
-#### Option B: Manual Certificate Setup
+#### Option B: Use an Existing Certificate File
 
-If you prefer to set up manually, you can choose between host-based or container-based certificates:
+If you have an existing `.p12` certificate file:
 
-**Host-based Certificate Setup (Traditional):**
-
-1. **Place your certificate file** in a accessible location on your host system
+1. **Place your certificate file** in an accessible location on your host system
 2. **Set proper permissions:**
 
    ```bash
@@ -187,70 +188,28 @@ If you prefer to set up manually, you can choose between host-based or container
 4. **Add certificate configuration** to your `.env` file:
    ```bash
    NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
-   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_passphrase_if_any
+   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_certificate_password
    ```
 
-**Container-based Certificate Setup (Recommended):**
-
-1. **Use Docker volumes** in your `compose.yml` file:
-
-   ```yaml
-   services:
-     documenso:
-       # ... other configuration
-       volumes:
-         - documenso_certs:/app/certs
-
-   volumes:
-     documenso_certs:
-   ```
-
-2. **Create certificate inside container** after starting services:
-
-   ```bash
-   # Start the services first
-   docker-compose up -d
-
-   # Create certificate inside container
-   docker-compose exec --user root documenso sh -c "
-     mkdir -p /app/certs
-     cd /app/certs
-
-     # Generate private key
-     openssl genrsa -out private.key 2048
-
-     # Generate certificate (adjust subject as needed)
-     openssl req -new -x509 -key private.key -out certificate.crt -days 365
-
-     # Create PKCS12 with compatible format
-     openssl pkcs12 -export -out cert.p12 \
-       -inkey private.key \
-       -in certificate.crt \
-       -name 'documenso' \
-       -keypbe PBE-SHA1-3DES \
-       -certpbe PBE-SHA1-3DES \
-       -macalg sha1
-
-     # Set proper ownership
-     chown 1001:1001 cert.p12
-     chmod 644 cert.p12
-   "
-
-   # Restart to load certificate
-   docker-compose restart documenso
-   ```
-
-3. **Add certificate configuration** to your `.env` file:
-   ```bash
-   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/app/certs/cert.p12
-   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_passphrase
-   ```
-
-<Callout type="info">
-  **Alternative:** Instead of mounting a file, you can provide the certificate as a base64-encoded
-  environment variable: ```bash NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=base64_encoded_cert_content
-  ``` This approach avoids file permission issues entirely.
+<Callout type="warning">
+  Your certificate MUST have a password. Certificates without passwords will cause "Failed to get
+  private key bags" errors.
 </Callout>
+
+#### Option C: Use Base64-Encoded Certificate
+
+To avoid file permission issues entirely, you can encode your certificate as base64:
+
+```bash
+# Encode your certificate
+base64 -i /path/to/your/cert.p12 -o cert_base64.txt
+
+# Add to your .env file
+echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
+echo "NEXT_PRIVATE_SIGNING_PASSPHRASE=your_certificate_password" >> .env
+```
+
+This approach eliminates the need for volume mounts and file permission management.
 
 After setting up your certificate, save the `compose.yml` file and run the following command to start the containers:
 
