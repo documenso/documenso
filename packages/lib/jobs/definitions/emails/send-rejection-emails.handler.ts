@@ -68,7 +68,7 @@ export const run = async ({
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const i18n = await getI18nInstance(emailLanguage);

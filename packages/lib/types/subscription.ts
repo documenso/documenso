@@ -134,7 +134,7 @@ export const internalClaims: InternalClaims = {
       unlimitedDocuments: true,
       allowCustomBranding: true,
       hidePoweredBy: true,
-      emailDomains: true,
+      emailDomains: false,
       embedAuthoring: false,
       embedAuthoringWhiteLabel: true,
       embedSigning: false,
