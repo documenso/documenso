@@ -339,8 +339,14 @@ export const templateRouter = router({
     .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
-      const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
-        input;
+      const {
+        templateId,
+        recipients,
+        distributeDocument,
+        customDocumentDataId,
+        prefillFields,
+        folderId,
+      } = input;
 
       ctx.logger.info({
         input: {
@@ -361,6 +367,7 @@ export const templateRouter = router({
         recipients,
         customDocumentDataId,
         requestMetadata: ctx.metadata,
+        folderId,
         prefillFields,
       });
 

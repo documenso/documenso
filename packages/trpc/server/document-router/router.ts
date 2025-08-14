@@ -284,6 +284,7 @@ export const documentRouter = router({
         globalActionAuth,
         recipients,
         meta,
+        folderId,
       } = input;
 
       const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -316,6 +317,7 @@ export const documentRouter = router({
           globalAccessAuth,
           globalActionAuth,
           recipients,
+          folderId,
         },
         meta,
         requestMetadata: ctx.metadata,

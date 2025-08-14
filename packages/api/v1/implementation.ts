@@ -330,6 +330,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
+        folderId: body.folderId,
         documentDataId: documentData.id,
         requestMetadata: metadata,
       });
@@ -736,6 +737,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           teamId: team?.id,
           recipients: body.recipients,
           prefillFields: body.prefillFields,
+          folderId: body.folderId,
           override: {
             title: body.title,
             ...body.meta,
