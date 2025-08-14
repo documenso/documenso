@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 
 import { getOrganisationInsights } from '@documenso/lib/server-only/admin/get-signing-volume';
+import type { DateRange } from '@documenso/lib/types/search-params';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
 import {
@@ -16,23 +17,20 @@ export async function loader({ request }: Route.LoaderArgs) {
   const rawSortBy = url.searchParams.get('sortBy') || 'signingVolume';
   const rawSortOrder = url.searchParams.get('sortOrder') || 'desc';
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const sortOrder = (['asc', 'desc'].includes(rawSortOrder) ? rawSortOrder : 'desc') as
-    | 'asc'
-    | 'desc';
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const sortBy = (
-    ['name', 'createdAt', 'signingVolume'].includes(rawSortBy) ? rawSortBy : 'signingVolume'
-  ) as 'name' | 'createdAt' | 'signingVolume';
+  const isSortOrder = (value: string): value is 'asc' | 'desc' =>
+    value === 'asc' || value === 'desc';
+  const isSortBy = (value: string): value is 'name' | 'createdAt' | 'signingVolume' =>
+    value === 'name' || value === 'createdAt' || value === 'signingVolume';
+
+  const sortOrder: 'asc' | 'desc' = isSortOrder(rawSortOrder) ? rawSortOrder : 'desc';
+  const sortBy: 'name' | 'createdAt' | 'signingVolume' = isSortBy(rawSortBy)
+    ? rawSortBy
+    : 'signingVolume';
 
   const page = Number(url.searchParams.get('page')) || 1;
   const perPage = Number(url.searchParams.get('perPage')) || 10;
   const search = url.searchParams.get('search') || '';
-  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as
-    | 'last30days'
-    | 'last90days'
-    | 'lastYear'
-    | 'allTime';
+  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as DateRange;
 
   const { organisations, totalPages } = await getOrganisationInsights({
     search,
@@ -48,7 +46,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     name: item.name || '',
     signingVolume: item.signingVolume,
     createdAt: item.createdAt || new Date(),
-    planId: item.customerId || '',
+    customerId: item.customerId || '',
     subscriptionStatus: item.subscriptionStatus,
     teamCount: item.teamCount || 0,
     memberCount: item.memberCount || 0,

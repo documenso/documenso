@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
+import { Link } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -16,7 +17,7 @@ export type OrganisationOverview = {
   name: string;
   signingVolume: number;
   createdAt: Date;
-  planId: string;
+  customerId: string;
   subscriptionStatus?: string;
   isActive?: boolean;
   teamCount?: number;
@@ -71,16 +72,16 @@ export const AdminOrganisationOverviewTable = ({
         cell: ({ row }) => {
           return (
             <div>
-              <a
+              <Link
                 className="text-primary underline"
-                href={`/admin/organisation-insights/${row.original.id}`}
+                to={`/admin/organisation-insights/${row.original.id}`}
               >
                 {row.getValue('name')}
-              </a>
+              </Link>
             </div>
           );
         },
-        size: 200,
+        size: 240,
       },
       {
         header: () => (
@@ -88,7 +89,7 @@ export const AdminOrganisationOverviewTable = ({
             className="flex cursor-pointer items-center"
             onClick={() => handleColumnSort('signingVolume')}
           >
-            {_(msg`Document Volume`)}
+            <span className="whitespace-nowrap">{_(msg`Document Volume`)}</span>
             {sortBy === 'signingVolume' ? (
               sortOrder === 'asc' ? (
                 <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -102,26 +103,7 @@ export const AdminOrganisationOverviewTable = ({
         ),
         accessorKey: 'signingVolume',
         cell: ({ row }) => <div>{Number(row.getValue('signingVolume'))}</div>,
-        size: 120,
-      },
-      {
-        header: () => {
-          return <div>{_(msg`Status`)}</div>;
-        },
-        accessorKey: 'subscriptionStatus',
-        cell: ({ row }) => {
-          const status = row.original.subscriptionStatus;
-          return (
-            <div
-              className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
-                status ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-              }`}
-            >
-              {status || 'Free'}
-            </div>
-          );
-        },
-        size: 100,
+        size: 160,
       },
       {
         header: () => {
@@ -129,7 +111,7 @@ export const AdminOrganisationOverviewTable = ({
         },
         accessorKey: 'teamCount',
         cell: ({ row }) => <div>{Number(row.original.teamCount) || 0}</div>,
-        size: 80,
+        size: 120,
       },
       {
         header: () => {
@@ -137,7 +119,7 @@ export const AdminOrganisationOverviewTable = ({
         },
         accessorKey: 'memberCount',
         cell: ({ row }) => <div>{Number(row.original.memberCount) || 0}</div>,
-        size: 80,
+        size: 160,
       },
       {
         header: () => {
@@ -146,7 +128,7 @@ export const AdminOrganisationOverviewTable = ({
               className="flex cursor-pointer items-center"
               onClick={() => handleColumnSort('createdAt')}
             >
-              {_(msg`Created`)}
+              <span className="whitespace-nowrap">{_(msg`Created`)}</span>
               {sortBy === 'createdAt' ? (
                 sortOrder === 'asc' ? (
                   <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -160,7 +142,7 @@ export const AdminOrganisationOverviewTable = ({
           );
         },
         accessorKey: 'createdAt',
-        cell: ({ row }) => i18n.date(row.original.createdAt),
+        cell: ({ row }) => i18n.date(new Date(row.original.createdAt)),
         size: 120,
       },
     ] satisfies DataTableColumnDef<OrganisationOverview>[];

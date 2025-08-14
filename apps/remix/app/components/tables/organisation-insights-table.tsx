@@ -6,18 +6,21 @@ import { Archive, Building2, Loader, TrendingUp, Users } from 'lucide-react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { OrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
+import type { DateRange } from '@documenso/lib/types/search-params';
+import type { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
 import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
+import { DocumentStatus } from '~/components/general/document/document-status';
 
 type OrganisationInsightsTableProps = {
   insights: OrganisationDetailedInsights;
   page: number;
   perPage: number;
-  dateRange: string;
+  dateRange: DateRange;
   view: 'teams' | 'users' | 'documents';
 };
 
@@ -54,82 +57,104 @@ export const OrganisationInsightsTable = ({
     {
       header: _(msg`Team Name`),
       accessorKey: 'name',
-      cell: ({ row }) => row.getValue('name'),
+      cell: ({ row }) => <span className="block max-w-full truncate">{row.getValue('name')}</span>,
+      size: 240,
     },
     {
       header: _(msg`Members`),
       accessorKey: 'memberCount',
       cell: ({ row }) => Number(row.getValue('memberCount')),
+      size: 120,
     },
     {
       header: _(msg`Documents`),
       accessorKey: 'documentCount',
       cell: ({ row }) => Number(row.getValue('documentCount')),
+      size: 140,
     },
     {
       header: _(msg`Created`),
       accessorKey: 'createdAt',
-      cell: ({ row }) => i18n.date(row.getValue('createdAt')),
+      cell: ({ row }) => i18n.date(new Date(row.getValue('createdAt'))),
+      size: 160,
     },
   ] satisfies DataTableColumnDef<(typeof insights.teams)[number]>[];
 
   const usersColumns = [
     {
-      header: _(msg`Name`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Name`)}</span>,
       accessorKey: 'name',
-      cell: ({ row }) => row.getValue('name') || row.getValue('email'),
+      cell: ({ row }) => (
+        <span className="block max-w-full truncate">
+          {(row.getValue('name') as string) || (row.getValue('email') as string)}
+        </span>
+      ),
+      size: 220,
     },
     {
-      header: _(msg`Email`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Email`)}</span>,
       accessorKey: 'email',
-      cell: ({ row }) => row.getValue('email'),
+      cell: ({ row }) => <span className="block max-w-full truncate">{row.getValue('email')}</span>,
+      size: 260,
     },
     {
-      header: _(msg`Documents Created`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Documents Created`)}</span>,
       accessorKey: 'documentCount',
       cell: ({ row }) => Number(row.getValue('documentCount')),
+      size: 180,
     },
     {
-      header: _(msg`Documents Signed`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Documents Signed`)}</span>,
       accessorKey: 'signedDocumentCount',
       cell: ({ row }) => Number(row.getValue('signedDocumentCount')),
+      size: 180,
     },
     {
-      header: _(msg`Joined`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Joined`)}</span>,
       accessorKey: 'createdAt',
-      cell: ({ row }) => i18n.date(row.getValue('createdAt')),
+      cell: ({ row }) => i18n.date(new Date(row.getValue('createdAt'))),
+      size: 160,
     },
   ] satisfies DataTableColumnDef<(typeof insights.users)[number]>[];
 
   const documentsColumns = [
     {
-      header: _(msg`Title`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Title`)}</span>,
       accessorKey: 'title',
-      cell: ({ row }) => row.getValue('title'),
+      cell: ({ row }) => <span className="block max-w-full truncate">{row.getValue('title')}</span>,
+      size: 240,
     },
     {
-      header: _(msg`Status`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Status`)}</span>,
       accessorKey: 'status',
-      cell: ({ row }) => row.getValue('status'),
+      cell: ({ row }) => (
+        <DocumentStatus status={row.getValue('status') as ExtendedDocumentStatus} />
+      ),
+      size: 140,
     },
     {
-      header: _(msg`Team`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Team`)}</span>,
       accessorKey: 'teamName',
-      cell: ({ row }) => row.getValue('teamName'),
+      cell: ({ row }) => (
+        <span className="block max-w-full truncate">{row.getValue('teamName')}</span>
+      ),
+      size: 180,
     },
     {
-      header: _(msg`Created`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Created`)}</span>,
       accessorKey: 'createdAt',
-      cell: ({ row }) => i18n.date(row.getValue('createdAt')),
+      cell: ({ row }) => i18n.date(new Date(row.getValue('createdAt'))),
+      size: 160,
     },
     {
-      header: _(msg`Completed`),
+      header: () => <span className="whitespace-nowrap">{_(msg`Completed`)}</span>,
       accessorKey: 'completedAt',
       cell: ({ row }) => {
         const completedAt = row.getValue('completedAt') as Date | null;
 
-        return completedAt ? i18n.date(completedAt) : '-';
+        return completedAt ? i18n.date(new Date(completedAt)) : '-';
       },
+      size: 160,
     },
   ] satisfies DataTableColumnDef<(typeof insights.documents)[number]>[];
 

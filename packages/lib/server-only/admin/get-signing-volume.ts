@@ -1,5 +1,6 @@
 import { DocumentStatus } from '@prisma/client';
 
+import type { DateRange } from '@documenso/lib/types/search-params';
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
 export type OrganisationInsights = {
@@ -73,7 +74,7 @@ export async function getSigningVolume({
     .where((eb) =>
       eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
     )
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(() => [sql<number>`COUNT(DISTINCT o.id)`.as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 
@@ -84,7 +85,7 @@ export async function getSigningVolume({
 }
 
 export type GetOrganisationInsightsOptions = GetSigningVolumeOptions & {
-  dateRange?: 'last30days' | 'last90days' | 'lastYear' | 'allTime';
+  dateRange?: DateRange;
   startDate?: Date;
   endDate?: Date;
 };
@@ -182,7 +183,7 @@ export async function getOrganisationInsights({
     .where((eb) =>
       eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
     )
-    .select(({ fn }) => [fn.countAll().as('count')]);
+    .select(() => [sql<number>`COUNT(DISTINCT o.id)`.as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 

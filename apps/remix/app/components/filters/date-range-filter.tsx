@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import type { DateRange } from '@documenso/lib/types/search-params';
 import {
   Select,
   SelectContent,
@@ -13,7 +14,7 @@ import {
 } from '@documenso/ui/primitives/select';
 
 type DateRangeFilterProps = {
-  currentRange: string;
+  currentRange: DateRange;
 };
 
 export const DateRangeFilter = ({ currentRange }: DateRangeFilterProps) => {
@@ -24,7 +25,7 @@ export const DateRangeFilter = ({ currentRange }: DateRangeFilterProps) => {
   const handleRangeChange = (value: string) => {
     startTransition(() => {
       updateSearchParams({
-        dateRange: value,
+        dateRange: value as DateRange,
         page: 1,
       });
     });
@@ -32,7 +33,6 @@ export const DateRangeFilter = ({ currentRange }: DateRangeFilterProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="text-sm font-medium">{_(msg`Time Range:`)}</span>
       <Select value={currentRange} onValueChange={handleRangeChange} disabled={isPending}>
         <SelectTrigger className="w-48">
           <SelectValue />

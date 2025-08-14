@@ -1,6 +1,5 @@
-import { Trans } from '@lingui/react/macro';
-
 import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
+import type { DateRange } from '@documenso/lib/types/search-params';
 import { getAdminOrganisation } from '@documenso/trpc/server/admin-router/get-admin-organisation';
 
 import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
@@ -13,11 +12,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const page = Number(url.searchParams.get('page')) || 1;
   const perPage = Number(url.searchParams.get('perPage')) || 10;
-  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as
-    | 'last30days'
-    | 'last90days'
-    | 'lastYear'
-    | 'allTime';
+  const dateRange = (url.searchParams.get('dateRange') || 'last30days') as DateRange;
   const view = (url.searchParams.get('view') || 'teams') as 'teams' | 'users' | 'documents';
 
   const [insights, organisation] = await Promise.all([
@@ -48,9 +43,7 @@ export default function OrganisationInsights({ loaderData }: Route.ComponentProp
   return (
     <div>
       <div className="flex items-center justify-between">
-        <h2 className="text-4xl font-semibold">
-          <Trans>{organisationName}</Trans>
-        </h2>
+        <h2 className="text-4xl font-semibold">{organisationName}</h2>
       </div>
       <div className="mt-8">
         <OrganisationInsightsTable

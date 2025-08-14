@@ -114,7 +114,7 @@ export default function AdminLayout() {
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
-              pathname?.startsWith('/admin/org-insights') && 'bg-secondary',
+              pathname?.startsWith('/admin/organisation-insights') && 'bg-secondary',
             )}
             asChild
           >
@@ -128,7 +128,7 @@ export default function AdminLayout() {
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
-              pathname?.startsWith('/admin/banner') && 'bg-secondary',
+              pathname?.startsWith('/admin/site-settings') && 'bg-secondary',
             )}
             asChild
           >

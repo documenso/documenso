@@ -93,7 +93,8 @@ export const AdminOrganisationsTable = ({
         ),
       },
       {
-        header: t`Status`,
+        id: 'role',
+        header: t`Role`,
         cell: ({ row }) => (
           <Badge variant="neutral">
             {row.original.owner.id === memberUserId ? t`Owner` : t`Member`}
@@ -101,6 +102,7 @@ export const AdminOrganisationsTable = ({
         ),
       },
       {
+        id: 'billingStatus',
         header: t`Status`,
         cell: ({ row }) => {
           const subscription = row.original.subscription;
@@ -111,7 +113,7 @@ export const AdminOrganisationsTable = ({
                 isPaid ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {isPaid ? 'Paid' : 'Free'}
+              {isPaid ? t`Paid` : t`Free`}
             </div>
           );
         },
@@ -184,7 +186,7 @@ export const AdminOrganisationsTable = ({
         onPaginationChange={onPaginationChange}
         columnVisibility={{
           owner: showOwnerColumn,
-          status: memberUserId !== undefined,
+          role: memberUserId !== undefined,
         }}
         error={{
           enable: isLoadingError,
