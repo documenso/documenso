@@ -18,6 +18,31 @@ export const ZGenericSuccessResponse = {
   success: true,
 } satisfies z.infer<typeof ZSuccessResponseSchema>;
 
+export const ZMoveDocumentToFolderResponseSchema = z.object({
+  id: z.number(),
+  userId: z.number(),
+  teamId: z.number(),
+  title: z.string(),
+  status: z.string(),
+  visibility: z.string(),
+  source: z.string(),
+  folderId: z.string().nullable(),
+  type: z.literal('DOCUMENT'),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export const ZMoveTemplateToFolderResponseSchema = z.object({
+  id: z.number(),
+  userId: z.number(),
+  teamId: z.number(),
+  title: z.string(),
+  folderId: z.string().nullable(),
+  type: z.literal('TEMPLATE'),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
 export const ZFolderSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -56,6 +81,8 @@ export const ZCreateFolderSchema = z.object({
   parentId: z.string().optional(),
   type: ZFolderTypeSchema.optional(),
 });
+
+export const ZCreateFolderResponseSchema = ZFolderSchema;
 
 export const ZUpdateFolderSchema = z.object({
   id: z.string(),
