@@ -14,15 +14,19 @@ import { FolderType } from '@documenso/lib/types/folder-type';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
+  ZCreateFolderResponseSchema,
   ZCreateFolderSchema,
   ZDeleteFolderSchema,
   ZFindFoldersRequestSchema,
   ZFindFoldersResponseSchema,
+  ZFolderSchema,
   ZGenericSuccessResponse,
   ZGetFoldersResponseSchema,
   ZGetFoldersSchema,
+  ZMoveDocumentToFolderResponseSchema,
   ZMoveDocumentToFolderSchema,
   ZMoveFolderSchema,
+  ZMoveTemplateToFolderResponseSchema,
   ZMoveTemplateToFolderSchema,
   ZPinFolderSchema,
   ZSuccessResponseSchema,
@@ -32,9 +36,18 @@ import {
 
 export const folderRouter = router({
   /**
-   * @private
+   * @public
    */
   getFolders: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/folders',
+        summary: 'Retrieve folders',
+        description: 'Returns a list of all your folders',
+        tags: ['Folder'],
+      },
+    })
     .input(ZGetFoldersSchema)
     .output(ZGetFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
@@ -75,6 +88,15 @@ export const folderRouter = router({
    * @private
    */
   findFolders: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'GET',
+        path: '/folders/find',
+        summary: 'Find folders',
+        description: 'Find folders based on search criteria',
+        tags: ['Folder'],
+      },
+    })
     .input(ZFindFoldersRequestSchema)
     .output(ZFindFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
@@ -112,10 +134,20 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   createFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/create',
+        summary: 'Create new folder',
+        description: 'Creates a new folder in your team',
+        tags: ['Folder'],
+      },
+    })
     .input(ZCreateFolderSchema)
+    .output(ZCreateFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { name, parentId, type } = input;
@@ -150,17 +182,24 @@ export const folderRouter = router({
         type,
       });
 
-      return {
-        ...result,
-        type,
-      };
+      return result;
     }),
 
   /**
    * @private
    */
   updateFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/update',
+        summary: 'Update folder',
+        description: 'Updates an existing folder',
+        tags: ['Folder'],
+      },
+    })
     .input(ZUpdateFolderSchema)
+    .output(ZFolderSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { id, name, visibility } = input;
@@ -196,6 +235,15 @@ export const folderRouter = router({
    * @private
    */
   deleteFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/delete',
+        summary: 'Delete folder',
+        description: 'Deletes an existing folder',
+        tags: ['Folder'],
+      },
+    })
     .input(ZDeleteFolderSchema)
     .output(ZSuccessResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -220,57 +268,79 @@ export const folderRouter = router({
   /**
    * @private
    */
-  moveFolder: authenticatedProcedure.input(ZMoveFolderSchema).mutation(async ({ input, ctx }) => {
-    const { teamId, user } = ctx;
-    const { id, parentId } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-        parentId,
+  moveFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/move',
+        summary: 'Move folder',
+        description: 'Moves a folder to a different parent folder',
+        tags: ['Folder'],
       },
-    });
+    })
+    .input(ZMoveFolderSchema)
+    .output(ZFolderSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+      const { id, parentId } = input;
 
-    const currentFolder = await getFolderById({
-      userId: user.id,
-      teamId,
-      folderId: id,
-    });
+      ctx.logger.info({
+        input: {
+          id,
+          parentId,
+        },
+      });
 
-    if (parentId !== null) {
-      try {
-        await getFolderById({
-          userId: user.id,
-          teamId,
-          folderId: parentId,
-          type: currentFolder.type,
-        });
-      } catch (error) {
-        throw new AppError(AppErrorCode.NOT_FOUND, {
-          message: 'Parent folder not found',
-        });
+      const currentFolder = await getFolderById({
+        userId: user.id,
+        teamId,
+        folderId: id,
+      });
+
+      if (parentId !== null) {
+        try {
+          await getFolderById({
+            userId: user.id,
+            teamId,
+            folderId: parentId,
+            type: currentFolder.type,
+          });
+        } catch (error) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Parent folder not found',
+          });
+        }
       }
-    }
 
-    const result = await moveFolder({
-      userId: user.id,
-      teamId,
-      folderId: id,
-      parentId,
-      requestMetadata: ctx.metadata,
-    });
+      const result = await moveFolder({
+        userId: user.id,
+        teamId,
+        folderId: id,
+        parentId,
+        requestMetadata: ctx.metadata,
+      });
 
-    return {
-      ...result,
-      type: currentFolder.type,
-    };
-  }),
+      return {
+        ...result,
+        type: currentFolder.type,
+      };
+    }),
 
   /**
    * @private
    */
   moveDocumentToFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/move-document',
+        summary: 'Move document to folder',
+        description: 'Moves a document to a specific folder',
+        tags: ['Folder'],
+      },
+    })
     .input(ZMoveDocumentToFolderSchema)
+    .output(ZMoveDocumentToFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { documentId, folderId } = input;
@@ -315,7 +385,17 @@ export const folderRouter = router({
    * @private
    */
   moveTemplateToFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/move-template',
+        summary: 'Move template to folder',
+        description: 'Moves a template to a specific folder',
+        tags: ['Folder'],
+      },
+    })
     .input(ZMoveTemplateToFolderSchema)
+    .output(ZMoveTemplateToFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { templateId, folderId } = input;
@@ -358,62 +438,86 @@ export const folderRouter = router({
   /**
    * @private
    */
-  pinFolder: authenticatedProcedure.input(ZPinFolderSchema).mutation(async ({ ctx, input }) => {
-    const { folderId } = input;
-
-    ctx.logger.info({
-      input: {
-        folderId,
+  pinFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/pin',
+        summary: 'Pin folder',
+        description: 'Pins a folder for quick access',
+        tags: ['Folder'],
       },
-    });
+    })
+    .input(ZPinFolderSchema)
+    .output(ZFolderSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { folderId } = input;
 
-    const currentFolder = await getFolderById({
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-      folderId,
-    });
+      ctx.logger.info({
+        input: {
+          folderId,
+        },
+      });
 
-    const result = await pinFolder({
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-      folderId,
-      type: currentFolder.type,
-    });
+      const currentFolder = await getFolderById({
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
+        folderId,
+      });
 
-    return {
-      ...result,
-      type: currentFolder.type,
-    };
-  }),
+      const result = await pinFolder({
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
+        folderId,
+        type: currentFolder.type,
+      });
+
+      return {
+        ...result,
+        type: currentFolder.type,
+      };
+    }),
 
   /**
    * @private
    */
-  unpinFolder: authenticatedProcedure.input(ZUnpinFolderSchema).mutation(async ({ ctx, input }) => {
-    const { folderId } = input;
-
-    ctx.logger.info({
-      input: {
-        folderId,
+  unpinFolder: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/folders/unpin',
+        summary: 'Unpin folder',
+        description: 'Unpins a previously pinned folder',
+        tags: ['Folder'],
       },
-    });
+    })
+    .input(ZUnpinFolderSchema)
+    .output(ZFolderSchema)
+    .mutation(async ({ ctx, input }) => {
+      const { folderId } = input;
 
-    const currentFolder = await getFolderById({
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-      folderId,
-    });
+      ctx.logger.info({
+        input: {
+          folderId,
+        },
+      });
 
-    const result = await unpinFolder({
-      userId: ctx.user.id,
-      teamId: ctx.teamId,
-      folderId,
-      type: currentFolder.type,
-    });
+      const currentFolder = await getFolderById({
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
+        folderId,
+      });
 
-    return {
-      ...result,
-      type: currentFolder.type,
-    };
-  }),
+      const result = await unpinFolder({
+        userId: ctx.user.id,
+        teamId: ctx.teamId,
+        folderId,
+        type: currentFolder.type,
+      });
+
+      return {
+        ...result,
+        type: currentFolder.type,
+      };
+    }),
 });
