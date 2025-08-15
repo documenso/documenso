@@ -1,0 +1,149 @@
+---
+title: SSO Portal
+description: Learn how to set up a custom SSO login portal for your organisation.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Organisation SSO Portal
+
+The SSO Portal provides a dedicated login URL for your organisation that integrates with any OIDC compliant identity provider. This feature provides:
+
+- **Single Sign-On**: Access Documenso using your own authentication system
+- **Automatic onboarding**: New users will be automatically added to your organisation when they sign in through the portal
+- **Delegated account management**: Your organisation has full control over the users who sign in through the portal
+
+<Callout type="warning">
+  Anyone who signs in through your portal will be added to your organisation as a member.
+</Callout>
+
+## Getting Started
+
+To set up the SSO Portal, you need to be an organisation owner, admin, or manager.
+
+<Callout type="info">
+  **Enterprise Only**: This feature is only available to Enterprise customers.
+</Callout>
+
+<Steps>
+
+### Access Organisation SSO Settings
+
+![Organisation SSO Portal settings](/organisations/organisations-sso-settings.webp)
+
+### Configure SSO Portal
+
+See the [Microsoft Entra ID](/users/organisations/sso/microsoft-entra-id) guide to find the values for the following fields.
+
+#### Issuer URL
+
+Enter the OpenID discovery endpoint URL for your provider. Here are some common examples:
+
+- **Google Workspace**: `https://accounts.google.com/.well-known/openid-configuration`
+- **Microsoft Entra ID**: `https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration`
+- **Okta**: `https://{your-domain}.okta.com/.well-known/openid-configuration`
+- **Auth0**: `https://{your-domain}.auth0.com/.well-known/openid-configuration`
+
+#### Client Credentials
+
+Enter the client ID and client secret provided by your identity provider:
+
+- **Client ID**: The unique identifier for your application
+- **Client Secret**: The secret key for authenticating your application
+
+#### Default Organisation Role
+
+Select the default Organisation role that new users will receive when they first sign in through the portal.
+
+#### Allowed Email Domains
+
+Specify which email domains are allowed to sign in through your SSO portal. Separate domains with spaces:
+
+```
+your-domain.com another-domain.com
+```
+
+Leave this field empty to allow all domains.
+
+### Configure Your Identity Provider
+
+You'll need to configure your identity provider with the following information:
+
+- Redirect URI
+- Scopes
+
+These values are found at the top of the page.
+
+### Save Configuration
+
+Toggle the "Enable SSO portal" switch to activate the feature for your organisation.
+
+Click "Update" to save your SSO portal configuration. The portal will be activated once all required fields are completed.
+
+</Steps>
+
+## Testing Your SSO Portal
+
+Once configured, you can test your SSO portal by:
+
+1. Navigating to your portal URL found at the top of the organisation SSO portal settings page
+2. Sign in with a test account from your configured domain
+3. Verifying that the user is properly provisioned with the correct organisation role
+
+## Best Practices
+
+### Reduce Friction
+
+Create a custom subdomain for your organisation's SSO portal. For example, you can create a subdomain like `documenso.your-organisation.com` which redirects to the portal link.
+
+### Security Considerations
+
+Please note that anyone who signs in through your portal will be added to your organisation as a member.
+
+- **Domain Restrictions**: Use allowed domains to prevent unauthorized access
+- **Role Assignment**: Carefully consider the default organisation role for new users
+
+## Troubleshooting
+
+### Common Issues
+
+**"Invalid issuer URL"**
+
+- Verify the issuer URL is correct and accessible
+- Ensure the URL follows the OpenID Connect discovery format
+
+**"Client authentication failed"**
+
+- Check that your client ID and client secret are correct
+- Verify that your application is properly registered with your identity provider
+
+**"User not provisioned"**
+
+- Check that the user's email domain is in the allowed domains list
+- Verify the default organisation role is set correctly
+
+**"Redirect URI mismatch"**
+
+- Ensure the redirect URI in Documenso matches exactly what's configured in your identity provider
+- Check for any trailing slashes or protocol mismatches
+
+### Getting Help
+
+If you encounter issues with your SSO portal configuration:
+
+1. Review your identity provider's documentation for OpenID Connect setup
+2. Check the Documenso logs for detailed error messages
+3. Contact your identity provider's support for provider-specific issues
+
+<Callout type="info">
+  For additional support for SSO Portal configuration, contact our support team at
+  support@documenso.com.
+</Callout>
+
+## Identity Provider Guides
+
+For detailed setup instructions for specific identity providers:
+
+- [Microsoft Entra ID](/users/organisations/sso/microsoft-entra-id) - Complete guide for Azure AD configuration

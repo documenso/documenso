@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { ZEmailDomainSchema } from '@documenso/lib/types/email-domain';
 
-const domainRegex =
+export const domainRegex =
   /^(?!https?:\/\/)(?!www\.)([a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$/;
 
 export const ZDomainSchema = z
