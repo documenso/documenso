@@ -1,7 +1,5 @@
-import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
-import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -104,10 +102,7 @@ export const updateDocumentRecipients = async ({
       });
     }
 
-    if (
-      hasRecipientBeenChanged(originalRecipient, recipient) &&
-      !canRecipientBeModified(originalRecipient, document.fields)
-    ) {
+    if (!canRecipientBeModified(originalRecipient, document.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',
       });
@@ -203,9 +198,6 @@ export const updateDocumentRecipients = async ({
   };
 };
 
-/**
- * If you change this you MUST update the `hasRecipientBeenChanged` function.
- */
 type RecipientData = {
   id: number;
   email?: string;
@@ -214,20 +206,4 @@ type RecipientData = {
   signingOrder?: number | null;
   accessAuth?: TRecipientAccessAuthTypes[];
   actionAuth?: TRecipientActionAuthTypes[];
-};
-
-const hasRecipientBeenChanged = (recipient: Recipient, newRecipientData: RecipientData) => {
-  const authOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
-
-  const newRecipientAccessAuth = newRecipientData.accessAuth || null;
-  const newRecipientActionAuth = newRecipientData.actionAuth || null;
-
-  return (
-    recipient.email !== newRecipientData.email ||
-    recipient.name !== newRecipientData.name ||
-    recipient.role !== newRecipientData.role ||
-    recipient.signingOrder !== newRecipientData.signingOrder ||
-    !isDeepEqual(authOptions.accessAuth, newRecipientAccessAuth) ||
-    !isDeepEqual(authOptions.actionAuth, newRecipientActionAuth)
-  );
 };
