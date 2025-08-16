@@ -144,10 +144,11 @@ test('[TEMPLATES]: use template', async ({ page }) => {
   await page.getByRole('button', { name: 'Use Template' }).click();
 
   // Enter template values.
-  await page.getByPlaceholder('recipient.1@documenso.com').click();
-  await page.getByPlaceholder('recipient.1@documenso.com').fill(teamMemberUser.email);
-  await page.getByPlaceholder('Recipient 1').click();
-  await page.getByPlaceholder('Recipient 1').fill('name');
+  // Get input with Email label placeholder.
+  await page.getByLabel('Email').click();
+  await page.getByLabel('Email').fill(teamMemberUser.email);
+  await page.getByLabel('Name').click();
+  await page.getByLabel('Name').fill('name');
 
   await page.getByRole('button', { name: 'Create as draft' }).click();
   await page.waitForURL(/\/t\/.+\/documents/);
