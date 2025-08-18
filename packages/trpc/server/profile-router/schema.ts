@@ -29,7 +29,8 @@ export const ZSetProfileImageMutationSchema = z.object({
 export type TSetProfileImageMutationSchema = z.infer<typeof ZSetProfileImageMutationSchema>;
 
 export const ZSubmitSupportTicketMutationSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
+  organisationId: z.string(),
+  teamId: z.number().min(1).nullable(),
   subject: z.string().min(3, 'Subject is required'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });

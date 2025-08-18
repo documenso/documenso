@@ -1,3 +1,4 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { SetAvatarImageOptions } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
@@ -97,12 +98,24 @@ export const profileRouter = router({
   submitSupportTicket: authenticatedProcedure
     .input(ZSubmitSupportTicketMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { email, subject, message } = input;
+      const { subject, message, organisationId, teamId } = input;
+
+      const userId = ctx.user.id;
+
+      const parsedTeamId = teamId ? Number(teamId) : null;
+
+      if (Number.isNaN(parsedTeamId)) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid team ID provided',
+        });
+      }
 
       return await submitSupportTicket({
-        email,
         subject,
         message,
+        userId,
+        organisationId,
+        teamId: parsedTeamId,
       });
     }),
 });

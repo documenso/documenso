@@ -4,6 +4,7 @@ import { Trans } from '@lingui/react/macro';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { Button } from '@documenso/ui/primitives/button';
@@ -17,17 +18,14 @@ export function meta() {
 
 export default function SupportPage() {
   const [showForm, setShowForm] = useState(false);
-  const { user, organisations } = useSession();
+  const { user } = useSession();
+  const organisation = useCurrentOrganisation();
+
   const [searchParams] = useSearchParams();
-  const org = searchParams.get('org');
 
-  let currentOrganisation;
+  const teamId = searchParams.get('team');
 
-  if (org) {
-    currentOrganisation = organisations.find((organisation) => organisation.id === org);
-  }
-
-  const subscriptionStatus = currentOrganisation?.subscription?.status;
+  const subscriptionStatus = organisation.subscription?.status;
 
   const handleSuccess = () => {
     setShowForm(false);
@@ -93,7 +91,7 @@ export default function SupportPage() {
               </Trans>
             </p>
           </div>
-          {currentOrganisation && IS_BILLING_ENABLED() && subscriptionStatus && (
+          {organisation && IS_BILLING_ENABLED() && subscriptionStatus && (
             <>
               <div className="rounded-lg border p-4">
                 <h2 className="flex items-center gap-2 text-lg font-bold">
@@ -110,7 +108,7 @@ export default function SupportPage() {
                     </Button>
                   ) : (
                     <SupportTicketForm
-                      email={user?.email}
+                      teamId={teamId}
                       onSuccess={handleSuccess}
                       onClose={handleCloseForm}
                     />

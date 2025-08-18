@@ -321,16 +321,18 @@ export const OrgMenuSwitcher = () => {
                 <Trans>Language</Trans>
               </DropdownMenuItem>
 
-              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                <Link
-                  to={{
-                    pathname: '/support',
-                    search: currentOrganisation?.id ? `?org=${currentOrganisation.id}` : '',
-                  }}
-                >
-                  <Trans>Support</Trans>
-                </Link>
-              </DropdownMenuItem>
+              {currentOrganisation && (
+                <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+                  <Link
+                    to={{
+                      pathname: `/o/${currentOrganisation.url}/support`,
+                      search: currentTeam ? `?team=${currentTeam.id}` : '',
+                    }}
+                  >
+                    <Trans>Support</Trans>
+                  </Link>
+                </DropdownMenuItem>
+              )}
 
               <DropdownMenuItem
                 className="text-muted-foreground hover:!text-muted-foreground px-4 py-2"

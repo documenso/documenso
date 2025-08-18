@@ -26,12 +26,18 @@ const ZSupportTicketSchema = z.object({
 type TSupportTicket = z.infer<typeof ZSupportTicketSchema>;
 
 export type SupportTicketFormProps = {
-  email: string;
+  organisationId: string;
+  teamId?: string;
   onSuccess?: () => void;
   onClose?: () => void;
 };
 
-export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFormProps) => {
+export const SupportTicketForm = ({
+  organisationId,
+  teamId,
+  onSuccess,
+  onClose,
+}: SupportTicketFormProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -41,7 +47,6 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
   const form = useForm<TSupportTicket>({
     resolver: zodResolver(ZSupportTicketSchema),
     defaultValues: {
-      email: email || '',
       subject: '',
       message: '',
     },
@@ -49,9 +54,16 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
 
   const isLoading = form.formState.isLoading || isPending;
 
-  const onSubmit = async (values: TSupportTicket) => {
+  const onSubmit = async (data: TSupportTicket) => {
+    const { subject, message } = data;
+
     try {
-      await submitSupportTicket(values);
+      await submitSupportTicket({
+        subject,
+        message,
+        organisationId,
+        teamId,
+      });
 
       toast({
         title: t`Support ticket created`,
@@ -79,21 +91,6 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
           <fieldset disabled={isLoading} className="flex flex-col gap-4">
             <FormField
               control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel required>
-                    <Trans>Email</Trans>
-                  </FormLabel>
-                  <FormControl>
-                    <Input type="email" autoComplete="email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
               name="subject"
               render={({ field }) => (
                 <FormItem>
@@ -107,6 +104,7 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="message"
@@ -122,6 +120,7 @@ export const SupportTicketForm = ({ email, onSuccess, onClose }: SupportTicketFo
                 </FormItem>
               )}
             />
+
             <div className="mt-2 flex flex-row gap-2">
               <Button type="submit" size="sm" loading={isLoading}>
                 <Trans>Submit</Trans>
