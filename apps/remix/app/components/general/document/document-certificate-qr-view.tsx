@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { DateTime } from 'luxon';
 
@@ -86,7 +86,7 @@ export const DocumentCertificateQRView = ({
           <h1 className="text-xl font-medium">{title}</h1>
           <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
             <p>
-              <Trans>{recipientCount} recipients</Trans>
+              <Plural one={`# recipient`} other={`# recipients`} value={recipientCount} />
             </p>
 
             <p>
