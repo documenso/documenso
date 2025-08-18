@@ -88,15 +88,6 @@ export const folderRouter = router({
    * @private
    */
   findFolders: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'GET',
-        path: '/folders/find',
-        summary: 'Find folders',
-        description: 'Find folders based on search criteria',
-        tags: ['Folder'],
-      },
-    })
     .input(ZFindFoldersRequestSchema)
     .output(ZFindFoldersResponseSchema)
     .query(async ({ input, ctx }) => {
@@ -186,7 +177,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   updateFolder: authenticatedProcedure
     .meta({
@@ -232,7 +223,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   deleteFolder: authenticatedProcedure
     .meta({
@@ -266,7 +257,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   moveFolder: authenticatedProcedure
     .meta({
@@ -327,7 +318,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   moveDocumentToFolder: authenticatedProcedure
     .meta({
@@ -382,7 +373,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   moveTemplateToFolder: authenticatedProcedure
     .meta({
@@ -436,7 +427,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   pinFolder: authenticatedProcedure
     .meta({
@@ -479,7 +470,7 @@ export const folderRouter = router({
     }),
 
   /**
-   * @private
+   * @public
    */
   unpinFolder: authenticatedProcedure
     .meta({
