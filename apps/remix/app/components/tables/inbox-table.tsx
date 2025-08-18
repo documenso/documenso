@@ -5,7 +5,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus as DocumentStatusEnum } from '@prisma/client';
 import { RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircleIcon, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
+import { CheckCircleIcon, Clock, DownloadIcon, EyeIcon, Loader, PencilIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
@@ -194,6 +194,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
   const isPending = row.status === DocumentStatusEnum.PENDING;
   const isComplete = isDocumentCompleted(row.status);
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const isExpired = recipient?.signingStatus === SigningStatus.EXPIRED;
   const role = recipient?.role;
 
   if (!recipient) {
@@ -231,7 +232,14 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     isPending,
     isComplete,
     isSigned,
+    isExpired,
   })
+    .with({ isExpired: true }, () => (
+      <Button className="w-32 bg-orange-100 text-orange-600 hover:bg-orange-200" disabled={true}>
+        <Clock className="-ml-1 mr-2 h-4 w-4" />
+        <Trans>Expired</Trans>
+      </Button>
+    ))
     .with({ isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
         <Link to={`/sign/${recipient?.token}`}>

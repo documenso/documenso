@@ -25,7 +25,9 @@ import {
 } from '../../types/field-meta';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { isRecipientExpired } from '../../utils/expiry';
 import { validateFieldAuth } from '../document/validate-field-auth';
+import { expireRecipient } from '../recipient/expire-recipient';
 
 export type SignFieldWithTokenOptions = {
   token: string;
@@ -113,6 +115,11 @@ export const signFieldWithToken = async ({
     field.recipient.signingStatus === SigningStatus.SIGNED
   ) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
+  }
+
+  if (isRecipientExpired(recipient)) {
+    await expireRecipient({ recipientId: recipient.id });
+    throw new Error(`Signing link has expired`);
   }
 
   if (field.inserted) {

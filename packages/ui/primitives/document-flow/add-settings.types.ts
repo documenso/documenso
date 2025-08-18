@@ -46,6 +46,8 @@ export const ZAddSettingsFormSchema = z.object({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    expiryAmount: z.number().int().min(1).optional(),
+    expiryUnit: z.enum(['minutes', 'hours', 'days', 'weeks', 'months']).optional(),
   }),
 });
 

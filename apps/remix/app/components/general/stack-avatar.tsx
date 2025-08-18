@@ -41,6 +41,9 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
     case RecipientStatusType.REJECTED:
       classes = 'bg-red-200 text-red-800';
       break;
+    case RecipientStatusType.EXPIRED:
+      classes = 'bg-orange-200 text-orange-800';
+      break;
     default:
       break;
   }

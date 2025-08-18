@@ -24,6 +24,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { downloadDocumentRoute } from './download-document';
@@ -284,7 +285,15 @@ export const documentRouter = router({
         globalActionAuth,
         recipients,
         meta,
+        expiryAmount,
+        expiryUnit,
       } = input;
+
+      if ((expiryAmount || expiryUnit) && !isValidExpirySettings(expiryAmount, expiryUnit)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Invalid expiry settings. Please check your expiry configuration.',
+        });
+      }
 
       const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
@@ -316,6 +325,8 @@ export const documentRouter = router({
           globalAccessAuth,
           globalActionAuth,
           recipients,
+          expiryAmount,
+          expiryUnit,
         },
         meta,
         requestMetadata: ctx.metadata,
@@ -345,7 +356,14 @@ export const documentRouter = router({
     .input(ZCreateDocumentRequestSchema)
     .mutation(async ({ input, ctx }) => {
       const { user, teamId } = ctx;
-      const { title, documentDataId, timezone, folderId } = input;
+      const { title, documentDataId, timezone, folderId, expiryAmount, expiryUnit } = input;
+
+      // Validate expiry settings
+      if ((expiryAmount || expiryUnit) && !isValidExpirySettings(expiryAmount, expiryUnit)) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Invalid expiry settings. Please check your expiry configuration.',
+        });
+      }
 
       ctx.logger.info({
         input: {
@@ -371,6 +389,8 @@ export const documentRouter = router({
         userTimezone: timezone,
         requestMetadata: ctx.metadata,
         folderId,
+        expiryAmount,
+        expiryUnit,
       });
     }),
 

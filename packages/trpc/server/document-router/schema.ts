@@ -117,6 +117,16 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using an uploaded signature.');
 
+export const ZDocumentExpiryAmountSchema = z
+  .number()
+  .int()
+  .min(1)
+  .describe('The amount for expiry duration (e.g., 3 for "3 days").');
+
+export const ZDocumentExpiryUnitSchema = z
+  .enum(['minutes', 'hours', 'days', 'weeks', 'months'])
+  .describe('The unit for expiry duration (e.g., "days" for "3 days").');
+
 export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
   templateId: z
     .number()
@@ -200,6 +210,8 @@ export const ZCreateDocumentRequestSchema = z.object({
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   folderId: z.string().describe('The ID of the folder to create the document in').optional(),
+  expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+  expiryUnit: ZDocumentExpiryUnitSchema.optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({
@@ -209,6 +221,8 @@ export const ZCreateDocumentV2RequestSchema = z.object({
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
+  expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+  expiryUnit: ZDocumentExpiryUnitSchema.optional(),
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({

@@ -11,7 +11,7 @@ import {
   TeamMemberRole,
 } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { match } from 'ts-pattern';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -56,6 +56,7 @@ import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combo
 
 import { DocumentSignatureSettingsTooltip } from '../../components/document/document-signature-settings-tooltip';
 import { Combobox } from '../combobox';
+import { ExpirySettingsPicker } from '../expiry-settings-picker';
 import { Input } from '../input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../select';
 import { useStep } from '../stepper';
@@ -70,6 +71,18 @@ import {
   DocumentFlowFormContainerStep,
 } from './document-flow-root';
 import type { DocumentFlowStep } from './types';
+
+const isExpiryUnit = (
+  value: unknown,
+): value is 'minutes' | 'hours' | 'days' | 'weeks' | 'months' => {
+  return (
+    value === 'minutes' ||
+    value === 'hours' ||
+    value === 'days' ||
+    value === 'weeks' ||
+    value === 'months'
+  );
+};
 
 export type AddSettingsFormProps = {
   documentFlow: DocumentFlowStep;
@@ -98,6 +111,9 @@ export const AddSettingsFormPartial = ({
     documentAuth: document.authOptions,
   });
 
+  const documentExpiryUnit = document.documentMeta?.expiryUnit;
+  const initialExpiryUnit = isExpiryUnit(documentExpiryUnit) ? documentExpiryUnit : undefined;
+
   const form = useForm<TAddSettingsFormSchema>({
     resolver: zodResolver(ZAddSettingsFormSchema),
     defaultValues: {
@@ -117,6 +133,8 @@ export const AddSettingsFormPartial = ({
         redirectUrl: document.documentMeta?.redirectUrl ?? '',
         language: document.documentMeta?.language ?? 'en',
         signatureTypes: extractTeamSignatureSettings(document.documentMeta),
+        expiryAmount: document.documentMeta?.expiryAmount ?? undefined,
+        expiryUnit: initialExpiryUnit,
       },
     },
   });
@@ -126,6 +144,9 @@ export const AddSettingsFormPartial = ({
   const documentHasBeenSent = recipients.some(
     (recipient) => recipient.sendStatus === SendStatus.SENT,
   );
+
+  const expiryAmount = useWatch({ control: form.control, name: 'meta.expiryAmount' });
+  const expiryUnit = useWatch({ control: form.control, name: 'meta.expiryUnit' });
 
   const canUpdateVisibility = match(currentTeamMemberRole)
     .with(TeamMemberRole.ADMIN, () => true)
@@ -469,6 +490,33 @@ export const AddSettingsFormPartial = ({
                         </FormItem>
                       )}
                     />
+
+                    <div>
+                      <FormLabel className="mb-4 block">
+                        <Trans>Link Expiry</Trans>
+                      </FormLabel>
+                      <ExpirySettingsPicker
+                        value={{
+                          expiryDuration:
+                            expiryAmount && expiryUnit
+                              ? {
+                                  amount: expiryAmount,
+                                  unit: expiryUnit,
+                                }
+                              : undefined,
+                        }}
+                        disabled={documentHasBeenSent}
+                        onValueChange={(value) => {
+                          if (value.expiryDuration) {
+                            form.setValue('meta.expiryAmount', value.expiryDuration.amount);
+                            form.setValue('meta.expiryUnit', value.expiryDuration.unit);
+                          } else {
+                            form.setValue('meta.expiryAmount', undefined);
+                            form.setValue('meta.expiryUnit', undefined);
+                          }
+                        }}
+                      />
+                    </div>
                   </div>
                 </AccordionContent>
               </AccordionItem>

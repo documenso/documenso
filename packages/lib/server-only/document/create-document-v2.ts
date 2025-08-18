@@ -27,6 +27,7 @@ import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { calculateRecipientExpiry } from '../../utils/expiry';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getMemberRoles } from '../team/get-member-roles';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -45,6 +46,8 @@ export type CreateDocumentOptions = {
     globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
     recipients: TCreateDocumentV2Request['recipients'];
+    expiryAmount?: number;
+    expiryUnit?: string;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
@@ -167,7 +170,11 @@ export const createDocumentV2 = async ({
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: extractDerivedDocumentMeta(settings, meta),
+          create: extractDerivedDocumentMeta(settings, {
+            ...meta,
+            expiryAmount: data.expiryAmount,
+            expiryUnit: data.expiryUnit,
+          }),
         },
       },
     });
@@ -178,6 +185,12 @@ export const createDocumentV2 = async ({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],
         });
+
+        const expiryDate = calculateRecipientExpiry(
+          data.expiryAmount ?? null,
+          data.expiryUnit ?? null,
+          new Date(), // Calculate from current time
+        );
 
         await tx.recipient.create({
           data: {
@@ -191,6 +204,7 @@ export const createDocumentV2 = async ({
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions: recipientAuthOptions,
+            expired: expiryDate,
             fields: {
               createMany: {
                 data: (recipient.fields || []).map((field) => ({

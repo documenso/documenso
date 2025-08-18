@@ -472,6 +472,9 @@ model DocumentMeta {
   emailSettings Json? /// [DocumentEmailSettings] @zod.custom.use(ZDocumentEmailSettingsSchema)
   emailReplyTo  String?
   emailId       String?
+
+  expiryAmount  Int?
+  expiryUnit    String?
 }
 
 enum ReadStatus {
@@ -488,6 +491,7 @@ enum SigningStatus {
   NOT_SIGNED
   SIGNED
   REJECTED
+  EXPIRED
 }
 
 enum RecipientRole {
@@ -853,6 +857,10 @@ model TemplateMeta {
   signingOrder           DocumentSigningOrder?      @default(PARALLEL)
   allowDictateNextSigner Boolean                    @default(false)
   distributionMethod     DocumentDistributionMethod @default(EMAIL)
+
+  // Default expiry settings
+  defaultExpiryAmount  Int?
+  defaultExpiryUnit    String?
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)

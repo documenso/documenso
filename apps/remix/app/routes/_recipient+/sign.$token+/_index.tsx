@@ -12,6 +12,7 @@ import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-re
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { expireRecipient } from '@documenso/lib/server-only/recipient/expire-recipient';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getNextPendingRecipient } from '@documenso/lib/server-only/recipient/get-next-pending-recipient';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -20,6 +21,7 @@ import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/expiry';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
@@ -126,6 +128,11 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }).catch(() => null);
 
   const { documentMeta } = document;
+
+  if (isRecipientExpired(recipient)) {
+    await expireRecipient({ recipientId: recipient.id });
+    throw redirect(`/sign/${token}/expired`);
+  }
 
   if (recipient.signingStatus === SigningStatus.REJECTED) {
     throw redirect(`/sign/${token}/rejected`);
