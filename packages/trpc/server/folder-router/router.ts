@@ -19,18 +19,21 @@ import {
   ZDeleteFolderSchema,
   ZFindFoldersRequestSchema,
   ZFindFoldersResponseSchema,
-  ZFolderSchema,
   ZGenericSuccessResponse,
   ZGetFoldersResponseSchema,
   ZGetFoldersSchema,
   ZMoveDocumentToFolderResponseSchema,
   ZMoveDocumentToFolderSchema,
+  ZMoveFolderResponseSchema,
   ZMoveFolderSchema,
   ZMoveTemplateToFolderResponseSchema,
   ZMoveTemplateToFolderSchema,
+  ZPinFolderResponseSchema,
   ZPinFolderSchema,
   ZSuccessResponseSchema,
+  ZUnpinFolderResponseSchema,
   ZUnpinFolderSchema,
+  ZUpdateFolderResponseSchema,
   ZUpdateFolderSchema,
 } from './schema';
 
@@ -190,7 +193,7 @@ export const folderRouter = router({
       },
     })
     .input(ZUpdateFolderSchema)
-    .output(ZFolderSchema)
+    .output(ZUpdateFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { id, name, visibility } = input;
@@ -270,7 +273,7 @@ export const folderRouter = router({
       },
     })
     .input(ZMoveFolderSchema)
-    .output(ZFolderSchema)
+    .output(ZMoveFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { id, parentId } = input;
@@ -440,7 +443,7 @@ export const folderRouter = router({
       },
     })
     .input(ZPinFolderSchema)
-    .output(ZFolderSchema)
+    .output(ZPinFolderResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { folderId } = input;
 
@@ -483,7 +486,7 @@ export const folderRouter = router({
       },
     })
     .input(ZUnpinFolderSchema)
-    .output(ZFolderSchema)
+    .output(ZUnpinFolderResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { folderId } = input;
 
