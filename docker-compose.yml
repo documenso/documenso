@@ -1,8 +1,42 @@
 name: documenso-production
 
 services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=documenso_network
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL:-mateus@gmaisp.com.br}
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log.filepath=/var/log/traefik/traefik.log
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8080:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+      - ./logs/traefik:/var/log/traefik
+    networks:
+      - documenso_network
+
   database:
-    image: postgres:15
+    image: postgres:17
+    container_name: postgres
+    restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
     environment:
       - POSTGRES_USER=documenso
       - POSTGRES_PASSWORD=documenso
@@ -13,9 +47,13 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - database:/var/lib/postgresql/data
+      - ~/documenso/db:/var/lib/postgresql/data:rw
+    networks:
+      - documenso_network
 
   documenso:
+    container_name: documenso
+    restart: always
     image: documenso/documenso:latest
     depends_on:
       database:
@@ -60,10 +98,34 @@ services:
       - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
       - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
-    ports:
-      - ${PORT:-3000}:${PORT:-3000}
+      - NEXT_PRIVATE_BROWSERLESS_URL=${NEXT_PRIVATE_BROWSERLESS_URL}
+    labels:
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.documenso.rule=Host(`${DOCUMENSO_DOMAIN:-localhost}`)'
+      - 'traefik.http.routers.documenso.entrypoints=websecure'
+      - 'traefik.http.routers.documenso.tls.certresolver=myresolver'
+      - 'traefik.http.routers.documenso-http.rule=Host(`${DOCUMENSO_DOMAIN:-localhost}`)'
+      - 'traefik.http.routers.documenso-http.entrypoints=web'
+      - 'traefik.http.routers.documenso-http.middlewares=redirect-to-https'
+      - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
+      - 'traefik.http.services.documenso.loadbalancer.server.port=${PORT:-3000}'
     volumes:
       - ~/documenso/cert.p12:/opt/documenso/cert.p12
+    networks:
+      - documenso_network
+  browserless:
+    image: browserless/chrome:latest
+    container_name: browserless
+    hostname: headless
+    networks:
+      - documenso_network
 
 volumes:
   database:
+  traefik_letsencrypt:
+  traefik_logs:
+
+networks:
+  documenso_network:
+    driver: bridge
+    name: documenso_network
