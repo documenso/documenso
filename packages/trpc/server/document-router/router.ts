@@ -1,5 +1,4 @@
 import { DocumentDataType } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
@@ -27,6 +26,7 @@ import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-action
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { downloadDocumentRoute } from './download-document';
 import { findInboxRoute } from './find-inbox';
 import { getInboxCountRoute } from './get-inbox-count';
 import {
@@ -63,6 +63,7 @@ export const documentRouter = router({
     getCount: getInboxCountRoute,
   },
   updateDocument: updateDocumentRoute,
+  downloadDocument: downloadDocumentRoute,
 
   /**
    * @private
@@ -322,7 +323,7 @@ export const documentRouter = router({
 
       return {
         document: createdDocument,
-        folder: createdDocument.folder,
+        folder: createdDocument.folder, // Todo: Remove this prior to api-v2 release.
         uploadUrl: url,
       };
     }),
@@ -367,7 +368,7 @@ export const documentRouter = router({
         title,
         documentDataId,
         normalizePdf: true,
-        timezone,
+        userTimezone: timezone,
         requestMetadata: ctx.metadata,
         folderId,
       });
@@ -477,6 +478,8 @@ export const documentRouter = router({
           distributionMethod: meta.distributionMethod,
           emailSettings: meta.emailSettings,
           language: meta.language,
+          emailId: meta.emailId,
+          emailReplyTo: meta.emailReplyTo,
           requestMetadata: ctx.metadata,
         });
       }
@@ -634,8 +637,7 @@ export const documentRouter = router({
       }).catch(() => null);
 
       if (!document || (teamId && document.teamId !== teamId)) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
           message: 'You do not have access to this document.',
         });
       }

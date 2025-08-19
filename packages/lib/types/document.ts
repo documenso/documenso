@@ -58,6 +58,8 @@ export const ZDocumentSchema = DocumentSchema.pick({
     allowDictateNextSigner: true,
     language: true,
     emailSettings: true,
+    emailId: true,
+    emailReplyTo: true,
   }).nullable(),
   folder: FolderSchema.pick({
     id: true,

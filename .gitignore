@@ -2,6 +2,9 @@
 
 packages/prisma/generated/types.ts
 
+db
+logs
+
 # dependencies
 node_modules
 .pnp

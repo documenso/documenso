@@ -25,7 +25,6 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { canRecipientBeModified } from '../../utils/recipients';
@@ -71,13 +70,6 @@ export const setDocumentRecipients = async ({
     },
   });
 
-  const { branding, settings } = await getEmailContext({
-    source: {
-      type: 'team',
-      teamId,
-    },
-  });
-
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -96,6 +88,15 @@ export const setDocumentRecipients = async ({
   if (document.completedAt) {
     throw new Error('Document already complete');
   }
+
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId,
+    },
+    meta: document.documentMeta,
+  });
 
   const recipientsHaveActionAuth = recipients.some(
     (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
@@ -133,6 +134,9 @@ export const setDocumentRecipients = async ({
         existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
     );
 
+    const canPersistedRecipientBeModified =
+      existing && canRecipientBeModified(existing, document.fields);
+
     if (
       existing &&
       hasRecipientBeenChanged(existing, recipient) &&
@@ -146,6 +150,7 @@ export const setDocumentRecipients = async ({
     return {
       ...recipient,
       _persisted: existing,
+      canPersistedRecipientBeModified,
     };
   });
 
@@ -159,6 +164,13 @@ export const setDocumentRecipients = async ({
             accessAuth: recipient.accessAuth || authOptions.accessAuth,
             actionAuth: recipient.actionAuth || authOptions.actionAuth,
           });
+        }
+
+        if (recipient._persisted && !recipient.canPersistedRecipientBeModified) {
+          return {
+            ...recipient._persisted,
+            clientId: recipient.clientId,
+          };
         }
 
         const upsertedRecipient = await tx.recipient.upsert({
@@ -302,24 +314,20 @@ export const setDocumentRecipients = async ({
           assetBaseUrl,
         });
 
-        const lang = document.documentMeta?.language ?? settings.documentLanguage;
-
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang, branding }),
-          renderEmailWithI18N(template, { lang, branding, plainText: true }),
+          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+          renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
         ]);
 
-        const i18n = await getI18nInstance(lang);
+        const i18n = await getI18nInstance(emailLanguage);
 
         await mailer.sendMail({
           to: {
             address: recipient.email,
             name: recipient.name,
           },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
+          from: senderEmail,
+          replyTo: replyToEmail,
           subject: i18n._(msg`You have been removed from a document`),
           html,
           text,
