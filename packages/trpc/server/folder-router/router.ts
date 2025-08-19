@@ -28,10 +28,8 @@ import {
   ZMoveFolderSchema,
   ZMoveTemplateToFolderResponseSchema,
   ZMoveTemplateToFolderSchema,
-  ZPinFolderResponseSchema,
   ZPinFolderSchema,
   ZSuccessResponseSchema,
-  ZUnpinFolderResponseSchema,
   ZUnpinFolderSchema,
   ZUpdateFolderResponseSchema,
   ZUpdateFolderSchema,
@@ -430,88 +428,64 @@ export const folderRouter = router({
     }),
 
   /**
-   * @public
+   * @private
    */
-  pinFolder: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/folders/pin',
-        summary: 'Pin folder',
-        description: 'Pins a folder for quick access',
-        tags: ['Folder'],
+  pinFolder: authenticatedProcedure.input(ZPinFolderSchema).mutation(async ({ ctx, input }) => {
+    const { folderId } = input;
+
+    ctx.logger.info({
+      input: {
+        folderId,
       },
-    })
-    .input(ZPinFolderSchema)
-    .output(ZPinFolderResponseSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { folderId } = input;
+    });
 
-      ctx.logger.info({
-        input: {
-          folderId,
-        },
-      });
+    const currentFolder = await getFolderById({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId,
+    });
 
-      const currentFolder = await getFolderById({
-        userId: ctx.user.id,
-        teamId: ctx.teamId,
-        folderId,
-      });
+    const result = await pinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId,
+      type: currentFolder.type,
+    });
 
-      const result = await pinFolder({
-        userId: ctx.user.id,
-        teamId: ctx.teamId,
-        folderId,
-        type: currentFolder.type,
-      });
-
-      return {
-        ...result,
-        type: currentFolder.type,
-      };
-    }),
+    return {
+      ...result,
+      type: currentFolder.type,
+    };
+  }),
 
   /**
-   * @public
+   * @private
    */
-  unpinFolder: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/folders/unpin',
-        summary: 'Unpin folder',
-        description: 'Unpins a previously pinned folder',
-        tags: ['Folder'],
+  unpinFolder: authenticatedProcedure.input(ZUnpinFolderSchema).mutation(async ({ ctx, input }) => {
+    const { folderId } = input;
+
+    ctx.logger.info({
+      input: {
+        folderId,
       },
-    })
-    .input(ZUnpinFolderSchema)
-    .output(ZUnpinFolderResponseSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { folderId } = input;
+    });
 
-      ctx.logger.info({
-        input: {
-          folderId,
-        },
-      });
+    const currentFolder = await getFolderById({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId,
+    });
 
-      const currentFolder = await getFolderById({
-        userId: ctx.user.id,
-        teamId: ctx.teamId,
-        folderId,
-      });
+    const result = await unpinFolder({
+      userId: ctx.user.id,
+      teamId: ctx.teamId,
+      folderId,
+      type: currentFolder.type,
+    });
 
-      const result = await unpinFolder({
-        userId: ctx.user.id,
-        teamId: ctx.teamId,
-        folderId,
-        type: currentFolder.type,
-      });
-
-      return {
-        ...result,
-        type: currentFolder.type,
-      };
-    }),
+    return {
+      ...result,
+      type: currentFolder.type,
+    };
+  }),
 });

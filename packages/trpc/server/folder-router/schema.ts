@@ -125,14 +125,10 @@ export const ZPinFolderSchema = z.object({
   type: ZFolderTypeSchema.optional(),
 });
 
-export const ZPinFolderResponseSchema = ZFolderSchema;
-
 export const ZUnpinFolderSchema = z.object({
   folderId: z.string(),
   type: ZFolderTypeSchema.optional(),
 });
-
-export const ZUnpinFolderResponseSchema = ZFolderSchema;
 
 export const ZGetFoldersSchema = z.object({
   parentId: z.string().nullable().optional(),
