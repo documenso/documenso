@@ -3,10 +3,11 @@
 import React from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { calculateExpiryDate, formatExpiryDate } from '@documenso/lib/utils/expiry';
 
 import { cn } from '../lib/utils';
 import { DurationSelector } from './duration-selector';
@@ -48,8 +49,6 @@ export const ExpirySettingsPicker = ({
   onValueChange,
   value,
 }: ExpirySettingsPickerProps) => {
-  const { _ } = useLingui();
-
   const form = useForm<ExpirySettings>({
     resolver: zodResolver(ZExpirySettingsSchema),
     defaultValues,
@@ -58,6 +57,13 @@ export const ExpirySettingsPicker = ({
 
   const { watch, setValue, getValues } = form;
   const expiryDuration = watch('expiryDuration');
+
+  const calculatedExpiryDate = React.useMemo(() => {
+    if (expiryDuration?.amount && expiryDuration?.unit) {
+      return calculateExpiryDate(expiryDuration);
+    }
+    return null;
+  }, [expiryDuration]);
 
   // Call onValueChange when form values change
   React.useEffect(() => {
@@ -111,6 +117,11 @@ export const ExpirySettingsPicker = ({
                   maxAmount={365}
                 />
               </FormControl>
+              {calculatedExpiryDate && (
+                <FormDescription>
+                  <Trans>Links will expire on: {formatExpiryDate(calculatedExpiryDate)}</Trans>
+                </FormDescription>
+              )}
               <FormMessage />
             </FormItem>
           )}

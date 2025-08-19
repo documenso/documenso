@@ -201,6 +201,7 @@ export const resendDocument = async ({
           });
 
           if (document.documentMeta?.expiryAmount && document.documentMeta?.expiryUnit) {
+            const previousExpiryDate = recipient.expired;
             const newExpiryDate = calculateRecipientExpiry(
               document.documentMeta.expiryAmount,
               document.documentMeta.expiryUnit,
@@ -214,6 +215,21 @@ export const resendDocument = async ({
               data: {
                 expired: newExpiryDate,
               },
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRY_EXTENDED,
+                documentId: document.id,
+                metadata: requestMetadata,
+                data: {
+                  recipientId: recipient.id,
+                  recipientName: recipient.name,
+                  recipientEmail: recipient.email,
+                  previousExpiryDate,
+                  newExpiryDate,
+                },
+              }),
             });
           }
 

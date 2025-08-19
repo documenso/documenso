@@ -130,8 +130,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const { documentMeta } = document;
 
   if (isRecipientExpired(recipient)) {
-    await expireRecipient({ recipientId: recipient.id });
-    throw redirect(`/sign/${token}/expired`);
+    const expiredRecipient = await expireRecipient({ recipientId: recipient.id });
+    if (expiredRecipient) {
+      throw redirect(`/sign/${token}/expired`);
+    }
   }
 
   if (recipient.signingStatus === SigningStatus.REJECTED) {

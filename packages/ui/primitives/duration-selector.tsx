@@ -2,19 +2,11 @@
 
 import React from 'react';
 
-import { useLingui } from '@lingui/react';
-import { DateTime } from 'luxon';
+import type { DurationValue } from '@documenso/lib/utils/expiry';
 
 import { cn } from '../lib/utils';
 import { Input } from './input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select';
-
-export type TimeUnit = 'minutes' | 'hours' | 'days' | 'weeks' | 'months';
-
-export interface DurationValue {
-  amount: number;
-  unit: TimeUnit;
-}
 
 export interface DurationSelectorProps {
   value?: DurationValue;
@@ -25,7 +17,7 @@ export interface DurationSelectorProps {
   maxAmount?: number;
 }
 
-const TIME_UNITS: Array<{ value: TimeUnit; label: string; labelPlural: string }> = [
+const TIME_UNITS: Array<{ value: string; label: string; labelPlural: string }> = [
   { value: 'minutes', label: 'Minute', labelPlural: 'Minutes' },
   { value: 'hours', label: 'Hour', labelPlural: 'Hours' },
   { value: 'days', label: 'Day', labelPlural: 'Days' },
@@ -41,8 +33,6 @@ export const DurationSelector = ({
   minAmount = 1,
   maxAmount = 365,
 }: DurationSelectorProps) => {
-  const { _ } = useLingui();
-
   const handleAmountChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const amount = parseInt(event.target.value, 10);
     if (!isNaN(amount) && amount >= minAmount && amount <= maxAmount) {
@@ -50,11 +40,11 @@ export const DurationSelector = ({
     }
   };
 
-  const handleUnitChange = (unit: TimeUnit) => {
+  const handleUnitChange = (unit: string) => {
     onChange?.({ ...value, unit });
   };
 
-  const getUnitLabel = (unit: TimeUnit, amount: number) => {
+  const getUnitLabel = (unit: string, amount: number) => {
     const unitConfig = TIME_UNITS.find((u) => u.value === unit);
     if (!unitConfig) return unit;
 
@@ -86,21 +76,4 @@ export const DurationSelector = ({
       </Select>
     </div>
   );
-};
-
-export const calculateExpiryDate = (duration: DurationValue, fromDate: Date = new Date()): Date => {
-  switch (duration.unit) {
-    case 'minutes':
-      return DateTime.fromJSDate(fromDate).plus({ minutes: duration.amount }).toJSDate();
-    case 'hours':
-      return DateTime.fromJSDate(fromDate).plus({ hours: duration.amount }).toJSDate();
-    case 'days':
-      return DateTime.fromJSDate(fromDate).plus({ days: duration.amount }).toJSDate();
-    case 'weeks':
-      return DateTime.fromJSDate(fromDate).plus({ weeks: duration.amount }).toJSDate();
-    case 'months':
-      return DateTime.fromJSDate(fromDate).plus({ months: duration.amount }).toJSDate();
-    default:
-      return DateTime.fromJSDate(fromDate).plus({ days: duration.amount }).toJSDate();
-  }
 };
