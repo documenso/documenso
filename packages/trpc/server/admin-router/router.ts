@@ -21,6 +21,7 @@ import { deleteSubscriptionClaimRoute } from './delete-subscription-claim';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
+import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import {
   ZAdminDeleteDocumentMutationSchema,
   ZAdminDeleteUserMutationSchema,
@@ -50,6 +51,9 @@ export const adminRouter = router({
   },
   stripe: {
     createCustomer: createStripeCustomerRoute,
+  },
+  user: {
+    resetTwoFactor: resetTwoFactorRoute,
   },
 
   // Todo: migrate old routes
