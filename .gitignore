@@ -21,6 +21,7 @@ build
 # misc
 .DS_Store
 *.pem
+*.p12
 
 # debug
 npm-debug.log*
