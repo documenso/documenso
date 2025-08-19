@@ -108,6 +108,7 @@ export default function SupportPage() {
                     </Button>
                   ) : (
                     <SupportTicketForm
+                      organisationId={organisation.id}
                       teamId={teamId}
                       onSuccess={handleSuccess}
                       onClose={handleCloseForm}

@@ -18,7 +18,6 @@ import { Textarea } from '@documenso/ui/primitives/textarea';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 const ZSupportTicketSchema = z.object({
-  email: z.string().email('Please enter a valid email address'),
   subject: z.string().min(3, 'Subject is required'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
 });
@@ -27,7 +26,7 @@ type TSupportTicket = z.infer<typeof ZSupportTicketSchema>;
 
 export type SupportTicketFormProps = {
   organisationId: string;
-  teamId?: string;
+  teamId?: string | null;
   onSuccess?: () => void;
   onClose?: () => void;
 };
