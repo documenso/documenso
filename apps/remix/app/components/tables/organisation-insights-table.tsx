@@ -2,7 +2,7 @@ import { useTransition } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Archive, Building2, Loader, TrendingUp, Users } from 'lucide-react';
+import { Building2, Loader, TrendingUp, Users } from 'lucide-react';
 import { useNavigation } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -207,7 +207,7 @@ export const OrganisationInsightsTable = ({
   }) => (
     <div className="bg-card flex items-start gap-x-2 rounded-lg border px-4 py-3">
       <Icon className="text-muted-foreground h-4 w-4 items-start" />
-      <div className="-mt-0.5 space-y-1">
+      <div className="-mt-0.5 space-y-2">
         <p className="text-muted-foreground text-sm font-medium">{title}</p>
         <p className="text-2xl font-bold">{value}</p>
         {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
@@ -218,20 +218,13 @@ export const OrganisationInsightsTable = ({
   return (
     <div className="relative">
       {insights.summary && (
-        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div className="mb-6 grid grid-cols-2 gap-4 md:grid-cols-3">
           <SummaryCard icon={Building2} title={_(msg`Teams`)} value={insights.summary.totalTeams} />
           <SummaryCard icon={Users} title={_(msg`Members`)} value={insights.summary.totalMembers} />
           <SummaryCard
             icon={TrendingUp}
-            title={_(msg`Volume (Period)`)}
+            title={_(msg`Completed Documents`)}
             value={insights.summary.volumeThisPeriod}
-            subtitle={_(msg`This time range`)}
-          />
-          <SummaryCard
-            icon={Archive}
-            title={_(msg`Volume (All Time)`)}
-            value={insights.summary.volumeAllTime}
-            subtitle={_(msg`Total completed`)}
           />
         </div>
       )}
