@@ -307,11 +307,18 @@ export const OrgMenuSwitcher = () => {
                 )}
 
               {currentTeam && canExecuteTeamAction('MANAGE_TEAM', currentTeam.currentTeamRole) && (
-                <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                  <Link to={`/t/${currentTeam.url}/settings`}>
-                    <Trans>Team settings</Trans>
-                  </Link>
-                </DropdownMenuItem>
+                <>
+                  <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+                    <Link to={`/t/${currentTeam.url}/settings`}>
+                      <Trans>Team settings</Trans>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+                    <Link to={`/t/${currentTeam.url}/analytics`}>
+                      <Trans>Team analytics</Trans>
+                    </Link>
+                  </DropdownMenuItem>
+                </>
               )}
 
               <DropdownMenuItem
