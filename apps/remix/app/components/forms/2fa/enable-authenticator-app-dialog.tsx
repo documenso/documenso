@@ -240,7 +240,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel className="text-muted-foreground">
-                            <Trans>Token</Trans>
+                            <Trans>Code</Trans>
                           </FormLabel>
                           <FormControl>
                             <PinInput {...field} value={field.value ?? ''} maxLength={6}>
