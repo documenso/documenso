@@ -74,7 +74,7 @@ describe('requestSignatureFromAPI', () => {
     const fixedDate = new Date('2023-12-25T12:00:00Z');
     vi.setSystemTime(fixedDate);
 
-    await requestSignatureFromAPI({ apiKeyId: mockApiKeyId, apiKey: mockApiKey, digest: mockDigest });
+    await requestSignatureFromAPI({ apiKeyId: mockApiKeyId, apiKey: mockApiKey, digest: mockDigest, tsaTimestamp: false });
 
     expect(global.fetch).toHaveBeenCalledWith(
       'https://api.trusted-signatures.com/v1/sign',
@@ -102,7 +102,8 @@ describe('requestSignatureFromAPI', () => {
     const result = await requestSignatureFromAPI({
       apiKeyId: mockApiKeyId,
       apiKey: mockApiKey,
-      digest: mockDigest
+      digest: mockDigest,
+      tsaTimestamp: false,
     });
 
     expect(result).toEqual(Buffer.from(mockSignature, 'base64'));
@@ -119,7 +120,8 @@ describe('requestSignatureFromAPI', () => {
       requestSignatureFromAPI({
         apiKeyId: mockApiKeyId,
         apiKey: mockApiKey,
-        digest: mockDigest
+        digest: mockDigest,
+        tsaTimestamp: false,
       })
     ).rejects.toThrow('HTTP error! Status: 400');
   });
@@ -131,7 +133,8 @@ describe('requestSignatureFromAPI', () => {
       requestSignatureFromAPI({
         apiKeyId: mockApiKeyId,
         apiKey: mockApiKey,
-        digest: mockDigest
+        digest: mockDigest,
+        tsaTimestamp: false,
       })
     ).rejects.toThrow('Network error');
   });

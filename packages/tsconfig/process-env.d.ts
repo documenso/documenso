@@ -42,6 +42,7 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_TS_API_KEY_ID?: string;
     NEXT_PRIVATE_SIGNING_TS_API_KEY?: string;
+    NEXT_PRIVATE_SIGNING_TS_TIMESTAMP?: boolean;
 
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'resend' | 'smtp-auth' | 'smtp-api';
 

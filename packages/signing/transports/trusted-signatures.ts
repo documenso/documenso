@@ -21,6 +21,8 @@ export const signWithTrustedSignatures = async ({ pdf }: SignWithTrustedSignatur
     throw new Error('No API Key found for Trusted Signatures Signing');
   }
 
+  const tsaTimestamp = env('NEXT_PRIVATE_SIGNING_TS_TIMESTAMP') === 'true';
+
   const apiKey = Buffer.from(apiKeyHex, 'hex');
 
   const { pdf: pdfWithPlaceholder, byteRange } = updateSigningPlaceholder({
@@ -38,6 +40,7 @@ export const signWithTrustedSignatures = async ({ pdf }: SignWithTrustedSignatur
     apiKeyId,
     apiKey,
     content: pdfWithoutSignature,
+    tsaTimestamp,
   });
 
   const signatureAsHex = signature.toString('hex');
@@ -140,16 +143,19 @@ export const requestSignatureFromAPI = async ({
   apiKeyId,
   apiKey,
   digest,
+  tsaTimestamp,
 }: {
   apiKeyId: string;
   apiKey: Buffer;
   digest: Buffer;
+  tsaTimestamp: boolean;
 }) => {
   const base64Digest = digest.toString('base64');
   const timeAsIso8601String = new Date().toISOString();
   const message = JSON.stringify({
     digestAlgorithm: 'SHA256',
     digest: base64Digest,
+    tsaTimestamp,
   });
   const hmac = calculateAuthorizationToken({ apiKey, message, timeAsIso8601String });
 
@@ -164,13 +170,15 @@ const getPdfDigest = async ({
   apiKeyId,
   apiKey,
   content,
+  tsaTimestamp,
 }: {
   apiKeyId: string;
   apiKey: Buffer;
   content: Buffer;
+  tsaTimestamp: boolean;
 }) => {
   const digest = calculateSHA256Digest(content);
-  const signature = await requestSignatureFromAPI({ apiKeyId, apiKey, digest });
+  const signature = await requestSignatureFromAPI({ apiKeyId, apiKey, digest, tsaTimestamp });
 
   return signature;
 };
