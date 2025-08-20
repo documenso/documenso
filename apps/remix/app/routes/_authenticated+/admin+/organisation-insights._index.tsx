@@ -83,6 +83,7 @@ export default function Organisations({ loaderData }: Route.ComponentProps) {
           perPage={perPage}
           sortBy={sortBy}
           sortOrder={sortOrder}
+          dateRange={dateRange}
         />
       </div>
     </div>

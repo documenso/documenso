@@ -108,7 +108,7 @@ export const OrganisationInsightsTable = ({
       size: 180,
     },
     {
-      header: () => <span className="whitespace-nowrap">{_(msg`Documents Signed`)}</span>,
+      header: () => <span className="whitespace-nowrap">{_(msg`Documents Completed`)}</span>,
       accessorKey: 'signedDocumentCount',
       cell: ({ row }) => Number(row.getValue('signedDocumentCount')),
       size: 180,
@@ -223,7 +223,7 @@ export const OrganisationInsightsTable = ({
           <SummaryCard icon={Users} title={_(msg`Members`)} value={insights.summary.totalMembers} />
           <SummaryCard
             icon={TrendingUp}
-            title={_(msg`Completed Documents`)}
+            title={_(msg`Documents Completed`)}
             value={insights.summary.volumeThisPeriod}
           />
         </div>

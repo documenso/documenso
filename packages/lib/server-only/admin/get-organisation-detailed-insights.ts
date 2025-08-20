@@ -191,8 +191,8 @@ async function getUserInsights(
         : sql<number>`COUNT(DISTINCT CASE WHEN td.id IS NOT NULL THEN d.id END)`
       ).as('documentCount'),
       (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN r.id IS NOT NULL AND ts.id IS NOT NULL AND r."signedAt" >= ${createdAtFrom} AND r.role = 'SIGNER'::"RecipientRole" THEN r.id END)`
-        : sql<number>`COUNT(DISTINCT CASE WHEN ts.id IS NOT NULL AND r.role = 'SIGNER'::"RecipientRole" THEN r.id END)`
+        ? sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND td.id IS NOT NULL AND d.status = 'COMPLETED' AND d."createdAt" >= ${createdAtFrom} THEN d.id END)`
+        : sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND td.id IS NOT NULL AND d.status = 'COMPLETED' THEN d.id END)`
       ).as('signedDocumentCount'),
     ])
     .groupBy(['u.id', 'u.name', 'u.email', 'u.createdAt'])
