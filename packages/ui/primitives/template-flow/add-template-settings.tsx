@@ -266,7 +266,7 @@ export const AddTemplateSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Document visibility
+                      <Trans>Document visibility</Trans>
                       <DocumentVisibilityTooltip />
                     </FormLabel>
 
