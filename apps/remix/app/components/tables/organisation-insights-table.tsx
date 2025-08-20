@@ -3,6 +3,7 @@ import { useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Archive, Building2, Loader, TrendingUp, Users } from 'lucide-react';
+import { useNavigation } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import type { OrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
@@ -33,7 +34,10 @@ export const OrganisationInsightsTable = ({
 }: OrganisationInsightsTableProps) => {
   const { _, i18n } = useLingui();
   const [isPending, startTransition] = useTransition();
+  const navigation = useNavigation();
   const updateSearchParams = useUpdateSearchParams();
+
+  const isLoading = isPending || navigation.state === 'loading';
 
   const onPaginationChange = (newPage: number, newPerPage: number) => {
     startTransition(() => {
@@ -121,8 +125,12 @@ export const OrganisationInsightsTable = ({
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Title`)}</span>,
       accessorKey: 'title',
-      cell: ({ row }) => <span className="block max-w-full truncate">{row.getValue('title')}</span>,
-      size: 240,
+      cell: ({ row }) => (
+        <span className="block max-w-[200px] truncate" title={row.getValue('title') as string}>
+          {row.getValue('title')}
+        </span>
+      ),
+      size: 200,
     },
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Status`)}</span>,
@@ -130,21 +138,23 @@ export const OrganisationInsightsTable = ({
       cell: ({ row }) => (
         <DocumentStatus status={row.getValue('status') as ExtendedDocumentStatus} />
       ),
-      size: 140,
+      size: 120,
     },
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Team`)}</span>,
       accessorKey: 'teamName',
       cell: ({ row }) => (
-        <span className="block max-w-full truncate">{row.getValue('teamName')}</span>
+        <span className="block max-w-[150px] truncate" title={row.getValue('teamName') as string}>
+          {row.getValue('teamName')}
+        </span>
       ),
-      size: 180,
+      size: 150,
     },
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Created`)}</span>,
       accessorKey: 'createdAt',
       cell: ({ row }) => i18n.date(new Date(row.getValue('createdAt'))),
-      size: 160,
+      size: 140,
     },
     {
       header: () => <span className="whitespace-nowrap">{_(msg`Completed`)}</span>,
@@ -154,7 +164,7 @@ export const OrganisationInsightsTable = ({
 
         return completedAt ? i18n.date(new Date(completedAt)) : '-';
       },
-      size: 160,
+      size: 140,
     },
   ] satisfies DataTableColumnDef<(typeof insights.documents)[number]>[];
 
@@ -231,21 +241,21 @@ export const OrganisationInsightsTable = ({
           <Button
             variant={view === 'teams' ? 'default' : 'outline'}
             onClick={() => handleViewChange('teams')}
-            disabled={isPending}
+            disabled={isLoading}
           >
             {_(msg`Teams`)}
           </Button>
           <Button
             variant={view === 'users' ? 'default' : 'outline'}
             onClick={() => handleViewChange('users')}
-            disabled={isPending}
+            disabled={isLoading}
           >
             {_(msg`Users`)}
           </Button>
           <Button
             variant={view === 'documents' ? 'default' : 'outline'}
             onClick={() => handleViewChange('documents')}
-            disabled={isPending}
+            disabled={isLoading}
           >
             {_(msg`Documents`)}
           </Button>
@@ -253,18 +263,20 @@ export const OrganisationInsightsTable = ({
         <DateRangeFilter currentRange={dateRange} />
       </div>
 
-      <DataTable<unknown, unknown>
-        columns={getCurrentColumns()}
-        data={getCurrentData()}
-        perPage={perPage}
-        currentPage={page}
-        totalPages={insights.totalPages}
-        onPaginationChange={onPaginationChange}
-      >
-        {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
-      </DataTable>
+      <div className={view === 'documents' ? 'overflow-hidden' : undefined}>
+        <DataTable<unknown, unknown>
+          columns={getCurrentColumns()}
+          data={getCurrentData()}
+          perPage={perPage}
+          currentPage={page}
+          totalPages={insights.totalPages}
+          onPaginationChange={onPaginationChange}
+        >
+          {(table) => <DataTablePagination additionalInformation="VisibleCount" table={table} />}
+        </DataTable>
+      </div>
 
-      {isPending && (
+      {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/50">
           <Loader className="h-8 w-8 animate-spin text-gray-500" />
         </div>

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -44,6 +44,7 @@ export const AdminOrganisationOverviewTable = ({
   const { _, i18n } = useLingui();
 
   const [isPending, startTransition] = useTransition();
+  const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
   const [searchString, setSearchString] = useState('');
   const debouncedSearchString = useDebouncedValue(searchString, 1000);
@@ -74,7 +75,7 @@ export const AdminOrganisationOverviewTable = ({
             <div>
               <Link
                 className="text-primary underline"
-                to={`/admin/organisation-insights/${row.original.id}`}
+                to={`/admin/organisation-insights/${row.original.id}?dateRange=${searchParams.get('dateRange') || 'last30days'}`}
               >
                 {row.getValue('name')}
               </Link>
