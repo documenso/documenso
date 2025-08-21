@@ -1,9 +1,4 @@
-import type {
-  Document,
-  DocumentMeta,
-  OrganisationGlobalSettings,
-  TemplateMeta,
-} from '@prisma/client';
+import type { Document, DocumentMeta, OrganisationGlobalSettings } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
@@ -29,7 +24,7 @@ export const isDocumentCompleted = (document: Pick<Document, 'status'> | Documen
  */
 export const extractDerivedDocumentMeta = (
   settings: Omit<OrganisationGlobalSettings, 'id'>,
-  overrideMeta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
+  overrideMeta: Partial<DocumentMeta> | undefined | null,
 ) => {
   const meta = overrideMeta ?? {};
 
@@ -58,5 +53,5 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-  } satisfies Omit<DocumentMeta, 'id' | 'documentId'>;
+  } satisfies Omit<DocumentMeta, 'id' | 'documentId' | 'templateId'>;
 };

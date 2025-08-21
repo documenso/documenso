@@ -1,4 +1,4 @@
-import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, Template } from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
@@ -26,7 +26,7 @@ export type CreateTemplateOptions = {
     publicDescription?: string;
     type?: Template['type'];
   };
-  meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
+  meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
 };
 
 export const ZCreateTemplateResponseSchema = TemplateSchema;

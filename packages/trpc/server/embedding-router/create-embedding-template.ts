@@ -94,7 +94,7 @@ export const createEmbeddingTemplateRoute = procedure
           emailSettings: meta.emailSettings,
         };
 
-        await prisma.templateMeta.upsert({
+        await prisma.documentMeta.upsert({
           where: {
             templateId: template.id,
           },
