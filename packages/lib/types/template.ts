@@ -1,10 +1,10 @@
 import type { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-import { TemplateMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateMetaSchema';
 import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
@@ -39,7 +39,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
     data: true,
     initialData: true,
   }),
-  templateMeta: TemplateMetaSchema.pick({
+  templateMeta: DocumentMetaSchema.pick({
     id: true,
     subject: true,
     message: true,
@@ -129,7 +129,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   }).nullable(),
   fields: ZFieldSchema.array(),
   recipients: ZRecipientLiteSchema.array(),
-  templateMeta: TemplateMetaSchema.pick({
+  templateMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,
   }).nullable(),

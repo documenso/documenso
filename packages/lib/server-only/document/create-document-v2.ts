@@ -1,4 +1,4 @@
-import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility } from '@prisma/client';
 import {
   DocumentSource,
   FolderType,
@@ -48,7 +48,7 @@ export type CreateDocumentOptions = {
     recipients: TCreateDocumentTemporaryRequest['recipients'];
     folderId?: string;
   };
-  meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
+  meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
 };
 

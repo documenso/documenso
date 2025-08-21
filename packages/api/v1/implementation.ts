@@ -556,6 +556,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         status: 200,
         body: {
           ...template,
+          templateMeta: template.templateMeta
+            ? {
+                ...template.templateMeta,
+                templateId: template.id,
+              }
+            : null,
           Field: template.fields.map((field) => ({
             ...field,
             fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
