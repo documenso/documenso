@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -103,18 +103,17 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
     }
   };
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
     }
-  }, [open, form]);
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button variant="outline" loading={isPending} className="bg-background">

@@ -76,7 +76,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
 
   const [selectedPriceId, setSelectedPriceId] = useState<string>('');
 
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(actionSearchParam === 'add-organisation');
 
   const form = useForm({
     resolver: zodResolver(ZCreateOrganisationFormSchema),
@@ -90,6 +90,19 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
   const { data: plansData } = trpc.enterprise.billing.plans.get.useQuery(undefined, {
     enabled: IS_BILLING_ENABLED(),
   });
+
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+      if (actionSearchParam === 'add-organisation') {
+        updateSearchParams({ action: null });
+      }
+    }
+
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
 
   const onFormSubmit = async ({ name }: TCreateOrganisationFormSchema) => {
     try {
@@ -126,17 +139,6 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
     }
   };
 
-  useEffect(() => {
-    if (actionSearchParam === 'add-organisation') {
-      setOpen(true);
-      updateSearchParams({ action: null });
-    }
-  }, [actionSearchParam, open]);
-
-  useEffect(() => {
-    form.reset();
-  }, [open, form]);
-
   const isIndividualPlan = (priceId: string) => {
     return (
       plansData?.plans[INTERNAL_CLAIM_ID.INDIVIDUAL]?.monthlyPrice?.id === priceId ||
@@ -145,11 +147,7 @@ export const OrganisationCreateDialog = ({ trigger, ...props }: OrganisationCrea
   };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
@@ -314,13 +312,16 @@ const BillingPlanForm = ({
         };
       },
     );
-  }, [plans]);
+  }, [plans, t]);
 
   useEffect(() => {
-    if (value === '' && !canCreateFreeOrganisation) {
-      onChange(dynamicPlans[0][billingPeriod]?.id ?? '');
+    if (value === '' && !canCreateFreeOrganisation && dynamicPlans.length > 0) {
+      const defaultValue = dynamicPlans[0][billingPeriod]?.id ?? '';
+      if (defaultValue) {
+        onChange(defaultValue);
+      }
     }
-  }, [value]);
+  }, [canCreateFreeOrganisation, dynamicPlans, billingPeriod, onChange, value]);
 
   const onBillingPeriodChange = (billingPeriod: 'monthlyPrice' | 'yearlyPrice') => {
     const plan = dynamicPlans.find(

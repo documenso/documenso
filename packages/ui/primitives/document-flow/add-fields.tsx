@@ -18,7 +18,6 @@ import {
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
@@ -102,6 +101,10 @@ export const AddFieldsFormPartial = ({
   const { _ } = useLingui();
 
   const [isMissingSignatureDialogVisible, setIsMissingSignatureDialogVisible] = useState(false);
+
+  const handleMissingSignatureDialogOpenChange = (value: boolean) => {
+    setIsMissingSignatureDialogVisible(value);
+  };
 
   const { isWithinPageBounds, getFieldPosition, getPage } = useDocumentElement();
   const { currentStep, totalSteps, previousStep } = useStep();
@@ -511,17 +514,23 @@ export const AddFieldsFormPartial = ({
     };
   }, []);
 
-  useEffect(() => {
+  const defaultSelectedSigner = useMemo(() => {
     const recipientsByRoleToDisplay = recipients.filter(
       (recipient) =>
         recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
     );
 
-    setSelectedSigner(
+    return (
       recipientsByRoleToDisplay.find((r) => r.sendStatus !== SendStatus.SENT) ??
-        recipientsByRoleToDisplay[0],
+      recipientsByRoleToDisplay[0]
     );
   }, [recipients]);
+
+  if (selectedSigner && !recipients.find((r) => r.id === selectedSigner.id)) {
+    setSelectedSigner(defaultSelectedSigner);
+  } else if (!selectedSigner && defaultSelectedSigner) {
+    setSelectedSigner(defaultSelectedSigner);
+  }
 
   const recipientsByRole = useMemo(() => {
     const recipientsByRole: Record<RecipientRole, Recipient[]> = {
@@ -538,29 +547,6 @@ export const AddFieldsFormPartial = ({
 
     return recipientsByRole;
   }, [recipients]);
-
-  const recipientsByRoleToDisplay = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
-      )
-      .map(
-        ([role, roleRecipients]) =>
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          [
-            role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [prop('id'), 'asc'],
-            ),
-          ] as [RecipientRole, Recipient[]],
-      );
-  }, [recipientsByRole]);
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
@@ -995,7 +981,7 @@ export const AddFieldsFormPartial = ({
 
           <MissingSignatureFieldDialog
             isOpen={isMissingSignatureDialogVisible}
-            onOpenChange={(value) => setIsMissingSignatureDialogVisible(value)}
+            onOpenChange={handleMissingSignatureDialogOpenChange}
           />
         </>
       )}

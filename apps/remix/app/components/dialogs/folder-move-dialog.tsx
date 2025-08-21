@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -97,12 +97,13 @@ export const FolderMoveDialog = ({
     }
   };
 
-  useEffect(() => {
-    if (!isOpen) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
       setSearchTerm('');
     }
-  }, [isOpen, form]);
+    onOpenChange(value);
+  };
 
   // Filter out the current folder, only show folders of the same type, and filter by search term
   const filteredFolders = foldersData?.filter(
@@ -113,7 +114,7 @@ export const FolderMoveDialog = ({
   );
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

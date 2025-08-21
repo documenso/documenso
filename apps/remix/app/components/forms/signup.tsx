@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MessageDescriptor } from '@lingui/core';
@@ -84,10 +84,19 @@ export const SignUpForm = ({
 
   const utmSrc = searchParams.get('utm_source') ?? null;
 
+  const emailFromHash = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    return params.get('email');
+  }, []);
+
   const form = useForm<TSignUpFormSchema>({
     values: {
       name: '',
-      email: initialEmail ?? '',
+      email: emailFromHash ?? initialEmail ?? '',
       password: '',
       signature: '',
     },
@@ -161,18 +170,6 @@ export const SignUpForm = ({
       });
     }
   };
-
-  useEffect(() => {
-    const hash = window.location.hash.slice(1);
-
-    const params = new URLSearchParams(hash);
-
-    const email = params.get('email');
-
-    if (email) {
-      form.setValue('email', email);
-    }
-  }, [form]);
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>

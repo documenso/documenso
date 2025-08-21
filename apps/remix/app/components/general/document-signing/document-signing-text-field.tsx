@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -80,19 +80,15 @@ export const DocumentSigningTextField = ({
   const parsedFieldMeta = safeFieldMeta.success ? safeFieldMeta.data : null;
 
   const isLoading = isSignFieldWithTokenLoading || isRemoveSignedFieldWithTokenLoading;
-  const shouldAutoSignField =
-    (!field.inserted && parsedFieldMeta?.text) ||
-    (!field.inserted && parsedFieldMeta?.text && parsedFieldMeta?.readOnly);
+  const shouldAutoSignField = useMemo(
+    () =>
+      (!field.inserted && parsedFieldMeta?.text) ||
+      (!field.inserted && parsedFieldMeta?.text && parsedFieldMeta?.readOnly),
+    [field.inserted, parsedFieldMeta?.text, parsedFieldMeta?.readOnly],
+  );
 
   const [showCustomTextModal, setShowCustomTextModal] = useState(false);
   const [localText, setLocalCustomText] = useState(parsedFieldMeta?.text ?? '');
-
-  useEffect(() => {
-    if (!showCustomTextModal) {
-      setLocalCustomText(parsedFieldMeta?.text ?? '');
-      setErrors(initialErrors);
-    }
-  }, [showCustomTextModal]);
 
   const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const text = e.target.value;
@@ -216,14 +212,12 @@ export const DocumentSigningTextField = ({
     }
   };
 
-  useEffect(() => {
-    if (shouldAutoSignField) {
-      void executeActionAuthProcedure({
-        onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
-        actionTarget: field.type,
-      });
-    }
-  }, []);
+  if (shouldAutoSignField) {
+    void executeActionAuthProcedure({
+      onReauthFormSubmit: async (authOptions) => await onSign(authOptions),
+      actionTarget: field.type,
+    });
+  }
 
   const parsedField = field.fieldMeta ? ZTextFieldMeta.parse(field.fieldMeta) : undefined;
 
@@ -318,7 +312,8 @@ export const DocumentSigningTextField = ({
                 className="flex-1"
                 onClick={() => {
                   setShowCustomTextModal(false);
-                  setLocalCustomText('');
+                  setLocalCustomText(parsedFieldMeta?.text ?? '');
+                  setErrors(initialErrors);
                 }}
               >
                 <Trans>Cancel</Trans>

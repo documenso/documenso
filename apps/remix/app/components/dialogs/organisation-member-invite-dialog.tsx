@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -193,13 +193,6 @@ export const OrganisationMemberInviteDialog = ({
     return 'form';
   }, [fullOrganisation]);
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      setInvitationType('INDIVIDUAL');
-    }
-  }, [open, form]);
-
   const onFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.length) {
       return;
@@ -267,12 +260,18 @@ export const OrganisationMemberInviteDialog = ({
     });
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+      setInvitationType('INDIVIDUAL');
+    }
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
+
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="secondary">

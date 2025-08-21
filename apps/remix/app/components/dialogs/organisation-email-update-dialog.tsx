@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -87,23 +87,20 @@ export const OrganisationEmailUpdateDialog = ({
     }
   };
 
-  useEffect(() => {
-    if (!open) {
-      return;
+  const handleOpenChange = (value: boolean) => {
+    if (value) {
+      form.reset({
+        emailName: organisationEmail.emailName,
+        // replyTo: organisationEmail.replyTo ?? undefined,
+      });
     }
-
-    form.reset({
-      emailName: organisationEmail.emailName,
-      // replyTo: organisationEmail.replyTo ?? undefined,
-    });
-  }, [open, form]);
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger}
       </DialogTrigger>

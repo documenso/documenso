@@ -1,11 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
-export const ClientOnly = async ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
+const subscribe = () => {
+  return () => {};
+};
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+const getSnapshot = () => {
+  return true;
+};
 
-  return mounted ? children : null;
+const getServerSnapshot = () => {
+  return false;
+};
+
+export const ClientOnly = ({
+  children,
+}: {
+  children: React.ReactNode;
+}): React.ReactElement | null => {
+  const isClient = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+
+  return isClient ? <>{children}</> : null;
 };

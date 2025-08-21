@@ -1,10 +1,9 @@
-import { useRef } from 'react';
+import { useLayoutEffect, useRef } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 import { UploadCloudIcon } from 'lucide-react';
 
-import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
 import { SIGNATURE_CANVAS_DPI } from '@documenso/lib/constants/signatures';
 
 import { cn } from '../../lib/utils';
@@ -97,7 +96,7 @@ export const SignaturePadUpload = ({
     }
   };
 
-  unsafe_useEffectOnce(() => {
+  useLayoutEffect(() => {
     // Todo: Not really sure if this is required for uploaded images.
     if ($el.current) {
       $el.current.width = $el.current.clientWidth * SIGNATURE_CANVAS_DPI;
@@ -121,7 +120,7 @@ export const SignaturePadUpload = ({
 
       img.src = value;
     }
-  });
+  }, [value]);
 
   return (
     <div className={cn('relative h-full w-full', className)}>

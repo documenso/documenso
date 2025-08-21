@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -119,20 +119,17 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
     }
   };
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
       setStep('SELECT');
     }
-  }, [open, form]);
+    // Disable automatic onOpenChange events to prevent dialog from closing if user 'accidentally' clicks the overlay.
+    // Since it would be annoying to redo the whole process, we handle open state manually
+  };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      // Disable automatic onOpenChange events to prevent dialog from closing if auser 'accidentally' clicks the overlay.
-      // Since it would be annoying to redo the whole process.
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         <Button variant="secondary" onClick={() => setOpen(true)}>
           <Trans>Add members</Trans>

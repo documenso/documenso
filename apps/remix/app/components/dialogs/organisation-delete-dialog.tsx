@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -93,14 +93,19 @@ export const OrganisationDeleteDialog = ({ trigger }: OrganisationDeleteDialogPr
     }
   };
 
-  useEffect(() => {
-    if (!open) {
+  const handleOpenChange = (value: boolean) => {
+    if (form.formState.isSubmitting) {
+      return;
+    }
+
+    if (!value) {
       form.reset();
     }
-  }, [open, form]);
+    setOpen(value);
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="destructive">

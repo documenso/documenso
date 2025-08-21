@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -136,18 +136,19 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
     setIsOpen(true);
   };
 
-  useEffect(() => {
-    enable2FAForm.reset();
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
 
-    if (!isOpen && recoveryCodes && recoveryCodes.length > 0) {
-      setRecoveryCodes(null);
+    if (!open) {
+      enable2FAForm.reset();
+      if (recoveryCodes && recoveryCodes.length > 0) {
+        setRecoveryCodes(null);
+      }
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isOpen]);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild={true}>
         <Button
           className="flex-shrink-0"

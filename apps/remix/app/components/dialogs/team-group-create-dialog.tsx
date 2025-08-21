@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -107,7 +107,7 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
         duration: 5000,
       });
 
-      setOpen(false);
+      handleClose();
     } catch {
       toast({
         title: t`An unknown error occurred`,
@@ -117,17 +117,23 @@ export const TeamGroupCreateDialog = ({ ...props }: TeamGroupCreateDialogProps) 
     }
   };
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      setStep('SELECT');
+  const handleClose = () => {
+    setOpen(false);
+    form.reset();
+    setStep('SELECT');
+  };
+
+  const handleOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
+      handleClose();
     }
-  }, [open, form]);
+  };
 
   return (
     <Dialog
       {...props}
       open={open}
+      onOpenChange={handleOpenChange}
       // Disable automatic onOpenChange events to prevent dialog from closing if auser 'accidentally' clicks the overlay.
       // Since it would be annoying to redo the whole process.
     >

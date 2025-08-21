@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -186,16 +186,20 @@ export const TemplateDirectLinkDialog = ({
   const isLoading =
     isCreatingTemplateDirectLink || isTogglingTemplateAccess || isDeletingTemplateDirectLink;
 
-  useEffect(() => {
-    resetCreateTemplateDirectLink();
-    setCurrentStep(token ? 'MANAGE' : 'ONBOARD');
-    setSelectedRecipientId(null);
+  const handleOpenChange = (value: boolean) => {
+    if (!isLoading) {
+      if (value) {
+        resetCreateTemplateDirectLink();
+        setCurrentStep(token ? 'MANAGE' : 'ONBOARD');
+        setSelectedRecipientId(null);
+      }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+      onOpenChange(value);
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <fieldset disabled={isLoading} className="relative">
         <AnimateGenericFadeInOut motionKey={currentStep}>
           {match({ token, currentStep })

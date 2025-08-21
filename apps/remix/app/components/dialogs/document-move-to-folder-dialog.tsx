@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -83,15 +83,6 @@ export const DocumentMoveToFolderDialog = ({
 
   const { mutateAsync: moveDocumentToFolder } = trpc.folder.moveDocumentToFolder.useMutation();
 
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-      setSearchTerm('');
-    } else {
-      form.reset({ folderId: currentFolderId });
-    }
-  }, [open, currentFolderId, form]);
-
   const onSubmit = async (data: TMoveDocumentFormSchema) => {
     try {
       await moveDocumentToFolder({
@@ -145,12 +136,22 @@ export const DocumentMoveToFolderDialog = ({
     }
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+      setSearchTerm('');
+    } else {
+      form.reset({ folderId: currentFolderId });
+    }
+    onOpenChange(value);
+  };
+
   const filteredFolders = folders?.data.filter((folder) =>
     folder.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
-    <Dialog {...props} open={open} onOpenChange={onOpenChange}>
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

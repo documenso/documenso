@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
@@ -92,14 +90,15 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
     }
   };
 
-  useEffect(() => {
-    if (!isOpen) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
     }
-  }, [isOpen]);
+    onOpenChange(value);
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

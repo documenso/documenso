@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { MessageDescriptor } from '@lingui/core';
@@ -116,9 +116,18 @@ export const SignInForm = ({
   const { mutateAsync: createPasskeySigninOptions } =
     trpc.auth.createPasskeySigninOptions.useMutation();
 
+  const emailFromHash = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return null;
+    }
+    const hash = window.location.hash.slice(1);
+    const params = new URLSearchParams(hash);
+    return params.get('email');
+  }, []);
+
   const form = useForm<TSignInFormSchema>({
     values: {
-      email: initialEmail ?? '',
+      email: emailFromHash ?? initialEmail ?? '',
       password: '',
       totpCode: '',
       backupCode: '',
@@ -286,18 +295,6 @@ export const SignInForm = ({
       });
     }
   };
-
-  useEffect(() => {
-    const hash = window.location.hash.slice(1);
-
-    const params = new URLSearchParams(hash);
-
-    const email = params.get('email');
-
-    if (email) {
-      form.setValue('email', email);
-    }
-  }, [form]);
 
   return (
     <Form {...form}>

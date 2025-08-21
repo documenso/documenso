@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -73,13 +73,6 @@ export const OrganisationEmailCreateDialog = ({
   const { mutateAsync: createOrganisationEmail, isPending } =
     trpc.enterprise.organisation.email.create.useMutation();
 
-  // Reset state when dialog closes
-  useEffect(() => {
-    if (!open) {
-      form.reset();
-    }
-  }, [open, form]);
-
   const onFormSubmit = async (data: TCreateOrganisationEmailFormSchema) => {
     try {
       await createOrganisationEmail({
@@ -114,8 +107,17 @@ export const OrganisationEmailCreateDialog = ({
     }
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+    }
+    if (!isPending) {
+      setOpen(value);
+    }
+  };
+
   return (
-    <Dialog {...props} open={open} onOpenChange={(value) => !isPending && setOpen(value)}>
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">

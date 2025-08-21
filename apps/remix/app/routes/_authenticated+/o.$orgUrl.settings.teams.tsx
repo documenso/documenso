@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
@@ -20,21 +20,28 @@ export default function OrganisationSettingsTeamsPage() {
   const [searchQuery, setSearchQuery] = useState(() => searchParams?.get('query') ?? '');
 
   const debouncedSearchQuery = useDebouncedValue(searchQuery, 500);
-
   /**
    * Handle debouncing the search query.
    */
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
+  const handleSearchQueryChange = useCallback(
+    (newQuery: string) => {
+      const params = new URLSearchParams(searchParams?.toString());
 
-    params.set('query', debouncedSearchQuery);
+      if (newQuery.trim()) {
+        params.set('query', newQuery);
+      } else {
+        params.delete('query');
+      }
 
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams],
+  );
 
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
+  const currentParamQuery = searchParams?.get('query') ?? '';
+  if (currentParamQuery !== debouncedSearchQuery) {
+    handleSearchQueryChange(debouncedSearchQuery);
+  }
 
   return (
     <div>

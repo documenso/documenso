@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
@@ -16,7 +14,7 @@ import {
   DOCUMENT_SIGNATURE_TYPES,
 } from '@documenso/lib/constants/document';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
-import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -113,7 +111,8 @@ export const AddTemplateSettingsFormPartial = ({
       meta: {
         subject: template.templateMeta?.subject ?? '',
         message: template.templateMeta?.message ?? '',
-        timezone: template.templateMeta?.timezone ?? DEFAULT_DOCUMENT_TIME_ZONE,
+        timezone:
+          template.templateMeta?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         dateFormat: (template.templateMeta?.dateFormat ??
           DEFAULT_DOCUMENT_DATE_FORMAT) as TDocumentMetaDateFormat,
@@ -151,14 +150,6 @@ export const AddTemplateSettingsFormPartial = ({
         template.visibility === DocumentVisibility.MANAGER_AND_ABOVE,
     )
     .otherwise(() => false);
-
-  // We almost always want to set the timezone to the user's local timezone to avoid confusion
-  // when the document is signed.
-  useEffect(() => {
-    if (!form.formState.touchedFields.meta?.timezone && !template.templateMeta?.timezone) {
-      form.setValue('meta.timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
-    }
-  }, [form, form.setValue, form.formState.touchedFields.meta?.timezone]);
 
   return (
     <>

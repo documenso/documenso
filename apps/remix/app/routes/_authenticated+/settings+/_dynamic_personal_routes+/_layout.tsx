@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { Outlet, useNavigate } from 'react-router';
 
 import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
@@ -30,13 +28,8 @@ export default function Layout() {
   const currentOrganisation = organisations[0];
   const team = currentOrganisation?.teams[0] || null;
 
-  useEffect(() => {
-    if (!isPersonalLayoutMode || !team) {
-      void navigate('/settings/profile');
-    }
-  }, []);
-
   if (!isPersonalLayoutMode || !team) {
+    void navigate('/settings/profile');
     return null;
   }
 

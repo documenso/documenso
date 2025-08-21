@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -26,16 +26,13 @@ export const DocumentSearch = ({ initialValue = '' }: { initialValue?: string })
 
       setSearchParams(params);
     },
-    [searchParams],
+    [searchParams, setSearchParams],
   );
 
-  useEffect(() => {
-    const currentQueryParam = searchParams.get('query') || '';
-
-    if (debouncedSearchTerm !== currentQueryParam) {
-      handleSearch(debouncedSearchTerm);
-    }
-  }, [debouncedSearchTerm, searchParams]);
+  const currentQuery = searchParams?.get('query') ?? '';
+  if (currentQuery !== debouncedSearchTerm) {
+    handleSearch(debouncedSearchTerm);
+  }
 
   return (
     <Input

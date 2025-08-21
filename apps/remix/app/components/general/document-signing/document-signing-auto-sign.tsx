@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
-import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
 import { AUTO_SIGNABLE_FIELD_TYPES } from '@documenso/lib/constants/autosign';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
@@ -61,12 +60,6 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
   const { email, fullName } = useRequiredDocumentSigningContext();
   const { derivedRecipientActionAuth } = useRequiredDocumentSigningAuthContext();
 
-  const [open, setOpen] = useState(false);
-
-  const form = useForm();
-
-  const { mutateAsync: signFieldWithToken } = trpc.field.signFieldWithToken.useMutation();
-
   const autoSignableFields = fields.filter((field) => {
     if (field.inserted) {
       return false;
@@ -94,6 +87,14 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
   const actionAuthAllowsAutoSign = derivedRecipientActionAuth.every(
     (actionAuth) => !NON_AUTO_SIGNABLE_ACTION_AUTH_TYPES.includes(actionAuth),
   );
+
+  const [open, setOpen] = useState(() => {
+    return actionAuthAllowsAutoSign && autoSignableFields.length > AUTO_SIGN_THRESHOLD;
+  });
+
+  const form = useForm();
+
+  const { mutateAsync: signFieldWithToken } = trpc.field.signFieldWithToken.useMutation();
 
   const onSubmit = async () => {
     const results = await Promise.allSettled(
@@ -151,12 +152,6 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
 
     await revalidate();
   };
-
-  unsafe_useEffectOnce(() => {
-    if (actionAuthAllowsAutoSign && autoSignableFields.length > AUTO_SIGN_THRESHOLD) {
-      setOpen(true);
-    }
-  });
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>

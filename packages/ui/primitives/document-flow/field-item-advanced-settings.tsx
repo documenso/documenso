@@ -1,4 +1,4 @@
-import { forwardRef, useEffect, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -160,22 +160,32 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const defaultState: FieldMeta = getDefaultState(field.type);
 
-    const [fieldState, setFieldState] = useState(() => {
-      const savedState = localStorage.getItem(localStorageKey);
-      return savedState ? { ...defaultState, ...JSON.parse(savedState) } : defaultState;
-    });
-
-    useEffect(() => {
+    const initialFieldState = useMemo(() => {
       if (fieldMeta && typeof fieldMeta === 'object') {
         const parsedFieldMeta = ZFieldMetaSchema.parse(fieldMeta);
-
-        setFieldState({
+        return {
           ...defaultState,
           ...parsedFieldMeta,
-        });
+        };
       }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [fieldMeta]);
+
+      const savedState = localStorage.getItem(localStorageKey);
+      return savedState ? { ...defaultState, ...JSON.parse(savedState) } : defaultState;
+    }, [fieldMeta, defaultState, localStorageKey]);
+
+    const [fieldState, setFieldState] = useState(initialFieldState);
+
+    if (fieldMeta && typeof fieldMeta === 'object') {
+      const parsedFieldMeta = ZFieldMetaSchema.parse(fieldMeta);
+      const expectedState = {
+        ...defaultState,
+        ...parsedFieldMeta,
+      };
+
+      if (JSON.stringify(fieldState) !== JSON.stringify(expectedState)) {
+        setFieldState(expectedState);
+      }
+    }
 
     const handleFieldChange = (
       key: FieldMetaKeys,

@@ -36,6 +36,12 @@ export const OrganisationEmailDeleteDialog = ({
 
   const organisation = useCurrentOrganisation();
 
+  const handleOpenChange = (value: boolean) => {
+    if (!isDeleting) {
+      setOpen(value);
+    }
+  };
+
   const { mutateAsync: deleteEmail, isPending: isDeleting } =
     trpc.enterprise.organisation.email.delete.useMutation({
       onSuccess: () => {
@@ -58,7 +64,7 @@ export const OrganisationEmailDeleteDialog = ({
     });
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isDeleting && setOpen(value)}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button variant="secondary">

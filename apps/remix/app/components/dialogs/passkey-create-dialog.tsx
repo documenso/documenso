@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -120,24 +120,21 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
     return passkeyName;
   };
 
-  useEffect(() => {
-    if (!open) {
+  const handleDialogOpenChange = (value: boolean) => {
+    if (!value) {
       const defaultPasskeyName = extractDefaultPasskeyName();
-
       form.reset({
         passkeyName: defaultPasskeyName,
       });
-
       setFormError(null);
     }
-  }, [open, form]);
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleDialogOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button variant="secondary" loading={isPending}>

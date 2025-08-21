@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { FolderType, OrganisationType } from '@prisma/client';
@@ -12,10 +12,7 @@ import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
-import {
-  type TFindDocumentsInternalResponse,
-  ZFindDocumentsInternalRequestSchema,
-} from '@documenso/trpc/server/document-router/schema';
+import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/schema';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
@@ -55,15 +52,6 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
 
-  const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
-    [ExtendedDocumentStatus.DRAFT]: 0,
-    [ExtendedDocumentStatus.PENDING]: 0,
-    [ExtendedDocumentStatus.COMPLETED]: 0,
-    [ExtendedDocumentStatus.REJECTED]: 0,
-    [ExtendedDocumentStatus.INBOX]: 0,
-    [ExtendedDocumentStatus.ALL]: 0,
-  });
-
   const findDocumentSearchParams = useMemo(
     () => ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
     [searchParams],
@@ -73,6 +61,19 @@ export default function DocumentsPage() {
     ...findDocumentSearchParams,
     folderId,
   });
+
+  const stats = useMemo(
+    () =>
+      data?.stats ?? {
+        [ExtendedDocumentStatus.DRAFT]: 0,
+        [ExtendedDocumentStatus.PENDING]: 0,
+        [ExtendedDocumentStatus.COMPLETED]: 0,
+        [ExtendedDocumentStatus.REJECTED]: 0,
+        [ExtendedDocumentStatus.INBOX]: 0,
+        [ExtendedDocumentStatus.ALL]: 0,
+      },
+    [data?.stats],
+  );
 
   const getTabHref = (value: keyof typeof ExtendedDocumentStatus) => {
     const params = new URLSearchParams(searchParams);
@@ -103,12 +104,6 @@ export default function DocumentsPage() {
 
     return path;
   };
-
-  useEffect(() => {
-    if (data?.stats) {
-      setStats(data.stats);
-    }
-  }, [data?.stats]);
 
   return (
     <DocumentDropZoneWrapper>

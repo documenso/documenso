@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -85,15 +85,6 @@ export function TemplateMoveToFolderDialog({
 
   const { mutateAsync: moveTemplateToFolder } = trpc.folder.moveTemplateToFolder.useMutation();
 
-  useEffect(() => {
-    if (!isOpen) {
-      form.reset();
-      setSearchTerm('');
-    } else {
-      form.reset({ folderId: currentFolderId ?? null });
-    }
-  }, [isOpen, currentFolderId, form]);
-
   const onSubmit = async (data: TMoveTemplateFormSchema) => {
     try {
       await moveTemplateToFolder({
@@ -137,12 +128,22 @@ export function TemplateMoveToFolderDialog({
     }
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+      setSearchTerm('');
+    } else {
+      form.reset({ folderId: currentFolderId ?? null });
+    }
+    onOpenChange(value);
+  };
+
   const filteredFolders = folders?.data?.filter((folder) =>
     folder.name.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   return (
-    <Dialog {...props} open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog {...props} open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

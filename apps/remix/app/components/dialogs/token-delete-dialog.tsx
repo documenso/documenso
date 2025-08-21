@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -95,17 +95,17 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
     }
   };
 
-  useEffect(() => {
-    if (!isOpen) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
     }
-  }, [isOpen, form]);
+    if (!form.formState.isSubmitting) {
+      setIsOpen(value);
+    }
+  };
 
   return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={(value) => !form.formState.isSubmitting && setIsOpen(value)}
-    >
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild={true}>
         {children ?? (
           <Button className="mr-4" variant="destructive">

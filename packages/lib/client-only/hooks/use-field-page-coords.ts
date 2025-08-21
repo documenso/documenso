@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import type { Field } from '@prisma/client';
 
@@ -6,20 +6,20 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 
 export const useFieldPageCoords = (field: Field) => {
-  const [coords, setCoords] = useState({
-    x: 0,
-    y: 0,
-    height: 0,
-    width: 0,
-  });
+  const [forceRecalc, setForceRecalc] = useState(0);
 
-  const calculateCoords = useCallback(() => {
+  const coords = useMemo(() => {
     const $page = document.querySelector<HTMLElement>(
       `${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${field.page}"]`,
     );
 
     if (!$page) {
-      return;
+      return {
+        x: 0,
+        y: 0,
+        height: 0,
+        width: 0,
+      };
     }
 
     const { top, left, height, width } = getBoundingClientRect($page);
@@ -31,21 +31,17 @@ export const useFieldPageCoords = (field: Field) => {
     const fieldHeight = (Number(field.height) / 100) * height;
     const fieldWidth = (Number(field.width) / 100) * width;
 
-    setCoords({
+    return {
       x: fieldX,
       y: fieldY,
       height: fieldHeight,
       width: fieldWidth,
-    });
-  }, [field.height, field.page, field.positionX, field.positionY, field.width]);
-
-  useEffect(() => {
-    calculateCoords();
-  }, [calculateCoords]);
+    };
+  }, [field.height, field.page, field.positionX, field.positionY, field.width, forceRecalc]);
 
   useEffect(() => {
     const onResize = () => {
-      calculateCoords();
+      setForceRecalc((prev) => prev + 1);
     };
 
     window.addEventListener('resize', onResize);
@@ -53,7 +49,7 @@ export const useFieldPageCoords = (field: Field) => {
     return () => {
       window.removeEventListener('resize', onResize);
     };
-  }, [calculateCoords]);
+  }, []);
 
   useEffect(() => {
     const $page = document.querySelector<HTMLElement>(
@@ -65,7 +61,7 @@ export const useFieldPageCoords = (field: Field) => {
     }
 
     const observer = new ResizeObserver(() => {
-      calculateCoords();
+      setForceRecalc((prev) => prev + 1);
     });
 
     observer.observe($page);
@@ -73,7 +69,7 @@ export const useFieldPageCoords = (field: Field) => {
     return () => {
       observer.disconnect();
     };
-  }, [calculateCoords, field.page]);
+  }, [field.page]);
 
   return coords;
 };

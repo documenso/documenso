@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -73,20 +73,23 @@ export const DocumentDeleteDialog = ({
     },
   });
 
-  useEffect(() => {
-    if (open) {
-      setInputValue('');
-      setIsDeleteEnabled(status === DocumentStatus.DRAFT);
-    }
-  }, [open, status]);
-
   const onInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
     setIsDeleteEnabled(event.target.value === _(deleteMessage));
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (value) {
+      setInputValue('');
+      setIsDeleteEnabled(status === DocumentStatus.DRAFT);
+    }
+    if (!isPending) {
+      onOpenChange(value);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={(value) => !isPending && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

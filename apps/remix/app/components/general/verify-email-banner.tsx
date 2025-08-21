@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -22,11 +22,34 @@ export type VerifyEmailBannerProps = {
 
 const RESEND_CONFIRMATION_EMAIL_TIMEOUT = 20 * ONE_SECOND;
 
+const shouldShowDialog = () => {
+  try {
+    const emailVerificationDialogLastShown = localStorage.getItem(
+      'emailVerificationDialogLastShown',
+    );
+
+    if (emailVerificationDialogLastShown) {
+      const lastShownTimestamp = parseInt(emailVerificationDialogLastShown);
+
+      if (Date.now() - lastShownTimestamp < ONE_DAY) {
+        return false;
+      }
+    }
+
+    // Update the timestamp when showing the dialog
+    localStorage.setItem('emailVerificationDialogLastShown', Date.now().toString());
+    return true;
+  } catch {
+    // In case localStorage is not available (SSR, incognito mode, etc.)
+    return false;
+  }
+};
+
 export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(shouldShowDialog);
   const [isPending, setIsPending] = useState(false);
 
   const [isButtonDisabled, setIsButtonDisabled] = useState(false);
@@ -61,27 +84,6 @@ export const VerifyEmailBanner = ({ email }: VerifyEmailBannerProps) => {
 
     setIsPending(false);
   };
-
-  useEffect(() => {
-    // Check localStorage to see if we've recently automatically displayed the dialog
-    // if it was within the past 24 hours, don't show it again
-    // otherwise, show it again and update the localStorage timestamp
-    const emailVerificationDialogLastShown = localStorage.getItem(
-      'emailVerificationDialogLastShown',
-    );
-
-    if (emailVerificationDialogLastShown) {
-      const lastShownTimestamp = parseInt(emailVerificationDialogLastShown);
-
-      if (Date.now() - lastShownTimestamp < ONE_DAY) {
-        return;
-      }
-    }
-
-    setIsOpen(true);
-
-    localStorage.setItem('emailVerificationDialogLastShown', Date.now().toString());
-  }, []);
 
   return (
     <>

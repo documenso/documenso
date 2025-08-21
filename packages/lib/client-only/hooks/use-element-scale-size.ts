@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/consistent-type-assertions */
-import { RefObject, useEffect, useState } from 'react';
+import { useMemo } from 'react';
 
 /**
  * Calculate the width and height of a text element.
@@ -64,13 +64,7 @@ export function useElementScaleSize(
   fontSize: number,
   fontFamily: string,
 ) {
-  const [scalingFactor, setScalingFactor] = useState(1);
-
-  useEffect(() => {
-    const scaleSize = calculateTextScaleSize(container, text, `${fontSize}px`, fontFamily);
-
-    setScalingFactor(scaleSize);
-  }, [text, container, fontFamily, fontSize]);
-
-  return scalingFactor;
+  return useMemo(() => {
+    return calculateTextScaleSize(container, text, `${fontSize}px`, fontFamily);
+  }, [container, text, fontSize, fontFamily]);
 }

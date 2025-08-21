@@ -38,33 +38,48 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   const [state, setState] = useState<keyof typeof EMAIL_VERIFICATION_STATE | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const verifyToken = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await authClient.emailPassword.verifyEmail({
-        token,
-      });
-
-      await refreshSession();
-
-      setState(response.state);
-    } catch (err) {
-      console.error(err);
-
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`We were unable to verify your email at this time.`),
-      });
-
-      await navigate('/verify-email');
-    }
-
-    setIsLoading(false);
-  };
-
   useEffect(() => {
-    void verifyToken();
+    let ignore = false;
+
+    const verify = async () => {
+      try {
+        setIsLoading(true);
+
+        const response = await authClient.emailPassword.verifyEmail({
+          token,
+        });
+
+        if (ignore) {
+          return;
+        }
+
+        await refreshSession();
+        setState(response.state);
+      } catch (err) {
+        if (ignore) {
+          return;
+        }
+
+        console.error(err);
+
+        toast({
+          title: _(msg`Something went wrong`),
+          description: _(msg`We were unable to verify your email at this time.`),
+        });
+
+        await navigate('/verify-email');
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    void verify();
+
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   if (isLoading || state === null) {

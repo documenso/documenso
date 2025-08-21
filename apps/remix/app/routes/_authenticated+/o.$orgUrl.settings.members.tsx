@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -29,22 +29,29 @@ export default function TeamsSettingsMembersPage() {
   /**
    * Handle debouncing the search query.
    */
-  useEffect(() => {
-    const params = new URLSearchParams(searchParams?.toString());
+  const handleSearchQueryChange = useCallback(
+    (newQuery: string) => {
+      const params = new URLSearchParams(searchParams?.toString());
 
-    params.set('query', debouncedSearchQuery);
+      if (newQuery.trim()) {
+        params.set('query', newQuery);
+      } else {
+        params.delete('query');
+      }
 
-    if (debouncedSearchQuery === '') {
-      params.delete('query');
-    }
+      if (params.toString() === searchParams?.toString()) {
+        return;
+      }
 
-    // If nothing  to change then do nothing.
-    if (params.toString() === searchParams?.toString()) {
-      return;
-    }
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams],
+  );
 
-    setSearchParams(params);
-  }, [debouncedSearchQuery, pathname, searchParams]);
+  const currentParamQuery = searchParams?.get('query') ?? '';
+  if (currentParamQuery !== debouncedSearchQuery) {
+    handleSearchQueryChange(debouncedSearchQuery);
+  }
 
   return (
     <div>

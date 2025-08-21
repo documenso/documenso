@@ -1,12 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 
 export const EmbedDocumentWaitingForTurn = () => {
-  const [hasPostedMessage, setHasPostedMessage] = useState(false);
-
   useEffect(() => {
-    if (window.parent && !hasPostedMessage) {
+    if (window.parent) {
       window.parent.postMessage(
         {
           action: 'document-waiting-for-turn',
@@ -15,13 +13,7 @@ export const EmbedDocumentWaitingForTurn = () => {
         '*',
       );
     }
-
-    setHasPostedMessage(true);
-  }, [hasPostedMessage]);
-
-  if (!hasPostedMessage) {
-    return null;
-  }
+  }, []);
 
   return (
     <div className="embed--WaitingForTurn relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">

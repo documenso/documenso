@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -106,30 +106,25 @@ export const TeamMemberUpdateDialog = ({
     }
   };
 
-  useEffect(() => {
-    if (!open) {
-      return;
+  const handleOpenChange = (value: boolean) => {
+    if (value) {
+      form.reset();
+      if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, memberTeamRole)) {
+        setOpen(false);
+        toast({
+          title: _(msg`You cannot modify a team member who has a higher role than you.`),
+          variant: 'destructive',
+        });
+        return;
+      }
     }
-
-    form.reset();
-
-    if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, memberTeamRole)) {
-      setOpen(false);
-
-      toast({
-        title: _(msg`You cannot modify a team member who has a higher role than you.`),
-        variant: 'destructive',
-      });
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentUserTeamRole, memberTeamRole, form, toast]);
+  };
 
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
         {trigger ?? (
           <Button variant="secondary">

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
@@ -130,12 +130,8 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
     }
   };
 
-  useEffect(() => {
-    setIsPublicProfileVisible(profile.enabled);
-  }, [profile.enabled]);
-
   return (
-    <div className="max-w-2xl">
+    <div key={team.id} className="max-w-2xl">
       <SettingsHeader
         title={t`Public Profile`}
         subtitle={t`You can choose to enable or disable the profile for public view.`}

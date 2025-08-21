@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans, useLingui } from '@lingui/react/macro';
@@ -80,14 +80,15 @@ export const FolderCreateDialog = ({ type, trigger, ...props }: FolderCreateDial
     }
   };
 
-  useEffect(() => {
-    if (!isCreateFolderOpen) {
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
       form.reset();
     }
-  }, [isCreateFolderOpen, form]);
+    setIsCreateFolderOpen(value);
+  };
 
   return (
-    <Dialog {...props} open={isCreateFolderOpen} onOpenChange={setIsCreateFolderOpen}>
+    <Dialog {...props} open={isCreateFolderOpen} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
           <Button

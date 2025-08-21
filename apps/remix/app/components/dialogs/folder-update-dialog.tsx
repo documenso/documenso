@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
@@ -71,15 +69,6 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
     },
   });
 
-  useEffect(() => {
-    if (folder) {
-      form.reset({
-        name: folder.name,
-        visibility: folder.visibility ?? DocumentVisibility.EVERYONE,
-      });
-    }
-  }, [folder, form]);
-
   const onFormSubmit = async (data: TUpdateFolderFormSchema) => {
     if (!folder) {
       return;
@@ -110,8 +99,18 @@ export const FolderUpdateDialog = ({ folder, isOpen, onOpenChange }: FolderUpdat
     }
   };
 
+  const handleOpenChange = (value: boolean) => {
+    if (value && folder) {
+      form.reset({
+        name: folder.name,
+        visibility: folder.visibility ?? DocumentVisibility.EVERYONE,
+      });
+    }
+    onOpenChange(value);
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>

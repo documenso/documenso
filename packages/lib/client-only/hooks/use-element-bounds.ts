@@ -1,23 +1,23 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 
 export const useElementBounds = (elementOrSelector: HTMLElement | string, withScroll = false) => {
-  const [bounds, setBounds] = useState({
-    top: 0,
-    left: 0,
-    height: 0,
-    width: 0,
-  });
+  const [forceRecalc, setForceRecalc] = useState(0);
 
-  const calculateBounds = useCallback(() => {
+  const bounds = useMemo(() => {
     const $el =
       typeof elementOrSelector === 'string'
         ? document.querySelector<HTMLElement>(elementOrSelector)
         : elementOrSelector;
 
     if (!$el) {
-      throw new Error('Element not found');
+      return {
+        top: 0,
+        left: 0,
+        height: 0,
+        width: 0,
+      };
     }
 
     if (withScroll) {
@@ -32,15 +32,11 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
       width,
       height,
     };
-  }, [elementOrSelector, withScroll]);
-
-  useEffect(() => {
-    setBounds(calculateBounds());
-  }, []);
+  }, [elementOrSelector, withScroll, forceRecalc]);
 
   useEffect(() => {
     const onResize = () => {
-      setBounds(calculateBounds());
+      setForceRecalc((prev) => prev + 1);
     };
 
     window.addEventListener('resize', onResize);
@@ -61,7 +57,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     }
 
     const observer = new ResizeObserver(() => {
-      setBounds(calculateBounds());
+      setForceRecalc((prev) => prev + 1);
     });
 
     observer.observe($el);
@@ -69,7 +65,7 @@ export const useElementBounds = (elementOrSelector: HTMLElement | string, withSc
     return () => {
       observer.disconnect();
     };
-  }, []);
+  }, [elementOrSelector]);
 
   return bounds;
 };

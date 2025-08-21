@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -66,13 +66,13 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
   const updateSearchParams = useUpdateSearchParams();
   const organisation = useCurrentOrganisation();
 
-  const [open, setOpen] = useState(false);
+  const actionSearchParam = searchParams?.get('action');
+  const shouldOpenDialog = actionSearchParam === 'add-team';
+  const [open, setOpen] = useState(shouldOpenDialog);
 
   const { data: fullOrganisation } = trpc.organisation.get.useQuery({
     organisationReference: organisation.id,
   });
-
-  const actionSearchParam = searchParams?.get('action');
 
   const form = useForm({
     resolver: zodResolver(ZCreateTeamFormSchema),
@@ -84,6 +84,18 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
   });
 
   const { mutateAsync: createTeam } = trpc.team.create.useMutation();
+
+  const handleOpenChange = (value: boolean) => {
+    if (!value) {
+      form.reset();
+      if (shouldOpenDialog) {
+        updateSearchParams({ action: null });
+      }
+    }
+    if (!form.formState.isSubmitting) {
+      setOpen(value);
+    }
+  };
 
   const onFormSubmit = async ({ teamName, teamUrl, inheritMembers }: TCreateTeamFormSchema) => {
     try {
@@ -150,23 +162,8 @@ export const TeamCreateDialog = ({ trigger, onCreated, ...props }: TeamCreateDia
     return 'form';
   }, [fullOrganisation]);
 
-  useEffect(() => {
-    if (actionSearchParam === 'add-team') {
-      setOpen(true);
-      updateSearchParams({ action: null });
-    }
-  }, [actionSearchParam, open]);
-
-  useEffect(() => {
-    form.reset();
-  }, [open, form]);
-
   return (
-    <Dialog
-      {...props}
-      open={open}
-      onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}
-    >
+    <Dialog {...props} open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild={true}>
         {trigger ?? (
           <Button className="flex-shrink-0" variant="secondary">
