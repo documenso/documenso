@@ -1,4 +1,4 @@
-import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility } from '@prisma/client';
 import {
   DocumentSource,
   RecipientRole,
@@ -46,7 +46,7 @@ export type CreateDocumentOptions = {
     formValues?: TDocumentFormValues;
     recipients: TCreateDocumentV2Request['recipients'];
   };
-  meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
+  meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
 };
 

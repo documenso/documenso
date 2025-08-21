@@ -3,7 +3,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta } from '@prisma/client';
 import {
   type DocumentData,
   type Field,
@@ -50,7 +50,7 @@ export type EmbedSignDocumentClientPageProps = {
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
