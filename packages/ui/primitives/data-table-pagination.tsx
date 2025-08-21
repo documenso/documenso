@@ -1,3 +1,4 @@
+import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import type { Table } from '@tanstack/react-table';
 import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
@@ -27,7 +28,16 @@ export function DataTablePagination<TData>({
         {match(additionalInformation)
           .with('SelectedCount', () => (
             <span>
-              <Plural one="{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} row selected." other="{table.getFilteredSelectedRowModel().rows.length} of {table.getFilteredRowModel().rows.length} rows selected." value={table.getFilteredRowModel().rows.length} />
+              <Trans comment="Full sentence: X of Y row(s) selected">
+                {table.getFilteredSelectedRowModel().rows.length} of
+              </Trans>
+              &nbsp;
+              <Plural
+                value={table.getFilteredRowModel().rows.length}
+                one="# row selected"
+                other="# rows selected"
+                comment="Full sentence: X of Y row(s) selected"
+              />
             </span>
           ))
           .with('VisibleCount', () => {
