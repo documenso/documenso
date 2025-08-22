@@ -18,8 +18,6 @@ export const ZFieldSchema = FieldSchema.pick({
   type: true,
   id: true,
   secondaryId: true,
-  documentId: true,
-  templateId: true,
   recipientId: true,
   page: true,
   positionX: true,
@@ -29,6 +27,10 @@ export const ZFieldSchema = FieldSchema.pick({
   customText: true,
   inserted: true,
   fieldMeta: true,
+}).extend({
+  // Todo: Decide whether to make these two IDs backwards compatible.
+  documentId: z.number().optional(),
+  templateId: z.number().optional(),
 });
 
 export const ZFieldPageNumberSchema = z

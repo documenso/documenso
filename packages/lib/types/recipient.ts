@@ -1,3 +1,5 @@
+import { z } from 'zod';
+
 import { RecipientSchema } from '@documenso/prisma/generated/zod/modelSchema/RecipientSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
@@ -15,8 +17,6 @@ export const ZRecipientSchema = RecipientSchema.pick({
   signingStatus: true,
   sendStatus: true,
   id: true,
-  documentId: true,
-  templateId: true,
   email: true,
   name: true,
   token: true,
@@ -28,6 +28,10 @@ export const ZRecipientSchema = RecipientSchema.pick({
   rejectionReason: true,
 }).extend({
   fields: ZFieldSchema.array(),
+
+  // Todo: Decide whether to make these two IDs backwards compatible.
+  documentId: z.number().optional(),
+  templateId: z.number().optional(),
 });
 
 /**
@@ -39,8 +43,6 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   signingStatus: true,
   sendStatus: true,
   id: true,
-  documentId: true,
-  templateId: true,
   email: true,
   name: true,
   token: true,
@@ -50,6 +52,10 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   authOptions: true,
   signingOrder: true,
   rejectionReason: true,
+}).extend({
+  // Todo: Decide whether to make these two IDs backwards compatible.
+  documentId: z.number().optional(),
+  templateId: z.number().optional(),
 });
 
 /**
@@ -61,8 +67,6 @@ export const ZRecipientManySchema = RecipientSchema.pick({
   signingStatus: true,
   sendStatus: true,
   id: true,
-  documentId: true,
-  templateId: true,
   email: true,
   name: true,
   token: true,
@@ -83,4 +87,8 @@ export const ZRecipientManySchema = RecipientSchema.pick({
     id: true,
     url: true,
   }).nullable(),
+
+  // Todo: Decide whether to make these two IDs backwards compatible.
+  documentId: z.number().optional(),
+  templateId: z.number().optional(),
 });

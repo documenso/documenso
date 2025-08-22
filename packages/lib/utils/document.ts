@@ -1,10 +1,10 @@
-import type { Document, DocumentMeta, OrganisationGlobalSettings } from '@prisma/client';
+import type { DocumentMeta, Envelope, OrganisationGlobalSettings } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
 
-export const isDocumentCompleted = (document: Pick<Document, 'status'> | DocumentStatus) => {
+export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
 
   return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
@@ -53,5 +53,5 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-  } satisfies Omit<DocumentMeta, 'id' | 'documentId' | 'templateId'>;
+  } satisfies Omit<DocumentMeta, 'id' | 'envelopeId'>;
 };

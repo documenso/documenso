@@ -1,12 +1,12 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { TemplateSchema } from '@documenso/prisma/types/template-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
@@ -51,13 +51,17 @@ export const ZTemplateSchema = TemplateSchema.pick({
     drawSignatureEnabled: true,
     allowDictateNextSigner: true,
     distributionMethod: true,
-    templateId: true,
     redirectUrl: true,
     language: true,
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
-  }).nullable(),
+  })
+    .extend({
+      // Legacy field for backwards compatibility. Needs to refer to the Envelope `secondaryTemplateId`.
+      templateId: z.number(),
+    })
+    .nullable(),
   directLink: TemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({
     id: true,
