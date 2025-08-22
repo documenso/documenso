@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import { CheckCircle, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
+import { CheckCircle, Clock, Download, Edit, EyeIcon, Pencil } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -36,6 +36,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const isPending = row.status === DocumentStatus.PENDING;
   const isComplete = isDocumentCompleted(row.status);
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
+  const isExpired = recipient?.signingStatus === SigningStatus.EXPIRED;
   const role = recipient?.role;
   const isCurrentTeamDocument = team && row.team?.url === team.url;
 
@@ -87,8 +88,15 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     isPending,
     isComplete,
     isSigned,
+    isExpired,
     isCurrentTeamDocument,
   })
+    .with({ isRecipient: true, isExpired: true }, () => (
+      <Button className="w-32 bg-orange-100 text-orange-600 hover:bg-orange-200" disabled={true}>
+        <Clock className="-ml-1 mr-2 h-4 w-4" />
+        <Trans>Expired</Trans>
+      </Button>
+    ))
     .with(
       isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
       () => (

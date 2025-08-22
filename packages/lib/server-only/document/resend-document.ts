@@ -19,6 +19,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { isDocumentCompleted } from '../../utils/document';
+import { calculateRecipientExpiry } from '../../utils/expiry';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getDocumentWhereInput } from './get-document-by-id';
@@ -198,6 +199,39 @@ export const resendDocument = async ({
             html,
             text,
           });
+
+          if (document.documentMeta?.expiryAmount && document.documentMeta?.expiryUnit) {
+            const previousExpiryDate = recipient.expired;
+            const newExpiryDate = calculateRecipientExpiry(
+              document.documentMeta.expiryAmount,
+              document.documentMeta.expiryUnit,
+              new Date(),
+            );
+
+            await tx.recipient.update({
+              where: {
+                id: recipient.id,
+              },
+              data: {
+                expired: newExpiryDate,
+              },
+            });
+
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRY_EXTENDED,
+                documentId: document.id,
+                metadata: requestMetadata,
+                data: {
+                  recipientId: recipient.id,
+                  recipientName: recipient.name,
+                  recipientEmail: recipient.email,
+                  previousExpiryDate,
+                  newExpiryDate,
+                },
+              }),
+            });
+          }
 
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({

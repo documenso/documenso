@@ -48,13 +48,20 @@ export const StackAvatarsWithTooltip = ({
     (recipient) => getRecipientType(recipient) === RecipientStatusType.REJECTED,
   );
 
+  const expiredRecipients = recipients.filter(
+    (recipient) => getRecipientType(recipient) === RecipientStatusType.EXPIRED,
+  );
+
   const sortedRecipients = useMemo(() => {
     const otherRecipients = recipients.filter(
-      (recipient) => getRecipientType(recipient) !== RecipientStatusType.REJECTED,
+      (recipient) =>
+        getRecipientType(recipient) !== RecipientStatusType.REJECTED &&
+        getRecipientType(recipient) !== RecipientStatusType.EXPIRED,
     );
 
     return [
       ...rejectedRecipients.sort((a, b) => a.id - b.id),
+      ...expiredRecipients.sort((a, b) => a.id - b.id),
       ...otherRecipients.sort((a, b) => {
         return a.id - b.id;
       }),
@@ -99,6 +106,30 @@ export const StackAvatarsWithTooltip = ({
             <Trans>Rejected</Trans>
           </h1>
           {rejectedRecipients.map((recipient: Recipient) => (
+            <div key={recipient.id} className="my-1 flex items-center gap-2">
+              <StackAvatar
+                first={true}
+                key={recipient.id}
+                type={getRecipientType(recipient)}
+                fallbackText={recipientAbbreviation(recipient)}
+              />
+              <div>
+                <p className="text-muted-foreground text-sm">{recipient.email}</p>
+                <p className="text-muted-foreground/70 text-xs">
+                  {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {expiredRecipients.length > 0 && (
+        <div>
+          <h1 className="text-base font-medium">
+            <Trans>Expired</Trans>
+          </h1>
+          {expiredRecipients.map((recipient: Recipient) => (
             <div key={recipient.id} className="my-1 flex items-center gap-2">
               <StackAvatar
                 first={true}

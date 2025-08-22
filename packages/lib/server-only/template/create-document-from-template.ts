@@ -46,6 +46,7 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { calculateRecipientExpiry } from '../../utils/expiry';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -91,6 +92,8 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
+    expiryAmount?: number;
+    expiryUnit?: string;
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -399,12 +402,26 @@ export const createDocumentFromTemplate = async ({
               override?.drawSignatureEnabled ?? template.templateMeta?.drawSignatureEnabled,
             allowDictateNextSigner:
               override?.allowDictateNextSigner ?? template.templateMeta?.allowDictateNextSigner,
+            defaultExpiryAmount:
+              override?.expiryAmount ?? template.templateMeta?.defaultExpiryAmount,
+            defaultExpiryUnit: override?.expiryUnit ?? template.templateMeta?.defaultExpiryUnit,
           }),
         },
         recipients: {
           createMany: {
             data: finalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
+
+              // Calculate expiry date based on template defaults
+              const expiryAmount =
+                override?.expiryAmount ?? template.templateMeta?.defaultExpiryAmount ?? null;
+              const expiryUnit =
+                override?.expiryUnit ?? template.templateMeta?.defaultExpiryUnit ?? null;
+              const recipientExpiryDate = calculateRecipientExpiry(
+                expiryAmount,
+                expiryUnit,
+                new Date(), // Calculate from current time
+              );
 
               return {
                 email: recipient.email,
@@ -421,6 +438,7 @@ export const createDocumentFromTemplate = async ({
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
+                expired: recipientExpiryDate,
                 token: nanoid(),
               };
             }),
