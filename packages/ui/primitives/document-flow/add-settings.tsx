@@ -376,7 +376,7 @@ export const AddSettingsFormPartial = ({
                               selectedValues={field.value}
                               onChange={field.onChange}
                               className="bg-background w-full"
-                              emptySelectionPlaceholder="Select signature types"
+                              emptySelectionPlaceholder={t`Select signature types`}
                             />
                           </FormControl>
 
@@ -411,31 +411,31 @@ export const AddSettingsFormPartial = ({
 
                               <SelectContent>
                                 <SelectItem value={DocumentReminderInterval.NONE}>
-                                  No reminders
+                                  <Trans>No reminders</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.EVERY_1_HOUR}>
-                                  Every hour
+                                  <Trans>Every hour</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.EVERY_6_HOURS}>
-                                  Every 6 hours
+                                  <Trans>Every 6 hours</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.EVERY_12_HOURS}>
-                                  Every 12 hours
+                                  <Trans>Every 12 hours</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.DAILY}>
-                                  Daily
+                                  <Trans>Daily</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.EVERY_3_DAYS}>
-                                  Every 3 days
+                                  <Trans>Every 3 days</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.WEEKLY}>
-                                  Weekly
+                                  <Trans>Weekly</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.EVERY_2_WEEKS}>
-                                  Every 2 weeks
+                                  <Trans>Every 2 weeks</Trans>
                                 </SelectItem>
                                 <SelectItem value={DocumentReminderInterval.MONTHLY}>
-                                  Monthly
+                                  <Trans>Monthly</Trans>
                                 </SelectItem>
                               </SelectContent>
                             </Select>
