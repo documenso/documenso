@@ -31,4 +31,38 @@ export const kyselyPrisma = remember('kyselyPrisma', () =>
   ),
 );
 
+export const prismaWithLogging = remember('prismaWithLogging', () => {
+  const client = new PrismaClient({
+    datasourceUrl: getDatabaseUrl(),
+    log: [
+      {
+        emit: 'event',
+        level: 'query',
+      },
+    ],
+  });
+
+  client.$on('query', (e) => {
+    console.log('query:', e.query);
+    console.log('params:', e.params);
+    console.log('duration:', e.duration);
+
+    const params = JSON.parse(e.params) as unknown[];
+
+    const query = e.query.replace(/\$\d+/g, (match) => {
+      const index = Number(match.replace('$', ''));
+
+      if (index > params.length) {
+        return match;
+      }
+
+      return String(params[index - 1]);
+    });
+
+    console.log('formatted query:', query);
+  });
+
+  return client;
+});
+
 export { sql } from 'kysely';

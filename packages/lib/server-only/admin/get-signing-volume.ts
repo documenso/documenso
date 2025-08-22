@@ -29,37 +29,26 @@ export async function getSigningVolume({
 
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Subscription as s')
-    .leftJoin('User as u', 's.userId', 'u.id')
-    .leftJoin('Team as t', 's.teamId', 't.id')
-    .leftJoin('Document as ud', (join) =>
+    .innerJoin('Organisation as o', 's.organisationId', 'o.id')
+    .leftJoin('Team as t', 'o.id', 't.organisationId')
+    .leftJoin('Document as d', (join) =>
       join
-        .onRef('u.id', '=', 'ud.userId')
-        .on('ud.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('ud.deletedAt', 'is', null)
-        .on('ud.teamId', 'is', null),
-    )
-    .leftJoin('Document as td', (join) =>
-      join
-        .onRef('t.id', '=', 'td.teamId')
-        .on('td.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('td.deletedAt', 'is', null),
+        .onRef('t.id', '=', 'd.teamId')
+        .on('d.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('d.deletedAt', 'is', null),
     )
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
-      eb.or([
-        eb('u.name', 'ilike', `%${search}%`),
-        eb('u.email', 'ilike', `%${search}%`),
-        eb('t.name', 'ilike', `%${search}%`),
-      ]),
+      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
     )
     .select([
       's.id as id',
       's.createdAt as createdAt',
       's.planId as planId',
-      sql<string>`COALESCE(u.name, t.name, u.email, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT ud.id) + COUNT(DISTINCT td.id)`.as('signingVolume'),
+      sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
+      sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
     ])
-    .groupBy(['s.id', 'u.name', 't.name', 'u.email']);
+    .groupBy(['s.id', 'o.name']);
 
   switch (sortBy) {
     case 'name':
@@ -79,15 +68,11 @@ export async function getSigningVolume({
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Subscription as s')
-    .leftJoin('User as u', 's.userId', 'u.id')
-    .leftJoin('Team as t', 's.teamId', 't.id')
+    .innerJoin('Organisation as o', 's.organisationId', 'o.id')
+    .leftJoin('Team as t', 'o.id', 't.organisationId')
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
-      eb.or([
-        eb('u.name', 'ilike', `%${search}%`),
-        eb('u.email', 'ilike', `%${search}%`),
-        eb('t.name', 'ilike', `%${search}%`),
-      ]),
+      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
     )
     .select(({ fn }) => [fn.countAll().as('count')]);
 

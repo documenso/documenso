@@ -1,25 +1,26 @@
 import type { DocumentVisibility, Template, TemplateMeta } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type UpdateTemplateOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   templateId: number;
   data?: {
     title?: string;
     externalId?: string | null;
     visibility?: DocumentVisibility;
-    globalAccessAuth?: TDocumentAccessAuthTypes | null;
-    globalActionAuth?: TDocumentActionAuthTypes | null;
+    globalAccessAuth?: TDocumentAccessAuthTypes[];
+    globalActionAuth?: TDocumentActionAuthTypes[];
     publicTitle?: string;
     publicDescription?: string;
     type?: Template['type'];
+    useLegacyFieldInsertion?: boolean;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
 };
@@ -31,29 +32,31 @@ export const updateTemplate = async ({
   meta = {},
   data = {},
 }: UpdateTemplateOptions) => {
-  const template = await prisma.template.findFirstOrThrow({
+  const template = await prisma.template.findFirst({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       templateMeta: true,
+      team: {
+        select: {
+          organisationId: true,
+          organisation: {
+            select: {
+              organisationClaim: true,
+            },
+          },
+        },
+      },
     },
   });
+
+  if (!template) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Template not found',
+    });
+  }
 
   if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
     return template;
@@ -73,23 +76,34 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (newGlobalActionAuth.length > 0 && !template.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
     });
-
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
-      });
-    }
   }
 
   const authOptions = createDocumentAuthOptions({
     globalAccessAuth: newGlobalAccessAuth,
     globalActionAuth: newGlobalActionAuth,
   });
+
+  const emailId = meta.emailId;
+
+  // Validate the emailId belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: template.team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
 
   return await prisma.template.update({
     where: {
@@ -102,6 +116,7 @@ export const updateTemplate = async ({
       visibility: data?.visibility,
       publicDescription: data?.publicDescription,
       publicTitle: data?.publicTitle,
+      useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
       authOptions,
       templateMeta: {
         upsert: {

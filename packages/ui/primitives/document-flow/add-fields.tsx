@@ -3,9 +3,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Prisma } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { FieldType, RecipientRole, SendStatus } from '@prisma/client';
+import { FieldType, Prisma, RecipientRole, SendStatus } from '@prisma/client';
 import {
   CalendarDays,
   CheckSquare,
@@ -38,7 +37,7 @@ import {
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
-import { useSignerColors } from '../../lib/signer-colors';
+import { useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
 import { Alert, AlertDescription } from '../alert';
 import { Card, CardContent } from '../card';
@@ -86,7 +85,7 @@ export type AddFieldsFormProps = {
   onSubmit: (_data: TAddFieldsFormSchema) => void;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddFieldsFormPartial = ({
@@ -167,7 +166,6 @@ export const AddFieldsFormPartial = ({
 
   const [selectedField, setSelectedField] = useState<FieldType | null>(null);
   const [selectedSigner, setSelectedSigner] = useState<Recipient | null>(null);
-  const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
   const [lastActiveField, setLastActiveField] = useState<TAddFieldsFormSchema['fields'][0] | null>(
     null,
   );
@@ -175,9 +173,10 @@ export const AddFieldsFormPartial = ({
     null,
   );
   const selectedSignerIndex = recipients.findIndex((r) => r.id === selectedSigner?.id);
-  const selectedSignerStyles = useSignerColors(
+  const selectedSignerStyles = useRecipientColors(
     selectedSignerIndex === -1 ? 0 : selectedSignerIndex,
   );
+
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
 
   const filterFieldsWithEmptyValues = (fields: typeof localFields, fieldType: string) =>
@@ -400,35 +399,60 @@ export const AddFieldsFormPartial = ({
   );
 
   const onFieldCopy = useCallback(
-    (event?: KeyboardEvent | null, options?: { duplicate?: boolean }) => {
-      const { duplicate = false } = options ?? {};
+    (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
+      const { duplicate = false, duplicateAll = false } = options ?? {};
 
       if (lastActiveField) {
         event?.preventDefault();
 
-        if (!duplicate) {
-          setFieldClipboard(lastActiveField);
+        if (duplicate) {
+          const newField: TAddFieldsFormSchema['fields'][0] = {
+            ...structuredClone(lastActiveField),
+            nativeId: undefined,
+            formId: nanoid(12),
+            signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            pageX: lastActiveField.pageX + 3,
+            pageY: lastActiveField.pageY + 3,
+          };
 
-          toast({
-            title: 'Copied field',
-            description: 'Copied field to clipboard',
+          append(newField);
+
+          return;
+        }
+
+        if (duplicateAll) {
+          const pages = Array.from(document.querySelectorAll(PDF_VIEWER_PAGE_SELECTOR));
+
+          pages.forEach((_, index) => {
+            const pageNumber = index + 1;
+
+            if (pageNumber === lastActiveField.pageNumber) {
+              return;
+            }
+
+            const newField: TAddFieldsFormSchema['fields'][0] = {
+              ...structuredClone(lastActiveField),
+              nativeId: undefined,
+              formId: nanoid(12),
+              signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              pageNumber,
+            };
+
+            append(newField);
           });
 
           return;
         }
 
-        const newField: TAddFieldsFormSchema['fields'][0] = {
-          ...structuredClone(lastActiveField),
-          formId: nanoid(12),
-          signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-          pageX: lastActiveField.pageX + 3,
-          pageY: lastActiveField.pageY + 3,
-        };
+        setFieldClipboard(lastActiveField);
 
-        append(newField);
+        toast({
+          title: 'Copied field',
+          description: 'Copied field to clipboard',
+        });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, toast],
+    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
   );
 
   const onFieldPaste = useCallback(
@@ -440,6 +464,7 @@ export const AddFieldsFormPartial = ({
 
         append({
           ...copiedField,
+          nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           pageX: copiedField.pageX + 3,
@@ -579,7 +604,6 @@ export const AddFieldsFormPartial = ({
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -593,13 +617,12 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
-                    selectedSignerStyles.default.base,
+                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
                       'dark:text-black/60': isFieldWithinBounds,
                     },
-                    // selectedField === FieldType.SIGNATURE && fontCaveat.className,
                   )}
                   style={{
                     top: coords.y,
@@ -638,15 +661,17 @@ export const AddFieldsFormPartial = ({
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
                       onBlur={() => setLastActiveField(null)}
+                      onMouseEnter={() => setLastActiveField(field)}
+                      onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
                       onRemove={() => remove(index)}
                       onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();
                       }}
-                      hideRecipients={hideRecipients}
                       hasErrors={!!hasFieldError}
                       active={activeFieldId === field.formId}
                       onFieldActivate={() => setActiveFieldId(field.formId)}
@@ -677,7 +702,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -702,7 +726,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -728,7 +751,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
@@ -754,7 +776,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -780,7 +801,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -806,7 +826,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -832,7 +851,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -858,7 +876,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -884,7 +901,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">
@@ -911,7 +927,6 @@ export const AddFieldsFormPartial = ({
                       <Card
                         className={cn(
                           'flex h-full w-full cursor-pointer items-center justify-center group-disabled:opacity-50',
-                          // selectedSignerStyles.borderClass,
                         )}
                       >
                         <CardContent className="p-4">

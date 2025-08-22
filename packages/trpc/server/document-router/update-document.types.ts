@@ -42,8 +42,9 @@ export const ZUpdateDocumentRequestSchema = z.object({
       title: ZDocumentTitleSchema.optional(),
       externalId: ZDocumentExternalIdSchema.nullish(),
       visibility: ZDocumentVisibilitySchema.optional(),
-      globalAccessAuth: ZDocumentAccessAuthTypesSchema.nullish(),
-      globalActionAuth: ZDocumentActionAuthTypesSchema.nullish(),
+      globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
+      globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
+      useLegacyFieldInsertion: z.boolean().optional(),
     })
     .optional(),
   meta: z
@@ -60,6 +61,8 @@ export const ZUpdateDocumentRequestSchema = z.object({
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      emailId: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
       reminderInterval: z.nativeEnum(DocumentReminderInterval).optional(),
     })

@@ -130,6 +130,7 @@ export const ZFindDocumentsRequestSchema = ZFindSearchParamsSchema.extend({
     .nativeEnum(DocumentStatus)
     .describe('Filter documents by the current status')
     .optional(),
+  folderId: z.string().describe('Filter documents by folder ID').optional(),
   orderByColumn: z.enum(['createdAt']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).describe('').default('desc'),
 });
@@ -144,6 +145,7 @@ export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.e
   period: z.enum(['7d', '14d', '30d']).optional(),
   senderIds: z.array(z.number()).optional(),
   status: z.nativeEnum(ExtendedDocumentStatus).optional(),
+  folderId: z.string().optional(),
 });
 
 export const ZFindDocumentsInternalResponseSchema = ZFindResultResponse.extend({
@@ -188,6 +190,7 @@ export type TGetDocumentByTokenQuerySchema = z.infer<typeof ZGetDocumentByTokenQ
 
 export const ZGetDocumentWithDetailsByIdRequestSchema = z.object({
   documentId: z.number(),
+  folderId: z.string().describe('Filter documents by folder ID').optional(),
 });
 
 export const ZGetDocumentWithDetailsByIdResponseSchema = ZDocumentSchema;
@@ -196,14 +199,15 @@ export const ZCreateDocumentRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
+  folderId: z.string().describe('The ID of the folder to create the document in').optional(),
 });
 
 export const ZCreateDocumentV2RequestSchema = z.object({
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
-  globalAccessAuth: ZDocumentAccessAuthTypesSchema.optional(),
-  globalActionAuth: ZDocumentActionAuthTypesSchema.optional(),
+  globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
+  globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
   recipients: z
     .array(
@@ -290,6 +294,8 @@ export const ZDistributeDocumentRequestSchema = z.object({
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
+      emailId: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),
@@ -341,9 +347,21 @@ export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
 
-export const ZMoveDocumentToTeamSchema = z.object({
-  documentId: z.number().describe('The ID of the document to move to a team.'),
-  teamId: z.number().describe('The ID of the team to move the document to.'),
+export const ZDownloadDocumentRequestSchema = z.object({
+  documentId: z.number().describe('The ID of the document to download.'),
+  version: z
+    .enum(['original', 'signed'])
+    .describe(
+      'The version of the document to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document.',
+    )
+    .default('signed'),
 });
 
-export const ZMoveDocumentToTeamResponseSchema = ZDocumentLiteSchema;
+export const ZDownloadDocumentResponseSchema = z.object({
+  downloadUrl: z.string().describe('Pre-signed URL for downloading the PDF file'),
+  filename: z.string().describe('The filename of the PDF file'),
+  contentType: z.string().describe('MIME type of the file'),
+});
+
+export type TDownloadDocumentRequest = z.infer<typeof ZDownloadDocumentRequestSchema>;
+export type TDownloadDocumentResponse = z.infer<typeof ZDownloadDocumentResponseSchema>;

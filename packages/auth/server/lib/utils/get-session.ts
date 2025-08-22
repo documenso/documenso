@@ -1,6 +1,8 @@
+import type { Session } from '@prisma/client';
 import type { Context } from 'hono';
 
 import { AppError } from '@documenso/lib/errors/app-error';
+import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../errors/error-codes';
 import type { SessionValidationResult } from '../session/session';
@@ -35,6 +37,33 @@ export const getOptionalSession = async (
   }
 
   return await validateSessionToken(sessionId);
+};
+
+export type ActiveSession = Omit<Session, 'sessionToken'>;
+
+export const getActiveSessions = async (c: Context | Request): Promise<ActiveSession[]> => {
+  const { user } = await getSession(c);
+
+  return await prisma.session.findMany({
+    where: {
+      userId: user.id,
+      expiresAt: {
+        gt: new Date(),
+      },
+    },
+    orderBy: {
+      updatedAt: 'desc',
+    },
+    select: {
+      id: true,
+      userId: true,
+      expiresAt: true,
+      updatedAt: true,
+      createdAt: true,
+      ipAddress: true,
+      userAgent: true,
+    },
+  });
 };
 
 /**

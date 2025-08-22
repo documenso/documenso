@@ -11,15 +11,16 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEmailContext } from '../email/get-email-context';
 
 export interface DeleteDocumentRecipientOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipientId: number;
   requestMetadata: ApiRequestMetadata;
 }
@@ -37,21 +38,7 @@ export const deleteDocumentRecipient = async ({
           id: recipientId,
         },
       },
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       documentMeta: true,
@@ -137,22 +124,29 @@ export const deleteDocumentRecipient = async ({
       assetBaseUrl,
     });
 
+    const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+      emailType: 'RECIPIENT',
+      source: {
+        type: 'team',
+        teamId: document.teamId,
+      },
+      meta: document.documentMeta,
+    });
+
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
-      renderEmailWithI18N(template, { lang: document.documentMeta?.language, plainText: true }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding, plainText: true }),
     ]);
 
-    const i18n = await getI18nInstance(document.documentMeta?.language);
+    const i18n = await getI18nInstance(emailLanguage);
 
     await mailer.sendMail({
       to: {
         address: recipientToDelete.email,
         name: recipientToDelete.name,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: i18n._(msg`You have been removed from a document`),
       html,
       text,

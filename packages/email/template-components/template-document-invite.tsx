@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { RecipientRole } from '@prisma/client';
+import { OrganisationType, RecipientRole } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -18,9 +18,9 @@ export interface TemplateDocumentInviteProps {
   assetBaseUrl: string;
   role: RecipientRole;
   selfSigner: boolean;
-  isTeamInvite: boolean;
   teamName?: string;
   includeSenderDetails?: boolean;
+  organisationType?: OrganisationType;
 }
 
 export const TemplateDocumentInvite = ({
@@ -30,9 +30,9 @@ export const TemplateDocumentInvite = ({
   assetBaseUrl,
   role,
   selfSigner,
-  isTeamInvite,
   teamName,
   includeSenderDetails,
+  organisationType,
 }: TemplateDocumentInviteProps) => {
   const { _ } = useLingui();
 
@@ -50,21 +50,28 @@ export const TemplateDocumentInvite = ({
 
       <Section>
         <Text className="text-primary mx-auto mb-0 max-w-[80%] text-center text-lg font-semibold">
-          {match({ selfSigner, isTeamInvite, includeSenderDetails, teamName })
+          {match({ selfSigner, organisationType, includeSenderDetails, teamName })
             .with({ selfSigner: true }, () => (
               <Trans>
                 Please {_(actionVerb).toLowerCase()} your document
                 <br />"{documentName}"
               </Trans>
             ))
-            .with({ isTeamInvite: true, includeSenderDetails: true, teamName: P.string }, () => (
-              <Trans>
-                {inviterName} on behalf of "{teamName}" has invited you to{' '}
-                {_(actionVerb).toLowerCase()}
-                <br />"{documentName}"
-              </Trans>
-            ))
-            .with({ isTeamInvite: true, teamName: P.string }, () => (
+            .with(
+              {
+                organisationType: OrganisationType.ORGANISATION,
+                includeSenderDetails: true,
+                teamName: P.string,
+              },
+              () => (
+                <Trans>
+                  {inviterName} on behalf of "{teamName}" has invited you to{' '}
+                  {_(actionVerb).toLowerCase()}
+                  <br />"{documentName}"
+                </Trans>
+              ),
+            )
+            .with({ organisationType: OrganisationType.ORGANISATION, teamName: P.string }, () => (
               <Trans>
                 {teamName} has invited you to {_(actionVerb).toLowerCase()}
                 <br />"{documentName}"

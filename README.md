@@ -49,8 +49,6 @@ Join us in creating the next generation of open trust infrastructure.
 
 ## Community and Next Steps 🎯
 
-We're currently working on a redesign of the application, including a revamp of the codebase, so Documenso can be more intuitive to use and robust to develop upon.
-
 - Check out the first source code release in this repository and test it.
 - Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
 - Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members.
@@ -247,14 +245,14 @@ Now you can install the dependencies and build it:
 
 ```
 npm i
-npm run build:web
+npm run build
 npm run prisma:migrate-deploy
 ```
 
 Finally, you can start it with:
 
 ```
-cd apps/web
+cd apps/remix
 npm run start
 ```
 
@@ -275,7 +273,7 @@ After=network.target
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/web
+WorkingDirectory=/var/www/documenso/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always
@@ -310,7 +308,7 @@ The Web UI can be found at http://localhost:9000, while the SMTP port will be on
 
 ### Support IPv6
 
-If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Next.js start command
+If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Remix start command
 
 For local docker run
 

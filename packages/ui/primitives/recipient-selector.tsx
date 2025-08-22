@@ -3,13 +3,13 @@ import { useCallback, useState } from 'react';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
-import { RecipientRole, SendStatus } from '@prisma/client';
+import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 
-import { getSignerColorStyles } from '../lib/signer-colors';
+import { getRecipientColorStyles } from '../lib/recipient-colors';
 import { cn } from '../lib/utils';
 import { Button } from './button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from './command';
@@ -78,12 +78,12 @@ export const RecipientSelector = ({
           role="combobox"
           className={cn(
             'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
-            getSignerColorStyles(
+            getRecipientColorStyles(
               Math.max(
                 recipients.findIndex((r) => r.id === selectedRecipient?.id),
                 0,
               ),
-            ).default.base,
+            ).base,
             className,
           )}
         >
@@ -131,12 +131,12 @@ export const RecipientSelector = ({
                   key={recipient.id}
                   className={cn(
                     'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                    getSignerColorStyles(
+                    getRecipientColorStyles(
                       Math.max(
                         recipients.findIndex((r) => r.id === recipient.id),
                         0,
                       ),
-                    ).default.comboxBoxItem,
+                    ).comboxBoxItem,
                     {
                       'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                     },
@@ -145,6 +145,7 @@ export const RecipientSelector = ({
                     onSelectedRecipientChange(recipient);
                     setShowRecipientsSelector(false);
                   }}
+                  disabled={recipient.signingStatus !== SigningStatus.NOT_SIGNED}
                 >
                   <span
                     className={cn('text-foreground/70 truncate', {

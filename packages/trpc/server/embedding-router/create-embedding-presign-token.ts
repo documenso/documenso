@@ -1,9 +1,7 @@
-import { isCommunityPlan } from '@documenso/ee/server-only/util/is-community-plan';
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
 
 import { procedure } from '../trpc';
@@ -42,13 +40,11 @@ export const createEmbeddingPresignTokenRoute = procedure
           });
         }
 
-        const [hasCommunityPlan, hasPlatformPlan, hasEnterprisePlan] = await Promise.all([
-          isCommunityPlan({ userId: token.userId, teamId: token.teamId ?? undefined }),
-          isDocumentPlatform({ userId: token.userId, teamId: token.teamId }),
-          isUserEnterprise({ userId: token.userId, teamId: token.teamId ?? undefined }),
-        ]);
+        const organisationClaim = await getOrganisationClaimByTeamId({
+          teamId: token.teamId,
+        });
 
-        if (!hasCommunityPlan && !hasPlatformPlan && !hasEnterprisePlan) {
+        if (!organisationClaim.flags.embedAuthoring) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
             message: 'You do not have permission to create embedding presign tokens',
           });

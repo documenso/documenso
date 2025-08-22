@@ -33,6 +33,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED', // When the global action authentication is updated.
   'DOCUMENT_META_UPDATED', // When the document meta data is updated.
   'DOCUMENT_OPENED', // When the document is opened by a recipient.
+  'DOCUMENT_VIEWED', // When the document is viewed by a recipient.
   'DOCUMENT_RECIPIENT_REJECTED', // When a recipient rejects the document.
   'DOCUMENT_RECIPIENT_COMPLETED', // When a recipient completes all their required tasks for the document.
   'DOCUMENT_SENT', // When the document transitions from DRAFT to PENDING.
@@ -58,6 +59,9 @@ export const ZDocumentMetaDiffTypeSchema = z.enum([
   'REDIRECT_URL',
   'SUBJECT',
   'TIMEZONE',
+  'EMAIL_ID',
+  'EMAIL_REPLY_TO',
+  'EMAIL_SETTINGS',
 ]);
 
 export const ZFieldDiffTypeSchema = z.enum(['DIMENSION', 'POSITION']);
@@ -109,6 +113,9 @@ export const ZDocumentAuditLogDocumentMetaSchema = z.union([
       z.literal(DOCUMENT_META_DIFF_TYPE.REDIRECT_URL),
       z.literal(DOCUMENT_META_DIFF_TYPE.SUBJECT),
       z.literal(DOCUMENT_META_DIFF_TYPE.TIMEZONE),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_ID),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_REPLY_TO),
+      z.literal(DOCUMENT_META_DIFF_TYPE.EMAIL_SETTINGS),
     ]),
     from: z.string().nullable(),
     to: z.string().nullable(),
@@ -124,8 +131,8 @@ export const ZDocumentAuditLogFieldDiffSchema = z.union([
 ]);
 
 export const ZGenericFromToSchema = z.object({
-  from: z.string().nullable(),
-  to: z.string().nullable(),
+  from: z.union([z.string(), z.array(z.string())]).nullable(),
+  to: z.union([z.string(), z.array(z.string())]).nullable(),
 });
 
 export const ZRecipientDiffActionAuthSchema = ZGenericFromToSchema.extend({
@@ -297,7 +304,7 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
       },
       z
         .object({
-          type: ZRecipientActionAuthTypesSchema,
+          type: ZRecipientActionAuthTypesSchema.optional(),
         })
         .optional(),
     ),
@@ -385,7 +392,7 @@ export const ZDocumentAuditLogEventDocumentFieldPrefilledSchema = z.object({
       },
       z
         .object({
-          type: ZRecipientActionAuthTypesSchema,
+          type: ZRecipientActionAuthTypesSchema.optional(),
         })
         .optional(),
     ),
@@ -429,7 +436,29 @@ export const ZDocumentAuditLogEventDocumentMetaUpdatedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED),
   data: ZBaseRecipientDataSchema.extend({
-    accessAuth: z.string().optional(),
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
+  }),
+});
+
+/**
+ * Event: Document viewed.
+ */
+export const ZDocumentAuditLogEventDocumentViewedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED),
+  data: ZBaseRecipientDataSchema.extend({
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
   }),
 });
 
@@ -439,7 +468,13 @@ export const ZDocumentAuditLogEventDocumentOpenedSchema = z.object({
 export const ZDocumentAuditLogEventDocumentRecipientCompleteSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED),
   data: ZBaseRecipientDataSchema.extend({
-    actionAuth: z.string().optional(),
+    actionAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientActionAuthTypesSchema)),
   }),
 });
 
@@ -517,8 +552,20 @@ export const ZDocumentAuditLogEventFieldUpdatedSchema = z.object({
 export const ZDocumentAuditLogEventRecipientAddedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED),
   data: ZBaseRecipientDataSchema.extend({
-    accessAuth: ZRecipientAccessAuthTypesSchema.optional(),
-    actionAuth: ZRecipientActionAuthTypesSchema.optional(),
+    accessAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientAccessAuthTypesSchema)),
+    actionAuth: z.preprocess((unknownValue) => {
+      if (!unknownValue) {
+        return [];
+      }
+
+      return Array.isArray(unknownValue) ? unknownValue : [unknownValue];
+    }, z.array(ZRecipientActionAuthTypesSchema)),
   }),
 });
 
@@ -578,6 +625,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentGlobalAuthActionUpdatedSchema,
     ZDocumentAuditLogEventDocumentMetaUpdatedSchema,
     ZDocumentAuditLogEventDocumentOpenedSchema,
+    ZDocumentAuditLogEventDocumentViewedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
     ZDocumentAuditLogEventDocumentRecipientRejectedSchema,
     ZDocumentAuditLogEventDocumentSentSchema,

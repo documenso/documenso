@@ -1,0 +1,44 @@
+---
+title: Preferences
+description: Learn how to manage your team's global preferences.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Document Preferences
+
+Document preferences allow you to set the default settings when creating new documents and templates.
+
+For example, you can set the default language for documents sent by the team, or set the allowed signatures types.
+
+## Preferences
+
+Document preferences can be set on either the organisation or team level.
+
+By default, teams inherit the preferences from the organisation. You can override these preferences on the team level at any time.
+
+To access the preferences, navigate to either the organisation or teams settings page and click the **Document** tab under the **Preferences** section.
+
+![A screenshot of the organisation's document preferences page](/organisations/organisation-document-preferences.webp)
+
+- **Document Visibility** - Set the default visibility of the documents created by team members. Learn more about [document visibility](/users/documents/document-visibility).
+- **Default Document Language** - This setting allows you to set the default language for the documents uploaded in the organisation. The default language is used as the default language in the email communications with the document recipients.
+- **Default Time Zone** - The timezone to use for date fields and signing the document.
+- **Default Date Format** - The date format to use for date fields and signing the document.
+- **Signature Settings** - Controls what signatures are allowed to be used when signing the documents.
+- **Sender Details** - Set whether the sender's name should be included in the emails sent by the team. See more below [sender details](/users/documents/document-preferences#sender-details).
+- **Include the Signing Certificate** - This setting controls whether the signing certificate should be included in the signed documents. If enabled, the signing certificate is included in the signed documents. If disabled, the signing certificate is not included in the signed documents. Regardless of this setting, the signing certificate is always available in the document's audit log page.
+
+Document visibility, language and signature settings can be overriden on a per document basis.
+
+### Sender Details
+
+If the **Sender Details** setting is enabled, the emails sent by the team will include the sender's name. The email will say:
+
+> "Example User" on behalf of "Example Team" has invited you to sign "document.pdf"
+
+If the **Sender Details** setting is disabled, the emails sent by the team will not include the sender's name. The email will say:
+
+> "Example Team" has invited you to sign "document.pdf"

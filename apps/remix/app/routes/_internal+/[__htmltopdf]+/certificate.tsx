@@ -3,10 +3,12 @@ import { useLingui } from '@lingui/react';
 import { FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
+import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 import { UAParser } from 'ua-parser-js';
+import { renderSVG } from 'uqr';
 
-import { isDocumentPlatform } from '@documenso/ee/server-only/util/is-document-platform';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { APP_I18N_OPTIONS, ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
@@ -15,6 +17,7 @@ import {
 import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { getTranslations } from '@documenso/lib/utils/i18n';
@@ -60,7 +63,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
-  const isPlatformDocument = await isDocumentPlatform(document);
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: document.teamId });
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
 
@@ -72,8 +75,8 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   return {
     document,
+    hidePoweredBy: organisationClaim.flags.hidePoweredBy,
     documentLanguage,
-    isPlatformDocument,
     auditLogs,
     messages,
   };
@@ -89,7 +92,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function SigningCertificate({ loaderData }: Route.ComponentProps) {
-  const { document, documentLanguage, isPlatformDocument, auditLogs, messages } = loaderData;
+  const { document, documentLanguage, hidePoweredBy, auditLogs, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -125,18 +128,30 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
       recipientAuth: recipient.authOptions,
     });
 
-    let authLevel = match(extractedAuthMethods.derivedRecipientActionAuth)
+    const insertedAuditLogsWithFieldAuth = sortBy(
+      auditLogs.DOCUMENT_FIELD_INSERTED.filter(
+        (log) => log.data.recipientId === recipient.id && log.data.fieldSecurity,
+      ),
+      [prop('createdAt'), 'desc'],
+    );
+
+    const actionAuthMethod = insertedAuditLogsWithFieldAuth.at(0)?.data?.fieldSecurity?.type;
+
+    let authLevel = match(actionAuthMethod)
       .with('ACCOUNT', () => _(msg`Account Re-Authentication`))
       .with('TWO_FACTOR_AUTH', () => _(msg`Two-Factor Re-Authentication`))
+      .with('PASSWORD', () => _(msg`Password Re-Authentication`))
       .with('PASSKEY', () => _(msg`Passkey Re-Authentication`))
       .with('EXPLICIT_NONE', () => _(msg`Email`))
-      .with(null, () => null)
+      .with(undefined, () => null)
       .exhaustive();
 
     if (!authLevel) {
-      authLevel = match(extractedAuthMethods.derivedRecipientAccessAuth)
+      const accessAuthMethod = extractedAuthMethods.derivedRecipientAccessAuth.at(0);
+
+      authLevel = match(accessAuthMethod)
         .with('ACCOUNT', () => _(msg`Account Authentication`))
-        .with(null, () => _(msg`Email`))
+        .with(undefined, () => _(msg`Email`))
         .exhaustive();
     }
 
@@ -249,24 +264,24 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                               {signature.secondaryId}
                             </span>
                           </p>
-
-                          <p className="text-muted-foreground mt-2 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
-                            <span className="inline-block">
-                              {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
-                            </span>
-                          </p>
-
-                          <p className="text-muted-foreground mt-1 text-sm print:text-xs">
-                            <span className="font-medium">{_(msg`Device`)}:</span>{' '}
-                            <span className="inline-block">
-                              {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
-                            </span>
-                          </p>
                         </>
                       ) : (
                         <p className="text-muted-foreground">N/A</p>
                       )}
+
+                      <p className="text-muted-foreground mt-2 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`IP Address`)}:</span>{' '}
+                        <span className="inline-block">
+                          {logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.ipAddress ?? _(msg`Unknown`)}
+                        </span>
+                      </p>
+
+                      <p className="text-muted-foreground mt-1 text-sm print:text-xs">
+                        <span className="font-medium">{_(msg`Device`)}:</span>{' '}
+                        <span className="inline-block">
+                          {getDevice(logs.DOCUMENT_RECIPIENT_COMPLETED[0]?.userAgent)}
+                        </span>
+                      </p>
                     </TableCell>
 
                     <TableCell truncate={false} className="w-[min-content] align-top">
@@ -341,13 +356,23 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
         </CardContent>
       </Card>
 
-      {isPlatformDocument && (
-        <div className="my-8 flex-row-reverse">
+      {!hidePoweredBy && (
+        <div className="my-8 flex-row-reverse space-y-4">
+          <div className="flex items-end justify-end gap-x-4">
+            <div
+              className="flex h-24 w-24 justify-center"
+              dangerouslySetInnerHTML={{
+                __html: renderSVG(`${NEXT_PUBLIC_WEBAPP_URL()}/share/${document.qrToken}`, {
+                  ecc: 'Q',
+                }),
+              }}
+            />
+          </div>
+
           <div className="flex items-end justify-end gap-x-4">
             <p className="flex-shrink-0 text-sm font-medium print:text-xs">
               {_(msg`Signing certificate provided by`)}:
             </p>
-
             <BrandingLogo className="max-h-6 print:max-h-4" />
           </div>
         </div>

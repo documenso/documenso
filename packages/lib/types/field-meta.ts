@@ -96,6 +96,7 @@ export const ZCheckboxFieldMeta = ZBaseFieldMeta.extend({
     .optional(),
   validationRule: z.string().optional(),
   validationLength: z.number().optional(),
+  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
 });
 
 export type TCheckboxFieldMeta = z.infer<typeof ZCheckboxFieldMeta>;
@@ -153,6 +154,10 @@ export const ZFieldMetaPrefillFieldsSchema = z
       z.object({
         type: z.literal('dropdown'),
         label: z.string().optional(),
+        value: z.string().optional(),
+      }),
+      z.object({
+        type: z.literal('date'),
         value: z.string().optional(),
       }),
     ]),

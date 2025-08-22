@@ -19,7 +19,7 @@ import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { TableCell } from '@documenso/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 import { DocumentsTableActionButton } from './documents-table-action-button';
@@ -29,14 +29,20 @@ export type DocumentsTableProps = {
   data?: TFindDocumentsResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
+  onMoveDocument?: (documentId: number) => void;
 };
 
 type DocumentsTableRow = TFindDocumentsResponse['data'][number];
 
-export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTableProps) => {
+export const DocumentsTable = ({
+  data,
+  isLoading,
+  isLoadingError,
+  onMoveDocument,
+}: DocumentsTableProps) => {
   const { _, i18n } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
   const [isPending, startTransition] = useTransition();
 
   const updateSearchParams = useUpdateSearchParams();
@@ -80,12 +86,15 @@ export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTab
           (!row.original.deletedAt || isDocumentCompleted(row.original.status)) && (
             <div className="flex items-center gap-x-4">
               <DocumentsTableActionButton row={row.original} />
-              <DocumentsTableActionDropdown row={row.original} />
+              <DocumentsTableActionDropdown
+                row={row.original}
+                onMoveDocument={onMoveDocument ? () => onMoveDocument(row.original.id) : undefined}
+              />
             </div>
           ),
       },
     ] satisfies DataTableColumnDef<DocumentsTableRow>[];
-  }, [team]);
+  }, [team, onMoveDocument]);
 
   const onPaginationChange = (page: number, perPage: number) => {
     startTransition(() => {
@@ -158,7 +167,7 @@ export const DocumentsTable = ({ data, isLoading, isLoadingError }: DocumentsTab
 
 type DataTableTitleProps = {
   row: DocumentsTableRow;
-  teamUrl?: string;
+  teamUrl: string;
 };
 
 const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
@@ -170,7 +179,8 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isRecipient = !!recipient;
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
-  const documentsPath = formatDocumentsPath(isCurrentTeamDocument ? teamUrl : undefined);
+  const documentsPath = formatDocumentsPath(teamUrl);
+  const formatPath = `${documentsPath}/${row.id}`;
 
   return match({
     isOwner,
@@ -179,7 +189,7 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   })
     .with({ isOwner: true }, { isCurrentTeamDocument: true }, () => (
       <Link
-        to={`${documentsPath}/${row.id}`}
+        to={formatPath}
         title={row.title}
         className="block max-w-[10rem] truncate font-medium hover:underline md:max-w-[20rem]"
       >

@@ -3,28 +3,20 @@ import { expect, test } from '@playwright/test';
 import { prisma } from '@documenso/prisma';
 import {
   seedTeamDocumentWithMeta,
-  seedTeamDocuments,
   seedTeamTemplateWithMeta,
 } from '@documenso/prisma/seed/documents';
+import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[TEAMS]: check that default team signature settings are all enabled', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
-
-  // Verify that the default created team settings has all signatures enabled
-  await expect(page.getByRole('combobox').filter({ hasText: 'Type' })).toBeVisible();
-  await expect(page.getByRole('combobox').filter({ hasText: 'Upload' })).toBeVisible();
-  await expect(page.getByRole('combobox').filter({ hasText: 'Draw' })).toBeVisible();
 
   const document = await seedTeamDocumentWithMeta(team);
 
@@ -48,23 +40,22 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
 });
 
 test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
 
   const allTabs = ['Type', 'Upload', 'Draw'];
   const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
-    await page.goto(`/t/${team.url}/settings/preferences`);
+    await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
@@ -89,41 +80,49 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
 
     await page.getByRole('button', { name: 'Update' }).first().click();
 
+    // Wait for the update to complete
+    const toast = page.locator('li[role="status"][data-state="open"]').first();
+    await expect(toast).toBeVisible();
+    await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
+
     const document = await seedTeamDocumentWithMeta(team);
 
-    // Go to document and check that the signatured tabs are correct.
+    // Go to document and check that the signature tabs are correct.
     await page.goto(`/sign/${document.recipients[0].token}`);
     await page.getByTestId('signature-pad-dialog-button').click();
+
+    // Wait for signature dialog to fully load
+    await page.waitForSelector('[role="dialog"]');
 
     // Check the tab values
     for (const tab of allTabs) {
       if (tabs.includes(tab)) {
         await expect(page.getByRole('tab', { name: tab })).toBeVisible();
       } else {
-        await expect(page.getByRole('tab', { name: tab })).not.toBeVisible();
+        // await expect(page.getByRole('tab', { name: tab })).not.toBeVisible();
+        await expect(page.getByRole('tab', { name: tab })).toHaveCount(0);
       }
     }
   }
 });
 
 test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
-  const { team } = await seedTeamDocuments();
+  const { user, team } = await seedUser();
 
   await apiSignin({
     page,
-    email: team.owner.email,
-    password: 'password',
-    redirectPath: `/t/${team.url}/settings/preferences`,
+    email: user.email,
+    redirectPath: `/t/${team.url}/settings/document`,
   });
 
   const allTabs = ['Type', 'Upload', 'Draw'];
   const tabTest = [['Type', 'Upload', 'Draw'], ['Type', 'Upload'], ['Type']];
 
   for (const tabs of tabTest) {
-    await page.goto(`/t/${team.url}/settings/preferences`);
+    await page.goto(`/t/${team.url}/settings/document`);
 
     // Update combobox to have the correct tabs
-    await page.getByTestId('signature-types-combobox').click();
+    await page.getByTestId('signature-types-trigger').click();
 
     await expect(page.getByRole('option', { name: 'Type' })).toBeVisible();
     await expect(page.getByRole('option', { name: 'Upload' })).toBeVisible();
@@ -149,8 +148,9 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await page.getByRole('button', { name: 'Update' }).first().click();
 
     // Wait for finish
-    await page.getByText('Document preferences updated').waitFor({ state: 'visible' });
-    await page.waitForTimeout(1000);
+    const toast = page.locator('li[role="status"][data-state="open"]').first();
+    await expect(toast).toBeVisible();
+    await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
 
     const template = await seedTeamTemplateWithMeta(team);
 

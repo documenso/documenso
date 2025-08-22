@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus } from '@prisma/client';
 import type { Document, Recipient, Team, User } from '@prisma/client';
+import { DocumentStatus } from '@prisma/client';
 import {
   Copy,
   Download,
@@ -15,8 +15,7 @@ import {
   Share,
   Trash2,
 } from 'lucide-react';
-import { Link } from 'react-router';
-import { useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -37,7 +36,7 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
   document: Document & {
@@ -53,7 +52,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const { _ } = useLingui();
 
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -68,7 +67,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const isCurrentTeamDocument = team && document.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
-  const documentsPath = formatDocumentsPath(team?.url);
+  const documentsPath = formatDocumentsPath(team.url);
 
   const onDownloadClick = async () => {
     try {
@@ -90,6 +89,35 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
       }
 
       await downloadPDF({ documentData, fileName: document.title });
+    } catch (err) {
+      toast({
+        title: _(msg`Something went wrong`),
+        description: _(msg`An error occurred while downloading your document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onDownloadOriginalClick = async () => {
+    try {
+      const documentWithData = await trpcClient.document.getDocumentById.query(
+        {
+          documentId: document.id,
+        },
+        {
+          context: {
+            teamId: team?.id?.toString(),
+          },
+        },
+      );
+
+      const documentData = documentWithData?.documentData;
+
+      if (!documentData) {
+        return;
+      }
+
+      await downloadPDF({ documentData, fileName: document.title, version: 'original' });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -128,10 +156,15 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
           </DropdownMenuItem>
         )}
 
+        <DropdownMenuItem onClick={onDownloadOriginalClick}>
+          <Download className="mr-2 h-4 w-4" />
+          <Trans>Download Original</Trans>
+        </DropdownMenuItem>
+
         <DropdownMenuItem asChild>
           <Link to={`${documentsPath}/${document.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
-            <Trans>Audit Log</Trans>
+            <Trans>Audit Logs</Trans>
           </Link>
         </DropdownMenuItem>
 

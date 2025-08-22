@@ -1,6 +1,5 @@
-import type { DocumentDistributionMethod } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import {
-  DocumentSigningOrder,
   DocumentSource,
   type Field,
   type Recipient,
@@ -9,11 +8,13 @@ import {
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
+import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import { nanoid } from '@documenso/lib/universal/id';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -38,12 +39,15 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
   createDocumentAuthOptions,
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type FinalRecipient = Pick<
@@ -58,7 +62,7 @@ export type CreateDocumentFromTemplateOptions = {
   templateId: number;
   externalId?: string | null;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipients: {
     id: number;
     name?: string;
@@ -224,6 +228,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'checkbox',
         label: field.label,
         values: newValues,
+        direction: checkboxMeta.direction ?? 'vertical',
       };
 
       return meta;
@@ -274,21 +279,7 @@ export const createDocumentFromTemplate = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       recipients: {
@@ -298,11 +289,6 @@ export const createDocumentFromTemplate = async ({
       },
       templateDocumentData: true,
       templateMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
@@ -311,6 +297,11 @@ export const createDocumentFromTemplate = async ({
       message: 'Template not found',
     });
   }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   // Check that all the passed in recipient IDs can be associated with a template recipient.
   recipients.forEach((recipient) => {
@@ -372,6 +363,7 @@ export const createDocumentFromTemplate = async ({
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
+        qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE,
         externalId: externalId || template.externalId,
         templateId: template.id,
@@ -383,9 +375,10 @@ export const createDocumentFromTemplate = async ({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
         }),
-        visibility: template.visibility || template.team?.teamGlobalSettings?.documentVisibility,
+        visibility: template.visibility || settings.documentVisibility,
+        useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
-          create: {
+          create: extractDerivedDocumentMeta(settings, {
             subject: override?.subject || template.templateMeta?.subject,
             message: override?.message || template.templateMeta?.message,
             timezone: override?.timezone || template.templateMeta?.timezone,
@@ -394,17 +387,10 @@ export const createDocumentFromTemplate = async ({
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
             distributionMethod:
               override?.distributionMethod || template.templateMeta?.distributionMethod,
-            // last `undefined` is due to JsonValue's
-            emailSettings:
-              override?.emailSettings || template.templateMeta?.emailSettings || undefined,
-            signingOrder:
-              override?.signingOrder ||
-              template.templateMeta?.signingOrder ||
-              DocumentSigningOrder.PARALLEL,
+            emailSettings: override?.emailSettings || template.templateMeta?.emailSettings,
+            signingOrder: override?.signingOrder || template.templateMeta?.signingOrder,
             language:
-              override?.language ||
-              template.templateMeta?.language ||
-              template.team?.teamGlobalSettings?.documentLanguage,
+              override?.language || template.templateMeta?.language || settings.documentLanguage,
             typedSignatureEnabled:
               override?.typedSignatureEnabled ?? template.templateMeta?.typedSignatureEnabled,
             uploadSignatureEnabled:
@@ -412,10 +398,8 @@ export const createDocumentFromTemplate = async ({
             drawSignatureEnabled:
               override?.drawSignatureEnabled ?? template.templateMeta?.drawSignatureEnabled,
             allowDictateNextSigner:
-              override?.allowDictateNextSigner ??
-              template.templateMeta?.allowDictateNextSigner ??
-              false,
-          },
+              override?.allowDictateNextSigner ?? template.templateMeta?.allowDictateNextSigner,
+          }),
         },
         recipients: {
           createMany: {
@@ -506,10 +490,8 @@ export const createDocumentFromTemplate = async ({
       fieldsToCreate = fieldsToCreate.concat(
         fields.map((field) => {
           const prefillField = prefillFields?.find((value) => value.id === field.id);
-          // Use type assertion to help TypeScript understand the structure
-          const updatedFieldMeta = getUpdatedFieldMeta(field, prefillField);
 
-          return {
+          const payload = {
             documentId: document.id,
             recipientId: recipient.id,
             type: field.type,
@@ -520,8 +502,38 @@ export const createDocumentFromTemplate = async ({
             height: field.height,
             customText: '',
             inserted: false,
-            fieldMeta: updatedFieldMeta,
+            fieldMeta: field.fieldMeta,
           };
+
+          if (prefillField) {
+            match(prefillField)
+              .with({ type: 'date' }, (selector) => {
+                if (!selector.value) {
+                  throw new AppError(AppErrorCode.INVALID_BODY, {
+                    message: `Date value is required for field ${field.id}`,
+                  });
+                }
+
+                const date = new Date(selector.value);
+
+                if (isNaN(date.getTime())) {
+                  throw new AppError(AppErrorCode.INVALID_BODY, {
+                    message: `Invalid date value for field ${field.id}: ${selector.value}`,
+                  });
+                }
+
+                payload.customText = DateTime.fromJSDate(date).toFormat(
+                  template.templateMeta?.dateFormat ?? DEFAULT_DOCUMENT_DATE_FORMAT,
+                );
+
+                payload.inserted = true;
+              })
+              .otherwise((selector) => {
+                payload.fieldMeta = getUpdatedFieldMeta(field, selector);
+              });
+          }
+
+          return payload;
         }),
       );
     });

@@ -9,6 +9,7 @@ export const VALID_DATE_FORMAT_VALUES = [
   'yyyy-MM-dd',
   'dd/MM/yyyy hh:mm a',
   'MM/dd/yyyy hh:mm a',
+  'dd.MM.yyyy HH:mm',
   'yyyy-MM-dd HH:mm',
   'yy-MM-dd hh:mm a',
   'yyyy-MM-dd HH:mm:ss',
@@ -16,6 +17,8 @@ export const VALID_DATE_FORMAT_VALUES = [
   'EEEE, MMMM dd, yyyy hh:mm a',
   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
 ] as const;
+
+export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
 export const DATE_FORMATS = [
   {
@@ -37,6 +40,11 @@ export const DATE_FORMATS = [
     key: 'MMDDYYYY',
     label: 'MM/DD/YYYY',
     value: 'MM/dd/yyyy hh:mm a',
+  },
+  {
+    key: 'DDMMYYYYHHMM',
+    label: 'DD.MM.YYYY HH:mm',
+    value: 'dd.MM.yyyy HH:mm',
   },
   {
     key: 'YYYYMMDDHHmm',
@@ -93,4 +101,8 @@ export const convertToLocalSystemFormat = (
   const formattedDate = parsedDate.toLocal().toFormat(coalescedDateFormat);
 
   return formattedDate;
+};
+
+export const isValidDateFormat = (dateFormat: unknown): dateFormat is ValidDateFormat => {
+  return VALID_DATE_FORMAT_VALUES.includes(dateFormat as ValidDateFormat);
 };

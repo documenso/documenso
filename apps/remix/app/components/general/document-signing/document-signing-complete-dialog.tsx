@@ -92,8 +92,6 @@ export const DocumentSigningCompleteDialog = ({
   };
 
   const onFormSubmit = async (data: TNextSignerFormSchema) => {
-    console.log('data', data);
-    console.log('form.formState.errors', form.formState.errors);
     try {
       if (allowDictateNextSigner && data.name && data.email) {
         await onSignatureComplete({ name: data.name, email: data.email });
@@ -281,7 +279,7 @@ export const DocumentSigningCompleteDialog = ({
                 <div className="flex w-full flex-1 flex-nowrap gap-4">
                   <Button
                     type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 flex-1 bg-black/5 hover:bg-black/10"
+                    className="flex-1"
                     variant="secondary"
                     onClick={() => setShowDialog(false)}
                     disabled={form.formState.isSubmitting}

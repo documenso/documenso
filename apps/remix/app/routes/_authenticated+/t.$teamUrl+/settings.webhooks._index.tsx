@@ -15,6 +15,11 @@ import { WebhookCreateDialog } from '~/components/dialogs/webhook-create-dialog'
 import { WebhookDeleteDialog } from '~/components/dialogs/webhook-delete-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { useCurrentTeam } from '~/providers/team';
+import { appMetaTags } from '~/utils/meta';
+
+export function meta() {
+  return appMetaTags('Webhooks');
+}
 
 export default function WebhookPage() {
   const { _, i18n } = useLingui();
@@ -49,7 +54,7 @@ export default function WebhookPage() {
         </div>
       )}
       {webhooks && webhooks.length > 0 && (
-        <div className="mt-4 flex max-w-xl flex-col gap-y-4">
+        <div className="mt-4 flex max-w-2xl flex-col gap-y-4">
           {webhooks?.map((webhook) => (
             <div
               key={webhook.id}

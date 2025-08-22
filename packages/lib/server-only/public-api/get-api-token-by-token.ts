@@ -10,8 +10,30 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
       token: hashedToken,
     },
     include: {
-      team: true,
-      user: true,
+      team: {
+        include: {
+          organisation: {
+            include: {
+              owner: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  disabled: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      user: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          disabled: true,
+        },
+      },
     },
   });
 
@@ -25,11 +47,7 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
 
   // Handle a silly choice from many moons ago
   if (apiToken.team && !apiToken.user) {
-    apiToken.user = await prisma.user.findFirst({
-      where: {
-        id: apiToken.team.ownerUserId,
-      },
-    });
+    apiToken.user = apiToken.team.organisation.owner;
   }
 
   const { user } = apiToken;

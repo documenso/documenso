@@ -7,14 +7,12 @@ import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
-test.describe.configure({ mode: 'parallel' });
-
 test('[DOCUMENT_AUTH]: should grant access when not required', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
-  const document = await seedPendingDocument(user, [
+  const document = await seedPendingDocument(user, team.id, [
     recipientWithAccount,
     'recipientwithoutaccount@documenso.com',
   ]);
@@ -34,18 +32,19 @@ test('[DOCUMENT_AUTH]: should grant access when not required', async ({ page }) 
 });
 
 test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page }) => {
-  const user = await seedUser();
+  const { user, team } = await seedUser();
 
-  const recipientWithAccount = await seedUser();
+  const { user: recipientWithAccount } = await seedUser();
 
   const document = await seedPendingDocument(
     user,
+    team.id,
     [recipientWithAccount, 'recipientwithoutaccount@documenso.com'],
     {
       createDocumentOptions: {
         authOptions: createDocumentAuthOptions({
-          globalAccessAuth: 'ACCOUNT',
-          globalActionAuth: null,
+          globalAccessAuth: ['ACCOUNT'],
+          globalActionAuth: [],
         }),
       },
     },

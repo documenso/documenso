@@ -1,9 +1,10 @@
 import type { Document } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
+import { DocumentDataType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { jobs } from '@documenso/lib/jobs/client';
+import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import {
@@ -21,9 +22,9 @@ import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/de
 import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { moveTemplateToTeam } from '@documenso/lib/server-only/template/move-template-to-team';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
+import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -35,6 +36,8 @@ import {
   ZCreateTemplateDirectLinkRequestSchema,
   ZCreateTemplateDirectLinkResponseSchema,
   ZCreateTemplateMutationSchema,
+  ZCreateTemplateV2RequestSchema,
+  ZCreateTemplateV2ResponseSchema,
   ZDeleteTemplateDirectLinkRequestSchema,
   ZDeleteTemplateMutationSchema,
   ZDuplicateTemplateMutationSchema,
@@ -43,8 +46,6 @@ import {
   ZFindTemplatesResponseSchema,
   ZGetTemplateByIdRequestSchema,
   ZGetTemplateByIdResponseSchema,
-  ZMoveTemplateToTeamRequestSchema,
-  ZMoveTemplateToTeamResponseSchema,
   ZToggleTemplateDirectLinkRequestSchema,
   ZToggleTemplateDirectLinkResponseSchema,
   ZUpdateTemplateRequestSchema,
@@ -70,6 +71,12 @@ export const templateRouter = router({
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
 
+      ctx.logger.info({
+        input: {
+          folderId: input.folderId,
+        },
+      });
+
       return await findTemplates({
         userId: ctx.user.id,
         teamId,
@@ -94,6 +101,12 @@ export const templateRouter = router({
     .query(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await getTemplateById({
         id: templateId,
@@ -121,14 +134,97 @@ export const templateRouter = router({
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, templateDocumentDataId } = input;
+      const { title, templateDocumentDataId, folderId } = input;
+
+      ctx.logger.info({
+        input: {
+          folderId,
+        },
+      });
 
       return await createTemplate({
         userId: ctx.user.id,
         teamId,
-        title,
         templateDocumentDataId,
+        data: {
+          title,
+          folderId,
+        },
       });
+    }),
+
+  /**
+   * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
+   *
+   * @public
+   * @deprecated
+   */
+  createTemplateTemporary: authenticatedProcedure
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/create/beta',
+        summary: 'Create template',
+        description:
+          'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
+        tags: ['Template'],
+      },
+    })
+    .input(ZCreateTemplateV2RequestSchema)
+    .output(ZCreateTemplateV2ResponseSchema)
+    .mutation(async ({ input, ctx }) => {
+      const { teamId, user } = ctx;
+
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
+        meta,
+      } = input;
+
+      const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
+
+      const { url, key } = await getPresignPostUrl(fileName, 'application/pdf');
+
+      const templateDocumentData = await createDocumentData({
+        data: key,
+        type: DocumentDataType.S3_PATH,
+      });
+
+      const createdTemplate = await createTemplate({
+        userId: user.id,
+        teamId,
+        templateDocumentDataId: templateDocumentData.id,
+        data: {
+          title,
+          folderId,
+          externalId,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          publicTitle,
+          publicDescription,
+          type,
+        },
+        meta,
+      });
+
+      const fullTemplate = await getTemplateById({
+        id: createdTemplate.id,
+        userId: user.id,
+        teamId,
+      });
+
+      return {
+        template: fullTemplate,
+        uploadUrl: url,
+      };
     }),
 
   /**
@@ -148,8 +244,13 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId, data, meta } = input;
-
       const userId = ctx.user.id;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       return await updateTemplate({
         userId,
@@ -178,6 +279,12 @@ export const templateRouter = router({
       const { teamId } = ctx;
       const { templateId } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       return await duplicateTemplate({
         userId: ctx.user.id,
         teamId,
@@ -202,8 +309,13 @@ export const templateRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
       const { templateId } = input;
-
       const userId = ctx.user.id;
+
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
 
       await deleteTemplate({ userId, id: templateId, teamId });
 
@@ -230,7 +342,13 @@ export const templateRouter = router({
       const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
         input;
 
-      const limits = await getServerLimits({ email: ctx.user.email, teamId });
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
+      const limits = await getServerLimits({ userId: ctx.user.id, teamId });
 
       if (limits.remaining.documents === 0) {
         throw new Error('You have reached your document limit.');
@@ -293,6 +411,12 @@ export const templateRouter = router({
         templateUpdatedAt,
       } = input;
 
+      ctx.logger.info({
+        input: {
+          directTemplateToken,
+        },
+      });
+
       return await createDocumentFromDirectTemplate({
         directRecipientName,
         directRecipientEmail,
@@ -332,9 +456,16 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+          directRecipientId,
+        },
+      });
+
       const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
 
-      const limits = await getServerLimits({ email: ctx.user.email, teamId: template.teamId });
+      const limits = await getServerLimits({ userId: ctx.user.id, teamId: template.teamId });
 
       if (limits.remaining.directTemplates === 0) {
         throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -366,6 +497,12 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
+      });
+
       await deleteTemplateDirectLink({ userId, teamId, templateId });
 
       return ZGenericSuccessResponse;
@@ -392,33 +529,13 @@ export const templateRouter = router({
 
       const userId = ctx.user.id;
 
-      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
-    }),
-
-  /**
-   * @public
-   */
-  moveTemplateToTeam: authenticatedProcedure
-    .meta({
-      openapi: {
-        method: 'POST',
-        path: '/template/move',
-        summary: 'Move template',
-        description: 'Move a template to a team',
-        tags: ['Template'],
-      },
-    })
-    .input(ZMoveTemplateToTeamRequestSchema)
-    .output(ZMoveTemplateToTeamResponseSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { templateId, teamId } = input;
-      const userId = ctx.user.id;
-
-      return await moveTemplateToTeam({
-        templateId,
-        teamId,
-        userId,
+      ctx.logger.info({
+        input: {
+          templateId,
+        },
       });
+
+      return await toggleTemplateDirectLink({ userId, teamId, templateId, enabled });
     }),
 
   /**
@@ -430,10 +547,17 @@ export const templateRouter = router({
       const { templateId, teamId, csv, sendImmediately } = input;
       const { user } = ctx;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+          teamId,
+        },
+      });
+
       if (csv.length > 4 * 1024 * 1024) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'File size exceeds 4MB limit',
+          statusCode: 400,
         });
       }
 
@@ -444,8 +568,7 @@ export const templateRouter = router({
       });
 
       if (!template) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
+        throw new AppError(AppErrorCode.NOT_FOUND, {
           message: 'Template not found',
         });
       }

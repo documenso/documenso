@@ -27,7 +27,6 @@ export const createEmbeddingPresignToken = async ({
     // In development mode, allow setting expiresIn to 0 for testing
     // In production, enforce a minimum expiration time
     const isDevelopment = env('NODE_ENV') !== 'production';
-    console.log('isDevelopment', isDevelopment);
     const minExpirationMinutes = isDevelopment ? 0 : 5;
 
     // Ensure expiresIn is at least the minimum allowed value

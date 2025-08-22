@@ -11,13 +11,20 @@ import { isExtendedDocumentStatus } from '@documenso/prisma/guards/is-extended-d
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 
 export type GetStatsInput = {
-  user: User;
+  user: Pick<User, 'id' | 'email'>;
   team?: Omit<GetTeamCountsOption, 'createdAt'>;
   period?: PeriodSelectorValue;
   search?: string;
+  folderId?: string;
 };
 
-export const getStats = async ({ user, period, search = '', ...options }: GetStatsInput) => {
+export const getStats = async ({
+  user,
+  period,
+  search = '',
+  folderId,
+  ...options
+}: GetStatsInput) => {
   let createdAt: Prisma.DocumentWhereInput['createdAt'];
 
   if (period) {
@@ -37,8 +44,9 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
         currentUserEmail: user.email,
         userId: user.id,
         search,
+        folderId,
       })
-    : getCounts({ user, createdAt, search }));
+    : getCounts({ user, createdAt, search, folderId }));
 
   const stats: Record<ExtendedDocumentStatus, number> = {
     [ExtendedDocumentStatus.DRAFT]: 0,
@@ -81,12 +89,13 @@ export const getStats = async ({ user, period, search = '', ...options }: GetSta
 };
 
 type GetCountsOption = {
-  user: User;
+  user: Pick<User, 'id' | 'email'>;
   createdAt: Prisma.DocumentWhereInput['createdAt'];
   search?: string;
+  folderId?: string | null;
 };
 
-const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
+const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption) => {
   const searchFilter: Prisma.DocumentWhereInput = {
     OR: [
       { title: { contains: search, mode: 'insensitive' } },
@@ -94,6 +103,8 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
       { recipients: { some: { email: { contains: search, mode: 'insensitive' } } } },
     ],
   };
+
+  const rootPageFilter = folderId === undefined ? { folderId: null } : {};
 
   return Promise.all([
     // Owner counts.
@@ -105,9 +116,8 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
       where: {
         userId: user.id,
         createdAt,
-        teamId: null,
         deletedAt: null,
-        AND: [searchFilter],
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
     }),
     // Not signed counts.
@@ -126,7 +136,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
           },
         },
         createdAt,
-        AND: [searchFilter],
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
     }),
     // Has signed counts.
@@ -164,7 +174,7 @@ const getCounts = async ({ user, createdAt, search }: GetCountsOption) => {
             },
           },
         ],
-        AND: [searchFilter],
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
     }),
   ]);
@@ -179,10 +189,11 @@ type GetTeamCountsOption = {
   createdAt: Prisma.DocumentWhereInput['createdAt'];
   currentTeamMemberRole?: TeamMemberRole;
   search?: string;
+  folderId?: string | null;
 };
 
 const getTeamCounts = async (options: GetTeamCountsOption) => {
-  const { createdAt, teamId, teamEmail } = options;
+  const { createdAt, teamId, teamEmail, folderId } = options;
 
   const senderIds = options.senderIds ?? [];
 
@@ -206,6 +217,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     createdAt,
     teamId,
     deletedAt: null,
+    folderId,
   };
 
   let notSignedCountsGroupByArgs = null;
@@ -278,6 +290,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       where: {
         userId: userIdWhereClause,
         createdAt,
+        folderId,
         status: ExtendedDocumentStatus.PENDING,
         recipients: {
           some: {
@@ -298,6 +311,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
       where: {
         userId: userIdWhereClause,
         createdAt,
+        folderId,
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
@@ -319,7 +333,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
                 documentDeletedAt: null,
               },
             },
-            deletedAt: null,
           },
         ],
       },

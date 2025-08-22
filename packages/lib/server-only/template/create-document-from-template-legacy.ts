@@ -1,12 +1,16 @@
 import { DocumentSource, type RecipientRole } from '@prisma/client';
 
-import { nanoid } from '@documenso/lib/universal/id';
+import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
+
+import { extractDerivedDocumentMeta } from '../../utils/document';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamSettings } from '../team/get-team-settings';
 
 export type CreateDocumentFromTemplateLegacyOptions = {
   templateId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   recipients?: {
     name?: string;
     email: string;
@@ -27,38 +31,24 @@ export const createDocumentFromTemplateLegacy = async ({
   const template = await prisma.template.findUnique({
     where: {
       id: templateId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
+      team: buildTeamWhereQuery({ teamId, userId }),
     },
     include: {
       recipients: true,
       fields: true,
       templateDocumentData: true,
       templateMeta: true,
-      team: {
-        include: {
-          teamGlobalSettings: true,
-        },
-      },
     },
   });
 
   if (!template) {
     throw new Error('Template not found.');
   }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -70,13 +60,15 @@ export const createDocumentFromTemplateLegacy = async ({
 
   const document = await prisma.document.create({
     data: {
+      qrToken: prefixedId('qr'),
       source: DocumentSource.TEMPLATE,
       templateId: template.id,
       userId,
       teamId: template.teamId,
       title: template.title,
-      visibility: template.team?.teamGlobalSettings?.documentVisibility,
+      visibility: settings.documentVisibility,
       documentDataId: documentData.id,
+      useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
       recipients: {
         create: template.recipients.map((recipient) => ({
           email: recipient.email,
@@ -87,19 +79,7 @@ export const createDocumentFromTemplateLegacy = async ({
         })),
       },
       documentMeta: {
-        create: {
-          subject: template.templateMeta?.subject,
-          message: template.templateMeta?.message,
-          timezone: template.templateMeta?.timezone,
-          dateFormat: template.templateMeta?.dateFormat,
-          redirectUrl: template.templateMeta?.redirectUrl,
-          signingOrder: template.templateMeta?.signingOrder ?? undefined,
-          language:
-            template.templateMeta?.language || template.team?.teamGlobalSettings?.documentLanguage,
-          typedSignatureEnabled: template.templateMeta?.typedSignatureEnabled,
-          uploadSignatureEnabled: template.templateMeta?.uploadSignatureEnabled,
-          drawSignatureEnabled: template.templateMeta?.drawSignatureEnabled,
-        },
+        create: extractDerivedDocumentMeta(settings, template.templateMeta),
       },
     },
 

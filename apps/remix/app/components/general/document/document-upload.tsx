@@ -3,12 +3,12 @@ import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { Loader } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
@@ -17,10 +17,16 @@ import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
+import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentUploadDropzoneProps = {
   className?: string;
@@ -30,11 +36,13 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
+  const { folderId } = useParams();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const navigate = useNavigate();
   const analytics = useAnalytics();
+  const organisation = useCurrentOrganisation();
 
   const userTimezone =
     TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??
@@ -47,10 +55,12 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
   const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
 
   const disabledMessage = useMemo(() => {
+    if (organisation.subscription && remaining.documents === 0) {
+      return msg`Document upload disabled due to unpaid invoices`;
+    }
+
     if (remaining.documents === 0) {
-      return team
-        ? msg`Document upload disabled due to unpaid invoices`
-        : msg`You have reached your document limit.`;
+      return msg`You have reached your document limit.`;
     }
 
     if (!user.emailVerified) {
@@ -68,10 +78,13 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
       const { id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
-        timezone: userTimezone,
+        timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
+        folderId: folderId ?? undefined,
       });
 
       void refreshLimits();
+
+      await navigate(`${formatDocumentsPath(team.url)}/${id}/edit`);
 
       toast({
         title: _(msg`Document uploaded`),
@@ -84,8 +97,6 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
         documentId: id,
         timestamp: new Date().toISOString(),
       });
-
-      await navigate(`${formatDocumentsPath(team?.url)}/${id}/edit`);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -121,31 +132,33 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   return (
     <div className={cn('relative', className)}>
-      <DocumentDropzone
-        className="h-[min(400px,50vh)]"
-        disabled={remaining.documents === 0 || !user.emailVerified}
-        disabledMessage={disabledMessage}
-        onDrop={onFileDrop}
-        onDropRejected={onFileDropRejected}
-      />
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>
+              <DocumentDropzone
+                loading={isLoading}
+                disabled={remaining.documents === 0 || !user.emailVerified}
+                disabledMessage={disabledMessage}
+                onDrop={onFileDrop}
+                onDropRejected={onFileDropRejected}
+              />
+            </div>
+          </TooltipTrigger>
 
-      <div className="absolute -bottom-6 right-0">
-        {team?.id === undefined &&
-          remaining.documents > 0 &&
-          Number.isFinite(remaining.documents) && (
-            <p className="text-muted-foreground/60 text-xs">
-              <Trans>
-                {remaining.documents} of {quota.documents} documents remaining this month.
-              </Trans>
-            </p>
-          )}
-      </div>
-
-      {isLoading && (
-        <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
-          <Loader className="text-muted-foreground h-12 w-12 animate-spin" />
-        </div>
-      )}
+          {team?.id === undefined &&
+            remaining.documents > 0 &&
+            Number.isFinite(remaining.documents) && (
+              <TooltipContent>
+                <p className="text-sm">
+                  <Trans>
+                    {remaining.documents} of {quota.documents} documents remaining this month.
+                  </Trans>
+                </p>
+              </TooltipContent>
+            )}
+        </Tooltip>
+      </TooltipProvider>
     </div>
   );
 };
