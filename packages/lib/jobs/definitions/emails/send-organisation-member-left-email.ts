@@ -18,6 +18,7 @@ export const SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION = {
   name: 'Send Organisation Member Left Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION_SCHEMA,
   },
