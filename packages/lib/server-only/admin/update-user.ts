@@ -16,7 +16,7 @@ export const updateUser = async ({ id, name, email, roles }: UpdateUserOptions) 
     },
   });
 
-  return await prisma.user.update({
+  await prisma.user.update({
     where: {
       id,
     },

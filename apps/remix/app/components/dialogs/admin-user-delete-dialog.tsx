@@ -35,7 +35,7 @@ export const AdminUserDeleteDialog = ({ className, user }: AdminUserDeleteDialog
   const [email, setEmail] = useState('');
 
   const { mutateAsync: deleteUser, isPending: isDeletingUser } =
-    trpc.admin.deleteUser.useMutation();
+    trpc.admin.user.delete.useMutation();
 
   const onDeleteAccount = async () => {
     try {

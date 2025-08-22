@@ -37,7 +37,7 @@ export const AdminUserDisableDialog = ({
   const [email, setEmail] = useState('');
 
   const { mutateAsync: disableUser, isPending: isDisablingUser } =
-    trpc.admin.disableUser.useMutation();
+    trpc.admin.user.disable.useMutation();
 
   const onDisableAccount = async () => {
     try {
