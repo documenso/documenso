@@ -308,7 +308,7 @@ The Web UI can be found at http://localhost:9000, while the SMTP port will be on
 
 ### Support IPv6
 
-If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Next.js start command
+If you are deploying to a cluster that uses only IPv6, You can use a custom command to pass a parameter to the Remix start command
 
 For local docker run
 

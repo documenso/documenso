@@ -111,7 +111,7 @@ export const getDocumentWhereInput = async ({
       visibility: {
         in: teamVisibilityFilters,
       },
-      teamId,
+      teamId: team.id,
     },
     // Or, if they are a recipient of the document.
     {
