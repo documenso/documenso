@@ -48,15 +48,19 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
    # Start containers
    docker-compose up -d
    
-   # Generate certificate inside container
-   docker exec -it documenso-production-documenso-1 bash -c "
+   # Set certificate password securely (won't appear in command history)
+   read -s -p "Enter certificate password: " CERT_PASS
+   echo
+   
+   # Generate certificate inside container using environment variable
+   docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
        -keyout /tmp/private.key \
        -out /tmp/certificate.crt \
        -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
      openssl pkcs12 -export -out /app/certs/cert.p12 \
        -inkey /tmp/private.key -in /tmp/certificate.crt \
-       -passout pass:your_password_here && \
+       -passout env:CERT_PASS && \
      rm /tmp/private.key /tmp/certificate.crt
    "
    
@@ -72,13 +76,6 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
      - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
    ```
    
-   **Option C: Use Base64-Encoded Certificate**
-   
-   Encode your certificate and add it to `.env`:
-   ```bash
-   base64 -i /path/to/your/cert.p12 -o cert_base64.txt
-   echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
-   ```
 
 5. Run the following command to start the containers:
 
@@ -160,20 +157,6 @@ If you encounter errors related to certificate access, here are common solutions
    docker exec -it <container_name> ls -la /opt/documenso/cert.p12
    ```
 
-#### Alternative: Use Base64 Encoding
-
-To avoid file permission issues entirely, encode your certificate:
-
-```bash
-# Encode your certificate
-base64 -i /path/to/your/cert.p12 -o cert_base64.txt
-
-# Add to your .env file
-echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
-
-# Remove the file path variable if using base64 (optional - having both is fine)
-# sed -i '/NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH/d' .env
-```
 
 ### Container Logs
 

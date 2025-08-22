@@ -137,17 +137,22 @@ This method avoids file permission issues by creating the certificate directly i
    docker-compose up -d
    ```
 
-2. Generate a self-signed certificate inside the container:
+2. Set certificate password securely and generate certificate inside the container:
 
    ```bash
-   docker exec -it documenso-production-documenso-1 bash -c "
+   # Set certificate password securely (won't appear in command history)
+   read -s -p "Enter certificate password: " CERT_PASS
+   echo
+
+   # Generate certificate inside container using environment variable
+   docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
        -keyout /tmp/private.key \
        -out /tmp/certificate.crt \
        -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
      openssl pkcs12 -export -out /app/certs/cert.p12 \
        -inkey /tmp/private.key -in /tmp/certificate.crt \
-       -passout pass:your_password_here && \
+       -passout env:CERT_PASS && \
      rm /tmp/private.key /tmp/certificate.crt
    "
    ```
@@ -195,21 +200,6 @@ If you have an existing `.p12` certificate file:
   Your certificate MUST have a password. Certificates without passwords will cause "Failed to get
   private key bags" errors.
 </Callout>
-
-#### Option C: Use Base64-Encoded Certificate
-
-To avoid file permission issues entirely, you can encode your certificate as base64:
-
-```bash
-# Encode your certificate
-base64 -i /path/to/your/cert.p12 -o cert_base64.txt
-
-# Add to your .env file
-echo "NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=$(cat cert_base64.txt)" >> .env
-echo "NEXT_PRIVATE_SIGNING_PASSPHRASE=your_certificate_password" >> .env
-```
-
-This approach eliminates the need for volume mounts and file permission management.
 
 After setting up your certificate, save the `compose.yml` file and run the following command to start the containers:
 

@@ -7,17 +7,6 @@ export type CertificateStatus = {
 };
 
 export const getCertificateStatus = (): CertificateStatus => {
-  const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');
-
-  if (localFileContents) {
-    try {
-      const decoded = Buffer.from(localFileContents, 'base64');
-      return { isAvailable: decoded.length > 0 };
-    } catch {
-      return { isAvailable: false };
-    }
-  }
-
   const defaultPath =
     env('NODE_ENV') === 'production' ? '/opt/documenso/cert.p12' : './example/cert.p12';
   const filePath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || defaultPath;
