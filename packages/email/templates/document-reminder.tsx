@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import type { RecipientRole } from '@prisma/client';
 
@@ -30,7 +31,7 @@ export const DocumentReminderEmailTemplate = ({
 
   const action = i18n.t(RECIPIENT_ROLES_DESCRIPTION[role].actionVerb).toLowerCase();
 
-  const previewTextString = `Reminder to ${action} ${documentName}`;
+  const previewTextString = i18n._(msg`Reminder to ${action} ${documentName}`);
 
   const getAssetUrl = (path: string) => {
     return new URL(path, assetBaseUrl).toString();

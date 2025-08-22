@@ -20,6 +20,6 @@ export const DOCUMENT_AUDIT_LOG_EMAIL_FORMAT = {
     description: 'Document completed',
   },
   [DOCUMENT_EMAIL_TYPE.REMINDER]: {
-    description: 'Reminder',
+    description: 'Signing Reminder',
   },
 } satisfies Record<keyof typeof DOCUMENT_EMAIL_TYPE, unknown>;

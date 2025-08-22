@@ -35,10 +35,10 @@ export class InngestJobProvider extends BaseJobProvider {
   }
 
   public defineJob<N extends string, T>(job: JobDefinition<N, T>): void {
-    let fn: InngestFunction.Any;
+    let jobFunction: InngestFunction.Any;
 
     if (job.trigger.type === 'cron') {
-      fn = this._client.createFunction(
+      jobFunction = this._client.createFunction(
         {
           id: job.id,
           name: job.name,
@@ -60,7 +60,7 @@ export class InngestJobProvider extends BaseJobProvider {
         },
       );
     } else {
-      fn = this._client.createFunction(
+      jobFunction = this._client.createFunction(
         {
           id: job.id,
           name: job.name,
@@ -83,7 +83,7 @@ export class InngestJobProvider extends BaseJobProvider {
       );
     }
 
-    this._functions.push(fn);
+    this._functions.push(jobFunction);
   }
 
   public async triggerJob(options: SimpleTriggerJobOptions): Promise<void> {
