@@ -8,7 +8,7 @@ import { Trans } from '@lingui/react/macro';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { FaIdCardClip } from 'react-icons/fa6';
+import { FaIdCardClip, FaMicrosoft } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -70,6 +70,7 @@ export type SignInFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
   returnTo?: string;
@@ -79,6 +80,7 @@ export const SignInForm = ({
   className,
   initialEmail,
   isGoogleSSOEnabled,
+  isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
   oidcProviderLabel,
   returnTo,
@@ -271,6 +273,22 @@ export const SignInForm = ({
     }
   };
 
+  const onSignInWithMicrosoftClick = async () => {
+    try {
+      await authClient.microsoft.signIn({
+        redirectPath,
+      });
+    } catch (err) {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onSignInWithOIDCClick = async () => {
     try {
       await authClient.oidc.signIn({
@@ -363,7 +381,7 @@ export const SignInForm = ({
             {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
           </Button>
 
-          {(isGoogleSSOEnabled || isOIDCSSOEnabled) && (
+          {(isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled) && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
               <span className="text-muted-foreground bg-transparent">
@@ -384,6 +402,20 @@ export const SignInForm = ({
             >
               <FcGoogle className="mr-2 h-5 w-5" />
               Google
+            </Button>
+          )}
+
+          {isMicrosoftSSOEnabled && (
+            <Button
+              type="button"
+              size="lg"
+              variant="outline"
+              className="bg-background text-muted-foreground border"
+              disabled={isSubmitting}
+              onClick={onSignInWithMicrosoftClick}
+            >
+              <FaMicrosoft className="mr-2 h-5 w-5" />
+              Microsoft
             </Button>
           )}
 
