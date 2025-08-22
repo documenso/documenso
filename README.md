@@ -180,6 +180,9 @@ git clone https://github.com/<your-username>/documenso
 - Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
 - Optional: Create your own signing certificate.
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
+- Optional: Configure job provider for document reminders.
+  - The default local job provider does not support scheduled jobs required for document reminders.
+  - To enable reminders, set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and provide `NEXT_PRIVATE_INNGEST_EVENT_KEY` in your `.env` file.
 
 ### Run in Gitpod
 
