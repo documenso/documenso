@@ -27,7 +27,7 @@ type FieldIconProps = {
     fieldMeta?: TFieldMetaSchema | null;
     signature?: Signature | null;
   };
-  documentMeta?: DocumentMeta | TemplateMeta;
+  documentMeta?: Pick<DocumentMeta | TemplateMeta, 'dateFormat'>;
 };
 
 /**
@@ -160,14 +160,14 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     );
   }
 
-  let textToDisplay = fieldMeta?.label || _(FRIENDLY_FIELD_TYPE[type]) || '';
+  const labelToDisplay = fieldMeta?.label || _(FRIENDLY_FIELD_TYPE[type]) || '';
+  let textToDisplay: string | undefined;
 
   const isSignatureField =
     field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE;
 
-  // Trim default labels.
-  if (textToDisplay.length > 20) {
-    textToDisplay = textToDisplay.substring(0, 20) + '...';
+  if (field.type === FieldType.TEXT && field.fieldMeta?.type === 'text' && field.fieldMeta?.text) {
+    textToDisplay = field.fieldMeta.text;
   }
 
   if (field.inserted) {
@@ -190,18 +190,19 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   const textAlign = fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'left';
 
   return (
-    <div
-      className={cn(
-        'text-field-card-foreground flex h-full w-full items-center justify-center gap-x-1.5 overflow-clip whitespace-nowrap text-center text-[clamp(0.07rem,25cqw,0.825rem)]',
-        {
-          // Using justify instead of align because we also vertically center the text.
-          'justify-start': field.inserted && !isSignatureField && textAlign === 'left',
-          'justify-end': field.inserted && !isSignatureField && textAlign === 'right',
-          'font-signature text-[clamp(0.07rem,25cqw,1.125rem)]': isSignatureField,
-        },
-      )}
-    >
-      {textToDisplay}
+    <div className="flex h-full w-full items-center overflow-hidden">
+      <p
+        className={cn(
+          'text-foreground w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] duration-200',
+          {
+            '!text-center': textAlign === 'center' || !textToDisplay,
+            '!text-right': textAlign === 'right',
+            'font-signature text-[clamp(0.07rem,25cqw,1.125rem)]': isSignatureField,
+          },
+        )}
+      >
+        {textToDisplay || labelToDisplay}
+      </p>
     </div>
   );
 };

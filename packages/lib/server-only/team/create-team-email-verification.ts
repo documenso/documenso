@@ -8,14 +8,12 @@ import { z } from 'zod';
 import { mailer } from '@documenso/email/mailer';
 import { ConfirmTeamEmailTemplate } from '@documenso/email/templates/confirm-team-email';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '@documenso/lib/constants/email';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createTokenVerification } from '@documenso/lib/utils/token-verification';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
-import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { env } from '../../utils/env';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
@@ -122,33 +120,28 @@ export const sendTeamEmailVerificationEmail = async (email: string, token: strin
     token,
   });
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail } = await getEmailContext({
+    emailType: 'INTERNAL',
     source: {
       type: 'team',
       teamId: team.id,
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const lang = settings.documentLanguage as SupportedLanguageCodes;
-
   const [html, text] = await Promise.all([
-    renderEmailWithI18N(template, { lang, branding }),
+    renderEmailWithI18N(template, { lang: emailLanguage, branding }),
     renderEmailWithI18N(template, {
-      lang,
+      lang: emailLanguage,
       branding,
       plainText: true,
     }),
   ]);
 
-  const i18n = await getI18nInstance(lang);
+  const i18n = await getI18nInstance(emailLanguage);
 
   await mailer.sendMail({
     to: email,
-    from: {
-      name: FROM_NAME,
-      address: FROM_ADDRESS,
-    },
+    from: senderEmail,
     subject: i18n._(
       msg`A request to use your email has been initiated by ${team.name} on Documenso`,
     ),

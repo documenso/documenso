@@ -1,5 +1,5 @@
+import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
 import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
-import { getPortalSession } from '@documenso/ee/server-only/stripe/get-portal-session';
 import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -7,16 +7,17 @@ import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations'
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
-import { ZManageSubscriptionRequestSchema } from './manage-subscription.types';
+import { ZCreateSubscriptionRequestSchema } from './create-subscription.types';
 
-export const manageSubscriptionRoute = authenticatedProcedure
-  .input(ZManageSubscriptionRequestSchema)
+export const createSubscriptionRoute = authenticatedProcedure
+  .input(ZCreateSubscriptionRequestSchema)
   .mutation(async ({ ctx, input }) => {
-    const { organisationId } = input;
+    const { organisationId, priceId, isPersonalLayoutMode } = input;
 
     ctx.logger.info({
       input: {
         organisationId,
+        priceId,
       },
     });
 
@@ -51,33 +52,9 @@ export const manageSubscriptionRoute = authenticatedProcedure
 
     let customerId = organisation.customerId;
 
-    // If for some reason customer ID is missing in the organisation but
-    // exists in the subscription take it from the subscription.
-    if (!customerId && organisation.subscription?.customerId) {
-      customerId = organisation.subscription.customerId;
-
-      await prisma.organisation
-        .update({
-          where: {
-            id: organisationId,
-          },
-          data: {
-            customerId,
-          },
-        })
-        .catch((err) => {
-          // Todo: Logger
-          console.error('Critical error, potential conflicting data');
-          console.error(err.message);
-
-          throw err;
-        });
-    }
-
-    // If the customer ID is still missing create a new customer.
     if (!customerId) {
       const customer = await createCustomer({
-        name: organisation.name,
+        name: organisation.owner.name || organisation.owner.email,
         email: organisation.owner.email,
       });
 
@@ -93,10 +70,21 @@ export const manageSubscriptionRoute = authenticatedProcedure
       });
     }
 
-    const redirectUrl = await getPortalSession({
+    const returnUrl = isPersonalLayoutMode
+      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`
+      : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
+
+    const redirectUrl = await createCheckoutSession({
       customerId,
-      returnUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`,
+      priceId,
+      returnUrl,
     });
+
+    if (!redirectUrl) {
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Failed to create checkout session',
+      });
+    }
 
     return {
       redirectUrl,

@@ -1,6 +1,7 @@
 import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
 import {
   DocumentSource,
+  FolderType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -24,6 +25,7 @@ import {
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { buildTeamWhereQuery } from '../../utils/teams';
@@ -44,6 +46,7 @@ export type CreateDocumentOptions = {
     globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
     recipients: TCreateDocumentV2Request['recipients'];
+    folderId?: string;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
@@ -58,7 +61,7 @@ export const createDocumentV2 = async ({
   meta,
   requestMetadata,
 }: CreateDocumentOptions) => {
-  const { title, formValues } = data;
+  const { title, formValues, folderId } = data;
 
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({ teamId, userId }),
@@ -75,6 +78,22 @@ export const createDocumentV2 = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
     });
+  }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
   }
 
   const settings = await getTeamSettings({
@@ -134,6 +153,24 @@ export const createDocumentV2 = async ({
 
   const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
 
+  const emailId = meta?.emailId;
+
+  // Validate that the email ID belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
+
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
       data: {
@@ -145,18 +182,11 @@ export const createDocumentV2 = async ({
         teamId,
         authOptions,
         visibility,
+        folderId,
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            ...meta,
-            signingOrder: meta?.signingOrder || undefined,
-            emailSettings: meta?.emailSettings || undefined,
-            language: meta?.language || settings.documentLanguage,
-            typedSignatureEnabled: meta?.typedSignatureEnabled ?? settings.typedSignatureEnabled,
-            uploadSignatureEnabled: meta?.uploadSignatureEnabled ?? settings.uploadSignatureEnabled,
-            drawSignatureEnabled: meta?.drawSignatureEnabled ?? settings.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, meta),
         },
       },
     });
@@ -201,7 +231,7 @@ export const createDocumentV2 = async ({
       }),
     );
 
-    // Todo: Is it necessary to create a full audit log with all fields and recipients audit logs?
+    // Todo: Is it necessary to create a full audit logs with all fields and recipients audit logs?
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({

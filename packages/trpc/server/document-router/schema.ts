@@ -223,6 +223,12 @@ export const ZCreateDocumentV2RequestSchema = z.object({
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+    )
+    .optional(),
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({
@@ -308,6 +314,8 @@ export const ZDistributeDocumentRequestSchema = z.object({
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
+      emailId: z.string().nullish(),
+      emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
     .optional(),
@@ -358,3 +366,22 @@ export const ZDownloadAuditLogsMutationSchema = z.object({
 export const ZDownloadCertificateMutationSchema = z.object({
   documentId: z.number(),
 });
+
+export const ZDownloadDocumentRequestSchema = z.object({
+  documentId: z.number().describe('The ID of the document to download.'),
+  version: z
+    .enum(['original', 'signed'])
+    .describe(
+      'The version of the document to download. "signed" returns the completed document with signatures, "original" returns the original uploaded document.',
+    )
+    .default('signed'),
+});
+
+export const ZDownloadDocumentResponseSchema = z.object({
+  downloadUrl: z.string().describe('Pre-signed URL for downloading the PDF file'),
+  filename: z.string().describe('The filename of the PDF file'),
+  contentType: z.string().describe('MIME type of the file'),
+});
+
+export type TDownloadDocumentRequest = z.infer<typeof ZDownloadDocumentRequestSchema>;
+export type TDownloadDocumentResponse = z.infer<typeof ZDownloadDocumentResponseSchema>;

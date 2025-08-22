@@ -1,8 +1,8 @@
-import type { DocumentDistributionMethod } from '@prisma/client';
+import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
 import {
-  DocumentSigningOrder,
   DocumentSource,
   type Field,
+  FolderType,
   type Recipient,
   RecipientRole,
   SendStatus,
@@ -40,6 +40,7 @@ import {
   mapDocumentToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
   createDocumentAuthOptions,
@@ -69,6 +70,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  folderId?: string;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
   customDocumentDataId?: string;
 
@@ -274,6 +276,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
+  folderId,
   prefillFields,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
@@ -296,6 +299,22 @@ export const createDocumentFromTemplate = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
+  }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
   }
 
   const settings = await getTeamSettings({
@@ -368,6 +387,7 @@ export const createDocumentFromTemplate = async ({
         externalId: externalId || template.externalId,
         templateId: template.id,
         userId,
+        folderId,
         teamId: template.teamId,
         title: override?.title || template.title,
         documentDataId: documentData.id,
@@ -378,7 +398,7 @@ export const createDocumentFromTemplate = async ({
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMeta: {
-          create: {
+          create: extractDerivedDocumentMeta(settings, {
             subject: override?.subject || template.templateMeta?.subject,
             message: override?.message || template.templateMeta?.message,
             timezone: override?.timezone || template.templateMeta?.timezone,
@@ -387,13 +407,8 @@ export const createDocumentFromTemplate = async ({
             redirectUrl: override?.redirectUrl || template.templateMeta?.redirectUrl,
             distributionMethod:
               override?.distributionMethod || template.templateMeta?.distributionMethod,
-            // last `undefined` is due to JsonValue's
-            emailSettings:
-              override?.emailSettings || template.templateMeta?.emailSettings || undefined,
-            signingOrder:
-              override?.signingOrder ||
-              template.templateMeta?.signingOrder ||
-              DocumentSigningOrder.PARALLEL,
+            emailSettings: override?.emailSettings || template.templateMeta?.emailSettings,
+            signingOrder: override?.signingOrder || template.templateMeta?.signingOrder,
             language:
               override?.language || template.templateMeta?.language || settings.documentLanguage,
             typedSignatureEnabled:
@@ -403,10 +418,8 @@ export const createDocumentFromTemplate = async ({
             drawSignatureEnabled:
               override?.drawSignatureEnabled ?? template.templateMeta?.drawSignatureEnabled,
             allowDictateNextSigner:
-              override?.allowDictateNextSigner ??
-              template.templateMeta?.allowDictateNextSigner ??
-              false,
-          },
+              override?.allowDictateNextSigner ?? template.templateMeta?.allowDictateNextSigner,
+          }),
         },
         recipients: {
           createMany: {
