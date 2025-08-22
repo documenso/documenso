@@ -62,7 +62,7 @@ export const SettingsSecurityPasskeyTableActions = ({
   });
 
   const { mutateAsync: updatePasskey, isPending: isUpdatingPasskey } =
-    trpc.auth.updatePasskey.useMutation({
+    trpc.auth.passkey.update.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),
@@ -84,7 +84,7 @@ export const SettingsSecurityPasskeyTableActions = ({
     });
 
   const { mutateAsync: deletePasskey, isPending: isDeletingPasskey } =
-    trpc.auth.deletePasskey.useMutation({
+    trpc.auth.passkey.delete.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),
