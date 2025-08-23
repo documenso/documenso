@@ -117,6 +117,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+    )
+    .optional(),
   prefillFields: z
     .array(ZFieldMetaPrefillFieldsSchema)
     .describe(
