@@ -258,7 +258,7 @@ npm run start
 
 This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
 
-> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/remix` folder.
 
 ### Run as a service
 
