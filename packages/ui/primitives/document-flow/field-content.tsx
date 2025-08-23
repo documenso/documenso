@@ -108,8 +108,15 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
     field.fieldMeta.values.length > 0
   ) {
     return (
-      <div className="flex flex-col gap-y-2 py-0.5">
-        <RadioGroup className="gap-y-1">
+      <div className="py-0.5">
+        <RadioGroup
+          className={cn(
+            'gap-1',
+            field.fieldMeta.direction === 'horizontal'
+              ? 'flex flex-row flex-wrap'
+              : 'flex flex-col gap-y-1',
+          )}
+        >
           {field.fieldMeta.values.map((item, index) => (
             <div key={index} className="flex items-center">
               <RadioGroupItem

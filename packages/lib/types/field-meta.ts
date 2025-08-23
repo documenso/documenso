@@ -79,6 +79,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
       }),
     )
     .optional(),
+  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
 });
 
 export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
