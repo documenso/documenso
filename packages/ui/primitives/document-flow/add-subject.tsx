@@ -1,3 +1,5 @@
+import { useCallback } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -8,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TDocument } from '@documenso/lib/types/document';
@@ -60,6 +63,7 @@ export type AddSubjectFormProps = {
   fields: Field[];
   document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
+  onAutoSave: (_data: TAddSubjectFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -69,6 +73,7 @@ export const AddSubjectFormPartial = ({
   fields: fields,
   document,
   onSubmit,
+  onAutoSave,
   isDocumentPdfLoaded,
 }: AddSubjectFormProps) => {
   const { _ } = useLingui();
@@ -95,7 +100,9 @@ export const AddSubjectFormPartial = ({
     handleSubmit,
     setValue,
     watch,
-    formState: { isSubmitting },
+    trigger,
+    getValues,
+    formState: { isSubmitting, isDirty },
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
@@ -128,6 +135,17 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = useCallback(async () => {
+    const isFormValid = await trigger();
+    const formData = getValues();
+
+    if (isFormValid && isDirty) {
+      scheduleSave(formData);
+    }
+  }, [isDirty, scheduleSave]);
 
   return (
     <>
@@ -185,7 +203,6 @@ export const AddSubjectFormPartial = ({
                             <FormLabel>
                               <Trans>Email Sender</Trans>
                             </FormLabel>
-
                             <FormControl>
                               <Select
                                 {...field}
