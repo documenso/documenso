@@ -9,7 +9,7 @@ import { Link } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZAdminUpdateProfileMutationSchema } from '@documenso/trpc/server/admin-router/schema';
+import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -33,7 +33,7 @@ import { AdminOrganisationsTable } from '~/components/tables/admin-organisations
 
 import { MultiSelectRoleCombobox } from '../../../components/general/multiselect-role-combobox';
 
-const ZUserFormSchema = ZAdminUpdateProfileMutationSchema.omit({ id: true });
+const ZUserFormSchema = ZUpdateUserRequestSchema.omit({ id: true });
 
 type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
@@ -85,7 +85,7 @@ const AdminUserPage = ({ user }: { user: User }) => {
 
   const roles = user.roles ?? [];
 
-  const { mutateAsync: updateUserMutation } = trpc.admin.updateUser.useMutation();
+  const { mutateAsync: updateUserMutation } = trpc.admin.user.update.useMutation();
 
   const form = useForm<TUserFormSchema>({
     resolver: zodResolver(ZUserFormSchema),
