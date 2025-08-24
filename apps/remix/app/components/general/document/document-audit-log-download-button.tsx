@@ -21,7 +21,7 @@ export const DocumentAuditLogDownloadButton = ({
   const { _ } = useLingui();
 
   const { mutateAsync: downloadAuditLogs, isPending } =
-    trpc.document.downloadAuditLogs.useMutation();
+    trpc.document.auditLog.download.useMutation();
 
   const onDownloadAuditLogsClick = async () => {
     try {
