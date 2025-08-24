@@ -209,6 +209,12 @@ export const ZCreateDocumentV2RequestSchema = z.object({
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+    )
+    .optional(),
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({
