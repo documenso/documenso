@@ -88,6 +88,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const fields = template.fields.filter((field) => field.recipientId === directTemplateRecipientId);
 
+  const isEnterpriseDocument = Boolean(organisationClaim);
+
   return superLoaderJson({
     token,
     user,
@@ -96,12 +98,21 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     fields,
     hidePoweredBy,
     allowEmbedSigningWhitelabel,
+    isEnterpriseDocument,
   });
 }
 
 export default function EmbedDirectTemplatePage() {
-  const { token, user, template, recipient, fields, hidePoweredBy, allowEmbedSigningWhitelabel } =
-    useSuperLoaderData<typeof loader>();
+  const {
+    token,
+    user,
+    template,
+    recipient,
+    fields,
+    hidePoweredBy,
+    allowEmbedSigningWhitelabel,
+    isEnterpriseDocument,
+  } = useSuperLoaderData<typeof loader>();
 
   return (
     <DocumentSigningProvider
@@ -116,6 +127,7 @@ export default function EmbedDirectTemplatePage() {
         documentAuthOptions={template.authOptions}
         recipient={recipient}
         user={user}
+        isEnterprise={isEnterpriseDocument}
       >
         <DocumentSigningRecipientProvider recipient={recipient}>
           <EmbedDirectTemplateClientPage
