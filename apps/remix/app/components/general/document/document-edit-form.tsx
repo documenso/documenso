@@ -59,7 +59,7 @@ export const DocumentEditForm = ({
 
   const utils = trpc.useUtils();
 
-  const { data: document, refetch: refetchDocument } = trpc.document.get.useQuery(
+  const { data: document, refetch: refetchDocument } = trpc.document.getDocument.useQuery(
     {
       documentId: initialDocument.id,
     },
@@ -74,7 +74,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: updateDocument } = trpc.document.update.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.get.setData(
+      utils.document.getDocument.setData(
         {
           documentId: initialDocument.id,
         },
@@ -86,7 +86,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ fields: newFields }) => {
-      utils.document.get.setData(
+      utils.document.getDocument.setData(
         {
           documentId: initialDocument.id,
         },
@@ -98,7 +98,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
-      utils.document.get.setData(
+      utils.document.getDocument.setData(
         {
           documentId: initialDocument.id,
         },
@@ -110,7 +110,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: sendDocument } = trpc.document.distribute.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.get.setData(
+      utils.document.getDocument.setData(
         {
           documentId: initialDocument.id,
         },

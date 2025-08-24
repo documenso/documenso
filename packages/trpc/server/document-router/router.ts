@@ -19,7 +19,7 @@ import { searchDocumentRoute } from './search-document';
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
-  get: getDocumentRoute,
+  getDocument: getDocumentRoute, // Note: can't use "get" because it breaks "initialData" on frontend.
   find: findDocumentsRoute,
   create: createDocumentRoute,
   update: updateDocumentRoute,

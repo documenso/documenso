@@ -77,7 +77,7 @@ export const DocumentsTableActionDropdown = ({
   const onDownloadClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.get.query({
+        ? await trpcClient.document.getDocument.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
@@ -103,7 +103,7 @@ export const DocumentsTableActionDropdown = ({
   const onDownloadOriginalClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.get.query({
+        ? await trpcClient.document.getDocument.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
