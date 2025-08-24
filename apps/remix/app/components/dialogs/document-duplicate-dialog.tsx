@@ -36,11 +36,12 @@ export const DocumentDuplicateDialog = ({
 
   const team = useCurrentTeam();
 
-  const { data: document, isLoading } = trpcReact.document.getDocument.useQuery(
+  const { data: document, isLoading } = trpcReact.document.get.useQuery(
     {
       documentId: id,
     },
     {
+      queryHash: `document-duplicate-dialog-${id}`,
       enabled: open === true,
     },
   );
