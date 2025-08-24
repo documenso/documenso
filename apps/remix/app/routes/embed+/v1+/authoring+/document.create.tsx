@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 
@@ -51,8 +52,8 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
       if (!configuration || !configuration.documentData) {
         toast({
           variant: 'destructive',
-          title: _('Error'),
-          description: _('Please configure the document first'),
+          title: _(msg`Error`),
+          description: _(msg`Please configure the document first`),
         });
 
         return;
@@ -103,8 +104,8 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
       });
 
       toast({
-        title: _('Success'),
-        description: _('Document created successfully'),
+        title: _(msg`Success`),
+        description: _(msg`Document created successfully`),
       });
 
       // Send a message to the parent window with the document details
@@ -130,8 +131,8 @@ export default function EmbeddingAuthoringDocumentCreatePage() {
 
       toast({
         variant: 'destructive',
-        title: _('Error'),
-        description: _('Failed to create document'),
+        title: _(msg`Error`),
+        description: _(msg`Failed to create document`),
       });
     }
   };

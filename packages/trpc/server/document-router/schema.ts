@@ -142,9 +142,23 @@ export const ZFindDocumentsResponseSchema = ZFindResultResponse.extend({
 export type TFindDocumentsResponse = z.infer<typeof ZFindDocumentsResponseSchema>;
 
 export const ZFindDocumentsInternalRequestSchema = ZFindDocumentsRequestSchema.extend({
-  period: z.enum(['7d', '14d', '30d']).optional(),
+  period: z
+    .enum([
+      'today',
+      'yesterday',
+      'this-week',
+      'last-week',
+      'this-month',
+      'last-month',
+      'this-quarter',
+      'last-quarter',
+      'this-year',
+      'last-year',
+      'all-time',
+    ])
+    .optional(),
   senderIds: z.array(z.number()).optional(),
-  status: z.nativeEnum(ExtendedDocumentStatus).optional(),
+  status: z.array(z.nativeEnum(ExtendedDocumentStatus)).optional(),
   folderId: z.string().optional(),
 });
 

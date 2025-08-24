@@ -1,28 +1,28 @@
 import { Trans } from '@lingui/react/macro';
+import { FolderType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
-import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 
 import { FolderGrid } from '~/components/general/folder/folder-grid';
+import { TemplateDropZoneWrapper } from '~/components/general/template/template-drop-zone-wrapper';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
-import { TemplateDropZoneWrapper } from '~/components/general/template/template-drop-zone-wrapper';
 
 export function meta() {
   return appMetaTags('Templates');
 }
 
 export default function TemplatesPage() {
-  const team = useCurrentTeam();
-
-  const { folderId } = useParams();
   const [searchParams] = useSearchParams();
+  const { folderId } = useParams();
+
+  const team = useCurrentTeam();
 
   const page = Number(searchParams.get('page')) || 1;
   const perPage = Number(searchParams.get('perPage')) || 10;

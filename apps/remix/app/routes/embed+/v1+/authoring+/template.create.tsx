@@ -1,5 +1,6 @@
 import { useLayoutEffect, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 
@@ -49,8 +50,8 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
       if (!configuration || !configuration.documentData) {
         toast({
           variant: 'destructive',
-          title: _('Error'),
-          description: _('Please configure the template first'),
+          title: _(msg`Error`),
+          description: _(msg`Please configure the template first`),
         });
 
         return;
@@ -93,8 +94,8 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
       });
 
       toast({
-        title: _('Success'),
-        description: _('Template created successfully'),
+        title: _(msg`Success`),
+        description: _(msg`Template created successfully`),
       });
 
       // Send a message to the parent window with the template details
@@ -120,8 +121,8 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
 
       toast({
         variant: 'destructive',
-        title: _('Error'),
-        description: _('Failed to create template'),
+        title: _(msg`Error`),
+        description: _(msg`Failed to create template`),
       });
     }
   };

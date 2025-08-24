@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 
@@ -90,19 +91,25 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
       <Card>
         <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
-            <span className="font-medium">{_(msg`Document ID`)}</span>
+            <span className="font-medium">
+              <Trans>Document ID</Trans>
+            </span>
 
             <span className="mt-1 block break-words">{document.id}</span>
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Enclosed Document`)}</span>
+            <span className="font-medium">
+              <Trans>Enclosed Document</Trans>
+            </span>
 
             <span className="mt-1 block break-words">{document.title}</span>
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Status`)}</span>
+            <span className="font-medium">
+              <Trans>Status</Trans>
+            </span>
 
             <span className="mt-1 block">
               {_(
@@ -112,7 +119,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Owner`)}</span>
+            <span className="font-medium">
+              <Trans>Owner</Trans>
+            </span>
 
             <span className="mt-1 block break-words">
               {document.user.name} ({document.user.email})
@@ -120,7 +129,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Created At`)}</span>
+            <span className="font-medium">
+              <Trans>Created At</Trans>
+            </span>
 
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.createdAt)
@@ -130,7 +141,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Last Updated`)}</span>
+            <span className="font-medium">
+              <Trans>Last Updated</Trans>
+            </span>
 
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.updatedAt)
@@ -140,7 +153,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           </p>
 
           <p>
-            <span className="font-medium">{_(msg`Time Zone`)}</span>
+            <span className="font-medium">
+              <Trans>Time Zone</Trans>
+            </span>
 
             <span className="mt-1 block break-words">
               {document.documentMeta?.timezone ?? 'N/A'}
@@ -148,7 +163,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
           </p>
 
           <div>
-            <p className="font-medium">{_(msg`Recipients`)}</p>
+            <p className="font-medium">
+              <Trans>Recipients</Trans>
+            </p>
 
             <ul className="mt-1 list-inside list-disc">
               {document.recipients.map((recipient) => (
