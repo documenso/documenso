@@ -49,7 +49,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
   const { quota, remaining, refreshLimits } = useLimits();
 
-  const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+  const { mutateAsync: createDocument } = trpc.document.create.useMutation();
 
   const isUploadDisabled = remaining.documents === 0 || !user.emailVerified;
 

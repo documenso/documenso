@@ -92,7 +92,11 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       providerAccountId: sub,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
