@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, Recipient, Signature } from '@prisma/client';
 import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
@@ -48,7 +48,7 @@ export type EmbedDirectTemplateClientPageProps = {
   documentData: DocumentData;
   recipient: Recipient;
   fields: Field[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   hidePoweredBy?: boolean;
   allowWhiteLabelling?: boolean;
 };

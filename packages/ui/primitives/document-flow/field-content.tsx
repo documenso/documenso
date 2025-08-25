@@ -1,5 +1,5 @@
 import { useLingui } from '@lingui/react';
-import type { DocumentMeta, Signature, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, Signature } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { ChevronDown } from 'lucide-react';
 
@@ -27,7 +27,7 @@ type FieldIconProps = {
     fieldMeta?: TFieldMetaSchema | null;
     signature?: Signature | null;
   };
-  documentMeta?: Pick<DocumentMeta | TemplateMeta, 'dateFormat'>;
+  documentMeta?: Pick<DocumentMeta, 'dateFormat'>;
 };
 
 /**
