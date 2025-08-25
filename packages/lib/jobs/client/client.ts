@@ -12,7 +12,13 @@ export class JobClient<T extends ReadonlyArray<JobDefinition> = []> {
   public constructor(definitions: T) {
     this._provider = match(env('NEXT_PRIVATE_JOBS_PROVIDER'))
       .with('inngest', () => InngestJobProvider.getInstance())
-      .otherwise(() => LocalJobProvider.getInstance());
+      .otherwise(() => {
+        console.warn(
+          '⚠️  Local job provider detected. Document reminders will not work as they require scheduled jobs. ' +
+            'To enable reminders, configure Inngest by setting NEXT_PRIVATE_JOBS_PROVIDER=inngest and providing NEXT_PRIVATE_INNGEST_EVENT_KEY.',
+        );
+        return LocalJobProvider.getInstance();
+      });
 
     definitions.forEach((definition) => {
       this._provider.defineJob(definition);
