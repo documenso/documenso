@@ -776,6 +776,7 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+  keyboardSignatureEnabled Boolean?
 
   emailId String?
   email   OrganisationEmail? @relation(fields: [emailId], references: [id])

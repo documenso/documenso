@@ -36,6 +36,7 @@ export type DocumentSigningSignatureFieldProps = {
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
+  keyboardSignatureEnabled?: boolean;
 };
 
 export const DocumentSigningSignatureField = ({
@@ -45,6 +46,7 @@ export const DocumentSigningSignatureField = ({
   typedSignatureEnabled,
   uploadSignatureEnabled,
   drawSignatureEnabled,
+  keyboardSignatureEnabled,
 }: DocumentSigningSignatureFieldProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -283,6 +285,7 @@ export const DocumentSigningSignatureField = ({
             typedSignatureEnabled={typedSignatureEnabled}
             uploadSignatureEnabled={uploadSignatureEnabled}
             drawSignatureEnabled={drawSignatureEnabled}
+            keyboardSignatureEnabled={keyboardSignatureEnabled}
           />
 
           <DocumentSigningDisclosure />

@@ -69,4 +69,11 @@ export const DOCUMENT_SIGNATURE_TYPES = {
     }),
     value: DocumentSignatureType.UPLOAD,
   },
+  [DocumentSignatureType.KEYBOARD]: {
+    label: msg({
+      message: `Keyboard`,
+      context: `Keyboard signatute type`,
+    }),
+    value: DocumentSignatureType.KEYBOARD,
+  },
 } satisfies Record<DocumentSignatureType, DocumentSignatureTypeData>;
