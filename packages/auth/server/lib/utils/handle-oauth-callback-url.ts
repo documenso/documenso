@@ -111,6 +111,10 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     where: {
       email: email,
     },
+    select: {
+      id: true,
+      emailVerified: true,
+    },
   });
 
   // Handle existing user but no account.
