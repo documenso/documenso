@@ -172,6 +172,8 @@ export const ConfigureFieldsView = ({
     name: 'fields',
   });
 
+  const highestPageNumber = Math.max(...localFields.map((field) => field.pageNumber));
+
   const onFieldCopy = useCallback(
     (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
       const { duplicate = false, duplicateAll = false } = options ?? {};
@@ -540,7 +542,9 @@ export const ConfigureFieldsView = ({
                 <div>
                   <PDFViewer documentData={normalizedDocumentData} />
 
-                  <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+                  <ElementVisible
+                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+                  >
                     {localFields.map((field, index) => {
                       const recipientIndex = recipients.findIndex(
                         (r) => r.id === field.recipientId,

@@ -67,6 +67,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   const documentVisibility = document?.visibility;
   const currentTeamMemberRole = team.currentTeamRole;
   const isRecipient = document?.recipients.find((recipient) => recipient.email === user.email);
+
   let canAccessDocument = true;
 
   if (!isRecipient && document?.userId !== user.id) {

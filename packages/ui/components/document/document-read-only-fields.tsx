@@ -95,8 +95,10 @@ export const DocumentReadOnlyFields = ({
     setHiddenFieldIds((prev) => ({ ...prev, [fieldId]: true }));
   };
 
+  const highestPageNumber = Math.max(...fields.map((field) => field.page));
+
   return (
-    <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+    <ElementVisible target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}>
       {fields.map(
         (field) =>
           !hiddenFieldIds[field.secondaryId] && (

@@ -92,6 +92,8 @@ export const MultiSignDocumentSigningView = ({
       [],
   ];
 
+  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
+
   const uninsertedFields = document?.fields.filter((field) => !field.inserted) ?? [];
 
   const onSignField = async (payload: TSignFieldWithTokenMutationSchema) => {
@@ -357,7 +359,9 @@ export const MultiSignDocumentSigningView = ({
               </div>
 
               {hasDocumentLoaded && (
-                <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+                <ElementVisible
+                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
+                >
                   {showPendingFieldTooltip && pendingFields.length > 0 && (
                     <FieldToolTip
                       key={pendingFields[0].id}
