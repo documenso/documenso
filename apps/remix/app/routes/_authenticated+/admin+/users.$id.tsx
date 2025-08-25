@@ -2,13 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { Link } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
+import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -78,7 +78,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
   return <AdminUserPage user={user} />;
 }
 
-const AdminUserPage = ({ user }: { user: User }) => {
+const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
