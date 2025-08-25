@@ -196,6 +196,7 @@ export const AddSettingsFormPartial = ({
                       className="bg-background"
                       {...field}
                       disabled={document.status !== DocumentStatus.DRAFT || field.disabled}
+                      maxLength={255}
                     />
                   </FormControl>
                   <FormMessage />
