@@ -11,6 +11,7 @@ import { findAdminOrganisationsRoute } from './find-admin-organisations';
 import { findDocumentsRoute } from './find-documents';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
+import { getUserRoute } from './get-user';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
@@ -36,6 +37,7 @@ export const adminRouter = router({
     createCustomer: createStripeCustomerRoute,
   },
   user: {
+    get: getUserRoute,
     update: updateUserRoute,
     delete: deleteUserRoute,
     enable: enableUserRoute,

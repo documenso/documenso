@@ -10,12 +10,6 @@ export type UpdateUserOptions = {
 };
 
 export const updateUser = async ({ id, name, email, roles }: UpdateUserOptions) => {
-  await prisma.user.findFirstOrThrow({
-    where: {
-      id,
-    },
-  });
-
   await prisma.user.update({
     where: {
       id,
