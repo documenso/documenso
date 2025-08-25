@@ -7,7 +7,7 @@ export interface GetUserByIdOptions {
 }
 
 export const getUserById = async ({ id }: GetUserByIdOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
+  const user = await prisma.user.findFirst({
     where: {
       id,
     },

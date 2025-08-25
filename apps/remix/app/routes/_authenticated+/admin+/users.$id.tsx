@@ -38,7 +38,7 @@ const ZUserFormSchema = ZUpdateUserRequestSchema.omit({ id: true });
 type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
 export default function UserPage({ params }: { params: { id: number } }) {
-  const { data: user, isLoading: isLoadingUser } = trpc.profile.getUser.useQuery(
+  const { data: user, isLoading: isLoadingUser } = trpc.admin.user.get.useQuery(
     {
       id: Number(params.id),
     },
