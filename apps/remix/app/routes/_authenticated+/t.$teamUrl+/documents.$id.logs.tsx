@@ -34,7 +34,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const documentId = Number(id);
 
-  let documentRootPath = formatDocumentsPath(team.url);
+  const documentRootPath = formatDocumentsPath(team.url);
 
   if (!documentId || Number.isNaN(documentId)) {
     throw redirect(documentRootPath);
@@ -48,10 +48,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   if (!document || !document.documentData) {
     throw redirect(documentRootPath);
-  }
-
-  if (document.folderId) {
-    documentRootPath = `${formatDocumentsPath(team.url)}/f/${document.folderId}`;
   }
 
   const recipients = await getRecipientsForDocument({
@@ -68,13 +64,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   return {
     document,
-    documentRootPath,
     recipients,
+    team,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, documentRootPath, recipients } = loaderData;
+  const { document, recipients, team } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -127,7 +123,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
-        to={`${documentRootPath}/${document.id}`}
+        to={`${formatDocumentsPath(team.url)}/${document.id}`}
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
