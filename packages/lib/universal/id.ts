@@ -16,6 +16,7 @@ type DatabaseIdPrefix =
   | 'org_email'
   | 'org_claim'
   | 'org_group'
+  | 'org_sso'
   | 'org_setting'
   | 'member'
   | 'member_invite'

@@ -28,6 +28,8 @@ export const ZClaimFlagsSchema = z.object({
   embedSigningWhiteLabel: z.boolean().optional(),
 
   cfr21: z.boolean().optional(),
+
+  authenticationPortal: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -75,6 +77,10 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   cfr21: {
     key: 'cfr21',
     label: '21 CFR',
+  },
+  authenticationPortal: {
+    key: 'authenticationPortal',
+    label: 'Authentication portal',
   },
 };
 
@@ -157,6 +163,7 @@ export const internalClaims: InternalClaims = {
       embedSigning: true,
       embedSigningWhiteLabel: true,
       cfr21: true,
+      authenticationPortal: true,
     },
   },
   [INTERNAL_CLAIM_ID.EARLY_ADOPTER]: {

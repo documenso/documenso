@@ -1,10 +1,8 @@
 import type { OrganisationMemberRole, OrganisationType } from '@prisma/client';
-import { OrganisationMemberInviteStatus, type User } from '@prisma/client';
-import { nanoid } from 'nanoid';
+import { OrganisationGroupType, type User } from '@prisma/client';
 
 import { hashSync } from '@documenso/lib/server-only/auth/hash';
-import { acceptOrganisationInvitation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
-import { prefixedId } from '@documenso/lib/universal/id';
+import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
 
 import { prisma } from '..';
 import { seedTestEmail } from './users';
@@ -26,6 +24,13 @@ export const seedOrganisationMembers = async ({
   }[] = [];
 
   const createdMembers: User[] = [];
+
+  const organisationGroups = await prisma.organisationGroup.findMany({
+    where: {
+      organisationId,
+      type: OrganisationGroupType.INTERNAL_ORGANISATION,
+    },
+  });
 
   for (const member of members) {
     const email = member.email ?? seedTestEmail();
@@ -53,32 +58,14 @@ export const seedOrganisationMembers = async ({
       email: newUser.email,
       organisationRole: member.organisationRole,
     });
+
+    await addUserToOrganisation({
+      userId: newUser.id,
+      organisationId,
+      organisationGroups,
+      organisationMemberRole: member.organisationRole,
+    });
   }
-
-  await prisma.organisationMemberInvite.createMany({
-    data: membersToInvite.map((invite) => ({
-      id: prefixedId('member_invite'),
-      email: invite.email,
-      organisationId,
-      organisationRole: invite.organisationRole,
-      token: nanoid(32),
-    })),
-  });
-
-  const invites = await prisma.organisationMemberInvite.findMany({
-    where: {
-      organisationId,
-      status: OrganisationMemberInviteStatus.PENDING,
-    },
-  });
-
-  await Promise.all(
-    invites.map(async (invite) => {
-      await acceptOrganisationInvitation({
-        token: invite.token,
-      });
-    }),
-  );
 
   return createdMembers;
 };
