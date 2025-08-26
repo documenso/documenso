@@ -8,7 +8,7 @@ import { Trans } from '@lingui/react/macro';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
-import { FaIdCardClip, FaMicrosoft } from 'react-icons/fa6';
+import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
@@ -414,7 +414,13 @@ export const SignInForm = ({
               disabled={isSubmitting}
               onClick={onSignInWithMicrosoftClick}
             >
-              <FaMicrosoft className="mr-2 h-5 w-5" />
+              <img
+                className="mr-2 h-4 w-4"
+                alt="Profile badge"
+                src={'/static/microsoft.svg'}
+                height={16}
+                width={16}
+              />
               Microsoft
             </Button>
           )}
