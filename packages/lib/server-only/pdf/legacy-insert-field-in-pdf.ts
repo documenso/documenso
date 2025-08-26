@@ -26,6 +26,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { getPageSize } from './get-page-size';
 
 export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
@@ -63,7 +64,7 @@ export const legacy_insertFieldInPDF = async (pdf: PDFDocument, field: FieldWith
 
   const isPageRotatedToLandscape = pageRotationInDegrees === 90 || pageRotationInDegrees === 270;
 
-  let { width: pageWidth, height: pageHeight } = page.getSize();
+  let { width: pageWidth, height: pageHeight } = getPageSize(page);
 
   // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
   // However when we load the PDF in the backend, the rotation is applied.

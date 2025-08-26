@@ -33,7 +33,13 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       documentData: true,
       documentMeta: true,
       recipients: true,
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       team: {
         select: {
           id: true,

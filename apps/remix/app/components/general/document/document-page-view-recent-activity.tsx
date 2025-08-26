@@ -32,7 +32,7 @@ export const DocumentPageViewRecentActivity = ({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = trpc.document.findDocumentAuditLogs.useInfiniteQuery(
+  } = trpc.document.auditLog.find.useInfiniteQuery(
     {
       documentId,
       filterForRecentActivity: true,
