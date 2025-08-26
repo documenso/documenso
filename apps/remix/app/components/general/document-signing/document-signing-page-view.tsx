@@ -78,6 +78,8 @@ export const DocumentSigningPageView = ({
   const targetSigner =
     recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
+  const highestPageNumber = Math.max(...fields.map((field) => field.page));
+
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
@@ -224,7 +226,9 @@ export const DocumentSigningPageView = ({
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
         )}
 
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+        <ElementVisible
+          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+        >
           {fields
             .filter(
               (field) =>
