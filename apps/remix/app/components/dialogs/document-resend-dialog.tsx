@@ -71,7 +71,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     document.status !== 'PENDING' ||
     !recipients.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED);
 
-  const { mutateAsync: resendDocument } = trpcReact.document.resendDocument.useMutation();
+  const { mutateAsync: resendDocument } = trpcReact.document.redistribute.useMutation();
 
   const form = useForm<TResendDocumentFormSchema>({
     resolver: zodResolver(ZResendDocumentFormSchema),

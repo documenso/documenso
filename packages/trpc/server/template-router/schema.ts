@@ -65,7 +65,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().nullish(),
+  emailReplyTo: z.string().email().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
@@ -115,6 +115,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .string()
     .describe(
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
   prefillFields: z

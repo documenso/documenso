@@ -102,7 +102,7 @@ export const resendDocument = async ({
         type: 'team',
         teamId: document.teamId,
       },
-      meta: document.documentMeta || null,
+      meta: document.documentMeta,
     });
 
   await Promise.all(
