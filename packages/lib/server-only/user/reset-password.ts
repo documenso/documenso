@@ -24,7 +24,14 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
       token,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          password: true,
+        },
+      },
     },
   });
 

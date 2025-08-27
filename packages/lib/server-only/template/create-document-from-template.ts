@@ -2,6 +2,7 @@ import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/c
 import {
   DocumentSource,
   type Field,
+  FolderType,
   type Recipient,
   RecipientRole,
   SendStatus,
@@ -70,6 +71,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  folderId?: string;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
   customDocumentDataId?: string;
 
@@ -277,6 +279,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
+  folderId,
   prefillFields,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
@@ -299,6 +302,22 @@ export const createDocumentFromTemplate = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
+  }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
   }
 
   const settings = await getTeamSettings({
@@ -371,6 +390,7 @@ export const createDocumentFromTemplate = async ({
         externalId: externalId || template.externalId,
         templateId: template.id,
         userId,
+        folderId,
         teamId: template.teamId,
         title: override?.title || template.title,
         documentDataId: documentData.id,
