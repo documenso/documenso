@@ -133,10 +133,7 @@ export const DocumentSigningPageView = ({
     recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
 
   const nextRecipient = useMemo(() => {
-    if (
-      !document.documentMeta?.signingOrder ||
-      document.documentMeta.signingOrder !== 'SEQUENTIAL'
-    ) {
+    if (!documentMeta?.signingOrder || documentMeta.signingOrder !== 'SEQUENTIAL') {
       return undefined;
     }
 
@@ -265,7 +262,7 @@ export const DocumentSigningPageView = ({
                           }}
                           role={recipient.role}
                           allowDictateNextSigner={
-                            nextRecipient && document.documentMeta?.allowDictateNextSigner
+                            nextRecipient && documentMeta?.allowDictateNextSigner
                           }
                           defaultNextSigner={
                             nextRecipient
