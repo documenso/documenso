@@ -2,14 +2,14 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { Link } from 'react-router';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZAdminUpdateProfileMutationSchema } from '@documenso/trpc/server/admin-router/schema';
+import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
+import { ZUpdateUserRequestSchema } from '@documenso/trpc/server/admin-router/update-user.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -27,17 +27,18 @@ import { AdminOrganisationCreateDialog } from '~/components/dialogs/admin-organi
 import { AdminUserDeleteDialog } from '~/components/dialogs/admin-user-delete-dialog';
 import { AdminUserDisableDialog } from '~/components/dialogs/admin-user-disable-dialog';
 import { AdminUserEnableDialog } from '~/components/dialogs/admin-user-enable-dialog';
+import { AdminUserResetTwoFactorDialog } from '~/components/dialogs/admin-user-reset-two-factor-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';
 
 import { MultiSelectRoleCombobox } from '../../../components/general/multiselect-role-combobox';
 
-const ZUserFormSchema = ZAdminUpdateProfileMutationSchema.omit({ id: true });
+const ZUserFormSchema = ZUpdateUserRequestSchema.omit({ id: true });
 
 type TUserFormSchema = z.infer<typeof ZUserFormSchema>;
 
 export default function UserPage({ params }: { params: { id: number } }) {
-  const { data: user, isLoading: isLoadingUser } = trpc.profile.getUser.useQuery(
+  const { data: user, isLoading: isLoadingUser } = trpc.admin.user.get.useQuery(
     {
       id: Number(params.id),
     },
@@ -77,14 +78,14 @@ export default function UserPage({ params }: { params: { id: number } }) {
   return <AdminUserPage user={user} />;
 }
 
-const AdminUserPage = ({ user }: { user: User }) => {
+const AdminUserPage = ({ user }: { user: TGetUserResponse }) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
   const roles = user.roles ?? [];
 
-  const { mutateAsync: updateUserMutation } = trpc.admin.updateUser.useMutation();
+  const { mutateAsync: updateUserMutation } = trpc.admin.user.update.useMutation();
 
   const form = useForm<TUserFormSchema>({
     resolver: zodResolver(ZUserFormSchema),
@@ -219,10 +220,11 @@ const AdminUserPage = ({ user }: { user: User }) => {
         />
       </div>
 
-      <div className="mt-16 flex flex-col items-center gap-4">
-        {user && <AdminUserDeleteDialog user={user} />}
+      <div className="mt-16 flex flex-col gap-4">
+        {user && user.twoFactorEnabled && <AdminUserResetTwoFactorDialog user={user} />}
         {user && user.disabled && <AdminUserEnableDialog userToEnable={user} />}
         {user && !user.disabled && <AdminUserDisableDialog userToDisable={user} />}
+        {user && <AdminUserDeleteDialog user={user} />}
       </div>
     </div>
   );

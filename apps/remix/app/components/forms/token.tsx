@@ -13,7 +13,7 @@ import type { z } from 'zod';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateTokenMutationSchema } from '@documenso/trpc/server/api-token-router/schema';
+import { ZCreateApiTokenRequestSchema } from '@documenso/trpc/server/api-token-router/create-api-token.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -47,7 +47,7 @@ export const EXPIRATION_DATES = {
   ONE_YEAR: msg`12 months`,
 } as const;
 
-const ZCreateTokenFormSchema = ZCreateTokenMutationSchema.pick({
+const ZCreateTokenFormSchema = ZCreateApiTokenRequestSchema.pick({
   tokenName: true,
   expirationDate: true,
 });
@@ -75,7 +75,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const [newlyCreatedToken, setNewlyCreatedToken] = useState<NewlyCreatedToken | null>();
   const [noExpirationDate, setNoExpirationDate] = useState(false);
 
-  const { mutateAsync: createTokenMutation } = trpc.apiToken.createToken.useMutation({
+  const { mutateAsync: createTokenMutation } = trpc.apiToken.create.useMutation({
     onSuccess(data) {
       setNewlyCreatedToken(data);
     },

@@ -1,6 +1,7 @@
 import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
 import {
   DocumentSource,
+  FolderType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -14,7 +15,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateDocumentV2Request } from '@documenso/trpc/server/document-router/schema';
+import type { TCreateDocumentTemporaryRequest } from '@documenso/trpc/server/document-router/create-document-temporary.types';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
@@ -44,7 +45,8 @@ export type CreateDocumentOptions = {
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
-    recipients: TCreateDocumentV2Request['recipients'];
+    recipients: TCreateDocumentTemporaryRequest['recipients'];
+    folderId?: string;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
@@ -59,7 +61,7 @@ export const createDocumentV2 = async ({
   meta,
   requestMetadata,
 }: CreateDocumentOptions) => {
-  const { title, formValues } = data;
+  const { title, formValues, folderId } = data;
 
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({ teamId, userId }),
@@ -76,6 +78,22 @@ export const createDocumentV2 = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
     });
+  }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
   }
 
   const settings = await getTeamSettings({
@@ -164,6 +182,7 @@ export const createDocumentV2 = async ({
         teamId,
         authOptions,
         visibility,
+        folderId,
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {

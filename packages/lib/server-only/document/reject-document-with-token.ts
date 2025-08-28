@@ -28,13 +28,7 @@ export async function rejectDocumentWithToken({
       documentId,
     },
     include: {
-      document: {
-        include: {
-          user: true,
-          recipients: true,
-          documentMeta: true,
-        },
-      },
+      document: true,
     },
   });
 

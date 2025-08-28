@@ -40,7 +40,13 @@ export const createOrganisationGroupRoute = authenticatedProcedure
         groups: true,
         members: {
           include: {
-            user: true,
+            user: {
+              select: {
+                id: true,
+                email: true,
+                name: true,
+              },
+            },
           },
         },
       },
