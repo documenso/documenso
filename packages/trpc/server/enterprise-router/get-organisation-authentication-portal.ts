@@ -43,6 +43,7 @@ export const getOrganisationAuthenticationPortal = async ({
       roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
     }),
     include: {
+      organisationClaim: true,
       organisationAuthenticationPortal: {
         select: {
           defaultOrganisationRole: true,
@@ -60,6 +61,12 @@ export const getOrganisationAuthenticationPortal = async ({
   if (!organisation) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Organisation not found',
+    });
+  }
+
+  if (!organisation.organisationClaim.flags.authenticationPortal) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Authentication portal not found',
     });
   }
 
