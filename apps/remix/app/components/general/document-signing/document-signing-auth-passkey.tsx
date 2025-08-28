@@ -77,7 +77,7 @@ export const DocumentSigningAuthPasskey = ({
   });
 
   const { mutateAsync: createPasskeyAuthenticationOptions } =
-    trpc.auth.createPasskeyAuthenticationOptions.useMutation();
+    trpc.auth.passkey.createAuthenticationOptions.useMutation();
 
   const [formErrorCode, setFormErrorCode] = useState<string | null>(null);
 

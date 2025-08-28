@@ -49,6 +49,11 @@ export const findDocuments = async ({
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
   });
 
   let team = null;
@@ -267,7 +272,7 @@ export const findDocuments = async ({
 
 const findDocumentsFilter = (
   status: ExtendedDocumentStatus,
-  user: User,
+  user: Pick<User, 'id' | 'email' | 'name'>,
   folderId?: string | null,
 ) => {
   return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)

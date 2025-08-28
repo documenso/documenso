@@ -32,7 +32,11 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       providerAccountId: sub,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
@@ -46,6 +50,10 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   const userWithSameEmail = await prisma.user.findFirst({
     where: {
       email: email,
+    },
+    select: {
+      id: true,
+      emailVerified: true,
     },
   });
 

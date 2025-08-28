@@ -1,5 +1,3 @@
-'use client';
-
 import { DateTime } from 'luxon';
 import type { TooltipProps } from 'recharts';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
