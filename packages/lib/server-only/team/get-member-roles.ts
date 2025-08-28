@@ -21,6 +21,13 @@ type GetMemberRolesOptions = {
  * Returns the highest Team role of a given member or user of a team
  */
 export const getMemberRoles = async ({ teamId, reference }: GetMemberRolesOptions) => {
+  // Enforce incase teamId undefined slips through due to invalid types.
+  if (teamId === undefined) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Team not found',
+    });
+  }
+
   const team = await prisma.team.findFirst({
     where: {
       id: teamId,

@@ -1,4 +1,4 @@
-import { TeamMemberRole } from '@prisma/client';
+import { EnvelopeType, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
@@ -69,13 +69,15 @@ export const findFolders = async ({ userId, teamId, parentId, type }: FindFolder
                 createdAt: 'desc',
               },
             }),
-            prisma.document.count({
+            prisma.envelope.count({
               where: {
+                type: EnvelopeType.DOCUMENT,
                 folderId: folder.id,
               },
             }),
-            prisma.template.count({
+            prisma.envelope.count({
               where: {
+                type: EnvelopeType.TEMPLATE,
                 folderId: folder.id,
               },
             }),

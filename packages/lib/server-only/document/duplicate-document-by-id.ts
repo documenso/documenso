@@ -1,5 +1,5 @@
-import type { Prisma, Recipient } from '@prisma/client';
-import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
+import type { Recipient } from '@prisma/client';
+import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
 import { omit } from 'remeda';
 
 import { prisma } from '@documenso/prisma';
@@ -7,11 +7,12 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { nanoid, prefixedId } from '../../universal/id';
+import { buildDocumentId } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface DuplicateDocumentOptions {
   documentId: number;
@@ -24,22 +25,29 @@ export const duplicateDocument = async ({
   userId,
   teamId,
 }: DuplicateDocumentOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     select: {
       title: true,
       userId: true,
-      documentData: {
-        select: {
-          data: true,
-          initialData: true,
-          type: true,
+      documents: {
+        include: {
+          documentData: {
+            select: {
+              data: true,
+              initialData: true,
+              type: true,
+            },
+          },
         },
       },
       authOptions: true,
@@ -57,41 +65,43 @@ export const duplicateDocument = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  const documentData = await prisma.documentData.create({
+  const createdDocumentMeta = await prisma.documentMeta.create({
     data: {
-      type: document.documentData.type,
-      data: document.documentData.initialData,
-      initialData: document.documentData.initialData,
+      ...omit(envelope.documentMeta, ['id']),
+      emailSettings: envelope.documentMeta.emailSettings || undefined,
     },
   });
 
-  let documentMeta: Prisma.DocumentCreateArgs['data']['documentMeta'] | undefined = undefined;
-
-  if (document.documentMeta) {
-    documentMeta = {
-      create: {
-        ...omit(document.documentMeta, ['id', 'documentId']),
-        emailSettings: document.documentMeta.emailSettings || undefined,
-      },
-    };
-  }
-
-  const createdDocument = await prisma.document.create({
+  const documentIdCounter = await prisma.counter.update({
+    where: {
+      id: 'document',
+    },
     data: {
-      userId: document.userId,
+      value: {
+        increment: 1,
+      },
+    },
+  });
+
+  const createdEnvelopeDocumentId = documentIdCounter.value;
+
+  const createdEnvelope = await prisma.envelope.create({
+    data: {
+      secondaryId: buildDocumentId(createdEnvelopeDocumentId),
+      type: EnvelopeType.DOCUMENT,
+      userId: envelope.userId,
       teamId: teamId,
-      title: document.title,
-      documentDataId: documentData.id,
-      authOptions: document.authOptions || undefined,
-      visibility: document.visibility,
+      title: envelope.title,
+      documentMetaId: createdDocumentMeta.id,
+      authOptions: envelope.authOptions || undefined,
+      visibility: envelope.visibility,
       qrToken: prefixedId('qr'),
-      documentMeta,
       source: DocumentSource.DOCUMENT,
     },
     include: {
@@ -100,8 +110,28 @@ export const duplicateDocument = async ({
     },
   });
 
-  const recipientsToCreate = document.recipients.map((recipient) => ({
-    documentId: createdDocument.id,
+  await Promise.all(
+    envelope.documents.map(async (document) => {
+      const createdDocumentData = await prisma.documentData.create({
+        data: {
+          type: document.documentData.type,
+          data: document.documentData.initialData,
+          initialData: document.documentData.initialData,
+        },
+      });
+
+      await prisma.document.create({
+        data: {
+          title: document.title,
+          envelopeId: createdEnvelope.id,
+          documentDataId: createdDocumentData.id,
+        },
+      });
+    }),
+  );
+
+  const recipientsToCreate = envelope.recipients.map((recipient) => ({
+    envelopeId: createdEnvelope.id,
     email: recipient.email,
     name: recipient.name,
     role: recipient.role,
@@ -110,7 +140,7 @@ export const duplicateDocument = async ({
     fields: {
       createMany: {
         data: recipient.fields.map((field) => ({
-          documentId: createdDocument.id,
+          envelopeId: createdEnvelope.id,
           type: field.type,
           page: field.page,
           positionX: field.positionX,
@@ -138,15 +168,15 @@ export const duplicateDocument = async ({
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_CREATED,
     data: ZWebhookDocumentSchema.parse({
-      ...mapDocumentToWebhookDocumentPayload(createdDocument),
+      ...mapEnvelopeToWebhookDocumentPayload(createdEnvelope),
       recipients,
-      documentMeta: createdDocument.documentMeta,
+      documentMeta: createdEnvelope.documentMeta,
     }),
     userId: userId,
     teamId: teamId,
   });
 
   return {
-    documentId: createdDocument.id,
+    documentId: createdEnvelopeDocumentId,
   };
 };

@@ -1,7 +1,5 @@
-import { prisma } from '@documenso/prisma';
-
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { getDocumentWhereInput } from './get-document-by-id';
+import { mapEnvelopeToLegacyDocument } from '../../utils/document';
+import { getEnvelopeById } from '../envelope/get-envelope-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
   documentId: number;
@@ -14,54 +12,15 @@ export const getDocumentWithDetailsById = async ({
   userId,
   teamId,
 }: GetDocumentWithDetailsByIdOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const envelope = await getEnvelopeById({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: {
-      ...documentWhereInput,
-    },
-    include: {
-      documentData: true,
-      documentMeta: true,
-      recipients: true,
-      folder: true,
-      fields: {
-        include: {
-          signature: true,
-          recipient: {
-            select: {
-              name: true,
-              email: true,
-              signingStatus: true,
-            },
-          },
-        },
-      },
-      team: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
-
-  if (!document) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
-    });
-  }
-
-  return document;
+  // Todo: Standardise mapping logic this.
+  return mapEnvelopeToLegacyDocument(envelope);
 };

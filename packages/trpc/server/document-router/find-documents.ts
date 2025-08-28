@@ -1,4 +1,5 @@
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
+import { parseSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -26,7 +27,7 @@ export const findDocumentsRoute = authenticatedProcedure
       folderId,
     } = input;
 
-    const documents = await findDocuments({
+    const findDocumentsQuery = await findDocuments({
       userId: user.id,
       teamId,
       templateId,
@@ -39,5 +40,12 @@ export const findDocumentsRoute = authenticatedProcedure
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
     });
 
-    return documents;
+    // Todo: Standardise mapping logic this.
+    return {
+      ...findDocumentsQuery,
+      data: findDocumentsQuery.data.map((envelope) => ({
+        ...envelope,
+        id: parseSecondaryIdToDocumentId(envelope.secondaryId),
+      })),
+    };
   });

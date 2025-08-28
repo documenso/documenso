@@ -11,6 +11,7 @@ export const prefixedId = (prefix: string, length = 16) => {
 };
 
 type DatabaseIdPrefix =
+  | 'TEMP' // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
   | 'email_domain'
   | 'org'
   | 'org_email'

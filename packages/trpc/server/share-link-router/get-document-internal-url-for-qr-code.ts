@@ -1,4 +1,7 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { parseDocumentIdToEnvelopeSecondaryId } from '@documenso/lib/utils/envelope';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
@@ -24,15 +27,16 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
       return null;
     }
 
-    const document = await prisma.document.findFirst({
+    const envelope = await prisma.envelope.findFirst({
       where: {
+        type: EnvelopeType.DOCUMENT,
         OR: [
           {
-            id: documentId,
+            secondaryId: parseDocumentIdToEnvelopeSecondaryId(documentId),
             userId: ctx.user.id,
           },
           {
-            id: documentId,
+            secondaryId: parseDocumentIdToEnvelopeSecondaryId(documentId),
             team: buildTeamWhereQuery({ teamId: undefined, userId: ctx.user.id }),
           },
         ],
@@ -42,9 +46,9 @@ export const getDocumentInternalUrlForQRCodeRoute = procedure
       },
     });
 
-    if (!document) {
+    if (!envelope) {
       return null;
     }
 
-    return `${NEXT_PUBLIC_WEBAPP_URL()}/t/${document.team.url}/documents/${document.id}`;
+    return `${NEXT_PUBLIC_WEBAPP_URL()}/t/${envelope.team.url}/documents/${documentId}`;
   });

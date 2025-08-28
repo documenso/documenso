@@ -1,4 +1,4 @@
-import type { Document, DocumentMeta, Recipient, WebhookTriggerEvents } from '@prisma/client';
+import type { DocumentMeta, Envelope, Recipient, WebhookTriggerEvents } from '@prisma/client';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -94,16 +94,16 @@ export type WebhookPayload = {
   webhookEndpoint: string;
 };
 
-export const mapDocumentToWebhookDocumentPayload = (
-  document: Document & {
+export const mapEnvelopeToWebhookDocumentPayload = (
+  envelope: Envelope & {
     recipients: Recipient[];
     documentMeta: DocumentMeta | null;
   },
 ): TWebhookDocument => {
-  const { recipients, documentMeta, ...trimmedDocument } = document;
+  const { recipients, documentMeta, ...trimmedEnvelope } = envelope;
 
   return {
-    ...trimmedDocument,
+    ...trimmedEnvelope,
     documentMeta: documentMeta
       ? {
           ...documentMeta,

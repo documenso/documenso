@@ -1,13 +1,12 @@
-import { TeamMemberRole } from '@prisma/client';
-import { match } from 'ts-pattern';
+import type { Prisma } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { FolderType } from '@documenso/lib/types/folder-type';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
-import { getTeamById } from '../team/get-team';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface MoveDocumentToFolderOptions {
   userId: number;
@@ -23,50 +22,40 @@ export const moveDocumentToFolder = async ({
   documentId,
   folderId,
 }: MoveDocumentToFolderOptions) => {
-  const team = await getTeamById({ userId, teamId });
-
-  const visibilityFilters = match(team.currentTeamRole)
-    .with(TeamMemberRole.ADMIN, () => ({
-      visibility: {
-        in: [
-          DocumentVisibility.EVERYONE,
-          DocumentVisibility.MANAGER_AND_ABOVE,
-          DocumentVisibility.ADMIN,
-        ],
-      },
-    }))
-    .with(TeamMemberRole.MANAGER, () => ({
-      visibility: {
-        in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
-      },
-    }))
-    .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE }));
-
-  const documentWhereClause = {
-    id: documentId,
-    OR: [
-      { teamId, ...visibilityFilters },
-      { userId, teamId },
-    ],
-  };
-
-  const document = await prisma.document.findFirst({
-    where: documentWhereClause,
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
+    userId,
+    teamId,
   });
 
-  if (!document) {
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
+  });
+
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
   if (folderId) {
-    const folderWhereClause = {
+    const folderWhereClause: Prisma.FolderWhereInput = {
       id: folderId,
       type: FolderType.DOCUMENT,
       OR: [
-        { teamId, ...visibilityFilters },
-        { userId, teamId },
+        {
+          teamId: team.id,
+          visibility: {
+            in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+          },
+        },
+        {
+          userId,
+          teamId: team.id,
+        },
       ],
     };
 
@@ -81,9 +70,9 @@ export const moveDocumentToFolder = async ({
     }
   }
 
-  return await prisma.document.update({
+  return await prisma.envelope.update({
     where: {
-      id: documentId,
+      id: envelope.id,
     },
     data: {
       folderId,

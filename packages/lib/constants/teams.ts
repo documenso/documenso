@@ -1,4 +1,4 @@
-import { OrganisationGroupType, TeamMemberRole } from '@prisma/client';
+import { DocumentVisibility, OrganisationGroupType, TeamMemberRole } from '@prisma/client';
 
 export const TEAM_URL_ROOT_REGEX = new RegExp('^/t/[^/]+/?$');
 export const TEAM_URL_REGEX = new RegExp('^/t/[^/]+');
@@ -32,6 +32,16 @@ export const TEAM_MEMBER_ROLE_PERMISSIONS_MAP = {
   DELETE_TEAM: [TeamMemberRole.ADMIN],
   MANAGE_TEAM: [TeamMemberRole.ADMIN, TeamMemberRole.MANAGER],
 } satisfies Record<string, TeamMemberRole[]>;
+
+export const TEAM_DOCUMENT_VISIBILITY_MAP = {
+  [TeamMemberRole.ADMIN]: [
+    DocumentVisibility.EVERYONE,
+    DocumentVisibility.MANAGER_AND_ABOVE,
+    DocumentVisibility.ADMIN,
+  ],
+  [TeamMemberRole.MANAGER]: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
+  [TeamMemberRole.MEMBER]: [DocumentVisibility.EVERYONE],
+} satisfies Record<TeamMemberRole, DocumentVisibility[]>;
 
 /**
  * A hierarchy of team member roles to determine which role has higher permission than another.

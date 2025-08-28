@@ -1,31 +1,35 @@
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { mapEnvelopeToTemplate } from '../../utils/templates';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type GetTemplateByIdOptions = {
   id: number;
   userId: number;
   teamId: number;
-  folderId?: string | null;
 };
 
-export const getTemplateById = async ({
-  id,
-  userId,
-  teamId,
-  folderId = null,
-}: GetTemplateByIdOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id,
-      team: buildTeamWhereQuery({ teamId, userId }),
-      ...(folderId ? { folderId } : {}),
     },
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       directLink: true,
-      templateDocumentData: true,
-      templateMeta: true,
+      documentMeta: true,
+      documents: {
+        select: {
+          documentData: true,
+        },
+      },
       recipients: true,
       fields: true,
       user: {
@@ -39,11 +43,11 @@ export const getTemplateById = async ({
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
   }
 
-  return template;
+  return mapEnvelopeToTemplate(envelope);
 };

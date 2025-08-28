@@ -14,6 +14,15 @@ export const downloadDocumentMeta: TrpcRouteMeta = {
 
 export const ZDownloadDocumentRequestSchema = z.object({
   documentId: z.number().describe('The ID of the document to download.'),
+
+  // Todo: Migration ?????????????????
+  documentDataId: z
+    .string()
+    .optional()
+    .describe(
+      'The specific PDF to download within a document. If empty will download the first document available',
+    ),
+
   version: z
     .enum(['original', 'signed'])
     .describe(

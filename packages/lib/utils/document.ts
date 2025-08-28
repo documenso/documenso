@@ -1,10 +1,13 @@
-import type { Document, DocumentMeta, OrganisationGlobalSettings } from '@prisma/client';
+import type { DocumentMeta, Envelope, OrganisationGlobalSettings } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
+import type { GetEnvelopeByIdResponse } from '../server-only/envelope/get-envelope-by-id';
+import type { TDocument, TDocumentLite } from '../types/document';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
+import { parseSecondaryIdToDocumentId } from './envelope';
 
-export const isDocumentCompleted = (document: Pick<Document, 'status'> | DocumentStatus) => {
+export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
 
   return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
@@ -53,5 +56,28 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
-  } satisfies Omit<DocumentMeta, 'id' | 'documentId' | 'templateId'>;
+  } satisfies Omit<DocumentMeta, 'id'>;
+};
+
+// Todo: Standardise mapping logic this.
+export const mapEnvelopeToLegacyDocument = (envelope: GetEnvelopeByIdResponse): TDocument => {
+  const documentId = parseSecondaryIdToDocumentId(envelope.secondaryId);
+
+  return {
+    ...envelope,
+    documentData: envelope.documents[0].documentData,
+    files: envelope.documents.map((document) => document.documentData),
+    id: documentId,
+    templateId: undefined,
+  };
+};
+
+export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => {
+  const documentId = parseSecondaryIdToDocumentId(envelope.secondaryId);
+
+  return {
+    ...envelope,
+    id: documentId,
+    templateId: undefined,
+  };
 };

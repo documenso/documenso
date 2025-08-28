@@ -1,6 +1,19 @@
-import type { Recipient } from '@prisma/client';
+import type {
+  DocumentData,
+  DocumentMeta,
+  Envelope,
+  Field,
+  Folder,
+  TemplateDirectLink,
+  User,
+} from '@prisma/client';
+import { type Recipient } from '@prisma/client';
+
+import { TemplateTypeSchema } from '@documenso/prisma/types/template-legacy-schema';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+import type { TTemplate, TTemplateLite } from '../types/template';
+import { parseSecondaryIdToTemplateId } from './envelope';
 
 export const formatDirectTemplatePath = (token: string) => {
   return `${NEXT_PUBLIC_WEBAPP_URL()}/d/${token}`;
@@ -41,4 +54,39 @@ export const generateAvaliableRecipientPlaceholder = (currentRecipients: Recipie
   }
 
   return recipientPlaceholder;
+};
+
+type EnvelopeOption = Envelope & {
+  directLink: TemplateDirectLink | null;
+  user: Pick<User, 'id' | 'name' | 'email'>;
+  documents: {
+    documentData: DocumentData;
+  }[];
+  documentMeta: DocumentMeta;
+  recipients: Recipient[];
+  fields: Field[];
+  folder: Folder | null;
+};
+
+export const mapEnvelopeToTemplate = (envelope: EnvelopeOption): TTemplate => {
+  const templateId = parseSecondaryIdToTemplateId(envelope.secondaryId);
+
+  return {
+    ...envelope,
+    type: TemplateTypeSchema.Enum.PRIVATE, // @@@@ TODO EXTRACT FROM DIRECT TEMPLATE
+    templateDocumentData: envelope.documents[0].documentData,
+    templateMeta: envelope.documentMeta,
+    // files: envelope.documents.map((document) => document.documentData),
+    id: templateId,
+  };
+};
+
+export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => {
+  const templateId = parseSecondaryIdToTemplateId(envelope.secondaryId);
+
+  return {
+    ...envelope,
+    type: TemplateTypeSchema.Enum.PRIVATE, // @@@@ TODO EXTRACT FROM DIRECT TEMPLATE
+    id: templateId,
+  };
 };

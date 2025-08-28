@@ -22,7 +22,7 @@ import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
 import type { ApiRequestMetadata, RequestMetadata } from '../universal/extract-request-metadata';
 
 type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
-  documentId: number;
+  envelopeId: string;
   type: T;
   data: Extract<TDocumentAuditLog, { type: T }>['data'];
   user?: { email?: string | null; id?: number | null; name?: string | null } | null;
@@ -32,13 +32,13 @@ type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
 
 export type CreateDocumentAuditLogDataResponse = Pick<
   DocumentAuditLog,
-  'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'documentId'
+  'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'envelopeId'
 > & {
   data: TDocumentAuditLog['data'];
 };
 
 export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>({
-  documentId,
+  envelopeId,
   type,
   data,
   user,
@@ -62,7 +62,7 @@ export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>(
   return {
     type,
     data,
-    documentId,
+    envelopeId,
     userId,
     email,
     name,

@@ -1,4 +1,9 @@
-import type { DocumentMeta, DocumentVisibility, Template } from '@prisma/client';
+import {
+  type DocumentMeta,
+  type DocumentVisibility,
+  EnvelopeType,
+  type Template,
+} from '@prisma/client';
 import type { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
@@ -88,8 +93,9 @@ export const createTemplate = async ({
     }
   }
 
-  return await prisma.template.create({
+  return await prisma.envelope.create({
     data: {
+      type: EnvelopeType.TEMPLATE,
       title,
       teamId,
       userId,

@@ -11,7 +11,7 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateDocumentRecipientsOptions {
   userId: number;
@@ -35,14 +35,17 @@ export const createDocumentRecipients = async ({
   recipients: recipientsToCreate,
   requestMetadata,
 }: CreateDocumentRecipientsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       team: {
@@ -57,13 +60,13 @@ export const createDocumentRecipients = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
@@ -74,7 +77,7 @@ export const createDocumentRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
@@ -86,7 +89,7 @@ export const createDocumentRecipients = async ({
   }));
 
   const duplicateRecipients = normalizedRecipients.filter((newRecipient) => {
-    const existingRecipient = document.recipients.find(
+    const existingRecipient = envelope.recipients.find(
       (existingRecipient) => existingRecipient.email === newRecipient.email,
     );
 
@@ -109,7 +112,7 @@ export const createDocumentRecipients = async ({
 
         const createdRecipient = await tx.recipient.create({
           data: {
-            documentId,
+            envelopeId: envelope.id,
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -126,7 +129,7 @@ export const createDocumentRecipients = async ({
         await tx.documentAuditLog.create({
           data: createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
-            documentId: documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               recipientEmail: createdRecipient.email,

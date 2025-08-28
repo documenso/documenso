@@ -1,13 +1,18 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
+
+import { parseDocumentIdToEnvelopeSecondaryId } from '../../utils/envelope';
 
 export type GetEntireDocumentOptions = {
   id: number;
 };
 
 export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
-  const document = await prisma.document.findFirstOrThrow({
+  const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id,
+      type: EnvelopeType.DOCUMENT,
+      secondaryId: parseDocumentIdToEnvelopeSecondaryId(id),
     },
     include: {
       documentMeta: true,
@@ -30,5 +35,5 @@ export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
     },
   });
 
-  return document;
+  return envelope;
 };

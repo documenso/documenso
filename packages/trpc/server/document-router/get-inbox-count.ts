@@ -20,7 +20,7 @@ export const getInboxCountRoute = authenticatedProcedure
         role: {
           not: RecipientRole.CC,
         },
-        document: {
+        envelope: {
           status: {
             not: DocumentStatus.DRAFT,
           },

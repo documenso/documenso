@@ -6,7 +6,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateDocumentFieldsOptions {
   userId: number;
@@ -30,27 +30,30 @@ export const createDocumentFields = async ({
   fields,
   requestMetadata,
 }: CreateDocumentFieldsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       fields: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
@@ -58,7 +61,7 @@ export const createDocumentFields = async ({
 
   // Field validation.
   const validatedFields = fields.map((field) => {
-    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -68,7 +71,7 @@ export const createDocumentFields = async ({
     }
 
     // Check whether the recipient associated with the field can have new fields created.
-    if (!canRecipientFieldsBeModified(recipient, document.fields)) {
+    if (!canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Recipient type cannot have fields, or they have already interacted with the document.',
@@ -95,6 +98,7 @@ export const createDocumentFields = async ({
             customText: '',
             inserted: false,
             fieldMeta: field.fieldMeta,
+            envelopeId: envelope.id,
             documentId,
             recipientId: field.recipientId,
           },
@@ -104,7 +108,7 @@ export const createDocumentFields = async ({
         await tx.documentAuditLog.create({
           data: createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-            documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               fieldId: createdField.secondaryId,

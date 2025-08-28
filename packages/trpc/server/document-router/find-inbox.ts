@@ -38,12 +38,16 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+    },
   });
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  const whereClause: Prisma.DocumentWhereInput = {
+  const whereClause: Prisma.EnvelopeWhereInput = {
     status: {
       not: DocumentStatus.DRAFT,
     },
@@ -59,7 +63,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
   };
 
   const [data, count] = await Promise.all([
-    prisma.document.findMany({
+    prisma.envelope.findMany({
       where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
@@ -83,7 +87,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
         },
       },
     }),
-    prisma.document.count({
+    prisma.envelope.count({
       where: whereClause,
     }),
   ]);

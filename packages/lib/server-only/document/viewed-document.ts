@@ -9,7 +9,7 @@ import { prisma } from '@documenso/prisma';
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -30,16 +30,16 @@ export const viewedDocument = async ({
     },
   });
 
-  if (!recipient || !recipient.documentId) {
+  if (!recipient || !recipient.envelopeId) {
     return;
   }
 
-  const { documentId } = recipient;
+  const { envelopeId } = recipient;
 
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
       type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED,
-      documentId,
+      envelopeId,
       user: {
         name: recipient.name,
         email: recipient.email,
@@ -75,7 +75,7 @@ export const viewedDocument = async ({
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
-        documentId,
+        envelopeId,
         user: {
           name: recipient.name,
           email: recipient.email,
@@ -92,9 +92,9 @@ export const viewedDocument = async ({
     });
   });
 
-  const document = await prisma.document.findFirst({
+  const envelope = await prisma.envelope.findFirst({
     where: {
-      id: documentId,
+      id: envelopeId,
     },
     include: {
       documentMeta: true,
@@ -102,14 +102,14 @@ export const viewedDocument = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
-    userId: document.userId,
-    teamId: document.teamId ?? undefined,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId ?? undefined,
   });
 };

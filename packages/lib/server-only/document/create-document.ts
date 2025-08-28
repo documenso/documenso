@@ -1,4 +1,4 @@
-import { DocumentSource, WebhookTriggerEvents } from '@prisma/client';
+import { DocumentSource, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
 import type { DocumentVisibility } from '@prisma/client';
 
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
@@ -10,13 +10,14 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { prefixedId } from '../../universal/id';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { buildDocumentId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -109,12 +110,38 @@ export const createDocument = async ({
   const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
 
   return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.create({
+    const documentIdCounter = await tx.counter.update({
+      where: {
+        id: 'document',
+      },
+      data: {
+        value: {
+          increment: 1,
+        },
+      },
+    });
+
+    const documentId = buildDocumentId(documentIdCounter.value);
+
+    const documentMeta = await tx.documentMeta.create({
+      data: extractDerivedDocumentMeta(settings, {
+        timezone: timezoneToUse,
+      }),
+    });
+
+    const envelope = await tx.envelope.create({
       data: {
         title,
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: documentId,
         qrToken: prefixedId('qr'),
         externalId,
-        documentDataId,
+        documents: {
+          create: {
+            title,
+            documentDataId,
+          },
+        },
         userId,
         teamId,
         folderId,
@@ -123,18 +150,18 @@ export const createDocument = async ({
           determineDocumentVisibility(settings.documentVisibility, team.currentTeamRole),
         formValues,
         source: DocumentSource.DOCUMENT,
-        documentMeta: {
-          create: extractDerivedDocumentMeta(settings, {
-            timezone: timezoneToUse,
-          }),
-        },
+        documentMetaId: documentMeta.id,
+      },
+      include: {
+        documentMeta: true,
+        recipients: true,
       },
     });
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
-        documentId: document.id,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
           title,
@@ -145,27 +172,16 @@ export const createDocument = async ({
       }),
     });
 
-    const createdDocument = await tx.document.findFirst({
-      where: {
-        id: document.id,
-      },
-      include: {
-        documentMeta: true,
-        recipients: true,
-      },
-    });
-
-    if (!createdDocument) {
-      throw new Error('Document not found');
-    }
-
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
       userId,
       teamId,
     });
 
-    return createdDocument;
+    return {
+      id: documentIdCounter.value,
+      envelope,
+    };
   });
 };

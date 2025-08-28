@@ -7,7 +7,7 @@ export type GetIsRecipientTurnOptions = {
 };
 
 export async function getIsRecipientsTurnToSign({ token }: GetIsRecipientTurnOptions) {
-  const document = await prisma.document.findFirstOrThrow({
+  const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
       recipients: {
         some: {
@@ -25,11 +25,11 @@ export async function getIsRecipientsTurnToSign({ token }: GetIsRecipientTurnOpt
     },
   });
 
-  if (document.documentMeta?.signingOrder !== DocumentSigningOrder.SEQUENTIAL) {
+  if (envelope.documentMeta?.signingOrder !== DocumentSigningOrder.SEQUENTIAL) {
     return true;
   }
 
-  const { recipients } = document;
+  const { recipients } = envelope;
 
   const currentRecipientIndex = recipients.findIndex((r) => r.token === token);
 

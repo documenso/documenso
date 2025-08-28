@@ -2,7 +2,7 @@ import { generateAvaliableRecipientPlaceholder } from '@documenso/lib/utils/temp
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type DeleteTemplateDirectLinkOptions = {
   templateId: number;
@@ -15,24 +15,30 @@ export const deleteTemplateDirectLink = async ({
   userId,
   teamId,
 }: DeleteTemplateDirectLinkOptions): Promise<void> => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       directLink: true,
       recipients: true,
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
   }
 
-  const { directLink } = template;
+  const { directLink } = envelope;
 
   if (!directLink) {
     return;
@@ -41,17 +47,17 @@ export const deleteTemplateDirectLink = async ({
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
       where: {
-        templateId: template.id,
+        envelopeId: envelope.id,
         id: directLink.directTemplateRecipientId,
       },
       data: {
-        ...generateAvaliableRecipientPlaceholder(template.recipients),
+        ...generateAvaliableRecipientPlaceholder(envelope.recipients),
       },
     });
 
     await tx.templateDirectLink.delete({
       where: {
-        templateId,
+        envelopeId: envelope.id,
       },
     });
   });

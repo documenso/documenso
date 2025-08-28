@@ -1,18 +1,19 @@
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
+import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
+import { parseSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
 } from './update-document.types';
-import { updateDocumentMeta } from './update-document.types';
+import { updateDocumentMeta as updateDocumentTrpcMeta } from './update-document.types';
 
 /**
  * Public route.
  */
 export const updateDocumentRoute = authenticatedProcedure
-  .meta(updateDocumentMeta)
+  .meta(updateDocumentTrpcMeta)
   .input(ZUpdateDocumentRequestSchema)
   .output(ZUpdateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -28,7 +29,7 @@ export const updateDocumentRoute = authenticatedProcedure
     const userId = ctx.user.id;
 
     if (Object.values(meta).length > 0) {
-      await upsertDocumentMeta({
+      await updateDocumentMeta({
         userId: ctx.user.id,
         teamId,
         documentId,
@@ -51,11 +52,18 @@ export const updateDocumentRoute = authenticatedProcedure
       });
     }
 
-    return await updateDocument({
+    const envelope = await updateDocument({
       userId,
       teamId,
       documentId,
       data,
       requestMetadata: ctx.metadata,
     });
+
+    const mappedDocument = {
+      ...envelope,
+      id: parseSecondaryIdToDocumentId(envelope.secondaryId),
+    };
+
+    return mappedDocument;
   });

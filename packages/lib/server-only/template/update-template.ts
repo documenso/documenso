@@ -1,11 +1,12 @@
-import type { DocumentMeta, DocumentVisibility, Template } from '@prisma/client';
+import { type DocumentMeta, type DocumentVisibility, EnvelopeType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
+import type { TemplateType } from '@documenso/prisma/types/template-legacy-schema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type UpdateTemplateOptions = {
   userId: number;
@@ -19,7 +20,7 @@ export type UpdateTemplateOptions = {
     globalActionAuth?: TDocumentActionAuthTypes[];
     publicTitle?: string;
     publicDescription?: string;
-    type?: Template['type'];
+    type?: TemplateType;
     useLegacyFieldInsertion?: boolean;
   };
   meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
@@ -32,13 +33,19 @@ export const updateTemplate = async ({
   meta = {},
   data = {},
 }: UpdateTemplateOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
-      templateMeta: true,
+      documentMeta: true,
       team: {
         select: {
           organisationId: true,
@@ -52,18 +59,18 @@ export const updateTemplate = async ({
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
   }
 
   if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
-    return template;
+    return envelope;
   }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
-    documentAuth: template.authOptions,
+    documentAuth: envelope.authOptions,
   });
 
   const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
@@ -76,7 +83,7 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth.length > 0 && !template.team.organisation.organisationClaim.flags.cfr21) {
+  if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
@@ -94,7 +101,7 @@ export const updateTemplate = async ({
     const email = await prisma.organisationEmail.findFirst({
       where: {
         id: emailId,
-        organisationId: template.team.organisationId,
+        organisationId: envelope.team.organisationId,
       },
     });
 
@@ -105,32 +112,24 @@ export const updateTemplate = async ({
     }
   }
 
-  return await prisma.template.update({
+  return await prisma.envelope.update({
     where: {
-      id: templateId,
+      id: envelope.id,
     },
     data: {
+      type: EnvelopeType.TEMPLATE,
+      templateType: data?.type,
       title: data?.title,
       externalId: data?.externalId,
-      type: data?.type,
       visibility: data?.visibility,
       publicDescription: data?.publicDescription,
       publicTitle: data?.publicTitle,
       useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
       authOptions,
-      templateMeta: {
-        upsert: {
-          where: {
-            templateId,
-          },
-          create: {
-            ...meta,
-            emailSettings: meta?.emailSettings || undefined,
-          },
-          update: {
-            ...meta,
-            emailSettings: meta?.emailSettings || undefined,
-          },
+      documentMeta: {
+        create: {
+          ...meta,
+          emailSettings: meta?.emailSettings || undefined,
         },
       },
     },

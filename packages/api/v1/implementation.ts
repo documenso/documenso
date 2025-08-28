@@ -10,7 +10,7 @@ import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
+import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { createDocument } from '@documenso/lib/server-only/document/create-document';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
@@ -335,7 +335,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         requestMetadata: metadata,
       });
 
-      await upsertDocumentMeta({
+      await updateDocumentMeta({
         documentId: document.id,
         userId: user.id,
         teamId: team?.id,
@@ -672,7 +672,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       if (body.meta) {
-        await upsertDocumentMeta({
+        await updateDocumentMeta({
           documentId: document.id,
           userId: user.id,
           teamId: team?.id,
@@ -852,7 +852,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
       // Update document email settings if sendCompletionEmails is provided
       if (typeof sendCompletionEmails === 'boolean') {
-        await upsertDocumentMeta({
+        await updateDocumentMeta({
           documentId: document.id,
           userId: user.id,
           teamId: team?.id,

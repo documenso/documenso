@@ -12,7 +12,7 @@ import { prisma } from '@documenso/prisma';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
-import { getDocumentWhereInput } from './get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type UpdateDocumentOptions = {
   userId: number;
@@ -36,14 +36,17 @@ export const updateDocument = async ({
   data,
   requestMetadata,
 }: UpdateDocumentOptions) => {
-  const { documentWhereInput, team } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       team: {
         select: {
@@ -57,16 +60,16 @@ export const updateDocument = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  const isDocumentOwner = document.userId === userId;
+  const isEnvelopeOwner = envelope.userId === userId;
   const requestedVisibility = data?.visibility;
 
-  if (!isDocumentOwner) {
+  if (!isEnvelopeOwner) {
     match(team.currentTeamRole)
       .with(TeamMemberRole.ADMIN, () => true)
       .with(TeamMemberRole.MANAGER, () => {
@@ -76,7 +79,7 @@ export const updateDocument = async ({
         ];
 
         if (
-          !allowedVisibilities.includes(document.visibility) ||
+          !allowedVisibilities.includes(envelope.visibility) ||
           (requestedVisibility && !allowedVisibilities.includes(requestedVisibility))
         ) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
@@ -86,7 +89,7 @@ export const updateDocument = async ({
       })
       .with(TeamMemberRole.MEMBER, () => {
         if (
-          document.visibility !== DocumentVisibility.EVERYONE ||
+          envelope.visibility !== DocumentVisibility.EVERYONE ||
           (requestedVisibility && requestedVisibility !== DocumentVisibility.EVERYONE)
         ) {
           throw new AppError(AppErrorCode.UNAUTHORIZED, {
@@ -103,11 +106,11 @@ export const updateDocument = async ({
 
   // If no data just return the document since this function is normally chained after a meta update.
   if (!data || Object.values(data).length === 0) {
-    return document;
+    return envelope;
   }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
-    documentAuth: document.authOptions,
+    documentAuth: envelope.authOptions,
   });
 
   const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
@@ -120,14 +123,14 @@ export const updateDocument = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth.length > 0 && !document.team.organisation.organisationClaim.flags.cfr21) {
+  if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
   }
 
-  const isTitleSame = data.title === undefined || data.title === document.title;
-  const isExternalIdSame = data.externalId === undefined || data.externalId === document.externalId;
+  const isTitleSame = data.title === undefined || data.title === envelope.title;
+  const isExternalIdSame = data.externalId === undefined || data.externalId === envelope.externalId;
   const isGlobalAccessSame =
     documentGlobalAccessAuth === undefined ||
     isDeepEqual(documentGlobalAccessAuth, newGlobalAccessAuth);
@@ -135,11 +138,11 @@ export const updateDocument = async ({
     documentGlobalActionAuth === undefined ||
     isDeepEqual(documentGlobalActionAuth, newGlobalActionAuth);
   const isDocumentVisibilitySame =
-    data.visibility === undefined || data.visibility === document.visibility;
+    data.visibility === undefined || data.visibility === envelope.visibility;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
-  if (!isTitleSame && document.status !== DocumentStatus.DRAFT) {
+  if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
       message: 'You cannot update the title if the document has been sent',
     });
@@ -149,7 +152,7 @@ export const updateDocument = async ({
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_TITLE_UPDATED,
-        documentId,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
           from: document.title,
@@ -163,10 +166,10 @@ export const updateDocument = async ({
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_EXTERNAL_ID_UPDATED,
-        documentId,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
-          from: document.externalId,
+          from: envelope.externalId,
           to: data.externalId || '',
         },
       }),
@@ -177,7 +180,7 @@ export const updateDocument = async ({
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACCESS_UPDATED,
-        documentId,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
           from: documentGlobalAccessAuth,
@@ -191,7 +194,7 @@ export const updateDocument = async ({
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_GLOBAL_AUTH_ACTION_UPDATED,
-        documentId,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
           from: documentGlobalActionAuth,
@@ -205,10 +208,10 @@ export const updateDocument = async ({
     auditLogs.push(
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VISIBILITY_UPDATED,
-        documentId,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
-          from: document.visibility,
+          from: envelope.visibility,
           to: data.visibility || '',
         },
       }),
@@ -217,7 +220,7 @@ export const updateDocument = async ({
 
   // Early return if nothing is required.
   if (auditLogs.length === 0 && data.useLegacyFieldInsertion === undefined) {
-    return document;
+    return envelope;
   }
 
   return await prisma.$transaction(async (tx) => {
@@ -226,9 +229,9 @@ export const updateDocument = async ({
       globalActionAuth: newGlobalActionAuth,
     });
 
-    const updatedDocument = await tx.document.update({
+    const updatedDocument = await tx.envelope.update({
       where: {
-        id: documentId,
+        id: envelope.id,
       },
       data: {
         title: data.title,

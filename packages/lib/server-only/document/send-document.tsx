@@ -16,14 +16,11 @@ import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
-import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
-import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { getDocumentWhereInput } from './get-document-by-id';
 
 export type SendDocumentOptions = {
   documentId: number;
@@ -40,88 +37,92 @@ export const sendDocument = async ({
   sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
-      documentData: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.recipients.length === 0) {
+  if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
-  if (isDocumentCompleted(document.status)) {
+  if (isDocumentCompleted(envelope.status)) {
     throw new Error('Can not send completed document');
   }
 
-  const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+  const signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
 
-  let recipientsToNotify = document.recipients;
+  let recipientsToNotify = envelope.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
     // Get the currently active recipient.
-    recipientsToNotify = document.recipients
+    recipientsToNotify = envelope.recipients
       .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
       .slice(0, 1);
 
     // Secondary filter so we aren't resending if the current active recipient has already
-    // received the document.
+    // received the envelope.
     recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
-  const { documentData } = document;
+  // Todo: Migration
+  // const { documentData } = envelope;
 
-  if (!documentData.data) {
-    throw new Error('Document data not found');
-  }
+  // if (!documentData.data) {
+  //   throw new Error('Document data not found');
+  // }
 
-  if (document.formValues) {
-    const file = await getFileServerSide(documentData);
+  // Todo: Migration
+  // if (envelope.formValues) {
+  //   const file = await getFileServerSide(documentData);
 
-    const prefilled = await insertFormValuesInPdf({
-      pdf: Buffer.from(file),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      formValues: document.formValues as Record<string, string | number | boolean>,
-    });
+  //   const prefilled = await insertFormValuesInPdf({
+  //     pdf: Buffer.from(file),
+  //     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  //     formValues: envelope.formValues as Record<string, string | number | boolean>,
+  //   });
 
-    let fileName = document.title;
+  //   let fileName = envelope.title;
 
-    if (!document.title.endsWith('.pdf')) {
-      fileName = `${document.title}.pdf`;
-    }
+  //   if (!envelope.title.endsWith('.pdf')) {
+  //     fileName = `${envelope.title}.pdf`;
+  //   }
 
-    const newDocumentData = await putPdfFileServerSide({
-      name: fileName,
-      type: 'application/pdf',
-      arrayBuffer: async () => Promise.resolve(prefilled),
-    });
+  //   const newDocumentData = await putPdfFileServerSide({
+  //     name: fileName,
+  //     type: 'application/pdf',
+  //     arrayBuffer: async () => Promise.resolve(prefilled),
+  //   });
 
-    const result = await prisma.document.update({
-      where: {
-        id: document.id,
-      },
-      data: {
-        documentDataId: newDocumentData.id,
-      },
-    });
+  //   const result = await prisma.envelope.update({
+  //     where: {
+  //       id: envelope.id,
+  //     },
+  //     data: {
+  //       documentDataId: newDocumentData.id,
+  //     },
+  //   });
 
-    Object.assign(document, result);
-  }
+  //   Object.assign(document, result);
+  // }
 
   // Commented out server side checks for minimum 1 signature per signer now since we need to
   // decide if we want to enforce this for API & templates.
@@ -133,7 +134,7 @@ export const sendDocument = async ({
   // const fieldsWithSignerEmail = fields.map((field) => ({
   //   ...field,
   //   signerEmail:
-  //     document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  //     envelope.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
   // }));
 
   // const everySignerHasSignature = document?.Recipient.every(
@@ -149,7 +150,7 @@ export const sendDocument = async ({
   // }
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientSigningRequest;
 
   // Only send email if one of the following is true:
@@ -175,7 +176,7 @@ export const sendDocument = async ({
     );
   }
 
-  const allRecipientsHaveNoActionToTake = document.recipients.every(
+  const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
@@ -190,9 +191,9 @@ export const sendDocument = async ({
     });
 
     // Keep the return type the same for the `sendDocument` method
-    return await prisma.document.findFirstOrThrow({
+    return await prisma.envelope.findFirstOrThrow({
       where: {
-        id: documentId,
+        id: envelope.id,
       },
       include: {
         documentMeta: true,
@@ -201,21 +202,21 @@ export const sendDocument = async ({
     });
   }
 
-  const updatedDocument = await prisma.$transaction(async (tx) => {
-    if (document.status === DocumentStatus.DRAFT) {
+  const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    if (envelope.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
-          documentId: document.id,
+          envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {},
         }),
       });
     }
 
-    return await tx.document.update({
+    return await tx.envelope.update({
       where: {
-        id: documentId,
+        id: envelope.id,
       },
       data: {
         status: DocumentStatus.PENDING,
@@ -229,10 +230,10 @@ export const sendDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
     userId,
     teamId,
   });
 
-  return updatedDocument;
+  return updatedEnvelope;
 };

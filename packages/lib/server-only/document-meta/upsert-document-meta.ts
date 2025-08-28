@@ -11,7 +11,7 @@ import { prisma } from '@documenso/prisma';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type CreateDocumentMetaOptions = {
   userId: number;
@@ -36,7 +36,10 @@ export type CreateDocumentMetaOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const upsertDocumentMeta = async ({
+// @@@@@@@@@@@@@@ TODO: CHECK THAT EVERY DOC HAS A DOCUMENT_META
+// @@@@@@@@@@@@@@ TODO: CHECK THAT EVERY DOC HAS A DOCUMENT_META
+// @@@@@@@@@@@@@@ TODO: CHECK THAT EVERY DOC HAS A DOCUMENT_META
+export const updateDocumentMeta = async ({
   userId,
   teamId,
   subject,
@@ -58,26 +61,29 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
-  const { documentWhereInput, team } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       documentMeta: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  const { documentMeta: originalDocumentMeta } = document;
+  const { documentMeta: originalDocumentMeta } = envelope;
 
   // Validate the emailId belongs to the organisation.
   if (emailId) {
@@ -96,30 +102,11 @@ export const upsertDocumentMeta = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
-    const upsertedDocumentMeta = await tx.documentMeta.upsert({
+    const upsertedDocumentMeta = await tx.documentMeta.update({
       where: {
-        documentId,
+        id: envelope.documentMetaId,
       },
-      create: {
-        subject,
-        message,
-        password,
-        dateFormat,
-        timezone,
-        documentId,
-        redirectUrl,
-        signingOrder,
-        allowDictateNextSigner,
-        emailId,
-        emailReplyTo,
-        emailSettings,
-        distributionMethod,
-        typedSignatureEnabled,
-        uploadSignatureEnabled,
-        drawSignatureEnabled,
-        language,
-      },
-      update: {
+      data: {
         subject,
         message,
         password,
@@ -145,7 +132,7 @@ export const upsertDocumentMeta = async ({
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
-          documentId,
+          envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {
             changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),

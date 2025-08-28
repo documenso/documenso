@@ -21,7 +21,7 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import { isDocumentCompleted } from '../../utils/document';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
-import { getDocumentWhereInput } from './get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type ResendDocumentOptions = {
   documentId: number;
@@ -42,16 +42,24 @@ export const resendDocument = async ({
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
   });
 
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findUnique({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findUnique({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       documentMeta: true,
@@ -64,31 +72,31 @@ export const resendDocument = async ({
     },
   });
 
-  const customEmail = document?.documentMeta;
+  const customEmail = envelope?.documentMeta;
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.recipients.length === 0) {
+  if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
-  if (document.status === DocumentStatus.DRAFT) {
+  if (envelope.status === DocumentStatus.DRAFT) {
     throw new Error('Can not send draft document');
   }
 
-  if (isDocumentCompleted(document.status)) {
+  if (isDocumentCompleted(envelope.status)) {
     throw new Error('Can not send completed document');
   }
 
-  const recipientsToRemind = document.recipients.filter(
+  const recipientsToRemind = envelope.recipients.filter(
     (recipient) =>
       recipients.includes(recipient.id) && recipient.signingStatus === SigningStatus.NOT_SIGNED,
   );
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
@@ -100,9 +108,9 @@ export const resendDocument = async ({
       emailType: 'RECIPIENT',
       source: {
         type: 'team',
-        teamId: document.teamId,
+        teamId: envelope.teamId,
       },
-      meta: document.documentMeta,
+      meta: envelope.documentMeta,
     });
 
   await Promise.all(
@@ -127,37 +135,37 @@ export const resendDocument = async ({
 
       if (selfSigner) {
         emailMessage = i18n._(
-          msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+          msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`,
         );
         emailSubject = i18n._(msg`Reminder: Please ${recipientActionVerb} your document`);
       }
 
       if (organisationType === OrganisationType.ORGANISATION) {
         emailSubject = i18n._(
-          msg`Reminder: ${document.team.name} invited you to ${recipientActionVerb} a document`,
+          msg`Reminder: ${envelope.team.name} invited you to ${recipientActionVerb} a document`,
         );
         emailMessage =
           customEmail?.message ||
           i18n._(
-            msg`${user.name || user.email} on behalf of "${document.team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`,
+            msg`${user.name || user.email} on behalf of "${envelope.team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
           );
       }
 
       const customEmailTemplate = {
         'signer.name': name,
         'signer.email': email,
-        'document.name': document.title,
+        'envelope.name': envelope.title,
       };
 
       const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
       const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
       const template = createElement(DocumentInviteEmailTemplate, {
-        documentName: document.title,
+        documentName: envelope.title,
         inviterName: user.name || undefined,
         inviterEmail:
           organisationType === OrganisationType.ORGANISATION
-            ? document.team?.teamEmail?.email || user.email
+            ? envelope.team?.teamEmail?.email || user.email
             : user.email,
         assetBaseUrl,
         signDocumentLink,
@@ -165,7 +173,7 @@ export const resendDocument = async ({
         role: recipient.role,
         selfSigner,
         organisationType,
-        teamName: document.team?.name,
+        teamName: envelope.team?.name,
       });
 
       const [html, text] = await Promise.all([
@@ -202,7 +210,7 @@ export const resendDocument = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              documentId: document.id,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 emailType: recipientEmailType,

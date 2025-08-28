@@ -1,7 +1,8 @@
+import type { DocumentData } from '@prisma/client';
 import { DocumentDataType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
@@ -18,7 +19,7 @@ export const downloadDocumentRoute = authenticatedProcedure
   .output(ZDownloadDocumentResponseSchema)
   .query(async ({ input, ctx }) => {
     const { teamId, user } = ctx;
-    const { documentId, version } = input;
+    const { documentId, version, documentDataId } = input;
 
     ctx.logger.info({
       input: {
@@ -33,39 +34,47 @@ export const downloadDocumentRoute = authenticatedProcedure
       });
     }
 
-    const document = await getDocumentById({
-      documentId,
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       userId: user.id,
       teamId,
     });
 
-    if (!document.documentData) {
+    let documentData: DocumentData | undefined = envelope.documents[0]?.documentData;
+
+    if (documentDataId) {
+      documentData = envelope.documents.find(
+        (document) => document.documentData.id === documentDataId,
+      )?.documentData;
+    }
+
+    if (!documentData) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Document data not found',
       });
     }
 
-    if (document.documentData.type !== DocumentDataType.S3_PATH) {
+    if (documentData.type !== DocumentDataType.S3_PATH) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not stored in S3 and cannot be downloaded via URL.',
       });
     }
 
-    if (version === 'signed' && !isDocumentCompleted(document.status)) {
+    if (version === 'signed' && !isDocumentCompleted(envelope.status)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not completed yet.',
       });
     }
 
     try {
-      const documentData =
-        version === 'original'
-          ? document.documentData.initialData || document.documentData.data
-          : document.documentData.data;
+      const { url } = await getPresignGetUrl(
+        version === 'original' ? documentData.initialData || documentData.data : documentData.data,
+      );
 
-      const { url } = await getPresignGetUrl(documentData);
-
-      const baseTitle = document.title.replace(/\.pdf$/, '');
+      const baseTitle = envelope.title.replace(/\.pdf$/, '');
       const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
       const filename = `${baseTitle}${suffix}`;
 

@@ -19,31 +19,38 @@ import { searchDocumentRoute } from './search-document';
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
-  get: getDocumentRoute,
-  find: findDocumentsRoute,
-  create: createDocumentRoute,
-  update: updateDocumentRoute,
-  delete: deleteDocumentRoute,
-  duplicate: duplicateDocumentRoute,
-  downloadCertificate: downloadDocumentCertificateRoute,
-  distribute: distributeDocumentRoute,
-  redistribute: redistributeDocumentRoute,
-  search: searchDocumentRoute,
+  get: getDocumentRoute, // Done
+  find: findDocumentsRoute, // Done
+  create: createDocumentRoute, // Done
+  update: updateDocumentRoute, // Done
+  delete: deleteDocumentRoute, // Done
+  duplicate: duplicateDocumentRoute, // Done
+  downloadCertificate: downloadDocumentCertificateRoute, // Not done due to redirect link thing
+  distribute: distributeDocumentRoute, // Done
+  redistribute: redistributeDocumentRoute, // Done
+  search: searchDocumentRoute, // Done
 
   // Temporary v2 beta routes to be removed once V2 is fully released.
-  download: downloadDocumentRoute,
+  download: downloadDocumentRoute, // Done
   createDocumentTemporary: createDocumentTemporaryRoute,
 
   // Internal document routes for custom frontend requests.
   getDocumentByToken: getDocumentByTokenRoute,
   findDocumentsInternal: findDocumentsInternalRoute,
 
+  // file: {
+  //   get: getDocumentFileRoute,
+  //   update: updateDocumentFileRoute,
+  //   delete: deleteDocumentFileRoute,
+  //   create: createDocumentFileRoute,
+  // },
+
   auditLog: {
-    find: findDocumentAuditLogsRoute,
-    download: downloadDocumentAuditLogsRoute,
+    find: findDocumentAuditLogsRoute, // Done.
+    download: downloadDocumentAuditLogsRoute, // Not done yet due to redirect link think
   },
   inbox: router({
-    find: findInboxRoute,
-    getCount: getInboxCountRoute,
+    find: findInboxRoute, // Done
+    getCount: getInboxCountRoute, // Done
   }),
 });
