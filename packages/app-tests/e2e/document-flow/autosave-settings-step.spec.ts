@@ -147,7 +147,7 @@ test.describe('AutoSave Settings Step', () => {
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
     await page.getByRole('combobox').nth(4).click();
-    await page.getByRole('option', { name: 'YYYY-MM-DD' }).click();
+    await page.getByRole('option', { name: 'ISO 8601', exact: true }).click();
 
     await triggerAutosave(page);
 
