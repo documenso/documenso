@@ -100,6 +100,13 @@ export default function SettingsLayout() {
       return false;
     }
 
+    if (
+      (!isBillingEnabled || !organisation.organisationClaim.flags.authenticationPortal) &&
+      route.path.includes('/sso')
+    ) {
+      return false;
+    }
+
     return true;
   });
 
