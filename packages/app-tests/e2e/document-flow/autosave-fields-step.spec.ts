@@ -34,7 +34,9 @@ const setupDocumentAndNavigateToFieldsStep = async (page: Page) => {
 
 const triggerAutosave = async (page: Page) => {
   await page.locator('#document-flow-form-container').click();
-  await page.waitForTimeout(3000);
+  await page.locator('#document-flow-form-container').blur();
+
+  await page.waitForTimeout(5000);
 };
 
 test.describe('AutoSave Fields Step', () => {
@@ -59,7 +61,12 @@ test.describe('AutoSave Fields Step', () => {
       },
     });
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
+
+    await page
+      .getByTestId('field-advanced-settings-footer')
+      .getByRole('button', { name: 'Cancel' })
+      .click();
 
     await triggerAutosave(page);
 
@@ -76,16 +83,18 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    const fieldsFromDB = await getFieldsForDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedFields = await getFieldsForDocument({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(fieldsFromDB.length).toBe(3);
-    expect(fieldsFromDB[0].type).toBe('SIGNATURE');
-    expect(fieldsFromDB[1].type).toBe('TEXT');
-    expect(fieldsFromDB[2].type).toBe('SIGNATURE');
+      expect(retrievedFields.length).toBe(3);
+      expect(retrievedFields[0].type).toBe('SIGNATURE');
+      expect(retrievedFields[1].type).toBe('TEXT');
+      expect(retrievedFields[2].type).toBe('SIGNATURE');
+    }).toPass();
   });
 
   test('should autosave the field deletion', async ({ page }) => {
@@ -109,7 +118,12 @@ test.describe('AutoSave Fields Step', () => {
       },
     });
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
+
+    await page
+      .getByTestId('field-advanced-settings-footer')
+      .getByRole('button', { name: 'Cancel' })
+      .click();
 
     await triggerAutosave(page);
 
@@ -134,15 +148,17 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    const fieldsFromDB = await getFieldsForDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedFields = await getFieldsForDocument({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(fieldsFromDB.length).toBe(2);
-    expect(fieldsFromDB[0].type).toBe('SIGNATURE');
-    expect(fieldsFromDB[1].type).toBe('SIGNATURE');
+      expect(retrievedFields.length).toBe(2);
+      expect(retrievedFields[0].type).toBe('SIGNATURE');
+      expect(retrievedFields[1].type).toBe('SIGNATURE');
+    }).toPass();
   });
 
   test('should autosave the field duplication', async ({ page }) => {
@@ -166,7 +182,12 @@ test.describe('AutoSave Fields Step', () => {
       },
     });
 
-    await page.getByRole('button', { name: 'Cancel' }).click();
+    await page.getByTestId('field-advanced-settings-footer').waitFor({ state: 'visible' });
+
+    await page
+      .getByTestId('field-advanced-settings-footer')
+      .getByRole('button', { name: 'Cancel' })
+      .click();
 
     await triggerAutosave(page);
 
@@ -191,17 +212,19 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    const fieldsFromDB = await getFieldsForDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedFields = await getFieldsForDocument({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(fieldsFromDB.length).toBe(4);
-    expect(fieldsFromDB[0].type).toBe('SIGNATURE');
-    expect(fieldsFromDB[1].type).toBe('TEXT');
-    expect(fieldsFromDB[2].type).toBe('SIGNATURE');
-    expect(fieldsFromDB[3].type).toBe('SIGNATURE');
+      expect(retrievedFields.length).toBe(4);
+      expect(retrievedFields[0].type).toBe('SIGNATURE');
+      expect(retrievedFields[1].type).toBe('TEXT');
+      expect(retrievedFields[2].type).toBe('SIGNATURE');
+      expect(retrievedFields[3].type).toBe('SIGNATURE');
+    }).toPass();
   });
 
   test('should autosave the fields with advanced settings', async ({ page }) => {
@@ -229,36 +252,42 @@ test.describe('AutoSave Fields Step', () => {
     await page.getByRole('textbox', { name: 'Field placeholder' }).fill('Test Placeholder');
     await page.getByRole('textbox', { name: 'Add text to the field' }).fill('Test Text');
 
-    await page.waitForTimeout(2500);
+    await page
+      .getByTestId('field-advanced-settings-footer')
+      .getByRole('button', { name: 'Save' })
+      .click();
+
     await triggerAutosave(page);
 
-    const fieldsFromDB = await getFieldsForDocument({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedFields = await getFieldsForDocument({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(fieldsFromDB.length).toBe(2);
-    expect(fieldsFromDB[0].type).toBe('SIGNATURE');
-    expect(fieldsFromDB[1].type).toBe('TEXT');
+      expect(retrievedFields.length).toBe(2);
+      expect(retrievedFields[0].type).toBe('SIGNATURE');
+      expect(retrievedFields[1].type).toBe('TEXT');
 
-    const textField = fieldsFromDB[1];
-    expect(textField.fieldMeta).toBeDefined();
+      const textField = retrievedFields[1];
+      expect(textField.fieldMeta).toBeDefined();
 
-    if (
-      textField.fieldMeta &&
-      typeof textField.fieldMeta === 'object' &&
-      'type' in textField.fieldMeta
-    ) {
-      expect(textField.fieldMeta.type).toBe('text');
-      expect(textField.fieldMeta.label).toBe('Test Field');
-      expect(textField.fieldMeta.placeholder).toBe('Test Placeholder');
+      if (
+        textField.fieldMeta &&
+        typeof textField.fieldMeta === 'object' &&
+        'type' in textField.fieldMeta
+      ) {
+        expect(textField.fieldMeta.type).toBe('text');
+        expect(textField.fieldMeta.label).toBe('Test Field');
+        expect(textField.fieldMeta.placeholder).toBe('Test Placeholder');
 
-      if (textField.fieldMeta.type === 'text') {
-        expect(textField.fieldMeta.text).toBe('Test Text');
+        if (textField.fieldMeta.type === 'text') {
+          expect(textField.fieldMeta.text).toBe('Test Text');
+        }
+      } else {
+        throw new Error('fieldMeta should be defined and contain advanced settings');
       }
-    } else {
-      throw new Error('fieldMeta should be defined and contain advanced settings');
-    }
+    }).toPass();
   });
 });

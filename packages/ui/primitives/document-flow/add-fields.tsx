@@ -595,16 +595,17 @@ export const AddFieldsFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleAutoSave = useCallback(async () => {
+  const handleAutoSave = async () => {
     const isFormValid = await form.trigger();
-    const { isDirty } = form.formState;
+
+    if (!isFormValid) {
+      return;
+    }
 
     const formData = form.getValues();
 
-    if (isFormValid && isDirty) {
-      scheduleSave(formData);
-    }
-  }, [form, form.formState.isDirty, scheduleSave]);
+    scheduleSave(formData);
+  };
 
   return (
     <>

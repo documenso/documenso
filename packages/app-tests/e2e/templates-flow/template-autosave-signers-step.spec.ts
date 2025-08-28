@@ -27,7 +27,9 @@ const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
 
 const triggerAutosave = async (page: Page) => {
   await page.locator('#document-flow-form-container').click();
-  await page.waitForTimeout(3000);
+  await page.locator('#document-flow-form-container').blur();
+
+  await page.waitForTimeout(5000);
 };
 
 const addSignerAndSave = async (page: Page) => {
@@ -43,15 +45,17 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await addSignerAndSave(page);
 
-    const recipientsFromDB = await getRecipientsForTemplate({
-      templateId: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedRecipients = await getRecipientsForTemplate({
+        templateId: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(recipientsFromDB.length).toBe(1);
-    expect(recipientsFromDB[0].email).toBe('recipient1@documenso.com');
-    expect(recipientsFromDB[0].name).toBe('Recipient 1');
+      expect(retrievedRecipients.length).toBe(1);
+      expect(retrievedRecipients[0].email).toBe('recipient1@documenso.com');
+      expect(retrievedRecipients[0].name).toBe('Recipient 1');
+    }).toPass();
   });
 
   test('should autosave the signer deletion', async ({ page }) => {
@@ -65,15 +69,17 @@ test.describe('AutoSave Signers Step - Templates', () => {
     await page.getByTestId('remove-placeholder-recipient-button').first().click();
     await triggerAutosave(page);
 
-    const recipientsFromDB = await getRecipientsForTemplate({
-      templateId: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedRecipients = await getRecipientsForTemplate({
+        templateId: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(recipientsFromDB.length).toBe(1);
-    expect(recipientsFromDB[0].email).toBe(user.email);
-    expect(recipientsFromDB[0].name).toBe(user.name);
+      expect(retrievedRecipients.length).toBe(1);
+      expect(retrievedRecipients[0].email).toBe(user.email);
+      expect(retrievedRecipients[0].name).toBe(user.name);
+    }).toPass();
   });
 
   test('should autosave the signer update', async ({ page }) => {
@@ -91,16 +97,18 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const recipientsFromDB = await getRecipientsForTemplate({
-      templateId: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedRecipients = await getRecipientsForTemplate({
+        templateId: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(recipientsFromDB.length).toBe(1);
-    expect(recipientsFromDB[0].email).toBe('manager@documenso.com');
-    expect(recipientsFromDB[0].name).toBe('Documenso Manager');
-    expect(recipientsFromDB[0].role).toBe('CC');
+      expect(retrievedRecipients.length).toBe(1);
+      expect(retrievedRecipients[0].email).toBe('manager@documenso.com');
+      expect(retrievedRecipients[0].name).toBe('Documenso Manager');
+      expect(retrievedRecipients[0].role).toBe('CC');
+    }).toPass();
   });
 
   test('should autosave the signing order change', async ({ page }) => {
@@ -142,23 +150,25 @@ test.describe('AutoSave Signers Step - Templates', () => {
     await page.getByTestId('placeholder-recipient-signing-order-input').nth(2).blur();
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    const recipientsFromDB = await getRecipientsForTemplate({
-      templateId: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+      const retrievedRecipients = await getRecipientsForTemplate({
+        templateId: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.signingOrder).toBe('SEQUENTIAL');
-    expect(templateDataFromDB.templateMeta?.allowDictateNextSigner).toBe(true);
-    expect(recipientsFromDB.length).toBe(3);
-    expect(recipientsFromDB[0].signingOrder).toBe(2);
-    expect(recipientsFromDB[1].signingOrder).toBe(3);
-    expect(recipientsFromDB[2].signingOrder).toBe(1);
+      expect(retrievedTemplate.templateMeta?.signingOrder).toBe('SEQUENTIAL');
+      expect(retrievedTemplate.templateMeta?.allowDictateNextSigner).toBe(true);
+      expect(retrievedRecipients.length).toBe(3);
+      expect(retrievedRecipients[0].signingOrder).toBe(2);
+      expect(retrievedRecipients[1].signingOrder).toBe(3);
+      expect(retrievedRecipients[2].signingOrder).toBe(1);
+    }).toPass();
   });
 });

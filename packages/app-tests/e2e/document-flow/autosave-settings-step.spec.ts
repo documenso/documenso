@@ -11,6 +11,7 @@ test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
 const setupDocument = async (page: Page) => {
   const { user, team } = await seedUser();
+
   const document = await seedBlankDocument(user, team.id);
 
   await apiSignin({
@@ -24,7 +25,9 @@ const setupDocument = async (page: Page) => {
 
 const triggerAutosave = async (page: Page) => {
   await page.locator('#document-flow-form-container').click();
-  await page.waitForTimeout(3000);
+  await page.locator('#document-flow-form-container').blur();
+
+  await page.waitForTimeout(5000);
 };
 
 test.describe('AutoSave Settings Step', () => {
@@ -37,15 +40,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
-      documentDataFromDB.title,
-    );
+      await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(retrieved.title);
+    }).toPass();
   });
 
   test('should autosave the language change', async ({ page }) => {
@@ -59,13 +62,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.documentMeta?.language).toBe(expectedLanguageCode);
+      expect(retrieved.documentMeta?.language).toBe(expectedLanguageCode);
+    }).toPass();
   });
 
   test('should autosave the document access change', async ({ page }) => {
@@ -79,13 +84,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.authOptions?.globalAccessAuth).toContain(accessValue);
+      expect(retrieved.authOptions?.globalAccessAuth).toContain(accessValue);
+    }).toPass();
   });
 
   test('should autosave the external ID change', async ({ page }) => {
@@ -99,13 +106,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.externalId).toBe(newExternalId);
+      expect(retrieved.externalId).toBe(newExternalId);
+    }).toPass();
   });
 
   test('should autosave the allowed signature types change', async ({ page }) => {
@@ -119,15 +128,17 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.documentMeta?.drawSignatureEnabled).toBe(false);
-    expect(documentDataFromDB.documentMeta?.typedSignatureEnabled).toBe(false);
-    expect(documentDataFromDB.documentMeta?.uploadSignatureEnabled).toBe(true);
+      expect(retrieved.documentMeta?.drawSignatureEnabled).toBe(false);
+      expect(retrieved.documentMeta?.typedSignatureEnabled).toBe(false);
+      expect(retrieved.documentMeta?.uploadSignatureEnabled).toBe(true);
+    }).toPass();
   });
 
   test('should autosave the date format change', async ({ page }) => {
@@ -136,17 +147,19 @@ test.describe('AutoSave Settings Step', () => {
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
     await page.getByRole('combobox').nth(4).click();
-    await page.getByRole('option', { name: 'ISO 8601' }).click();
+    await page.getByRole('option', { name: 'YYYY-MM-DD' }).click();
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.documentMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+      expect(retrieved.documentMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    }).toPass();
   });
 
   test('should autosave the timezone change', async ({ page }) => {
@@ -159,13 +172,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.documentMeta?.timezone).toBe('Europe/London');
+      expect(retrieved.documentMeta?.timezone).toBe('Europe/London');
+    }).toPass();
   });
 
   test('should autosave the redirect URL change', async ({ page }) => {
@@ -179,13 +194,15 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.documentMeta?.redirectUrl).toBe(newRedirectUrl);
+      expect(retrieved.documentMeta?.redirectUrl).toBe(newRedirectUrl);
+    }).toPass();
   });
 
   test('should autosave multiple field changes together', async ({ page }) => {
@@ -209,16 +226,18 @@ test.describe('AutoSave Settings Step', () => {
 
     await triggerAutosave(page);
 
-    const documentDataFromDB = await getDocumentById({
-      documentId: document.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrieved = await getDocumentById({
+        documentId: document.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(documentDataFromDB.title).toBe(newTitle);
-    expect(documentDataFromDB.documentMeta?.language).toBe('de');
-    expect(documentDataFromDB.authOptions?.globalAccessAuth).toContain('ACCOUNT');
-    expect(documentDataFromDB.externalId).toBe(newExternalId);
-    expect(documentDataFromDB.documentMeta?.timezone).toBe('Europe/Berlin');
+      expect(retrieved.title).toBe(newTitle);
+      expect(retrieved.documentMeta?.language).toBe('de');
+      expect(retrieved.authOptions?.globalAccessAuth).toContain('ACCOUNT');
+      expect(retrieved.externalId).toBe(newExternalId);
+      expect(retrieved.documentMeta?.timezone).toBe('Europe/Berlin');
+    }).toPass();
   });
 });

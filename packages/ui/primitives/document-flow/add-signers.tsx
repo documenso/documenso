@@ -176,20 +176,21 @@ export const AddSignersFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleAutoSave = useCallback(async () => {
+  const handleAutoSave = async () => {
     if (emptySigners().length > 0) {
       return;
     }
 
     const isFormValid = await form.trigger();
-    const { isDirty } = form.formState;
+
+    if (!isFormValid) {
+      return;
+    }
 
     const formData = form.getValues();
 
-    if (isFormValid && isDirty) {
-      scheduleSave(formData);
-    }
-  }, [form, emptySigners, form.formState.isDirty, scheduleSave]);
+    scheduleSave(formData);
+  };
 
   const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
   const isUserAlreadyARecipient = watchedSigners.some(

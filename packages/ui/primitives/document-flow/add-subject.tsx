@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
@@ -102,7 +102,7 @@ export const AddSubjectFormPartial = ({
     watch,
     trigger,
     getValues,
-    formState: { isSubmitting, isDirty },
+    formState: { isSubmitting },
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
@@ -138,14 +138,32 @@ export const AddSubjectFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleAutoSave = useCallback(async () => {
+  const handleAutoSave = async () => {
     const isFormValid = await trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
     const formData = getValues();
 
-    if (isFormValid && isDirty) {
-      scheduleSave(formData);
+    scheduleSave(formData);
+  };
+
+  useEffect(() => {
+    const container = window.document.getElementById('document-flow-form-container');
+
+    const handleBlur = () => {
+      void handleAutoSave();
+    };
+
+    if (container) {
+      container.addEventListener('blur', handleBlur, true);
+      return () => {
+        container.removeEventListener('blur', handleBlur, true);
+      };
     }
-  }, [isDirty, scheduleSave]);
+  }, []);
 
   return (
     <>

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -165,10 +165,10 @@ export const AddTemplateSettingsFormPartial = ({
 
   const { scheduleSave } = useAutoSave(onAutoSave);
 
-  const handleAutoSave = useCallback(() => {
-    const { isDirty } = form.formState;
+  const handleAutoSave = async () => {
+    const isFormValid = await form.trigger();
 
-    if (!isDirty) {
+    if (!isFormValid) {
       return;
     }
 
@@ -182,10 +182,8 @@ export const AddTemplateSettingsFormPartial = ({
 
     if (parseResult.success) {
       scheduleSave(parseResult.data);
-    } else {
-      console.log('Form validation failed during auto-save:', parseResult.error);
     }
-  }, [form, form.formState.isDirty, scheduleSave]);
+  };
 
   return (
     <>

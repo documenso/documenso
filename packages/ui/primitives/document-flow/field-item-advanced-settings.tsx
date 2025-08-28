@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useEffect, useState } from 'react';
+import { forwardRef, useEffect, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
@@ -190,11 +190,11 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
 
     const { scheduleSave } = useAutoSave(onAutoSave || (async () => {}));
 
-    const handleAutoSave = useCallback(() => {
+    const handleAutoSave = () => {
       if (errors.length === 0) {
         scheduleSave(fieldState);
       }
-    }, [fieldState, errors.length, scheduleSave]);
+    };
 
     // Auto-save to localStorage and schedule remote save when fieldState changes
     useEffect(() => {
@@ -354,7 +354,10 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
           )}
         </DocumentFlowFormContainerContent>
 
-        <DocumentFlowFormContainerFooter className="mt-auto">
+        <DocumentFlowFormContainerFooter
+          className="mt-auto"
+          data-testid="field-advanced-settings-footer"
+        >
           <DocumentFlowFormContainerActions
             goNextLabel={msg`Save`}
             goBackLabel={msg`Cancel`}

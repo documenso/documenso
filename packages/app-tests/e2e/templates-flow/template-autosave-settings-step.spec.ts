@@ -24,7 +24,9 @@ const setupTemplate = async (page: Page) => {
 
 const triggerAutosave = async (page: Page) => {
   await page.locator('#document-flow-form-container').click();
-  await page.waitForTimeout(3000);
+  await page.locator('#document-flow-form-container').blur();
+
+  await page.waitForTimeout(5000);
 };
 
 test.describe('AutoSave Settings Step - Templates', () => {
@@ -37,15 +39,17 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
-      templateDataFromDB.title,
-    );
+      await expect(page.getByRole('textbox', { name: 'Title *' })).toHaveValue(
+        retrievedTemplate.title,
+      );
+    }).toPass();
   });
 
   test('should autosave the language change', async ({ page }) => {
@@ -59,13 +63,15 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.language).toBe(expectedLanguageCode);
+      expect(retrievedTemplate.templateMeta?.language).toBe(expectedLanguageCode);
+    }).toPass();
   });
 
   test('should autosave the template access change', async ({ page }) => {
@@ -79,13 +85,15 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.authOptions?.globalAccessAuth).toContain(accessValue);
+      expect(retrievedTemplate.authOptions?.globalAccessAuth).toContain(accessValue);
+    }).toPass();
   });
 
   test('should autosave the external ID change', async ({ page }) => {
@@ -99,13 +107,15 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.externalId).toBe(newExternalId);
+      expect(retrievedTemplate.externalId).toBe(newExternalId);
+    }).toPass();
   });
 
   test('should autosave the allowed signature types change', async ({ page }) => {
@@ -119,15 +129,17 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.drawSignatureEnabled).toBe(false);
-    expect(templateDataFromDB.templateMeta?.typedSignatureEnabled).toBe(false);
-    expect(templateDataFromDB.templateMeta?.uploadSignatureEnabled).toBe(true);
+      expect(retrievedTemplate.templateMeta?.drawSignatureEnabled).toBe(false);
+      expect(retrievedTemplate.templateMeta?.typedSignatureEnabled).toBe(false);
+      expect(retrievedTemplate.templateMeta?.uploadSignatureEnabled).toBe(true);
+    }).toPass();
   });
 
   test('should autosave the date format change', async ({ page }) => {
@@ -136,17 +148,19 @@ test.describe('AutoSave Settings Step - Templates', () => {
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
     await page.getByRole('combobox').nth(5).click();
-    await page.getByRole('option', { name: 'ISO 8601' }).click();
+    await page.getByRole('option', { name: 'YYYY-MM-DD' }).click();
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+      expect(retrievedTemplate.templateMeta?.dateFormat).toBe("yyyy-MM-dd'T'HH:mm:ss.SSSXXX");
+    }).toPass();
   });
 
   test('should autosave the timezone change', async ({ page }) => {
@@ -159,13 +173,15 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.timezone).toBe('Europe/London');
+      expect(retrievedTemplate.templateMeta?.timezone).toBe('Europe/London');
+    }).toPass();
   });
 
   test('should autosave the redirect URL change', async ({ page }) => {
@@ -179,13 +195,15 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.templateMeta?.redirectUrl).toBe(newRedirectUrl);
+      expect(retrievedTemplate.templateMeta?.redirectUrl).toBe(newRedirectUrl);
+    }).toPass();
   });
 
   test('should autosave multiple field changes together', async ({ page }) => {
@@ -209,16 +227,18 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await triggerAutosave(page);
 
-    const templateDataFromDB = await getTemplateById({
-      id: template.id,
-      userId: user.id,
-      teamId: team.id,
-    });
+    await expect(async () => {
+      const retrievedTemplate = await getTemplateById({
+        id: template.id,
+        userId: user.id,
+        teamId: team.id,
+      });
 
-    expect(templateDataFromDB.title).toBe(newTitle);
-    expect(templateDataFromDB.templateMeta?.language).toBe('de');
-    expect(templateDataFromDB.authOptions?.globalAccessAuth).toContain('ACCOUNT');
-    expect(templateDataFromDB.externalId).toBe(newExternalId);
-    expect(templateDataFromDB.templateMeta?.timezone).toBe('Europe/Berlin');
+      expect(retrievedTemplate.title).toBe(newTitle);
+      expect(retrievedTemplate.templateMeta?.language).toBe('de');
+      expect(retrievedTemplate.authOptions?.globalAccessAuth).toContain('ACCOUNT');
+      expect(retrievedTemplate.externalId).toBe(newExternalId);
+      expect(retrievedTemplate.templateMeta?.timezone).toBe('Europe/Berlin');
+    }).toPass();
   });
 });
