@@ -184,6 +184,8 @@ export const DocumentEditForm = ({
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+          expiryAmount: data.meta.expiryAmount,
+          expiryUnit: data.meta.expiryUnit,
         },
       });
 

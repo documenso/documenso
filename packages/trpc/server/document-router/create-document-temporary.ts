@@ -5,6 +5,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -35,7 +36,16 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       recipients,
       meta,
       folderId,
+      expiryAmount,
+      expiryUnit,
     } = input;
+
+    // Validate expiry settings
+    if ((expiryAmount || expiryUnit) && !isValidExpirySettings(expiryAmount, expiryUnit)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid expiry settings. Please check your expiry configuration.',
+      });
+    }
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
@@ -68,6 +78,8 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         globalActionAuth,
         recipients,
         folderId,
+        expiryAmount,
+        expiryUnit,
       },
       meta,
       requestMetadata: ctx.metadata,
@@ -75,7 +87,6 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
 
     return {
       document: createdDocument,
-      folder: createdDocument.folder, // Todo: Remove this prior to api-v2 release.
       uploadUrl: url,
     };
   });
