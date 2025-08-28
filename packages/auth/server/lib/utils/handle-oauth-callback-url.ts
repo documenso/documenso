@@ -194,12 +194,6 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   const name = claims.name;
   const sub = claims.sub;
 
-  console.log({
-    email,
-    name,
-    sub,
-  });
-
   if (typeof email !== 'string') {
     throw new AppError(AuthenticationErrorCode.InvalidRequest, {
       message: 'Missing email',
