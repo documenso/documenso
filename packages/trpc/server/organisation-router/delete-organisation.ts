@@ -114,6 +114,7 @@ export const deleteOrganisationRoute = authenticatedProcedure
           data: {
             userId: serviceAccount.id,
             teamId: serviceAccountTeam.id,
+            deletedAt: new Date(),
           },
         });
       }
