@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-import { GoogleAuthOptions, OidcAuthOptions } from '../config';
+import { GoogleAuthOptions, MicrosoftAuthOptions, OidcAuthOptions } from '../config';
 import { handleOAuthCallbackUrl } from '../lib/utils/handle-oauth-callback-url';
 import type { HonoAuthContext } from '../types/context';
 
@@ -17,4 +17,11 @@ export const callbackRoute = new Hono<HonoAuthContext>()
   /**
    * Google callback verification.
    */
-  .get('/google', async (c) => handleOAuthCallbackUrl({ c, clientOptions: GoogleAuthOptions }));
+  .get('/google', async (c) => handleOAuthCallbackUrl({ c, clientOptions: GoogleAuthOptions }))
+
+  /**
+   * Microsoft callback verification.
+   */
+  .get('/microsoft', async (c) =>
+    handleOAuthCallbackUrl({ c, clientOptions: MicrosoftAuthOptions }),
+  );
