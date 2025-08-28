@@ -1377,11 +1377,6 @@ msgstr "API Tokens"
 msgid "App Version"
 msgstr "App Version"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
-msgid "Approve"
-msgstr "Approve"
-
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
@@ -1391,17 +1386,22 @@ msgstr "Approve"
 msgid "Approve"
 msgstr "Approve"
 
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role action verb"
+msgid "Approve"
+msgstr "Approve"
+
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 #: packages/email/template-components/template-document-invite.tsx
 msgid "Approve Document"
 msgstr "Approve Document"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Approved"
 msgstr "Approved"
 
-#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role actioned"
 msgid "Approved"
 msgstr "Approved"
 
@@ -1505,12 +1505,12 @@ msgstr "Assistants"
 msgid "Assistants and Copy roles are currently not compatible with the multi-sign experience."
 msgstr "Assistants and Copy roles are currently not compatible with the multi-sign experience."
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Assisted"
 msgstr "Assisted"
 
-#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role actioned"
 msgid "Assisted"
 msgstr "Assisted"
 
@@ -2891,13 +2891,13 @@ msgstr "Document Approved"
 msgid "Document Cancelled"
 msgstr "Document Cancelled"
 
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
+#: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document completed"
 msgstr "Document completed"
 
-#: apps/remix/app/components/general/document/document-status.tsx
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Document completed"
 msgstr "Document completed"
 
@@ -2910,12 +2910,12 @@ msgstr "Document completed email"
 msgid "Document Completed!"
 msgstr "Document Completed!"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
+#: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Document created"
 msgstr "Document created"
 
-#: apps/remix/app/components/dialogs/template-use-dialog.tsx
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Document created"
 msgstr "Document created"
 
@@ -2941,14 +2941,14 @@ msgstr "Document created using a <0>direct link</0>"
 msgid "Document Creation"
 msgstr "Document Creation"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
-msgid "Document deleted"
-msgstr "Document deleted"
-
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
+msgid "Document deleted"
+msgstr "Document deleted"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Document deleted"
 msgstr "Document deleted"
 
@@ -3062,12 +3062,12 @@ msgstr "Document Rejected"
 msgid "Document resealed"
 msgstr "Document resealed"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
+#: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Document sent"
 msgstr "Document sent"
 
-#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Document sent"
 msgstr "Document sent"
 
@@ -6302,11 +6302,6 @@ msgstr "Show advanced settings"
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
 msgstr "Show templates in your public profile for your audience to sign and get started quickly"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
-msgid "Sign"
-msgstr "Sign"
-
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -6320,6 +6315,11 @@ msgstr "Sign"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
+msgid "Sign"
+msgstr "Sign"
+
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role action verb"
 msgid "Sign"
 msgstr "Sign"
 
@@ -6433,14 +6433,14 @@ msgstr "Signatures Collected"
 msgid "Signatures will appear once the document has been completed"
 msgstr "Signatures will appear once the document has been completed"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
-msgid "Signed"
-msgstr "Signed"
-
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: packages/ui/components/document/document-read-only-fields.tsx
+msgid "Signed"
+msgstr "Signed"
+
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role actioned"
 msgid "Signed"
 msgstr "Signed"
 
@@ -7804,13 +7804,13 @@ msgstr "Two-factor authentication has been disabled for your account. You will n
 msgid "Two-Factor Re-Authentication"
 msgstr "Two-Factor Re-Authentication"
 
-#: packages/lib/constants/document.ts
-msgctxt "Type signatute type"
+#: apps/remix/app/components/tables/templates-table.tsx
+#: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Type"
 msgstr "Type"
 
-#: apps/remix/app/components/tables/templates-table.tsx
-#: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: packages/lib/constants/document.ts
+msgctxt "Type signatute type"
 msgid "Type"
 msgstr "Type"
 
@@ -8271,11 +8271,6 @@ msgstr "Verify your team email address"
 msgid "Vertical"
 msgstr "Vertical"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role action verb"
-msgid "View"
-msgstr "View"
-
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -8285,6 +8280,11 @@ msgstr "View"
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "View"
+msgstr "View"
+
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role action verb"
 msgid "View"
 msgstr "View"
 
@@ -8379,14 +8379,14 @@ msgstr "View teams"
 msgid "View the DNS records for this email domain"
 msgstr "View the DNS records for this email domain"
 
-#: packages/lib/constants/recipient-roles.ts
-msgctxt "Recipient role actioned"
-msgid "Viewed"
-msgstr "Viewed"
-
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
+msgid "Viewed"
+msgstr "Viewed"
+
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role actioned"
 msgid "Viewed"
 msgstr "Viewed"
 
