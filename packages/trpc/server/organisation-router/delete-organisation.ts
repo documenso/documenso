@@ -99,6 +99,7 @@ export const deleteOrganisationRoute = authenticatedProcedure
           data: {
             userId: organisationOwner.id,
             teamId: ownerPersonalTeam.id,
+            deletedAt: new Date(),
           },
         });
       } else {
