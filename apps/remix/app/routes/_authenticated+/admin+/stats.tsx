@@ -18,12 +18,14 @@ import {
 import { getDocumentStats } from '@documenso/lib/server-only/admin/get-documents-stats';
 import { getRecipientsStats } from '@documenso/lib/server-only/admin/get-recipients-stats';
 import {
+  getMonthlyActiveUsers,
+  getOrganisationsWithSubscriptionsCount,
   getUserWithSignedDocumentMonthlyGrowth,
   getUsersCount,
-  getUsersWithSubscriptionsCount,
 } from '@documenso/lib/server-only/admin/get-users-stats';
 import { getSignerConversionMonthly } from '@documenso/lib/server-only/user/get-signer-conversion';
 
+import { MonthlyActiveUsersChart } from '~/components/general/admin-monthly-active-user-charts';
 import { AdminStatsSignerConversionChart } from '~/components/general/admin-stats-signer-conversion-chart';
 import { AdminStatsUsersWithDocumentsChart } from '~/components/general/admin-stats-users-with-documents';
 import { CardMetric } from '~/components/general/metric-card';
@@ -34,31 +36,30 @@ import type { Route } from './+types/stats';
 export async function loader() {
   const [
     usersCount,
-    usersWithSubscriptionsCount,
+    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
-    // userWithAtLeastOneDocumentPerMonth,
-    // userWithAtLeastOneDocumentSignedPerMonth,
-    MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
+    monthlyActiveUsers,
   ] = await Promise.all([
     getUsersCount(),
-    getUsersWithSubscriptionsCount(),
+    getOrganisationsWithSubscriptionsCount(),
     getDocumentStats(),
     getRecipientsStats(),
     getSignerConversionMonthly(),
-    // getUserWithAtLeastOneDocumentPerMonth(),
-    // getUserWithAtLeastOneDocumentSignedPerMonth(),
     getUserWithSignedDocumentMonthlyGrowth(),
+    getMonthlyActiveUsers(),
   ]);
 
   return {
     usersCount,
-    usersWithSubscriptionsCount,
+    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
-    MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
+    monthlyActiveUsers,
   };
 }
 
@@ -67,11 +68,12 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
 
   const {
     usersCount,
-    usersWithSubscriptionsCount,
+    organisationsWithSubscriptionsCount,
     docStats,
     recipientStats,
     signerConversionMonthly,
-    MONTHLY_USERS_SIGNED,
+    monthlyUsersWithDocuments,
+    monthlyActiveUsers,
   } = loaderData;
 
   return (
@@ -86,7 +88,7 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         <CardMetric
           icon={UserPlus}
           title={_(msg`Active Subscriptions`)}
-          value={usersWithSubscriptionsCount}
+          value={organisationsWithSubscriptionsCount}
         />
 
         <CardMetric icon={FileCog} title={_(msg`App Version`)} value={`v${version}`} />
@@ -148,13 +150,21 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
           <Trans>Charts</Trans>
         </h3>
         <div className="mt-5 grid grid-cols-2 gap-8">
+          <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={monthlyActiveUsers} />
+
+          <MonthlyActiveUsersChart
+            title={_(msg`Cumulative MAU (signed in)`)}
+            data={monthlyActiveUsers}
+            cummulative
+          />
+
           <AdminStatsUsersWithDocumentsChart
-            data={MONTHLY_USERS_SIGNED}
+            data={monthlyUsersWithDocuments}
             title={_(msg`MAU (created document)`)}
             tooltip={_(msg`Monthly Active Users: Users that created at least one Document`)}
           />
           <AdminStatsUsersWithDocumentsChart
-            data={MONTHLY_USERS_SIGNED}
+            data={monthlyUsersWithDocuments}
             completed
             title={_(msg`MAU (had document completed)`)}
             tooltip={_(

@@ -1,8 +1,11 @@
 import { customAlphabet } from 'nanoid';
 
+import { createTeamMembers } from '@documenso/trpc/server/team-router/create-team-members';
+
 import { prisma } from '..';
 import type { Prisma } from '../client';
-import { TeamMemberInviteStatus, TeamMemberRole } from '../client';
+import { OrganisationMemberRole, TeamMemberRole } from '../client';
+import { seedOrganisationMembers } from './organisations';
 import { seedUser } from './users';
 
 const EMAIL_DOMAIN = `test.documenso.com`;
@@ -19,72 +22,60 @@ export const seedTeam = async ({
   createTeamEmail,
   createTeamOptions = {},
 }: SeedTeamOptions = {}) => {
-  const teamUrl = `team-${nanoid()}`;
-  const teamEmail = createTeamEmail === true ? `${teamUrl}@${EMAIL_DOMAIN}` : createTeamEmail;
-
-  const teamOwner = await seedUser({
-    name: `${teamUrl}-original-owner`,
-    email: `${teamUrl}-original-owner@${EMAIL_DOMAIN}`,
+  const {
+    user: owner,
+    team: seededTeam,
+    organisation: seededOrganisation,
+  } = await seedUser({
+    name: 'Owner',
+    teamEmail: createTeamEmail === true ? `${nanoid()}@${EMAIL_DOMAIN}` : createTeamEmail,
   });
 
-  const teamMembers = await Promise.all(
-    Array.from({ length: createTeamMembers }).map(async (_, i) => {
-      return seedUser({
-        name: `${teamUrl}-member-${i + 1}`,
-        email: `${teamUrl}-member-${i + 1}@${EMAIL_DOMAIN}`,
-      });
-    }),
-  );
+  const teamUrl = seededTeam.url;
 
-  const team = await prisma.team.create({
-    data: {
-      name: teamUrl,
-      url: teamUrl,
-      ownerUserId: teamOwner.id,
-      members: {
-        createMany: {
-          data: [teamOwner, ...teamMembers].map((user) => ({
-            userId: user.id,
-            role: user === teamOwner ? TeamMemberRole.ADMIN : TeamMemberRole.MEMBER,
-          })),
-        },
-      },
-      teamEmail: teamEmail
-        ? {
-            create: {
-              email: teamEmail,
-              name: teamEmail,
-            },
-          }
-        : undefined,
-      ...createTeamOptions,
-    },
+  await seedOrganisationMembers({
+    members: Array.from({ length: createTeamMembers }).map((_, i) => ({
+      name: `${teamUrl}-member-${i + 1}`,
+      email: `${teamUrl}-member-${i + 1}@${EMAIL_DOMAIN}`,
+      organisationRole: OrganisationMemberRole.MEMBER,
+    })),
+    organisationId: seededOrganisation.id,
   });
 
-  return await prisma.team.findFirstOrThrow({
+  const team = await prisma.team.findFirstOrThrow({
     where: {
-      id: team.id,
+      id: seededTeam.id,
     },
     include: {
-      owner: true,
+      teamEmail: true,
+      teamGlobalSettings: true,
+    },
+  });
+
+  const organisation = await prisma.organisation.findFirstOrThrow({
+    where: {
+      id: seededOrganisation.id,
+    },
+    include: {
       members: {
         include: {
           user: true,
         },
       },
-      teamEmail: true,
-      teamGlobalSettings: true,
     },
   });
+
+  return {
+    owner,
+    team,
+    organisation,
+  };
 };
 
 export const unseedTeam = async (teamUrl: string) => {
   const team = await prisma.team.findUnique({
     where: {
       url: teamUrl,
-    },
-    include: {
-      members: true,
     },
   });
 
@@ -95,14 +86,6 @@ export const unseedTeam = async (teamUrl: string) => {
   await prisma.team.delete({
     where: {
       url: teamUrl,
-    },
-  });
-
-  await prisma.user.deleteMany({
-    where: {
-      id: {
-        in: team.members.map((member) => member.userId),
-      },
     },
   });
 };
@@ -118,46 +101,47 @@ export const seedTeamMember = async ({
   name,
   role = TeamMemberRole.ADMIN,
 }: SeedTeamMemberOptions) => {
-  const user = await seedUser({ name });
+  const { user } = await seedUser({ name });
 
-  await prisma.teamMember.create({
-    data: {
-      teamId,
-      role,
-      userId: user.id,
+  const team = await prisma.team.findFirstOrThrow({
+    where: {
+      id: teamId,
     },
+    include: {
+      organisation: true,
+    },
+  });
+
+  await seedOrganisationMembers({
+    members: [
+      {
+        name: user.name ?? '',
+        email: user.email,
+        organisationRole: OrganisationMemberRole.MEMBER,
+      },
+    ],
+    organisationId: team.organisationId,
+  });
+
+  const { id: organisationMemberId } = await prisma.organisationMember.findFirstOrThrow({
+    where: {
+      userId: user.id,
+      organisationId: team.organisationId,
+    },
+  });
+
+  await createTeamMembers({
+    userId: team.organisation.ownerUserId,
+    teamId,
+    membersToCreate: [
+      {
+        organisationMemberId,
+        teamRole: role,
+      },
+    ],
   });
 
   return user;
-};
-
-type UnseedTeamMemberOptions = {
-  teamId: number;
-  userId: number;
-};
-
-export const unseedTeamMember = async ({ teamId, userId }: UnseedTeamMemberOptions) => {
-  await prisma.teamMember.delete({
-    where: {
-      userId_teamId: {
-        userId,
-        teamId,
-      },
-    },
-  });
-};
-
-export const seedTeamTransfer = async (options: { newOwnerUserId: number; teamId: number }) => {
-  return await prisma.teamTransferVerification.create({
-    data: {
-      teamId: options.teamId,
-      token: Date.now().toString(),
-      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      userId: options.newOwnerUserId,
-      name: '',
-      email: '',
-    },
-  });
 };
 
 export const seedTeamEmail = async ({ email, teamId }: { email: string; teamId: number }) => {
@@ -174,26 +158,6 @@ export const unseedTeamEmail = async ({ teamId }: { teamId: number }) => {
   return await prisma.teamEmail.delete({
     where: {
       teamId,
-    },
-  });
-};
-
-export const seedTeamInvite = async ({
-  email,
-  teamId,
-  role = TeamMemberRole.ADMIN,
-}: {
-  email: string;
-  teamId: number;
-  role?: TeamMemberRole;
-}) => {
-  return await prisma.teamMemberInvite.create({
-    data: {
-      email,
-      teamId,
-      role,
-      status: TeamMemberInviteStatus.PENDING,
-      token: Date.now().toString(),
     },
   });
 };

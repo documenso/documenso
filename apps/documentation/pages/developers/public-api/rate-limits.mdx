@@ -1,0 +1,54 @@
+import { Callout } from 'nextra/components';
+
+# Rate Limits
+
+Documenso enforces rate limits on all API endpoints to ensure service stability.
+
+## HTTP Rate Limits
+
+**Limit:** 100 requests per minute per IP address  
+**Response:** 429 Too Many Requests
+
+### Rate Limit Response
+
+```json
+{
+  "error": "Too many requests, please try again later."
+}
+```
+
+<Callout type="warning">
+  No rate limit headers are currently provided. When you receive a 429 response, wait at least 60
+  seconds before retrying.
+</Callout>
+
+## Resource Limits
+
+Beyond HTTP rate limits, your account has usage limits based on your subscription plan.
+
+### Plan Limits
+
+| Resource         | Free | Paid      | Self-hosted | Enterprise |
+| ---------------- | ---- | --------- | ----------- | ---------- |
+| Documents/month  | 5    | Unlimited | Unlimited   | Unlimited  |
+| Total Recipients | 10   | Unlimited | Unlimited   | Unlimited  |
+| Direct Templates | 3    | Unlimited | Unlimited   | Unlimited  |
+
+### Error Response
+
+When you exceed a resource limit:
+
+```json
+{
+  "error": "You have reached your document limit for this month. Please upgrade your plan.",
+  "code": "LIMIT_EXCEEDED",
+  "statusCode": 400
+}
+```
+
+## Error Codes
+
+| Code                | Status | Description                   |
+| ------------------- | ------ | ----------------------------- |
+| `TOO_MANY_REQUESTS` | 429    | HTTP rate limit exceeded      |
+| `LIMIT_EXCEEDED`    | 400    | Resource usage limit exceeded |

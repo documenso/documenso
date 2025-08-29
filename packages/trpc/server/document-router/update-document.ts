@@ -19,6 +19,12 @@ export const updateDocumentRoute = authenticatedProcedure
     const { teamId } = ctx;
     const { documentId, data, meta = {} } = input;
 
+    ctx.logger.info({
+      input: {
+        documentId,
+      },
+    });
+
     const userId = ctx.user.id;
 
     if (Object.values(meta).length > 0) {
@@ -38,6 +44,8 @@ export const updateDocumentRoute = authenticatedProcedure
         distributionMethod: meta.distributionMethod,
         signingOrder: meta.signingOrder,
         allowDictateNextSigner: meta.allowDictateNextSigner,
+        emailId: meta.emailId,
+        emailReplyTo: meta.emailReplyTo,
         emailSettings: meta.emailSettings,
         requestMetadata: ctx.metadata,
       });

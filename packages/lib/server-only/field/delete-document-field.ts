@@ -5,10 +5,11 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export interface DeleteDocumentFieldOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   fieldId: number;
   requestMetadata: ApiRequestMetadata;
 }
@@ -39,25 +40,14 @@ export const deleteDocumentField = async ({
     });
   }
 
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       recipients: {
         where: {

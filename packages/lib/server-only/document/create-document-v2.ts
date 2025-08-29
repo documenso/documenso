@@ -1,14 +1,13 @@
 import type { DocumentVisibility, TemplateMeta } from '@prisma/client';
 import {
   DocumentSource,
+  FolderType,
   RecipientRole,
   SendStatus,
   SigningStatus,
   WebhookTriggerEvents,
 } from '@prisma/client';
-import { TeamMemberRole } from '@prisma/client';
 
-import { isUserEnterprise } from '@documenso/ee/server-only/util/is-document-enterprise';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -16,7 +15,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateDocumentV2Request } from '@documenso/trpc/server/document-router/schema';
+import type { TCreateDocumentTemporaryRequest } from '@documenso/trpc/server/document-router/create-document-temporary.types';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
@@ -26,23 +25,28 @@ import {
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
 import { determineDocumentVisibility } from '../../utils/document-visibility';
+import { buildTeamWhereQuery } from '../../utils/teams';
+import { getMemberRoles } from '../team/get-member-roles';
+import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentDataId: string;
   normalizePdf?: boolean;
   data: {
     title: string;
     externalId?: string;
     visibility?: DocumentVisibility;
-    globalAccessAuth?: TDocumentAccessAuthTypes;
-    globalActionAuth?: TDocumentActionAuthTypes;
+    globalAccessAuth?: TDocumentAccessAuthTypes[];
+    globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
-    recipients: TCreateDocumentV2Request['recipients'];
+    recipients: TCreateDocumentTemporaryRequest['recipients'];
+    folderId?: string;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;
   requestMetadata: ApiRequestMetadata;
@@ -57,37 +61,45 @@ export const createDocumentV2 = async ({
   meta,
   requestMetadata,
 }: CreateDocumentOptions) => {
-  const { title, formValues } = data;
+  const { title, formValues, folderId } = data;
 
-  const team = teamId
-    ? await prisma.team.findFirst({
-        where: {
-          id: teamId,
-          members: {
-            some: {
-              userId,
-            },
-          },
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery({ teamId, userId }),
+    include: {
+      organisation: {
+        select: {
+          organisationClaim: true,
         },
-        include: {
-          teamGlobalSettings: true,
-          members: {
-            where: {
-              userId: userId,
-            },
-            select: {
-              role: true,
-            },
-          },
-        },
-      })
-    : null;
+      },
+    },
+  });
 
-  if (teamId !== undefined && !team) {
+  if (!team) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Team not found',
     });
   }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+  }
+
+  const settings = await getTeamSettings({
+    userId,
+    teamId,
+  });
 
   if (normalizePdf) {
     const documentData = await prisma.documentData.findFirst({
@@ -113,30 +125,51 @@ export const createDocumentV2 = async ({
   }
 
   const authOptions = createDocumentAuthOptions({
-    globalAccessAuth: data?.globalAccessAuth || null,
-    globalActionAuth: data?.globalActionAuth || null,
+    globalAccessAuth: data?.globalAccessAuth || [],
+    globalActionAuth: data?.globalActionAuth || [],
   });
 
-  const recipientsHaveActionAuth = data.recipients?.some((recipient) => recipient.actionAuth);
+  const recipientsHaveActionAuth = data.recipients?.some(
+    (recipient) => recipient.actionAuth && recipient.actionAuth.length > 0,
+  );
 
   // Check if user has permission to set the global action auth.
-  if (authOptions.globalActionAuth || recipientsHaveActionAuth) {
-    const isDocumentEnterprise = await isUserEnterprise({
-      userId,
-      teamId,
+  if (
+    (authOptions.globalActionAuth.length > 0 || recipientsHaveActionAuth) &&
+    !team.organisation.organisationClaim.flags.cfr21
+  ) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
+    });
+  }
+
+  const { teamRole } = await getMemberRoles({
+    teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
+  });
+
+  const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
+
+  const emailId = meta?.emailId;
+
+  // Validate that the email ID belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
     });
 
-    if (!isDocumentEnterprise) {
-      throw new AppError(AppErrorCode.UNAUTHORIZED, {
-        message: 'You do not have permission to set the action auth',
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
       });
     }
   }
-
-  const visibility = determineDocumentVisibility(
-    team?.teamGlobalSettings?.documentVisibility,
-    team?.members[0].role ?? TeamMemberRole.MEMBER,
-  );
 
   return await prisma.$transaction(async (tx) => {
     const document = await tx.document.create({
@@ -149,21 +182,11 @@ export const createDocumentV2 = async ({
         teamId,
         authOptions,
         visibility,
+        folderId,
         formValues,
         source: DocumentSource.DOCUMENT,
         documentMeta: {
-          create: {
-            ...meta,
-            signingOrder: meta?.signingOrder || undefined,
-            emailSettings: meta?.emailSettings || undefined,
-            language: meta?.language || team?.teamGlobalSettings?.documentLanguage,
-            typedSignatureEnabled:
-              meta?.typedSignatureEnabled ?? team?.teamGlobalSettings?.typedSignatureEnabled,
-            uploadSignatureEnabled:
-              meta?.uploadSignatureEnabled ?? team?.teamGlobalSettings?.uploadSignatureEnabled,
-            drawSignatureEnabled:
-              meta?.drawSignatureEnabled ?? team?.teamGlobalSettings?.drawSignatureEnabled,
-          },
+          create: extractDerivedDocumentMeta(settings, meta),
         },
       },
     });
@@ -171,8 +194,8 @@ export const createDocumentV2 = async ({
     await Promise.all(
       (data.recipients || []).map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
-          accessAuth: recipient.accessAuth || null,
-          actionAuth: recipient.actionAuth || null,
+          accessAuth: recipient.accessAuth ?? [],
+          actionAuth: recipient.actionAuth ?? [],
         });
 
         await tx.recipient.create({
@@ -208,7 +231,7 @@ export const createDocumentV2 = async ({
       }),
     );
 
-    // Todo: Is it necessary to create a full audit log with all fields and recipients audit logs?
+    // Todo: Is it necessary to create a full audit logs with all fields and recipients audit logs?
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({

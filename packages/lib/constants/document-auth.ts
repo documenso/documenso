@@ -19,6 +19,10 @@ export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
     key: DocumentAuth.TWO_FACTOR_AUTH,
     value: 'Require 2FA',
   },
+  [DocumentAuth.PASSWORD]: {
+    key: DocumentAuth.PASSWORD,
+    value: 'Require password',
+  },
   [DocumentAuth.EXPLICIT_NONE]: {
     key: DocumentAuth.EXPLICIT_NONE,
     value: 'None (Overrides global settings)',

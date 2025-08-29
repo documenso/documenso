@@ -9,6 +9,7 @@ import { signPdf } from '@documenso/signing';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
+import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
@@ -16,6 +17,7 @@ import { flattenForm } from '../../../server-only/pdf/flatten-form';
 import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
+import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import {
@@ -47,16 +49,12 @@ export const run = async ({
     include: {
       documentMeta: true,
       recipients: true,
-      team: {
-        select: {
-          teamGlobalSettings: {
-            select: {
-              includeSigningCertificate: true,
-            },
-          },
-        },
-      },
     },
+  });
+
+  const settings = await getTeamSettings({
+    userId: document.userId,
+    teamId: document.teamId,
   });
 
   const isComplete =
@@ -144,20 +142,36 @@ export const run = async ({
 
   const pdfData = await getFileServerSide(documentData);
 
-  const certificateData =
-    (document.team?.teamGlobalSettings?.includeSigningCertificate ?? true)
-      ? await getCertificatePdf({
-          documentId,
-          language: document.documentMeta?.language,
-        }).catch(() => null)
-      : null;
+  const certificateData = settings.includeSigningCertificate
+    ? await getCertificatePdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch((e) => {
+        console.log('Failed to get certificate PDF');
+        console.error(e);
+
+        return null;
+      })
+    : null;
+
+  const auditLogData = settings.includeAuditLog
+    ? await getAuditLogsPdf({
+        documentId,
+        language: document.documentMeta?.language,
+      }).catch((e) => {
+        console.log('Failed to get audit logs PDF');
+        console.error(e);
+
+        return null;
+      })
+    : null;
 
   const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
     const pdfDoc = await PDFDocument.load(pdfData);
 
     // Normalize and flatten layers that could cause issues with the signature
     normalizeSignatureAppearances(pdfDoc);
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
     flattenAnnotations(pdfDoc);
 
     // Add rejection stamp if the document is rejected
@@ -178,6 +192,16 @@ export const run = async ({
       });
     }
 
+    if (auditLogData) {
+      const auditLogDoc = await PDFDocument.load(auditLogData);
+
+      const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
+
+      auditLogPages.forEach((page) => {
+        pdfDoc.addPage(page);
+      });
+    }
+
     for (const field of fields) {
       if (field.inserted) {
         document.useLegacyFieldInsertion
@@ -188,7 +212,7 @@ export const run = async ({
 
     // Re-flatten the form to handle our checkbox and radio fields that
     // create native arcoFields
-    flattenForm(pdfDoc);
+    await flattenForm(pdfDoc);
 
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });

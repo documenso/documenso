@@ -28,7 +28,7 @@ export const LegacyFieldWarningPopover = ({
   const { mutateAsync: updateTemplate, isPending: isUpdatingTemplate } =
     trpc.template.updateTemplate.useMutation();
   const { mutateAsync: updateDocument, isPending: isUpdatingDocument } =
-    trpc.document.updateDocument.useMutation();
+    trpc.document.update.useMutation();
 
   const onUpdateFieldsClick = async () => {
     if (type === 'document') {

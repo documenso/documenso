@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
+import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,17 +24,20 @@ import {
 import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useCurrentTeam } from '~/providers/team';
+
 type TemplateCreateDialogProps = {
-  templateRootPath: string;
   folderId?: string;
 };
 
-export const TemplateCreateDialog = ({ templateRootPath, folderId }: TemplateCreateDialogProps) => {
+export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) => {
   const navigate = useNavigate();
 
   const { user } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
+
+  const team = useCurrentTeam();
 
   const { mutateAsync: createTemplate } = trpc.template.createTemplate.useMutation();
 
@@ -66,7 +70,7 @@ export const TemplateCreateDialog = ({ templateRootPath, folderId }: TemplateCre
 
       setShowTemplateCreateDialog(false);
 
-      await navigate(`${templateRootPath}/${id}/edit`);
+      await navigate(`${formatTemplatesPath(team.url)}/${id}/edit`);
     } catch {
       toast({
         title: _(msg`Something went wrong`),

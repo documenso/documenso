@@ -46,7 +46,7 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   await page.context().addCookies([
     {
-      name: 'language',
+      name: 'lang',
       value: lang,
       url: NEXT_PUBLIC_WEBAPP_URL(),
     },
@@ -57,8 +57,22 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
     timeout: 10_000,
   });
 
+  // !: This is a workaround to ensure the page is loaded correctly.
+  // !: It's not clear why but suddenly browserless cdp connections would
+  // !: cause the page to render blank until a reload is performed.
+  await page.reload({
+    waitUntil: 'networkidle',
+    timeout: 10_000,
+  });
+
+  await page.waitForSelector('h1', {
+    state: 'visible',
+    timeout: 10_000,
+  });
+
   const result = await page.pdf({
     format: 'A4',
+    printBackground: true,
   });
 
   await browserContext.close();

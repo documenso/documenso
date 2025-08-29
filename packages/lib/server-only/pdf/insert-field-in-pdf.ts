@@ -1,8 +1,15 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
 import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
-import type { PDFDocument, PDFFont } from 'pdf-lib';
-import { RotationTypes, TextAlignment, degrees, radiansToDegrees, rgb } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFTextField } from 'pdf-lib';
+import {
+  RotationTypes,
+  TextAlignment,
+  degrees,
+  radiansToDegrees,
+  rgb,
+  setFontAndSize,
+} from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -26,6 +33,7 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
@@ -70,7 +78,7 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
   const isPageRotatedToLandscape = pageRotationInDegrees === 90 || pageRotationInDegrees === 270;
 
-  let { width: pageWidth, height: pageHeight } = page.getSize();
+  let { width: pageWidth, height: pageHeight } = getPageSize(page);
 
   // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
   // However when we load the PDF in the backend, the rotation is applied.
@@ -233,35 +241,79 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
       }));
 
       const selected: string[] = fromCheckboxValue(field.customText);
+      const direction = meta.data.direction ?? 'vertical';
 
       const topPadding = 12;
       const leftCheckboxPadding = 8;
       const leftCheckboxLabelPadding = 12;
       const checkboxSpaceY = 13;
 
-      for (const [index, item] of (values ?? []).entries()) {
-        const offsetY = index * checkboxSpaceY + topPadding;
+      if (direction === 'horizontal') {
+        // Horizontal layout: arrange checkboxes side by side with wrapping
+        let currentX = leftCheckboxPadding;
+        let currentY = topPadding;
+        const maxWidth = pageWidth - fieldX - leftCheckboxPadding * 2;
 
-        const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
+        for (const [index, item] of (values ?? []).entries()) {
+          const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
-        if (selected.includes(item.value)) {
-          checkbox.check();
+          if (selected.includes(item.value)) {
+            checkbox.check();
+          }
+
+          const labelText = item.value.includes('empty-value-') ? '' : item.value;
+          const labelWidth = font.widthOfTextAtSize(labelText, 12);
+          const itemWidth = leftCheckboxLabelPadding + labelWidth + 16; // checkbox + padding + label + margin
+
+          // Check if item fits on current line, if not wrap to next line
+          if (currentX + itemWidth > maxWidth && index > 0) {
+            currentX = leftCheckboxPadding;
+            currentY += checkboxSpaceY;
+          }
+
+          page.drawText(labelText, {
+            x: fieldX + currentX + leftCheckboxLabelPadding,
+            y: pageHeight - (fieldY + currentY),
+            size: 12,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
+
+          checkbox.addToPage(page, {
+            x: fieldX + currentX,
+            y: pageHeight - (fieldY + currentY),
+            height: 8,
+            width: 8,
+          });
+
+          currentX += itemWidth;
         }
+      } else {
+        // Vertical layout: original behavior
+        for (const [index, item] of (values ?? []).entries()) {
+          const offsetY = index * checkboxSpaceY + topPadding;
 
-        page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
-          x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
-          y: pageHeight - (fieldY + offsetY),
-          size: 12,
-          font,
-          rotate: degrees(pageRotationInDegrees),
-        });
+          const checkbox = pdf.getForm().createCheckBox(`checkbox.${field.secondaryId}.${index}`);
 
-        checkbox.addToPage(page, {
-          x: fieldX + leftCheckboxPadding,
-          y: pageHeight - (fieldY + offsetY),
-          height: 8,
-          width: 8,
-        });
+          if (selected.includes(item.value)) {
+            checkbox.check();
+          }
+
+          page.drawText(item.value.includes('empty-value-') ? '' : item.value, {
+            x: fieldX + leftCheckboxPadding + leftCheckboxLabelPadding,
+            y: pageHeight - (fieldY + offsetY),
+            size: 12,
+            font,
+            rotate: degrees(pageRotationInDegrees),
+          });
+
+          checkbox.addToPage(page, {
+            x: fieldX + leftCheckboxPadding,
+            y: pageHeight - (fieldY + offsetY),
+            height: 8,
+            width: 8,
+          });
+        }
       }
     })
     .with({ type: FieldType.RADIO }, (field) => {
@@ -442,6 +494,10 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         adjustedFieldY = adjustedPosition.yPos;
       }
 
+      // Set properties for the text field
+      setTextFieldFontSize(textField, font, fontSize);
+      textField.setText(textToInsert);
+
       // Set the position and size of the text field
       textField.addToPage(page, {
         x: adjustedFieldX,
@@ -450,6 +506,8 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
         height: adjustedFieldHeight,
         rotate: degrees(pageRotationInDegrees),
 
+        font,
+
         // Hide borders.
         borderWidth: 0,
         borderColor: undefined,
@@ -457,10 +515,6 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
 
         ...(isDebugMode ? { borderWidth: 1, borderColor: rgb(0, 0, 1) } : {}),
       });
-
-      // Set properties for the text field
-      textField.setFontSize(fontSize);
-      textField.setText(textToInsert);
     });
 
   return pdf;
@@ -629,3 +683,21 @@ function breakLongString(text: string, maxWidth: number, font: PDFFont, fontSize
 
   return lines.join('\n');
 }
+
+const setTextFieldFontSize = (textField: PDFTextField, font: PDFFont, fontSize: number) => {
+  textField.defaultUpdateAppearances(font);
+  textField.updateAppearances(font);
+
+  try {
+    textField.setFontSize(fontSize);
+  } catch (err) {
+    let da = textField.acroField.getDefaultAppearance() ?? '';
+
+    da += `\n ${setFontAndSize(font.name, fontSize)}`;
+
+    textField.acroField.setDefaultAppearance(da);
+  }
+
+  textField.defaultUpdateAppearances(font);
+  textField.updateAppearances(font);
+};

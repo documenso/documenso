@@ -1,5 +1,6 @@
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
+import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
@@ -10,6 +11,7 @@ import { validateTextField } from '@documenso/lib/advanced-fields-validation/val
 import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
 import { prisma } from '@documenso/prisma';
 
+import { AUTO_SIGNABLE_FIELD_TYPES } from '../../constants/autosign';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../../constants/time-zones';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
@@ -203,6 +205,29 @@ export const signFieldWithToken = async ({
 
   if (isSignatureField && documentMeta?.typedSignatureEnabled === false && typedSignature) {
     throw new Error('Typed signatures are not allowed. Please draw your signature');
+  }
+
+  if (field.fieldMeta?.readOnly && !AUTO_SIGNABLE_FIELD_TYPES.includes(field.type)) {
+    // !: This is a bit of a hack at the moment, readonly fields with default values
+    // !: should be inserted with their default value on document creation instead of
+    // !: this weird programattic approach. Until that's fixed though this will verify
+    // !: that the programmatic signed value is only that of its default.
+    const isAutomaticSigningValueValid = match(field.fieldMeta)
+      .with({ type: 'text' }, (meta) => customText === meta.text)
+      .with({ type: 'number' }, (meta) => customText === meta.value)
+      .with({ type: 'checkbox' }, (meta) =>
+        isDeepEqual(
+          fromCheckboxValue(customText ?? ''),
+          meta.values?.filter((v) => v.checked).map((v) => v.value) ?? [],
+        ),
+      )
+      .with({ type: 'radio' }, (meta) => customText === meta.values?.find((v) => v.checked)?.value)
+      .with({ type: 'dropdown' }, (meta) => customText === meta.defaultValue)
+      .otherwise(() => false);
+
+    if (!isAutomaticSigningValueValid) {
+      throw new Error('Field is read only and only accepts its default value for signing.');
+    }
   }
 
   const assistant = recipient.role === RecipientRole.ASSISTANT ? recipient : undefined;

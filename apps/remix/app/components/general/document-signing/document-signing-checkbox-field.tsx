@@ -17,6 +17,7 @@ import type {
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { cn } from '@documenso/ui/lib/utils';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import { Label } from '@documenso/ui/primitives/label';
@@ -276,7 +277,14 @@ export const DocumentSigningCheckboxField = ({
               {validationSign?.label} {checkboxValidationLength}
             </FieldToolTip>
           )}
-          <div className="z-50 my-0.5 flex flex-col gap-y-1">
+          <div
+            className={cn(
+              'z-50 my-0.5 flex gap-1',
+              parsedFieldMeta.direction === 'horizontal'
+                ? 'flex-row flex-wrap'
+                : 'flex-col gap-y-1',
+            )}
+          >
             {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
               const itemValue = item.value || `empty-value-${item.id}`;
 
@@ -286,6 +294,7 @@ export const DocumentSigningCheckboxField = ({
                     className="h-3 w-3"
                     id={`checkbox-${field.id}-${item.id}`}
                     checked={checkedValues.includes(itemValue)}
+                    disabled={isReadOnly}
                     onCheckedChange={() => handleCheckboxChange(item.value, item.id)}
                   />
                   {!item.value.includes('empty-value-') && item.value && (
@@ -304,7 +313,12 @@ export const DocumentSigningCheckboxField = ({
       )}
 
       {field.inserted && (
-        <div className="my-0.5 flex flex-col gap-y-1">
+        <div
+          className={cn(
+            'my-0.5 flex gap-1',
+            parsedFieldMeta.direction === 'horizontal' ? 'flex-row flex-wrap' : 'flex-col gap-y-1',
+          )}
+        >
           {values?.map((item: { id: number; value: string; checked: boolean }, index: number) => {
             const itemValue = item.value || `empty-value-${item.id}`;
 
@@ -314,7 +328,7 @@ export const DocumentSigningCheckboxField = ({
                   className="h-3 w-3"
                   id={`checkbox-${field.id}-${item.id}`}
                   checked={parsedCheckedValues.includes(itemValue)}
-                  disabled={isLoading}
+                  disabled={isLoading || isReadOnly}
                   onCheckedChange={() => void handleCheckboxOptionClick(item)}
                 />
                 {!item.value.includes('empty-value-') && item.value && (

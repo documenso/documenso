@@ -28,7 +28,7 @@ import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with
 import { DocumentsTableActionButton } from '~/components/tables/documents-table-action-button';
 import { DocumentsTableActionDropdown } from '~/components/tables/documents-table-action-dropdown';
 import { DataTableTitle } from '~/components/tables/documents-table-title';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { PeriodSelector } from '../period-selector';
 
@@ -61,13 +61,13 @@ export const TemplatePageViewDocumentsTable = ({
   const [searchParams] = useSearchParams();
   const updateSearchParams = useUpdateSearchParams();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const parsedSearchParams = ZDocumentSearchParamsSchema.parse(
     Object.fromEntries(searchParams ?? []),
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocuments.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.document.find.useQuery(
     {
       templateId,
       page: parsedSearchParams.page,

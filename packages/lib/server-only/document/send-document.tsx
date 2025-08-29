@@ -23,11 +23,12 @@ import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export type SendDocumentOptions = {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   sendEmail?: boolean;
   requestMetadata: ApiRequestMetadata;
 };
@@ -39,25 +40,14 @@ export const sendDocument = async ({
   sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
-  const document = await prisma.document.findUnique({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
+  const document = await prisma.document.findFirst({
+    where: documentWhereInput,
     include: {
       recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],

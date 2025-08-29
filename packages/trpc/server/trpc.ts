@@ -4,7 +4,9 @@ import type { AnyZodObject } from 'zod';
 
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
 import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import type { TrpcApiLog } from '@documenso/lib/types/api-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { alphaid } from '@documenso/lib/universal/id';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 
 import type { TrpcContext } from './context';
@@ -65,7 +67,15 @@ const t = initTRPC
 /**
  * Middlewares
  */
-export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
+export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+  const infoToLog: TrpcApiLog = {
+    path,
+    auth: ctx.metadata.auth,
+    source: ctx.metadata.source,
+    trpcMiddleware: 'authenticated',
+    unverifiedTeamId: ctx.teamId,
+  };
+
   const authorizationHeader = ctx.req.headers.get('authorization');
 
   // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
@@ -79,11 +89,17 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
 
     const apiToken = await getApiTokenByToken({ token });
 
+    ctx.logger.info({
+      ...infoToLog,
+      userId: apiToken.user.id,
+      apiTokenId: apiToken.id,
+    } satisfies TrpcApiLog);
+
     return await next({
       ctx: {
         ...ctx,
         user: apiToken.user,
-        teamId: apiToken.teamId || undefined,
+        teamId: apiToken.teamId,
         session: null,
         metadata: {
           ...ctx.metadata,
@@ -111,9 +127,22 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
     });
   }
 
+  // Recreate the logger with a sub request ID to differentiate between batched requests.
+  const trpcSessionLogger = ctx.logger.child({
+    nonBatchedRequestId: alphaid(),
+  });
+
+  trpcSessionLogger.info({
+    ...infoToLog,
+    userId: ctx.user.id,
+    apiTokenId: null,
+  } satisfies TrpcApiLog);
+
   return await next({
     ctx: {
       ...ctx,
+      teamId: ctx.teamId || -1,
+      logger: trpcSessionLogger,
       user: ctx.user,
       session: ctx.session,
       metadata: {
@@ -129,10 +158,26 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
   });
 });
 
-export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) => {
+export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, path }) => {
+  // Recreate the logger with a sub request ID to differentiate between batched requests.
+  const trpcSessionLogger = ctx.logger.child({
+    nonBatchedRequestId: alphaid(),
+  });
+
+  ctx.logger.info({
+    path,
+    auth: ctx.metadata.auth,
+    source: ctx.metadata.source,
+    userId: ctx.user?.id,
+    apiTokenId: null,
+    trpcMiddleware: 'maybeAuthenticated',
+    unverifiedTeamId: ctx.teamId,
+  } satisfies TrpcApiLog);
+
   return await next({
     ctx: {
       ...ctx,
+      logger: trpcSessionLogger,
       user: ctx.user,
       session: ctx.session,
       metadata: {
@@ -150,7 +195,7 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next }) =
   });
 });
 
-export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
+export const adminMiddleware = t.middleware(async ({ ctx, next, path }) => {
   if (!ctx.session || !ctx.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
@@ -167,9 +212,24 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
     });
   }
 
+  // Recreate the logger with a sub request ID to differentiate between batched requests.
+  const trpcSessionLogger = ctx.logger.child({
+    nonBatchedRequestId: alphaid(),
+  });
+
+  trpcSessionLogger.info({
+    path,
+    auth: ctx.metadata.auth,
+    source: ctx.metadata.source,
+    userId: ctx.user.id,
+    apiTokenId: null,
+    trpcMiddleware: 'admin',
+  } satisfies TrpcApiLog);
+
   return await next({
     ctx: {
       ...ctx,
+      logger: trpcSessionLogger,
       user: ctx.user,
       session: ctx.session,
       metadata: {
@@ -185,11 +245,34 @@ export const adminMiddleware = t.middleware(async ({ ctx, next }) => {
   });
 });
 
+export const procedureMiddleware = t.middleware(async ({ ctx, next, path }) => {
+  // Recreate the logger with a sub request ID to differentiate between batched requests.
+  const trpcSessionLogger = ctx.logger.child({
+    nonBatchedRequestId: alphaid(),
+  });
+
+  trpcSessionLogger.info({
+    path,
+    auth: ctx.metadata.auth,
+    source: ctx.metadata.source,
+    userId: ctx.user?.id,
+    apiTokenId: null,
+    trpcMiddleware: 'procedure',
+  } satisfies TrpcApiLog);
+
+  return await next({
+    ctx: {
+      ...ctx,
+      logger: trpcSessionLogger,
+    },
+  });
+});
+
 /**
  * Routers and Procedures
  */
 export const router = t.router;
-export const procedure = t.procedure;
+export const procedure = t.procedure.use(procedureMiddleware);
 export const authenticatedProcedure = t.procedure.use(authenticatedMiddleware);
 // While this is functionally the same as `procedure`, it's useful for indicating purpose
 export const maybeAuthenticatedProcedure = t.procedure.use(maybeAuthenticatedMiddleware);

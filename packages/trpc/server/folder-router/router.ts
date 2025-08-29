@@ -1,5 +1,4 @@
-import { TRPCError } from '@trpc/server';
-
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createFolder } from '@documenso/lib/server-only/folder/create-folder';
 import { deleteFolder } from '@documenso/lib/server-only/folder/delete-folder';
 import { findFolders } from '@documenso/lib/server-only/folder/find-folders';
@@ -42,6 +41,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { parentId, type } = input;
 
+      ctx.logger.info({
+        input: {
+          parentId,
+          type,
+        },
+      });
+
       const folders = await findFolders({
         userId: user.id,
         teamId,
@@ -75,6 +81,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { parentId, type } = input;
 
+      ctx.logger.info({
+        input: {
+          parentId,
+          type,
+        },
+      });
+
       const folders = await findFolders({
         userId: user.id,
         teamId,
@@ -107,6 +120,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { name, parentId, type } = input;
 
+      ctx.logger.info({
+        input: {
+          parentId,
+          type,
+        },
+      });
+
       if (parentId) {
         try {
           await getFolderById({
@@ -116,8 +136,7 @@ export const folderRouter = router({
             type,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Parent folder not found',
           });
         }
@@ -145,6 +164,12 @@ export const folderRouter = router({
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
       const { id, name, visibility } = input;
+
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
 
       const currentFolder = await getFolderById({
         userId: user.id,
@@ -177,6 +202,12 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { id } = input;
 
+      ctx.logger.info({
+        input: {
+          id,
+        },
+      });
+
       await deleteFolder({
         userId: user.id,
         teamId,
@@ -193,6 +224,13 @@ export const folderRouter = router({
     const { teamId, user } = ctx;
     const { id, parentId } = input;
 
+    ctx.logger.info({
+      input: {
+        id,
+        parentId,
+      },
+    });
+
     const currentFolder = await getFolderById({
       userId: user.id,
       teamId,
@@ -208,8 +246,7 @@ export const folderRouter = router({
           type: currentFolder.type,
         });
       } catch (error) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
+        throw new AppError(AppErrorCode.NOT_FOUND, {
           message: 'Parent folder not found',
         });
       }
@@ -238,6 +275,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { documentId, folderId } = input;
 
+      ctx.logger.info({
+        input: {
+          documentId,
+          folderId,
+        },
+      });
+
       if (folderId !== null) {
         try {
           await getFolderById({
@@ -247,8 +291,7 @@ export const folderRouter = router({
             type: FolderType.DOCUMENT,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Folder not found',
           });
         }
@@ -277,6 +320,13 @@ export const folderRouter = router({
       const { teamId, user } = ctx;
       const { templateId, folderId } = input;
 
+      ctx.logger.info({
+        input: {
+          templateId,
+          folderId,
+        },
+      });
+
       if (folderId !== null) {
         try {
           await getFolderById({
@@ -286,8 +336,7 @@ export const folderRouter = router({
             type: FolderType.TEMPLATE,
           });
         } catch (error) {
-          throw new TRPCError({
-            code: 'NOT_FOUND',
+          throw new AppError(AppErrorCode.NOT_FOUND, {
             message: 'Folder not found',
           });
         }
@@ -310,16 +359,24 @@ export const folderRouter = router({
    * @private
    */
   pinFolder: authenticatedProcedure.input(ZPinFolderSchema).mutation(async ({ ctx, input }) => {
+    const { folderId } = input;
+
+    ctx.logger.info({
+      input: {
+        folderId,
+      },
+    });
+
     const currentFolder = await getFolderById({
       userId: ctx.user.id,
       teamId: ctx.teamId,
-      folderId: input.folderId,
+      folderId,
     });
 
     const result = await pinFolder({
       userId: ctx.user.id,
       teamId: ctx.teamId,
-      folderId: input.folderId,
+      folderId,
       type: currentFolder.type,
     });
 
@@ -333,16 +390,24 @@ export const folderRouter = router({
    * @private
    */
   unpinFolder: authenticatedProcedure.input(ZUnpinFolderSchema).mutation(async ({ ctx, input }) => {
+    const { folderId } = input;
+
+    ctx.logger.info({
+      input: {
+        folderId,
+      },
+    });
+
     const currentFolder = await getFolderById({
       userId: ctx.user.id,
       teamId: ctx.teamId,
-      folderId: input.folderId,
+      folderId,
     });
 
     const result = await unpinFolder({
       userId: ctx.user.id,
       teamId: ctx.teamId,
-      folderId: input.folderId,
+      folderId,
       type: currentFolder.type,
     });
 
