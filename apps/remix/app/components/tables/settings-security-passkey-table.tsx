@@ -26,7 +26,7 @@ export const SettingsSecurityPasskeyTable = () => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError } = trpc.auth.findPasskeys.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.auth.passkey.find.useQuery(
     {
       page: parsedSearchParams.page,
       perPage: parsedSearchParams.perPage,

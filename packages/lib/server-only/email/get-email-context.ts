@@ -1,3 +1,5 @@
+import { P, match } from 'ts-pattern';
+
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
 import type {
@@ -59,7 +61,7 @@ type RecipientGetEmailContextOptions = BaseGetEmailContextOptions & {
    * Force meta options as a typesafe way to ensure developers don't forget to
    * pass it in if it is available.
    */
-  meta: EmailMetaOption | null;
+  meta: EmailMetaOption | null | undefined;
 };
 
 type GetEmailContextOptions = InternalGetEmailContextOptions | RecipientGetEmailContextOptions;
@@ -104,7 +106,12 @@ export const getEmailContext = async (
   }
 
   const replyToEmail = meta?.emailReplyTo || emailContext.settings.emailReplyTo || undefined;
-  const senderEmailId = meta?.emailId || emailContext.settings.emailId;
+
+  const senderEmailId = match(meta?.emailId)
+    .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
+    .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
+    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
 

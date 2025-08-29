@@ -42,6 +42,11 @@ export const run = async ({
       where: {
         id: userId,
       },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
     }),
     prisma.document.findFirstOrThrow({
       where: {
@@ -86,7 +91,7 @@ export const run = async ({
         type: 'team',
         teamId: document.teamId,
       },
-      meta: document.documentMeta || null,
+      meta: document.documentMeta,
     });
 
   const customEmail = document?.documentMeta;

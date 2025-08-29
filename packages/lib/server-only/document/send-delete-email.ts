@@ -24,7 +24,13 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       id: documentId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
     },
   });
@@ -49,7 +55,7 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { email, name } = document.user;

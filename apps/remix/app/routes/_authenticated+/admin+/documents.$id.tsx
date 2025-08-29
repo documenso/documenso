@@ -48,7 +48,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
   const { toast } = useToast();
 
   const { mutate: resealDocument, isPending: isResealDocumentLoading } =
-    trpc.admin.resealDocument.useMutation({
+    trpc.admin.document.reseal.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),

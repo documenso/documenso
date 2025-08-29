@@ -34,6 +34,7 @@ import { createTemplate } from '@documenso/lib/server-only/template/create-templ
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { extractDerivedDocumentEmailSettings } from '@documenso/lib/types/document-email';
 import {
   ZCheckboxFieldMeta,
@@ -330,6 +331,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         formValues: body.formValues,
+        folderId: body.folderId,
         documentDataId: documentData.id,
         requestMetadata: metadata,
       });
@@ -736,6 +738,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           teamId: team?.id,
           recipients: body.recipients,
           prefillFields: body.prefillFields,
+          folderId: body.folderId,
           override: {
             title: body.title,
             ...body.meta,
@@ -978,10 +981,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         userId: user.id,
         teamId: team?.id,
         recipients: [
-          ...recipients.map(({ email, name }) => ({
-            email,
-            name,
-            role,
+          ...recipients.map((recipient) => ({
+            email: recipient.email,
+            name: recipient.name,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? [],
           })),
           {
             email,
