@@ -52,7 +52,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+  const { mutateAsync: createDocument } = trpc.document.create.useMutation();
 
   const disabledMessage = useMemo(() => {
     if (organisation.subscription && remaining.documents === 0) {
@@ -78,7 +78,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
       const { id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
-        timezone: userTimezone,
+        timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
         folderId: folderId ?? undefined,
       });
 

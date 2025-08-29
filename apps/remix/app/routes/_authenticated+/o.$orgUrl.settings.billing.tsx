@@ -1,5 +1,6 @@
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { SubscriptionStatus } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
@@ -23,7 +24,7 @@ export default function TeamsSettingBillingPage() {
   const organisation = useCurrentOrganisation();
 
   const { data: subscriptionQuery, isLoading: isLoadingSubscription } =
-    trpc.billing.subscription.get.useQuery({
+    trpc.enterprise.billing.subscription.get.useQuery({
       organisationId: organisation.id,
     });
 
@@ -134,7 +135,9 @@ export default function TeamsSettingBillingPage() {
 
       <hr className="my-4" />
 
-      {!subscription && canManageBilling && <BillingPlans plans={plans} />}
+      {(!subscription ||
+        subscription.organisationSubscription.status === SubscriptionStatus.INACTIVE) &&
+        canManageBilling && <BillingPlans plans={plans} />}
 
       <section className="mt-6">
         <OrganisationBillingInvoicesTable

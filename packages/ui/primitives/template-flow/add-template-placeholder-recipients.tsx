@@ -14,6 +14,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
@@ -245,62 +246,6 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
       await form.trigger('signers');
     },
     [form, watchedSigners, toast],
-  );
-
-  const triggerDragAndDrop = useCallback(
-    (fromIndex: number, toIndex: number) => {
-      if (!$sensorApi.current) {
-        return;
-      }
-
-      const draggableId = signers[fromIndex].id;
-
-      const preDrag = $sensorApi.current.tryGetLock(draggableId);
-
-      if (!preDrag) {
-        return;
-      }
-
-      const drag = preDrag.snapLift();
-
-      setTimeout(() => {
-        // Move directly to the target index
-        if (fromIndex < toIndex) {
-          for (let i = fromIndex; i < toIndex; i++) {
-            drag.moveDown();
-          }
-        } else {
-          for (let i = fromIndex; i > toIndex; i--) {
-            drag.moveUp();
-          }
-        }
-
-        setTimeout(() => {
-          drag.drop();
-        }, 500);
-      }, 0);
-    },
-    [signers],
-  );
-
-  const updateSigningOrders = useCallback(
-    (newIndex: number, oldIndex: number) => {
-      const updatedSigners = form.getValues('signers').map((signer, index) => {
-        if (index === oldIndex) {
-          return { ...signer, signingOrder: newIndex + 1 };
-        } else if (index >= newIndex && index < oldIndex) {
-          return { ...signer, signingOrder: (signer.signingOrder ?? index + 1) + 1 };
-        } else if (index <= newIndex && index > oldIndex) {
-          return { ...signer, signingOrder: Math.max(1, (signer.signingOrder ?? index + 1) - 1) };
-        }
-        return signer;
-      });
-
-      updatedSigners.forEach((signer, index) => {
-        form.setValue(`signers.${index}.signingOrder`, signer.signingOrder);
-      });
-    },
-    [form],
   );
 
   const handleSigningOrderChange = useCallback(
@@ -592,7 +537,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                     })}
                                   >
                                     {!showAdvancedSettings && index === 0 && (
-                                      <FormLabel required>
+                                      <FormLabel>
                                         <Trans>Email</Trans>
                                       </FormLabel>
                                     )}
@@ -602,6 +547,11 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                         type="email"
                                         placeholder={_(msg`Email`)}
                                         {...field}
+                                        value={
+                                          isTemplateRecipientEmailPlaceholder(field.value)
+                                            ? ''
+                                            : field.value
+                                        }
                                         disabled={
                                           field.disabled ||
                                           isSubmitting ||

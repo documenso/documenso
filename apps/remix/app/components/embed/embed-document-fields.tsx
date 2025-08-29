@@ -32,7 +32,14 @@ import { DocumentSigningTextField } from '~/components/general/document-signing/
 
 export type EmbedDocumentFieldsProps = {
   fields: Field[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: Pick<
+    DocumentMeta | TemplateMeta,
+    | 'timezone'
+    | 'dateFormat'
+    | 'typedSignatureEnabled'
+    | 'uploadSignatureEnabled'
+    | 'drawSignatureEnabled'
+  > | null;
   onSignField?: (value: TSignFieldWithTokenMutationSchema) => Promise<void> | void;
   onUnsignField?: (value: TRemovedSignedFieldWithTokenMutationSchema) => Promise<void> | void;
 };
@@ -43,8 +50,10 @@ export const EmbedDocumentFields = ({
   onSignField,
   onUnsignField,
 }: EmbedDocumentFieldsProps) => {
+  const highestPageNumber = Math.max(...fields.map((field) => field.page));
+
   return (
-    <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+    <ElementVisible target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}>
       {fields.map((field) =>
         match(field.type)
           .with(FieldType.SIGNATURE, () => (

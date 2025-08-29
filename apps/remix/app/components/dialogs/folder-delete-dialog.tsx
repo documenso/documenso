@@ -116,8 +116,8 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
           <Alert variant="destructive">
             <AlertDescription>
               <Trans>
-                This folder contains multiple items. Deleting it will also delete all items in the
-                folder, including nested folders and their contents.
+                This folder contains multiple items. Deleting it will remove all subfolders and move
+                all nested documents and templates to the root folder.
               </Trans>
             </AlertDescription>
           </Alert>

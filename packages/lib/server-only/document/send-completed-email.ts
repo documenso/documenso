@@ -14,7 +14,6 @@ import { extractDerivedDocumentEmailSettings } from '../../types/document-email'
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { env } from '../../utils/env';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -34,7 +33,13 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       documentData: true,
       documentMeta: true,
       recipients: true,
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       team: {
         select: {
           id: true,
@@ -54,11 +59,13 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
     throw new Error('Document has no recipients');
   }
 
-  const { branding, settings } = await getEmailContext({
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
     source: {
       type: 'team',
       teamId: document.teamId,
     },
+    meta: document.documentMeta,
   });
 
   const { user: owner } = document;
@@ -97,18 +104,16 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
       downloadLink: documentOwnerDownloadLink,
     });
 
-    const lang = document.documentMeta?.language ?? settings.documentLanguage;
-
     const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang, branding }),
+      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
       renderEmailWithI18N(template, {
-        lang,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
     ]);
 
-    const i18n = await getI18nInstance(lang);
+    const i18n = await getI18nInstance(emailLanguage);
 
     await mailer.sendMail({
       to: [
@@ -117,10 +122,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
           address: owner.email,
         },
       ],
-      from: {
-        name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-        address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-      },
+      from: senderEmail,
+      replyTo: replyToEmail,
       subject: i18n._(msg`Signing Complete!`),
       html,
       text,
@@ -174,18 +177,16 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             : undefined,
       });
 
-      const lang = document.documentMeta?.language ?? settings.documentLanguage;
-
       const [html, text] = await Promise.all([
-        renderEmailWithI18N(template, { lang, branding }),
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
         renderEmailWithI18N(template, {
-          lang,
+          lang: emailLanguage,
           branding,
           plainText: true,
         }),
       ]);
 
-      const i18n = await getI18nInstance(lang);
+      const i18n = await getI18nInstance(emailLanguage);
 
       await mailer.sendMail({
         to: [
@@ -194,10 +195,8 @@ export const sendCompletedEmail = async ({ documentId, requestMetadata }: SendDo
             address: recipient.email,
           },
         ],
-        from: {
-          name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-          address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
-        },
+        from: senderEmail,
+        replyTo: replyToEmail,
         subject:
           isDirectTemplate && document.documentMeta?.subject
             ? renderCustomEmailTemplate(document.documentMeta.subject, customEmailTemplate)

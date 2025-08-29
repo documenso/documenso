@@ -64,7 +64,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const [pages, setPages] = useState<string[]>([]);
 
   const { data: searchDocumentsData, isPending: isSearchingDocuments } =
-    trpcReact.document.searchDocuments.useQuery(
+    trpcReact.document.search.useQuery(
       {
         query: search,
       },

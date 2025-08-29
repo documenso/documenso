@@ -15,6 +15,7 @@ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
+  isTemplateRecipientEmailPlaceholder,
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -279,7 +280,11 @@ export function TemplateUseDialog({
                           <FormControl>
                             <Input
                               {...field}
-                              placeholder={recipients[index].email || _(msg`Email`)}
+                              placeholder={
+                                isTemplateRecipientEmailPlaceholder(field.value)
+                                  ? ''
+                                  : _(msg`Email`)
+                              }
                             />
                           </FormControl>
                           <FormMessage />
@@ -484,6 +489,7 @@ export function TemplateUseDialog({
 
                                 <input
                                   type="file"
+                                  data-testid="template-use-dialog-file-input"
                                   className="absolute h-full w-full opacity-0"
                                   accept=".pdf,application/pdf"
                                   onChange={(e) => {

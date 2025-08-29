@@ -49,7 +49,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
   const { quota, remaining, refreshLimits } = useLimits();
 
-  const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+  const { mutateAsync: createDocument } = trpc.document.create.useMutation();
 
   const isUploadDisabled = remaining.documents === 0 || !user.emailVerified;
 
@@ -67,7 +67,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
       const { id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
-        timezone: userTimezone,
+        timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
         folderId: folderId ?? undefined,
       });
 

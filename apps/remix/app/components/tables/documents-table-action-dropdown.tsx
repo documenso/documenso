@@ -77,7 +77,7 @@ export const DocumentsTableActionDropdown = ({
   const onDownloadClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query({
+        ? await trpcClient.document.get.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
@@ -103,7 +103,7 @@ export const DocumentsTableActionDropdown = ({
   const onDownloadOriginalClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query({
+        ? await trpcClient.document.get.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
@@ -188,7 +188,7 @@ export const DocumentsTableActionDropdown = ({
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        {onMoveDocument && (
+        {onMoveDocument && canManageDocument && (
           <DropdownMenuItem onClick={onMoveDocument} onSelect={(e) => e.preventDefault()}>
             <FolderInput className="mr-2 h-4 w-4" />
             <Trans>Move to Folder</Trans>

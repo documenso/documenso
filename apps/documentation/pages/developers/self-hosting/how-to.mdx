@@ -54,7 +54,7 @@ Install the project dependencies as follows:
 
 ```bash
 npm i
-npm run build:web
+npm run build
 npm run prisma:migrate-deploy
 ```
 
@@ -69,7 +69,7 @@ npm run start
 This will start the server on `localhost:3000`. Any reverse proxy can handle the front end and SSL termination.
 
 <Callout type="info">
- If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+ If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/remix` folder.
 </Callout>
 
 </Steps>
@@ -249,7 +249,7 @@ After=network.target
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/web
+WorkingDirectory=/var/www/documenso/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always
