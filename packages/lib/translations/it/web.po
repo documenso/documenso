@@ -1948,6 +1948,8 @@ msgstr "Confronta tutti i piani e le caratteristiche in dettaglio"
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page.tsx
+#: apps/remix/app/components/embed/embed-document-signing-page.tsx
+#: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
 msgid "Complete"
