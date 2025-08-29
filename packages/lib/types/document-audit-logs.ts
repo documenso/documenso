@@ -49,6 +49,7 @@ export const ZDocumentAuditLogEmailTypeSchema = z.enum([
   'ASSISTING_REQUEST',
   'CC',
   'DOCUMENT_COMPLETED',
+  'REMINDER',
 ]);
 
 export const ZDocumentMetaDiffTypeSchema = z.enum([
