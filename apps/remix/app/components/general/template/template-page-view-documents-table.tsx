@@ -67,7 +67,7 @@ export const TemplatePageViewDocumentsTable = ({
     Object.fromEntries(searchParams ?? []),
   );
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocuments.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.document.find.useQuery(
     {
       templateId,
       page: parsedSearchParams.page,

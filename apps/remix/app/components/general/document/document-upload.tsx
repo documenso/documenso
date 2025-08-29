@@ -52,7 +52,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
   const [isLoading, setIsLoading] = useState(false);
 
-  const { mutateAsync: createDocument } = trpc.document.createDocument.useMutation();
+  const { mutateAsync: createDocument } = trpc.document.create.useMutation();
 
   const disabledMessage = useMemo(() => {
     if (organisation.subscription && remaining.documents === 0) {
