@@ -6,18 +6,14 @@ import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
-import { ZDownloadDocumentRequestSchema, ZDownloadDocumentResponseSchema } from './schema';
+import {
+  ZDownloadDocumentRequestSchema,
+  ZDownloadDocumentResponseSchema,
+  downloadDocumentMeta,
+} from './download-document.types';
 
 export const downloadDocumentRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'GET',
-      path: '/document/{documentId}/download-beta',
-      summary: 'Download document (beta)',
-      description: 'Get a pre-signed download URL for the original or signed version of a document',
-      tags: ['Document'],
-    },
-  })
+  .meta(downloadDocumentMeta)
   .input(ZDownloadDocumentRequestSchema)
   .output(ZDownloadDocumentResponseSchema)
   .query(async ({ input, ctx }) => {

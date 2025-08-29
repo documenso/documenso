@@ -105,7 +105,13 @@ export const createDocumentFromDirectTemplate = async ({
       directLink: true,
       templateDocumentData: true,
       templateMeta: true,
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
     },
   });
 
