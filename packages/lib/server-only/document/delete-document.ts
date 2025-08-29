@@ -156,7 +156,7 @@ const handleDocumentOwnerDelete = async ({
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   // Soft delete completed documents.

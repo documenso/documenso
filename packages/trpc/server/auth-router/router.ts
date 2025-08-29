@@ -1,113 +1,20 @@
-import type { RegistrationResponseJSON } from '@simplewebauthn/types';
-
-import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
-import { createPasskeyAuthenticationOptions } from '@documenso/lib/server-only/auth/create-passkey-authentication-options';
-import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
-import { createPasskeySigninOptions } from '@documenso/lib/server-only/auth/create-passkey-signin-options';
-import { deletePasskey } from '@documenso/lib/server-only/auth/delete-passkey';
-import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
-import { updatePasskey } from '@documenso/lib/server-only/auth/update-passkey';
-import { nanoid } from '@documenso/lib/universal/id';
-
-import { authenticatedProcedure, procedure, router } from '../trpc';
-import {
-  ZCreatePasskeyAuthenticationOptionsMutationSchema,
-  ZCreatePasskeyMutationSchema,
-  ZDeletePasskeyMutationSchema,
-  ZFindPasskeysQuerySchema,
-  ZUpdatePasskeyMutationSchema,
-} from './schema';
+import { router } from '../trpc';
+import { createPasskeyRoute } from './create-passkey';
+import { createPasskeyAuthenticationOptionsRoute } from './create-passkey-authentication-options';
+import { createPasskeyRegistrationOptionsRoute } from './create-passkey-registration-options';
+import { createPasskeySigninOptionsRoute } from './create-passkey-signin-options';
+import { deletePasskeyRoute } from './delete-passkey';
+import { findPasskeysRoute } from './find-passkeys';
+import { updatePasskeyRoute } from './update-passkey';
 
 export const authRouter = router({
-  createPasskey: authenticatedProcedure
-    .input(ZCreatePasskeyMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const verificationResponse = input.verificationResponse as RegistrationResponseJSON;
-
-      return await createPasskey({
-        userId: ctx.user.id,
-        verificationResponse,
-        passkeyName: input.passkeyName,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
-
-  createPasskeyAuthenticationOptions: authenticatedProcedure
-    .input(ZCreatePasskeyAuthenticationOptionsMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      return await createPasskeyAuthenticationOptions({
-        userId: ctx.user.id,
-        preferredPasskeyId: input?.preferredPasskeyId,
-      });
-    }),
-
-  createPasskeyRegistrationOptions: authenticatedProcedure.mutation(async ({ ctx }) => {
-    return await createPasskeyRegistrationOptions({
-      userId: ctx.user.id,
-    });
+  passkey: router({
+    create: createPasskeyRoute,
+    createAuthenticationOptions: createPasskeyAuthenticationOptionsRoute,
+    createRegistrationOptions: createPasskeyRegistrationOptionsRoute,
+    createSigninOptions: createPasskeySigninOptionsRoute,
+    delete: deletePasskeyRoute,
+    find: findPasskeysRoute,
+    update: updatePasskeyRoute,
   }),
-
-  createPasskeySigninOptions: procedure.mutation(async () => {
-    const sessionIdToken = nanoid(16);
-
-    const [sessionId] = decodeURI(sessionIdToken).split('|');
-
-    const options = await createPasskeySigninOptions({ sessionId });
-
-    return {
-      options,
-      sessionId,
-    };
-  }),
-
-  deletePasskey: authenticatedProcedure
-    .input(ZDeletePasskeyMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { passkeyId } = input;
-
-      ctx.logger.info({
-        input: {
-          passkeyId,
-        },
-      });
-
-      await deletePasskey({
-        userId: ctx.user.id,
-        passkeyId,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
-
-  findPasskeys: authenticatedProcedure
-    .input(ZFindPasskeysQuerySchema)
-    .query(async ({ input, ctx }) => {
-      const { page, perPage, orderBy } = input;
-
-      return await findPasskeys({
-        page,
-        perPage,
-        orderBy,
-        userId: ctx.user.id,
-      });
-    }),
-
-  updatePasskey: authenticatedProcedure
-    .input(ZUpdatePasskeyMutationSchema)
-    .mutation(async ({ ctx, input }) => {
-      const { passkeyId, name } = input;
-
-      ctx.logger.info({
-        input: {
-          passkeyId,
-        },
-      });
-
-      await updatePasskey({
-        userId: ctx.user.id,
-        passkeyId,
-        name,
-        requestMetadata: ctx.metadata.requestMetadata,
-      });
-    }),
 });

@@ -45,7 +45,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const onDownloadClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query(
+        ? await trpcClient.document.get.query(
             {
               documentId: row.id,
             },

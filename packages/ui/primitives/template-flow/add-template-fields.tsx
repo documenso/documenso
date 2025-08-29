@@ -24,6 +24,7 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -593,15 +594,21 @@ export const AddTemplateFieldsFormPartial = ({
                       selectedSignerStyles?.comboxBoxTrigger,
                     )}
                   >
-                    {selectedSigner?.email && (
-                      <span className="flex-1 truncate text-left">
-                        {selectedSigner?.name} ({selectedSigner?.email})
-                      </span>
-                    )}
+                    {selectedSigner?.email &&
+                      !isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">
+                          {selectedSigner?.name} ({selectedSigner?.email})
+                        </span>
+                      )}
+
+                    {selectedSigner?.email &&
+                      isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
+                      )}
 
                     {!selectedSigner?.email && (
                       <span className="gradie flex-1 truncate text-left">
-                        {selectedSigner?.email}
+                        No recipient selected
                       </span>
                     )}
 
@@ -657,15 +664,22 @@ export const AddTemplateFieldsFormPartial = ({
                                 'text-foreground/80': recipient === selectedSigner,
                               })}
                             >
-                              {recipient.name && (
-                                <span title={`${recipient.name} (${recipient.email})`}>
-                                  {recipient.name} ({recipient.email})
-                                </span>
-                              )}
+                              {recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={`${recipient.name} (${recipient.email})`}>
+                                    {recipient.name} ({recipient.email})
+                                  </span>
+                                )}
 
-                              {!recipient.name && (
-                                <span title={recipient.email}>{recipient.email}</span>
-                              )}
+                              {recipient.name &&
+                                isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.name}>{recipient.name}</span>
+                                )}
+
+                              {!recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.email}>{recipient.email}</span>
+                                )}
                             </span>
                           </CommandItem>
                         ))}
