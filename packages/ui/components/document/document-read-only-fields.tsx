@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Field, Recipient, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, Field, Recipient } from '@prisma/client';
 import { SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
@@ -36,7 +36,7 @@ const getRecipientDisplayText = (recipient: { name: string; email: string }) => 
 
 export type DocumentReadOnlyFieldsProps = {
   fields: DocumentField[];
-  documentMeta?: Pick<DocumentMeta | TemplateMeta, 'dateFormat'>;
+  documentMeta?: Pick<DocumentMeta, 'dateFormat'>;
 
   showFieldStatus?: boolean;
 
