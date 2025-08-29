@@ -1,0 +1,77 @@
+name: build-from-upstream-and-publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      documenso_ref:
+        description: "Branch/Tag/Commit do repositório oficial documenso/documenso (ex: main ou v0.17.3)"
+        required: true
+        default: "main"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/${{ github.repository_owner }}/infinitesign-documenso-ptbr
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1) Checkout do SEU repositório (contém seus arquivos customizados)
+      - name: Checkout (your repo)
+        uses: actions/checkout@v4
+
+      # 2) Checkout do repositório oficial do Documenso
+      - name: Checkout upstream documenso/documenso
+        uses: actions/checkout@v4
+        with:
+          repository: documenso/documenso
+          ref: ${{ inputs.documenso_ref }}
+          path: upstream
+
+      # 3) Sobrescrever os seus dois arquivos por cima do upstream
+      - name: Overlay custom files into upstream
+        run: |
+          set -euxo pipefail
+          # Verificações rápidas
+          test -f packages/lib/translations/pt/web.po
+          test -f packages/lib/constants/i18n.ts
+
+          # Copia arquivos para os caminhos corretos no monorepo oficial
+          cp -f packages/lib/translations/pt/web.po upstream/packages/lib/translations/pt/web.po
+          cp -f packages/lib/constants/i18n.ts       upstream/packages/lib/constants/i18n.ts
+
+          echo "Overlay aplicado com sucesso."
+
+      # 4) Login no GHCR (usa GITHUB_TOKEN automaticamente)
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 5) Tags úteis
+      - name: Set tags
+        id: vars
+        run: |
+          SHORT_SHA="${GITHUB_SHA::7}"
+          REF_SLUG="$(echo '${{ inputs.documenso_ref }}' | tr '/' '-' )"
+          echo "TAG_SHA=$SHORT_SHA" >> $GITHUB_OUTPUT
+          echo "TAG_REF=$REF_SLUG"   >> $GITHUB_OUTPUT
+
+      # 6) Build & Push usando o Dockerfile OFICIAL (upstream/docker/Dockerfile) e contexto do upstream
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: upstream
+          file: upstream/docker/Dockerfile
+          push: true
+          tags: |
+            ${{ env.IMAGE_NAME }}:latest
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.TAG_REF }}
+            ${{ env.IMAGE_NAME }}:${{ steps.vars.outputs.TAG_REF }}-${{ steps.vars.outputs.TAG_SHA }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
