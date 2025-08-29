@@ -1,0 +1,121 @@
+---
+title: Teams
+description: Learn how to create and manage teams in Documenso.
+---
+
+import Image from 'next/image';
+
+import { Callout, Steps } from 'nextra/components';
+
+# Teams
+
+Documenso teams allow you to collaborate with others on creating, sending and receiving documents within your organisation. Teams operate within the organisational structure and inherit settings and branding from their parent organisation.
+
+## Team Structure
+
+Teams provide focused collaboration spaces while benefiting from organisation-level management and settings.
+
+Each team within an organisation has its own:
+
+- Team members and roles
+- Documents and templates
+- Team-specific settings (that can override organisation defaults)
+- Team email and branding (if enabled)
+
+## Creating a Team
+
+Only members with the "Organisation Admin" or "Organisation Manager" role can create teams.
+
+<Steps>
+
+### Create Team
+
+To create a team, navigate to the organisation settings page and click the "Teams" tab. Then you can click the "Create Team" button.
+
+![Create Team Dialog](/teams/team-create.webp)
+
+### Name and URL
+
+When creating a team, you'll need to provide:
+
+- **Team Name**: The display name for your team
+- **Team URL**: A unique identifier for your team
+
+The team URL will follow this format:
+
+```bash
+https://app.documenso.com/t/<team-url>
+```
+
+You can select different names and URLs for your team, but we recommend using the same or similar names for consistency.
+
+![Documenso create team modal](/teams/team-create-dialog.webp)
+
+You can also decide whether to automatically inherit members from the organisation into the team. This means that all members of the organisation will have access to this team.
+
+Members with the "Organisation Admin" or "Organisation Manager" role will be assigned as "Team Admin" regardless of this setting. This will only affect members with the "Organisation Member" role, who will be added to the team as a "Team Member".
+
+Disabling this setting will remove all these members automatically. This can always be turned on or off later in the teams member settings page.
+
+</Steps>
+
+## Team Members
+
+After creating the team, you can add organisation members into your team using two methods:
+
+- Directly adding members to the team
+- Add members using groups
+
+### Directly adding members
+
+1. Navigate to the team settings member page
+2. Click the "Add Members" button
+3. Choose which members you want to add
+4. Assign the team roles for each team member
+
+If you want to add people outside of the organisation, you will need to invite them to the organisation first.
+
+See the [organisation members](/users/organisations/members#invite-organisation-members) page for more information.
+
+### Adding members using groups
+
+1. Navigate to the teams settings groups page
+2. Click the "Add groups" button
+3. Choose which groups you want to add
+4. Assign the team roles for each group
+
+See the [organisation groups](/users/organisations/groups) page for more information.
+
+### Team Member Roles
+
+You can assign different permissions to team members based on their roles. The roles available are:
+
+|     Role     | Manage Documents | Manage Team | Delete Team |
+| :----------: | :--------------: | :---------: | :---------: |
+|  Team Admin  |        ✅        |     ✅      |     ✅      |
+| Team Manager |        ✅        |     ✅      |     ❌      |
+| Team Member  |        ✅        |     ❌      |     ❌      |
+
+These roles can be used for document visibility and management as well.
+
+## Set a Team Email
+
+You can add a team email which allows you to:
+
+- See signing requests sent to this email (Team Inbox)
+- See documents sent from this email
+- Send documents on behalf of the team
+- Maintain consistent team branding in communications
+
+## Team Settings and Branding
+
+You can override preferences and settings from the Organisation on the Team level. See the following pages for more information:
+
+- [Document preferences](/users/documents/document-preferences)
+- [Branding preferences](/users/branding/branding-preferences)
+
+## What's next?
+
+- [Send your first document](/users/documents/sending-documents)
+- [Setup your default document preferences](/users/documents/document-preferences)
+- [Setup your default branding preferences](/users/branding)

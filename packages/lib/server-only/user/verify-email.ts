@@ -12,7 +12,13 @@ export type VerifyEmailProps = {
 export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   const verificationToken = await prisma.verificationToken.findFirst({
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
     },
     where: {
       token,

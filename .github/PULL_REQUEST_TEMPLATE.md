@@ -1,8 +1,3 @@
----
-name: Pull Request
-about: Submit changes to the project for review and inclusion
----
-
 ## Description
 
 <!--- Describe the changes introduced by this pull request. -->

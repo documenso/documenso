@@ -1,6 +1,7 @@
 import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   ZRecipientAccessAuthTypesSchema,
   ZRecipientActionAuthSchema,
@@ -26,8 +27,8 @@ export const ZCreateRecipientSchema = z.object({
   name: z.string(),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
-  accessAuth: ZRecipientAccessAuthTypesSchema.optional().nullable(),
-  actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
 });
 
 export const ZUpdateRecipientSchema = z.object({
@@ -36,8 +37,8 @@ export const ZUpdateRecipientSchema = z.object({
   name: z.string().optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
-  accessAuth: ZRecipientAccessAuthTypesSchema.optional().nullable(),
-  actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
 });
 
 export const ZCreateDocumentRecipientRequestSchema = z.object({
@@ -106,7 +107,7 @@ export const ZSetDocumentRecipientsRequestSchema = z
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
   })
@@ -186,19 +187,33 @@ export const ZSetTemplateRecipientsRequestSchema = z
     recipients: z.array(
       z.object({
         nativeId: z.number().optional(),
-        email: z.string().toLowerCase().email().min(1),
+        email: z
+          .string()
+          .toLowerCase()
+          .refine(
+            (email) => {
+              return (
+                isTemplateRecipientEmailPlaceholder(email) ||
+                z.string().email().safeParse(email).success
+              );
+            },
+            { message: 'Please enter a valid email address' },
+          ),
         name: z.string(),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
-        actionAuth: ZRecipientActionAuthTypesSchema.optional().nullable(),
+        actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
       }),
     ),
   })
   .refine(
     (schema) => {
-      const emails = schema.recipients.map((recipient) => recipient.email);
+      // Filter out placeholder emails and only check uniqueness for actual emails
+      const nonPlaceholderEmails = schema.recipients
+        .map((recipient) => recipient.email)
+        .filter((email) => !isTemplateRecipientEmailPlaceholder(email));
 
-      return new Set(emails).size === emails.length;
+      return new Set(nonPlaceholderEmails).size === nonPlaceholderEmails.length;
     },
     // Dirty hack to handle errors when .root is populated for an array type
     { message: 'Recipients must have unique emails', path: ['recipients__root'] },

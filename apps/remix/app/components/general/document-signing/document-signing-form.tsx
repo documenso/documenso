@@ -7,16 +7,12 @@ import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/cl
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
-import { trpc } from '@documenso/trpc/react';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -35,29 +31,33 @@ export type DocumentSigningFormProps = {
   document: DocumentAndSender;
   recipient: Recipient;
   fields: Field[];
-  redirectUrl?: string | null;
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
+  completeDocument: (
+    authOptions?: TRecipientActionAuth,
+    nextSigner?: { email: string; name: string },
+  ) => Promise<void>;
+  isSubmitting: boolean;
+  fieldsValidated: () => void;
+  nextRecipient?: RecipientWithFields;
 };
 
 export const DocumentSigningForm = ({
   document,
   recipient,
   fields,
-  redirectUrl,
   isRecipientsTurn,
   allRecipients = [],
   setSelectedSignerId,
+  completeDocument,
+  isSubmitting,
+  fieldsValidated,
+  nextRecipient,
 }: DocumentSigningFormProps) => {
-  const { sessionData } = useOptionalSession();
-  const user = sessionData?.user;
-
   const { _ } = useLingui();
   const { toast } = useToast();
-
   const navigate = useNavigate();
-  const analytics = useAnalytics();
 
   const assistantSignersId = useId();
 
@@ -67,20 +67,11 @@ export const DocumentSigningForm = ({
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] = useState(false);
   const [isAssistantSubmitting, setIsAssistantSubmitting] = useState(false);
 
-  const {
-    mutateAsync: completeDocumentWithToken,
-    isPending,
-    isSuccess,
-  } = trpc.recipient.completeDocumentWithToken.useMutation();
-
   const assistantForm = useForm<{ selectedSignerId: number | undefined }>({
     defaultValues: {
       selectedSignerId: undefined,
     },
   });
-
-  // Keep the loading state going if successful since the redirect may take some time.
-  const isSubmitting = isPending || isSuccess;
 
   const fieldsRequiringValidation = useMemo(
     () => fields.filter(isFieldUnsignedAndRequired),
@@ -97,9 +88,9 @@ export const DocumentSigningForm = ({
     return fieldsRequiringValidation.filter((field) => field.recipientId === recipient.id);
   }, [fieldsRequiringValidation, recipient]);
 
-  const fieldsValidated = () => {
+  const localFieldsValidated = () => {
     setValidateUninsertedFields(true);
-    validateFieldsInserted(fieldsRequiringValidation);
+    fieldsValidated();
   };
 
   const onAssistantFormSubmit = () => {
@@ -127,65 +118,8 @@ export const DocumentSigningForm = ({
     }
   };
 
-  const completeDocument = async (
-    authOptions?: TRecipientActionAuth,
-    nextSigner?: { email: string; name: string },
-  ) => {
-    const payload = {
-      token: recipient.token,
-      documentId: document.id,
-      authOptions,
-      ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
-    };
-
-    await completeDocumentWithToken(payload);
-
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: document.id,
-      timestamp: new Date().toISOString(),
-    });
-
-    if (redirectUrl) {
-      window.location.href = redirectUrl;
-    } else {
-      await navigate(`/sign/${recipient.token}/complete`);
-    }
-  };
-
-  const nextRecipient = useMemo(() => {
-    if (
-      !document.documentMeta?.signingOrder ||
-      document.documentMeta.signingOrder !== 'SEQUENTIAL'
-    ) {
-      return undefined;
-    }
-
-    const sortedRecipients = allRecipients.sort((a, b) => {
-      // Sort by signingOrder first (nulls last), then by id
-      if (a.signingOrder === null && b.signingOrder === null) return a.id - b.id;
-      if (a.signingOrder === null) return 1;
-      if (b.signingOrder === null) return -1;
-      if (a.signingOrder === b.signingOrder) return a.id - b.id;
-      return a.signingOrder - b.signingOrder;
-    });
-
-    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
-    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
-      ? sortedRecipients[currentIndex + 1]
-      : undefined;
-  }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
-
   return (
-    <div
-      className={cn(
-        'dark:bg-background border-border bg-widget sticky flex h-full flex-col rounded-xl border px-4 py-6',
-        {
-          'top-20 max-h-[min(68rem,calc(100vh-6rem))]': user,
-          'top-4 max-h-[min(68rem,calc(100vh-2rem))]': !user,
-        },
-      )}
-    >
+    <div className="flex h-full flex-col">
       {validateUninsertedFields && uninsertedFields[0] && (
         <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
           <Trans>Click to insert field</Trans>
@@ -194,21 +128,8 @@ export const DocumentSigningForm = ({
 
       <div className="custom-scrollbar -mx-2 flex flex-1 flex-col overflow-y-auto overflow-x-hidden px-2">
         <div className="flex flex-1 flex-col">
-          <h3 className="text-foreground text-2xl font-semibold">
-            {recipient.role === RecipientRole.VIEWER && <Trans>View Document</Trans>}
-            {recipient.role === RecipientRole.SIGNER && <Trans>Sign Document</Trans>}
-            {recipient.role === RecipientRole.APPROVER && <Trans>Approve Document</Trans>}
-            {recipient.role === RecipientRole.ASSISTANT && <Trans>Assist Document</Trans>}
-          </h3>
-
           {recipient.role === RecipientRole.VIEWER ? (
             <>
-              <p className="text-muted-foreground mt-2 text-sm">
-                <Trans>Please mark as viewed to complete</Trans>
-              </p>
-
-              <hr className="border-border mb-8 mt-4" />
-
               <div className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2">
                 <div className="flex flex-1 flex-col gap-y-4" />
                 <div className="flex flex-col gap-4 md:flex-row">
@@ -227,7 +148,7 @@ export const DocumentSigningForm = ({
                     isSubmitting={isSubmitting}
                     documentTitle={document.title}
                     fields={fields}
-                    fieldsValidated={fieldsValidated}
+                    fieldsValidated={localFieldsValidated}
                     onSignatureComplete={async (nextSigner) => {
                       await completeDocument(undefined, nextSigner);
                     }}
@@ -245,15 +166,6 @@ export const DocumentSigningForm = ({
           ) : recipient.role === RecipientRole.ASSISTANT ? (
             <>
               <form onSubmit={assistantForm.handleSubmit(onAssistantFormSubmit)}>
-                <p className="text-muted-foreground mt-2 text-sm">
-                  <Trans>
-                    Complete the fields for the following signers. Once reviewed, they will inform
-                    you if any modifications are needed.
-                  </Trans>
-                </p>
-
-                <hr className="border-border my-4" />
-
                 <fieldset className="dark:bg-background border-border rounded-2xl border bg-white p-3">
                   <Controller
                     name="selectedSignerId"
@@ -340,88 +252,76 @@ export const DocumentSigningForm = ({
             </>
           ) : (
             <>
-              <div>
-                <p className="text-muted-foreground mt-2 text-sm">
-                  {recipient.role === RecipientRole.APPROVER && !hasSignatureField ? (
-                    <Trans>Please review the document before approving.</Trans>
-                  ) : (
-                    <Trans>Please review the document before signing.</Trans>
-                  )}
-                </p>
+              <fieldset
+                disabled={isSubmitting}
+                className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2"
+              >
+                <div className="flex flex-1 flex-col gap-y-4">
+                  <div>
+                    <Label htmlFor="full-name">
+                      <Trans>Full Name</Trans>
+                    </Label>
 
-                <hr className="border-border mb-8 mt-4" />
+                    <Input
+                      type="text"
+                      id="full-name"
+                      className="bg-background mt-2"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value.trimStart())}
+                    />
+                  </div>
 
-                <fieldset
-                  disabled={isSubmitting}
-                  className="-mx-2 flex flex-1 flex-col gap-4 overflow-y-auto px-2"
-                >
-                  <div className="flex flex-1 flex-col gap-y-4">
+                  {hasSignatureField && (
                     <div>
-                      <Label htmlFor="full-name">
-                        <Trans>Full Name</Trans>
+                      <Label htmlFor="Signature">
+                        <Trans>Signature</Trans>
                       </Label>
 
-                      <Input
-                        type="text"
-                        id="full-name"
-                        className="bg-background mt-2"
-                        value={fullName}
-                        onChange={(e) => setFullName(e.target.value.trimStart())}
+                      <SignaturePadDialog
+                        className="mt-2"
+                        disabled={isSubmitting}
+                        value={signature ?? ''}
+                        onChange={(v) => setSignature(v ?? '')}
+                        typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
+                        uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
+                        drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
                       />
                     </div>
-
-                    {hasSignatureField && (
-                      <div>
-                        <Label htmlFor="Signature">
-                          <Trans>Signature</Trans>
-                        </Label>
-
-                        <SignaturePadDialog
-                          className="mt-2"
-                          disabled={isSubmitting}
-                          value={signature ?? ''}
-                          onChange={(v) => setSignature(v ?? '')}
-                          typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
-                          uploadSignatureEnabled={document.documentMeta?.uploadSignatureEnabled}
-                          drawSignatureEnabled={document.documentMeta?.drawSignatureEnabled}
-                        />
-                      </div>
-                    )}
-                  </div>
-                </fieldset>
-
-                <div className="mt-6 flex flex-col gap-4 md:flex-row">
-                  <Button
-                    type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
-                    variant="secondary"
-                    size="lg"
-                    disabled={typeof window !== 'undefined' && window.history.length <= 1}
-                    onClick={async () => navigate(-1)}
-                  >
-                    <Trans>Cancel</Trans>
-                  </Button>
-
-                  <DocumentSigningCompleteDialog
-                    isSubmitting={isSubmitting || isAssistantSubmitting}
-                    documentTitle={document.title}
-                    fields={fields}
-                    fieldsValidated={fieldsValidated}
-                    disabled={!isRecipientsTurn}
-                    onSignatureComplete={async (nextSigner) => {
-                      await completeDocument(undefined, nextSigner);
-                    }}
-                    role={recipient.role}
-                    allowDictateNextSigner={
-                      nextRecipient && document.documentMeta?.allowDictateNextSigner
-                    }
-                    defaultNextSigner={
-                      nextRecipient
-                        ? { name: nextRecipient.name, email: nextRecipient.email }
-                        : undefined
-                    }
-                  />
+                  )}
                 </div>
+              </fieldset>
+
+              <div className="mt-6 flex flex-col gap-4 md:flex-row">
+                <Button
+                  type="button"
+                  className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+                  variant="secondary"
+                  size="lg"
+                  disabled={typeof window !== 'undefined' && window.history.length <= 1}
+                  onClick={async () => navigate(-1)}
+                >
+                  <Trans>Cancel</Trans>
+                </Button>
+
+                <DocumentSigningCompleteDialog
+                  isSubmitting={isSubmitting || isAssistantSubmitting}
+                  documentTitle={document.title}
+                  fields={fields}
+                  fieldsValidated={localFieldsValidated}
+                  disabled={!isRecipientsTurn}
+                  onSignatureComplete={async (nextSigner) => {
+                    await completeDocument(undefined, nextSigner);
+                  }}
+                  role={recipient.role}
+                  allowDictateNextSigner={
+                    nextRecipient && document.documentMeta?.allowDictateNextSigner
+                  }
+                  defaultNextSigner={
+                    nextRecipient
+                      ? { name: nextRecipient.name, email: nextRecipient.email }
+                      : undefined
+                  }
+                />
               </div>
             </>
           )}

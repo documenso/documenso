@@ -1,7 +1,6 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/macro';
-import type { TeamGlobalSettings } from '@prisma/client';
 import { parse } from 'csv-parse/sync';
 import { z } from 'zod';
 
@@ -14,10 +13,9 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
 import { AppError } from '../../../errors/app-error';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TBulkSendTemplateJobDefinition } from './bulk-send-template';
 
@@ -163,29 +161,23 @@ export const run = async ({
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
     });
 
-    let teamGlobalSettings: TeamGlobalSettings | undefined | null;
+    const { branding, emailLanguage, senderEmail } = await getEmailContext({
+      emailType: 'INTERNAL',
+      source: {
+        type: 'team',
+        teamId,
+      },
+    });
 
-    if (template.teamId) {
-      teamGlobalSettings = await prisma.teamGlobalSettings.findUnique({
-        where: {
-          teamId: template.teamId,
-        },
-      });
-    }
-
-    const branding = teamGlobalSettings
-      ? teamGlobalSettingsToBranding(teamGlobalSettings)
-      : undefined;
-
-    const i18n = await getI18nInstance(teamGlobalSettings?.documentLanguage);
+    const i18n = await getI18nInstance(emailLanguage);
 
     const [html, text] = await Promise.all([
       renderEmailWithI18N(completionTemplate, {
-        lang: teamGlobalSettings?.documentLanguage,
+        lang: emailLanguage,
         branding,
       }),
       renderEmailWithI18N(completionTemplate, {
-        lang: teamGlobalSettings?.documentLanguage,
+        lang: emailLanguage,
         branding,
         plainText: true,
       }),
@@ -196,10 +188,7 @@ export const run = async ({
         name: user.name || '',
         address: user.email,
       },
-      from: {
-        name: FROM_NAME,
-        address: FROM_ADDRESS,
-      },
+      from: senderEmail,
       subject: i18n._(msg`Bulk Send Complete: ${template.title}`),
       html,
       text,

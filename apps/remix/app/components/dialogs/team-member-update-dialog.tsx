@@ -9,7 +9,8 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { TEAM_MEMBER_ROLE_HIERARCHY, TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
+import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
 import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -43,9 +44,9 @@ export type TeamMemberUpdateDialogProps = {
   currentUserTeamRole: TeamMemberRole;
   trigger?: React.ReactNode;
   teamId: number;
-  teamMemberId: number;
-  teamMemberName: string;
-  teamMemberRole: TeamMemberRole;
+  memberId: string;
+  memberName: string;
+  memberTeamRole: TeamMemberRole;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
 const ZUpdateTeamMemberFormSchema = z.object({
@@ -58,9 +59,9 @@ export const TeamMemberUpdateDialog = ({
   currentUserTeamRole,
   trigger,
   teamId,
-  teamMemberId,
-  teamMemberName,
-  teamMemberRole,
+  memberId,
+  memberName,
+  memberTeamRole,
   ...props
 }: TeamMemberUpdateDialogProps) => {
   const [open, setOpen] = useState(false);
@@ -71,17 +72,17 @@ export const TeamMemberUpdateDialog = ({
   const form = useForm<ZUpdateTeamMemberSchema>({
     resolver: zodResolver(ZUpdateTeamMemberFormSchema),
     defaultValues: {
-      role: teamMemberRole,
+      role: memberTeamRole,
     },
   });
 
-  const { mutateAsync: updateTeamMember } = trpc.team.updateTeamMember.useMutation();
+  const { mutateAsync: updateTeamMember } = trpc.team.member.update.useMutation();
 
   const onFormSubmit = async ({ role }: ZUpdateTeamMemberSchema) => {
     try {
       await updateTeamMember({
         teamId,
-        teamMemberId,
+        memberId,
         data: {
           role,
         },
@@ -89,7 +90,7 @@ export const TeamMemberUpdateDialog = ({
 
       toast({
         title: _(msg`Success`),
-        description: _(msg`You have updated ${teamMemberName}.`),
+        description: _(msg`You have updated ${memberName}.`),
         duration: 5000,
       });
 
@@ -112,7 +113,7 @@ export const TeamMemberUpdateDialog = ({
 
     form.reset();
 
-    if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, teamMemberRole)) {
+    if (!isTeamRoleWithinUserHierarchy(currentUserTeamRole, memberTeamRole)) {
       setOpen(false);
 
       toast({
@@ -121,7 +122,7 @@ export const TeamMemberUpdateDialog = ({
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentUserTeamRole, teamMemberRole, form, toast]);
+  }, [open, currentUserTeamRole, memberTeamRole, form, toast]);
 
   return (
     <Dialog
@@ -143,9 +144,9 @@ export const TeamMemberUpdateDialog = ({
             <Trans>Update team member</Trans>
           </DialogTitle>
 
-          <DialogDescription className="mt-4">
+          <DialogDescription>
             <Trans>
-              You are currently updating <span className="font-bold">{teamMemberName}.</span>
+              You are currently updating <span className="font-bold">{memberName}.</span>
             </Trans>
           </DialogDescription>
         </DialogHeader>
@@ -170,7 +171,7 @@ export const TeamMemberUpdateDialog = ({
                         <SelectContent className="w-full" position="popper">
                           {TEAM_MEMBER_ROLE_HIERARCHY[currentUserTeamRole].map((role) => (
                             <SelectItem key={role} value={role}>
-                              {_(TEAM_MEMBER_ROLE_MAP[role]) ?? role}
+                              {_(EXTENDED_TEAM_MEMBER_ROLE_MAP[role]) ?? role}
                             </SelectItem>
                           ))}
                         </SelectContent>

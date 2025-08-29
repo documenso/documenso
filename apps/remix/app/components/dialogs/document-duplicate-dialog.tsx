@@ -16,7 +16,7 @@ import {
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 type DocumentDuplicateDialogProps = {
   id: number;
@@ -34,13 +34,14 @@ export const DocumentDuplicateDialog = ({
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
-  const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery(
+  const { data: document, isLoading } = trpcReact.document.get.useQuery(
     {
       documentId: id,
     },
     {
+      queryHash: `document-duplicate-dialog-${id}`,
       enabled: open === true,
     },
   );
@@ -52,10 +53,10 @@ export const DocumentDuplicateDialog = ({
       }
     : undefined;
 
-  const documentsPath = formatDocumentsPath(team?.url);
+  const documentsPath = formatDocumentsPath(team.url);
 
   const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
-    trpcReact.document.duplicateDocument.useMutation({
+    trpcReact.document.duplicate.useMutation({
       onSuccess: async ({ documentId }) => {
         toast({
           title: _(msg`Document Duplicated`),

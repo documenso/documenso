@@ -18,7 +18,7 @@ export const TemplatePageViewRecentActivity = ({
   templateId,
   documentRootPath,
 }: TemplatePageViewRecentActivityProps) => {
-  const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocuments.useQuery({
+  const { data, isLoading, isLoadingError, refetch } = trpc.document.find.useQuery({
     templateId,
     orderByColumn: 'createdAt',
     orderByDirection: 'asc',

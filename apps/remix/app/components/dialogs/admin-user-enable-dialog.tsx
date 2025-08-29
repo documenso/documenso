@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
+import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -24,7 +24,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type AdminUserEnableDialogProps = {
   className?: string;
-  userToEnable: User;
+  userToEnable: TGetUserResponse;
 };
 
 export const AdminUserEnableDialog = ({ className, userToEnable }: AdminUserEnableDialogProps) => {
@@ -34,7 +34,7 @@ export const AdminUserEnableDialog = ({ className, userToEnable }: AdminUserEnab
   const [email, setEmail] = useState('');
 
   const { mutateAsync: enableUser, isPending: isEnablingUser } =
-    trpc.admin.enableUser.useMutation();
+    trpc.admin.user.enable.useMutation();
 
   const onEnableAccount = async () => {
     try {

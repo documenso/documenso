@@ -1,14 +1,19 @@
 import type { Session } from '@prisma/client';
 import type { Context } from 'hono';
+import type { Logger } from 'pino';
 import { z } from 'zod';
 
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
+import type { RootApiLog } from '@documenso/lib/types/api-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { alphaid } from '@documenso/lib/universal/id';
+import { logger } from '@documenso/lib/utils/logger';
+// This is a bit nasty. Todo: Extract
+import type { HonoEnv } from '@documenso/remix/server/router';
 
 type CreateTrpcContextOptions = {
-  c: Context;
+  c: Context<HonoEnv>;
   requestSource: 'app' | 'apiV1' | 'apiV2';
 };
 
@@ -20,13 +25,21 @@ export const createTrpcContext = async ({
 
   const req = c.req.raw;
 
+  const requestMetadata = c.get('context').requestMetadata;
+
   const metadata: ApiRequestMetadata = {
-    requestMetadata: extractRequestMetadata(req),
+    requestMetadata,
     source: requestSource,
     auth: null,
   };
 
   const rawTeamId = req.headers.get('x-team-id') || undefined;
+
+  const trpcLogger = logger.child({
+    ipAddress: requestMetadata.ipAddress,
+    userAgent: requestMetadata.userAgent,
+    requestId: alphaid(),
+  } satisfies RootApiLog);
 
   const teamId = z.coerce
     .number()
@@ -36,6 +49,7 @@ export const createTrpcContext = async ({
 
   if (!session || !user) {
     return {
+      logger: trpcLogger,
       session: null,
       user: null,
       teamId,
@@ -45,6 +59,7 @@ export const createTrpcContext = async ({
   }
 
   return {
+    logger: trpcLogger,
     session,
     user,
     teamId,
@@ -66,4 +81,5 @@ export type TrpcContext = (
   teamId: number | undefined;
   req: Request;
   metadata: ApiRequestMetadata;
+  logger: Logger;
 };
