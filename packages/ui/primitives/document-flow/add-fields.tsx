@@ -21,6 +21,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import {
@@ -83,6 +84,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  onAutoSave: (_data: TAddFieldsFormSchema) => Promise<void>;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
   teamId: number;
@@ -94,6 +96,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  onAutoSave,
   canGoBack = false,
   isDocumentPdfLoaded,
   teamId,
@@ -590,6 +593,20 @@ export const AddFieldsFormPartial = ({
     }
   };
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = async () => {
+    const isFormValid = await form.trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    const formData = form.getValues();
+
+    scheduleSave(formData);
+  };
+
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -603,7 +620,14 @@ export const AddFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
-          onSave={handleSavedFieldSettings}
+          onSave={(fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            void handleAutoSave();
+          }}
+          onAutoSave={async (fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            await handleAutoSave();
+          }}
         />
       ) : (
         <>
@@ -660,14 +684,26 @@ export const AddFieldsFormPartial = ({
                       defaultWidth={DEFAULT_WIDTH_PX}
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
-                      onBlur={() => setLastActiveField(null)}
+                      onBlur={() => {
+                        setLastActiveField(null);
+                        void handleAutoSave();
+                      }}
                       onMouseEnter={() => setLastActiveField(field)}
                       onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
-                      onRemove={() => remove(index)}
-                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                      onRemove={() => {
+                        remove(index);
+                        void handleAutoSave();
+                      }}
+                      onDuplicate={() => {
+                        onFieldCopy(null, { duplicate: true });
+                        void handleAutoSave();
+                      }}
+                      onDuplicateAllPages={() => {
+                        onFieldCopy(null, { duplicateAll: true });
+                        void handleAutoSave();
+                      }}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();

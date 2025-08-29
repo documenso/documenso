@@ -1,5 +1,7 @@
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export interface GetRecipientsForTemplateOptions {
   templateId: number;
   userId: number;
@@ -14,21 +16,12 @@ export const getRecipientsForTemplate = async ({
   const recipients = await prisma.recipient.findMany({
     where: {
       templateId,
-      template: teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          },
+      template: {
+        team: buildTeamWhereQuery({
+          teamId,
+          userId,
+        }),
+      },
     },
     orderBy: {
       id: 'asc',
