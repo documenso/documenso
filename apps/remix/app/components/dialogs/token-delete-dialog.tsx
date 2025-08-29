@@ -56,7 +56,7 @@ export default function TokenDeleteDialog({ token, onDelete, children }: TokenDe
 
   type TDeleteTokenByIdMutationSchema = z.infer<typeof ZTokenDeleteDialogSchema>;
 
-  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.deleteTokenById.useMutation({
+  const { mutateAsync: deleteTokenMutation } = trpc.apiToken.delete.useMutation({
     onSuccess() {
       onDelete?.();
     },

@@ -49,7 +49,7 @@ export const DocumentDeleteDialog = ({
   const [inputValue, setInputValue] = useState('');
   const [isDeleteEnabled, setIsDeleteEnabled] = useState(status === DocumentStatus.DRAFT);
 
-  const { mutateAsync: deleteDocument, isPending } = trpcReact.document.deleteDocument.useMutation({
+  const { mutateAsync: deleteDocument, isPending } = trpcReact.document.delete.useMutation({
     onSuccess: async () => {
       void refreshLimits();
 

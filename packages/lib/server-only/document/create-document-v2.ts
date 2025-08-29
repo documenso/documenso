@@ -15,7 +15,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateDocumentV2Request } from '@documenso/trpc/server/document-router/schema';
+import type { TCreateDocumentTemporaryRequest } from '@documenso/trpc/server/document-router/create-document-temporary.types';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
@@ -45,7 +45,7 @@ export type CreateDocumentOptions = {
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
     formValues?: TDocumentFormValues;
-    recipients: TCreateDocumentV2Request['recipients'];
+    recipients: TCreateDocumentTemporaryRequest['recipients'];
     folderId?: string;
   };
   meta?: Partial<Omit<TemplateMeta, 'id' | 'templateId'>>;

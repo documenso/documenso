@@ -65,9 +65,9 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
   });
 
   const { mutateAsync: createPasskeyRegistrationOptions, isPending } =
-    trpc.auth.createPasskeyRegistrationOptions.useMutation();
+    trpc.auth.passkey.createRegistrationOptions.useMutation();
 
-  const { mutateAsync: createPasskey } = trpc.auth.createPasskey.useMutation();
+  const { mutateAsync: createPasskey } = trpc.auth.passkey.create.useMutation();
 
   const onFormSubmit = async ({ passkeyName }: TCreatePasskeyFormSchema) => {
     setFormError(null);

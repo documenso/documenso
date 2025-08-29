@@ -38,7 +38,13 @@ export const run = async ({
           id: recipientId,
         },
       },
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
     },
   });

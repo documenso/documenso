@@ -24,7 +24,13 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
       id: documentId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
     },
   });
