@@ -31,6 +31,7 @@ export const USER_SECURITY_AUDIT_LOG_MAP: Record<string, string> = {
   PASSKEY_UPDATED: 'Passkey updated',
   PASSWORD_RESET: 'Password reset',
   PASSWORD_UPDATE: 'Password updated',
+  SESSION_REVOKED: 'Session revoked',
   SIGN_OUT: 'Signed Out',
   SIGN_IN: 'Signed In',
   SIGN_IN_FAIL: 'Sign in attempt failed',

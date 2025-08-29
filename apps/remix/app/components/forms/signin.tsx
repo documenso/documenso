@@ -55,7 +55,7 @@ const handleFallbackErrorMessages = (code: string) => {
   return message;
 };
 
-const LOGIN_REDIRECT_PATH = '/documents';
+const LOGIN_REDIRECT_PATH = '/';
 
 export const ZSignInFormSchema = z.object({
   email: z.string().email().min(1),
@@ -114,7 +114,7 @@ export const SignInForm = ({
   }, [returnTo]);
 
   const { mutateAsync: createPasskeySigninOptions } =
-    trpc.auth.createPasskeySigninOptions.useMutation();
+    trpc.auth.passkey.createSigninOptions.useMutation();
 
   const form = useForm<TSignInFormSchema>({
     values: {

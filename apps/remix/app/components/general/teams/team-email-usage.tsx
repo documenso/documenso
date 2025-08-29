@@ -30,7 +30,7 @@ export const TeamEmailUsage = ({ teamEmail }: TeamEmailUsageProps) => {
   const { toast } = useToast();
 
   const { mutateAsync: deleteTeamEmail, isPending: isDeletingTeamEmail } =
-    trpc.team.deleteTeamEmail.useMutation({
+    trpc.team.email.delete.useMutation({
       onSuccess: () => {
         toast({
           title: _(msg`Success`),

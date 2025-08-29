@@ -1,4 +1,4 @@
-import TemplatesPage, { meta } from '~/routes/_authenticated+/templates.f.$folderId._index';
+import TemplatesPage, { meta } from './templates._index';
 
 export { meta };
 

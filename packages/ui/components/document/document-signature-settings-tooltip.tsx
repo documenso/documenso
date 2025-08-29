@@ -6,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 export const DocumentSignatureSettingsTooltip = () => {
   return (
     <Tooltip>
-      <TooltipTrigger>
+      <TooltipTrigger type="button">
         <InfoIcon className="mx-2 h-4 w-4" />
       </TooltipTrigger>
 

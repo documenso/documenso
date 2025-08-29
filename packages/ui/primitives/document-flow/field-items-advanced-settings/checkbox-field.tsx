@@ -44,6 +44,9 @@ export const CheckboxFieldAdvancedSettings = ({
   const [required, setRequired] = useState(fieldState.required ?? false);
   const [validationLength, setValidationLength] = useState(fieldState.validationLength ?? 0);
   const [validationRule, setValidationRule] = useState(fieldState.validationRule ?? '');
+  const [direction, setDirection] = useState<'vertical' | 'horizontal'>(
+    fieldState.direction ?? 'vertical',
+  );
 
   const handleToggleChange = (field: keyof CheckboxFieldMeta, value: string | boolean) => {
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
@@ -52,11 +55,14 @@ export const CheckboxFieldAdvancedSettings = ({
       field === 'validationRule' ? String(value) : String(fieldState.validationRule);
     const validationLength =
       field === 'validationLength' ? Number(value) : Number(fieldState.validationLength);
+    const currentDirection =
+      field === 'direction' && String(value) === 'horizontal' ? 'horizontal' : 'vertical';
 
     setReadOnly(readOnly);
     setRequired(required);
     setValidationRule(validationRule);
     setValidationLength(validationLength);
+    setDirection(currentDirection);
 
     const errors = validateCheckboxField(
       values.map((item) => item.value),
@@ -65,6 +71,7 @@ export const CheckboxFieldAdvancedSettings = ({
         required,
         validationRule,
         validationLength,
+        direction: currentDirection,
         type: 'checkbox',
       },
     );
@@ -86,6 +93,7 @@ export const CheckboxFieldAdvancedSettings = ({
         required,
         validationRule,
         validationLength,
+        direction: direction,
         type: 'checkbox',
       },
     );
@@ -137,6 +145,29 @@ export const CheckboxFieldAdvancedSettings = ({
           onChange={(e) => handleFieldChange('label', e.target.value)}
         />
       </div>
+
+      <div className="mb-2">
+        <Label>
+          <Trans>Direction</Trans>
+        </Label>
+        <Select
+          value={fieldState.direction ?? 'vertical'}
+          onValueChange={(val) => handleToggleChange('direction', val)}
+        >
+          <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
+            <SelectValue placeholder={_(msg`Select direction`)} />
+          </SelectTrigger>
+          <SelectContent position="popper">
+            <SelectItem value="vertical">
+              <Trans>Vertical</Trans>
+            </SelectItem>
+            <SelectItem value="horizontal">
+              <Trans>Horizontal</Trans>
+            </SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
       <div className="flex flex-row items-center gap-x-4">
         <div className="flex w-2/3 flex-col">
           <Label>

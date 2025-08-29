@@ -1,16 +1,17 @@
-import type { Team } from '@prisma/client';
 import { SendStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { buildTeamWhereQuery } from '../../utils/teams';
 
 export type DeleteRecipientOptions = {
   documentId: number;
   recipientId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
   requestMetadata?: RequestMetadata;
 };
 
@@ -26,21 +27,8 @@ export const deleteRecipient = async ({
       id: recipientId,
       document: {
         id: documentId,
-        ...(teamId
-          ? {
-              team: {
-                id: teamId,
-                members: {
-                  some: {
-                    userId,
-                  },
-                },
-              },
-            }
-          : {
-              userId,
-              teamId: null,
-            }),
+        userId,
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });
@@ -59,19 +47,12 @@ export const deleteRecipient = async ({
     },
   });
 
-  let team: Team | null = null;
+  const team = await prisma.team.findFirst({
+    where: buildTeamWhereQuery({ teamId, userId }),
+  });
 
-  if (teamId) {
-    team = await prisma.team.findFirst({
-      where: {
-        id: teamId,
-        members: {
-          some: {
-            userId,
-          },
-        },
-      },
-    });
+  if (!team) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
   }
 
   const deletedRecipient = await prisma.$transaction(async (tx) => {

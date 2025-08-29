@@ -39,7 +39,7 @@ const Alert = React.forwardRef<
   <div
     ref={ref}
     role="alert"
-    className={cn(alertVariants({ variant, padding }), className)}
+    className={cn('space-y-2', alertVariants({ variant, padding }), className)}
     {...props}
   />
 ));

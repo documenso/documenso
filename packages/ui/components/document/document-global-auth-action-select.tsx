@@ -1,54 +1,75 @@
-import { forwardRef } from 'react';
-
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
 
 import { DOCUMENT_AUTH_TYPES } from '@documenso/lib/constants/document-auth';
 import { DocumentActionAuth, DocumentAuth } from '@documenso/lib/types/document-auth';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@documenso/ui/primitives/select';
+import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
-export const DocumentGlobalAuthActionSelect = forwardRef<HTMLButtonElement, SelectProps>(
-  (props, ref) => {
-    const { _ } = useLingui();
+export interface DocumentGlobalAuthActionSelectProps {
+  value?: string[];
+  defaultValue?: string[];
+  onValueChange?: (value: string[]) => void;
+  disabled?: boolean;
+  placeholder?: string;
+}
 
-    return (
-      <Select {...props}>
-        <SelectTrigger className="bg-background text-muted-foreground">
-          <SelectValue
-            ref={ref}
-            data-testid="documentActionSelectValue"
-            placeholder={_(msg`No restrictions`)}
-          />
-        </SelectTrigger>
+export const DocumentGlobalAuthActionSelect = ({
+  value,
+  defaultValue,
+  onValueChange,
+  disabled,
+  placeholder,
+}: DocumentGlobalAuthActionSelectProps) => {
+  const { _ } = useLingui();
 
-        <SelectContent position="popper">
-          {/* Note: -1 is remapped in the Zod schema to the required value. */}
-          <SelectItem value={'-1'}>
-            <Trans>No restrictions</Trans>
-          </SelectItem>
+  // Convert auth types to MultiSelect options
+  const authOptions: Option[] = [
+    {
+      value: '-1',
+      label: _(msg`No restrictions`),
+    },
+    ...Object.values(DocumentActionAuth)
+      .filter((auth) => auth !== DocumentAuth.ACCOUNT)
+      .map((authType) => ({
+        value: authType,
+        label: DOCUMENT_AUTH_TYPES[authType].value,
+      })),
+  ];
 
-          {Object.values(DocumentActionAuth)
-            .filter((auth) => auth !== DocumentAuth.ACCOUNT)
-            .map((authType) => (
-              <SelectItem key={authType} value={authType}>
-                {DOCUMENT_AUTH_TYPES[authType].value}
-              </SelectItem>
-            ))}
-        </SelectContent>
-      </Select>
-    );
-  },
-);
+  // Convert string array to Option array for MultiSelect
+  const selectedOptions =
+    (value
+      ?.map((val) => authOptions.find((option) => option.value === val))
+      .filter(Boolean) as Option[]) || [];
+
+  // Convert default value to Option array
+  const defaultOptions =
+    (defaultValue
+      ?.map((val) => authOptions.find((option) => option.value === val))
+      .filter(Boolean) as Option[]) || [];
+
+  const handleChange = (options: Option[]) => {
+    const values = options.map((option) => option.value);
+    onValueChange?.(values);
+  };
+
+  return (
+    <MultiSelect
+      value={selectedOptions}
+      defaultOptions={defaultOptions}
+      options={authOptions}
+      onChange={handleChange}
+      disabled={disabled}
+      placeholder={placeholder || _(msg`Select authentication methods`)}
+      className="bg-background text-muted-foreground"
+      hideClearAllButton={false}
+      data-testid="documentActionSelectValue"
+    />
+  );
+};
 
 DocumentGlobalAuthActionSelect.displayName = 'DocumentGlobalAuthActionSelect';
 
@@ -64,20 +85,19 @@ export const DocumentGlobalAuthActionTooltip = () => (
       </h2>
 
       <p>
-        <Trans>The authentication required for recipients to sign the signature field.</Trans>
+        <Trans>
+          The authentication methods required for recipients to sign the signature field.
+        </Trans>
       </p>
 
       <p>
         <Trans>
-          This can be overriden by setting the authentication requirements directly on each
-          recipient in the next step.
+          These can be overriden by setting the authentication requirements directly on each
+          recipient in the next step. Multiple methods can be selected.
         </Trans>
       </p>
 
       <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-        {/* <li>
-          <strong>Require account</strong> - The recipient must be signed in
-        </li> */}
         <li>
           <Trans>
             <strong>Require passkey</strong> - The recipient must have an account and passkey
@@ -90,6 +110,14 @@ export const DocumentGlobalAuthActionTooltip = () => (
             their settings
           </Trans>
         </li>
+
+        <li>
+          <Trans>
+            <strong>Require password</strong> - The recipient must have an account and password
+            configured via their settings, the password will be verified during signing
+          </Trans>
+        </li>
+
         <li>
           <Trans>
             <strong>No restrictions</strong> - No authentication required

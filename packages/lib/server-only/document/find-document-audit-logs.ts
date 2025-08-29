@@ -6,10 +6,11 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import type { FindResultResponse } from '../../types/search-params';
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { getDocumentWhereInput } from './get-document-by-id';
 
 export interface FindDocumentAuditLogsOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   page?: number;
   perPage?: number;
@@ -34,25 +35,14 @@ export const findDocumentAuditLogs = async ({
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
   });
 
   if (!document) {

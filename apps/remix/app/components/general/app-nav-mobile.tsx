@@ -1,13 +1,19 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useMemo } from 'react';
+
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { Link, useParams } from 'react-router';
+import { ReadStatus } from '@prisma/client';
+import { Link } from 'react-router';
 
 import LogoImage from '@documenso/assets/logo.png';
 import { authClient } from '@documenso/auth/client';
-import { getRootHref } from '@documenso/lib/utils/params';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { trpc } from '@documenso/trpc/react';
 import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
 import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 export type AppNavMobileProps = {
   isMenuOpen: boolean;
@@ -15,34 +21,64 @@ export type AppNavMobileProps = {
 };
 
 export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
-  const params = useParams();
+  const { organisations } = useSession();
+
+  const currentTeam = useOptionalCurrentTeam();
+
+  const { data: unreadCountData } = trpc.document.inbox.getCount.useQuery(
+    {
+      readStatus: ReadStatus.NOT_OPENED,
+    },
+    {
+      // refetchInterval: 30000, // Refetch every 30 seconds
+    },
+  );
 
   const handleMenuItemClick = () => {
     onMenuOpenChange?.(false);
   };
 
-  const rootHref = getRootHref(params, { returnEmptyRootString: true });
+  const menuNavigationLinks = useMemo(() => {
+    let teamUrl = currentTeam?.url || null;
 
-  const menuNavigationLinks = [
-    {
-      href: `${rootHref}/documents`,
-      text: msg`Documents`,
-    },
-    {
-      href: `${rootHref}/templates`,
-      text: msg`Templates`,
-    },
-    {
-      href: '/settings/teams',
-      text: msg`Teams`,
-    },
-    {
-      href: '/settings/profile',
-      text: msg`Settings`,
-    },
-  ];
+    if (!teamUrl && isPersonalLayout(organisations)) {
+      teamUrl = organisations[0].teams[0]?.url || null;
+    }
+
+    if (!teamUrl) {
+      return [
+        {
+          href: '/inbox',
+          text: t`Inbox`,
+        },
+        {
+          href: '/settings/profile',
+          text: t`Settings`,
+        },
+      ];
+    }
+
+    return [
+      {
+        href: `/t/${teamUrl}/documents`,
+        text: t`Documents`,
+      },
+      {
+        href: `/t/${teamUrl}/templates`,
+        text: t`Templates`,
+      },
+      {
+        href: '/inbox',
+        text: t`Inbox`,
+      },
+      {
+        href: '/settings/profile',
+        text: t`Settings`,
+      },
+    ];
+  }, [currentTeam, organisations]);
 
   return (
     <Sheet open={isMenuOpen} onOpenChange={onMenuOpenChange}>
@@ -61,11 +97,16 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           {menuNavigationLinks.map(({ href, text }) => (
             <Link
               key={href}
-              className="text-foreground hover:text-foreground/80 text-2xl font-semibold"
+              className="text-foreground hover:text-foreground/80 flex items-center gap-2 text-2xl font-semibold"
               to={href}
               onClick={() => handleMenuItemClick()}
             >
-              {_(text)}
+              {text}
+              {href === '/inbox' && unreadCountData && unreadCountData.count > 0 && (
+                <span className="bg-primary text-primary-foreground flex h-6 min-w-[1.5rem] items-center justify-center rounded-full px-1.5 text-xs font-semibold">
+                  {unreadCountData.count > 99 ? '99+' : unreadCountData.count}
+                </span>
+              )}
             </Link>
           ))}
 

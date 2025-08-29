@@ -24,7 +24,7 @@ export const updateProfile = async ({
     },
   });
 
-  return await prisma.$transaction(async (tx) => {
+  await prisma.$transaction(async (tx) => {
     await tx.userSecurityAuditLog.create({
       data: {
         userId,
@@ -34,7 +34,7 @@ export const updateProfile = async ({
       },
     });
 
-    return await tx.user.update({
+    await tx.user.update({
       where: {
         id: userId,
       },

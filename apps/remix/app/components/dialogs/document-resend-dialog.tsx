@@ -36,7 +36,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 import { StackAvatar } from '../general/stack-avatar';
 
@@ -57,7 +57,7 @@ export type TResendDocumentFormSchema = z.infer<typeof ZResendDocumentFormSchema
 
 export const DocumentResendDialog = ({ document, recipients }: DocumentResendDialogProps) => {
   const { user } = useSession();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -71,7 +71,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     document.status !== 'PENDING' ||
     !recipients.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED);
 
-  const { mutateAsync: resendDocument } = trpcReact.document.resendDocument.useMutation();
+  const { mutateAsync: resendDocument } = trpcReact.document.redistribute.useMutation();
 
   const form = useForm<TResendDocumentFormSchema>({
     resolver: zodResolver(ZResendDocumentFormSchema),
