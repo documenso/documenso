@@ -11,10 +11,11 @@ import { prisma } from '@documenso/prisma';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import { getDocumentWhereInput } from '../document/get-document-by-id';
 
 export type CreateDocumentMetaOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   documentId: number;
   subject?: string;
   message?: string;
@@ -22,6 +23,8 @@ export type CreateDocumentMetaOptions = {
   password?: string;
   dateFormat?: string;
   redirectUrl?: string;
+  emailId?: string | null;
+  emailReplyTo?: string | null;
   emailSettings?: TDocumentEmailSettings;
   signingOrder?: DocumentSigningOrder;
   allowDictateNextSigner?: boolean;
@@ -45,6 +48,8 @@ export const upsertDocumentMeta = async ({
   redirectUrl,
   signingOrder,
   allowDictateNextSigner,
+  emailId,
+  emailReplyTo,
   emailSettings,
   distributionMethod,
   typedSignatureEnabled,
@@ -53,25 +58,14 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
+  const { documentWhereInput, team } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-      ...(teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          }),
-    },
+    where: documentWhereInput,
     include: {
       documentMeta: true,
     },
@@ -84,6 +78,22 @@ export const upsertDocumentMeta = async ({
   }
 
   const { documentMeta: originalDocumentMeta } = document;
+
+  // Validate the emailId belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
+  }
 
   return await prisma.$transaction(async (tx) => {
     const upsertedDocumentMeta = await tx.documentMeta.upsert({
@@ -100,6 +110,8 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         allowDictateNextSigner,
+        emailId,
+        emailReplyTo,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,
@@ -116,6 +128,8 @@ export const upsertDocumentMeta = async ({
         redirectUrl,
         signingOrder,
         allowDictateNextSigner,
+        emailId,
+        emailReplyTo,
         emailSettings,
         distributionMethod,
         typedSignatureEnabled,

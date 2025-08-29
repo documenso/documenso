@@ -1,5 +1,3 @@
-'use client';
-
 import * as React from 'react';
 import { useEffect } from 'react';
 
@@ -78,6 +76,8 @@ interface MultiSelectProps {
   >;
   /** hide the clear all button. */
   hideClearAllButton?: boolean;
+  /** test id for the select value. */
+  'data-testid'?: string;
 }
 
 export interface MultiSelectRef {
@@ -170,6 +170,7 @@ const MultiSelect = ({
   commandProps,
   inputProps,
   hideClearAllButton = false,
+  'data-testid': dataTestId,
 }: MultiSelectProps) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [open, setOpen] = React.useState(false);
@@ -403,6 +404,7 @@ const MultiSelect = ({
         commandProps?.shouldFilter !== undefined ? commandProps.shouldFilter : !onSearch
       } // When onSearch is provided, we don&lsquo;t want to filter the options. You can still override it.
       filter={commandFilter()}
+      data-testid={dataTestId}
     >
       <div
         className={cn(

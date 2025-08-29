@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { User } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
+import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -24,7 +24,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type AdminUserDisableDialogProps = {
   className?: string;
-  userToDisable: User;
+  userToDisable: TGetUserResponse;
 };
 
 export const AdminUserDisableDialog = ({
@@ -37,7 +37,7 @@ export const AdminUserDisableDialog = ({
   const [email, setEmail] = useState('');
 
   const { mutateAsync: disableUser, isPending: isDisablingUser } =
-    trpc.admin.disableUser.useMutation();
+    trpc.admin.user.disable.useMutation();
 
   const onDisableAccount = async () => {
     try {

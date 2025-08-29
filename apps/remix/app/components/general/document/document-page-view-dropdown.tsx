@@ -36,7 +36,7 @@ import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialo
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
-import { useOptionalCurrentTeam } from '~/providers/team';
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
   document: Document & {
@@ -52,7 +52,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const { _ } = useLingui();
 
   const navigate = useNavigate();
-  const team = useOptionalCurrentTeam();
+  const team = useCurrentTeam();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
@@ -67,11 +67,11 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const isCurrentTeamDocument = team && document.team?.url === team.url;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
-  const documentsPath = formatDocumentsPath(team?.url);
+  const documentsPath = formatDocumentsPath(team.url);
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
@@ -100,7 +100,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
   const onDownloadOriginalClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
@@ -164,7 +164,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         <DropdownMenuItem asChild>
           <Link to={`${documentsPath}/${document.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
-            <Trans>Audit Log</Trans>
+            <Trans>Audit Logs</Trans>
           </Link>
         </DropdownMenuItem>
 

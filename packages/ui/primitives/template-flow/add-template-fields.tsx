@@ -24,11 +24,13 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
 } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -71,7 +73,7 @@ export type AddTemplateFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
-  teamId?: number;
+  teamId: number;
 };
 
 export const AddTemplateFieldsFormPartial = ({
@@ -209,6 +211,7 @@ export const AddTemplateFieldsFormPartial = ({
         append({
           ...copiedField,
           formId: nanoid(12),
+          nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
           signerId: selectedSigner?.id ?? copiedField.signerId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
@@ -323,7 +326,7 @@ export const AddTemplateFieldsFormPartial = ({
       pageX -= fieldPageWidth / 2;
       pageY -= fieldPageHeight / 2;
 
-      append({
+      const field = {
         formId: nanoid(12),
         type: selectedField,
         pageNumber,
@@ -335,7 +338,13 @@ export const AddTemplateFieldsFormPartial = ({
         signerId: selectedSigner.id,
         signerToken: selectedSigner.token ?? '',
         fieldMeta: undefined,
-      });
+      };
+
+      append(field);
+      if (ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING.includes(selectedField)) {
+        setCurrentField(field);
+        setShowAdvancedSettings(true);
+      }
 
       setIsFieldWithinBounds(false);
       setSelectedField(null);
@@ -510,7 +519,6 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
-          teamId={teamId}
         />
       ) : (
         <>
@@ -586,15 +594,21 @@ export const AddTemplateFieldsFormPartial = ({
                       selectedSignerStyles?.comboxBoxTrigger,
                     )}
                   >
-                    {selectedSigner?.email && (
-                      <span className="flex-1 truncate text-left">
-                        {selectedSigner?.name} ({selectedSigner?.email})
-                      </span>
-                    )}
+                    {selectedSigner?.email &&
+                      !isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">
+                          {selectedSigner?.name} ({selectedSigner?.email})
+                        </span>
+                      )}
+
+                    {selectedSigner?.email &&
+                      isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
+                      )}
 
                     {!selectedSigner?.email && (
                       <span className="gradie flex-1 truncate text-left">
-                        {selectedSigner?.email}
+                        No recipient selected
                       </span>
                     )}
 
@@ -650,15 +664,22 @@ export const AddTemplateFieldsFormPartial = ({
                                 'text-foreground/80': recipient === selectedSigner,
                               })}
                             >
-                              {recipient.name && (
-                                <span title={`${recipient.name} (${recipient.email})`}>
-                                  {recipient.name} ({recipient.email})
-                                </span>
-                              )}
+                              {recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={`${recipient.name} (${recipient.email})`}>
+                                    {recipient.name} ({recipient.email})
+                                  </span>
+                                )}
 
-                              {!recipient.name && (
-                                <span title={recipient.email}>{recipient.email}</span>
-                              )}
+                              {recipient.name &&
+                                isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.name}>{recipient.name}</span>
+                                )}
+
+                              {!recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.email}>{recipient.email}</span>
+                                )}
                             </span>
                           </CommandItem>
                         ))}

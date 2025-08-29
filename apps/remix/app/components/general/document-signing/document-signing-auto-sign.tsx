@@ -10,6 +10,7 @@ import { useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
 import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { AUTO_SIGNABLE_FIELD_TYPES } from '@documenso/lib/constants/autosign';
 import { DocumentAuth } from '@documenso/lib/types/document-auth';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { trpc } from '@documenso/trpc/react';
@@ -30,13 +31,6 @@ import { DocumentSigningDisclosure } from '~/components/general/document-signing
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from './document-signing-provider';
 
-const AUTO_SIGNABLE_FIELD_TYPES: string[] = [
-  FieldType.NAME,
-  FieldType.INITIALS,
-  FieldType.EMAIL,
-  FieldType.DATE,
-];
-
 // The action auth types that are not allowed to be auto signed
 //
 // Reasoning: If the action auth is a passkey or 2FA, it's likely that the owner of the document
@@ -44,6 +38,7 @@ const AUTO_SIGNABLE_FIELD_TYPES: string[] = [
 // other field types.
 const NON_AUTO_SIGNABLE_ACTION_AUTH_TYPES: string[] = [
   DocumentAuth.PASSKEY,
+  DocumentAuth.PASSWORD,
   DocumentAuth.TWO_FACTOR_AUTH,
 ];
 
@@ -96,8 +91,8 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
     return true;
   });
 
-  const actionAuthAllowsAutoSign = !NON_AUTO_SIGNABLE_ACTION_AUTH_TYPES.includes(
-    derivedRecipientActionAuth ?? '',
+  const actionAuthAllowsAutoSign = derivedRecipientActionAuth.every(
+    (actionAuth) => !NON_AUTO_SIGNABLE_ACTION_AUTH_TYPES.includes(actionAuth),
   );
 
   const onSubmit = async () => {
@@ -110,16 +105,16 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
           .with(FieldType.DATE, () => new Date().toISOString())
           .otherwise(() => '');
 
-        const authOptions = match(derivedRecipientActionAuth)
+        const authOptions = match(derivedRecipientActionAuth.at(0))
           .with(DocumentAuth.ACCOUNT, () => ({
             type: DocumentAuth.ACCOUNT,
           }))
           .with(DocumentAuth.EXPLICIT_NONE, () => ({
             type: DocumentAuth.EXPLICIT_NONE,
           }))
-          .with(null, () => undefined)
+          .with(undefined, () => undefined)
           .with(
-            P.union(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH),
+            P.union(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, DocumentAuth.PASSWORD),
             // This is a bit dirty, but the sentinel value used here is incredibly short-lived.
             () => 'NOT_SUPPORTED' as const,
           )

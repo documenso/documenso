@@ -9,10 +9,9 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
-import { FROM_ADDRESS, FROM_NAME } from '../../../constants/email';
+import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
-import { teamGlobalSettingsToBranding } from '../../../utils/team-global-settings-to-branding';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendDocumentCancelledEmailsJobDefinition } from './send-document-cancelled-emails';
 
@@ -30,7 +29,13 @@ export const run = async ({
       id: documentId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
       recipients: true,
       team: {
@@ -38,10 +43,18 @@ export const run = async ({
           teamEmail: true,
           name: true,
           url: true,
-          teamGlobalSettings: true,
         },
       },
     },
+  });
+
+  const { branding, emailLanguage, senderEmail, replyToEmail } = await getEmailContext({
+    emailType: 'RECIPIENT',
+    source: {
+      type: 'team',
+      teamId: document.teamId,
+    },
+    meta: document.documentMeta,
   });
 
   const { documentMeta, user: documentOwner } = document;
@@ -53,7 +66,7 @@ export const run = async ({
     return;
   }
 
-  const i18n = await getI18nInstance(documentMeta?.language);
+  const i18n = await getI18nInstance(emailLanguage);
 
   // Send cancellation emails to all recipients who have been sent the document or viewed it
   const recipientsToNotify = document.recipients.filter(
@@ -73,14 +86,10 @@ export const run = async ({
           cancellationReason: cancellationReason || 'The document has been cancelled.',
         });
 
-        const branding = document.team?.teamGlobalSettings
-          ? teamGlobalSettingsToBranding(document.team.teamGlobalSettings)
-          : undefined;
-
         const [html, text] = await Promise.all([
-          renderEmailWithI18N(template, { lang: documentMeta?.language, branding }),
+          renderEmailWithI18N(template, { lang: emailLanguage, branding }),
           renderEmailWithI18N(template, {
-            lang: documentMeta?.language,
+            lang: emailLanguage,
             branding,
             plainText: true,
           }),
@@ -91,10 +100,8 @@ export const run = async ({
             name: recipient.name,
             address: recipient.email,
           },
-          from: {
-            name: FROM_NAME,
-            address: FROM_ADDRESS,
-          },
+          from: senderEmail,
+          replyTo: replyToEmail,
           subject: i18n._(msg`Document "${document.title}" Cancelled`),
           html,
           text,

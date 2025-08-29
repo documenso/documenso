@@ -15,6 +15,15 @@ export type RecipientColorStyles = {
 
 // !: values of the declared variable to do all the background, border and shadow styles.
 export const RECIPIENT_COLOR_STYLES = {
+  readOnly: {
+    base: 'ring-neutral-400',
+    fieldItem: 'group/field-item rounded-[2px]',
+    fieldItemInitials: '',
+    comboxBoxTrigger:
+      'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
+    comboxBoxItem: '',
+  },
+
   green: {
     base: 'ring-recipient-green hover:bg-recipient-green/30',
     fieldItem: 'group/field-item rounded-[2px]',

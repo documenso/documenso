@@ -1,9 +1,11 @@
 import { prisma } from '@documenso/prisma';
 
+import { getDocumentWhereInput } from '../document/get-document-by-id';
+
 export interface GetRecipientsForDocumentOptions {
   documentId: number;
   userId: number;
-  teamId?: number;
+  teamId: number;
 }
 
 export const getRecipientsForDocument = async ({
@@ -11,24 +13,15 @@ export const getRecipientsForDocument = async ({
   userId,
   teamId,
 }: GetRecipientsForDocumentOptions) => {
+  const { documentWhereInput } = await getDocumentWhereInput({
+    documentId,
+    userId,
+    teamId,
+  });
+
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId,
-      document: teamId
-        ? {
-            team: {
-              id: teamId,
-              members: {
-                some: {
-                  userId,
-                },
-              },
-            },
-          }
-        : {
-            userId,
-            teamId: null,
-          },
+      document: documentWhereInput,
     },
     orderBy: {
       id: 'asc',

@@ -18,17 +18,18 @@ test.describe('Template Field Prefill API v2', () => {
     request,
   }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template with seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template with Advanced Fields V2',
       },
@@ -193,7 +194,7 @@ test.describe('Template Field Prefill API v2', () => {
             id: numberField.id,
             type: 'number',
             label: 'Prefilled Number',
-            value: '42',
+            value: '98765',
           },
           {
             id: radioField.id,
@@ -252,7 +253,7 @@ test.describe('Template Field Prefill API v2', () => {
     expect(documentNumberField?.fieldMeta).toMatchObject({
       type: 'number',
       label: 'Prefilled Number',
-      value: '42',
+      value: '98765',
     });
 
     const documentRadioField = document?.fields.find(
@@ -325,7 +326,7 @@ test.describe('Template Field Prefill API v2', () => {
     await expect(page.getByText('This is prefilled')).toBeVisible();
 
     // Number field
-    await expect(page.getByText('42')).toBeVisible();
+    await expect(page.getByText('98765', { exact: true })).toBeVisible();
 
     // Radio field
     await expect(page.getByText('Option A')).toBeVisible();
@@ -346,17 +347,18 @@ test.describe('Template Field Prefill API v2', () => {
     request,
   }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template with seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template with Default Fields V2',
       },
@@ -378,7 +380,7 @@ test.describe('Template Field Prefill API v2', () => {
 
     // 5. Add fields to the template
     // Add TEXT field
-    const textField = await prisma.field.create({
+    await prisma.field.create({
       data: {
         templateId: template.id,
         recipientId: recipient.id,
@@ -398,7 +400,7 @@ test.describe('Template Field Prefill API v2', () => {
     });
 
     // Add NUMBER field
-    const numberField = await prisma.field.create({
+    await prisma.field.create({
       data: {
         templateId: template.id,
         recipientId: recipient.id,
@@ -511,17 +513,18 @@ test.describe('Template Field Prefill API v2', () => {
 
   test('should handle invalid field prefill values', async ({ request }) => {
     // 1. Create a user
-    const user = await seedUser();
+    const { user, team } = await seedUser();
 
     // 2. Create an API token for the user
     const { token } = await createApiToken({
       userId: user.id,
+      teamId: team.id,
       tokenName: 'test-token',
       expiresIn: null,
     });
 
     // 3. Create a template using seedBlankTemplate
-    const template = await seedBlankTemplate(user, {
+    const template = await seedBlankTemplate(user, team.id, {
       createTemplateOptions: {
         title: 'Template for Invalid Test V2',
         visibility: 'EVERYONE',

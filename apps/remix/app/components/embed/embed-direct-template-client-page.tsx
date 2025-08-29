@@ -57,7 +57,7 @@ export const EmbedDirectTemplateClientPage = ({
   token,
   updatedAt,
   documentData,
-  recipient,
+  recipient: _recipient,
   fields,
   metadata,
   hidePoweredBy = false,
@@ -91,7 +91,11 @@ export const EmbedDirectTemplateClientPage = ({
     localFields.filter((field) => field.inserted),
   ];
 
+  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
+
   const hasSignatureField = localFields.some((field) => field.type === FieldType.SIGNATURE);
+
+  const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
 
   const { mutateAsync: createDocumentFromDirectTemplate, isPending: isSubmitting } =
     trpc.template.createDocumentFromDirectTemplate.useMutation();
@@ -332,7 +336,7 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Widget */}
         <div
           key={isExpanded ? 'expanded' : 'collapsed'}
-          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:top-4 md:z-auto md:w-[350px] md:px-0"
+          className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
           <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
@@ -343,19 +347,34 @@ export const EmbedDirectTemplateClientPage = ({
                   <Trans>Sign document</Trans>
                 </h3>
 
-                <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                  {isExpanded ? (
-                    <LucideChevronDown
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(false)}
-                    />
-                  ) : (
-                    <LucideChevronUp
-                      className="text-muted-foreground h-5 w-5"
-                      onClick={() => setIsExpanded(true)}
-                    />
-                  )}
-                </Button>
+                {isExpanded ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(false)}
+                  >
+                    <LucideChevronDown className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : pendingFields.length > 0 ? (
+                  <Button
+                    variant="outline"
+                    className="h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(true)}
+                  >
+                    <LucideChevronUp className="text-muted-foreground h-5 w-5" />
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="md:hidden"
+                    disabled={isThrottled || (hasSignatureField && !signatureValid)}
+                    loading={isSubmitting}
+                    onClick={() => throttledOnCompleteClick()}
+                  >
+                    <Trans>Complete</Trans>
+                  </Button>
+                )}
               </div>
             </div>
 
@@ -442,7 +461,9 @@ export const EmbedDirectTemplateClientPage = ({
           </div>
         </div>
 
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+        <ElementVisible
+          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
+        >
           {showPendingFieldTooltip && pendingFields.length > 0 && (
             <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
               <Trans>Click to insert field</Trans>

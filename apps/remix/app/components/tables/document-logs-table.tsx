@@ -34,7 +34,7 @@ export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
 
   const parsedSearchParams = ZUrlSearchParamsSchema.parse(Object.fromEntries(searchParams ?? []));
 
-  const { data, isLoading, isLoadingError } = trpc.document.findDocumentAuditLogs.useQuery(
+  const { data, isLoading, isLoadingError } = trpc.document.auditLog.find.useQuery(
     {
       documentId,
       page: parsedSearchParams.page,

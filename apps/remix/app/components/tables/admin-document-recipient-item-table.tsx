@@ -52,7 +52,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
     },
   });
 
-  const { mutateAsync: updateRecipient } = trpc.admin.updateRecipient.useMutation();
+  const { mutateAsync: updateRecipient } = trpc.admin.recipient.update.useMutation();
 
   const columns = useMemo(() => {
     return [
