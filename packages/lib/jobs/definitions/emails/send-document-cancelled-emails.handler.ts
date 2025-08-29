@@ -29,7 +29,13 @@ export const run = async ({
       id: documentId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
       recipients: true,
       team: {

@@ -30,7 +30,13 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
     include: {
       recipients: true,
       documentMeta: true,
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
     },
   });
 

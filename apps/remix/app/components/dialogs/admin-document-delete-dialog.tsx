@@ -34,7 +34,7 @@ export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialo
   const [reason, setReason] = useState('');
 
   const { mutateAsync: deleteDocument, isPending: isDeletingDocument } =
-    trpc.admin.deleteDocument.useMutation();
+    trpc.admin.document.delete.useMutation();
 
   const handleDeleteDocument = async () => {
     try {

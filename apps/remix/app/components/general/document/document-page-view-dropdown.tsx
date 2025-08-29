@@ -71,7 +71,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
@@ -100,7 +100,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
   const onDownloadOriginalClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
