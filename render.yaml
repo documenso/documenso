@@ -103,6 +103,8 @@ services:
       # Signing
       - key: NEXT_PRIVATE_SIGNING_TRANSPORT
         sync: false
+      - key: NEXT_PRIVATE_SIGNING_TIMESTAMP_SERVER
+        sync: false
       - key: NEXT_PRIVATE_SIGNING_PASSPHRASE
         sync: false
       - key: NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH
