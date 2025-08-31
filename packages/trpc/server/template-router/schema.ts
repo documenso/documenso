@@ -83,8 +83,8 @@ export const ZCreateTemplateMutationSchema = z.object({
 });
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
-  directRecipientName: z.string().optional(),
-  directRecipientEmail: z.string().email(),
+  directRecipientName: z.string().max(255).optional(),
+  directRecipientEmail: z.string().email().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
@@ -97,8 +97,8 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email(),
-        name: z.string().optional(),
+        email: z.string().email().max(254),
+        name: z.string().max(255).optional(),
       }),
     )
     .describe('The information of the recipients to create the document with.')

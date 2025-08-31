@@ -589,6 +589,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
+                                        maxLength={254}
                                       />
                                     </FormControl>
 
@@ -626,6 +627,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
+                                        maxLength={255}
                                       />
                                     </FormControl>
 
