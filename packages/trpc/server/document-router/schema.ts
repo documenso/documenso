@@ -58,6 +58,7 @@ export const ZDocumentTitleSchema = z
 export const ZDocumentExternalIdSchema = z
   .string()
   .trim()
+  .max(255)
   .describe('The external ID of the document.');
 
 export const ZDocumentVisibilitySchema = z
@@ -95,10 +96,12 @@ export const ZDocumentMetaLanguageSchema = z
 
 export const ZDocumentMetaSubjectSchema = z
   .string()
+  .max(254)
   .describe('The subject of the email that will be sent to the recipients.');
 
 export const ZDocumentMetaMessageSchema = z
   .string()
+  .max(5000)
   .describe('The message of the email that will be sent to the recipients.');
 
 export const ZDocumentMetaDistributionMethodSchema = z

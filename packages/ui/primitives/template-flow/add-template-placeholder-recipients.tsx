@@ -558,6 +558,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        maxLength={254}
                                       />
                                     </FormControl>
 
@@ -592,6 +593,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        maxLength={255}
                                       />
                                     </FormControl>
 
