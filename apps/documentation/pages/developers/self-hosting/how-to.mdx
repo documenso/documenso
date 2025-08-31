@@ -194,47 +194,49 @@ You can access the Documenso application by visiting the URL you provided for th
 
 The environment variables listed above are a subset of those available for configuring Documenso. The table below provides a complete list of environment variables and their descriptions.
 
-| Variable                                     | Description                                                                                         |
-| -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                            |
-| `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
-| `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |
-| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`              | The Google client ID for Google authentication (optional).                                          |
-| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET`          | The Google client secret for Google authentication (optional).                                      |
-| `NEXT_PUBLIC_WEBAPP_URL`                     | The URL for the web application.                                                                    |
-| `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                              |
-| `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                            |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
-| `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                  |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
-| `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                    |
-| `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
-| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |
-| `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                    |
-| `NEXT_PRIVATE_UPLOAD_BUCKET`                 | The bucket to use for the S3 storage transport.                                                     |
-| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`          | The access key ID for the S3 storage transport.                                                     |
-| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY`      | The secret access key for the S3 storage transport.                                                 |
-| `NEXT_PRIVATE_SMTP_TRANSPORT`                | The transport to send emails (smtp-auth, smtp-api, resend, or mailchannels).                        |
-| `NEXT_PRIVATE_SMTP_HOST`                     | The host for the SMTP server for SMTP transports.                                                   |
-| `NEXT_PRIVATE_SMTP_PORT`                     | The port for the SMTP server for SMTP transports.                                                   |
-| `NEXT_PRIVATE_SMTP_USERNAME`                 | The username for the SMTP server for the `smtp-auth` transport.                                     |
-| `NEXT_PRIVATE_SMTP_PASSWORD`                 | The password for the SMTP server for the `smtp-auth` transport.                                     |
-| `NEXT_PRIVATE_SMTP_APIKEY_USER`              | The API key user for the SMTP server for the `smtp-api` transport.                                  |
-| `NEXT_PRIVATE_SMTP_APIKEY`                   | The API key for the SMTP server for the `smtp-api` transport.                                       |
-| `NEXT_PRIVATE_SMTP_SECURE`                   | Whether to force the use of TLS for the SMTP server for SMTP transports.                            |
-| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`             | The email address for the "from" address.                                                           |
-| `NEXT_PRIVATE_SMTP_FROM_NAME`                | The sender name for the "from" address.                                                             |
-| `NEXT_PRIVATE_RESEND_API_KEY`                | The API key for Resend.com for the `resend` transport.                                              |
-| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | The optional API key for MailChannels (if using a proxy) for the `mailchannels` transport.          |
-| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | The optional endpoint for the MailChannels API (if using a proxy) for the `mailchannels` transport. |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | The domain for DKIM signing with MailChannels for the `mailchannels` transport.                     |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | The selector for DKIM signing with MailChannels for the `mailchannels` transport.                   |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | The private key for DKIM signing with MailChannels for the `mailchannels` transport.                |
-| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`     | The maximum document upload limit displayed to the user (in MB).                                    |
-| `NEXT_PUBLIC_POSTHOG_KEY`                    | The optional PostHog key for analytics and feature flags.                                           |
-| `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Whether to disable user signups through the /signup page.                                           |
+| Variable                                     | Description                                                                                                             |
+| -------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                                                |
+| `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                                          |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).                            |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).                          |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`              | The Google client ID for Google authentication (optional).                                                              |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET`          | The Google client secret for Google authentication (optional).                                                          |
+| `NEXT_PUBLIC_WEBAPP_URL`                     | The URL for the web application.                                                                                        |
+| `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                                                  |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                                                |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                                        |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                                        |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                                      |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                                            |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                                        |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                                    |
+| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                                          |
+| `NEXT_PRIVATE_UPLOAD_REGION`                 | The region for the S3 storage transport (defaults to us-east-1).                                                        |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`                 | The bucket to use for the S3 storage transport.                                                                         |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`          | The access key ID for the S3 storage transport.                                                                         |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY`      | The secret access key for the S3 storage transport.                                                                     |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`                | The transport to send emails (smtp-auth, smtp-api, resend, or mailchannels).                                            |
+| `NEXT_PRIVATE_SMTP_HOST`                     | The host for the SMTP server for SMTP transports.                                                                       |
+| `NEXT_PRIVATE_SMTP_PORT`                     | The port for the SMTP server for SMTP transports.                                                                       |
+| `NEXT_PRIVATE_SMTP_USERNAME`                 | The username for the SMTP server for the `smtp-auth` transport.                                                         |
+| `NEXT_PRIVATE_SMTP_PASSWORD`                 | The password for the SMTP server for the `smtp-auth` transport.                                                         |
+| `NEXT_PRIVATE_SMTP_APIKEY_USER`              | The API key user for the SMTP server for the `smtp-api` transport.                                                      |
+| `NEXT_PRIVATE_SMTP_APIKEY`                   | The API key for the SMTP server for the `smtp-api` transport.                                                           |
+| `NEXT_PRIVATE_SMTP_SECURE`                   | Whether to force the use of TLS for the SMTP server for SMTP transports.                                                |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`             | The email address for the "from" address.                                                                               |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`                | The sender name for the "from" address.                                                                                 |
+| `NEXT_PRIVATE_RESEND_API_KEY`                | The API key for Resend.com for the `resend` transport.                                                                  |
+| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | The optional API key for MailChannels (if using a proxy) for the `mailchannels` transport.                              |
+| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | The optional endpoint for the MailChannels API (if using a proxy) for the `mailchannels` transport.                     |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | The domain for DKIM signing with MailChannels for the `mailchannels` transport.                                         |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | The selector for DKIM signing with MailChannels for the `mailchannels` transport.                                       |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | The private key for DKIM signing with MailChannels for the `mailchannels` transport.                                    |
+| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`     | The maximum document upload limit displayed to the user (in MB).                                                        |
+| `NEXT_PUBLIC_POSTHOG_KEY`                    | The optional PostHog key for analytics and feature flags.                                                               |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Whether to disable user signups through the /signup page.                                                               |
+| `NEXT_PRIVATE_JOBS_PROVIDER`                 | The job provider to use. Available options: `local` (default) or `inngest`. Note: Document reminders require `inngest`. |
+| `NEXT_PRIVATE_INNGEST_EVENT_KEY`             | The Inngest event key for scheduled jobs. Required when using `inngest` as the job provider.                            |
 
 ## Run as a Service
 

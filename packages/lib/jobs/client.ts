@@ -1,6 +1,8 @@
 import { JobClient } from './client/client';
 import { SEND_CONFIRMATION_EMAIL_JOB_DEFINITION } from './definitions/emails/send-confirmation-email';
+import { SEND_DAILY_REMINDER_EMAIL_JOB } from './definitions/emails/send-daily-reminder-email';
 import { SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION } from './definitions/emails/send-document-cancelled-emails';
+import { SEND_HOURLY_REMINDER_EMAIL_JOB } from './definitions/emails/send-hourly-reminder-email';
 import { SEND_ORGANISATION_MEMBER_JOINED_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-joined-email';
 import { SEND_ORGANISATION_MEMBER_LEFT_EMAIL_JOB_DEFINITION } from './definitions/emails/send-organisation-member-left-email';
 import { SEND_PASSWORD_RESET_SUCCESS_EMAIL_JOB_DEFINITION } from './definitions/emails/send-password-reset-success-email';
@@ -30,6 +32,8 @@ export const jobsClient = new JobClient([
   SEND_DOCUMENT_CANCELLED_EMAILS_JOB_DEFINITION,
   BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION,
   BULK_SEND_TEMPLATE_JOB_DEFINITION,
+  SEND_HOURLY_REMINDER_EMAIL_JOB,
+  SEND_DAILY_REMINDER_EMAIL_JOB,
   EXECUTE_WEBHOOK_JOB_DEFINITION,
 ] as const);
 

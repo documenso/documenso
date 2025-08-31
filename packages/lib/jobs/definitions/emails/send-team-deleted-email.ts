@@ -28,6 +28,7 @@ export const SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION = {
   name: 'Send Team Deleted Email',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_ID,
     schema: SEND_TEAM_DELETED_EMAIL_JOB_DEFINITION_SCHEMA,
   },
