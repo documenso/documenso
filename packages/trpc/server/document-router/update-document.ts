@@ -1,5 +1,7 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -27,6 +29,15 @@ export const updateDocumentRoute = authenticatedProcedure
 
     const userId = ctx.user.id;
 
+    if (
+      (meta.expiryAmount || meta.expiryUnit) &&
+      !isValidExpirySettings(meta.expiryAmount, meta.expiryUnit)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid expiry settings. Please check your expiry configuration.',
+      });
+    }
+
     if (Object.values(meta).length > 0) {
       await upsertDocumentMeta({
         userId: ctx.user.id,
@@ -47,6 +58,8 @@ export const updateDocumentRoute = authenticatedProcedure
         emailId: meta.emailId,
         emailReplyTo: meta.emailReplyTo,
         emailSettings: meta.emailSettings,
+        expiryAmount: meta.expiryAmount,
+        expiryUnit: meta.expiryUnit,
         requestMetadata: ctx.metadata,
       });
     }

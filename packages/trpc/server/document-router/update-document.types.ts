@@ -11,6 +11,8 @@ import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-emai
 
 import type { TrpcRouteMeta } from '../trpc';
 import {
+  ZDocumentExpiryAmountSchema,
+  ZDocumentExpiryUnitSchema,
   ZDocumentExternalIdSchema,
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -64,6 +66,8 @@ export const ZUpdateDocumentRequestSchema = z.object({
       emailId: z.string().nullish(),
       emailReplyTo: z.string().email().nullish(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+      expiryUnit: ZDocumentExpiryUnitSchema.optional(),
     })
     .optional(),
 });
