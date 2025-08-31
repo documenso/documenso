@@ -65,12 +65,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   return {
     document,
     recipients,
-    team,
+    documentRootPath,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, recipients, team } = loaderData;
+  const { document, recipients, documentRootPath } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -123,7 +123,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
-        to={`${formatDocumentsPath(team.url)}/${document.id}`}
+        to={`${documentRootPath}/${document.id}`}
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
