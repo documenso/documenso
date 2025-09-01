@@ -2,7 +2,7 @@ import { deletedAccountServiceAccount } from '@documenso/lib/server-only/user/se
 import { prisma } from '@documenso/prisma';
 import { DocumentStatus } from '@documenso/prisma/client';
 
-type MoveDocumentsOptions = {
+type HandleDocumentOwnershipOnDeletionOptions = {
   documentIds: number[];
   organisationOwnerId: number;
 };
@@ -10,7 +10,7 @@ type MoveDocumentsOptions = {
 export const handleDocumentOwnershipOnDeletion = async ({
   documentIds,
   organisationOwnerId,
-}: MoveDocumentsOptions) => {
+}: HandleDocumentOwnershipOnDeletionOptions) => {
   if (documentIds.length === 0) {
     return;
   }

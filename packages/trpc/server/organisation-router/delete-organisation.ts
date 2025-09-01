@@ -1,6 +1,6 @@
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { handleDocumentOwnershipOnDeletion } from '@documenso/lib/server-only/document/move-documents-to-owner-or-service';
+import { handleDocumentOwnershipOnDeletion } from '@documenso/lib/server-only/document/handle-document-ownership-on-deletion';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 
