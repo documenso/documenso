@@ -10,7 +10,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: \n"
 "Last-Translator: Yago veloso\n"
-"Language-Team: Estúdio AANY \n"
+"Language-Team: Estúdio AANY\n"
 "Plural-Forms: \n"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
@@ -6651,7 +6651,9 @@ msgid "The following team has been deleted. You will no longer be able to access
 msgstr "O seguinte time foi excluído. Você não poderá mais acessar este time e seus documentos"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n                    existed."
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 msgstr "A equipe do grupo da organização que você procura pode ter sido removida, renomeada ou talvez nunca tenha existido."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
@@ -6659,11 +6661,15 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "O papel da organização que será aplicado a todos os membros deste grupo."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n                    existed."
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 msgstr "A organização que você procura pode ter sido removida, renomeada ou talvez nunca tenha existido."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n                  existed."
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
+"                  existed."
 msgstr "A organização que você procura pode ter sido removida, renomeada ou nunca ter existido."
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
@@ -6746,11 +6752,15 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "O equipe de e-mail <0>{teamEmail}</0> foi removida da equipe a seguir"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n                  existed."
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
+"                  existed."
 msgstr "A equipe que você procura pode ter sido removida, renomeada ou talvez nunca tenha existido."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n                existed."
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
+"                existed."
 msgstr "A equipe que você está procurando pode ter sido removida, renomeada ou talvez nunca tenha existido."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
@@ -6791,7 +6801,9 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "A URL para o Documenso enviar eventos de webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n                    existed."
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 msgstr "O usuário que você procura pode ter sido removido, renomeado ou talvez nunca tenha existido."
 
 #: apps/remix/app/components/dialogs/webhook-delete-dialog.tsx
@@ -6807,7 +6819,9 @@ msgid "The webhook was successfully created."
 msgstr "O webhook foi criado com sucesso."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
-msgid "The webhook you are looking for may have been removed, renamed or may have never\n                    existed."
+msgid ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
+"                    existed."
 msgstr "O webhook que você procura pode ter sido removido, renomeado ou talvez nunca tenha existido."
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
