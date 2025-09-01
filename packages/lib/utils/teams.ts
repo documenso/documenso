@@ -165,8 +165,12 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
   return {
     documentVisibility: null,
     documentLanguage: null,
+    documentTimezone: null,
+    documentDateFormat: null,
+
     includeSenderDetails: null,
     includeSigningCertificate: null,
+    includeAuditLog: null,
 
     typedSignatureEnabled: null,
     uploadSignatureEnabled: null,
@@ -176,6 +180,11 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     brandingLogo: null,
     brandingUrl: null,
     brandingCompanyDetails: null,
+
+    emailDocumentSettings: null,
+    emailId: null,
+    emailReplyTo: null,
+    // emailReplyToName: null,
   };
 };
 

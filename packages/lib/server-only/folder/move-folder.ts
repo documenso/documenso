@@ -2,6 +2,8 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { prisma } from '@documenso/prisma';
 
+import { buildTeamWhereQuery } from '../../utils/teams';
+
 export interface MoveFolderOptions {
   userId: number;
   teamId?: number;
@@ -15,8 +17,10 @@ export const moveFolder = async ({ userId, teamId, folderId, parentId }: MoveFol
     const folder = await tx.folder.findFirst({
       where: {
         id: folderId,
-        userId,
-        teamId,
+        team: buildTeamWhereQuery({
+          teamId,
+          userId,
+        }),
       },
     });
 

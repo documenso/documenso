@@ -127,6 +127,16 @@ export const DocumentMoveToFolderDialog = ({
         return;
       }
 
+      if (error.code === AppErrorCode.UNAUTHORIZED) {
+        toast({
+          title: _(msg`Error`),
+          description: _(msg`You are not allowed to move this document.`),
+          variant: 'destructive',
+        });
+
+        return;
+      }
+
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while moving the document.`),

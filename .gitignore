@@ -2,6 +2,9 @@
 
 packages/prisma/generated/types.ts
 
+db
+logs
+
 # dependencies
 node_modules
 .pnp
@@ -18,6 +21,7 @@ build
 # misc
 .DS_Store
 *.pem
+*.p12
 
 # debug
 npm-debug.log*

@@ -1,0 +1,132 @@
+name: documenso-production
+
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: always
+    command:
+      - --api.dashboard=true
+      - --api.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+      - --providers.docker.network=documenso_network
+      - --entrypoints.web.address=:80
+      - --entrypoints.websecure.address=:443
+      - --certificatesresolvers.myresolver.acme.tlschallenge=true
+      - --certificatesresolvers.myresolver.acme.email=${ACME_EMAIL:-mateus@gmaisp.com.br}
+      - --certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json
+      - --log.level=DEBUG
+      - --accesslog=true
+      - --accesslog.filepath=/var/log/traefik/access.log
+      - --log.filepath=/var/log/traefik/traefik.log
+    ports:
+      - '80:80'
+      - '443:443'
+      - '8080:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_letsencrypt:/letsencrypt
+      - ./logs/traefik:/var/log/traefik
+    networks:
+      - documenso_network
+
+  database:
+    image: postgres:17
+    container_name: postgres
+    restart: on-failure:5
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=documenso
+      - POSTGRES_DB=documenso
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - ~/documenso/db:/var/lib/postgresql/data:rw
+    networks:
+      - documenso_network
+
+  # documenso:
+  #   container_name: documenso
+  #   restart: always
+  #   image: documenso/documenso:latest
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
+  #   environment:
+  #     - PORT=${PORT:-3000}
+  #     - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?err}
+  #     - NEXT_PRIVATE_ENCRYPTION_KEY=${NEXT_PRIVATE_ENCRYPTION_KEY:?err}
+  #     - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY:?err}
+  #     - NEXT_PRIVATE_GOOGLE_CLIENT_ID=${NEXT_PRIVATE_GOOGLE_CLIENT_ID}
+  #     - NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET}
+  #     - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL:?err}
+  #     - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-http://localhost:$PORT}
+  #     - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL:?err}
+  #     - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:-${NEXT_PRIVATE_DATABASE_URL}}
+  #     - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT:-database}
+  #     - NEXT_PRIVATE_UPLOAD_ENDPOINT=${NEXT_PRIVATE_UPLOAD_ENDPOINT}
+  #     - NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=${NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE}
+  #     - NEXT_PRIVATE_UPLOAD_REGION=${NEXT_PRIVATE_UPLOAD_REGION}
+  #     - NEXT_PRIVATE_UPLOAD_BUCKET=${NEXT_PRIVATE_UPLOAD_BUCKET}
+  #     - NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=${NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID}
+  #     - NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=${NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY}
+  #     - NEXT_PRIVATE_SMTP_TRANSPORT=${NEXT_PRIVATE_SMTP_TRANSPORT:?err}
+  #     - NEXT_PRIVATE_SMTP_HOST=${NEXT_PRIVATE_SMTP_HOST}
+  #     - NEXT_PRIVATE_SMTP_PORT=${NEXT_PRIVATE_SMTP_PORT}
+  #     - NEXT_PRIVATE_SMTP_USERNAME=${NEXT_PRIVATE_SMTP_USERNAME}
+  #     - NEXT_PRIVATE_SMTP_PASSWORD=${NEXT_PRIVATE_SMTP_PASSWORD}
+  #     - NEXT_PRIVATE_SMTP_APIKEY_USER=${NEXT_PRIVATE_SMTP_APIKEY_USER}
+  #     - NEXT_PRIVATE_SMTP_APIKEY=${NEXT_PRIVATE_SMTP_APIKEY}
+  #     - NEXT_PRIVATE_SMTP_SECURE=${NEXT_PRIVATE_SMTP_SECURE}
+  #     - NEXT_PRIVATE_SMTP_FROM_NAME=${NEXT_PRIVATE_SMTP_FROM_NAME:?err}
+  #     - NEXT_PRIVATE_SMTP_FROM_ADDRESS=${NEXT_PRIVATE_SMTP_FROM_ADDRESS:?err}
+  #     - NEXT_PRIVATE_SMTP_SERVICE=${NEXT_PRIVATE_SMTP_SERVICE}
+  #     - NEXT_PRIVATE_RESEND_API_KEY=${NEXT_PRIVATE_RESEND_API_KEY}
+  #     - NEXT_PRIVATE_MAILCHANNELS_API_KEY=${NEXT_PRIVATE_MAILCHANNELS_API_KEY}
+  #     - NEXT_PRIVATE_MAILCHANNELS_ENDPOINT=${NEXT_PRIVATE_MAILCHANNELS_ENDPOINT}
+  #     - NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN=${NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN}
+  #     - NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR=${NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR}
+  #     - NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY=${NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY}
+  #     - NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT}
+  #     - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
+  #     - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
+  #     - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
+  #     - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
+  #     - NEXT_PRIVATE_BROWSERLESS_URL=${NEXT_PRIVATE_BROWSERLESS_URL}
+  #   labels:
+  #     - 'traefik.enable=true'
+  #     - 'traefik.http.routers.documenso.rule=Host(`${DOCUMENSO_DOMAIN:-localhost}`)'
+  #     - 'traefik.http.routers.documenso.entrypoints=websecure'
+  #     - 'traefik.http.routers.documenso.tls.certresolver=myresolver'
+  #     - 'traefik.http.routers.documenso-http.rule=Host(`${DOCUMENSO_DOMAIN:-localhost}`)'
+  #     - 'traefik.http.routers.documenso-http.entrypoints=web'
+  #     - 'traefik.http.routers.documenso-http.middlewares=redirect-to-https'
+  #     - 'traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https'
+  #     - 'traefik.http.services.documenso.loadbalancer.server.port=${PORT:-3000}'
+  #   volumes:
+  #     - ~/documenso/cert.p12:/opt/documenso/cert.p12
+  #   networks:
+  #     - documenso_network
+
+  browserless:
+    image: browserless/chrome:latest
+    container_name: browserless
+    hostname: headless
+    networks:
+      - documenso_network
+
+volumes:
+  database:
+  traefik_letsencrypt:
+  traefik_logs:
+
+networks:
+  documenso_network:
+    driver: bridge
+    name: documenso_network

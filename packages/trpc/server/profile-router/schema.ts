@@ -27,3 +27,12 @@ export const ZSetProfileImageMutationSchema = z.object({
 });
 
 export type TSetProfileImageMutationSchema = z.infer<typeof ZSetProfileImageMutationSchema>;
+
+export const ZSubmitSupportTicketMutationSchema = z.object({
+  organisationId: z.string(),
+  teamId: z.string().min(1).nullish(),
+  subject: z.string().min(3, 'Subject is required'),
+  message: z.string().min(10, 'Message must be at least 10 characters'),
+});
+
+export type TSupportTicketRequest = z.infer<typeof ZSubmitSupportTicketMutationSchema>;
