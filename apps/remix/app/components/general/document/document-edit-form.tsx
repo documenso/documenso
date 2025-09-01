@@ -59,23 +59,22 @@ export const DocumentEditForm = ({
 
   const utils = trpc.useUtils();
 
-  const { data: document, refetch: refetchDocument } =
-    trpc.document.getDocumentWithDetailsById.useQuery(
-      {
-        documentId: initialDocument.id,
-      },
-      {
-        initialData: initialDocument,
-        ...SKIP_QUERY_BATCH_META,
-      },
-    );
+  const { data: document, refetch: refetchDocument } = trpc.document.get.useQuery(
+    {
+      documentId: initialDocument.id,
+    },
+    {
+      initialData: initialDocument,
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.updateDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.update.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -84,23 +83,10 @@ export const DocumentEditForm = ({
     },
   });
 
-  const { mutateAsync: setSigningOrderForDocument } =
-    trpc.document.setSigningOrderForDocument.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.document.getDocumentWithDetailsById.setData(
-          {
-            documentId: initialDocument.id,
-          },
-          (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
-        );
-      },
-    });
-
   const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ fields: newFields }) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -112,7 +98,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -121,10 +107,10 @@ export const DocumentEditForm = ({
     },
   });
 
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+  const { mutateAsync: sendDocument } = trpc.document.distribute.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -216,15 +202,11 @@ export const DocumentEditForm = ({
   const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
     try {
       await Promise.all([
-        setSigningOrderForDocument({
-          documentId: document.id,
-          signingOrder: data.signingOrder,
-        }),
-
         updateDocument({
           documentId: document.id,
           meta: {
             allowDictateNextSigner: data.allowDictateNextSigner,
+            signingOrder: data.signingOrder,
           },
         }),
 

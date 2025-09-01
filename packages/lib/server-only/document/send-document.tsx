@@ -148,33 +148,6 @@ export const sendDocument = async ({
   //   throw new Error('Some signers have not been assigned a signature field.');
   // }
 
-  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
-  ).recipientSigningRequest;
-
-  // Only send email if one of the following is true:
-  // - It is explicitly set
-  // - The email is enabled for signing requests AND sendEmail is undefined
-  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
-    await Promise.all(
-      recipientsToNotify.map(async (recipient) => {
-        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
-          return;
-        }
-
-        await jobs.triggerJob({
-          name: 'send.signing.requested.email',
-          payload: {
-            userId,
-            documentId,
-            recipientId: recipient.id,
-            requestMetadata: requestMetadata?.requestMetadata,
-          },
-        });
-      }),
-    );
-  }
-
   const allRecipientsHaveNoActionToTake = document.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
@@ -226,6 +199,33 @@ export const sendDocument = async ({
       },
     });
   });
+
+  const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
+    document.documentMeta,
+  ).recipientSigningRequest;
+
+  // Only send email if one of the following is true:
+  // - It is explicitly set
+  // - The email is enabled for signing requests AND sendEmail is undefined
+  if (sendEmail || (isRecipientSigningRequestEmailEnabled && sendEmail === undefined)) {
+    await Promise.all(
+      recipientsToNotify.map(async (recipient) => {
+        if (recipient.sendStatus === SendStatus.SENT || recipient.role === RecipientRole.CC) {
+          return;
+        }
+
+        await jobs.triggerJob({
+          name: 'send.signing.requested.email',
+          payload: {
+            userId,
+            documentId,
+            recipientId: recipient.id,
+            requestMetadata: requestMetadata?.requestMetadata,
+          },
+        });
+      }),
+    );
+  }
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,

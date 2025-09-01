@@ -93,7 +93,7 @@ export const DocumentSigningAuthProvider = ({
     [documentAuthOptions, recipient],
   );
 
-  const passkeyQuery = trpc.auth.findPasskeys.useQuery(
+  const passkeyQuery = trpc.auth.passkey.find.useQuery(
     {
       perPage: MAXIMUM_PASSKEYS,
     },

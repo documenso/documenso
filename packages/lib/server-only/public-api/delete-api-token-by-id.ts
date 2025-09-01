@@ -25,7 +25,7 @@ export const deleteTokenById = async ({ id, userId, teamId }: DeleteTokenByIdOpt
     });
   }
 
-  return await prisma.apiToken.delete({
+  await prisma.apiToken.delete({
     where: {
       id,
       teamId,
