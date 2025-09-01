@@ -34,7 +34,11 @@ export const handleDocumentOwnershipOnDeletion = async ({
     include: {
       ownedOrganisations: {
         include: {
-          teams: true,
+          teams: {
+            select: {
+              id: true,
+            },
+          },
         },
       },
     },
@@ -49,7 +53,7 @@ export const handleDocumentOwnershipOnDeletion = async ({
           in: documentIds,
         },
         status: {
-          not: DocumentStatus.DRAFT,
+          in: [DocumentStatus.PENDING, DocumentStatus.REJECTED, DocumentStatus.COMPLETED],
         },
       },
       data: {
@@ -65,7 +69,7 @@ export const handleDocumentOwnershipOnDeletion = async ({
           in: documentIds,
         },
         status: {
-          not: DocumentStatus.DRAFT,
+          in: [DocumentStatus.PENDING, DocumentStatus.REJECTED, DocumentStatus.COMPLETED],
         },
       },
       data: {
