@@ -31,9 +31,11 @@ export const handleDocumentOwnershipOnDeletion = async ({
     where: {
       id: organisationOwnerId,
     },
-    include: {
+    select: {
+      id: true,
       ownedOrganisations: {
-        include: {
+        select: {
+          id: true,
           teams: {
             select: {
               id: true,
