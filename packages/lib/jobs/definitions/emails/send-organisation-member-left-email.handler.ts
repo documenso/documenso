@@ -39,7 +39,13 @@ export const run = async ({
           },
         },
         include: {
-          user: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
         },
       },
     },
@@ -48,6 +54,11 @@ export const run = async ({
   const oldMember = await prisma.user.findFirstOrThrow({
     where: {
       id: payload.memberUserId,
+    },
+    select: {
+      id: true,
+      email: true,
+      name: true,
     },
   });
 

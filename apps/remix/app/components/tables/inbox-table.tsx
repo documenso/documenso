@@ -17,7 +17,6 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
-import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
 import { DataTable } from '@documenso/ui/primitives/data-table';
@@ -32,12 +31,12 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 
 export type DocumentsTableProps = {
-  data?: TFindDocumentsResponse;
+  data?: TFindInboxResponse;
   isLoading?: boolean;
   isLoadingError?: boolean;
 };
 
-type DocumentsTableRow = TFindDocumentsResponse['data'][number];
+type DocumentsTableRow = TFindInboxResponse['data'][number];
 
 export const InboxTable = () => {
   const { _, i18n } = useLingui();
