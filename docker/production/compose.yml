@@ -4,9 +4,9 @@ services:
   database:
     image: postgres:15
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:?err}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
-      - POSTGRES_DB=${POSTGRES_DB:?err}
+      - POSTGRES_USER=documenso
+      - POSTGRES_PASSWORD=documenso
+      - POSTGRES_DB=documenso
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
@@ -63,7 +63,7 @@ services:
     ports:
       - ${PORT:-3000}:${PORT:-3000}
     volumes:
-      - /opt/documenso/cert.p12:/opt/documenso/cert.p12
+      - ~/documenso/cert.p12:/opt/documenso/cert.p12
 
 volumes:
   database:

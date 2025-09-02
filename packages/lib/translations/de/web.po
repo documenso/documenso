@@ -7055,7 +7055,8 @@ msgid "The organisation email has been created successfully."
 msgstr "Die E-Mail der Organisation wurde erfolgreich erstellt."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Die Organisationsgruppe, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -7064,12 +7065,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Die Organisationsrolle, die auf alle Mitglieder in dieser Gruppe angewendet wird."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -7158,12 +7161,14 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Die Team-E-Mail <0>{teamEmail}</0> wurde aus dem folgenden Team entfernt"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Das Team, das Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Das Team, das Sie suchen, könnte entfernt, umbenannt oder nie existiert haben."
 
@@ -7205,7 +7210,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "Die URL für Documenso, um Webhook-Ereignisse zu senden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Der Benutzer, nach dem Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -9288,4 +9294,3 @@ msgstr "Ihr Token wurde erfolgreich erstellt! Stellen Sie sicher, dass Sie es ko
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.tokens.tsx
 msgid "Your tokens will be shown here once you create them."
 msgstr "Ihre Tokens werden hier angezeigt, sobald Sie sie erstellt haben."
-
