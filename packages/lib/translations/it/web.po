@@ -3253,6 +3253,10 @@ msgstr "Trascina e rilascia o fai clic per caricare"
 msgid "Drag and drop your PDF file here"
 msgstr "Trascina qui il tuo file PDF"
 
+#: packages/ui/primitives/signature-pad/signature-pad.tsx
+msgid "Draw"
+msgstr ""
+
 #: packages/lib/constants/document.ts
 msgctxt "Draw signatute type"
 msgid "Draw"
@@ -7813,6 +7817,7 @@ msgstr "Ri-autenticazione a due fattori"
 
 #: apps/remix/app/components/tables/templates-table.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
+#: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgid "Type"
 msgstr "Tipo"
 
@@ -8087,6 +8092,10 @@ msgstr "Aggiorna <0>{0}</0> al {planName}"
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
 msgid "Upgrade your plan to upload more documents"
 msgstr "Aggiorna il tuo piano per caricare più documenti"
+
+#: packages/ui/primitives/signature-pad/signature-pad.tsx
+msgid "Upload"
+msgstr ""
 
 #: packages/lib/constants/document.ts
 msgctxt "Upload signatute type"
