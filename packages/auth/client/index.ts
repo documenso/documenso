@@ -202,6 +202,22 @@ export class AuthClient {
     },
   };
 
+  public microsoft = {
+    signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
+      const response = await this.client['oauth'].authorize.microsoft.$post({
+        json: { redirectPath },
+      });
+
+      await this.handleError(response);
+
+      const data = await response.json();
+
+      if (data.redirectUrl) {
+        window.location.href = data.redirectUrl;
+      }
+    },
+  };
+
   public oidc = {
     signIn: async ({ redirectPath }: { redirectPath?: string } = {}) => {
       const response = await this.client['oauth'].authorize.oidc.$post({ json: { redirectPath } });
