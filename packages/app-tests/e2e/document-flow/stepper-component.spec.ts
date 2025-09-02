@@ -534,9 +534,6 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.getByLabel('Title').fill(documentTitle);
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-  await page.getByLabel('Enable signing order').check();
-
   for (let i = 1; i <= 3; i++) {
     if (i > 1) {
       await page.getByRole('button', { name: 'Add Signer' }).click();
@@ -557,6 +554,9 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
       .nth(i - 1)
       .fill(`User ${i}`);
   }
+
+  await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
+  await page.getByLabel('Enable signing order').check();
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
