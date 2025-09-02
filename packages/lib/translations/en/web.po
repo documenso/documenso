@@ -809,6 +809,10 @@ msgstr "Active Subscriptions"
 msgid "Add"
 msgstr "Add"
 
+#: packages/ui/primitives/document-flow/add-signers.tsx
+msgid "Add 2 or more signers to enable signing order."
+msgstr "Add 2 or more signers to enable signing order."
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
 msgstr "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
@@ -1144,12 +1148,37 @@ msgstr "An error occurred while adding fields."
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "An error occurred while adding signers."
 msgstr "An error occurred while adding signers."
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "An error occurred while adding the fields."
 msgstr "An error occurred while adding the fields."
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the document settings."
+msgstr "An error occurred while auto-saving the document settings."
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the fields."
+msgstr "An error occurred while auto-saving the fields."
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the subject form."
+msgstr "An error occurred while auto-saving the subject form."
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template fields."
+msgstr "An error occurred while auto-saving the template fields."
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template placeholders."
+msgstr "An error occurred while auto-saving the template placeholders."
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template settings."
+msgstr "An error occurred while auto-saving the template settings."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
@@ -3571,6 +3600,9 @@ msgstr "Enterprise"
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
@@ -3595,6 +3627,10 @@ msgstr "Enterprise"
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx

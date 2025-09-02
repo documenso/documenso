@@ -809,6 +809,10 @@ msgstr "Assinaturas Ativas"
 msgid "Add"
 msgstr "Adicionar"
 
+#: packages/ui/primitives/document-flow/add-signers.tsx
+msgid "Add 2 or more signers to enable signing order."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Add a custom domain to send emails on behalf of your organisation. We'll generate DKIM records that you need to add to your DNS provider."
 msgstr "Adicione um domínio personalizado para enviar e-mails em nome de sua organização. Geraremos registros DKIM que você precisará adicionar ao seu provedor de DNS."
@@ -1144,12 +1148,37 @@ msgstr "Ocorreu um erro ao adicionar campos."
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "An error occurred while adding signers."
 msgstr "Ocorreu um erro ao adicionar signatários."
 
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "An error occurred while adding the fields."
 msgstr "Ocorreu um erro ao adicionar os campos."
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the document settings."
+msgstr ""
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the fields."
+msgstr ""
+
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+msgid "An error occurred while auto-saving the subject form."
+msgstr ""
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template fields."
+msgstr ""
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template placeholders."
+msgstr ""
+
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+msgid "An error occurred while auto-saving the template settings."
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 msgid "An error occurred while auto-signing the document, some fields may not be signed. Please review and manually sign any remaining fields."
@@ -3571,6 +3600,9 @@ msgstr "Empresa"
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
+#: apps/remix/app/components/general/template/template-edit-form.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-text-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
@@ -3595,6 +3627,10 @@ msgstr "Empresa"
 #: apps/remix/app/components/general/document-signing/document-signing-checkbox-field.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document/document-upload.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
+#: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 #: apps/remix/app/components/general/document/document-edit-form.tsx
