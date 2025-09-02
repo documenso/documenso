@@ -14,6 +14,7 @@ import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
 } from '@documenso/trpc/server/field-router/schema';
+import { cn } from '@documenso/ui/lib/utils';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -156,7 +157,12 @@ export const DocumentSigningRadioField = ({
       {!field.inserted && (
         <RadioGroup
           onValueChange={(value) => handleSelectItem(value)}
-          className="z-10 my-0.5 gap-y-1"
+          className={cn(
+            'z-10 my-0.5 gap-1',
+            parsedFieldMeta.direction === 'horizontal'
+              ? 'flex flex-row flex-wrap'
+              : 'flex flex-col gap-y-1',
+          )}
         >
           {values?.map((item, index) => (
             <div key={index} className="flex items-center">
@@ -181,7 +187,14 @@ export const DocumentSigningRadioField = ({
       )}
 
       {field.inserted && (
-        <RadioGroup className="my-0.5 gap-y-1">
+        <RadioGroup
+          className={cn(
+            'my-0.5 gap-1',
+            parsedFieldMeta.direction === 'horizontal'
+              ? 'flex flex-row flex-wrap'
+              : 'flex flex-col gap-y-1',
+          )}
+        >
           {values?.map((item, index) => (
             <div key={index} className="flex items-center">
               <RadioGroupItem
