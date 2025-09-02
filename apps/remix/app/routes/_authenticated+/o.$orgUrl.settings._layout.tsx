@@ -6,6 +6,7 @@ import {
   GroupIcon,
   MailboxIcon,
   Settings2Icon,
+  ShieldCheckIcon,
   Users2Icon,
 } from 'lucide-react';
 import { FaUsers } from 'react-icons/fa6';
@@ -78,6 +79,11 @@ export default function SettingsLayout() {
       icon: GroupIcon,
     },
     {
+      path: `/o/${organisation.url}/settings/sso`,
+      label: t`SSO`,
+      icon: ShieldCheckIcon,
+    },
+    {
       path: `/o/${organisation.url}/settings/billing`,
       label: t`Billing`,
       icon: CreditCardIcon,
@@ -90,6 +96,13 @@ export default function SettingsLayout() {
     if (
       (!isBillingEnabled || !organisation.organisationClaim.flags.emailDomains) &&
       route.path.includes('/email-domains')
+    ) {
+      return false;
+    }
+
+    if (
+      (!isBillingEnabled || !organisation.organisationClaim.flags.authenticationPortal) &&
+      route.path.includes('/sso')
     ) {
       return false;
     }
