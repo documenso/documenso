@@ -45,6 +45,9 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         mode: 'insensitive',
       },
     },
+    select: {
+      id: true,
+    },
   });
 
   // Directly convert the team member invite to a team member if they already have an account.

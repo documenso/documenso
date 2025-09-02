@@ -50,10 +50,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
-  if (document.folderId) {
-    throw redirect(documentRootPath);
-  }
-
   const recipients = await getRecipientsForDocument({
     documentId,
     userId: user.id,
@@ -68,13 +64,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   return {
     document,
-    documentRootPath,
     recipients,
+    documentRootPath,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, documentRootPath, recipients } = loaderData;
+  const { document, recipients, documentRootPath } = loaderData;
 
   const { _, i18n } = useLingui();
 

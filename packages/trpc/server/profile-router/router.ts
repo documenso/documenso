@@ -3,14 +3,12 @@ import type { SetAvatarImageOptions } from '@documenso/lib/server-only/profile/s
 import { setAvatarImage } from '@documenso/lib/server-only/profile/set-avatar-image';
 import { deleteUser } from '@documenso/lib/server-only/user/delete-user';
 import { findUserSecurityAuditLogs } from '@documenso/lib/server-only/user/find-user-security-audit-logs';
-import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
 import { submitSupportTicket } from '@documenso/lib/server-only/user/submit-support-ticket';
 import { updateProfile } from '@documenso/lib/server-only/user/update-profile';
 
-import { adminProcedure, authenticatedProcedure, router } from '../trpc';
+import { authenticatedProcedure, router } from '../trpc';
 import {
   ZFindUserSecurityAuditLogsSchema,
-  ZRetrieveUserByIdQuerySchema,
   ZSetProfileImageMutationSchema,
   ZSubmitSupportTicketMutationSchema,
   ZUpdateProfileMutationSchema,
@@ -26,24 +24,12 @@ export const profileRouter = router({
       });
     }),
 
-  getUser: adminProcedure.input(ZRetrieveUserByIdQuerySchema).query(async ({ input, ctx }) => {
-    const { id } = input;
-
-    ctx.logger.info({
-      input: {
-        id,
-      },
-    });
-
-    return await getUserById({ id });
-  }),
-
   updateProfile: authenticatedProcedure
     .input(ZUpdateProfileMutationSchema)
     .mutation(async ({ input, ctx }) => {
       const { name, signature } = input;
 
-      return await updateProfile({
+      await updateProfile({
         userId: ctx.user.id,
         name,
         signature,
@@ -52,7 +38,7 @@ export const profileRouter = router({
     }),
 
   deleteAccount: authenticatedProcedure.mutation(async ({ ctx }) => {
-    return await deleteUser({
+    await deleteUser({
       id: ctx.user.id,
     });
   }),
