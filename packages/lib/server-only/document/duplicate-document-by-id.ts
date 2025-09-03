@@ -35,6 +35,7 @@ export const duplicateDocument = async ({
     select: {
       title: true,
       userId: true,
+      teamId: true,
       documentData: {
         select: {
           data: true,
@@ -57,11 +58,18 @@ export const duplicateDocument = async ({
     },
   });
 
+  const currentUser = await prisma.user.findFirstOrThrow({
+    where: { id: userId },
+    select: { email: true },
+  });
+
   if (!document) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
+
+  const isDocumentOwner = userId === document.userId || teamId === document.teamId;
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -100,30 +108,38 @@ export const duplicateDocument = async ({
     },
   });
 
-  const recipientsToCreate = document.recipients.map((recipient) => ({
-    documentId: createdDocument.id,
-    email: recipient.email,
-    name: recipient.name,
-    role: recipient.role,
-    signingOrder: recipient.signingOrder,
-    token: nanoid(),
-    fields: {
-      createMany: {
-        data: recipient.fields.map((field) => ({
-          documentId: createdDocument.id,
-          type: field.type,
-          page: field.page,
-          positionX: field.positionX,
-          positionY: field.positionY,
-          width: field.width,
-          height: field.height,
-          customText: '',
-          inserted: false,
-          fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
-        })),
+  const recipientsToCreate = document.recipients
+    .filter((recipient) => {
+      if (isDocumentOwner) {
+        return true;
+      }
+
+      return recipient.email === currentUser.email;
+    })
+    .map((recipient) => ({
+      documentId: createdDocument.id,
+      email: recipient.email,
+      name: recipient.name,
+      role: recipient.role,
+      signingOrder: recipient.signingOrder,
+      token: nanoid(),
+      fields: {
+        createMany: {
+          data: recipient.fields.map((field) => ({
+            documentId: createdDocument.id,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: field.fieldMeta as PrismaJson.FieldMeta,
+          })),
+        },
       },
-    },
-  }));
+    }));
 
   const recipients: Recipient[] = [];
 
