@@ -4,7 +4,7 @@ import type { DocumentWithRecipients } from '@documenso/prisma/types/document-wi
 
 export type MaskRecipientTokensForDocumentOptions<T extends DocumentWithRecipients> = {
   document: T;
-  user?: User;
+  user?: Pick<User, 'id' | 'email' | 'name'>;
   token?: string;
 };
 

@@ -141,6 +141,7 @@ export const authenticatedMiddleware = t.middleware(async ({ ctx, next, path }) 
   return await next({
     ctx: {
       ...ctx,
+      teamId: ctx.teamId || -1,
       logger: trpcSessionLogger,
       user: ctx.user,
       session: ctx.session,

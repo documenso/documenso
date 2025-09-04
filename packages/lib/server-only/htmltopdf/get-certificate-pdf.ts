@@ -72,6 +72,7 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   const result = await page.pdf({
     format: 'A4',
+    printBackground: true,
   });
 
   await browserContext.close();

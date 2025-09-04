@@ -3,6 +3,7 @@ import type { PDFDocument } from 'pdf-lib';
 import { TextAlignment, rgb, setFontAndSize } from 'pdf-lib';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { getPageSize } from './get-page-size';
 
 /**
  * Adds a rejection stamp to each page of a PDF document.
@@ -27,7 +28,7 @@ export async function addRejectionStampToPdf(
 
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
-    const { width, height } = page.getSize();
+    const { width, height } = getPageSize(page);
 
     // Draw the "REJECTED" text
     const rejectedTitleText = 'DOCUMENT REJECTED';

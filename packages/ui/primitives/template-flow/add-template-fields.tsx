@@ -21,9 +21,11 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
@@ -72,6 +74,7 @@ export type AddTemplateFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
+  onAutoSave: (_data: TAddTemplateFieldsFormSchema) => Promise<void>;
   teamId: number;
 };
 
@@ -80,6 +83,7 @@ export const AddTemplateFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  onAutoSave,
   teamId,
 }: AddTemplateFieldsFormProps) => {
   const { _ } = useLingui();
@@ -120,6 +124,20 @@ export const AddTemplateFieldsFormPartial = ({
 
   const onFormSubmit = form.handleSubmit(onSubmit);
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = async () => {
+    const isFormValid = await form.trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    const formData = form.getValues();
+
+    scheduleSave(formData);
+  };
+
   const {
     append,
     remove,
@@ -159,6 +177,7 @@ export const AddTemplateFieldsFormPartial = ({
           };
 
           append(newField);
+          void handleAutoSave();
 
           return;
         }
@@ -186,6 +205,7 @@ export const AddTemplateFieldsFormPartial = ({
             append(newField);
           });
 
+          void handleAutoSave();
           return;
         }
 
@@ -197,7 +217,15 @@ export const AddTemplateFieldsFormPartial = ({
         });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
+    [
+      append,
+      lastActiveField,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      toast,
+      handleAutoSave,
+    ],
   );
 
   const onFieldPaste = useCallback(
@@ -217,9 +245,18 @@ export const AddTemplateFieldsFormPartial = ({
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
+
+        void handleAutoSave();
       }
     },
-    [append, fieldClipboard, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token],
+    [
+      append,
+      fieldClipboard,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      handleAutoSave,
+    ],
   );
 
   useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
@@ -377,8 +414,10 @@ export const AddTemplateFieldsFormPartial = ({
         pageWidth,
         pageHeight,
       });
+
+      void handleAutoSave();
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update, handleAutoSave],
   );
 
   const onFieldMove = useCallback(
@@ -400,8 +439,10 @@ export const AddTemplateFieldsFormPartial = ({
         pageX,
         pageY,
       });
+
+      void handleAutoSave();
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update, handleAutoSave],
   );
 
   useEffect(() => {
@@ -503,6 +544,7 @@ export const AddTemplateFieldsFormPartial = ({
     });
 
     form.setValue('fields', updatedFields);
+    void handleAutoSave();
   };
 
   return (
@@ -518,6 +560,10 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
+          onAutoSave={async (fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            await handleAutoSave();
+          }}
         />
       ) : (
         <>
@@ -565,12 +611,22 @@ export const AddTemplateFieldsFormPartial = ({
                     defaultWidth={DEFAULT_WIDTH_PX}
                     passive={isFieldWithinBounds && !!selectedField}
                     onFocus={() => setLastActiveField(field)}
-                    onBlur={() => setLastActiveField(null)}
+                    onBlur={() => {
+                      setLastActiveField(null);
+                      void handleAutoSave();
+                    }}
                     onResize={(options) => onFieldResize(options, index)}
                     onMove={(options) => onFieldMove(options, index)}
-                    onRemove={() => remove(index)}
-                    onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                    onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                    onRemove={() => {
+                      remove(index);
+                      void handleAutoSave();
+                    }}
+                    onDuplicate={() => {
+                      onFieldCopy(null, { duplicate: true });
+                    }}
+                    onDuplicateAllPages={() => {
+                      onFieldCopy(null, { duplicateAll: true });
+                    }}
                     onAdvancedSettings={() => {
                       setCurrentField(field);
                       handleAdvancedSettings();
@@ -593,15 +649,21 @@ export const AddTemplateFieldsFormPartial = ({
                       selectedSignerStyles?.comboxBoxTrigger,
                     )}
                   >
-                    {selectedSigner?.email && (
-                      <span className="flex-1 truncate text-left">
-                        {selectedSigner?.name} ({selectedSigner?.email})
-                      </span>
-                    )}
+                    {selectedSigner?.email &&
+                      !isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">
+                          {selectedSigner?.name} ({selectedSigner?.email})
+                        </span>
+                      )}
+
+                    {selectedSigner?.email &&
+                      isTemplateRecipientEmailPlaceholder(selectedSigner.email) && (
+                        <span className="flex-1 truncate text-left">{selectedSigner?.name}</span>
+                      )}
 
                     {!selectedSigner?.email && (
                       <span className="gradie flex-1 truncate text-left">
-                        {selectedSigner?.email}
+                        No recipient selected
                       </span>
                     )}
 
@@ -657,15 +719,22 @@ export const AddTemplateFieldsFormPartial = ({
                                 'text-foreground/80': recipient === selectedSigner,
                               })}
                             >
-                              {recipient.name && (
-                                <span title={`${recipient.name} (${recipient.email})`}>
-                                  {recipient.name} ({recipient.email})
-                                </span>
-                              )}
+                              {recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={`${recipient.name} (${recipient.email})`}>
+                                    {recipient.name} ({recipient.email})
+                                  </span>
+                                )}
 
-                              {!recipient.name && (
-                                <span title={recipient.email}>{recipient.email}</span>
-                              )}
+                              {recipient.name &&
+                                isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.name}>{recipient.name}</span>
+                                )}
+
+                              {!recipient.name &&
+                                !isTemplateRecipientEmailPlaceholder(recipient.email) && (
+                                  <span title={recipient.email}>{recipient.email}</span>
+                                )}
                             </span>
                           </CommandItem>
                         ))}
