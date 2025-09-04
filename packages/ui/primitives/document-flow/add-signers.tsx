@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -15,20 +15,24 @@ import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import type { Suggestion } from '@documenso/ui/components/recipient/recipient-suggestions';
 import { cn } from '@documenso/ui/lib/utils';
 
 import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
 } from '../../components/document/document-read-only-fields';
+import { AutocompleteInput } from '../../components/recipient/recipient-suggestions';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -74,6 +78,8 @@ export const AddSignersFormPartial = ({
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { user } = useSession();
+  const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+  const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
 
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
@@ -81,6 +87,18 @@ export const AddSignersFormPartial = ({
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const organisation = useCurrentOrganisation();
+
+  const { data: recipientSuggestionsData, isLoading } =
+    trpc.recipient.recipientSuggestions.find.useQuery(
+      {
+        query: debouncedRecipientSearchQuery,
+      },
+      {
+        enabled: debouncedRecipientSearchQuery.length > 1,
+      },
+    );
+
+  const recipientSuggestions = recipientSuggestionsData?.results || [];
 
   const defaultRecipients = [
     {
@@ -286,10 +304,9 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
-      onAddSigner();
-    }
+  const handleSuggestionSelect = (index: number, suggestion: Suggestion) => {
+    setValue(`signers.${index}.email`, suggestion.email);
+    setValue(`signers.${index}.name`, suggestion.name || '');
   };
 
   const onDragEnd = useCallback(
@@ -679,7 +696,7 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <AutocompleteInput
                                         type="email"
                                         placeholder={_(msg`Email`)}
                                         {...field}
@@ -688,6 +705,15 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
+                                        suggestions={recipientSuggestions}
+                                        onSuggestionSelect={(suggestion) =>
+                                          handleSuggestionSelect(index, suggestion)
+                                        }
+                                        onSearchQueryChange={(e) => {
+                                          field.onChange(e);
+                                          setRecipientSearchQuery(e.target.value);
+                                        }}
+                                        loading={isLoading}
                                         data-testid="signer-email-input"
                                         onKeyDown={onKeyDown}
                                         onBlur={handleAutoSave}
@@ -719,7 +745,8 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <AutocompleteInput
+                                        type="text"
                                         placeholder={_(msg`Name`)}
                                         {...field}
                                         disabled={
@@ -727,6 +754,15 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
+                                        suggestions={recipientSuggestions}
+                                        onSuggestionSelect={(suggestion) =>
+                                          handleSuggestionSelect(index, suggestion)
+                                        }
+                                        onSearchQueryChange={(e) => {
+                                          field.onChange(e);
+                                          setRecipientSearchQuery(e.target.value);
+                                        }}
+                                        loading={isLoading}
                                         onKeyDown={onKeyDown}
                                         onBlur={handleAutoSave}
                                       />
