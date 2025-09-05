@@ -3892,7 +3892,7 @@ msgstr "Groupes"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to approve this document"
-msgstr "t'a invité à approuver ce document"
+msgstr "vous a invité à approuver ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to assist this document"
@@ -3900,11 +3900,11 @@ msgstr "vous a invité à aider ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to sign this document"
-msgstr "t'a invité à signer ce document"
+msgstr "vous a invité à signer ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to view this document"
-msgstr "t'a invité à voir ce document"
+msgstr "vous a invité à voir ce document"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
