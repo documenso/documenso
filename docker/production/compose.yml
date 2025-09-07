@@ -1,8 +1,12 @@
 name: documenso-production
 
+networks:
+  docu_net: {} 
+
 services:
   database:
     image: postgres:15
+    networks: [docu_net]
     environment:
       - POSTGRES_USER=${POSTGRES_USER:?err}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
@@ -16,13 +20,10 @@ services:
       - database:/var/lib/postgresql/data
     restart: unless-stopped
 
-  # Sidecar: Headless Chrome (no expongas puertos)
   chrome:
     image: browserless/chrome:latest
-    container_name: headless
-    hostname: headless
+    networks: [docu_net]
     environment:
-      # opcional, para proteger conexiones
       - TOKEN=${BROWSERLESS_TOKEN:-}
       - MAX_CONCURRENT_SESSIONS=2
       - CONNECTION_TIMEOUT=30000
@@ -35,6 +36,7 @@ services:
         condition: service_healthy
       chrome:
         condition: service_started
+    networks: [docu_net]
     environment:
       - PORT=${PORT:-3000}
       - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:?err}
@@ -73,19 +75,16 @@ services:
       - NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT}
       - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
       - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
-
-      # Firma
       - NEXT_PRIVATE_SIGNING_TRANSPORT=local
       - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
-
-      # Usa el Chrome del sidecar (con token si lo defines)
-      - NEXT_PRIVATE_BROWSERLESS_URL=${NEXT_PRIVATE_BROWSERLESS_URL:-ws://headless:3000${BROWSERLESS_TOKEN:+?token=${BROWSERLESS_TOKEN}}}
-
+      - NEXT_PRIVATE_BROWSERLESS_URL=ws://chrome:3000${BROWSERLESS_TOKEN:+?token=${BROWSERLESS_TOKEN}}
     ports:
       - ${PORT:-3000}:${PORT:-3000}
+    entrypoint: ["/bin/sh", "/opt/documenso/entrypoint.sh"]
     volumes:
       - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+      - /opt/documenso/entrypoint.sh:/opt/documenso/entrypoint.sh:ro
     restart: unless-stopped
 
 volumes:
