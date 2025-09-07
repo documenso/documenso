@@ -65,7 +65,7 @@ COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 
 RUN npm ci
 
-RUN npx playwright install --with-deps chromium
+RUN npx playwright install chromium
 
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
