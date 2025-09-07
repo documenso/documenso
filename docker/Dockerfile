@@ -77,32 +77,52 @@ RUN turbo run build --filter=@documenso/remix...
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
-FROM mcr.microsoft.com/playwright:v1.45.0-jammy AS runner
+# Mantén Node 22 en runtime (como antes), pero en Debian para poder instalar deps
+FROM node:22-bullseye-slim AS runner
 
-# La imagen ya trae navegadores y dependencias listas
-# Usamos el usuario no-root incluido
-USER pwuser
+ENV HUSKY=0 DOCKER_OUTPUT=1
 
+# Crea el mismo usuario 1001 que usabas (así coinciden permisos del .p12)
+RUN addgroup --system --gid 1001 nodejs \
+ && adduser  --system --uid 1001 nodejs
+
+USER nodejs
 WORKDIR /app
 
-# Copiamos artefactos del builder
-COPY --from=builder --chown=pwuser:pwuser /app/out/json/ .
-COPY --from=builder --chown=pwuser:pwuser /app/out/full/packages/tailwind-config ./packages/tailwind-config
+# Instalar dependencias del sistema que Playwright necesita
+USER root
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl git \
+ && rm -rf /var/lib/apt/lists/*
+
+# Instalar dependencias y navegadores de Playwright EN RUNTIME
+# (pin al mismo mayor de playwright que uses en build; 1.45.0 si quieres)
+RUN npx -y playwright@1.45.0 install-deps \
+ && npx -y playwright@1.45.0 install chromium
+
+# Volver al usuario no-root 1001
+USER nodejs
+
+# === A partir de aquí, tu flujo original ===
+
+# Artefactos mínimos
+COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
+COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 
 # Dependencias de producción
 RUN npm ci --only=production
 
-# Copiamos el build y los estáticos generados en installer
-COPY --from=installer --chown=pwuser:pwuser /app/apps/remix/build ./apps/remix/build
-COPY --from=installer --chown=pwuser:pwuser /app/apps/remix/public ./apps/remix/public
+# Build y estáticos generados en installer
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
 
-# Prisma: schema + migrations y generar cliente para linux-gnu (Ubuntu)
-COPY --from=installer --chown=pwuser:pwuser /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
-COPY --from=installer --chown=pwuser:pwuser /app/packages/prisma/migrations ./packages/prisma/migrations
+# Prisma: schema + migrations, y generar cliente para linux-gnu (Debian)
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
 # Script de arranque
-COPY --chown=pwuser:pwuser ./docker/start.sh /app/apps/remix/start.sh
+COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
 
 WORKDIR /app/apps/remix
 CMD ["sh", "start.sh"]
