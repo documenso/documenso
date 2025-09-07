@@ -78,7 +78,7 @@ services:
       - NEXT_PRIVATE_SIGNING_TRANSPORT=local
       - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
-      - NEXT_PRIVATE_BROWSERLESS_URL=ws://chrome:3000${BROWSERLESS_TOKEN:+?token=${BROWSERLESS_TOKEN}}
+      - NEXT_PRIVATE_BROWSERLESS_URL=ws://chrome:3000?token=${BROWSERLESS_TOKEN}
     ports:
       - ${PORT:-3000}:${PORT:-3000}
     entrypoint: ["/bin/sh", "/opt/documenso/entrypoint.sh"]
