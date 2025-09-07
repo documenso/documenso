@@ -65,6 +65,8 @@ COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 
 RUN npm ci
 
+RUN npx playwright install --with-deps chromium
+
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
