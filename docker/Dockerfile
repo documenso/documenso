@@ -65,8 +65,6 @@ COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 
 RUN npm ci
 
-RUN npx playwright install chromium
-
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
@@ -79,41 +77,32 @@ RUN turbo run build --filter=@documenso/remix...
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
-FROM base AS runner
+FROM mcr.microsoft.com/playwright:v1.45.0-jammy AS runner
 
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
-
-# Don't run production as root
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nodejs
-
-USER nodejs
+# La imagen ya trae navegadores y dependencias listas
+# Usamos el usuario no-root incluido
+USER pwuser
 
 WORKDIR /app
 
-COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
-# Copy the tailwind config files across
-COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+# Copiamos artefactos del builder
+COPY --from=builder --chown=pwuser:pwuser /app/out/json/ .
+COPY --from=builder --chown=pwuser:pwuser /app/out/full/packages/tailwind-config ./packages/tailwind-config
 
+# Dependencias de producción
 RUN npm ci --only=production
 
-# Automatically leverage output traces to reduce image size
-# https://nodejs.org/docs/advanced-features/output-file-tracing
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
+# Copiamos el build y los estáticos generados en installer
+COPY --from=installer --chown=pwuser:pwuser /app/apps/remix/build ./apps/remix/build
+COPY --from=installer --chown=pwuser:pwuser /app/apps/remix/public ./apps/remix/public
 
-# Copy the prisma binary, schema and migrations
-COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
-COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
-
-# Generate the prisma client again
+# Prisma: schema + migrations y generar cliente para linux-gnu (Ubuntu)
+COPY --from=installer --chown=pwuser:pwuser /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
+COPY --from=installer --chown=pwuser:pwuser /app/packages/prisma/migrations ./packages/prisma/migrations
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
-
-# Get the start script from docker/start.sh
-COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
+# Script de arranque
+COPY --chown=pwuser:pwuser ./docker/start.sh /app/apps/remix/start.sh
 
 WORKDIR /app/apps/remix
-
 CMD ["sh", "start.sh"]
