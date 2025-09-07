@@ -1,9 +1,13 @@
 ###########################
 #     BASE CONTAINER      #
 ###########################
-FROM node:22-alpine3.20 AS base
+# USAR DEBIAN (bookworm) EN VEZ DE ALPINE
+FROM node:22-bookworm AS base
 
-RUN apk add --no-cache openssl
+# openssl para utilidades (igual que antes)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    openssl \
+ && rm -rf /var/lib/apt/lists/*
 
 
 ###########################
@@ -11,9 +15,11 @@ RUN apk add --no-cache openssl
 ###########################
 FROM base AS builder
 
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
+# Herramientas necesarias
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    jq ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 COPY . .
@@ -21,107 +27,98 @@ COPY . .
 RUN npm install -g "turbo@^1.9.3"
 
 # Outputs to the /out folder
-# source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
 RUN turbo prune --scope=@documenso/remix --docker
+
 
 ###########################
 #   INSTALLER CONTAINER   #
 ###########################
 FROM base AS installer
 
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-RUN apk add --no-cache jq
-# Required for node_modules/aws-crt
-RUN apk add --no-cache make cmake g++ openssl bash
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    jq make cmake g++ openssl bash ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Disable husky from installing hooks
-ENV HUSKY 0
-ENV DOCKER_OUTPUT 1
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Encryption keys
+# Encryption keys (build args)
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
 ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
-
 ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
-
-
-# Uncomment and use build args to enable remote caching
-# ARG TURBO_TEAM
-# ENV TURBO_TEAM=$TURBO_TEAM
-# ARG TURBO_TOKEN
-# ENV TURBO_TOKEN=$TURBO_TOKEN
 
 # First install the dependencies (as they change less often)
 COPY .gitignore .gitignore
 COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
-
 COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
 
 RUN npm ci
 
 # Then copy all the source code (as it changes more often)
 COPY --from=builder /app/out/full/ .
-# Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
-
 RUN turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
 ###########################
-# Mantén Node 22 en runtime (como antes), pero en Debian para poder instalar deps
-FROM node:22-bullseye-slim AS runner
+FROM base AS runner
 
-ENV HUSKY=0 DOCKER_OUTPUT=1
+ENV HUSKY=0
+ENV DOCKER_OUTPUT=1
 
-# Crea el mismo usuario 1001 que usabas (así coinciden permisos del .p12)
+# No ejecutar como root
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nodejs
 
-USER nodejs
-WORKDIR /app
-
-# Instalar dependencias del sistema que Playwright necesita
+# --- PLAYWRIGHT: deps del sistema + navegador ---
+# 1) Instalar deps del sistema (root)
 USER root
-RUN apt-get update \
- && apt-get install -y --no-install-recommends ca-certificates curl git \
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libasound2 libatk-bridge2.0-0 libatk1.0-0 \
+    libcairo2 libdrm2 libgbm1 libgtk-3-0 \
+    libnspr4 libnss3 libxcomposite1 libxdamage1 \
+    libxfixes3 libxrandr2 libxshmfence1 \
+    fonts-liberation xdg-utils wget \
  && rm -rf /var/lib/apt/lists/*
 
-# Instalar dependencias y navegadores de Playwright EN RUNTIME
-# (pin al mismo mayor de playwright que uses en build; 1.45.0 si quieres)
-RUN npx -y playwright@1.45.0 install-deps \
- && npx -y playwright@1.45.0 install chromium
-
-# Volver al usuario no-root 1001
+# 2) Instalar playwright deps (script oficial) y Chromium
+RUN npx -y playwright@1.45.0 install-deps
+# instalar el navegador en el HOME del usuario nodejs
+ENV HOME=/home/nodejs
 USER nodejs
+RUN npx -y playwright@1.45.0 install chromium
+# (Opcional) fija dónde guarda los browsers
+ENV PLAYWRIGHT_BROWSERS_PATH=/home/nodejs/.cache/ms-playwright
+# --- FIN PLAYWRIGHT ---
 
-# === A partir de aquí, tu flujo original ===
+WORKDIR /app
 
-# Artefactos mínimos
-COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
-COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+# Copiar artefactos como usuario app
+COPY --from=builder   --chown=nodejs:nodejs /app/out/json/ ./
+COPY --from=builder   --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
 
-# Dependencias de producción
 RUN npm ci --only=production
 
-# Build y estáticos generados en installer
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build ./apps/remix/build
-COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/public
+# Output traces
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/build   ./apps/remix/build
+COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public  ./apps/remix/public
 
-# Prisma: schema + migrations, y generar cliente para linux-gnu (Debian)
-COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
-COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
+# Prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma   ./packages/prisma/schema.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations     ./packages/prisma/migrations
 RUN npx prisma generate --schema ./packages/prisma/schema.prisma
 
-# Script de arranque
+# Start script
 COPY --chown=nodejs:nodejs ./docker/start.sh /app/apps/remix/start.sh
 
 WORKDIR /app/apps/remix
