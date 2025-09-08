@@ -20,12 +20,6 @@ COPY . .
 
 RUN npm install -g "turbo@^1.9.3"
 
-# 👇 Añadir aquí
-ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
-ARG NEXT_PUBLIC_WEBAPP_URL
-ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
-ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
-
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
 RUN turbo prune --scope=@documenso/remix --docker
@@ -78,12 +72,10 @@ COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 
-# --- 👇 NUEVO: variables públicas para el build del frontend ---
 ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
 ARG NEXT_PUBLIC_WEBAPP_URL
 ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
 ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
-# --- 👆 ---
 
 RUN turbo run build --filter=@documenso/remix...
 
@@ -94,6 +86,11 @@ FROM base AS runner
 
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
+
+ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
+ARG NEXT_PUBLIC_WEBAPP_URL
+ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
+ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
