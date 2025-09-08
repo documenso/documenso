@@ -43,7 +43,7 @@ import {
 } from './schema';
 
 export const recipientRouter = router({
-  recipientSuggestions: {
+  suggestions: {
     find: findRecipientSuggestionsRoute,
   },
 

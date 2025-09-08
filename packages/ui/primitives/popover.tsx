@@ -93,4 +93,4 @@ const PopoverHover = ({ trigger, children, contentProps, side = 'top' }: Popover
   );
 };
 
-export { Popover, PopoverTrigger, PopoverContent, PopoverHover, PopoverAnchor };
+export { Popover, PopoverTrigger, PopoverAnchor, PopoverContent, PopoverHover };
