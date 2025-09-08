@@ -29,39 +29,30 @@ export const DocumentCertificateDownloadButton = ({
 
   const onDownloadCertificatesClick = async () => {
     try {
-      const { url } = await downloadCertificate({ documentId });
+      const { pdfData, filename } = await downloadCertificate({ documentId });
 
-      const iframe = Object.assign(document.createElement('iframe'), {
-        src: url,
-      });
+      const byteCharacters = atob(pdfData);
+      const byteNumbers = new Array(byteCharacters.length);
 
-      Object.assign(iframe.style, {
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '0',
-        height: '0',
-      });
+      for (let i = 0; i < byteCharacters.length; i++) {
+        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      }
 
-      const onLoaded = () => {
-        if (iframe.contentDocument?.readyState === 'complete') {
-          iframe.contentWindow?.print();
+      const byteArray = new Uint8Array(byteNumbers);
+      const blob = new Blob([byteArray], { type: 'application/pdf' });
 
-          iframe.contentWindow?.addEventListener('afterprint', () => {
-            document.body.removeChild(iframe);
-          });
-        }
-      };
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
 
-      // When the iframe has loaded, print the iframe and remove it from the dom
-      iframe.addEventListener('load', onLoaded);
+      link.href = url;
+      link.download = filename;
 
-      document.body.appendChild(iframe);
+      document.body.appendChild(link);
+      link.click();
 
-      onLoaded();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error(error);
-
       toast({
         title: _(msg`Something went wrong`),
         description: _(

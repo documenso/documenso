@@ -1,9 +1,6 @@
-import { DateTime } from 'luxon';
-
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getCertificatePdf } from '@documenso/lib/server-only/htmltopdf/get-certificate-pdf';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
@@ -16,7 +13,7 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
   .input(ZDownloadDocumentCertificateRequestSchema)
   .output(ZDownloadDocumentCertificateResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { teamId } = ctx;
+    const { teamId, user } = ctx;
     const { documentId } = input;
 
     ctx.logger.info({
@@ -27,20 +24,43 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
 
     const document = await getDocumentById({
       documentId,
-      userId: ctx.user.id,
+      userId: user.id,
       teamId,
     });
+
+    if (!document || (teamId && document.teamId !== teamId)) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'You do not have access to this document.',
+      });
+    }
 
     if (!isDocumentCompleted(document.status)) {
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }
 
-    const encrypted = encryptSecondaryData({
-      data: document.id.toString(),
-      expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
-    });
+    try {
+      const pdfBuffer = await getCertificatePdf({
+        documentId: document.id,
+        language: document.documentMeta?.language,
+      });
 
-    return {
-      url: `${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encrypted}`,
-    };
+      const base64Pdf = pdfBuffer.toString('base64');
+      const filename = `${document.title.replace(/\.pdf$/, '')}_certificate.pdf`;
+
+      return {
+        pdfData: base64Pdf,
+        filename,
+        contentType: 'application/pdf',
+      };
+    } catch (error) {
+      ctx.logger.error({
+        error,
+        message: 'Failed to generate certificate PDF',
+        documentId,
+      });
+
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Failed to generate certificate PDF',
+      });
+    }
   });

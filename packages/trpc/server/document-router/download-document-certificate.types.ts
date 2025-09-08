@@ -5,7 +5,9 @@ export const ZDownloadDocumentCertificateRequestSchema = z.object({
 });
 
 export const ZDownloadDocumentCertificateResponseSchema = z.object({
-  url: z.string(),
+  pdfData: z.string(),
+  filename: z.string(),
+  contentType: z.string(),
 });
 
 export type TDownloadDocumentCertificateRequest = z.infer<
