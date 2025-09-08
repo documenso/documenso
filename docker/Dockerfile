@@ -20,6 +20,13 @@ COPY . .
 
 RUN npm install -g "turbo@^1.9.3"
 
+# 👉 Fuerza los valores públicos aquí, con defaults.
+#    (Así funciona aunque Dokploy no pase build-args)
+ARG NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+ARG NEXT_PUBLIC_WEBAPP_URL=https://sign.gcmasesores.io
+ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=$NEXT_PUBLIC_UPLOAD_TRANSPORT
+ENV NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL
+
 # Outputs to the /out folder
 # source: https://turbo.build/repo/docs/reference/command-line-reference/prune#--docker
 RUN turbo prune --scope=@documenso/remix --docker
@@ -42,13 +49,12 @@ ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
 ENV NEXT_TELEMETRY_DISABLED 1
 
-# Encryption keys
+
+# Claves de cifrado (como las tenías)
 ARG NEXT_PRIVATE_ENCRYPTION_KEY="CAFEBABE"
 ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
-
 ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
-
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
@@ -72,10 +78,10 @@ COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 
-ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
-ARG NEXT_PUBLIC_WEBAPP_URL
-ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
-ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
+ARG NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+ARG NEXT_PUBLIC_WEBAPP_URL=https://sign.gcmasesores.io
+ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=$NEXT_PUBLIC_UPLOAD_TRANSPORT
+ENV NEXT_PUBLIC_WEBAPP_URL=$NEXT_PUBLIC_WEBAPP_URL
 
 RUN turbo run build --filter=@documenso/remix...
 
