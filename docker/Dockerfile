@@ -78,8 +78,6 @@ COPY turbo.json turbo.json
 
 RUN npm install -g "turbo@^1.9.3"
 
-RUN turbo run build --filter=@documenso/remix...
-
 # --- 👇 NUEVO: variables públicas para el build del frontend ---
 ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
 ARG NEXT_PUBLIC_WEBAPP_URL
@@ -87,6 +85,7 @@ ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
 ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
 # --- 👆 ---
 
+RUN turbo run build --filter=@documenso/remix...
 
 ###########################
 #     RUNNER CONTAINER    #
@@ -95,7 +94,10 @@ FROM base AS runner
 
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
-# --- 👇 NUEVO: asegurar que están disponibles también en runtime del cliente/SSR ---
+
+# --- 👇 NUEVO: volver a declararlas en este stage (opcional pero seguro para SSR) ---
+ARG NEXT_PUBLIC_UPLOAD_TRANSPORT
+ARG NEXT_PUBLIC_WEBAPP_URL
 ENV NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT}
 ENV NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL}
 # --- 👆 ---
