@@ -42,6 +42,11 @@ export const run = async ({
       where: {
         id: userId,
       },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
     }),
     prisma.document.findFirstOrThrow({
       where: {

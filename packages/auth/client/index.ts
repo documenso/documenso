@@ -7,6 +7,7 @@ import { AppError } from '@documenso/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
 import type { SessionValidationResult } from '../server/lib/session/session';
+import type { PartialAccount } from '../server/lib/utils/get-accounts';
 import type { ActiveSession } from '../server/lib/utils/get-session';
 import { handleSignInRedirect } from '../server/lib/utils/redirect';
 import type {
@@ -95,6 +96,25 @@ export class AuthClient {
       throw AppError.parseError(error);
     }
   }
+
+  public account = {
+    getMany: async () => {
+      const response = await this.client['accounts'].$get();
+
+      await this.handleError(response);
+
+      const result = await response.json();
+
+      return superjson.deserialize<{ accounts: PartialAccount[] }>(result);
+    },
+    delete: async (accountId: string) => {
+      const response = await this.client['account'][':accountId'].$delete({
+        param: { accountId },
+      });
+
+      await this.handleError(response);
+    },
+  };
 
   public emailPassword = {
     signIn: async (data: Omit<TEmailPasswordSignin, 'csrfToken'> & { csrfToken?: string }) => {
@@ -213,6 +233,22 @@ export class AuthClient {
       if (data.redirectUrl) {
         window.location.href = data.redirectUrl;
       }
+    },
+    org: {
+      signIn: async ({ orgUrl }: { orgUrl: string }) => {
+        const response = await this.client['oauth'].authorize.oidc.org[':orgUrl'].$post({
+          param: { orgUrl },
+        });
+
+        await this.handleError(response);
+
+        const data = await response.json();
+
+        // Redirect to external OIDC provider URL.
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        }
+      },
     },
   };
 }

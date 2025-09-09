@@ -1,15 +1,18 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import type { Field } from '@prisma/client';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
-import { match } from 'ts-pattern';
+import { useNavigate } from 'react-router';
+import { P, match } from 'ts-pattern';
 
+import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -18,8 +21,11 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
+import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
+import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -40,6 +46,7 @@ import { DocumentSigningRejectDialog } from '~/components/general/document-signi
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
 
+import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
 export type DocumentSigningPageViewProps = {
@@ -63,8 +70,55 @@ export const DocumentSigningPageView = ({
 }: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
 
+  const navigate = useNavigate();
+  const analytics = useAnalytics();
+
   const [selectedSignerId, setSelectedSignerId] = useState<number | null>(allRecipients?.[0]?.id);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const {
+    mutateAsync: completeDocumentWithToken,
+    isPending,
+    isSuccess,
+  } = trpc.recipient.completeDocumentWithToken.useMutation();
+
+  // Keep the loading state going if successful since the redirect may take some time.
+  const isSubmitting = isPending || isSuccess;
+
+  const fieldsRequiringValidation = useMemo(
+    () => fields.filter(isFieldUnsignedAndRequired),
+    [fields],
+  );
+
+  const fieldsValidated = () => {
+    validateFieldsInserted(fieldsRequiringValidation);
+  };
+
+  const completeDocument = async (
+    authOptions?: TRecipientActionAuth,
+    nextSigner?: { email: string; name: string },
+  ) => {
+    const payload = {
+      token: recipient.token,
+      documentId: document.id,
+      authOptions,
+      ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
+    };
+
+    await completeDocumentWithToken(payload);
+
+    analytics.capture('App: Recipient has completed signing', {
+      signerId: recipient.id,
+      documentId: document.id,
+      timestamp: new Date().toISOString(),
+    });
+
+    if (documentMeta?.redirectUrl) {
+      window.location.href = documentMeta.redirectUrl;
+    } else {
+      await navigate(`/sign/${recipient.token}/complete`);
+    }
+  };
 
   let senderName = document.user.name ?? '';
   let senderEmail = `(${document.user.email})`;
@@ -77,6 +131,31 @@ export const DocumentSigningPageView = ({
   const selectedSigner = allRecipients?.find((r) => r.id === selectedSignerId);
   const targetSigner =
     recipient.role === RecipientRole.ASSISTANT && selectedSigner ? selectedSigner : null;
+
+  const nextRecipient = useMemo(() => {
+    if (!documentMeta?.signingOrder || documentMeta.signingOrder !== 'SEQUENTIAL') {
+      return undefined;
+    }
+
+    const sortedRecipients = allRecipients.sort((a, b) => {
+      // Sort by signingOrder first (nulls last), then by id
+      if (a.signingOrder === null && b.signingOrder === null) return a.id - b.id;
+      if (a.signingOrder === null) return 1;
+      if (b.signingOrder === null) return -1;
+      if (a.signingOrder === b.signingOrder) return a.id - b.id;
+      return a.signingOrder - b.signingOrder;
+    });
+
+    const currentIndex = sortedRecipients.findIndex((r) => r.id === recipient.id);
+    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
+      ? sortedRecipients[currentIndex + 1]
+      : undefined;
+  }, [document.documentMeta?.signingOrder, allRecipients, recipient.id]);
+
+  const highestPageNumber = Math.max(...fields.map((field) => field.page));
+
+  const pendingFields = fieldsRequiringValidation.filter((field) => !field.inserted);
+  const hasPendingFields = pendingFields.length > 0;
 
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
@@ -163,19 +242,55 @@ export const DocumentSigningPageView = ({
                     .otherwise(() => null)}
                 </h3>
 
-                <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                  {isExpanded ? (
-                    <LucideChevronDown
-                      className="text-muted-foreground h-5 w-5"
+                {match({ hasPendingFields, isExpanded, role: recipient.role })
+                  .with(
+                    {
+                      hasPendingFields: false,
+                      role: P.not(RecipientRole.ASSISTANT),
+                      isExpanded: false,
+                    },
+                    () => (
+                      <div className="md:hidden">
+                        <DocumentSigningCompleteDialog
+                          isSubmitting={isSubmitting}
+                          documentTitle={document.title}
+                          fields={fields}
+                          fieldsValidated={fieldsValidated}
+                          disabled={!isRecipientsTurn}
+                          onSignatureComplete={async (nextSigner) => {
+                            await completeDocument(undefined, nextSigner);
+                          }}
+                          role={recipient.role}
+                          allowDictateNextSigner={
+                            nextRecipient && documentMeta?.allowDictateNextSigner
+                          }
+                          defaultNextSigner={
+                            nextRecipient
+                              ? { name: nextRecipient.name, email: nextRecipient.email }
+                              : undefined
+                          }
+                        />
+                      </div>
+                    ),
+                  )
+                  .with({ isExpanded: true }, () => (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
                       onClick={() => setIsExpanded(false)}
-                    />
-                  ) : (
-                    <LucideChevronUp
-                      className="text-muted-foreground h-5 w-5"
+                    >
+                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ))
+                  .otherwise(() => (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
                       onClick={() => setIsExpanded(true)}
-                    />
-                  )}
-                </Button>
+                    >
+                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ))}
               </div>
 
               <div className="hidden group-data-[expanded]/document-widget:block md:block">
@@ -204,10 +319,13 @@ export const DocumentSigningPageView = ({
                   document={document}
                   recipient={recipient}
                   fields={fields}
-                  redirectUrl={documentMeta?.redirectUrl}
                   isRecipientsTurn={isRecipientsTurn}
                   allRecipients={allRecipients}
                   setSelectedSignerId={setSelectedSignerId}
+                  completeDocument={completeDocument}
+                  isSubmitting={isSubmitting}
+                  fieldsValidated={fieldsValidated}
+                  nextRecipient={nextRecipient}
                 />
               </div>
             </div>
@@ -224,7 +342,9 @@ export const DocumentSigningPageView = ({
           <DocumentSigningAutoSign recipient={recipient} fields={fields} />
         )}
 
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+        <ElementVisible
+          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+        >
           {fields
             .filter(
               (field) =>
