@@ -51,21 +51,21 @@ export const DOCUMENT_SIGNATURE_TYPES = {
   [DocumentSignatureType.DRAW]: {
     label: msg({
       message: `Draw`,
-      context: `Draw signatute type`,
+      context: `Draw signature type`,
     }),
     value: DocumentSignatureType.DRAW,
   },
   [DocumentSignatureType.TYPE]: {
     label: msg({
       message: `Type`,
-      context: `Type signatute type`,
+      context: `Type signature type`,
     }),
     value: DocumentSignatureType.TYPE,
   },
   [DocumentSignatureType.UPLOAD]: {
     label: msg({
       message: `Upload`,
-      context: `Upload signatute type`,
+      context: `Upload signature type`,
     }),
     value: DocumentSignatureType.UPLOAD,
   },
