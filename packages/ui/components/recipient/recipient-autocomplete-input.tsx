@@ -1,11 +1,12 @@
 import React, { useRef, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { PopoverAnchor } from '@radix-ui/react-popover';
 
-import { cn } from '@documenso/ui/lib/utils';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+import { Popover, PopoverContent } from '@documenso/ui/primitives/popover';
 
-import { Command, CommandGroup, CommandItem, CommandTextInput } from '../../primitives/command';
+import { Command, CommandGroup, CommandItem } from '../../primitives/command';
+import { Input } from '../../primitives/input';
 
 export type RecipientAutoCompleteOption = {
   email: string;
@@ -26,8 +27,6 @@ type RecipientAutoCompleteInputProps = {
 type CombinedProps = RecipientAutoCompleteInputProps &
   Omit<React.InputHTMLAttributes<HTMLInputElement>, keyof RecipientAutoCompleteInputProps>;
 
-const minTypedQueryLength = 1;
-
 export const RecipientAutoCompleteInput = ({
   value,
   placeholder,
@@ -36,10 +35,10 @@ export const RecipientAutoCompleteInput = ({
   onSearchQueryChange,
   onSelect,
   options = [],
+  onChange: _onChange,
   ...props
 }: CombinedProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -50,29 +49,23 @@ export const RecipientAutoCompleteInput = ({
 
   const handleSelectItem = (option: RecipientAutoCompleteOption) => {
     setIsOpen(false);
-    setSelectedSuggestionIndex(-1);
-
     onSelect(option);
-
-    if (inputRef.current) {
-      inputRef.current.blur();
-    }
   };
 
   return (
     <Command>
       <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger asChild>
-          <CommandTextInput
+        <PopoverAnchor asChild>
+          <Input
             ref={inputRef}
             className="w-full"
             placeholder={placeholder}
             value={value}
             disabled={disabled}
-            onValueChange={onValueChange}
-            onBlur={props.onBlur}
+            onChange={(e) => onValueChange(e.target.value)}
+            {...props}
           />
-        </PopoverTrigger>
+        </PopoverAnchor>
 
         <PopoverContent
           align="start"
@@ -98,7 +91,7 @@ export const RecipientAutoCompleteInput = ({
                 <CommandItem
                   key={`${index}-${option.email}`}
                   value={`${option.email}`}
-                  className={cn('cursor-pointer', index === selectedSuggestionIndex && 'bg-accent')}
+                  className="cursor-pointer"
                   onSelect={() => handleSelectItem(option)}
                 >
                   {option.name} ({option.email})

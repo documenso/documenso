@@ -767,7 +767,7 @@ export const AddSignersFormPartial = ({
                                           setRecipientSearchQuery(query);
                                         }}
                                         loading={isLoading}
-                                        // onBlur={handleAutoSave}
+                                        onBlur={handleAutoSave}
                                       />
                                     </FormControl>
 
