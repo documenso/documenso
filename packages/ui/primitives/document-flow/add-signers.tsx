@@ -719,6 +719,9 @@ export const AddSignersFormPartial = ({
                                           setRecipientSearchQuery(query);
                                         }}
                                         loading={isLoading}
+                                        data-testid="signer-email-input"
+                                        onKeyDown={onKeyDown}
+                                        maxLength={254}
                                         onBlur={handleAutoSave}
                                         data-testid="signer-email-input"
                                       />
@@ -767,6 +770,8 @@ export const AddSignersFormPartial = ({
                                           setRecipientSearchQuery(query);
                                         }}
                                         loading={isLoading}
+                                        onKeyDown={onKeyDown}
+                                        maxLength={255}
                                         onBlur={handleAutoSave}
                                       />
                                     </FormControl>
