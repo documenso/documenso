@@ -627,6 +627,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        maxLength={254}
                                         onBlur={handleAutoSave}
                                         data-testid="placeholder-recipient-email-input"
                                       />
@@ -663,6 +664,7 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
                                           signers[index].email === user?.email ||
                                           isSignerDirectRecipient(signer)
                                         }
+                                        maxLength={255}
                                         onBlur={handleAutoSave}
                                         data-testid="placeholder-recipient-name-input"
                                       />

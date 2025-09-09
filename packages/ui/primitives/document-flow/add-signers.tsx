@@ -690,6 +690,7 @@ export const AddSignersFormPartial = ({
                                         }
                                         data-testid="signer-email-input"
                                         onKeyDown={onKeyDown}
+                                        maxLength={254}
                                         onBlur={handleAutoSave}
                                       />
                                     </FormControl>
@@ -728,6 +729,7 @@ export const AddSignersFormPartial = ({
                                           !canRecipientBeModified(signer.nativeId)
                                         }
                                         onKeyDown={onKeyDown}
+                                        maxLength={255}
                                         onBlur={handleAutoSave}
                                       />
                                     </FormControl>
