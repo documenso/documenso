@@ -31,6 +31,10 @@ export const DocumentAuditLogDownloadButton = ({
     try {
       const response = await fetch(`/api/t/${team.url}/download/audit-logs/${documentId}`);
 
+      if (!response.ok) {
+        throw new Error('Failed to download certificate');
+      }
+
       const contentDisposition = response.headers.get('Content-Disposition');
       const filename =
         contentDisposition?.split('filename="')[1]?.split('"')[0] ||
