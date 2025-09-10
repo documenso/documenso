@@ -54,7 +54,6 @@ export async function loader({ request, params }: Route.LoaderArgs) {
         'Content-Disposition': `attachment; filename="${filename}"`,
         'Content-Length': pdfBuffer.length.toString(),
         'Cache-Control': 'no-cache, no-store, must-revalidate',
-        Pragma: 'no-cache',
         Expires: '0',
       },
     });

@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -5,10 +7,11 @@ import type { DocumentStatus } from '@prisma/client';
 import { DownloadIcon } from 'lucide-react';
 
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentCertificateDownloadButtonProps = {
   className?: string;
@@ -23,24 +26,25 @@ export const DocumentCertificateDownloadButton = ({
 }: DocumentCertificateDownloadButtonProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
-
-  const { mutateAsync: downloadCertificate, isPending } =
-    trpc.document.downloadCertificate.useMutation();
+  const [isPending, setIsPending] = useState(false);
+  const team = useCurrentTeam();
 
   const onDownloadCertificatesClick = async () => {
+    setIsPending(true);
+
     try {
-      const { pdfData, filename } = await downloadCertificate({ documentId });
+      const response = await fetch(`/api/t/${team.url}/download/certificate/${documentId}`);
 
-      const byteCharacters = atob(pdfData);
-      const byteNumbers = new Array(byteCharacters.length);
-
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
+      if (!response.ok) {
+        throw new Error('Failed to download certificate');
       }
 
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], { type: 'application/pdf' });
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename =
+        contentDisposition?.split('filename="')[1]?.split('"')[0] ||
+        `document_${documentId}_certificate.pdf`;
 
+      const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
 
@@ -53,6 +57,8 @@ export const DocumentCertificateDownloadButton = ({
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
     } catch (error) {
+      console.error('Certificate download error:', error);
+
       toast({
         title: _(msg`Something went wrong`),
         description: _(
@@ -60,6 +66,8 @@ export const DocumentCertificateDownloadButton = ({
         ),
         variant: 'destructive',
       });
+    } finally {
+      setIsPending(false);
     }
   };
 

@@ -1,12 +1,15 @@
+import { useState } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DownloadIcon } from 'lucide-react';
 
-import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentAuditLogDownloadButtonProps = {
   className?: string;
@@ -19,44 +22,34 @@ export const DocumentAuditLogDownloadButton = ({
 }: DocumentAuditLogDownloadButtonProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
-
-  const { mutateAsync: downloadAuditLogs, isPending } =
-    trpc.document.auditLog.download.useMutation();
+  const [isPending, setIsPending] = useState(false);
+  const team = useCurrentTeam();
 
   const onDownloadAuditLogsClick = async () => {
+    setIsPending(true);
+
     try {
-      const { url } = await downloadAuditLogs({ documentId });
+      const response = await fetch(`/api/t/${team.url}/download/audit-logs/${documentId}`);
 
-      const iframe = Object.assign(document.createElement('iframe'), {
-        src: url,
-      });
+      const contentDisposition = response.headers.get('Content-Disposition');
+      const filename =
+        contentDisposition?.split('filename="')[1]?.split('"')[0] ||
+        `document_${documentId}_audit_logs.pdf`;
 
-      Object.assign(iframe.style, {
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        width: '0',
-        height: '0',
-      });
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
 
-      const onLoaded = () => {
-        if (iframe.contentDocument?.readyState === 'complete') {
-          iframe.contentWindow?.print();
+      link.href = url;
+      link.download = filename;
 
-          iframe.contentWindow?.addEventListener('afterprint', () => {
-            document.body.removeChild(iframe);
-          });
-        }
-      };
+      document.body.appendChild(link);
+      link.click();
 
-      // When the iframe has loaded, print the iframe and remove it from the dom
-      iframe.addEventListener('load', onLoaded);
-
-      document.body.appendChild(iframe);
-
-      onLoaded();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
     } catch (error) {
-      console.error(error);
+      console.error('Audit logs download error:', error);
 
       toast({
         title: _(msg`Something went wrong`),
@@ -65,6 +58,8 @@ export const DocumentAuditLogDownloadButton = ({
         ),
         variant: 'destructive',
       });
+    } finally {
+      setIsPending(false);
     }
   };
 
