@@ -48,7 +48,6 @@ export const documentRouter = router({
     find: findInboxRoute,
     getCount: getInboxCountRoute,
   }),
-  updateDocument: updateDocumentRoute,
   attachments: {
     find: findDocumentAttachmentsRoute,
     set: setDocumentAttachmentsRoute,
