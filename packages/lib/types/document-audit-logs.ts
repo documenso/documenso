@@ -40,6 +40,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_ATTACHMENTS_UPDATED', // When the document attachments are updated.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -598,6 +599,29 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document attachments updated.
+ */
+export const ZDocumentAuditLogEventDocumentAttachmentsUpdatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED),
+  data: z.object({
+    from: z.array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        url: z.string(),
+      }),
+    ),
+    to: z.array(
+      z.object({
+        id: z.string(),
+        label: z.string(),
+        url: z.string(),
+      }),
+    ),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -630,6 +654,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentSentSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
     ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema,
+    ZDocumentAuditLogEventDocumentAttachmentsUpdatedSchema,
     ZDocumentAuditLogEventFieldCreatedSchema,
     ZDocumentAuditLogEventFieldRemovedSchema,
     ZDocumentAuditLogEventFieldUpdatedSchema,

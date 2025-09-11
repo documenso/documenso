@@ -7,6 +7,7 @@ import { downloadDocumentRoute } from './download-document';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
 import { downloadDocumentCertificateRoute } from './download-document-certificate';
 import { duplicateDocumentRoute } from './duplicate-document';
+import { findDocumentAttachmentsRoute } from './find-document-attachments';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentsRoute } from './find-documents';
 import { findDocumentsInternalRoute } from './find-documents-internal';
@@ -16,6 +17,7 @@ import { getDocumentByTokenRoute } from './get-document-by-token';
 import { getInboxCountRoute } from './get-inbox-count';
 import { redistributeDocumentRoute } from './redistribute-document';
 import { searchDocumentRoute } from './search-document';
+import { setDocumentAttachmentsRoute } from './set-document-attachments';
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
@@ -46,4 +48,8 @@ export const documentRouter = router({
     find: findInboxRoute,
     getCount: getInboxCountRoute,
   }),
+  attachments: {
+    find: findDocumentAttachmentsRoute,
+    set: setDocumentAttachmentsRoute,
+  },
 });

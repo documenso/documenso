@@ -87,6 +87,7 @@ export const getDocumentAndSenderByToken = async ({
           token,
         },
       },
+      attachments: true,
       team: {
         select: {
           name: true,
