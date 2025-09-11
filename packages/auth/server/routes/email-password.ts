@@ -16,7 +16,7 @@ import { validateTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/
 import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
 import { createUser } from '@documenso/lib/server-only/user/create-user';
 import { forgotPassword } from '@documenso/lib/server-only/user/forgot-password';
-import { getMostRecentVerificationTokenByUserId } from '@documenso/lib/server-only/user/get-most-recent-verification-token-by-user-id';
+import { getMostRecentEmailVerificationToken } from '@documenso/lib/server-only/user/get-most-recent-email-verification-token';
 import { resetPassword } from '@documenso/lib/server-only/user/reset-password';
 import { updatePassword } from '@documenso/lib/server-only/user/update-password';
 import { verifyEmail } from '@documenso/lib/server-only/user/verify-email';
@@ -105,7 +105,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     }
 
     if (!user.emailVerified) {
-      const mostRecentToken = await getMostRecentVerificationTokenByUserId({
+      const mostRecentToken = await getMostRecentEmailVerificationToken({
         userId: user.id,
       });
 

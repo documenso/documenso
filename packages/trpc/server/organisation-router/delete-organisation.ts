@@ -1,4 +1,7 @@
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
+import {
+  ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP,
+  ORGANISATION_USER_ACCOUNT_TYPE,
+} from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { handleDocumentOwnershipOnDeletion } from '@documenso/lib/server-only/document/handle-document-ownership-on-deletion';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -65,9 +68,18 @@ export const deleteOrganisationRoute = authenticatedProcedure
       });
     }
 
-    await prisma.organisation.delete({
-      where: {
-        id: organisation.id,
-      },
+    await prisma.$transaction(async (tx) => {
+      await tx.account.deleteMany({
+        where: {
+          type: ORGANISATION_USER_ACCOUNT_TYPE,
+          provider: organisation.id,
+        },
+      });
+
+      await tx.organisation.delete({
+        where: {
+          id: organisation.id,
+        },
+      });
     });
   });

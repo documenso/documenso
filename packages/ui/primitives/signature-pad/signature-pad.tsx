@@ -1,6 +1,7 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { KeyboardIcon, UploadCloudIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
@@ -146,21 +147,21 @@ export const SignaturePad = ({
         {drawSignatureEnabled && (
           <TabsTrigger value="draw">
             <SignatureIcon className="mr-2 size-4" />
-            Draw
+            <Trans>Draw</Trans>
           </TabsTrigger>
         )}
 
         {typedSignatureEnabled && (
           <TabsTrigger value="text">
             <KeyboardIcon className="mr-2 size-4" />
-            Type
+            <Trans>Type</Trans>
           </TabsTrigger>
         )}
 
         {uploadSignatureEnabled && (
           <TabsTrigger value="image">
             <UploadCloudIcon className="mr-2 size-4" />
-            Upload
+            <Trans>Upload</Trans>
           </TabsTrigger>
         )}
       </TabsList>
