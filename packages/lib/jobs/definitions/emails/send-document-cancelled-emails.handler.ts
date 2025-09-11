@@ -29,7 +29,13 @@ export const run = async ({
       id: documentId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
       recipients: true,
       team: {
@@ -48,7 +54,7 @@ export const run = async ({
       type: 'team',
       teamId: document.teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const { documentMeta, user: documentOwner } = document;

@@ -1,6 +1,5 @@
 import type { Document } from '@prisma/client';
 import { DocumentDataType } from '@prisma/client';
-import { TRPCError } from '@trpc/server';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -347,8 +346,14 @@ export const templateRouter = router({
     .output(ZCreateDocumentFromTemplateResponseSchema)
     .mutation(async ({ ctx, input }) => {
       const { teamId } = ctx;
-      const { templateId, recipients, distributeDocument, customDocumentDataId, prefillFields } =
-        input;
+      const {
+        templateId,
+        recipients,
+        distributeDocument,
+        customDocumentDataId,
+        prefillFields,
+        folderId,
+      } = input;
 
       ctx.logger.info({
         input: {
@@ -369,6 +374,7 @@ export const templateRouter = router({
         recipients,
         customDocumentDataId,
         requestMetadata: ctx.metadata,
+        folderId,
         prefillFields,
       });
 
@@ -563,9 +569,9 @@ export const templateRouter = router({
       });
 
       if (csv.length > 4 * 1024 * 1024) {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
+        throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
           message: 'File size exceeds 4MB limit',
+          statusCode: 400,
         });
       }
 
@@ -576,8 +582,7 @@ export const templateRouter = router({
       });
 
       if (!template) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
+        throw new AppError(AppErrorCode.NOT_FOUND, {
           message: 'Template not found',
         });
       }

@@ -71,7 +71,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
@@ -100,7 +100,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
   const onDownloadOriginalClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.getDocumentById.query(
+      const documentWithData = await trpcClient.document.get.query(
         {
           documentId: document.id,
         },
@@ -164,7 +164,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         <DropdownMenuItem asChild>
           <Link to={`${documentsPath}/${document.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
-            <Trans>Audit Log</Trans>
+            <Trans>Audit Logs</Trans>
           </Link>
         </DropdownMenuItem>
 

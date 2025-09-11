@@ -73,7 +73,13 @@ export const getDocumentAndSenderByToken = async ({
       },
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentData: true,
       documentMeta: true,
       recipients: {
@@ -90,9 +96,6 @@ export const getDocumentAndSenderByToken = async ({
       },
     },
   });
-
-  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-  const { password: _password, ...user } = result.user;
 
   const recipient = result.recipients[0];
 
@@ -121,7 +124,11 @@ export const getDocumentAndSenderByToken = async ({
 
   return {
     ...result,
-    user,
+    user: {
+      id: result.user.id,
+      email: result.user.email,
+      name: result.user.name,
+    },
   };
 };
 

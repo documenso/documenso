@@ -95,7 +95,7 @@ export const setDocumentRecipients = async ({
       type: 'team',
       teamId,
     },
-    meta: document.documentMeta || null,
+    meta: document.documentMeta,
   });
 
   const recipientsHaveActionAuth = recipients.some(
@@ -134,6 +134,9 @@ export const setDocumentRecipients = async ({
         existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
     );
 
+    const canPersistedRecipientBeModified =
+      existing && canRecipientBeModified(existing, document.fields);
+
     if (
       existing &&
       hasRecipientBeenChanged(existing, recipient) &&
@@ -147,6 +150,7 @@ export const setDocumentRecipients = async ({
     return {
       ...recipient,
       _persisted: existing,
+      canPersistedRecipientBeModified,
     };
   });
 
@@ -160,6 +164,13 @@ export const setDocumentRecipients = async ({
             accessAuth: recipient.accessAuth || authOptions.accessAuth,
             actionAuth: recipient.actionAuth || authOptions.actionAuth,
           });
+        }
+
+        if (recipient._persisted && !recipient.canPersistedRecipientBeModified) {
+          return {
+            ...recipient._persisted,
+            clientId: recipient.clientId,
+          };
         }
 
         const upsertedRecipient = await tx.recipient.upsert({

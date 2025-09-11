@@ -65,7 +65,7 @@ export const ZTemplateMetaUpsertSchema = z.object({
   dateFormat: ZDocumentMetaDateFormatSchema.optional(),
   distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
   emailId: z.string().nullish(),
-  emailReplyTo: z.string().nullish(),
+  emailReplyTo: z.string().email().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.optional(),
   redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
   language: ZDocumentMetaLanguageSchema.optional(),
@@ -83,8 +83,8 @@ export const ZCreateTemplateMutationSchema = z.object({
 });
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
-  directRecipientName: z.string().optional(),
-  directRecipientEmail: z.string().email(),
+  directRecipientName: z.string().max(255).optional(),
+  directRecipientEmail: z.string().email().max(254),
   directTemplateToken: z.string().min(1),
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
@@ -97,8 +97,8 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email(),
-        name: z.string().optional(),
+        email: z.string().email().max(254),
+        name: z.string().max(255).optional(),
       }),
     )
     .describe('The information of the recipients to create the document with.')
@@ -115,6 +115,12 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
     .string()
     .describe(
       'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
   prefillFields: z
