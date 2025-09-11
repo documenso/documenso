@@ -54,7 +54,7 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
     try {
       const response = await putPdfFile(file);
 
-      const { id } = await createTemplate({
+      const { legacyTemplateId: id } = await createTemplate({
         title: file.name,
         templateDocumentDataId: response.id,
         folderId: folderId,

@@ -28,7 +28,9 @@ test.describe('Signing Certificate Tests', () => {
     const documentData = await prisma.documentData
       .findFirstOrThrow({
         where: {
-          id: document.documentDataId,
+          envelopeItem: {
+            envelopeId: document.id,
+          },
         },
       })
       .then(async (data) => getFile(data));
@@ -65,12 +67,21 @@ test.describe('Signing Certificate Tests', () => {
     await page.waitForTimeout(2500);
 
     // Get the completed document
-    const completedDocument = await prisma.document.findFirstOrThrow({
+    const completedDocument = await prisma.envelope.findFirstOrThrow({
       where: { id: document.id },
-      include: { documentData: true },
+      include: {
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
+      },
     });
 
-    const completedDocumentData = await getFile(completedDocument.documentData);
+    // Todo: Envelopes
+    const firstDocumentData = completedDocument.envelopeItems[0].documentData;
+
+    const completedDocumentData = await getFile(firstDocumentData);
 
     // Load the PDF and check number of pages
     const pdfDoc = await PDFDocument.load(completedDocumentData);
@@ -110,7 +121,9 @@ test.describe('Signing Certificate Tests', () => {
     const documentData = await prisma.documentData
       .findFirstOrThrow({
         where: {
-          id: document.documentDataId,
+          envelopeItem: {
+            envelopeId: document.id,
+          },
         },
       })
       .then(async (data) => getFile(data));
@@ -145,12 +158,21 @@ test.describe('Signing Certificate Tests', () => {
     await page.waitForTimeout(2500);
 
     // Get the completed document
-    const completedDocument = await prisma.document.findFirstOrThrow({
+    const completedDocument = await prisma.envelope.findFirstOrThrow({
       where: { id: document.id },
-      include: { documentData: true },
+      include: {
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
+      },
     });
 
-    const completedDocumentData = await getFile(completedDocument.documentData);
+    // Todo: Envelopes
+    const firstDocumentData = completedDocument.envelopeItems[0].documentData;
+
+    const completedDocumentData = await getFile(firstDocumentData);
 
     // Load the PDF and check number of pages
     const completedPdf = await PDFDocument.load(completedDocumentData);
@@ -190,7 +212,9 @@ test.describe('Signing Certificate Tests', () => {
     const documentData = await prisma.documentData
       .findFirstOrThrow({
         where: {
-          id: document.documentDataId,
+          envelopeItem: {
+            envelopeId: document.id,
+          },
         },
       })
       .then(async (data) => getFile(data));
@@ -225,12 +249,18 @@ test.describe('Signing Certificate Tests', () => {
     await page.waitForTimeout(2500);
 
     // Get the completed document
-    const completedDocument = await prisma.document.findFirstOrThrow({
+    const completedDocument = await prisma.envelope.findFirstOrThrow({
       where: { id: document.id },
-      include: { documentData: true },
+      include: {
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
+      },
     });
 
-    const completedDocumentData = await getFile(completedDocument.documentData);
+    const completedDocumentData = await getFile(completedDocument.envelopeItems[0].documentData);
 
     // Load the PDF and check number of pages
     const completedPdf = await PDFDocument.load(completedDocumentData);

@@ -1,5 +1,4 @@
-import type { Field } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import { EnvelopeType, type Field, FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
@@ -26,7 +25,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
@@ -43,39 +42,49 @@ export const setFieldsForDocument = async ({
   fields,
   requestMetadata,
 }: SetFieldsForDocumentOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
+      envelopeItems: {
+        select: {
+          id: true,
+        },
+      },
+      fields: {
+        include: {
+          recipient: true,
+        },
+      },
     },
   });
 
-  if (!document) {
+  // Todo: Envelopes
+  const firstEnvelopeItemId = envelope?.envelopeItems[0]?.id;
+
+  if (!envelope || !firstEnvelopeItemId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
   }
 
-  const existingFields = await prisma.field.findMany({
-    where: {
-      documentId,
-    },
-    include: {
-      recipient: true,
-    },
-  });
+  const existingFields = envelope.fields;
 
   const removedFields = existingFields.filter(
     (existingField) => !fields.find((field) => field.id === existingField.id),
@@ -84,7 +93,7 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -197,7 +206,7 @@ export const setFieldsForDocument = async ({
         const upsertedField = await tx.field.upsert({
           where: {
             id: field._persisted?.id ?? -1,
-            documentId,
+            envelopeId: envelope.id,
           },
           update: {
             page: field.pageNumber,
@@ -208,6 +217,8 @@ export const setFieldsForDocument = async ({
             fieldMeta: parsedFieldMeta,
           },
           create: {
+            envelopeId: envelope.id,
+            envelopeItemId: firstEnvelopeItemId, // Todo: Envelopes
             type: field.type,
             page: field.pageNumber,
             positionX: field.pageX,
@@ -217,17 +228,7 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
-            document: {
-              connect: {
-                id: documentId,
-              },
-            },
-            recipient: {
-              connect: {
-                id: field.recipientId,
-                documentId,
-              },
-            },
+            recipientId: field._recipient.id,
           },
         });
 
@@ -249,7 +250,7 @@ export const setFieldsForDocument = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 changes,
@@ -264,7 +265,7 @@ export const setFieldsForDocument = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
@@ -292,7 +293,7 @@ export const setFieldsForDocument = async ({
         data: removedFields.map((field) =>
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
-            documentId: documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,

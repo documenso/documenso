@@ -1,6 +1,9 @@
-import type { Recipient } from '@prisma/client';
+import type { Envelope } from '@prisma/client';
+import { type Recipient } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+import type { TTemplateLite } from '../types/template';
+import { mapSecondaryIdToTemplateId } from './envelope';
 
 export const formatDirectTemplatePath = (token: string) => {
   return `${NEXT_PUBLIC_WEBAPP_URL()}/d/${token}`;
@@ -41,4 +44,25 @@ export const generateAvaliableRecipientPlaceholder = (currentRecipients: Recipie
   }
 
   return recipientPlaceholder;
+};
+
+export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => {
+  const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+  return {
+    id: legacyTemplateId,
+    type: envelope.templateType,
+    visibility: envelope.visibility,
+    externalId: envelope.externalId,
+    title: envelope.title,
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+    authOptions: envelope.authOptions,
+    createdAt: envelope.createdAt,
+    updatedAt: envelope.updatedAt,
+    publicTitle: envelope.publicTitle,
+    publicDescription: envelope.publicDescription,
+    folderId: envelope.folderId,
+    useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+  };
 };

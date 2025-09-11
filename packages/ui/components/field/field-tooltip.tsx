@@ -29,7 +29,10 @@ const tooltipVariants = cva('font-semibold', {
 interface FieldToolTipProps extends VariantProps<typeof tooltipVariants> {
   children: React.ReactNode;
   className?: string;
-  field: Field;
+  field: Pick<
+    Field,
+    'id' | 'inserted' | 'fieldMeta' | 'positionX' | 'positionY' | 'width' | 'height' | 'page'
+  >;
 }
 
 /**

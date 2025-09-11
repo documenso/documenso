@@ -54,7 +54,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   const document = await getDocumentWithDetailsById({
-    documentId,
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId: result?.userId,
     teamId: result?.teamId ?? undefined,
   }).catch(() => null);

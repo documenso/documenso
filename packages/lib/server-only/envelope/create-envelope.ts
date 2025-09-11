@@ -1,6 +1,7 @@
-import type { DocumentMeta, DocumentVisibility } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, TemplateType } from '@prisma/client';
 import {
   DocumentSource,
+  EnvelopeType,
   FolderType,
   RecipientRole,
   SendStatus,
@@ -21,47 +22,68 @@ import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../t
 import type { TDocumentFormValues } from '../../types/document-form-values';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
-import { determineDocumentVisibility } from '../../utils/document-visibility';
 import { buildTeamWhereQuery } from '../../utils/teams';
-import { getMemberRoles } from '../team/get-member-roles';
+import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
-export type CreateDocumentOptions = {
+export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
-  documentDataId: string;
   normalizePdf?: boolean;
   data: {
+    type: EnvelopeType;
     title: string;
     externalId?: string;
+    envelopeItems: { title?: string; documentDataId: string }[];
+    formValues?: TDocumentFormValues;
+
+    timezone?: string;
+    userTimezone?: string;
+
+    templateType?: TemplateType;
+    publicTitle?: string;
+    publicDescription?: string;
+
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    formValues?: TDocumentFormValues;
-    recipients: TCreateDocumentTemporaryRequest['recipients'];
+    recipients?: TCreateDocumentTemporaryRequest['recipients'];
     folderId?: string;
   };
-  meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
+  meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
 
-export const createDocumentV2 = async ({
+export const createEnvelope = async ({
   userId,
   teamId,
-  documentDataId,
   normalizePdf,
   data,
   meta,
   requestMetadata,
-}: CreateDocumentOptions) => {
-  const { title, formValues, folderId } = data;
+}: CreateEnvelopeOptions) => {
+  const {
+    type,
+    title,
+    externalId,
+    formValues,
+    timezone,
+    userTimezone,
+    folderId,
+    templateType,
+    globalAccessAuth,
+    globalActionAuth,
+    publicTitle,
+    publicDescription,
+    visibility: visibilityOverride,
+  } = data;
 
   const team = await prisma.team.findFirst({
     where: buildTeamWhereQuery({ teamId, userId }),
@@ -80,11 +102,12 @@ export const createDocumentV2 = async ({
     });
   }
 
+  // Verify that the folder exists and is associated with the team.
   if (folderId) {
     const folder = await prisma.folder.findUnique({
       where: {
         id: folderId,
-        type: FolderType.DOCUMENT,
+        type: data.type === EnvelopeType.TEMPLATE ? FolderType.TEMPLATE : FolderType.DOCUMENT,
         team: buildTeamWhereQuery({ teamId, userId }),
       },
     });
@@ -101,32 +124,44 @@ export const createDocumentV2 = async ({
     teamId,
   });
 
+  let envelopeItems: { title?: string; documentDataId: string }[] = data.envelopeItems;
+
   if (normalizePdf) {
-    const documentData = await prisma.documentData.findFirst({
-      where: {
-        id: documentDataId,
-      },
-    });
+    envelopeItems = await Promise.all(
+      data.envelopeItems.map(async (item) => {
+        const documentData = await prisma.documentData.findFirst({
+          where: {
+            id: item.documentDataId,
+          },
+        });
 
-    if (documentData) {
-      const buffer = await getFileServerSide(documentData);
+        if (!documentData) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Document data not found',
+          });
+        }
 
-      const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+        const buffer = await getFileServerSide(documentData);
 
-      const newDocumentData = await putPdfFileServerSide({
-        name: title.endsWith('.pdf') ? title : `${title}.pdf`,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(normalizedPdf),
-      });
+        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
-      // eslint-disable-next-line require-atomic-updates
-      documentDataId = newDocumentData.id;
-    }
+        const newDocumentData = await putPdfFileServerSide({
+          name: title.endsWith('.pdf') ? title : `${title}.pdf`,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(normalizedPdf),
+        });
+
+        return {
+          title: item.title,
+          documentDataId: newDocumentData.id,
+        };
+      }),
+    );
   }
 
   const authOptions = createDocumentAuthOptions({
-    globalAccessAuth: data?.globalAccessAuth || [],
-    globalActionAuth: data?.globalActionAuth || [],
+    globalAccessAuth: globalAccessAuth || [],
+    globalActionAuth: globalActionAuth || [],
   });
 
   const recipientsHaveActionAuth = data.recipients?.some(
@@ -143,15 +178,7 @@ export const createDocumentV2 = async ({
     });
   }
 
-  const { teamRole } = await getMemberRoles({
-    teamId,
-    reference: {
-      type: 'User',
-      id: userId,
-    },
-  });
-
-  const visibility = determineDocumentVisibility(settings.documentVisibility, teamRole);
+  const visibility = visibilityOverride || settings.documentVisibility;
 
   const emailId = meta?.emailId;
 
@@ -171,25 +198,61 @@ export const createDocumentV2 = async ({
     }
   }
 
+  // userTimezone is last because it's always passed in regardless of the organisation/team settings
+  // for uploads from the frontend
+  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+
+  const documentMeta = await prisma.documentMeta.create({
+    data: extractDerivedDocumentMeta(settings, {
+      ...meta,
+      timezone: timezoneToUse,
+    }),
+  });
+
+  const secondaryId =
+    type === EnvelopeType.DOCUMENT
+      ? await incrementDocumentId().then((v) => v.formattedDocumentId)
+      : await incrementTemplateId().then((v) => v.formattedTemplateId);
+
   return await prisma.$transaction(async (tx) => {
-    const document = await tx.document.create({
+    const envelope = await tx.envelope.create({
       data: {
+        id: prefixedId('envelope'),
+        secondaryId,
+        type,
         title,
         qrToken: prefixedId('qr'),
-        externalId: data.externalId,
-        documentDataId,
+        externalId,
+        envelopeItems: {
+          createMany: {
+            data: envelopeItems.map((item) => ({
+              id: prefixedId('envelope_item'),
+              title: item.title || title,
+              documentDataId: item.documentDataId,
+            })),
+          },
+        },
         userId,
         teamId,
         authOptions,
         visibility,
         folderId,
         formValues,
-        source: DocumentSource.DOCUMENT,
-        documentMeta: {
-          create: extractDerivedDocumentMeta(settings, meta),
-        },
+        source: DocumentSource.DOCUMENT, // Todo: Migration
+        documentMetaId: documentMeta.id,
+
+        // Template specific fields.
+        templateType: type === EnvelopeType.TEMPLATE ? templateType : undefined,
+        publicTitle: type === EnvelopeType.TEMPLATE ? publicTitle : undefined,
+        publicDescription: type === EnvelopeType.TEMPLATE ? publicDescription : undefined,
+      },
+      include: {
+        envelopeItems: true,
       },
     });
+
+    // Todo: Envelopes - Support multiple envelope items.
+    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
 
     await Promise.all(
       (data.recipients || []).map(async (recipient) => {
@@ -200,7 +263,7 @@ export const createDocumentV2 = async ({
 
         await tx.recipient.create({
           data: {
-            documentId: document.id,
+            envelopeId: envelope.id,
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -213,7 +276,8 @@ export const createDocumentV2 = async ({
             fields: {
               createMany: {
                 data: (recipient.fields || []).map((field) => ({
-                  documentId: document.id,
+                  envelopeId: envelope.id,
+                  envelopeItemId: firstEnvelopeItemId,
                   type: field.type,
                   page: field.pageNumber,
                   positionX: field.pageX,
@@ -231,48 +295,49 @@ export const createDocumentV2 = async ({
       }),
     );
 
-    // Todo: Is it necessary to create a full audit logs with all fields and recipients audit logs?
-
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
-        documentId: document.id,
-        metadata: requestMetadata,
-        data: {
-          title,
-          source: {
-            type: DocumentSource.DOCUMENT,
-          },
-        },
-      }),
-    });
-
-    const createdDocument = await tx.document.findFirst({
+    const createdEnvelope = await tx.envelope.findFirst({
       where: {
-        id: document.id,
+        id: envelope.id,
       },
       include: {
-        documentData: true,
         documentMeta: true,
         recipients: true,
         fields: true,
         folder: true,
+        envelopeItems: true,
       },
     });
 
-    if (!createdDocument) {
+    if (!createdEnvelope) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Document not found',
+        message: 'Envelope not found',
       });
     }
 
-    await triggerWebhook({
-      event: WebhookTriggerEvents.DOCUMENT_CREATED,
-      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
-      userId,
-      teamId,
-    });
+    // Only create audit logs and webhook events for documents.
+    if (type === EnvelopeType.DOCUMENT) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
+          envelopeId: envelope.id,
+          metadata: requestMetadata,
+          data: {
+            title,
+            source: {
+              type: DocumentSource.DOCUMENT,
+            },
+          },
+        }),
+      });
 
-    return createdDocument;
+      await triggerWebhook({
+        event: WebhookTriggerEvents.DOCUMENT_CREATED,
+        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+        userId,
+        teamId,
+      });
+    }
+
+    return createdEnvelope;
   });
 };

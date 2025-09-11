@@ -3,12 +3,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import {
-  type Recipient,
-  RecipientRole,
-  type Template,
-  type TemplateDirectLink,
-} from '@prisma/client';
+import { type Recipient, RecipientRole, type TemplateDirectLink } from '@prisma/client';
 import { CircleDotIcon, CircleIcon, ClipboardCopyIcon, InfoIcon, LoaderIcon } from 'lucide-react';
 import { Link, useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
@@ -20,6 +15,7 @@ import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { DIRECT_TEMPLATE_DOCUMENTATION } from '@documenso/lib/constants/template';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
+import type { Template } from '@documenso/prisma/types/template-legacy-schema';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';

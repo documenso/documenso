@@ -75,7 +75,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
 
       const response = await putPdfFile(file);
 
-      const { id } = await createDocument({
+      const { legacyDocumentId: id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
         timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.

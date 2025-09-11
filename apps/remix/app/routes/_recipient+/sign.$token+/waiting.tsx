@@ -1,11 +1,11 @@
 import { Trans } from '@lingui/react/macro';
 import type { Team } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { Link, redirect } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
@@ -40,12 +40,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   let team: Team | null = null;
 
   if (user) {
-    isOwnerOrTeamMember = await getDocumentById({
-      documentId: document.id,
+    isOwnerOrTeamMember = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: document.id,
+      },
+      type: EnvelopeType.DOCUMENT,
       userId: user.id,
       teamId: document.teamId ?? undefined,
     })
-      .then((document) => !!document)
+      .then((envelope) => !!envelope)
       .catch(() => false);
 
     if (document.teamId) {

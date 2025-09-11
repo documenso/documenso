@@ -5,8 +5,8 @@ import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { TemplateSchema } from '@documenso/prisma/types/template-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
@@ -25,7 +25,6 @@ export const ZTemplateSchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -51,13 +50,12 @@ export const ZTemplateSchema = TemplateSchema.pick({
     drawSignatureEnabled: true,
     allowDictateNextSigner: true,
     distributionMethod: true,
-    templateId: true,
     redirectUrl: true,
     language: true,
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
-  }).nullable(),
+  }),
   directLink: TemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({
     id: true,
@@ -94,7 +92,6 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -102,6 +99,8 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 });
+
+export type TTemplateLite = z.infer<typeof ZTemplateLiteSchema>;
 
 /**
  * A version of the template response schema when returning multiple template at once from a single API endpoint.
@@ -115,7 +114,6 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -138,3 +136,5 @@ export const ZTemplateManySchema = TemplateSchema.pick({
     enabled: true,
   }).nullable(),
 });
+
+export type TTemplateMany = z.infer<typeof ZTemplateManySchema>;

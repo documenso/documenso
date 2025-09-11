@@ -1,17 +1,21 @@
-import type { Prisma } from '@prisma/client';
+import { EnvelopeType, type Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
 import type { FindResultResponse } from '../../types/search-params';
 
-export interface FindDocumentsOptions {
+export interface AdminFindDocumentsOptions {
   query?: string;
   page?: number;
   perPage?: number;
 }
 
-export const findDocuments = async ({ query, page = 1, perPage = 10 }: FindDocumentsOptions) => {
-  const termFilters: Prisma.DocumentWhereInput | undefined = !query
+export const adminFindDocuments = async ({
+  query,
+  page = 1,
+  perPage = 10,
+}: AdminFindDocumentsOptions) => {
+  const termFilters: Prisma.EnvelopeWhereInput | undefined = !query
     ? undefined
     : {
         title: {
@@ -21,8 +25,9 @@ export const findDocuments = async ({ query, page = 1, perPage = 10 }: FindDocum
       };
 
   const [data, count] = await Promise.all([
-    prisma.document.findMany({
+    prisma.envelope.findMany({
       where: {
+        type: EnvelopeType.DOCUMENT,
         ...termFilters,
       },
       skip: Math.max(page - 1, 0) * perPage,
@@ -39,10 +44,17 @@ export const findDocuments = async ({ query, page = 1, perPage = 10 }: FindDocum
           },
         },
         recipients: true,
+        team: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
     }),
-    prisma.document.count({
+    prisma.envelope.count({
       where: {
+        type: EnvelopeType.DOCUMENT,
         ...termFilters,
       },
     }),

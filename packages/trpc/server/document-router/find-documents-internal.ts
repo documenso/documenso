@@ -2,6 +2,7 @@ import { findDocuments } from '@documenso/lib/server-only/document/find-document
 import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
 import { getStats } from '@documenso/lib/server-only/document/get-stats';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -69,6 +70,7 @@ export const findDocumentsInternalRoute = authenticatedProcedure
 
     return {
       ...documents,
+      data: documents.data.map((envelope) => mapEnvelopesToDocumentMany(envelope)),
       stats,
     };
   });

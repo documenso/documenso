@@ -383,12 +383,10 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await page.waitForTimeout(3000);
 
-  await page.getByRole('button', { name: 'Create' }).click();
-
-  await page.waitForTimeout(1000);
-
+  // Expect redirect.
   await expect(page.getByText('documenso-supporter-pledge.pdf')).toBeVisible();
 
+  // Return to folder and verify file is visible.
   await page.goto(`/t/${team.url}/templates/f/${folder.id}`);
   await expect(page.getByText('documenso-supporter-pledge.pdf')).toBeVisible();
 });

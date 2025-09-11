@@ -1,6 +1,11 @@
+import { EnvelopeType } from '@prisma/client';
 import type { Context } from 'hono';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import {
+  mapDocumentIdToSecondaryId,
+  mapTemplateIdToSecondaryId,
+} from '@documenso/lib/utils/envelope';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
@@ -104,9 +109,10 @@ async function hasAccessToDocument(c: Context, documentId: number): Promise<stri
 
   const userId = session.user.id;
 
-  const document = await prisma.document.findUnique({
+  const envelope = await prisma.envelope.findUnique({
     where: {
-      id: documentId,
+      type: EnvelopeType.DOCUMENT,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
       team: buildTeamWhereQuery({
         userId,
         teamId: undefined,
@@ -121,7 +127,7 @@ async function hasAccessToDocument(c: Context, documentId: number): Promise<stri
     },
   });
 
-  return document ? document.team.url : null;
+  return envelope ? envelope.team.url : null;
 }
 
 async function hasAccessToFolder(c: Context, folderId: string): Promise<string | null> {
@@ -154,9 +160,10 @@ async function hasAccessToTemplate(c: Context, templateId: number): Promise<stri
 
   const userId = session.user.id;
 
-  const template = await prisma.template.findUnique({
+  const envelope = await prisma.envelope.findUnique({
     where: {
-      id: templateId,
+      type: EnvelopeType.TEMPLATE,
+      secondaryId: mapTemplateIdToSecondaryId(templateId),
       team: buildTeamWhereQuery({
         userId,
         teamId: undefined,
@@ -171,5 +178,5 @@ async function hasAccessToTemplate(c: Context, templateId: number): Promise<stri
     },
   });
 
-  return template ? template.team.url : null;
+  return envelope ? envelope.team.url : null;
 }

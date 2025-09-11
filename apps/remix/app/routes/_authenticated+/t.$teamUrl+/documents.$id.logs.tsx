@@ -2,15 +2,16 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
+import { EnvelopeType, type Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Card } from '@documenso/ui/primitives/card';
@@ -40,13 +41,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw redirect(documentRootPath);
   }
 
-  const document = await getDocumentById({
-    documentId,
+  const envelope = await getEnvelopeById({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
+    type: EnvelopeType.DOCUMENT,
     userId: user.id,
-    teamId: team?.id,
+    teamId: team.id,
   }).catch(() => null);
 
-  if (!document || !document.documentData) {
+  if (!envelope) {
     throw redirect(documentRootPath);
   }
 
@@ -63,7 +68,19 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   return {
-    document,
+    // Only return necessary data
+    document: {
+      id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      title: envelope.title,
+      status: envelope.status,
+      user: {
+        name: envelope.user.name,
+        email: envelope.user.email,
+      },
+      createdAt: envelope.createdAt,
+      updatedAt: envelope.updatedAt,
+      documentMeta: envelope.documentMeta,
+    },
     recipients,
     documentRootPath,
   };

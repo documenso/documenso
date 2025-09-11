@@ -1,67 +1,52 @@
-import { prisma } from '@documenso/prisma';
+import { EnvelopeType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '../../errors/app-error';
-import { getDocumentWhereInput } from './get-document-by-id';
+import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { getEnvelopeById } from '../envelope/get-envelope-by-id';
 
 export type GetDocumentWithDetailsByIdOptions = {
-  documentId: number;
+  id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
 };
 
 export const getDocumentWithDetailsById = async ({
-  documentId,
+  id,
   userId,
   teamId,
 }: GetDocumentWithDetailsByIdOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const envelope = await getEnvelopeById({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: {
-      ...documentWhereInput,
-    },
-    include: {
-      documentData: true,
-      documentMeta: true,
-      recipients: true,
-      folder: true,
-      fields: {
-        include: {
-          signature: true,
-          recipient: {
-            select: {
-              name: true,
-              email: true,
-              signingStatus: true,
-            },
-          },
-        },
-      },
-      team: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
-      user: {
-        select: {
-          id: true,
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  if (!document) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
-    });
+  // Todo: Envelopes
+  const firstDocumentData = envelope.envelopeItems[0].documentData;
+
+  if (!firstDocumentData) {
+    throw new Error('Document data not found');
   }
 
-  return document;
+  return {
+    ...envelope,
+    documentData: firstDocumentData,
+    id: legacyDocumentId,
+    fields: envelope.fields.map((field) => ({
+      ...field,
+      documentId: legacyDocumentId,
+    })),
+    user: {
+      id: envelope.userId,
+      name: envelope.user.name,
+      email: envelope.user.email,
+    },
+    team: {
+      id: envelope.teamId,
+      url: envelope.team.url,
+    },
+    recipients: envelope.recipients,
+  };
 };

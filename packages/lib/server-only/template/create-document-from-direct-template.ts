@@ -5,6 +5,7 @@ import type { Field, Signature } from '@prisma/client';
 import {
   DocumentSource,
   DocumentStatus,
+  EnvelopeType,
   FieldType,
   Prisma,
   RecipientRole,
@@ -31,7 +32,7 @@ import { DocumentAccessAuth, ZRecipientAuthOptionsSchema } from '../../types/doc
 import { ZFieldMetaSchema } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { isRequiredField } from '../../utils/advanced-fields-helpers';
@@ -43,11 +44,13 @@ import {
   createRecipientAuthOptions,
   extractDocumentAuthMethods,
 } from '../../utils/document-auth';
+import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
 import { sendDocument } from '../document/send-document';
 import { validateFieldAuth } from '../document/validate-field-auth';
 import { getEmailContext } from '../email/get-email-context';
+import { incrementDocumentId } from '../envelope/increment-id';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type CreateDocumentFromDirectTemplateOptions = {
@@ -90,7 +93,7 @@ export const createDocumentFromDirectTemplate = async ({
   requestMetadata,
   user,
 }: CreateDocumentFromDirectTemplateOptions): Promise<TCreateDocumentFromDirectTemplateResponse> => {
-  const template = await prisma.template.findFirst({
+  const directTemplateEnvelope = await prisma.envelope.findFirst({
     where: {
       directLink: {
         token: directTemplateToken,
@@ -103,8 +106,12 @@ export const createDocumentFromDirectTemplate = async ({
         },
       },
       directLink: true,
-      templateDocumentData: true,
-      templateMeta: true,
+      envelopeItems: {
+        select: {
+          documentData: true,
+        },
+      },
+      documentMeta: true,
       user: {
         select: {
           id: true,
@@ -115,19 +122,31 @@ export const createDocumentFromDirectTemplate = async ({
     },
   });
 
-  if (!template?.directLink?.enabled) {
+  if (!directTemplateEnvelope?.directLink?.enabled) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Invalid or missing template' });
+  }
+
+  const directTemplateEnvelopeLegacyId = mapSecondaryIdToTemplateId(
+    directTemplateEnvelope.secondaryId,
+  );
+  const firstEnvelopeItem = directTemplateEnvelope.envelopeItems[0];
+
+  // Todo: Envelopes
+  if (directTemplateEnvelope.envelopeItems.length !== 1 || !firstEnvelopeItem) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Invalid number of envelope items',
+    });
   }
 
   const { branding, settings, senderEmail, emailLanguage } = await getEmailContext({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
-      teamId: template.teamId,
+      teamId: directTemplateEnvelope.teamId,
     },
   });
 
-  const { recipients, directLink, user: templateOwner } = template;
+  const { recipients, directLink, user: templateOwner } = directTemplateEnvelope;
 
   const directTemplateRecipient = recipients.find(
     (recipient) => recipient.id === directLink.directTemplateRecipientId,
@@ -139,7 +158,7 @@ export const createDocumentFromDirectTemplate = async ({
     });
   }
 
-  if (template.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
+  if (directTemplateEnvelope.updatedAt.getTime() !== templateUpdatedAt.getTime()) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
@@ -151,7 +170,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
     extractDocumentAuthMethods({
-      documentAuth: template.authOptions,
+      documentAuth: directTemplateEnvelope.authOptions,
     });
 
   const directRecipientName = user?.name || initialDirectRecipientName;
@@ -171,10 +190,13 @@ export const createDocumentFromDirectTemplate = async ({
     directTemplateRecipient.authOptions,
   );
 
-  const nonDirectTemplateRecipients = template.recipients.filter(
+  const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-  const derivedDocumentMeta = extractDerivedDocumentMeta(settings, template.templateMeta);
+  const derivedDocumentMeta = extractDerivedDocumentMeta(
+    settings,
+    directTemplateEnvelope.documentMeta,
+  );
 
   // Associate, validate and map to a query every direct template recipient field with the provided fields.
   // Only process fields that are either required or have been signed by the user
@@ -202,7 +224,7 @@ export const createDocumentFromDirectTemplate = async ({
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
-        documentAuthOptions: template.authOptions,
+        documentAuthOptions: directTemplateEnvelope.authOptions,
         recipient: {
           authOptions: directTemplateRecipient.authOptions,
           email: directRecipientEmail,
@@ -267,29 +289,45 @@ export const createDocumentFromDirectTemplate = async ({
 
   const initialRequestTime = new Date();
 
-  const { documentId, recipientId, token } = await prisma.$transaction(async (tx) => {
-    const documentData = await tx.documentData.create({
-      data: {
-        type: template.templateDocumentData.type,
-        data: template.templateDocumentData.data,
-        initialData: template.templateDocumentData.initialData,
-      },
-    });
+  // Todo: Envelopes
+  const documentData = await prisma.documentData.create({
+    data: {
+      type: firstEnvelopeItem.documentData.type,
+      data: firstEnvelopeItem.documentData.data,
+      initialData: firstEnvelopeItem.documentData.initialData,
+    },
+  });
 
-    // Create the document and non direct template recipients.
-    const document = await tx.document.create({
+  const documentMeta = await prisma.documentMeta.create({
+    data: derivedDocumentMeta,
+  });
+
+  const incrementedDocumentId = await incrementDocumentId();
+
+  const { createdEnvelope, recipientId, token } = await prisma.$transaction(async (tx) => {
+    // Create the envelope and non direct template recipients.
+    const createdEnvelope = await tx.envelope.create({
       data: {
+        id: prefixedId('envelope'),
+        secondaryId: incrementedDocumentId.formattedDocumentId,
+        type: EnvelopeType.DOCUMENT,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
-        templateId: template.id,
-        userId: template.userId,
-        teamId: template.teamId,
-        title: template.title,
+        templateId: directTemplateEnvelopeLegacyId,
+        userId: directTemplateEnvelope.userId,
+        teamId: directTemplateEnvelope.teamId,
+        title: directTemplateEnvelope.title,
         createdAt: initialRequestTime,
         status: DocumentStatus.PENDING,
         externalId: directTemplateExternalId,
         visibility: settings.documentVisibility,
-        documentDataId: documentData.id,
+        envelopeItems: {
+          create: {
+            id: prefixedId('envelope_item'),
+            title: directTemplateEnvelope.title, // Todo: Envelopes use item title instead
+            documentDataId: documentData.id,
+          },
+        },
         authOptions: createDocumentAuthOptions({
           globalAccessAuth: templateAuthOptions.globalAccessAuth,
           globalActionAuth: templateAuthOptions.globalActionAuth,
@@ -319,9 +357,7 @@ export const createDocumentFromDirectTemplate = async ({
             }),
           },
         },
-        documentMeta: {
-          create: derivedDocumentMeta,
-        },
+        documentMetaId: documentMeta.id,
       },
       include: {
         recipients: true,
@@ -330,13 +366,20 @@ export const createDocumentFromDirectTemplate = async ({
             url: true,
           },
         },
+        envelopeItems: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
+
+    const envelopeItemId = createdEnvelope.envelopeItems[0].id;
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
     Object.values(nonDirectTemplateRecipients).forEach((templateRecipient) => {
-      const recipient = document.recipients.find(
+      const recipient = createdEnvelope.recipients.find(
         (recipient) => recipient.email === templateRecipient.email,
       );
 
@@ -346,7 +389,8 @@ export const createDocumentFromDirectTemplate = async ({
 
       nonDirectRecipientFieldsToCreate = nonDirectRecipientFieldsToCreate.concat(
         templateRecipient.fields.map((field) => ({
-          documentId: document.id,
+          envelopeId: createdEnvelope.id,
+          envelopeItemId: envelopeItemId, // Todo: Envelopes
           recipientId: recipient.id,
           type: field.type,
           page: field.page,
@@ -371,7 +415,7 @@ export const createDocumentFromDirectTemplate = async ({
     // Create the direct recipient and their non signature fields.
     const createdDirectRecipient = await tx.recipient.create({
       data: {
-        documentId: document.id,
+        envelopeId: createdEnvelope.id,
         email: directRecipientEmail,
         name: directRecipientName,
         authOptions: createRecipientAuthOptions({
@@ -387,7 +431,8 @@ export const createDocumentFromDirectTemplate = async ({
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => ({
-              documentId: document.id,
+              envelopeId: createdEnvelope.id,
+              envelopeItemId: envelopeItemId, // Todo: Envelopes
               type: templateField.type,
               page: templateField.page,
               positionX: templateField.positionX,
@@ -417,7 +462,8 @@ export const createDocumentFromDirectTemplate = async ({
 
           const field = await tx.field.create({
             data: {
-              documentId: document.id,
+              envelopeId: createdEnvelope.id,
+              envelopeItemId: envelopeItemId, // Todo: Envelopes
               recipientId: createdDirectRecipient.id,
               type: templateField.type,
               page: templateField.page,
@@ -466,7 +512,7 @@ export const createDocumentFromDirectTemplate = async ({
     const auditLogsToCreate: CreateDocumentAuditLogDataResponse[] = [
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
-        documentId: document.id,
+        envelopeId: createdEnvelope.id,
         user: {
           id: user?.id,
           name: user?.name,
@@ -474,17 +520,17 @@ export const createDocumentFromDirectTemplate = async ({
         },
         metadata: requestMetadata,
         data: {
-          title: document.title,
+          title: createdEnvelope.title,
           source: {
             type: DocumentSource.TEMPLATE_DIRECT_LINK,
-            templateId: template.id,
+            templateId: directTemplateEnvelopeLegacyId,
             directRecipientEmail,
           },
         },
       }),
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
-        documentId: document.id,
+        envelopeId: createdEnvelope.id,
         user: {
           id: user?.id,
           name: user?.name,
@@ -502,7 +548,7 @@ export const createDocumentFromDirectTemplate = async ({
       ...createdDirectRecipientFields.map(({ field, derivedRecipientActionAuth }) =>
         createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-          documentId: document.id,
+          envelopeId: createdEnvelope.id,
           user: {
             id: user?.id,
             name: user?.name,
@@ -547,7 +593,7 @@ export const createDocumentFromDirectTemplate = async ({
       ),
       createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
-        documentId: document.id,
+        envelopeId: createdEnvelope.id,
         user: {
           id: user?.id,
           name: user?.name,
@@ -572,10 +618,10 @@ export const createDocumentFromDirectTemplate = async ({
     const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
       recipientName: directRecipientEmail,
       recipientRole: directTemplateRecipient.role,
-      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(document.team?.url)}/${
-        document.id
+      documentLink: `${NEXT_PUBLIC_WEBAPP_URL()}${formatDocumentsPath(createdEnvelope.team?.url)}/${
+        createdEnvelope.id
       }`,
-      documentName: document.title,
+      documentName: createdEnvelope.title,
       assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000',
     });
 
@@ -600,8 +646,8 @@ export const createDocumentFromDirectTemplate = async ({
     });
 
     return {
+      createdEnvelope,
       token: createdDirectRecipient.token,
-      documentId: document.id,
       recipientId: createdDirectRecipient.id,
     };
   });
@@ -609,18 +655,21 @@ export const createDocumentFromDirectTemplate = async ({
   try {
     // This handles sending emails and sealing the document if required.
     await sendDocument({
-      documentId,
-      userId: template.userId,
-      teamId: template.teamId,
+      id: {
+        type: 'envelopeId',
+        id: createdEnvelope.id,
+      },
+      userId: createdEnvelope.userId,
+      teamId: createdEnvelope.teamId,
       requestMetadata,
     });
 
-    const createdDocument = await prisma.document.findFirstOrThrow({
+    // Refetch envelope so we get the final data.
+    const refetchedEnvelope = await prisma.envelope.findFirstOrThrow({
       where: {
-        id: documentId,
+        id: createdEnvelope.id,
       },
       include: {
-        documentData: true,
         documentMeta: true,
         recipients: true,
       },
@@ -628,9 +677,9 @@ export const createDocumentFromDirectTemplate = async ({
 
     await triggerWebhook({
       event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-      data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(createdDocument)),
-      userId: template.userId,
-      teamId: template.teamId ?? undefined,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(refetchedEnvelope)),
+      userId: refetchedEnvelope.userId,
+      teamId: refetchedEnvelope.teamId ?? undefined,
     });
   } catch (err) {
     console.error('[CREATE_DOCUMENT_FROM_DIRECT_TEMPLATE]:', err);
@@ -641,7 +690,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   return {
     token,
-    documentId,
+    documentId: incrementedDocumentId.documentId,
     recipientId,
   };
 };

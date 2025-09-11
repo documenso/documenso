@@ -1,11 +1,19 @@
-import type { DocumentMeta, DocumentVisibility, Template } from '@prisma/client';
+import type { Prisma, TemplateType } from '@prisma/client';
+import {
+  type DocumentMeta,
+  type DocumentVisibility,
+  EnvelopeType,
+  FolderType,
+} from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type UpdateTemplateOptions = {
   userId: number;
@@ -13,13 +21,14 @@ export type UpdateTemplateOptions = {
   templateId: number;
   data?: {
     title?: string;
+    folderId?: string | null;
     externalId?: string | null;
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
     publicTitle?: string;
     publicDescription?: string;
-    type?: Template['type'];
+    type?: TemplateType;
     useLegacyFieldInsertion?: boolean;
   };
   meta?: Partial<Omit<DocumentMeta, 'id' | 'templateId'>>;
@@ -32,13 +41,20 @@ export const updateTemplate = async ({
   meta = {},
   data = {},
 }: UpdateTemplateOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
-      templateMeta: true,
+      documentMeta: true,
       team: {
         select: {
           organisationId: true,
@@ -52,18 +68,18 @@ export const updateTemplate = async ({
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
   }
 
   if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
-    return template;
+    return envelope;
   }
 
   const { documentAuthOption } = extractDocumentAuthMethods({
-    documentAuth: template.authOptions,
+    documentAuth: envelope.authOptions,
   });
 
   const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
@@ -76,7 +92,7 @@ export const updateTemplate = async ({
     data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
 
   // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth.length > 0 && !template.team.organisation.organisationClaim.flags.cfr21) {
+  if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
@@ -94,7 +110,7 @@ export const updateTemplate = async ({
     const email = await prisma.organisationEmail.findFirst({
       where: {
         id: emailId,
-        organisationId: template.team.organisationId,
+        organisationId: envelope.team.organisationId,
       },
     });
 
@@ -105,32 +121,63 @@ export const updateTemplate = async ({
     }
   }
 
-  return await prisma.template.update({
+  let folderUpdateQuery: Prisma.FolderUpdateOneWithoutEnvelopesNestedInput | undefined = undefined;
+
+  // Validate folder ID.
+  if (data.folderId) {
+    const folder = await prisma.folder.findFirst({
+      where: {
+        id: data.folderId,
+        team: buildTeamWhereQuery({
+          teamId,
+          userId,
+        }),
+        type: FolderType.TEMPLATE,
+        visibility: {
+          in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+        },
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
+
+    folderUpdateQuery = {
+      connect: {
+        id: data.folderId,
+      },
+    };
+  }
+
+  // Move template to root folder if folderId is null.
+  if (data.folderId === null) {
+    folderUpdateQuery = {
+      disconnect: true,
+    };
+  }
+
+  return await prisma.envelope.update({
     where: {
-      id: templateId,
+      id: envelope.id,
+      type: EnvelopeType.TEMPLATE,
     },
     data: {
+      templateType: data?.type,
       title: data?.title,
       externalId: data?.externalId,
-      type: data?.type,
       visibility: data?.visibility,
       publicDescription: data?.publicDescription,
       publicTitle: data?.publicTitle,
       useLegacyFieldInsertion: data?.useLegacyFieldInsertion,
+      folder: folderUpdateQuery,
       authOptions,
-      templateMeta: {
-        upsert: {
-          where: {
-            templateId,
-          },
-          create: {
-            ...meta,
-            emailSettings: meta?.emailSettings || undefined,
-          },
-          update: {
-            ...meta,
-            emailSettings: meta?.emailSettings || undefined,
-          },
+      documentMeta: {
+        update: {
+          ...meta,
+          emailSettings: meta?.emailSettings || undefined,
         },
       },
     },

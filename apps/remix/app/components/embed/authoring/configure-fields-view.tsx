@@ -118,6 +118,9 @@ export const ConfigureFieldsView = ({
       sendStatus: signer.disabled ? SendStatus.SENT : SendStatus.NOT_SENT,
       readStatus: signer.disabled ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
       signingStatus: signer.disabled ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+
+      // Todo: Envelopes - Dummy data
+      envelopeId: '',
     }));
   }, [configData.signers]);
 

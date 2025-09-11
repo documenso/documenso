@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import {
   seedBlankDocument,
   seedDocuments,
@@ -750,7 +751,7 @@ test('[TEAMS]: check that ADMIN role can change document visibility', async ({ p
   await apiSignin({
     page,
     email: adminUser.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await page.getByTestId('documentVisibilitySelectValue').click();
@@ -784,7 +785,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of EVERYONE docum
   await apiSignin({
     page,
     email: teamMember.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Everyone');
@@ -810,7 +811,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of MANAGER_AND_AB
   await apiSignin({
     page,
     email: teamMember.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Managers and above');
@@ -836,7 +837,7 @@ test('[TEAMS]: check that MEMBER role cannot change visibility of ADMIN document
   await apiSignin({
     page,
     email: teamMember.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Admins only');
@@ -862,7 +863,7 @@ test('[TEAMS]: check that MANAGER role cannot change visibility of ADMIN documen
   await apiSignin({
     page,
     email: teamManager.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await expect(page.getByTestId('documentVisibilitySelectValue')).toHaveText('Admins only');

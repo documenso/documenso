@@ -1,4 +1,4 @@
-import type { FieldType } from '@prisma/client';
+import { EnvelopeType, type FieldType } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -11,7 +11,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateDocumentFieldsOptions {
   userId: number;
@@ -37,34 +37,38 @@ export const updateDocumentFields = async ({
   fields,
   requestMetadata,
 }: UpdateDocumentFieldsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       fields: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
   }
 
   const fieldsToUpdate = fields.map((field) => {
-    const originalField = document.fields.find((existingField) => existingField.id === field.id);
+    const originalField = envelope.fields.find((existingField) => existingField.id === field.id);
 
     if (!originalField) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -72,7 +76,7 @@ export const updateDocumentFields = async ({
       });
     }
 
-    const recipient = document.recipients.find(
+    const recipient = envelope.recipients.find(
       (recipient) => recipient.id === originalField.recipientId,
     );
 
@@ -84,7 +88,7 @@ export const updateDocumentFields = async ({
     }
 
     // Check whether the recipient associated with the field can be modified.
-    if (!canRecipientFieldsBeModified(recipient, document.fields)) {
+    if (!canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Cannot modify a field where the recipient has already interacted with the document',
@@ -123,7 +127,7 @@ export const updateDocumentFields = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 fieldId: updatedField.secondaryId,

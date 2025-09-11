@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -11,12 +11,13 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateDocumentRecipientsOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   recipients: {
     email: string;
     name: string;
@@ -31,18 +32,19 @@ export interface CreateDocumentRecipientsOptions {
 export const createDocumentRecipients = async ({
   userId,
   teamId,
-  documentId,
+  id,
   recipients: recipientsToCreate,
   requestMetadata,
 }: CreateDocumentRecipientsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       team: {
@@ -57,13 +59,13 @@ export const createDocumentRecipients = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
@@ -74,7 +76,7 @@ export const createDocumentRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
@@ -95,7 +97,7 @@ export const createDocumentRecipients = async ({
 
         const createdRecipient = await tx.recipient.create({
           data: {
-            documentId,
+            envelopeId: envelope.id,
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -112,7 +114,7 @@ export const createDocumentRecipients = async ({
         await tx.documentAuditLog.create({
           data: createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
-            documentId: documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               recipientEmail: createdRecipient.email,

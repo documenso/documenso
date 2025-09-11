@@ -1,6 +1,7 @@
 import {
   DocumentSigningOrder,
   DocumentStatus,
+  EnvelopeType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -16,17 +17,18 @@ import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
+import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
-import { getDocumentWhereInput } from './get-document-by-id';
 
 export type SendDocumentOptions = {
-  documentId: number;
+  id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
   sendEmail?: boolean;
@@ -34,75 +36,92 @@ export type SendDocumentOptions = {
 };
 
 export const sendDocument = async ({
-  documentId,
+  id,
   userId,
   teamId,
   sendEmail,
   requestMetadata,
 }: SendDocumentOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
       documentMeta: true,
-      documentData: true,
+      envelopeItems: {
+        select: {
+          id: true,
+          documentData: {
+            select: {
+              type: true,
+              id: true,
+              data: true,
+            },
+          },
+        },
+      },
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.recipients.length === 0) {
+  if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
-  if (isDocumentCompleted(document.status)) {
+  if (isDocumentCompleted(envelope.status)) {
     throw new Error('Can not send completed document');
   }
 
-  const signingOrder = document.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  let recipientsToNotify = document.recipients;
+  const signingOrder = envelope.documentMeta?.signingOrder || DocumentSigningOrder.PARALLEL;
+
+  let recipientsToNotify = envelope.recipients;
 
   if (signingOrder === DocumentSigningOrder.SEQUENTIAL) {
     // Get the currently active recipient.
-    recipientsToNotify = document.recipients
+    recipientsToNotify = envelope.recipients
       .filter((r) => r.signingStatus === SigningStatus.NOT_SIGNED && r.role !== RecipientRole.CC)
       .slice(0, 1);
 
     // Secondary filter so we aren't resending if the current active recipient has already
-    // received the document.
+    // received the envelope.
     recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
-  const { documentData } = document;
+  const envelopeItem = envelope.envelopeItems[0];
+  const documentData = envelopeItem?.documentData;
 
-  if (!documentData.data) {
-    throw new Error('Document data not found');
+  // Todo: Envelopes
+  if (!envelopeItem || !documentData || envelope.envelopeItems.length !== 1) {
+    throw new Error('Invalid document data');
   }
 
-  if (document.formValues) {
+  // Todo: Envelopes need to support multiple envelope items.
+  if (envelope.formValues) {
     const file = await getFileServerSide(documentData);
 
     const prefilled = await insertFormValuesInPdf({
       pdf: Buffer.from(file),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      formValues: document.formValues as Record<string, string | number | boolean>,
+      formValues: envelope.formValues as Record<string, string | number | boolean>,
     });
 
-    let fileName = document.title;
+    let fileName = envelope.title;
 
-    if (!document.title.endsWith('.pdf')) {
-      fileName = `${document.title}.pdf`;
+    if (!envelope.title.endsWith('.pdf')) {
+      fileName = `${envelope.title}.pdf`;
     }
 
     const newDocumentData = await putPdfFileServerSide({
@@ -111,9 +130,9 @@ export const sendDocument = async ({
       arrayBuffer: async () => Promise.resolve(prefilled),
     });
 
-    const result = await prisma.document.update({
+    const result = await prisma.envelopeItem.update({
       where: {
-        id: document.id,
+        id: envelopeItem.id,
       },
       data: {
         documentDataId: newDocumentData.id,
@@ -133,7 +152,7 @@ export const sendDocument = async ({
   // const fieldsWithSignerEmail = fields.map((field) => ({
   //   ...field,
   //   signerEmail:
-  //     document.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+  //     envelope.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
   // }));
 
   // const everySignerHasSignature = document?.Recipient.every(
@@ -148,7 +167,7 @@ export const sendDocument = async ({
   //   throw new Error('Some signers have not been assigned a signature field.');
   // }
 
-  const allRecipientsHaveNoActionToTake = document.recipients.every(
+  const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) =>
       recipient.role === RecipientRole.CC || recipient.signingStatus === SigningStatus.SIGNED,
   );
@@ -157,15 +176,15 @@ export const sendDocument = async ({
     await jobs.triggerJob({
       name: 'internal.seal-document',
       payload: {
-        documentId,
+        documentId: legacyDocumentId,
         requestMetadata: requestMetadata?.requestMetadata,
       },
     });
 
     // Keep the return type the same for the `sendDocument` method
-    return await prisma.document.findFirstOrThrow({
+    return await prisma.envelope.findFirstOrThrow({
       where: {
-        id: documentId,
+        id: envelope.id,
       },
       include: {
         documentMeta: true,
@@ -174,21 +193,21 @@ export const sendDocument = async ({
     });
   }
 
-  const updatedDocument = await prisma.$transaction(async (tx) => {
-    if (document.status === DocumentStatus.DRAFT) {
+  const updatedEnvelope = await prisma.$transaction(async (tx) => {
+    if (envelope.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT,
-          documentId: document.id,
+          envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {},
         }),
       });
     }
 
-    return await tx.document.update({
+    return await tx.envelope.update({
       where: {
-        id: documentId,
+        id: envelope.id,
       },
       data: {
         status: DocumentStatus.PENDING,
@@ -201,7 +220,7 @@ export const sendDocument = async ({
   });
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientSigningRequest;
 
   // Only send email if one of the following is true:
@@ -218,7 +237,7 @@ export const sendDocument = async ({
           name: 'send.signing.requested.email',
           payload: {
             userId,
-            documentId,
+            documentId: legacyDocumentId,
             recipientId: recipient.id,
             requestMetadata: requestMetadata?.requestMetadata,
           },
@@ -229,10 +248,10 @@ export const sendDocument = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SENT,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
     userId,
     teamId,
   });
 
-  return updatedDocument;
+  return updatedEnvelope;
 };

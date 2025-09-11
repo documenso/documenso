@@ -1,5 +1,5 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
+import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
@@ -40,8 +40,11 @@ export const updateEmbeddingDocumentRoute = procedure
       const { documentId, title, externalId, recipients, meta } = input;
 
       if (meta && Object.values(meta).length > 0) {
-        await upsertDocumentMeta({
-          documentId: documentId,
+        await updateDocumentMeta({
+          id: {
+            type: 'documentId',
+            id: documentId,
+          },
           userId: apiToken.userId,
           teamId: apiToken.teamId ?? undefined,
           ...meta,

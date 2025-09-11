@@ -1,10 +1,12 @@
-import { DocumentDataType } from '@prisma/client';
+import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -55,12 +57,12 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       type: DocumentDataType.S3_PATH,
     });
 
-    const createdDocument = await createDocumentV2({
+    const createdEnvelope = await createEnvelope({
       userId: ctx.user.id,
       teamId,
-      documentDataId: documentData.id,
       normalizePdf: false, // Not normalizing because of presigned URL.
       data: {
+        type: EnvelopeType.DOCUMENT,
         title,
         externalId,
         visibility,
@@ -68,14 +70,44 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         globalActionAuth,
         recipients,
         folderId,
+        envelopeItems: [
+          {
+            documentDataId: documentData.id,
+          },
+        ],
       },
       meta,
       requestMetadata: ctx.metadata,
     });
 
+    const envelopeItems = await prisma.envelopeItem.findMany({
+      where: {
+        envelopeId: createdEnvelope.id,
+      },
+      include: {
+        documentData: true,
+      },
+    });
+
+    const legacyDocumentId = mapSecondaryIdToDocumentId(createdEnvelope.secondaryId);
+
+    const firstDocumentData = envelopeItems[0].documentData;
+
+    if (!firstDocumentData) {
+      throw new Error('Document data not found');
+    }
+
     return {
-      document: createdDocument,
-      folder: createdDocument.folder, // Todo: Remove this prior to api-v2 release.
+      document: {
+        ...createdEnvelope,
+        documentData: firstDocumentData,
+        id: legacyDocumentId,
+        fields: createdEnvelope.fields.map((field) => ({
+          ...field,
+          documentId: legacyDocumentId,
+        })),
+      },
+      folder: createdEnvelope.folder, // Todo: Remove this prior to api-v2 release.
       uploadUrl: url,
     };
   });

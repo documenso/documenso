@@ -1,11 +1,11 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { SigningStatus } from '@prisma/client';
+import { EnvelopeType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
-import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
+import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { trpc } from '@documenso/trpc/react';
 import {
   Accordion,
@@ -36,13 +36,19 @@ export async function loader({ params }: Route.LoaderArgs) {
     throw redirect('/admin/documents');
   }
 
-  const document = await getEntireDocument({ id });
+  const envelope = await unsafeGetEntireEnvelope({
+    id: {
+      type: 'documentId',
+      id,
+    },
+    type: EnvelopeType.DOCUMENT,
+  });
 
-  return { document };
+  return { envelope };
 }
 
 export default function AdminDocumentDetailsPage({ loaderData }: Route.ComponentProps) {
-  const { document } = loaderData;
+  const { envelope } = loaderData;
 
   const { _, i18n } = useLingui();
   const { toast } = useToast();
@@ -68,11 +74,11 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
     <div>
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-x-4">
-          <h1 className="text-2xl font-semibold">{document.title}</h1>
-          <DocumentStatus status={document.status} />
+          <h1 className="text-2xl font-semibold">{envelope.title}</h1>
+          <DocumentStatus status={envelope.status} />
         </div>
 
-        {document.deletedAt && (
+        {envelope.deletedAt && (
           <Badge size="large" variant="destructive">
             <Trans>Deleted</Trans>
           </Badge>
@@ -81,11 +87,11 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
       <div className="text-muted-foreground mt-4 text-sm">
         <div>
-          <Trans>Created on</Trans>: {i18n.date(document.createdAt, DateTime.DATETIME_MED)}
+          <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
         </div>
 
         <div>
-          <Trans>Last updated at</Trans>: {i18n.date(document.updatedAt, DateTime.DATETIME_MED)}
+          <Trans>Last updated at</Trans>: {i18n.date(envelope.updatedAt, DateTime.DATETIME_MED)}
         </div>
       </div>
 
@@ -102,12 +108,12 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
               <Button
                 variant="outline"
                 loading={isResealDocumentLoading}
-                disabled={document.recipients.some(
+                disabled={envelope.recipients.some(
                   (recipient) =>
                     recipient.signingStatus !== SigningStatus.SIGNED &&
                     recipient.signingStatus !== SigningStatus.REJECTED,
                 )}
-                onClick={() => resealDocument({ id: document.id })}
+                onClick={() => resealDocument({ id: envelope.id })}
               >
                 <Trans>Reseal document</Trans>
               </Button>
@@ -123,7 +129,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
         </TooltipProvider>
 
         <Button variant="outline" asChild>
-          <Link to={`/admin/users/${document.userId}`}>
+          <Link to={`/admin/users/${envelope.userId}`}>
             <Trans>Go to owner</Trans>
           </Link>
         </Button>
@@ -136,7 +142,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
       <div className="mt-4">
         <Accordion type="multiple" className="space-y-4">
-          {document.recipients.map((recipient) => (
+          {envelope.recipients.map((recipient) => (
             <AccordionItem
               key={recipient.id}
               value={recipient.id.toString()}
@@ -161,7 +167,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
 
       <hr className="my-4" />
 
-      {document && <AdminDocumentDeleteDialog document={document} />}
+      {envelope && <AdminDocumentDeleteDialog envelopeId={envelope.id} />}
     </div>
   );
 }

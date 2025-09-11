@@ -1,4 +1,4 @@
-import { FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { EnvelopeType, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -6,6 +6,7 @@ export type GetFieldsForTokenOptions = {
   token: string;
 };
 
+// Todo: Envelopes, this will return all fields, might need to filter based on actual documentId.
 export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => {
   if (!token) {
     throw new Error('Missing token');
@@ -35,7 +36,10 @@ export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => 
                 gte: recipient.signingOrder ?? 0,
               },
             },
-            documentId: recipient.documentId,
+            envelope: {
+              id: recipient.envelopeId,
+              type: EnvelopeType.DOCUMENT,
+            },
           },
           {
             recipientId: recipient.id,

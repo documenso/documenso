@@ -1,6 +1,9 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { procedure } from '../trpc';
 import {
@@ -29,27 +32,34 @@ export const createEmbeddingDocumentRoute = procedure
 
       const { title, documentDataId, externalId, recipients, meta } = input;
 
-      const document = await createDocumentV2({
+      const envelope = await createEnvelope({
         data: {
+          type: EnvelopeType.DOCUMENT,
           title,
           externalId,
           recipients,
+          envelopeItems: [
+            {
+              documentDataId,
+            },
+          ],
         },
         meta,
-        documentDataId,
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
         requestMetadata: metadata,
       });
 
-      if (!document.id) {
+      if (!envelope.id) {
         throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
           message: 'Failed to create document: missing document ID',
         });
       }
 
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
       return {
-        documentId: document.id,
+        documentId: legacyDocumentId,
       };
     } catch (error) {
       if (error instanceof AppError) {

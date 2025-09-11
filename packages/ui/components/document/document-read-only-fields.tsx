@@ -8,7 +8,6 @@ import { Clock, EyeOffIcon } from 'lucide-react';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
-import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { FieldRootContainer } from '@documenso/ui/components/field/field';
@@ -32,6 +31,10 @@ const getRecipientDisplayText = (recipient: { name: string; email: string }) => 
   }
 
   return recipient.email;
+};
+
+export type DocumentField = Field & {
+  recipient: Pick<Recipient, 'name' | 'email' | 'signingStatus'>;
 };
 
 export type DocumentReadOnlyFieldsProps = {

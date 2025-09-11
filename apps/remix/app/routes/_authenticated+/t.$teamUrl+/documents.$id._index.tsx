@@ -12,7 +12,10 @@ import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import {
+  DocumentReadOnlyFields,
+  mapFieldsWithRecipients,
+} from '@documenso/ui/components/document/document-read-only-fields';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
@@ -54,7 +57,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const document = await getDocumentWithDetailsById({
-    documentId,
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId: user.id,
     teamId: team.id,
   }).catch(() => null);
@@ -171,7 +177,7 @@ export default function DocumentPage() {
 
         {document.status !== DocumentStatus.COMPLETED && (
           <DocumentReadOnlyFields
-            fields={document.fields}
+            fields={mapFieldsWithRecipients(document.fields, recipients)}
             documentMeta={documentMeta || undefined}
             showRecipientTooltip={true}
             showRecipientColors={true}

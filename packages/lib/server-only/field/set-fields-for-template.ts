@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@prisma/client';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -16,7 +16,7 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
@@ -42,25 +42,40 @@ export const setFieldsForTemplate = async ({
   templateId,
   fields,
 }: SetFieldsForTemplateOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
+    },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
+    include: {
+      envelopeItems: {
+        select: {
+          id: true,
+        },
+      },
+      fields: {
+        include: {
+          recipient: true,
+        },
+      },
     },
   });
 
-  if (!template) {
+  // Todo: Envelopes
+  const firstEnvelopeItemId = envelope?.envelopeItems[0]?.id;
+
+  if (!envelope || !firstEnvelopeItemId) {
     throw new Error('Template not found');
   }
 
-  const existingFields = await prisma.field.findMany({
-    where: {
-      templateId,
-    },
-    include: {
-      recipient: true,
-    },
-  });
+  const existingFields = envelope.fields;
 
   const removedFields = existingFields.filter(
     (existingField) => !fields.find((field) => field.id === existingField.id),
@@ -143,7 +158,8 @@ export const setFieldsForTemplate = async ({
       return prisma.field.upsert({
         where: {
           id: field._persisted?.id ?? -1,
-          templateId,
+          envelopeId: envelope.id,
+          envelopeItemId: firstEnvelopeItemId, // Todo: Envelopes
         },
         update: {
           page: field.pageNumber,
@@ -163,15 +179,20 @@ export const setFieldsForTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
-          template: {
+          envelope: {
             connect: {
-              id: templateId,
+              id: envelope.id,
+            },
+          },
+          envelopeItem: {
+            connect: {
+              id: firstEnvelopeItemId, // Todo: Envelopes
             },
           },
           recipient: {
             connect: {
               id: field.recipientId,
-              templateId,
+              envelopeId: envelope.id,
             },
           },
         },
