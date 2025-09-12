@@ -110,7 +110,6 @@ export const getDocumentAndSenderByToken = async ({
     },
   });
 
-  // Todo: Envelopes
   const firstDocumentData = result.envelopeItems[0].documentData;
 
   if (!firstDocumentData) {
@@ -153,5 +152,6 @@ export const getDocumentAndSenderByToken = async ({
     },
     documentData: firstDocumentData,
     id: legacyDocumentId,
+    envelopeId: result.id,
   };
 };

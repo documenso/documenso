@@ -15,7 +15,7 @@ test('[TEMPLATE_FLOW]: add settings', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set title.
@@ -49,7 +49,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set document visibility.
@@ -64,9 +64,7 @@ test('[TEMPLATE_FLOW] add document visibility settings', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Add Placeholders' })).toBeVisible();
 
   // Navigate back to the edit page to check that the settings are saved correctly.
-  await page.goto(
-    `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
-  );
+  await page.goto(`/t/${team.url}/templates/${template.id}/edit`);
 
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
   await expect(page.getByTestId('documentVisibilitySelectValue')).toContainText(
@@ -99,7 +97,7 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   await apiSignin({
     page,
     email: managerUser.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Manager should be able to set visibility to managers and above
@@ -118,12 +116,13 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   await apiSignin({
     page,
     email: memberUser.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // A regular member should not be able to see the template.
   // They should be redirected to the templates page.
-  expect(new URL(page.url()).pathname).toBe(`/t/${team.url}/templates`);
+  await expect(page.getByText('Not Found').first()).toBeVisible();
+  await page.goto(`/t/${team.url}/templates`);
 
   // Create a new template with 'everyone' visibility
   const everyoneTemplate = await seedBlankTemplate(owner, team.id, {

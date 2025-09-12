@@ -9,10 +9,6 @@ import {
 import { DateTime } from 'luxon';
 import path from 'node:path';
 
-import {
-  mapDocumentIdToSecondaryId,
-  mapSecondaryIdToDocumentId,
-} from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
@@ -62,7 +58,7 @@ test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }
   await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
 
   // Wait to be redirected to the edit page.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 });
 
 test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) => {
@@ -72,7 +68,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -118,7 +114,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -133,7 +129,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -203,7 +199,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -218,7 +214,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   // Set title
@@ -301,7 +297,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: 'Test Title' })).toBeVisible();
@@ -316,7 +312,7 @@ test('[DOCUMENT_FLOW]: should not be able to create a document without signature
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -404,7 +400,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `example-${Date.now()}.pdf`;
@@ -440,7 +436,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
   await page.getByRole('link', { name: documentTitle }).click();
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   const url = page.url().split('/');
   const documentId = url[url.length - 1];
@@ -448,7 +444,7 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   const { token } = await prisma.recipient.findFirstOrThrow({
     where: {
       envelope: {
-        secondaryId: mapDocumentIdToSecondaryId(Number(documentId)),
+        id: documentId,
       },
       email: 'user1@example.com',
     },
@@ -532,7 +528,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   const documentTitle = `Sequential-Signing-${Date.now()}.pdf`;
@@ -590,7 +586,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
 

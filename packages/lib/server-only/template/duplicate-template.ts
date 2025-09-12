@@ -64,13 +64,14 @@ export const duplicateTemplate = async ({ id, userId, teamId }: DuplicateTemplat
       id: prefixedId('envelope'),
       secondaryId: formattedTemplateId,
       type: EnvelopeType.TEMPLATE,
+      internalVersion: envelope.internalVersion,
       userId,
       teamId,
       title: envelope.title + ' (copy)',
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
-      source: DocumentSource.DOCUMENT, // Todo: Migration what to use here.
+      source: DocumentSource.NONE,
     },
     include: {
       recipients: true,
@@ -98,6 +99,7 @@ export const duplicateTemplate = async ({ id, userId, teamId }: DuplicateTemplat
           title: envelopeItem.title,
           envelopeId: duplicatedEnvelope.id,
           documentDataId: duplicatedDocumentData.id,
+          order: envelopeItem.order,
         },
       });
 

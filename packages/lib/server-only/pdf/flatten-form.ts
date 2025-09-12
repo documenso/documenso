@@ -1,5 +1,4 @@
-import fontkit from '@pdf-lib/fontkit';
-import type { PDFField, PDFWidgetAnnotation } from 'pdf-lib';
+import type { PDFField, PDFWidgetAnnotation } from '@cantoo/pdf-lib';
 import {
   PDFCheckBox,
   PDFDict,
@@ -12,7 +11,8 @@ import {
   pushGraphicsState,
   rotateInPlace,
   translate,
-} from 'pdf-lib';
+} from '@cantoo/pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 

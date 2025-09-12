@@ -1,4 +1,4 @@
-import type { DocumentVisibility, Prisma } from '@prisma/client';
+import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
 import { EnvelopeType, FolderType } from '@prisma/client';
 import { DocumentStatus } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
@@ -13,38 +13,41 @@ import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
-import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
-export type UpdateDocumentOptions = {
+export type UpdateEnvelopeOptions = {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   data?: {
     title?: string;
+    folderId?: string | null;
     externalId?: string | null;
-    visibility?: DocumentVisibility | null;
+    visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
+    publicTitle?: string;
+    publicDescription?: string;
+    templateType?: TemplateType;
     useLegacyFieldInsertion?: boolean;
-    folderId?: string | null;
   };
+  meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
 
-export const updateDocument = async ({
+export const updateEnvelope = async ({
   userId,
   teamId,
-  documentId,
-  data,
+  id,
+  data = {},
+  meta = {},
   requestMetadata,
-}: UpdateDocumentOptions) => {
+}: UpdateEnvelopeOptions) => {
   const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
-    type: EnvelopeType.DOCUMENT,
+    id,
+    type: null, // Allow updating both documents and templates.
     userId,
     teamId,
   });
@@ -52,8 +55,10 @@ export const updateDocument = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
+      documentMeta: true,
       team: {
         select: {
+          organisationId: true,
           organisation: {
             select: {
               organisationClaim: true,
@@ -66,8 +71,22 @@ export const updateDocument = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: 'Envelope not found',
     });
+  }
+
+  if (
+    envelope.type !== EnvelopeType.TEMPLATE &&
+    (data.publicTitle || data.publicDescription || data.templateType)
+  ) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'You cannot update the template fields for document type envelopes',
+    });
+  }
+
+  // If no data just return the document since this function is normally chained after a meta update.
+  if (Object.values(data).length === 0 && Object.keys(meta).length === 0) {
+    return envelope;
   }
 
   const isEnvelopeOwner = envelope.userId === userId;
@@ -79,13 +98,51 @@ export const updateDocument = async ({
     !canAccessTeamDocument(team.currentTeamRole, data.visibility)
   ) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to update the document visibility',
+      message: 'You do not have permission to update the envelope visibility',
     });
   }
 
-  // If no data just return the document since this function is normally chained after a meta update.
-  if (!data || Object.values(data).length === 0) {
-    return envelope;
+  const { documentAuthOption } = extractDocumentAuthMethods({
+    documentAuth: envelope.authOptions,
+  });
+
+  const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
+  const documentGlobalActionAuth = documentAuthOption?.globalActionAuth ?? null;
+
+  // If the new global auth values aren't passed in, fallback to the current document values.
+  const newGlobalAccessAuth =
+    data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
+  const newGlobalActionAuth =
+    data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
+
+  // Check if user has permission to set the global action auth.
+  if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'You do not have permission to set the action auth',
+    });
+  }
+
+  const authOptions = createDocumentAuthOptions({
+    globalAccessAuth: newGlobalAccessAuth,
+    globalActionAuth: newGlobalActionAuth,
+  });
+
+  const emailId = meta.emailId;
+
+  // Validate the emailId belongs to the organisation.
+  if (emailId) {
+    const email = await prisma.organisationEmail.findFirst({
+      where: {
+        id: emailId,
+        organisationId: envelope.team.organisationId,
+      },
+    });
+
+    if (!email) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Email not found',
+      });
+    }
   }
 
   let folderUpdateQuery: Prisma.FolderUpdateOneWithoutEnvelopesNestedInput | undefined = undefined;
@@ -99,7 +156,7 @@ export const updateDocument = async ({
           teamId,
           userId,
         }),
-        type: FolderType.DOCUMENT,
+        type: envelope.type === EnvelopeType.TEMPLATE ? FolderType.TEMPLATE : FolderType.DOCUMENT,
         visibility: {
           in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
         },
@@ -126,26 +183,6 @@ export const updateDocument = async ({
     };
   }
 
-  const { documentAuthOption } = extractDocumentAuthMethods({
-    documentAuth: envelope.authOptions,
-  });
-
-  const documentGlobalAccessAuth = documentAuthOption?.globalAccessAuth ?? null;
-  const documentGlobalActionAuth = documentAuthOption?.globalActionAuth ?? null;
-
-  // If the new global auth values aren't passed in, fallback to the current document values.
-  const newGlobalAccessAuth =
-    data?.globalAccessAuth === undefined ? documentGlobalAccessAuth : data.globalAccessAuth;
-  const newGlobalActionAuth =
-    data?.globalActionAuth === undefined ? documentGlobalActionAuth : data.globalActionAuth;
-
-  // Check if user has permission to set the global action auth.
-  if (newGlobalActionAuth.length > 0 && !envelope.team.organisation.organisationClaim.flags.cfr21) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'You do not have permission to set the action auth',
-    });
-  }
-
   const isTitleSame = data.title === undefined || data.title === envelope.title;
   const isExternalIdSame = data.externalId === undefined || data.externalId === envelope.externalId;
   const isGlobalAccessSame =
@@ -157,12 +194,18 @@ export const updateDocument = async ({
   const isDocumentVisibilitySame =
     data.visibility === undefined || data.visibility === envelope.visibility;
   const isFolderSame = data.folderId === undefined || data.folderId === envelope.folderId;
+  const isTemplateTypeSame =
+    data.templateType === undefined || data.templateType === envelope.templateType;
+  const isPublicDescriptionSame =
+    data.publicDescription === undefined || data.publicDescription === envelope.publicDescription;
+  const isPublicTitleSame =
+    data.publicTitle === undefined || data.publicTitle === envelope.publicTitle;
 
   const auditLogs: CreateDocumentAuditLogDataResponse[] = [];
 
   if (!isTitleSame && envelope.status !== DocumentStatus.DRAFT) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'You cannot update the title if the document has been sent',
+      message: 'You cannot update the title if the envelope has been sent',
     });
   }
 
@@ -251,36 +294,51 @@ export const updateDocument = async ({
   //   );
   // }
 
+  // Todo: Determine if changes are made
+  // Commented out since we didn't detect the changes to sequence.
+  // const isMetaSame = isDeepEqual(envelope.documentMeta, meta);
   // Early return if nothing is required.
-  if (auditLogs.length === 0 && data.useLegacyFieldInsertion === undefined && isFolderSame) {
-    return envelope;
-  }
+  // if (
+  //   auditLogs.length === 0 &&
+  //   data.useLegacyFieldInsertion === undefined &&
+  //   isFolderSame &&
+  //   isTemplateTypeSame &&
+  //   isPublicDescriptionSame &&
+  //   isPublicTitleSame
+  // ) {
+  //   return envelope;
+  // }
 
   return await prisma.$transaction(async (tx) => {
-    const authOptions = createDocumentAuthOptions({
-      globalAccessAuth: newGlobalAccessAuth,
-      globalActionAuth: newGlobalActionAuth,
-    });
-
-    const updatedDocument = await tx.envelope.update({
+    const updatedEnvelope = await tx.envelope.update({
       where: {
         id: envelope.id,
-        type: EnvelopeType.DOCUMENT,
       },
       data: {
         title: data.title,
         externalId: data.externalId,
-        visibility: data.visibility as DocumentVisibility,
+        visibility: data.visibility,
+        templateType: data.templateType,
+        publicDescription: data.publicDescription,
+        publicTitle: data.publicTitle,
         useLegacyFieldInsertion: data.useLegacyFieldInsertion,
         authOptions,
         folder: folderUpdateQuery,
+        documentMeta: {
+          update: {
+            ...meta,
+            emailSettings: meta?.emailSettings || undefined,
+          },
+        },
       },
     });
 
-    await tx.documentAuditLog.createMany({
-      data: auditLogs,
-    });
+    if (envelope.type === EnvelopeType.DOCUMENT) {
+      await tx.documentAuditLog.createMany({
+        data: auditLogs,
+      });
+    }
 
-    return updatedDocument;
+    return updatedEnvelope;
   });
 };

@@ -44,7 +44,9 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
   const [showTemplateCreateDialog, setShowTemplateCreateDialog] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  const onFileDrop = async (file: File) => {
+  const onFileDrop = async (files: File[]) => {
+    const file = files[0];
+
     if (isUploadingFile) {
       return;
     }

@@ -34,6 +34,7 @@ export const duplicateDocument = async ({ id, userId, teamId }: DuplicateDocumen
     select: {
       title: true,
       userId: true,
+      internalVersion: true,
       envelopeItems: {
         include: {
           documentData: {
@@ -81,6 +82,7 @@ export const duplicateDocument = async ({ id, userId, teamId }: DuplicateDocumen
       id: prefixedId('envelope'),
       secondaryId: formattedDocumentId,
       type: EnvelopeType.DOCUMENT,
+      internalVersion: envelope.internalVersion,
       userId,
       teamId,
       title: envelope.title,
@@ -114,6 +116,7 @@ export const duplicateDocument = async ({ id, userId, teamId }: DuplicateDocumen
         data: {
           id: prefixedId('envelope_item'),
           title: envelopeItem.title,
+          order: envelopeItem.order,
           envelopeId: duplicatedEnvelope.id,
           documentDataId: duplicatedDocumentData.id,
         },
@@ -175,6 +178,7 @@ export const duplicateDocument = async ({ id, userId, teamId }: DuplicateDocumen
   });
 
   return {
+    id: duplicatedEnvelope.id,
     documentId,
   };
 };

@@ -76,7 +76,7 @@ export const DocumentCertificateQRView = ({
             <DialogFooter className="flex flex-row justify-end gap-2">
               <Button asChild>
                 <a
-                  href={`${formatDocumentsPath(documentTeamUrl)}/${documentViaUser.id}`}
+                  href={`${formatDocumentsPath(documentTeamUrl)}/${documentViaUser.envelopeId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                 >

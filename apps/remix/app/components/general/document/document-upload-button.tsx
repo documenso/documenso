@@ -28,11 +28,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 
-export type DocumentUploadDropzoneProps = {
+export type DocumentUploadButtonProps = {
   className?: string;
 };
 
-export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProps) => {
+export const DocumentUploadButton = ({ className }: DocumentUploadButtonProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
@@ -78,7 +78,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
       const { legacyDocumentId: id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
-        timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
+        timezone: userTimezone,
         folderId: folderId ?? undefined,
       });
 
@@ -140,7 +140,7 @@ export const DocumentUploadDropzone = ({ className }: DocumentUploadDropzoneProp
                 loading={isLoading}
                 disabled={remaining.documents === 0 || !user.emailVerified}
                 disabledMessage={disabledMessage}
-                onDrop={onFileDrop}
+                onDrop={async (files) => onFileDrop(files[0])}
                 onDropRejected={onFileDropRejected}
               />
             </div>

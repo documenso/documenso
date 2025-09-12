@@ -18,7 +18,7 @@ type IsRecipientAuthorizedOptions = {
   // !: Probably find a better name than 'ACCESS_2FA' if requirements change.
   type: 'ACCESS' | 'ACCESS_2FA' | 'ACTION';
   documentAuthOptions: Envelope['authOptions'];
-  recipient: Pick<Recipient, 'authOptions' | 'email'>;
+  recipient: Pick<Recipient, 'authOptions' | 'email' | 'envelopeId'>;
 
   /**
    * The ID of the user who initiated the request.
@@ -125,15 +125,8 @@ export const isRecipientAuthorized = async ({
       }
 
       if (type === 'ACCESS_2FA' && method === 'email') {
-        // Todo: Envelopes - Need to pass in the secondary ID to parse the document ID for.
-        if (!recipient.documentId) {
-          throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Document ID is required for email 2FA verification',
-          });
-        }
-
         return await validateTwoFactorTokenFromEmail({
-          documentId: recipient.documentId,
+          envelopeId: recipient.envelopeId,
           email: recipient.email,
           code: token,
           window: 10, // 5 minutes worth of tokens

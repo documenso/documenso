@@ -33,6 +33,7 @@ export const createEmbeddingDocumentRoute = procedure
       const { title, documentDataId, externalId, recipients, meta } = input;
 
       const envelope = await createEnvelope({
+        internalVersion: 1, // Todo: Envelopes - What to use.
         data: {
           type: EnvelopeType.DOCUMENT,
           title,

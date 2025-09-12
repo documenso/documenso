@@ -37,6 +37,9 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
+      // We have an any cast so any changes here you need to update it
+      // in the embeding document edit page
+      // Search: "map<any>" to find it
       fields: ZFieldAndMetaSchema.and(
         z.object({
           id: z.number().optional(),
@@ -45,6 +48,7 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
           pageY: ZFieldPageYSchema,
           width: ZFieldWidthSchema,
           height: ZFieldHeightSchema,
+          envelopeItemId: z.string(),
         }),
       )
         .array()

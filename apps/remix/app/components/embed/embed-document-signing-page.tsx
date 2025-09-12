@@ -38,7 +38,6 @@ import { injectCss } from '~/utils/css-vars';
 
 import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
-import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
 import { DocumentSigningRejectDialog } from '../general/document-signing/document-signing-reject-dialog';
 import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
@@ -270,214 +269,70 @@ export const EmbedSignDocumentClientPage = ({
   }
 
   return (
-    <DocumentSigningRecipientProvider recipient={recipient} targetSigner={selectedSigner ?? null}>
-      <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
-        {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
+    <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+      {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-        {allowDocumentRejection && (
-          <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
-            <DocumentSigningRejectDialog
-              document={{ id: documentId }}
-              token={token}
-              onRejected={onDocumentRejected}
-            />
-          </div>
-        )}
+      {allowDocumentRejection && (
+        <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+          <DocumentSigningRejectDialog
+            documentId={documentId}
+            token={token}
+            onRejected={onDocumentRejected}
+          />
+        </div>
+      )}
 
-        <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
-          {/* Viewer */}
-          <div className="embed--DocumentViewer flex-1">
-            <PDFViewer
-              documentData={documentData}
-              onDocumentLoad={() => setHasDocumentLoaded(true)}
-            />
-          </div>
+      <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
+        {/* Viewer */}
+        <div className="embed--DocumentViewer flex-1">
+          <PDFViewer
+            documentData={documentData}
+            onDocumentLoad={() => setHasDocumentLoaded(true)}
+          />
+        </div>
 
-          {/* Widget */}
-          <div
-            key={isExpanded ? 'expanded' : 'collapsed'}
-            className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
-            data-expanded={isExpanded || undefined}
-          >
-            <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
-              {/* Header */}
-              <div className="embed--DocumentWidgetHeader">
-                <div className="flex items-center justify-between gap-x-2">
-                  <h3 className="text-foreground text-xl font-semibold md:text-2xl">
-                    {isAssistantMode ? (
-                      <Trans>Assist with signing</Trans>
-                    ) : (
-                      <Trans>Sign document</Trans>
-                    )}
-                  </h3>
-
-                  {isExpanded ? (
-                    <Button
-                      variant="outline"
-                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
-                      onClick={() => setIsExpanded(false)}
-                    >
-                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
-                    </Button>
-                  ) : pendingFields.length > 0 ? (
-                    <Button
-                      variant="outline"
-                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
-                      onClick={() => setIsExpanded(true)}
-                    >
-                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
-                    </Button>
-                  ) : (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="md:hidden"
-                      disabled={
-                        isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
-                      }
-                      loading={isSubmitting}
-                      onClick={() => throttledOnCompleteClick()}
-                    >
-                      <Trans>Complete</Trans>
-                    </Button>
-                  )}
-                </div>
-              </div>
-
-              <div className="embed--DocumentWidgetContent hidden group-data-[expanded]/document-widget:block md:block">
-                <p className="text-muted-foreground mt-2 text-sm">
+        {/* Widget */}
+        <div
+          key={isExpanded ? 'expanded' : 'collapsed'}
+          className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
+          data-expanded={isExpanded || undefined}
+        >
+          <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
+            {/* Header */}
+            <div className="embed--DocumentWidgetHeader">
+              <div className="flex items-center justify-between gap-x-2">
+                <h3 className="text-foreground text-xl font-semibold md:text-2xl">
                   {isAssistantMode ? (
-                    <Trans>Help complete the document for other signers.</Trans>
+                    <Trans>Assist with signing</Trans>
                   ) : (
-                    <Trans>Sign the document to complete the process.</Trans>
+                    <Trans>Sign document</Trans>
                   )}
-                </p>
+                </h3>
 
-                <hr className="border-border mb-8 mt-4" />
-              </div>
-
-              {/* Form */}
-              <div className="embed--DocumentWidgetForm -mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
-                <div className="flex flex-1 flex-col gap-y-4">
-                  {isAssistantMode && (
-                    <div>
-                      <Label>
-                        <Trans>Signing for</Trans>
-                      </Label>
-
-                      <fieldset className="dark:bg-background border-border mt-2 rounded-2xl border bg-white p-3">
-                        <RadioGroup
-                          className="gap-0 space-y-3 shadow-none"
-                          value={selectedSignerId?.toString()}
-                          onValueChange={(value) => setSelectedSignerId(Number(value))}
-                        >
-                          {allRecipients
-                            .filter((r) => r.fields.length > 0)
-                            .map((r) => (
-                              <div
-                                key={`${assistantSignersId}-${r.id}`}
-                                className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
-                              >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-3">
-                                    <RadioGroupItem
-                                      id={`${assistantSignersId}-${r.id}`}
-                                      value={r.id.toString()}
-                                      className="after:absolute after:inset-0"
-                                    />
-
-                                    <div className="grid grow gap-1">
-                                      <Label
-                                        className="inline-flex items-start"
-                                        htmlFor={`${assistantSignersId}-${r.id}`}
-                                      >
-                                        {r.name}
-
-                                        {r.id === recipient.id && (
-                                          <span className="text-muted-foreground ml-2">
-                                            {_(msg`(You)`)}
-                                          </span>
-                                        )}
-                                      </Label>
-                                      <p className="text-muted-foreground text-xs">{r.email}</p>
-                                    </div>
-                                  </div>
-                                  <div className="text-muted-foreground text-xs leading-[inherit]">
-                                    {r.fields.length} {r.fields.length === 1 ? 'field' : 'fields'}
-                                  </div>
-                                </div>
-                              </div>
-                            ))}
-                        </RadioGroup>
-                      </fieldset>
-                    </div>
-                  )}
-
-                  {!isAssistantMode && (
-                    <>
-                      <div>
-                        <Label htmlFor="full-name">
-                          <Trans>Full Name</Trans>
-                        </Label>
-
-                        <Input
-                          type="text"
-                          id="full-name"
-                          className="bg-background mt-2"
-                          disabled={isNameLocked}
-                          value={fullName}
-                          onChange={(e) => !isNameLocked && setFullName(e.target.value)}
-                        />
-                      </div>
-
-                      <div>
-                        <Label htmlFor="email">
-                          <Trans>Email</Trans>
-                        </Label>
-
-                        <Input
-                          type="email"
-                          id="email"
-                          className="bg-background mt-2"
-                          value={email}
-                          disabled
-                        />
-                      </div>
-
-                      {hasSignatureField && (
-                        <div>
-                          <Label htmlFor="Signature">
-                            <Trans>Signature</Trans>
-                          </Label>
-
-                          <SignaturePadDialog
-                            className="mt-2"
-                            disabled={isThrottled || isSubmitting}
-                            disableAnimation
-                            value={signature ?? ''}
-                            onChange={(v) => setSignature(v ?? '')}
-                            typedSignatureEnabled={metadata?.typedSignatureEnabled}
-                            uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
-                            drawSignatureEnabled={metadata?.drawSignatureEnabled}
-                          />
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-
-              <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
-
-              <div className="embed--DocumentWidgetFooter mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
-                {pendingFields.length > 0 ? (
-                  <Button className="col-start-2" onClick={() => onNextFieldClick()}>
-                    <Trans>Next</Trans>
+                {isExpanded ? (
+                  <Button
+                    variant="outline"
+                    className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(false)}
+                  >
+                    <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                  </Button>
+                ) : pendingFields.length > 0 ? (
+                  <Button
+                    variant="outline"
+                    className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                    onClick={() => setIsExpanded(true)}
+                  >
+                    <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
                   </Button>
                 ) : (
                   <Button
-                    className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
-                    disabled={isThrottled}
+                    variant="default"
+                    size="sm"
+                    className="md:hidden"
+                    disabled={
+                      isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
+                    }
                     loading={isSubmitting}
                     onClick={() => throttledOnCompleteClick()}
                   >
@@ -486,32 +341,174 @@ export const EmbedSignDocumentClientPage = ({
                 )}
               </div>
             </div>
+
+            <div className="embed--DocumentWidgetContent hidden group-data-[expanded]/document-widget:block md:block">
+              <p className="text-muted-foreground mt-2 text-sm">
+                {isAssistantMode ? (
+                  <Trans>Help complete the document for other signers.</Trans>
+                ) : (
+                  <Trans>Sign the document to complete the process.</Trans>
+                )}
+              </p>
+
+              <hr className="border-border mb-8 mt-4" />
+            </div>
+
+            {/* Form */}
+            <div className="embed--DocumentWidgetForm -mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">
+              <div className="flex flex-1 flex-col gap-y-4">
+                {isAssistantMode && (
+                  <div>
+                    <Label>
+                      <Trans>Signing for</Trans>
+                    </Label>
+
+                    <fieldset className="dark:bg-background border-border mt-2 rounded-2xl border bg-white p-3">
+                      <RadioGroup
+                        className="gap-0 space-y-3 shadow-none"
+                        value={selectedSignerId?.toString()}
+                        onValueChange={(value) => setSelectedSignerId(Number(value))}
+                      >
+                        {allRecipients
+                          .filter((r) => r.fields.length > 0)
+                          .map((r) => (
+                            <div
+                              key={`${assistantSignersId}-${r.id}`}
+                              className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
+                            >
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <RadioGroupItem
+                                    id={`${assistantSignersId}-${r.id}`}
+                                    value={r.id.toString()}
+                                    className="after:absolute after:inset-0"
+                                  />
+
+                                  <div className="grid grow gap-1">
+                                    <Label
+                                      className="inline-flex items-start"
+                                      htmlFor={`${assistantSignersId}-${r.id}`}
+                                    >
+                                      {r.name}
+
+                                      {r.id === recipient.id && (
+                                        <span className="text-muted-foreground ml-2">
+                                          {_(msg`(You)`)}
+                                        </span>
+                                      )}
+                                    </Label>
+                                    <p className="text-muted-foreground text-xs">{r.email}</p>
+                                  </div>
+                                </div>
+                                <div className="text-muted-foreground text-xs leading-[inherit]">
+                                  {r.fields.length} {r.fields.length === 1 ? 'field' : 'fields'}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                      </RadioGroup>
+                    </fieldset>
+                  </div>
+                )}
+
+                {!isAssistantMode && (
+                  <>
+                    <div>
+                      <Label htmlFor="full-name">
+                        <Trans>Full Name</Trans>
+                      </Label>
+
+                      <Input
+                        type="text"
+                        id="full-name"
+                        className="bg-background mt-2"
+                        disabled={isNameLocked}
+                        value={fullName}
+                        onChange={(e) => !isNameLocked && setFullName(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="email">
+                        <Trans>Email</Trans>
+                      </Label>
+
+                      <Input
+                        type="email"
+                        id="email"
+                        className="bg-background mt-2"
+                        value={email}
+                        disabled
+                      />
+                    </div>
+
+                    {hasSignatureField && (
+                      <div>
+                        <Label htmlFor="Signature">
+                          <Trans>Signature</Trans>
+                        </Label>
+
+                        <SignaturePadDialog
+                          className="mt-2"
+                          disabled={isThrottled || isSubmitting}
+                          disableAnimation
+                          value={signature ?? ''}
+                          onChange={(v) => setSignature(v ?? '')}
+                          typedSignatureEnabled={metadata?.typedSignatureEnabled}
+                          uploadSignatureEnabled={metadata?.uploadSignatureEnabled}
+                          drawSignatureEnabled={metadata?.drawSignatureEnabled}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="hidden flex-1 group-data-[expanded]/document-widget:block md:block" />
+
+            <div className="embed--DocumentWidgetFooter mt-4 hidden w-full grid-cols-2 items-center group-data-[expanded]/document-widget:grid md:grid">
+              {pendingFields.length > 0 ? (
+                <Button className="col-start-2" onClick={() => onNextFieldClick()}>
+                  <Trans>Next</Trans>
+                </Button>
+              ) : (
+                <Button
+                  className={allowDocumentRejection ? 'col-start-2' : 'col-span-2'}
+                  disabled={isThrottled}
+                  loading={isSubmitting}
+                  onClick={() => throttledOnCompleteClick()}
+                >
+                  <Trans>Complete</Trans>
+                </Button>
+              )}
+            </div>
           </div>
-
-          <ElementVisible
-            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
-          >
-            {showPendingFieldTooltip && pendingFields.length > 0 && (
-              <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
-                <Trans>Click to insert field</Trans>
-              </FieldToolTip>
-            )}
-          </ElementVisible>
-
-          {/* Fields */}
-          <EmbedDocumentFields fields={fields} metadata={metadata} />
-
-          {/* Completed fields */}
-          <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />
         </div>
 
-        {!hidePoweredBy && (
-          <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-            <span>Powered by</span>
-            <BrandingLogo className="ml-2 inline-block h-[14px]" />
-          </div>
-        )}
+        <ElementVisible
+          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
+        >
+          {showPendingFieldTooltip && pendingFields.length > 0 && (
+            <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
+              <Trans>Click to insert field</Trans>
+            </FieldToolTip>
+          )}
+        </ElementVisible>
+
+        {/* Fields */}
+        <EmbedDocumentFields fields={fields} metadata={metadata} />
+
+        {/* Completed fields */}
+        <DocumentReadOnlyFields documentMeta={metadata || undefined} fields={completedFields} />
       </div>
-    </DocumentSigningRecipientProvider>
+
+      {!hidePoweredBy && (
+        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+          <span>Powered by</span>
+          <BrandingLogo className="ml-2 inline-block h-[14px]" />
+        </div>
+      )}
+    </div>
   );
 };

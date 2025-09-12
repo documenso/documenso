@@ -35,6 +35,7 @@ export const createEmbeddingTemplateRoute = procedure
 
       // First create the template
       const template = await createEnvelope({
+        internalVersion: 1, // Todo: Envelopes - What to use.
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
         data: {

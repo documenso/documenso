@@ -49,6 +49,7 @@ export const createDocumentRoute = authenticatedProcedure
       },
       normalizePdf: true,
       requestMetadata: ctx.metadata,
+      internalVersion: 1,
     });
 
     return {

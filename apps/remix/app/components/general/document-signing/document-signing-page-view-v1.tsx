@@ -50,7 +50,7 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
-export type DocumentSigningPageViewProps = {
+export type DocumentSigningPageViewV1Props = {
   recipient: RecipientWithFields;
   document: DocumentAndSender;
   fields: Field[];
@@ -60,7 +60,7 @@ export type DocumentSigningPageViewProps = {
   includeSenderDetails: boolean;
 };
 
-export const DocumentSigningPageView = ({
+export const DocumentSigningPageViewV1 = ({
   recipient,
   document,
   fields,
@@ -68,7 +68,7 @@ export const DocumentSigningPageView = ({
   isRecipientsTurn,
   allRecipients = [],
   includeSenderDetails,
-}: DocumentSigningPageViewProps) => {
+}: DocumentSigningPageViewV1Props) => {
   const { documentData, documentMeta } = document;
 
   const { derivedRecipientAccessAuth, user: authUser } = useRequiredDocumentSigningAuthContext();
@@ -231,7 +231,7 @@ export const DocumentSigningPageView = ({
             </span>
           </div>
 
-          <DocumentSigningRejectDialog document={document} token={recipient.token} />
+          <DocumentSigningRejectDialog documentId={document.id} token={recipient.token} />
         </div>
 
         <div className="relative mt-4 flex w-full flex-col gap-x-6 gap-y-8 sm:mt-8 md:flex-row lg:gap-x-8 lg:gap-y-0">

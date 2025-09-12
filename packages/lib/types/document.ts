@@ -32,8 +32,9 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
   teamId: true,
   folderId: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
   templateId: z.number().nullish(),
 
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
@@ -42,6 +43,8 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     id: true,
     data: true,
     initialData: true,
+  }).extend({
+    envelopeItemId: z.string(),
   }),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
@@ -100,8 +103,9 @@ export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
   templateId: z.number().nullish(),
 });
 
@@ -128,8 +132,9 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
   templateId: z.number().nullish(),
 
   user: UserSchema.pick({

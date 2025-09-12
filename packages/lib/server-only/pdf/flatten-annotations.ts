@@ -1,4 +1,4 @@
-import { PDFAnnotation, PDFRef } from 'pdf-lib';
+import { PDFAnnotation, PDFRef } from '@cantoo/pdf-lib';
 import {
   PDFDict,
   type PDFDocument,
@@ -8,7 +8,7 @@ import {
   pushGraphicsState,
   rotateInPlace,
   translate,
-} from 'pdf-lib';
+} from '@cantoo/pdf-lib';
 
 export const flattenAnnotations = (document: PDFDocument) => {
   const pages = document.getPages();

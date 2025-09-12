@@ -37,7 +37,10 @@ export const run = async ({
   const { userId, teamId, templateId, csvContent, sendImmediately, requestMetadata } = payload;
 
   const template = await getTemplateById({
-    id: templateId,
+    id: {
+      type: 'templateId',
+      id: templateId,
+    },
     userId,
     teamId,
   });

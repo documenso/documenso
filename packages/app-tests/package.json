@@ -12,11 +12,10 @@
   "keywords": [],
   "author": "",
   "devDependencies": {
-    "@playwright/test": "1.52.0",
-    "@types/node": "^20",
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "pdf-lib": "^1.17.1"
+    "@playwright/test": "1.52.0",
+    "@types/node": "^20"
   },
   "dependencies": {
     "start-server-and-test": "^2.0.12"

@@ -1,8 +1,8 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
+import type { PDFDocument } from '@cantoo/pdf-lib';
+import { RotationTypes, degrees, radiansToDegrees, rgb } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { FieldType } from '@prisma/client';
-import type { PDFDocument } from 'pdf-lib';
-import { RotationTypes, degrees, radiansToDegrees, rgb } from 'pdf-lib';
 import { P, match } from 'ts-pattern';
 
 import {

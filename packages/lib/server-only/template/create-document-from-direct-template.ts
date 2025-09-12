@@ -228,7 +228,7 @@ export const createDocumentFromDirectTemplate = async ({
         recipient: {
           authOptions: directTemplateRecipient.authOptions,
           email: directRecipientEmail,
-          documentId: template.id,
+          envelopeId: directTemplateEnvelope.id,
         },
         field: templateField,
         userId: user?.id,
@@ -311,6 +311,7 @@ export const createDocumentFromDirectTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
+        internalVersion: 1,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,
@@ -322,10 +323,12 @@ export const createDocumentFromDirectTemplate = async ({
         externalId: directTemplateExternalId,
         visibility: settings.documentVisibility,
         envelopeItems: {
+          // Todo: Envelopes
           create: {
             id: prefixedId('envelope_item'),
             title: directTemplateEnvelope.title, // Todo: Envelopes use item title instead
             documentDataId: documentData.id,
+            order: 1,
           },
         },
         authOptions: createDocumentAuthOptions({
@@ -374,6 +377,7 @@ export const createDocumentFromDirectTemplate = async ({
       },
     });
 
+    // Todo: Envelopes - Support multiple envelope items.
     const envelopeItemId = createdEnvelope.envelopeItems[0].id;
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];

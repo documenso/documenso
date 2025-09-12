@@ -409,6 +409,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const envelope = await createEnvelope({
         userId: user.id,
         teamId: team.id,
+        internalVersion: 1,
         data: {
           title: body.title,
           type: EnvelopeType.DOCUMENT,
@@ -446,7 +447,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const { recipients } = await setDocumentRecipients({
         userId: user.id,
         teamId: team.id,
-        documentId: legacyDocumentId,
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
         recipients: body.recipients,
         requestMetadata: metadata,
       });
@@ -542,6 +546,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const createdTemplate = await createEnvelope({
         userId: user.id,
         teamId: team.id,
+        internalVersion: 1,
         data: {
           type: EnvelopeType.TEMPLATE,
           envelopeItems: [
@@ -564,7 +569,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       const fullTemplate = await getTemplateById({
-        id: mapSecondaryIdToTemplateId(createdTemplate.secondaryId),
+        id: {
+          type: 'envelopeId',
+          id: createdTemplate.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -638,7 +646,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const template = await getTemplateById({
-        id: Number(templateId),
+        id: {
+          type: 'templateId',
+          id: Number(templateId),
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -1090,7 +1101,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     try {
       await resendDocument({
         userId: user.id,
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         recipients,
         teamId: team.id,
         requestMetadata: metadata,
@@ -1171,7 +1185,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const { recipients: newRecipients } = await setDocumentRecipients({
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         userId: user.id,
         teamId: team.id,
         recipients: [

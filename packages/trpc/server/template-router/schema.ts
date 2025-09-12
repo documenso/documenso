@@ -109,9 +109,21 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   customDocumentDataId: z
     .string()
     .describe(
-      'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      '[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
+  customDocumentData: z
+    .array(
+      z.object({
+        documentDataId: z.string(),
+        envelopeItemId: z.string(),
+      }),
+    )
+    .describe(
+      'The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+
   folderId: z
     .string()
     .describe(

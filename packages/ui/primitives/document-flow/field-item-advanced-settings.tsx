@@ -64,7 +64,7 @@ export type FieldMetaKeys =
   | keyof EmailFieldMeta
   | keyof DateFieldMeta;
 
-const getDefaultState = (fieldType: FieldType): FieldMeta => {
+export const getDefaultState = (fieldType: FieldType): FieldMeta => {
   switch (fieldType) {
     case FieldType.INITIALS:
       return {

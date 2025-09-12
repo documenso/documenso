@@ -11,7 +11,6 @@ import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-re
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
-import { DocumentSigningRecipientProvider } from '~/components/general/document-signing/document-signing-recipient-provider';
 import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
 import { injectCss } from '~/utils/css-vars';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
@@ -265,18 +264,16 @@ export default function MultisignPage() {
             recipient={selectedRecipient}
             user={user}
           >
-            <DocumentSigningRecipientProvider recipient={selectedRecipient} targetSigner={null}>
-              <MultiSignDocumentSigningView
-                token={selectedRecipient.token}
-                recipientId={selectedRecipient.id}
-                onBack={onBackToDocumentList}
-                onDocumentCompleted={onDocumentCompleted}
-                onDocumentRejected={onDocumentRejected}
-                onDocumentError={onDocumentError}
-                onDocumentReady={onDocumentReady}
-                isNameLocked={isNameLocked}
-              />
-            </DocumentSigningRecipientProvider>
+            <MultiSignDocumentSigningView
+              token={selectedRecipient.token}
+              recipientId={selectedRecipient.id}
+              onBack={onBackToDocumentList}
+              onDocumentCompleted={onDocumentCompleted}
+              onDocumentRejected={onDocumentRejected}
+              onDocumentError={onDocumentError}
+              onDocumentReady={onDocumentReady}
+              isNameLocked={isNameLocked}
+            />
           </DocumentSigningAuthProvider>
         </DocumentSigningProvider>
 

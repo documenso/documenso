@@ -13,6 +13,7 @@ import {
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
+import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { prisma } from '@documenso/prisma';
 
@@ -41,6 +42,8 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -77,7 +80,15 @@ export type CreateDocumentFromTemplateOptions = {
   }[];
   folderId?: string;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
-  customDocumentDataId?: string;
+
+  customDocumentData?: {
+    documentDataId: string;
+
+    /**
+     * The envelope item ID which will be updated to use the custom document data.
+     */
+    envelopeItemId: string;
+  }[];
 
   /**
    * Values that will override the predefined values in the template.
@@ -278,7 +289,7 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
-  customDocumentDataId,
+  customDocumentData = [],
   override,
   requestMetadata,
   folderId,
@@ -331,11 +342,11 @@ export const createDocumentFromTemplate = async ({
   }
 
   const legacyTemplateId = mapSecondaryIdToTemplateId(template.secondaryId);
+  const finalEnvelopeTitle = override?.title || template.title;
 
-  // Todo: Envelopes
-  if (template.envelopeItems.length !== 1) {
+  if (template.envelopeItems.length < 1) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Template must have exactly 1 envelope item',
+      message: 'Template must have at least 1 envelope item',
     });
   }
 
@@ -376,32 +387,45 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  // Todo: Envelopes
-  let parentDocumentData = template.envelopeItems[0].documentData;
+  // Duplicate the envelope item data.
+  const envelopeItems: { title?: string; documentDataId: string }[] = await Promise.all(
+    template.envelopeItems.map(async (item) => {
+      // Todo: Envelopes - Is this okay? Isn't this a potiential vulnerability?
+      const documentDataIdToDuplicate =
+        customDocumentData.find(
+          (customDocumentDataItem) => customDocumentDataItem.envelopeItemId === item.id,
+        )?.documentDataId || item.documentDataId;
 
-  if (customDocumentDataId) {
-    const customDocumentData = await prisma.documentData.findFirst({
-      where: {
-        id: customDocumentDataId,
-      },
-    });
-
-    if (!customDocumentData) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Custom document data not found',
+      const documentData = await prisma.documentData.findFirst({
+        where: {
+          id: documentDataIdToDuplicate,
+        },
       });
-    }
 
-    parentDocumentData = customDocumentData;
-  }
+      if (!documentData) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Document data not found',
+        });
+      }
 
-  const documentData = await prisma.documentData.create({
-    data: {
-      type: parentDocumentData.type,
-      data: parentDocumentData.data,
-      initialData: parentDocumentData.initialData,
-    },
-  });
+      const buffer = await getFileServerSide(documentData);
+
+      const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+
+      const titleToUse = item.title || finalEnvelopeTitle;
+
+      const newDocumentData = await putPdfFileServerSide({
+        name: titleToUse,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(normalizedPdf),
+      });
+
+      return {
+        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        documentDataId: newDocumentData.id,
+      };
+    }),
+  );
 
   const incrementedDocumentId = await incrementDocumentId();
 
@@ -433,6 +457,7 @@ export const createDocumentFromTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
+        internalVersion: template.internalVersion,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE,
         externalId: externalId || template.externalId,
@@ -440,12 +465,15 @@ export const createDocumentFromTemplate = async ({
         userId,
         folderId,
         teamId: template.teamId,
-        title: override?.title || template.title,
+        title: finalEnvelopeTitle,
         envelopeItems: {
-          create: {
-            id: prefixedId('envelope_item'),
-            title: override?.title || template.title,
-            documentDataId: documentData.id,
+          createMany: {
+            data: envelopeItems.map((item, index) => ({
+              id: prefixedId('envelope_item'),
+              title: item.title || finalEnvelopeTitle,
+              documentDataId: item.documentDataId,
+              order: index + 1,
+            })),
           },
         },
         authOptions: createDocumentAuthOptions({

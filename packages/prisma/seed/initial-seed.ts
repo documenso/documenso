@@ -65,6 +65,7 @@ export const seedDatabase = async () => {
       data: {
         id: prefixedId('envelope'),
         secondaryId: documentId.formattedDocumentId,
+        internalVersion: 1,
         type: EnvelopeType.DOCUMENT,
         documentMetaId: documentMeta.id,
         source: DocumentSource.DOCUMENT,
@@ -74,6 +75,7 @@ export const seedDatabase = async () => {
             id: prefixedId('envelope_item'),
             title: `Example Document ${i}`,
             documentDataId: documentData.id,
+            order: 1,
           },
         },
         userId: exampleUser.user.id,
@@ -102,6 +104,7 @@ export const seedDatabase = async () => {
       data: {
         id: prefixedId('envelope'),
         secondaryId: documentId.formattedDocumentId,
+        internalVersion: 1,
         type: EnvelopeType.DOCUMENT,
         source: DocumentSource.DOCUMENT,
         title: `Document ${i}`,
@@ -111,6 +114,7 @@ export const seedDatabase = async () => {
             id: prefixedId('envelope_item'),
             title: `Document ${i}`,
             documentDataId: documentData.id,
+            order: 1,
           },
         },
         userId: adminUser.user.id,

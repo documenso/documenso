@@ -1,7 +1,5 @@
 // https://github.com/Hopding/pdf-lib/issues/20#issuecomment-412852821
-import fontkit from '@pdf-lib/fontkit';
-import { FieldType } from '@prisma/client';
-import type { PDFDocument, PDFFont, PDFTextField } from 'pdf-lib';
+import type { PDFDocument, PDFFont, PDFTextField } from '@cantoo/pdf-lib';
 import {
   RotationTypes,
   TextAlignment,
@@ -9,7 +7,9 @@ import {
   radiansToDegrees,
   rgb,
   setFontAndSize,
-} from 'pdf-lib';
+} from '@cantoo/pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
+import { FieldType } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 
 import {
@@ -35,7 +35,7 @@ import {
 } from '../../types/field-meta';
 import { getPageSize } from './get-page-size';
 
-export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
+export const insertFieldInPDFV1 = async (pdf: PDFDocument, field: FieldWithSignature) => {
   const [fontCaveat, fontNoto] = await Promise.all([
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),

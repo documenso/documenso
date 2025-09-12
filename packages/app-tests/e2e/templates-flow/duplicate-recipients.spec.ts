@@ -1,5 +1,5 @@
 import { type Page, expect, test } from '@playwright/test';
-import type { Team, Template } from '@prisma/client';
+import type { Envelope, Team } from '@prisma/client';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { prisma } from '@documenso/prisma';
@@ -14,7 +14,7 @@ import { apiSignin } from '../fixtures/authentication';
 const completeTemplateFlowWithDuplicateRecipients = async (options: {
   page: Page;
   team: Team;
-  template: Template;
+  template: Envelope;
 }) => {
   const { page, team, template } = options;
   // Step 1: Settings - Continue with defaults
@@ -131,20 +131,20 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
 
     // Create document
     await page.getByRole('button', { name: 'Create and send' }).click();
-    await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+    await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
     // Get the document ID from URL for database queries
     const url = page.url();
-    const documentIdMatch = url.match(/\/documents\/(\d+)/);
+    const documentIdMatch = url.match(/\/documents\/envelope_(.*)/);
 
-    const documentId = documentIdMatch ? parseInt(documentIdMatch[1]) : null;
+    const envelopeId = documentIdMatch ? documentIdMatch[1] : null;
 
-    expect(documentId).not.toBeNull();
+    expect(envelopeId).not.toBeNull();
 
     // Get recipients directly from database
     const recipients = await prisma.recipient.findMany({
       where: {
-        documentId: documentId!,
+        envelopeId: `envelope_${envelopeId}`,
       },
     });
 

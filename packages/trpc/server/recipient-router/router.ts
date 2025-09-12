@@ -288,9 +288,12 @@ export const recipientRouter = router({
       return await setDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients: recipients.map((recipient) => ({
-          id: recipient.nativeId,
+          id: recipient.id,
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
@@ -528,7 +531,7 @@ export const recipientRouter = router({
           id: templateId,
         },
         recipients: recipients.map((recipient) => ({
-          id: recipient.nativeId,
+          id: recipient.id,
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,

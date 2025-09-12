@@ -1,7 +1,6 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -39,27 +38,18 @@ export const updateEmbeddingDocumentRoute = procedure
 
       const { documentId, title, externalId, recipients, meta } = input;
 
-      if (meta && Object.values(meta).length > 0) {
-        await updateDocumentMeta({
-          id: {
-            type: 'documentId',
-            id: documentId,
-          },
-          userId: apiToken.userId,
-          teamId: apiToken.teamId ?? undefined,
-          ...meta,
-          requestMetadata: ctx.metadata,
-        });
-      }
-
-      await updateDocument({
+      await updateEnvelope({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        documentId: documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         data: {
           title,
           externalId,
         },
+        meta,
         requestMetadata: ctx.metadata,
       });
 
@@ -71,7 +61,10 @@ export const updateEmbeddingDocumentRoute = procedure
       const { recipients: updatedRecipients } = await setDocumentRecipients({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        documentId: documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients: recipientsWithClientId.map((recipient) => ({
           id: recipient.id,
           clientId: recipient.clientId,
@@ -103,7 +96,10 @@ export const updateEmbeddingDocumentRoute = procedure
       await setFieldsForDocument({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         fields: fields.map((field) => ({
           ...field,
           pageWidth: field.width,

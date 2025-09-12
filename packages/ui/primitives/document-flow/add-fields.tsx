@@ -19,7 +19,6 @@ import {
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
@@ -550,29 +549,6 @@ export const AddFieldsFormPartial = ({
 
     return recipientsByRole;
   }, [recipients]);
-
-  const recipientsByRoleToDisplay = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
-      )
-      .map(
-        ([role, roleRecipients]) =>
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          [
-            role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [prop('id'), 'asc'],
-            ),
-          ] as [RecipientRole, Recipient[]],
-      );
-  }, [recipientsByRole]);
 
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);

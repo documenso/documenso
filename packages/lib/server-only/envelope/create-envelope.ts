@@ -37,11 +37,12 @@ export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
   normalizePdf?: boolean;
+  internalVersion: 1 | 2;
   data: {
     type: EnvelopeType;
     title: string;
     externalId?: string;
-    envelopeItems: { title?: string; documentDataId: string }[];
+    envelopeItems: { title?: string; documentDataId: string }[]; // Todo: Envelopes (post) - Add order
     formValues?: TDocumentFormValues;
 
     timezone?: string;
@@ -68,6 +69,7 @@ export const createEnvelope = async ({
   data,
   meta,
   requestMetadata,
+  internalVersion,
 }: CreateEnvelopeOptions) => {
   const {
     type,
@@ -124,6 +126,12 @@ export const createEnvelope = async ({
     teamId,
   });
 
+  if (data.envelopeItems.length !== 1 && internalVersion === 1) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Envelope items must have exactly 1 item for version 1',
+    });
+  }
+
   let envelopeItems: { title?: string; documentDataId: string }[] = data.envelopeItems;
 
   if (normalizePdf) {
@@ -145,14 +153,16 @@ export const createEnvelope = async ({
 
         const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
+        const titleToUse = item.title || title;
+
         const newDocumentData = await putPdfFileServerSide({
-          name: title.endsWith('.pdf') ? title : `${title}.pdf`,
+          name: titleToUse,
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(normalizedPdf),
         });
 
         return {
-          title: item.title,
+          title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
           documentDataId: newDocumentData.id,
         };
       }),
@@ -219,15 +229,17 @@ export const createEnvelope = async ({
       data: {
         id: prefixedId('envelope'),
         secondaryId,
+        internalVersion,
         type,
         title,
         qrToken: prefixedId('qr'),
         externalId,
         envelopeItems: {
           createMany: {
-            data: envelopeItems.map((item) => ({
+            data: envelopeItems.map((item, i) => ({
               id: prefixedId('envelope_item'),
               title: item.title || title,
+              order: i + 1,
               documentDataId: item.documentDataId,
             })),
           },
@@ -238,7 +250,7 @@ export const createEnvelope = async ({
         visibility,
         folderId,
         formValues,
-        source: DocumentSource.DOCUMENT, // Todo: Migration
+        source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.NONE,
         documentMetaId: documentMeta.id,
 
         // Template specific fields.

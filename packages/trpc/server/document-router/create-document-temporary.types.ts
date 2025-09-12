@@ -82,6 +82,7 @@ export const ZCreateDocumentTemporaryRequestSchema = z.object({
     .optional(),
   meta: z
     .object({
+      // Todo: Envelopes - Sync properly (emailId?)
       subject: ZDocumentMetaSubjectSchema.optional(),
       message: ZDocumentMetaMessageSchema.optional(),
       timezone: ZDocumentMetaTimezoneSchema.optional(),

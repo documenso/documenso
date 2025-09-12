@@ -51,11 +51,9 @@ import { DocumentSigningRadioField } from '~/components/general/document-signing
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
 
-import { DocumentSigningRecipientProvider } from '../document-signing/document-signing-recipient-provider';
-
 export type DirectTemplateSigningFormProps = {
   flowStep: DocumentFlowStep;
-  directRecipient: Recipient;
+  directRecipient: Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
   directRecipientFields: Field[];
   template: Omit<TTemplate, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
@@ -219,7 +217,7 @@ export const DirectTemplateSigningForm = ({
   }, []);
 
   return (
-    <DocumentSigningRecipientProvider recipient={directRecipient}>
+    <div>
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
@@ -425,6 +423,6 @@ export const DirectTemplateSigningForm = ({
           />
         </div>
       </DocumentFlowFormContainerFooter>
-    </DocumentSigningRecipientProvider>
+    </div>
   );
 };

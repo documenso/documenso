@@ -50,8 +50,9 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     },
   });
 
-  // Todo: Envelopes
-  if (!result.envelopeItems[0].documentData) {
+  const firstDocumentData = result.envelopeItems[0].documentData;
+
+  if (!firstDocumentData) {
     throw new Error('Missing document data');
   }
 
@@ -59,7 +60,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     id: mapSecondaryIdToDocumentId(result.secondaryId),
     title: result.title,
     completedAt: result.completedAt,
-    documentData: result.envelopeItems[0].documentData,
+    documentData: firstDocumentData,
     recipientCount: result._count.recipients,
     documentTeamUrl: result.team.url,
   };

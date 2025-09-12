@@ -23,7 +23,6 @@ export const getDocumentWithDetailsById = async ({
 
   const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  // Todo: Envelopes
   const firstDocumentData = envelope.envelopeItems[0].documentData;
 
   if (!firstDocumentData) {
@@ -32,7 +31,11 @@ export const getDocumentWithDetailsById = async ({
 
   return {
     ...envelope,
-    documentData: firstDocumentData,
+    envelopeId: envelope.id,
+    documentData: {
+      ...firstDocumentData,
+      envelopeItemId: envelope.envelopeItems[0].id,
+    },
     id: legacyDocumentId,
     fields: envelope.fields.map((field) => ({
       ...field,

@@ -61,6 +61,7 @@ export const seedBlankTemplate = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
+      internalVersion: 1,
       type: EnvelopeType.TEMPLATE,
       title: `[TEST] Template ${key}`,
       teamId,
@@ -69,6 +70,7 @@ export const seedBlankTemplate = async (
           id: prefixedId('envelope_item'),
           title: `[TEST] Template ${key}`,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       userId: owner.id,
@@ -107,6 +109,7 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
     data: {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
+      internalVersion: 1,
       type: EnvelopeType.TEMPLATE,
       title,
       envelopeItems: {
@@ -114,6 +117,7 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
           id: prefixedId('envelope_item'),
           title,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       source: DocumentSource.TEMPLATE,
@@ -163,6 +167,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
     data: {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
+      internalVersion: 1,
       type: EnvelopeType.TEMPLATE,
       title,
       envelopeItems: {
@@ -170,6 +175,7 @@ export const seedDirectTemplate = async (options: SeedTemplateOptions) => {
           id: prefixedId('envelope_item'),
           title,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       source: DocumentSource.TEMPLATE,

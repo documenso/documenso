@@ -8,6 +8,7 @@ import { createDocumentData } from '@documenso/lib/server-only/document-data/cre
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
   createDocumentFromDirectTemplate,
@@ -20,10 +21,13 @@ import { duplicateTemplate } from '@documenso/lib/server-only/template/duplicate
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
-import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import {
+  mapSecondaryIdToTemplateId,
+  unsafeBuildEnvelopeIdQuery,
+} from '@documenso/lib/utils/envelope';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
+import { prisma } from '@documenso/prisma';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -91,6 +95,7 @@ export const templateRouter = router({
 
           return {
             id: legacyTemplateId,
+            envelopeId: envelope.id,
             type: envelope.templateType,
             visibility: envelope.visibility,
             externalId: envelope.externalId,
@@ -139,7 +144,10 @@ export const templateRouter = router({
       });
 
       return await getTemplateById({
-        id: templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         userId: ctx.user.id,
         teamId,
       });
@@ -175,6 +183,7 @@ export const templateRouter = router({
       const envelope = await createEnvelope({
         userId: ctx.user.id,
         teamId,
+        internalVersion: 1,
         data: {
           type: EnvelopeType.TEMPLATE,
           title,
@@ -240,6 +249,7 @@ export const templateRouter = router({
       const createdTemplate = await createEnvelope({
         userId: user.id,
         teamId,
+        internalVersion: 1,
         data: {
           type: EnvelopeType.TEMPLATE,
           title,
@@ -264,7 +274,10 @@ export const templateRouter = router({
       const legacyTemplateId = mapSecondaryIdToTemplateId(createdTemplate.secondaryId);
 
       const fullTemplate = await getTemplateById({
-        id: legacyTemplateId,
+        id: {
+          type: 'templateId',
+          id: legacyTemplateId,
+        },
         userId: user.id,
         teamId,
       });
@@ -300,12 +313,19 @@ export const templateRouter = router({
         },
       });
 
-      const envelope = await updateTemplate({
+      const envelope = await updateEnvelope({
         userId,
         teamId,
-        templateId,
-        data,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
+        data: {
+          ...data,
+          templateType: data?.type, // Backwards compatibility things.
+        },
         meta,
+        requestMetadata: ctx.metadata,
       });
 
       return mapEnvelopeToTemplateLite(envelope);
@@ -415,6 +435,39 @@ export const templateRouter = router({
         throw new Error('You have reached your document limit.');
       }
 
+      const customDocumentData = input.customDocumentData || [];
+
+      if (customDocumentDataId) {
+        // This is unsafe, do not use this data outside of the intended context.
+        const unsafeEnvelopeData = await prisma.envelope.findFirst({
+          where: unsafeBuildEnvelopeIdQuery(
+            {
+              type: 'templateId',
+              id: templateId,
+            },
+            EnvelopeType.TEMPLATE,
+          ),
+          select: {
+            envelopeItems: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        });
+
+        if (!unsafeEnvelopeData?.envelopeItems[0]?.id) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Template not found',
+          });
+        }
+
+        customDocumentData.push({
+          documentDataId: customDocumentDataId,
+          envelopeItemId: unsafeEnvelopeData.envelopeItems[0].id,
+        });
+      }
+
       const envelope: Envelope = await createDocumentFromTemplate({
         id: {
           type: 'templateId',
@@ -423,7 +476,7 @@ export const templateRouter = router({
         teamId,
         userId: ctx.user.id,
         recipients,
-        customDocumentDataId,
+        customDocumentData,
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
@@ -534,7 +587,14 @@ export const templateRouter = router({
         },
       });
 
-      const template = await getTemplateById({ id: templateId, teamId, userId: ctx.user.id });
+      const template = await getTemplateById({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
+        teamId,
+        userId: ctx.user.id,
+      });
 
       const limits = await getServerLimits({ userId: ctx.user.id, teamId: template.teamId });
 
@@ -641,7 +701,10 @@ export const templateRouter = router({
       }
 
       const template = await getTemplateById({
-        id: templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         teamId,
         userId: user.id,
       });

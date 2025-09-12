@@ -87,6 +87,7 @@ export const seedBlankDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
+      internalVersion: 1,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -98,6 +99,7 @@ export const seedBlankDocument = async (
           id: prefixedId('envelope_item'),
           title: `[TEST] Document ${key} - Draft`,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       userId: owner.id,
@@ -133,6 +135,7 @@ export const seedTeamDocumentWithMeta = async (team: Team) => {
   const document = await createEnvelope({
     userId: ownerUser.id,
     teamId: team.id,
+    internalVersion: 1,
     data: {
       type: EnvelopeType.DOCUMENT,
       title: `[TEST] Document ${nanoid(8)} - Draft`,
@@ -222,6 +225,7 @@ export const seedTeamTemplateWithMeta = async (team: Team) => {
   const ownerUser = organisation.owner;
 
   const template = await createEnvelope({
+    internalVersion: 1,
     data: {
       type: EnvelopeType.TEMPLATE,
       title: `[TEST] Template ${nanoid(8)} - Draft`,
@@ -303,6 +307,7 @@ export const seedDraftDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
+      internalVersion: 1,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -314,6 +319,7 @@ export const seedDraftDocument = async (
           id: prefixedId('envelope_item'),
           title: `[TEST] Document ${key} - Draft`,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       userId: sender.id,
@@ -394,6 +400,7 @@ export const seedPendingDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
+      internalVersion: 1,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -405,6 +412,7 @@ export const seedPendingDocument = async (
           id: prefixedId('envelope_item'),
           title: `[TEST] Document ${key} - Pending`,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       userId: sender.id,
@@ -629,6 +637,7 @@ export const seedCompletedDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
+      internalVersion: 1,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -640,6 +649,7 @@ export const seedCompletedDocument = async (
           id: prefixedId('envelope_item'),
           title: `[TEST] Document ${key} - Completed`,
           documentDataId: documentData.id,
+          order: 1,
         },
       },
       userId: sender.id,

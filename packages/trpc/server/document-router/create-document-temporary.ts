@@ -61,6 +61,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       userId: ctx.user.id,
       teamId,
       normalizePdf: false, // Not normalizing because of presigned URL.
+      internalVersion: 1,
       data: {
         type: EnvelopeType.DOCUMENT,
         title,
@@ -100,7 +101,11 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
     return {
       document: {
         ...createdEnvelope,
-        documentData: firstDocumentData,
+        envelopeId: createdEnvelope.id,
+        documentData: {
+          ...firstDocumentData,
+          envelopeItemId: envelopeItems[0].id,
+        },
         id: legacyDocumentId,
         fields: createdEnvelope.fields.map((field) => ({
           ...field,
