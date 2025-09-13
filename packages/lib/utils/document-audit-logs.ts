@@ -492,6 +492,10 @@ export const formatDocumentAuditLogAction = (
         context: `Audit log format`,
       }),
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_EXPIRY_EXTENDED }, (data) => ({
+      anonymous: msg`Recipient expiry extended`,
+      identified: msg`${prefix} extended expiry for ${data.data.recipientEmail}`,
+    }))
     .exhaustive();
 
   return {
