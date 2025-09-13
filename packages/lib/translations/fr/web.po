@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-08-08 04:19\n"
+"PO-Revision-Date: 2025-09-13 08:41\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -24,7 +24,7 @@ msgstr " Activer la signature par lien direct"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
-msgstr ".Des documents PDF acceptés (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}Mo)"
+msgstr "Documents .PDF acceptés (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}Mo)"
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
@@ -3892,7 +3892,7 @@ msgstr "Groupes"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to approve this document"
-msgstr "t'a invité à approuver ce document"
+msgstr "vous a invité à approuver ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to assist this document"
@@ -3900,11 +3900,11 @@ msgstr "vous a invité à aider ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to sign this document"
-msgstr "t'a invité à signer ce document"
+msgstr "vous a invité à signer ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to view this document"
-msgstr "t'a invité à voir ce document"
+msgstr "vous a invité à voir ce document"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
@@ -8579,7 +8579,7 @@ msgstr "Bienvenue"
 
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Welcome back, we are lucky to have you."
-msgstr "Contentieux, nous avons de la chance de vous avoir."
+msgstr "Bon retour, nous avons de la chance de vous avoir."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
