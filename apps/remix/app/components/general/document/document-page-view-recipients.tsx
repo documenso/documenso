@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import type { Document, Recipient } from '@prisma/client';
+import type { Recipient } from '@prisma/client';
 import {
   AlertTriangle,
   CheckIcon,
@@ -19,6 +19,7 @@ import { match } from 'ts-pattern';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
+import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';

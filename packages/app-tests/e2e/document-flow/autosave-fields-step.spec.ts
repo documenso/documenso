@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { prisma } from '@documenso/prisma';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -14,7 +15,7 @@ const setupDocumentAndNavigateToFieldsStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -84,10 +85,8 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedFields = await getFieldsForDocument({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team.id,
+      const retrievedFields = await getFieldsForEnvelope({
+        envelopeId: document.id,
       });
 
       expect(retrievedFields.length).toBe(3);
@@ -149,10 +148,8 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedFields = await getFieldsForDocument({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team.id,
+      const retrievedFields = await getFieldsForEnvelope({
+        envelopeId: document.id,
       });
 
       expect(retrievedFields.length).toBe(2);
@@ -213,10 +210,8 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedFields = await getFieldsForDocument({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team.id,
+      const retrievedFields = await getFieldsForEnvelope({
+        envelopeId: document.id,
       });
 
       expect(retrievedFields.length).toBe(4);
@@ -260,10 +255,8 @@ test.describe('AutoSave Fields Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedFields = await getFieldsForDocument({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team.id,
+      const retrievedFields = await getFieldsForEnvelope({
+        envelopeId: document.id,
       });
 
       expect(retrievedFields.length).toBe(2);
@@ -291,3 +284,28 @@ test.describe('AutoSave Fields Step', () => {
     }).toPass();
   });
 });
+
+const getFieldsForEnvelope = async ({ envelopeId }: { envelopeId: string }) => {
+  const fields = await prisma.field.findMany({
+    where: {
+      envelope: {
+        id: envelopeId,
+      },
+    },
+    include: {
+      signature: true,
+      recipient: {
+        select: {
+          name: true,
+          email: true,
+          signingStatus: true,
+        },
+      },
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return fields;
+};

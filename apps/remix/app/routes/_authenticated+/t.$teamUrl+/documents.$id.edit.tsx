@@ -42,7 +42,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   }
 
   const document = await getDocumentWithDetailsById({
-    documentId,
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId: user.id,
     teamId: team.id,
   }).catch(() => null);

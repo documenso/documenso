@@ -1,4 +1,8 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
+
+import { mapDocumentIdToSecondaryId } from '../../utils/envelope';
 
 export const getNextPendingRecipient = async ({
   documentId,
@@ -9,7 +13,10 @@ export const getNextPendingRecipient = async ({
 }) => {
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId,
+      envelope: {
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: mapDocumentIdToSecondaryId(documentId),
+      },
     },
     orderBy: [
       {

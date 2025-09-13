@@ -1,4 +1,10 @@
-import { DocumentStatus, RecipientRole, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -11,12 +17,17 @@ import { signPdf } from '@documenso/signing';
 
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { fieldsContainUnsignedRequiredField } from '../../utils/advanced-fields-helpers';
+import {
+  type EnvelopeIdOptions,
+  mapSecondaryIdToDocumentId,
+  unsafeBuildEnvelopeIdQuery,
+} from '../../utils/envelope';
 import { getAuditLogsPdf } from '../htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../pdf/add-rejection-stamp-to-pdf';
@@ -30,47 +41,61 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { sendCompletedEmail } from './send-completed-email';
 
 export type SealDocumentOptions = {
-  documentId: number;
+  id: EnvelopeIdOptions;
   sendEmail?: boolean;
   isResealing?: boolean;
   requestMetadata?: RequestMetadata;
 };
 
 export const sealDocument = async ({
-  documentId,
+  id,
   sendEmail = true,
   isResealing = false,
   requestMetadata,
 }: SealDocumentOptions) => {
-  const document = await prisma.document.findFirstOrThrow({
-    where: {
-      id: documentId,
-    },
+  const envelope = await prisma.envelope.findFirstOrThrow({
+    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     include: {
-      documentData: true,
+      envelopeItems: {
+        select: {
+          id: true,
+          documentData: true,
+        },
+        include: {
+          field: {
+            include: {
+              signature: true,
+            },
+          },
+        },
+      },
       documentMeta: true,
-      recipients: true,
-    },
-  });
-
-  const { documentData } = document;
-
-  if (!documentData) {
-    throw new Error(`Document ${document.id} has no document data`);
-  }
-
-  const settings = await getTeamSettings({
-    userId: document.userId,
-    teamId: document.teamId,
-  });
-
-  const recipients = await prisma.recipient.findMany({
-    where: {
-      documentId: document.id,
-      role: {
-        not: RecipientRole.CC,
+      recipients: {
+        where: {
+          role: {
+            not: RecipientRole.CC,
+          },
+        },
       },
     },
+  });
+
+  // Todo: Envelopes
+  const envelopeItemToSeal = envelope.envelopeItems[0];
+
+  // Todo: Envelopes
+  if (envelope.envelopeItems.length !== 1 || !envelopeItemToSeal) {
+    throw new Error(`Document ${envelope.id} needs exactly 1 envelope item`);
+  }
+
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+  const documentData = envelopeItemToSeal.documentData;
+  const fields = envelopeItemToSeal.field; // Todo: Envelopes - This only takes in the first envelope item fields.
+  const recipients = envelope.recipients;
+
+  const settings = await getTeamSettings({
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 
   // Determine if the document has been rejected by checking if any recipient has rejected it
@@ -88,21 +113,12 @@ export const sealDocument = async ({
     !isRejected &&
     recipients.some((recipient) => recipient.signingStatus !== SigningStatus.SIGNED)
   ) {
-    throw new Error(`Document ${document.id} has unsigned recipients`);
+    throw new Error(`Envelope ${envelope.id} has unsigned recipients`);
   }
-
-  const fields = await prisma.field.findMany({
-    where: {
-      documentId: document.id,
-    },
-    include: {
-      signature: true,
-    },
-  });
 
   // Skip the field check if the document is rejected
   if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Document ${document.id} has unsigned required fields`);
+    throw new Error(`Document ${envelope.id} has unsigned required fields`);
   }
 
   if (isResealing) {
@@ -116,8 +132,8 @@ export const sealDocument = async ({
 
   const certificateData = settings.includeSigningCertificate
     ? await getCertificatePdf({
-        documentId,
-        language: document.documentMeta?.language,
+        documentId: legacyDocumentId,
+        language: envelope.documentMeta.language,
       }).catch((e) => {
         console.log('Failed to get certificate PDF');
         console.error(e);
@@ -128,8 +144,8 @@ export const sealDocument = async ({
 
   const auditLogData = settings.includeAuditLog
     ? await getAuditLogsPdf({
-        documentId,
-        language: document.documentMeta?.language,
+        documentId: legacyDocumentId,
+        language: envelope.documentMeta.language,
       }).catch((e) => {
         console.log('Failed to get audit logs PDF');
         console.error(e);
@@ -171,7 +187,7 @@ export const sealDocument = async ({
   }
 
   for (const field of fields) {
-    document.useLegacyFieldInsertion
+    envelope.useLegacyFieldInsertion
       ? await legacy_insertFieldInPDF(doc, field)
       : await insertFieldInPDF(doc, field);
   }
@@ -183,7 +199,8 @@ export const sealDocument = async ({
 
   const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
 
-  const { name } = path.parse(document.title);
+  // Todo: Envelopes use EnvelopeItem title instead.
+  const { name } = path.parse(envelope.title);
 
   // Add suffix based on document status
   const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
@@ -201,16 +218,16 @@ export const sealDocument = async ({
       distinctId: nanoid(),
       event: 'App: Document Sealed',
       properties: {
-        documentId: document.id,
+        documentId: envelope.id,
         isRejected,
       },
     });
   }
 
   await prisma.$transaction(async (tx) => {
-    await tx.document.update({
+    await tx.envelope.update({
       where: {
-        id: document.id,
+        id: envelope.id,
       },
       data: {
         status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
@@ -230,7 +247,7 @@ export const sealDocument = async ({
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-        documentId: document.id,
+        envelopeId: envelope.id,
         requestMetadata,
         user: null,
         data: {
@@ -242,15 +259,14 @@ export const sealDocument = async ({
   });
 
   if (sendEmail && !isResealing) {
-    await sendCompletedEmail({ documentId, requestMetadata });
+    await sendCompletedEmail({ id, requestMetadata });
   }
 
-  const updatedDocument = await prisma.document.findFirstOrThrow({
+  const updatedDocument = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: document.id,
+      id: envelope.id,
     },
     include: {
-      documentData: true,
       documentMeta: true,
       recipients: true,
     },
@@ -260,8 +276,8 @@ export const sealDocument = async ({
     event: isRejected
       ? WebhookTriggerEvents.DOCUMENT_REJECTED
       : WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
-    userId: document.userId,
-    teamId: document.teamId ?? undefined,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedDocument)),
+    userId: envelope.userId,
+    teamId: envelope.teamId ?? undefined,
   });
 };

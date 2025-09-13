@@ -68,7 +68,7 @@ export const applyMultiSignSignatureRoute = procedure
 
           const signatureFields = await prisma.field.findMany({
             where: {
-              documentId: envelope.document.id,
+              envelopeId: envelope.document.id,
               recipientId: envelope.recipient.id,
               type: FieldType.SIGNATURE,
               inserted: false,

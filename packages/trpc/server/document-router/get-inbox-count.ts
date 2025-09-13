@@ -1,4 +1,4 @@
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -20,7 +20,8 @@ export const getInboxCountRoute = authenticatedProcedure
         role: {
           not: RecipientRole.CC,
         },
-        document: {
+        envelope: {
+          type: EnvelopeType.DOCUMENT,
           status: {
             not: DocumentStatus.DRAFT,
           },

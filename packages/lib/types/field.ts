@@ -15,11 +15,11 @@ import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSc
  * - ./templates.ts
  */
 export const ZFieldSchema = FieldSchema.pick({
+  envelopeId: true,
+  envelopeItemId: true,
   type: true,
   id: true,
   secondaryId: true,
-  documentId: true,
-  templateId: true,
   recipientId: true,
   page: true,
   positionX: true,
@@ -29,6 +29,10 @@ export const ZFieldSchema = FieldSchema.pick({
   customText: true,
   inserted: true,
   fieldMeta: true,
+}).extend({
+  // Todo: Migration - Backwards compatibility.
+  documentId: z.number().nullish(),
+  templateId: z.number().nullish(),
 });
 
 export const ZFieldPageNumberSchema = z

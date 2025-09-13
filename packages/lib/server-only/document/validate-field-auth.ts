@@ -1,4 +1,4 @@
-import type { Document, Field, Recipient } from '@prisma/client';
+import type { Envelope, Field, Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -6,7 +6,7 @@ import type { TRecipientActionAuth } from '../../types/document-auth';
 import { isRecipientAuthorized } from './is-recipient-authorized';
 
 export type ValidateFieldAuthOptions = {
-  documentAuthOptions: Document['authOptions'];
+  documentAuthOptions: Envelope['authOptions'];
   recipient: Pick<Recipient, 'authOptions' | 'email'>;
   field: Field;
   userId?: number;

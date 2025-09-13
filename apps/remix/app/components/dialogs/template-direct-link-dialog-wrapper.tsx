@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
+import type { Recipient, TemplateDirectLink } from '@prisma/client';
 import { LinkIcon } from 'lucide-react';
 
+import type { Template } from '@documenso/prisma/types/template-legacy-schema';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';

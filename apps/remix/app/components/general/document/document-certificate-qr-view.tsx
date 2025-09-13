@@ -4,6 +4,7 @@ import { Trans } from '@lingui/react/macro';
 import type { DocumentData } from '@prisma/client';
 import { DateTime } from 'luxon';
 
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -23,6 +24,7 @@ export type DocumentCertificateQRViewProps = {
   title: string;
   documentData: DocumentData;
   password?: string | null;
+  documentTeamUrl: string;
   recipientCount?: number;
   completedDate?: Date;
 };
@@ -32,29 +34,30 @@ export const DocumentCertificateQRView = ({
   title,
   documentData,
   password,
+  documentTeamUrl,
   recipientCount = 0,
   completedDate,
 }: DocumentCertificateQRViewProps) => {
-  const { data: documentUrl } = trpc.shareLink.getDocumentInternalUrlForQRCode.useQuery({
+  const { data: documentViaUser } = trpc.document.get.useQuery({
     documentId,
   });
 
-  const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentUrl);
+  const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentViaUser);
 
   const formattedDate = completedDate
     ? DateTime.fromJSDate(completedDate).toLocaleString(DateTime.DATETIME_MED)
     : '';
 
   useEffect(() => {
-    if (documentUrl) {
+    if (documentViaUser) {
       setIsDialogOpen(true);
     }
-  }, [documentUrl]);
+  }, [documentViaUser]);
 
   return (
     <div className="mx-auto w-full max-w-screen-md">
       {/* Dialog for internal document link */}
-      {documentUrl && (
+      {documentViaUser && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -72,7 +75,11 @@ export const DocumentCertificateQRView = ({
 
             <DialogFooter className="flex flex-row justify-end gap-2">
               <Button asChild>
-                <a href={documentUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={`${formatDocumentsPath(documentTeamUrl)}/${documentViaUser.id}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Trans>Go to document</Trans>
                 </a>
               </Button>

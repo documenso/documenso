@@ -1,4 +1,4 @@
-import type { Document, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 
 import type {
   TDocumentAuthOptions,
@@ -10,7 +10,7 @@ import { DocumentAuth } from '../types/document-auth';
 import { ZDocumentAuthOptionsSchema, ZRecipientAuthOptionsSchema } from '../types/document-auth';
 
 type ExtractDocumentAuthMethodsOptions = {
-  documentAuth: Document['authOptions'];
+  documentAuth: Envelope['authOptions'];
   recipientAuth?: Recipient['authOptions'];
 };
 

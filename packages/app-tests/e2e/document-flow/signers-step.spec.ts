@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -12,7 +13,7 @@ test('[DOCUMENT_FLOW]: add signers', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
   });
 
   // Save the settings by going to the next step.

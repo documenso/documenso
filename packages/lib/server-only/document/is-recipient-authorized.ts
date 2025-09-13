@@ -1,4 +1,4 @@
-import type { Document, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { match } from 'ts-pattern';
 
@@ -15,7 +15,7 @@ import { extractDocumentAuthMethods } from '../../utils/document-auth';
 
 type IsRecipientAuthorizedOptions = {
   type: 'ACCESS' | 'ACTION';
-  documentAuthOptions: Document['authOptions'];
+  documentAuthOptions: Envelope['authOptions'];
   recipient: Pick<Recipient, 'authOptions' | 'email'>;
 
   /**

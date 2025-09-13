@@ -17,15 +17,18 @@ import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
-export type SuperDeleteDocumentOptions = {
-  id: number;
+export type AdminSuperDeleteDocumentOptions = {
+  envelopeId: string;
   requestMetadata?: RequestMetadata;
 };
 
-export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDocumentOptions) => {
-  const document = await prisma.document.findUnique({
+export const adminSuperDeleteDocument = async ({
+  envelopeId,
+  requestMetadata,
+}: AdminSuperDeleteDocumentOptions) => {
+  const envelope = await prisma.envelope.findUnique({
     where: {
-      id,
+      id: envelopeId,
     },
     include: {
       recipients: true,
@@ -40,7 +43,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
@@ -50,38 +53,38 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
-      teamId: document.teamId,
+      teamId: envelope.teamId,
     },
-    meta: document.documentMeta,
+    meta: envelope.documentMeta,
   });
 
-  const { status, user } = document;
+  const { status, user } = envelope;
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).documentDeleted;
 
   // if the document is pending, send cancellation emails to all recipients
   if (
     status === DocumentStatus.PENDING &&
-    document.recipients.length > 0 &&
+    envelope.recipients.length > 0 &&
     isDocumentDeletedEmailEnabled
   ) {
     await Promise.all(
-      document.recipients.map(async (recipient) => {
+      envelope.recipients.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {
           return;
         }
 
         const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
         const template = createElement(DocumentCancelTemplate, {
-          documentName: document.title,
+          documentName: envelope.title,
           inviterName: user.name || undefined,
           inviterEmail: user.email,
           assetBaseUrl,
         });
 
-        const lang = document.documentMeta?.language ?? settings.documentLanguage;
+        const lang = envelope.documentMeta?.language ?? settings.documentLanguage;
 
         const [html, text] = await Promise.all([
           renderEmailWithI18N(template, { lang, branding }),
@@ -113,7 +116,7 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
   return await prisma.$transaction(async (tx) => {
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
-        documentId: id,
+        envelopeId,
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELETED,
         user,
         requestMetadata,
@@ -123,6 +126,6 @@ export const superDeleteDocument = async ({ id, requestMetadata }: SuperDeleteDo
       }),
     });
 
-    return await tx.document.delete({ where: { id } });
+    return await tx.envelope.delete({ where: { id: envelopeId } });
   });
 };

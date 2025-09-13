@@ -1,12 +1,12 @@
 import type { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-import { TemplateMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateMetaSchema';
-import { TemplateSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { TemplateSchema } from '@documenso/prisma/types/template-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
@@ -25,7 +25,6 @@ export const ZTemplateSchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -39,7 +38,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
     data: true,
     initialData: true,
   }),
-  templateMeta: TemplateMetaSchema.pick({
+  templateMeta: DocumentMetaSchema.pick({
     id: true,
     subject: true,
     message: true,
@@ -51,13 +50,12 @@ export const ZTemplateSchema = TemplateSchema.pick({
     drawSignatureEnabled: true,
     allowDictateNextSigner: true,
     distributionMethod: true,
-    templateId: true,
     redirectUrl: true,
     language: true,
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
-  }).nullable(),
+  }),
   directLink: TemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({
     id: true,
@@ -94,7 +92,6 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -102,6 +99,8 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 });
+
+export type TTemplateLite = z.infer<typeof ZTemplateLiteSchema>;
 
 /**
  * A version of the template response schema when returning multiple template at once from a single API endpoint.
@@ -115,7 +114,6 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   userId: true,
   teamId: true,
   authOptions: true,
-  templateDocumentDataId: true,
   createdAt: true,
   updatedAt: true,
   publicTitle: true,
@@ -129,7 +127,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   }).nullable(),
   fields: ZFieldSchema.array(),
   recipients: ZRecipientLiteSchema.array(),
-  templateMeta: TemplateMetaSchema.pick({
+  templateMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,
   }).nullable(),
@@ -138,3 +136,5 @@ export const ZTemplateManySchema = TemplateSchema.pick({
     enabled: true,
   }).nullable(),
 });
+
+export type TTemplateMany = z.infer<typeof ZTemplateManySchema>;

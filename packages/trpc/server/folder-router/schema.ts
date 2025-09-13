@@ -77,18 +77,6 @@ export const ZMoveFolderSchema = z.object({
   type: ZFolderTypeSchema.optional(),
 });
 
-export const ZMoveDocumentToFolderSchema = z.object({
-  documentId: z.number(),
-  folderId: z.string().nullable().optional(),
-  type: z.enum(['DOCUMENT']).optional(),
-});
-
-export const ZMoveTemplateToFolderSchema = z.object({
-  templateId: z.number(),
-  folderId: z.string().nullable().optional(),
-  type: z.enum(['TEMPLATE']).optional(),
-});
-
 export const ZPinFolderSchema = z.object({
   folderId: z.string(),
   type: ZFolderTypeSchema.optional(),

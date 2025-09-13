@@ -4,6 +4,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import {
+  mapDocumentIdToSecondaryId,
+  mapSecondaryIdToTemplateId,
+} from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -29,7 +33,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title.
@@ -79,9 +83,9 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
       recipients: true,
@@ -132,7 +136,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title.
@@ -182,9 +186,9 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
       recipients: true,
@@ -240,7 +244,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title
@@ -288,14 +292,20 @@ test('[TEMPLATE]: should create a document from a template with custom document'
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
+
+  const firstDocumentData = document.envelopeItems[0].documentData;
 
   const expectedDocumentDataType =
     process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
@@ -303,15 +313,15 @@ test('[TEMPLATE]: should create a document from a template with custom document'
       : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+  expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
-    expect(document.documentData.data).toEqual(pdfContent);
-    expect(document.documentData.initialData).toEqual(pdfContent);
+    expect(firstDocumentData.data).toEqual(pdfContent);
+    expect(firstDocumentData.initialData).toEqual(pdfContent);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
-    expect(document.documentData.data).toBeTruthy();
-    expect(document.documentData.initialData).toBeTruthy();
+    expect(firstDocumentData.data).toBeTruthy();
+    expect(firstDocumentData.initialData).toBeTruthy();
   }
 });
 
@@ -333,7 +343,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title
@@ -381,12 +391,16 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
@@ -395,17 +409,19 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
       ? DocumentDataType.S3_PATH
       : DocumentDataType.BYTES_64;
 
+  const firstDocumentData = document.envelopeItems[0].documentData;
+
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+  expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
-    expect(document.documentData.data).toEqual(pdfContent);
-    expect(document.documentData.initialData).toEqual(pdfContent);
+    expect(firstDocumentData.data).toEqual(pdfContent);
+    expect(firstDocumentData.initialData).toEqual(pdfContent);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
-    expect(document.documentData.data).toBeTruthy();
-    expect(document.documentData.initialData).toBeTruthy();
+    expect(firstDocumentData.data).toBeTruthy();
+    expect(firstDocumentData.initialData).toBeTruthy();
   }
 });
 
@@ -422,7 +438,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title
@@ -455,30 +471,40 @@ test('[TEMPLATE]: should create a document from a template using template docume
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
-  const templateWithData = await prisma.template.findFirstOrThrow({
+  const firstDocumentData = document.envelopeItems[0].documentData;
+
+  const templateWithData = await prisma.envelope.findFirstOrThrow({
     where: {
       id: template.id,
     },
     include: {
-      templateDocumentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
   expect(document.title).toEqual('TEMPLATE_WITH_ORIGINAL_DOC');
-  expect(document.documentData.data).toEqual(templateWithData.templateDocumentData.data);
-  expect(document.documentData.initialData).toEqual(
-    templateWithData.templateDocumentData.initialData,
+  expect(firstDocumentData.data).toEqual(templateWithData.envelopeItems[0].documentData.data);
+  expect(firstDocumentData.initialData).toEqual(
+    templateWithData.envelopeItems[0].documentData.initialData,
   );
-  expect(document.documentData.type).toEqual(templateWithData.templateDocumentData.type);
+  expect(firstDocumentData.type).toEqual(templateWithData.envelopeItems[0].documentData.type);
 });
 
 test('[TEMPLATE]: should persist document visibility when creating from template', async ({
@@ -493,7 +519,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   // Set template title and visibility
@@ -536,9 +562,16 @@ test('[TEMPLATE]: should persist document visibility when creating from template
 
   const documentId = Number(page.url().split('/').pop());
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
+    },
+    include: {
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 

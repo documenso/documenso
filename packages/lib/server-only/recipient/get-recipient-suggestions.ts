@@ -1,11 +1,11 @@
-import { Prisma } from '@prisma/client';
+import { EnvelopeType, Prisma } from '@prisma/client';
 
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 export type GetRecipientSuggestionsOptions = {
   userId: number;
-  teamId?: number;
+  teamId: number;
   query: string;
 };
 
@@ -37,7 +37,8 @@ export const getRecipientSuggestions = async ({
 
   const recipients = await prisma.recipient.findMany({
     where: {
-      document: {
+      envelope: {
+        type: EnvelopeType.DOCUMENT,
         team: buildTeamWhereQuery({ teamId, userId }),
       },
       ...nameEmailFilter,
@@ -45,7 +46,7 @@ export const getRecipientSuggestions = async ({
     select: {
       name: true,
       email: true,
-      document: {
+      envelope: {
         select: {
           createdAt: true,
         },
@@ -53,7 +54,7 @@ export const getRecipientSuggestions = async ({
     },
     distinct: ['email'],
     orderBy: {
-      document: {
+      envelope: {
         createdAt: 'desc',
       },
     },

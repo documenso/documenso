@@ -57,7 +57,10 @@ export const updateEmbeddingTemplateRoute = procedure
       const { recipients: updatedRecipients } = await setTemplateRecipients({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         recipients: recipientsWithClientId.map((recipient) => ({
           id: recipient.id,
           email: recipient.email,

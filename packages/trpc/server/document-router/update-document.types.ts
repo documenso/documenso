@@ -45,6 +45,7 @@ export const ZUpdateDocumentRequestSchema = z.object({
       globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
       globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
+      folderId: z.string().nullish(),
     })
     .optional(),
   meta: z
