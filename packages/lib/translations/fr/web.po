@@ -8579,7 +8579,7 @@ msgstr "Bienvenue"
 
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Welcome back, we are lucky to have you."
-msgstr "Contentieux, nous avons de la chance de vous avoir."
+msgstr "Bon retour, nous avons de la chance de vous avoir."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
