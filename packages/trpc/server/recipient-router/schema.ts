@@ -23,8 +23,8 @@ export const ZGetRecipientResponseSchema = ZRecipientSchema;
  * pass along required details.
  */
 export const ZCreateRecipientSchema = z.object({
-  email: z.string().toLowerCase().email().min(1),
-  name: z.string(),
+  email: z.string().toLowerCase().email().min(1).max(254),
+  name: z.string().max(255),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
   accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
@@ -33,8 +33,8 @@ export const ZCreateRecipientSchema = z.object({
 
 export const ZUpdateRecipientSchema = z.object({
   id: z.number().describe('The ID of the recipient to update.'),
-  email: z.string().toLowerCase().email().min(1).optional(),
-  name: z.string().optional(),
+  email: z.string().toLowerCase().email().min(1).max(254).optional(),
+  name: z.string().max(255).optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
   accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
@@ -103,8 +103,8 @@ export const ZSetDocumentRecipientsRequestSchema = z
     recipients: z.array(
       z.object({
         nativeId: z.number().optional(),
-        email: z.string().toLowerCase().email().min(1),
-        name: z.string(),
+        email: z.string().toLowerCase().email().min(1).max(254),
+        name: z.string().max(255),
         role: z.nativeEnum(RecipientRole),
         signingOrder: z.number().optional(),
         actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
@@ -229,8 +229,8 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   authOptions: ZRecipientActionAuthSchema.optional(),
   nextSigner: z
     .object({
-      email: z.string().email(),
-      name: z.string().min(1),
+      email: z.string().email().max(254),
+      name: z.string().min(1).max(255),
     })
     .optional(),
 });
