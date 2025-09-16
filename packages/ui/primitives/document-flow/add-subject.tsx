@@ -1,3 +1,5 @@
+import { useEffect } from 'react';
+
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -8,6 +10,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TDocument } from '@documenso/lib/types/document';
@@ -60,6 +63,7 @@ export type AddSubjectFormProps = {
   fields: Field[];
   document: TDocument;
   onSubmit: (_data: TAddSubjectFormSchema) => void;
+  onAutoSave: (_data: TAddSubjectFormSchema) => Promise<void>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -69,6 +73,7 @@ export const AddSubjectFormPartial = ({
   fields: fields,
   document,
   onSubmit,
+  onAutoSave,
   isDocumentPdfLoaded,
 }: AddSubjectFormProps) => {
   const { _ } = useLingui();
@@ -95,6 +100,8 @@ export const AddSubjectFormPartial = ({
     handleSubmit,
     setValue,
     watch,
+    trigger,
+    getValues,
     formState: { isSubmitting },
   } = form;
 
@@ -128,6 +135,35 @@ export const AddSubjectFormPartial = ({
 
   const onFormSubmit = handleSubmit(onSubmit);
   const { currentStep, totalSteps, previousStep } = useStep();
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = async () => {
+    const isFormValid = await trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    const formData = getValues();
+
+    scheduleSave(formData);
+  };
+
+  useEffect(() => {
+    const container = window.document.getElementById('document-flow-form-container');
+
+    const handleBlur = () => {
+      void handleAutoSave();
+    };
+
+    if (container) {
+      container.addEventListener('blur', handleBlur, true);
+      return () => {
+        container.removeEventListener('blur', handleBlur, true);
+      };
+    }
+  }, []);
 
   return (
     <>
@@ -185,7 +221,6 @@ export const AddSubjectFormPartial = ({
                             <FormLabel>
                               <Trans>Email Sender</Trans>
                             </FormLabel>
-
                             <FormControl>
                               <Select
                                 {...field}
@@ -227,7 +262,7 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} maxLength={254} />
                           </FormControl>
 
                           <FormMessage />
@@ -265,7 +300,7 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} maxLength={255} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -291,7 +326,11 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Textarea className="bg-background mt-2 h-16 resize-none" {...field} />
+                            <Textarea
+                              className="bg-background mt-2 h-16 resize-none"
+                              {...field}
+                              maxLength={5000}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

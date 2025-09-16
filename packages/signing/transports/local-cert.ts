@@ -1,5 +1,6 @@
-import fs from 'node:fs';
+import * as fs from 'node:fs';
 
+import { getCertificateStatus } from '@documenso/lib/server-only/cert/cert-status';
 import { env } from '@documenso/lib/utils/env';
 import { signWithP12 } from '@documenso/pdf-sign';
 
@@ -22,12 +23,23 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
 
   const signatureLength = byteRange[2] - byteRange[1];
 
+  const certStatus = getCertificateStatus();
+
+  if (!certStatus.isAvailable) {
+    console.error('Certificate error: Certificate not available for document signing');
+    throw new Error('Document signing failed: Certificate not available');
+  }
+
   let cert: Buffer | null = null;
 
   const localFileContents = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS');
 
   if (localFileContents) {
-    cert = Buffer.from(localFileContents, 'base64');
+    try {
+      cert = Buffer.from(localFileContents, 'base64');
+    } catch {
+      throw new Error('Failed to decode certificate contents');
+    }
   }
 
   if (!cert) {
@@ -42,7 +54,12 @@ export const signWithLocalCert = async ({ pdf }: SignWithLocalCertOptions) => {
       certPath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || './example/cert.p12';
     }
 
-    cert = Buffer.from(fs.readFileSync(certPath));
+    try {
+      cert = Buffer.from(fs.readFileSync(certPath));
+    } catch {
+      console.error('Certificate error: Failed to read certificate file');
+      throw new Error('Document signing failed: Certificate file not accessible');
+    }
   }
 
   const signature = signWithP12({
