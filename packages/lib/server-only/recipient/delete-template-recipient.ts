@@ -1,7 +1,10 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface DeleteTemplateRecipientOptions {
   userId: number;
@@ -14,31 +17,31 @@ export const deleteTemplateRecipient = async ({
   teamId,
   recipientId,
 }: DeleteTemplateRecipientOptions): Promise<void> => {
-  const template = await prisma.template.findFirst({
+  const recipientToDelete = await prisma.recipient.findFirst({
     where: {
-      recipients: {
-        some: {
-          id: recipientId,
-        },
-      },
-      team: buildTeamWhereQuery({ teamId, userId }),
-    },
-    include: {
-      recipients: {
-        where: {
-          id: recipientId,
-        },
+      id: recipientId,
+      envelope: {
+        type: EnvelopeType.TEMPLATE,
+        team: buildTeamWhereQuery({ teamId, userId }),
       },
     },
   });
 
-  if (!template) {
+  if (!recipientToDelete) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template not found',
+      message: 'Recipient not found',
     });
   }
 
-  const recipientToDelete = template.recipients[0];
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'envelopeId',
+      id: recipientToDelete.envelopeId,
+    },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
 
   if (!recipientToDelete || recipientToDelete.id !== recipientId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -49,6 +52,7 @@ export const deleteTemplateRecipient = async ({
   await prisma.recipient.delete({
     where: {
       id: recipientId,
+      envelope: envelopeWhereInput,
     },
   });
 };

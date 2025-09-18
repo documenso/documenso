@@ -85,7 +85,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dict
   await page.waitForURL(`${signUrl}/complete`);
 
   // Verify document and recipient states
-  const updatedDocument = await prisma.document.findUniqueOrThrow({
+  const updatedDocument = await prisma.envelope.findUniqueOrThrow({
     where: { id: document.id },
     include: {
       recipients: {
@@ -172,7 +172,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should not show dictation UI when disabled', a
 
   // Verify document and recipient states
 
-  const updatedDocument = await prisma.document.findUniqueOrThrow({
+  const updatedDocument = await prisma.envelope.findUniqueOrThrow({
     where: { id: document.id },
     include: {
       recipients: {
@@ -259,7 +259,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should work with parallel signing flow', async
 
   // Verify final document and recipient states
   await expect(async () => {
-    const updatedDocument = await prisma.document.findUniqueOrThrow({
+    const updatedDocument = await prisma.envelope.findUniqueOrThrow({
       where: { id: document.id },
       include: {
         recipients: {
@@ -362,7 +362,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
 
   // Verify document and recipient states
   await expect(async () => {
-    const updatedDocument = await prisma.document.findUniqueOrThrow({
+    const updatedDocument = await prisma.envelope.findUniqueOrThrow({
       where: { id: document.id },
       include: {
         recipients: {

@@ -1,10 +1,7 @@
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
-import { match } from 'ts-pattern';
-
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
 export interface DeleteFolderOptions {
@@ -24,11 +21,6 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
         userId,
       }),
     },
-    include: {
-      documents: true,
-      subfolders: true,
-      templates: true,
-    },
   });
 
   if (!folder) {
@@ -37,11 +29,7 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
     });
   }
 
-  const hasPermission = match(team.currentTeamRole)
-    .with(TeamMemberRole.ADMIN, () => true)
-    .with(TeamMemberRole.MANAGER, () => folder.visibility !== DocumentVisibility.ADMIN)
-    .with(TeamMemberRole.MEMBER, () => folder.visibility === DocumentVisibility.EVERYONE)
-    .otherwise(() => false);
+  const hasPermission = canAccessTeamDocument(team.currentTeamRole, folder.visibility);
 
   if (!hasPermission) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {

@@ -1,10 +1,12 @@
+import { EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -25,18 +27,22 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
       },
     });
 
-    const document = await getDocumentById({
-      documentId,
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
+      type: EnvelopeType.DOCUMENT,
       userId: ctx.user.id,
       teamId,
     });
 
-    if (!isDocumentCompleted(document.status)) {
+    if (!isDocumentCompleted(envelope.status)) {
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }
 
     const encrypted = encryptSecondaryData({
-      data: document.id.toString(),
+      data: mapSecondaryIdToDocumentId(envelope.secondaryId).toString(),
       expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
     });
 

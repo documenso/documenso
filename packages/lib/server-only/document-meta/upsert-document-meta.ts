@@ -1,4 +1,8 @@
-import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
+import {
+  type DocumentDistributionMethod,
+  type DocumentSigningOrder,
+  EnvelopeType,
+} from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -11,16 +15,16 @@ import { prisma } from '@documenso/prisma';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentEmailSettings } from '../../types/document-email';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type CreateDocumentMetaOptions = {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   subject?: string;
   message?: string;
   timezone?: string;
-  password?: string;
   dateFormat?: string;
   redirectUrl?: string;
   emailId?: string | null;
@@ -36,15 +40,14 @@ export type CreateDocumentMetaOptions = {
   requestMetadata: ApiRequestMetadata;
 };
 
-export const upsertDocumentMeta = async ({
+export const updateDocumentMeta = async ({
+  id,
   userId,
   teamId,
   subject,
   message,
   timezone,
   dateFormat,
-  documentId,
-  password,
   redirectUrl,
   signingOrder,
   allowDictateNextSigner,
@@ -58,26 +61,27 @@ export const upsertDocumentMeta = async ({
   language,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
-  const { documentWhereInput, team } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
+    id,
+    type: null, // Allow updating both documents and templates meta.
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       documentMeta: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  const { documentMeta: originalDocumentMeta } = document;
+  const { documentMeta: originalDocumentMeta } = envelope;
 
   // Validate the emailId belongs to the organisation.
   if (emailId) {
@@ -96,33 +100,13 @@ export const upsertDocumentMeta = async ({
   }
 
   return await prisma.$transaction(async (tx) => {
-    const upsertedDocumentMeta = await tx.documentMeta.upsert({
+    const upsertedDocumentMeta = await tx.documentMeta.update({
       where: {
-        documentId,
+        id: envelope.documentMetaId,
       },
-      create: {
+      data: {
         subject,
         message,
-        password,
-        dateFormat,
-        timezone,
-        documentId,
-        redirectUrl,
-        signingOrder,
-        allowDictateNextSigner,
-        emailId,
-        emailReplyTo,
-        emailSettings,
-        distributionMethod,
-        typedSignatureEnabled,
-        uploadSignatureEnabled,
-        drawSignatureEnabled,
-        language,
-      },
-      update: {
-        subject,
-        message,
-        password,
         dateFormat,
         timezone,
         redirectUrl,
@@ -141,11 +125,12 @@ export const upsertDocumentMeta = async ({
 
     const changes = diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta);
 
-    if (changes.length > 0) {
+    // Create audit logs only for document type envelopes.
+    if (changes.length > 0 && envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_META_UPDATED,
-          documentId,
+          envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {
             changes: diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta),

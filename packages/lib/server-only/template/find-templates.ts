@@ -1,15 +1,16 @@
-import { DocumentVisibility, type Prisma, TeamMemberRole, type Template } from '@prisma/client';
-import { match } from 'ts-pattern';
+import type { TemplateType } from '@prisma/client';
+import { EnvelopeType, type Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { type FindResultResponse } from '../../types/search-params';
 import { getMemberRoles } from '../team/get-member-roles';
 
 export type FindTemplatesOptions = {
   userId: number;
   teamId: number;
-  type?: Template['type'];
+  type?: TemplateType;
   page?: number;
   perPage?: number;
   folderId?: string;
@@ -23,46 +24,29 @@ export const findTemplates = async ({
   perPage = 10,
   folderId,
 }: FindTemplatesOptions) => {
-  const whereFilter: Prisma.TemplateWhereInput[] = [];
+  const whereFilter: Prisma.EnvelopeWhereInput[] = [];
 
-  if (teamId === undefined) {
-    whereFilter.push({ userId });
-  }
+  const { teamRole } = await getMemberRoles({
+    teamId,
+    reference: {
+      type: 'User',
+      id: userId,
+    },
+  });
 
-  if (teamId !== undefined) {
-    const { teamRole } = await getMemberRoles({
-      teamId,
-      reference: {
-        type: 'User',
-        id: userId,
-      },
-    });
-
-    whereFilter.push(
-      { teamId },
-      {
-        OR: [
-          match(teamRole)
-            .with(TeamMemberRole.ADMIN, () => ({
-              visibility: {
-                in: [
-                  DocumentVisibility.EVERYONE,
-                  DocumentVisibility.MANAGER_AND_ABOVE,
-                  DocumentVisibility.ADMIN,
-                ],
-              },
-            }))
-            .with(TeamMemberRole.MANAGER, () => ({
-              visibility: {
-                in: [DocumentVisibility.EVERYONE, DocumentVisibility.MANAGER_AND_ABOVE],
-              },
-            }))
-            .otherwise(() => ({ visibility: DocumentVisibility.EVERYONE })),
-          { userId, teamId },
-        ],
-      },
-    );
-  }
+  whereFilter.push(
+    { teamId },
+    {
+      OR: [
+        {
+          visibility: {
+            in: TEAM_DOCUMENT_VISIBILITY_MAP[teamRole],
+          },
+        },
+        { userId, teamId },
+      ],
+    },
+  );
 
   if (folderId) {
     whereFilter.push({ folderId });
@@ -71,9 +55,10 @@ export const findTemplates = async ({
   }
 
   const [data, count] = await Promise.all([
-    prisma.template.findMany({
+    prisma.envelope.findMany({
       where: {
-        type,
+        type: EnvelopeType.TEMPLATE,
+        templateType: type,
         AND: whereFilter,
       },
       include: {
@@ -85,7 +70,7 @@ export const findTemplates = async ({
         },
         fields: true,
         recipients: true,
-        templateMeta: true,
+        documentMeta: true,
         directLink: {
           select: {
             token: true,
@@ -98,8 +83,10 @@ export const findTemplates = async ({
         createdAt: 'desc',
       },
     }),
-    prisma.template.count({
+    prisma.envelope.count({
       where: {
+        type: EnvelopeType.TEMPLATE,
+        templateType: type,
         AND: whereFilter,
       },
     }),

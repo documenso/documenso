@@ -1,4 +1,6 @@
-import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
+import { EnvelopeType } from '@prisma/client';
+
+import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { sealDocument } from '@documenso/lib/server-only/document/seal-document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
@@ -20,9 +22,21 @@ export const resealDocumentRoute = adminProcedure
       },
     });
 
-    const document = await getEntireDocument({ id });
+    const envelope = await unsafeGetEntireEnvelope({
+      id: {
+        type: 'envelopeId',
+        id,
+      },
+      type: EnvelopeType.DOCUMENT,
+    });
 
-    const isResealing = isDocumentCompleted(document.status);
+    const isResealing = isDocumentCompleted(envelope.status);
 
-    await sealDocument({ documentId: id, isResealing });
+    await sealDocument({
+      id: {
+        type: 'envelopeId',
+        id,
+      },
+      isResealing,
+    });
   });

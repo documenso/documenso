@@ -1,5 +1,5 @@
-import type { Document } from '@prisma/client';
-import { DocumentDataType } from '@prisma/client';
+import type { Envelope } from '@prisma/client';
+import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -7,15 +7,12 @@ import { jobs } from '@documenso/lib/jobs/client';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
 import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
   createDocumentFromDirectTemplate,
 } from '@documenso/lib/server-only/template/create-document-from-direct-template';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
-import {
-  ZCreateTemplateResponseSchema,
-  createTemplate,
-} from '@documenso/lib/server-only/template/create-template';
 import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
@@ -25,6 +22,8 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
@@ -36,6 +35,7 @@ import {
   ZCreateTemplateDirectLinkRequestSchema,
   ZCreateTemplateDirectLinkResponseSchema,
   ZCreateTemplateMutationSchema,
+  ZCreateTemplateResponseSchema,
   ZCreateTemplateV2RequestSchema,
   ZCreateTemplateV2ResponseSchema,
   ZDeleteTemplateDirectLinkRequestSchema,
@@ -77,11 +77,41 @@ export const templateRouter = router({
         },
       });
 
-      return await findTemplates({
+      const result = await findTemplates({
         userId: ctx.user.id,
         teamId,
         ...input,
       });
+
+      // Remapping for backwards compatibility.
+      return {
+        ...result,
+        data: result.data.map((envelope) => {
+          const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+          return {
+            id: legacyTemplateId,
+            type: envelope.templateType,
+            visibility: envelope.visibility,
+            externalId: envelope.externalId,
+            title: envelope.title,
+            userId: envelope.userId,
+            teamId: envelope.teamId,
+            authOptions: envelope.authOptions,
+            createdAt: envelope.createdAt,
+            updatedAt: envelope.updatedAt,
+            publicTitle: envelope.publicTitle,
+            publicDescription: envelope.publicDescription,
+            folderId: envelope.folderId,
+            useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+            team: envelope.team,
+            fields: envelope.fields,
+            recipients: envelope.recipients,
+            templateMeta: envelope.documentMeta,
+            directLink: envelope.directLink,
+          };
+        }),
+      };
     }),
 
   /**
@@ -121,7 +151,7 @@ export const templateRouter = router({
    * @private
    */
   createTemplate: authenticatedProcedure
-    // .meta({
+    // .meta({ // Note before releasing this to public, update the response schema to be correct.
     //   openapi: {
     //     method: 'POST',
     //     path: '/template/create',
@@ -142,15 +172,25 @@ export const templateRouter = router({
         },
       });
 
-      return await createTemplate({
+      const envelope = await createEnvelope({
         userId: ctx.user.id,
         teamId,
-        templateDocumentDataId,
         data: {
+          type: EnvelopeType.TEMPLATE,
           title,
           folderId,
+          envelopeItems: [
+            {
+              documentDataId: templateDocumentDataId,
+            },
+          ],
         },
+        requestMetadata: ctx.metadata,
       });
+
+      return {
+        legacyTemplateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      };
     }),
 
   /**
@@ -197,26 +237,34 @@ export const templateRouter = router({
         type: DocumentDataType.S3_PATH,
       });
 
-      const createdTemplate = await createTemplate({
+      const createdTemplate = await createEnvelope({
         userId: user.id,
         teamId,
-        templateDocumentDataId: templateDocumentData.id,
         data: {
+          type: EnvelopeType.TEMPLATE,
           title,
+          envelopeItems: [
+            {
+              documentDataId: templateDocumentData.id,
+            },
+          ],
           folderId,
-          externalId,
+          externalId: externalId ?? undefined,
           visibility,
           globalAccessAuth,
           globalActionAuth,
+          templateType: type,
           publicTitle,
           publicDescription,
-          type,
         },
         meta,
+        requestMetadata: ctx.metadata,
       });
 
+      const legacyTemplateId = mapSecondaryIdToTemplateId(createdTemplate.secondaryId);
+
       const fullTemplate = await getTemplateById({
-        id: createdTemplate.id,
+        id: legacyTemplateId,
         userId: user.id,
         teamId,
       });
@@ -252,13 +300,15 @@ export const templateRouter = router({
         },
       });
 
-      return await updateTemplate({
+      const envelope = await updateTemplate({
         userId,
         teamId,
         templateId,
         data,
         meta,
       });
+
+      return mapEnvelopeToTemplateLite(envelope);
     }),
 
   /**
@@ -285,11 +335,16 @@ export const templateRouter = router({
         },
       });
 
-      return await duplicateTemplate({
+      const envelope = await duplicateTemplate({
         userId: ctx.user.id,
         teamId,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
       });
+
+      return mapEnvelopeToTemplateLite(envelope);
     }),
 
   /**
@@ -360,8 +415,11 @@ export const templateRouter = router({
         throw new Error('You have reached your document limit.');
       }
 
-      const document: Document = await createDocumentFromTemplate({
-        templateId,
+      const envelope: Envelope = await createDocumentFromTemplate({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         teamId,
         userId: ctx.user.id,
         recipients,
@@ -373,7 +431,10 @@ export const templateRouter = router({
 
       if (distributeDocument) {
         await sendDocument({
-          documentId: document.id,
+          id: {
+            type: 'envelopeId',
+            id: envelope.id,
+          },
           userId: ctx.user.id,
           teamId,
           requestMetadata: ctx.metadata,
@@ -385,7 +446,10 @@ export const templateRouter = router({
       }
 
       return getDocumentWithDetailsById({
-        documentId: document.id,
+        id: {
+          type: 'envelopeId',
+          id: envelope.id,
+        },
         userId: ctx.user.id,
         teamId,
       });
@@ -480,7 +544,15 @@ export const templateRouter = router({
         });
       }
 
-      return await createTemplateDirectLink({ userId, teamId, templateId, directRecipientId });
+      return await createTemplateDirectLink({
+        userId,
+        teamId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
+        directRecipientId,
+      });
     }),
 
   /**

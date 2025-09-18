@@ -20,7 +20,7 @@ export const ZCreateDocumentRequestSchema = z.object({
 });
 
 export const ZCreateDocumentResponseSchema = z.object({
-  id: z.number(),
+  legacyDocumentId: z.number(),
 });
 
 export type TCreateDocumentRequest = z.infer<typeof ZCreateDocumentRequestSchema>;

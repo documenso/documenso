@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 
 import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -17,7 +18,7 @@ const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -26,6 +27,10 @@ const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
 };
 
 const triggerAutosave = async (page: Page) => {
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+  });
+
   await page.locator('#document-flow-form-container').click();
   await page.locator('#document-flow-form-container').blur();
 
@@ -47,7 +52,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -71,7 +76,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -99,7 +104,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -152,13 +157,13 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
 
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });

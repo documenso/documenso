@@ -1,4 +1,4 @@
-import { ReadStatus, SendStatus } from '@prisma/client';
+import { EnvelopeType, ReadStatus, SendStatus } from '@prisma/client';
 import { WebhookTriggerEvents } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -9,7 +9,7 @@ import { prisma } from '@documenso/prisma';
 import type { TDocumentAccessAuthTypes } from '../../types/document-auth';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -27,19 +27,30 @@ export const viewedDocument = async ({
   const recipient = await prisma.recipient.findFirst({
     where: {
       token,
+      envelope: {
+        type: EnvelopeType.DOCUMENT,
+      },
+    },
+    include: {
+      envelope: {
+        include: {
+          documentMeta: true,
+          recipients: true,
+        },
+      },
     },
   });
 
-  if (!recipient || !recipient.documentId) {
+  if (!recipient) {
     return;
   }
 
-  const { documentId } = recipient;
+  const { envelope } = recipient;
 
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
       type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED,
-      documentId,
+      envelopeId: envelope.id,
       user: {
         name: recipient.name,
         email: recipient.email,
@@ -75,7 +86,7 @@ export const viewedDocument = async ({
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
-        documentId,
+        envelopeId: envelope.id,
         user: {
           name: recipient.name,
           email: recipient.email,
@@ -92,24 +103,10 @@ export const viewedDocument = async ({
     });
   });
 
-  const document = await prisma.document.findFirst({
-    where: {
-      id: documentId,
-    },
-    include: {
-      documentMeta: true,
-      recipients: true,
-    },
-  });
-
-  if (!document) {
-    throw new Error('Document not found');
-  }
-
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_OPENED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(document)),
-    userId: document.userId,
-    teamId: document.teamId ?? undefined,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 };

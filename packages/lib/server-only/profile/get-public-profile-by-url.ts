@@ -1,5 +1,5 @@
-import type { Template, TemplateDirectLink } from '@prisma/client';
-import { type TeamProfile, TemplateType } from '@prisma/client';
+import type { Envelope, TemplateDirectLink } from '@prisma/client';
+import { EnvelopeType, type TeamProfile, TemplateType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -9,11 +9,8 @@ export type GetPublicProfileByUrlOptions = {
   profileUrl: string;
 };
 
-type PublicDirectLinkTemplate = Template & {
-  type: 'PUBLIC';
-  directLink: TemplateDirectLink & {
-    enabled: true;
-  };
+type PublicDirectLinkTemplate = Pick<Envelope, 'id' | 'publicTitle' | 'publicDescription'> & {
+  directLink: TemplateDirectLink;
 };
 
 type GetPublicProfileByUrlResponse = {
@@ -43,12 +40,13 @@ export const getPublicProfileByUrl = async ({
     },
     include: {
       profile: true,
-      templates: {
+      envelopes: {
         where: {
+          type: EnvelopeType.TEMPLATE,
+          templateType: TemplateType.PUBLIC,
           directLink: {
             enabled: true,
           },
-          type: TemplateType.PUBLIC,
         },
         include: {
           directLink: true,
@@ -68,13 +66,28 @@ export const getPublicProfileByUrl = async ({
       type: 'Premium',
       since: team.createdAt,
     },
-    profile: team.profile,
+    profile: {
+      teamId: team.profile.teamId,
+      id: team.profile.id,
+      enabled: team.profile.enabled,
+      bio: team.profile.bio,
+    },
     url: profileUrl,
     avatarImageId: team.avatarImageId,
     name: team.name || '',
-    templates: team.templates.filter(
-      (template): template is PublicDirectLinkTemplate =>
-        template.directLink?.enabled === true && template.type === TemplateType.PUBLIC,
-    ),
+    templates: team.envelopes.map((template) => {
+      const directLink = template.directLink;
+
+      if (!directLink || !directLink.enabled || template.templateType !== TemplateType.PUBLIC) {
+        throw new Error('Not possible');
+      }
+
+      return {
+        id: template.id,
+        publicTitle: template.publicTitle,
+        publicDescription: template.publicDescription,
+        directLink,
+      };
+    }),
   };
 };

@@ -3,10 +3,11 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, User } from '@prisma/client';
+import type { Recipient, User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
+import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 
 export type DocumentPageViewInformationProps = {
   userId: number;

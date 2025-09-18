@@ -3,6 +3,7 @@ import { customAlphabet } from 'nanoid';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
@@ -34,7 +35,7 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  const url = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${teamTemplate.id}`;
+  const url = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(teamTemplate.secondaryId)}`;
 
   // Owner should see list of templates with no direct link badge.
   await page.goto(url);

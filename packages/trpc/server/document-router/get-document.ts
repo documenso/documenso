@@ -24,6 +24,9 @@ export const getDocumentRoute = authenticatedProcedure
     return await getDocumentWithDetailsById({
       userId: user.id,
       teamId,
-      documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
     });
   });

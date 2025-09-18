@@ -1,11 +1,12 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
+import type { Recipient, TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { Template } from '@documenso/prisma/types/template-legacy-schema';
 import {
   DropdownMenu,
   DropdownMenuContent,

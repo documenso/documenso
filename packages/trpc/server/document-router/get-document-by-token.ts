@@ -1,3 +1,5 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
@@ -13,8 +15,9 @@ export const getDocumentByTokenRoute = authenticatedProcedure
   .query(async ({ input, ctx }) => {
     const { token } = input;
 
-    const document = await prisma.document.findFirst({
+    const envelope = await prisma.envelope.findFirst({
       where: {
+        type: EnvelopeType.DOCUMENT,
         recipients: {
           some: {
             token,
@@ -23,21 +26,34 @@ export const getDocumentByTokenRoute = authenticatedProcedure
         },
       },
       include: {
-        documentData: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
       },
     });
 
-    if (!document) {
+    // Todo: Envelopes
+    const firstDocumentData = envelope?.envelopeItems[0].documentData;
+
+    if (!envelope || !firstDocumentData) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: 'Document not found',
       });
     }
 
+    if (envelope.envelopeItems.length !== 1) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'This endpoint does not support multiple items',
+      });
+    }
+
     ctx.logger.info({
-      documentId: document.id,
+      documentId: envelope.id,
     });
 
     return {
-      documentData: document.documentData,
+      documentData: firstDocumentData,
     };
   });

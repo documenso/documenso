@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -16,13 +17,17 @@ const setupTemplate = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   return { user, team, template };
 };
 
 const triggerAutosave = async (page: Page) => {
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+  });
+
   await page.locator('#document-flow-form-container').click();
   await page.locator('#document-flow-form-container').blur();
 
@@ -41,7 +46,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -65,7 +70,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -87,7 +92,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -109,7 +114,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -131,7 +136,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -154,7 +159,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -175,7 +180,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -197,7 +202,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -229,7 +234,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });

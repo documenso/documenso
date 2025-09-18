@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZDeleteDocumentRequestSchema = z.object({
-  id: z.number().min(1),
+  id: z.string(),
   reason: z.string(),
 });
 

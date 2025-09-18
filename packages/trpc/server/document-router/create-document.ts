@@ -1,6 +1,9 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -9,7 +12,7 @@ import {
 } from './create-document.types';
 
 export const createDocumentRoute = authenticatedProcedure
-  .input(ZCreateDocumentRequestSchema)
+  .input(ZCreateDocumentRequestSchema) // Note: Before releasing this to public, update the response schema to be correct.
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
@@ -30,18 +33,25 @@ export const createDocumentRoute = authenticatedProcedure
       });
     }
 
-    const document = await createDocument({
+    const document = await createEnvelope({
       userId: user.id,
       teamId,
-      title,
-      documentDataId,
+      data: {
+        type: EnvelopeType.DOCUMENT,
+        title,
+        userTimezone: timezone,
+        folderId,
+        envelopeItems: [
+          {
+            documentDataId,
+          },
+        ],
+      },
       normalizePdf: true,
-      userTimezone: timezone,
       requestMetadata: ctx.metadata,
-      folderId,
     });
 
     return {
-      id: document.id,
+      legacyDocumentId: mapSecondaryIdToDocumentId(document.secondaryId),
     };
   });

@@ -1,7 +1,8 @@
-import { DocumentDataType } from '@prisma/client';
+import type { DocumentData } from '@prisma/client';
+import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
@@ -27,45 +28,51 @@ export const downloadDocumentRoute = authenticatedProcedure
       },
     });
 
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
+      type: EnvelopeType.DOCUMENT,
+      userId: user.id,
+      teamId,
+    });
+
+    // This error is done AFTER the get envelope so we can test access controls without S3.
     if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document downloads are only available when S3 storage is configured.',
       });
     }
 
-    const document = await getDocumentById({
-      documentId,
-      userId: user.id,
-      teamId,
-    });
+    const documentData: DocumentData | undefined = envelope.envelopeItems[0]?.documentData;
 
-    if (!document.documentData) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Document data not found',
+    if (envelope.envelopeItems.length !== 1 || !documentData) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'This endpoint only supports documents with a single item. Use envelopes API instead.',
       });
     }
 
-    if (document.documentData.type !== DocumentDataType.S3_PATH) {
+    if (documentData.type !== DocumentDataType.S3_PATH) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not stored in S3 and cannot be downloaded via URL.',
       });
     }
 
-    if (version === 'signed' && !isDocumentCompleted(document.status)) {
+    if (version === 'signed' && !isDocumentCompleted(envelope.status)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Document is not completed yet.',
       });
     }
 
     try {
-      const documentData =
-        version === 'original'
-          ? document.documentData.initialData || document.documentData.data
-          : document.documentData.data;
+      const data =
+        version === 'original' ? documentData.initialData || documentData.data : documentData.data;
 
-      const { url } = await getPresignGetUrl(documentData);
+      const { url } = await getPresignGetUrl(data);
 
-      const baseTitle = document.title.replace(/\.pdf$/, '');
+      const baseTitle = envelope.title.replace(/\.pdf$/, '');
       const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
       const filename = `${baseTitle}${suffix}`;
 

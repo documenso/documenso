@@ -1,4 +1,10 @@
-import { DocumentStatus, RecipientRole, SigningStatus, WebhookTriggerEvents } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SigningStatus,
+  WebhookTriggerEvents,
+} from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { PDFDocument } from 'pdf-lib';
@@ -22,7 +28,7 @@ import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-we
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../../types/webhook-payload';
 import { prefixedId } from '../../../universal/id';
 import { getFileServerSide } from '../../../universal/upload/get-file.server';
@@ -30,6 +36,7 @@ import { putPdfFileServerSide } from '../../../universal/upload/put-file.server'
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -42,24 +49,35 @@ export const run = async ({
 }) => {
   const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
 
-  const document = await prisma.document.findFirstOrThrow({
+  const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      type: EnvelopeType.DOCUMENT,
+      secondaryId: mapDocumentIdToSecondaryId(documentId),
     },
     include: {
       documentMeta: true,
       recipients: true,
+      envelopeItems: {
+        select: {
+          documentDataId: true,
+        },
+      },
     },
   });
 
+  // Todo: Envelopes
+  if (envelope.envelopeItems.length !== 1) {
+    throw new Error('1 Envelope item required');
+  }
+
   const settings = await getTeamSettings({
-    userId: document.userId,
-    teamId: document.teamId,
+    userId: envelope.userId,
+    teamId: envelope.teamId,
   });
 
   const isComplete =
-    document.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
-    document.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
+    envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
+    envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
 
   if (!isComplete) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
@@ -71,13 +89,13 @@ export const run = async ({
   // after it has already run through the update task further below.
   // eslint-disable-next-line @typescript-eslint/require-await
   const documentStatus = await io.runTask('get-document-status', async () => {
-    return document.status;
+    return envelope.status;
   });
 
   // This is the same case as above.
   // eslint-disable-next-line @typescript-eslint/require-await
   const documentDataId = await io.runTask('get-document-data-id', async () => {
-    return document.documentDataId;
+    return envelope.envelopeItems[0].documentDataId;
   });
 
   const documentData = await prisma.documentData.findFirst({
@@ -87,12 +105,12 @@ export const run = async ({
   });
 
   if (!documentData) {
-    throw new Error(`Document ${document.id} has no document data`);
+    throw new Error(`Document ${envelope.id} has no document data`);
   }
 
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId: document.id,
+      envelopeId: envelope.id,
       role: {
         not: RecipientRole.CC,
       },
@@ -111,7 +129,7 @@ export const run = async ({
 
   const fields = await prisma.field.findMany({
     where: {
-      documentId: document.id,
+      envelopeId: envelope.id,
     },
     include: {
       signature: true,
@@ -120,7 +138,7 @@ export const run = async ({
 
   // Skip the field check if the document is rejected
   if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Document ${document.id} has unsigned required fields`);
+    throw new Error(`Document ${envelope.id} has unsigned required fields`);
   }
 
   if (isResealing) {
@@ -129,10 +147,10 @@ export const run = async ({
     documentData.data = documentData.initialData;
   }
 
-  if (!document.qrToken) {
-    await prisma.document.update({
+  if (!envelope.qrToken) {
+    await prisma.envelope.update({
       where: {
-        id: document.id,
+        id: envelope.id,
       },
       data: {
         qrToken: prefixedId('qr'),
@@ -145,7 +163,7 @@ export const run = async ({
   const certificateData = settings.includeSigningCertificate
     ? await getCertificatePdf({
         documentId,
-        language: document.documentMeta?.language,
+        language: envelope.documentMeta?.language,
       }).catch((e) => {
         console.log('Failed to get certificate PDF');
         console.error(e);
@@ -157,7 +175,7 @@ export const run = async ({
   const auditLogData = settings.includeAuditLog
     ? await getAuditLogsPdf({
         documentId,
-        language: document.documentMeta?.language,
+        language: envelope.documentMeta?.language,
       }).catch((e) => {
         console.log('Failed to get audit logs PDF');
         console.error(e);
@@ -204,7 +222,7 @@ export const run = async ({
 
     for (const field of fields) {
       if (field.inserted) {
-        document.useLegacyFieldInsertion
+        envelope.useLegacyFieldInsertion
           ? await legacy_insertFieldInPDF(pdfDoc, field)
           : await insertFieldInPDF(pdfDoc, field);
       }
@@ -217,7 +235,8 @@ export const run = async ({
     const pdfBytes = await pdfDoc.save();
     const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
 
-    const { name } = path.parse(document.title);
+    // Todo: Envelopes - Use the envelope item title instead.
+    const { name } = path.parse(envelope.title);
 
     // Add suffix based on document status
     const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
@@ -238,7 +257,7 @@ export const run = async ({
       distinctId: nanoid(),
       event: 'App: Document Sealed',
       properties: {
-        documentId: document.id,
+        documentId: envelope.id,
         isRejected,
       },
     });
@@ -252,9 +271,9 @@ export const run = async ({
         },
       });
 
-      await tx.document.update({
+      await tx.envelope.update({
         where: {
-          id: document.id,
+          id: envelope.id,
         },
         data: {
           status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
@@ -274,7 +293,7 @@ export const run = async ({
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-          documentId: document.id,
+          envelopeId: envelope.id,
           requestMetadata,
           user: null,
           data: {
@@ -289,21 +308,23 @@ export const run = async ({
   await io.runTask('send-completed-email', async () => {
     let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-    if (isResealing && !isDocumentCompleted(document.status)) {
+    if (isResealing && !isDocumentCompleted(envelope.status)) {
       shouldSendCompletedEmail = sendEmail;
     }
 
     if (shouldSendCompletedEmail) {
-      await sendCompletedEmail({ documentId, requestMetadata });
+      await sendCompletedEmail({
+        id: { type: 'envelopeId', id: envelope.id },
+        requestMetadata,
+      });
     }
   });
 
-  const updatedDocument = await prisma.document.findFirstOrThrow({
+  const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: document.id,
+      id: envelope.id,
     },
     include: {
-      documentData: true,
       documentMeta: true,
       recipients: true,
     },
@@ -313,8 +334,8 @@ export const run = async ({
     event: isRejected
       ? WebhookTriggerEvents.DOCUMENT_REJECTED
       : WebhookTriggerEvents.DOCUMENT_COMPLETED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
-    userId: updatedDocument.userId,
-    teamId: updatedDocument.teamId ?? undefined,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedEnvelope)),
+    userId: updatedEnvelope.userId,
+    teamId: updatedEnvelope.teamId ?? undefined,
   });
 };
