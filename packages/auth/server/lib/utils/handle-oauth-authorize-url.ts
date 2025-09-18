@@ -58,7 +58,9 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
   );
 
   // Allow user to select account during login.
-  url.searchParams.append('prompt', 'login');
+  if (process.env.NEXT_PRIVATE_OIDC_DISABLE_LOGIN_PARAMETER !== 'true') {
+    url.searchParams.append('prompt', 'login');
+  }
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,
