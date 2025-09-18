@@ -139,7 +139,7 @@ export const sendDocument = async ({
       },
     });
 
-    Object.assign(document, result);
+    Object.assign(envelope, result);
   }
 
   // Commented out server side checks for minimum 1 signature per signer now since we need to
