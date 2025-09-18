@@ -7,6 +7,12 @@ export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
 export const VALID_DATE_FORMAT_VALUES = [
   DEFAULT_DOCUMENT_DATE_FORMAT,
   'yyyy-MM-dd',
+  'dd/MM/yyyy',
+  'MM/dd/yyyy',
+  'dd.MM.yyyy',
+  'yy-MM-dd',
+  'MMMM dd, yyyy',
+  'EEEE, MMMM dd, yyyy',
   'dd/MM/yyyy hh:mm a',
   'MM/dd/yyyy hh:mm a',
   'dd.MM.yyyy HH:mm',
@@ -27,18 +33,13 @@ export const DATE_FORMATS = [
     value: DEFAULT_DOCUMENT_DATE_FORMAT,
   },
   {
-    key: 'YYYYMMDD',
-    label: 'YYYY-MM-DD',
-    value: 'yyyy-MM-dd',
-  },
-  {
-    key: 'DDMMYYYY',
-    label: 'DD/MM/YYYY',
+    key: 'DDMMYYYY_TIME',
+    label: 'DD/MM/YYYY HH:mm a',
     value: 'dd/MM/yyyy hh:mm a',
   },
   {
-    key: 'MMDDYYYY',
-    label: 'MM/DD/YYYY',
+    key: 'MMDDYYYY_TIME',
+    label: 'MM/DD/YYYY HH:mm a',
     value: 'MM/dd/yyyy hh:mm a',
   },
   {
@@ -52,8 +53,8 @@ export const DATE_FORMATS = [
     value: 'yyyy-MM-dd HH:mm',
   },
   {
-    key: 'YYMMDD',
-    label: 'YY-MM-DD',
+    key: 'YYMMDD_TIME',
+    label: 'YY-MM-DD HH:mm a',
     value: 'yy-MM-dd hh:mm a',
   },
   {
@@ -62,19 +63,54 @@ export const DATE_FORMATS = [
     value: 'yyyy-MM-dd HH:mm:ss',
   },
   {
-    key: 'MonthDateYear',
-    label: 'Month Date, Year',
+    key: 'MonthDateYear_TIME',
+    label: 'Month Date, Year HH:mm a',
     value: 'MMMM dd, yyyy hh:mm a',
   },
   {
-    key: 'DayMonthYear',
-    label: 'Day, Month Year',
+    key: 'DayMonthYear_TIME',
+    label: 'Day, Month Year HH:mm a',
     value: 'EEEE, MMMM dd, yyyy hh:mm a',
   },
   {
     key: 'ISO8601',
     label: 'ISO 8601',
     value: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+  },
+  {
+    key: 'YYYYMMDD',
+    label: 'YYYY-MM-DD',
+    value: 'yyyy-MM-dd',
+  },
+  {
+    key: 'DDMMYYYY',
+    label: 'DD/MM/YYYY',
+    value: 'dd/MM/yyyy',
+  },
+  {
+    key: 'MMDDYYYY',
+    label: 'MM/DD/YYYY',
+    value: 'MM/dd/yyyy',
+  },
+  {
+    key: 'DDMMYYYY_DOT',
+    label: 'DD.MM.YYYY',
+    value: 'dd.MM.yyyy',
+  },
+  {
+    key: 'YYMMDD',
+    label: 'YY-MM-DD',
+    value: 'yy-MM-dd',
+  },
+  {
+    key: 'MonthDateYear',
+    label: 'Month Date, Year',
+    value: 'MMMM dd, yyyy',
+  },
+  {
+    key: 'DayMonthYear',
+    label: 'Day, Month Year',
+    value: 'EEEE, MMMM dd, yyyy',
   },
 ] satisfies {
   key: string;
