@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { ErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 import { Link, useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -108,15 +108,41 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
     }
   };
 
-  const onFileDropRejected = () => {
+  const onFileDropRejected = (fileRejections: FileRejection[]) => {
+    if (!fileRejections.length) {
+      return;
+    }
+
+    // Since users can only upload only one file (no multi-upload), we only handle the first file rejection
+    const { file, errors } = fileRejections[0];
+
+    if (!errors.length) {
+      return;
+    }
+
+    const errorMessages = errors.map((error) =>
+      match(error.code)
+        .with(ErrorCode.FileTooLarge, () =>
+          _(msg`File is larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
+        )
+        .with(ErrorCode.FileInvalidType, () => _(msg`Only PDF files are allowed`))
+        .with(ErrorCode.FileTooSmall, () => _(msg`File is too small`))
+        .with(ErrorCode.TooManyFiles, () => _(msg`Only one file can be uploaded at a time`))
+        .otherwise(() => _(msg`Unknown error`)),
+    );
+
+    const description =
+      errors.length > 1
+        ? `${file.name}: ${errorMessages.join(' & ')}`
+        : `${file.name}: ${errorMessages[0]}`;
+
     toast({
-      title: _(msg`Your document failed to upload.`),
-      description: _(msg`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
+      title: _(msg`Upload failed`),
+      description,
       duration: 5000,
       variant: 'destructive',
     });
   };
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
@@ -129,8 +155,8 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
         void onFileDrop(acceptedFile);
       }
     },
-    onDropRejected: () => {
-      void onFileDropRejected();
+    onDropRejected: (fileRejections) => {
+      onFileDropRejected(fileRejections);
     },
     noClick: true,
     noDragEventsBubbling: true,
