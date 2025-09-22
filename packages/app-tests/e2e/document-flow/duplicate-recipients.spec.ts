@@ -145,7 +145,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.waitForTimeout(1000);
 
     // Switch to duplicate recipient and add field
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByText('Test Recipient Duplicate (test@example.com)').first().click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -271,7 +271,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.locator('canvas').click({ position: { x: 100, y: 100 } });
 
     // Add name field for second recipient
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
 
     await page.getByText('Approver Role (signer@example.com)').first().click();
     await page.getByRole('button', { name: 'Name' }).click();

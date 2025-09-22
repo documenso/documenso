@@ -70,7 +70,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -127,7 +127,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -140,7 +140,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
 
     await page.getByText('Text').nth(1).click();
@@ -191,7 +191,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -204,7 +204,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
 
     await page.getByText('Signature').nth(1).click();

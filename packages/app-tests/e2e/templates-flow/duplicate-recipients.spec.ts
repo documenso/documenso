@@ -45,13 +45,13 @@ const completeTemplateFlowWithDuplicateRecipients = async (options: {
   await page.locator('canvas').click({ position: { x: 100, y: 100 } });
 
   // Switch to second instance and add their field
-  await page.getByRole('combobox').click();
+  await page.getByRole('combobox').first().click();
   await page.getByText('Second Instance').first().click();
   await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({ position: { x: 200, y: 100 } });
 
   // Switch to different recipient and add their field
-  await page.getByRole('combobox').click();
+  await page.getByRole('combobox').first().click();
   await page.getByText('Different Recipient').first().click();
   await page.getByRole('button', { name: 'Name' }).click();
   await page.locator('canvas').click({ position: { x: 300, y: 100 } });
@@ -209,12 +209,12 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
     await page.getByRole('button', { name: 'Signature' }).click();
     await page.locator('canvas').click({ position: { x: 100, y: 100 } });
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByText('Duplicate Recipient 2').first().click();
     await page.getByRole('button', { name: 'Date' }).click();
     await page.locator('canvas').click({ position: { x: 200, y: 100 } });
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByText('Different Recipient').first().click();
     await page.getByRole('button', { name: 'Name' }).click();
     await page.locator('canvas').click({ position: { x: 100, y: 200 } });
@@ -251,23 +251,23 @@ test.describe('[TEMPLATE_FLOW]: Duplicate Recipients', () => {
     await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
 
     // Verify fields are correctly assigned to each recipient instance
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'First Instance' }).first().click();
     let visibleFields = await page.locator(`[data-field-type="SIGNATURE"]:not(:disabled)`).all();
     expect(visibleFields.length).toBeGreaterThan(0);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Second Instance' }).first().click();
     visibleFields = await page.locator(`[data-field-type="SIGNATURE"]:not(:disabled)`).all();
     expect(visibleFields.length).toBeGreaterThan(0);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Different Recipient' }).first().click();
     const nameFields = await page.locator(`[data-field-type="NAME"]:not(:disabled)`).all();
     expect(nameFields.length).toBeGreaterThan(0);
 
     // Add additional field to verify proper assignment
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'First Instance' }).first().click();
     await page.getByRole('button', { name: 'Name' }).click();
     await page.locator('canvas').click({ position: { x: 100, y: 300 } });

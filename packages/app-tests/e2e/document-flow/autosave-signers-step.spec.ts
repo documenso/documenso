@@ -92,7 +92,7 @@ test.describe('AutoSave Signers Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Receives copy' }).click();
 
     await triggerAutosave(page);
