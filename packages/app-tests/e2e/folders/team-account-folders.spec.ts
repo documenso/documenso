@@ -841,10 +841,15 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
 
   await page.getByText('Admin Only Folder').click();
 
-  const fileInput = page.locator('input[type="file"]').nth(1);
-  await fileInput.waitFor({ state: 'attached' });
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/f/.+`));
 
-  await fileInput.setInputFiles(
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: 'Upload Document' }).click(),
+  ]);
+
+  await fileChooser.setFiles(
     path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
   );
 
