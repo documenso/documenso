@@ -17,7 +17,7 @@ export default defineConfig({
   testDir: './e2e',
   /* Run tests in files in parallel */
   fullyParallel: false,
-  workers: 4,
+  workers: 2,
   maxFailures: process.env.CI ? 1 : undefined,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -33,7 +33,7 @@ export default defineConfig({
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on',
 
-    video: 'retain-on-failure',
+    video: 'on-first-retry',
 
     /* Add explicit timeouts for actions */
     actionTimeout: 15_000,
