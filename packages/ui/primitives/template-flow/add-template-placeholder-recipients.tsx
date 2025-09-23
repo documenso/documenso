@@ -48,6 +48,10 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../tooltip';
 import type { TAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 import { ZAddTemplatePlacholderRecipientsFormSchema } from './add-template-placeholder-recipients.types';
 
+type AutoSaveResponse = {
+  recipients: Recipient[];
+};
+
 export type AddTemplatePlaceholderRecipientsFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
@@ -56,7 +60,7 @@ export type AddTemplatePlaceholderRecipientsFormProps = {
   allowDictateNextSigner?: boolean;
   templateDirectLink?: TemplateDirectLink | null;
   onSubmit: (_data: TAddTemplatePlacholderRecipientsFormSchema) => void;
-  onAutoSave: (_data: TAddTemplatePlacholderRecipientsFormSchema) => Promise<void>;
+  onAutoSave: (_data: TAddTemplatePlacholderRecipientsFormSchema) => Promise<AutoSaveResponse>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -146,7 +150,44 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
 
     const formData = form.getValues();
 
-    scheduleSave(formData);
+    scheduleSave(formData, (response) => {
+      // Sync the response recipients back to form state to prevent duplicates
+      if (response?.recipients) {
+        const currentSigners = form.getValues('signers');
+        const updatedSigners = currentSigners.map((signer) => {
+          // Find the matching recipient from the response using nativeId
+          const matchingRecipient = response.recipients.find(
+            (recipient) => recipient.id === signer.nativeId,
+          );
+
+          if (matchingRecipient) {
+            // Update the signer with the server-returned data, especially the ID
+            return {
+              ...signer,
+              nativeId: matchingRecipient.id,
+            };
+          }
+
+          // For new signers without nativeId, match by email and update with server ID
+          if (!signer.nativeId) {
+            const newRecipient = response.recipients.find(
+              (recipient) => recipient.email === signer.email,
+            );
+            if (newRecipient) {
+              return {
+                ...signer,
+                nativeId: newRecipient.id,
+              };
+            }
+          }
+
+          return signer;
+        });
+
+        // Update the form state with the synced data
+        form.setValue('signers', updatedSigners, { shouldValidate: false });
+      }
+    });
   };
 
   // useEffect(() => {
