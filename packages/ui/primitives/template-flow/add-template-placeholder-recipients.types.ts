@@ -1,7 +1,6 @@
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX } from '@documenso/lib/constants/template';
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
 
 export const ZAddTemplatePlacholderRecipientsFormSchema = z
@@ -20,17 +19,7 @@ export const ZAddTemplatePlacholderRecipientsFormSchema = z
     signingOrder: z.nativeEnum(DocumentSigningOrder),
     allowDictateNextSigner: z.boolean().default(false),
   })
-  .refine(
-    (schema) => {
-      const nonPlaceholderEmails = schema.signers
-        .map((signer) => signer.email.toLowerCase())
-        .filter((email) => !TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX.test(email));
 
-      return new Set(nonPlaceholderEmails).size === nonPlaceholderEmails.length;
-    },
-    // Dirty hack to handle errors when .root is populated for an array type
-    { message: 'Signers must have unique emails', path: ['signers__root'] },
-  )
   .refine(
     /*
       Since placeholder emails are empty, we need to check that the names are unique.

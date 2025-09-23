@@ -91,17 +91,6 @@ export const updateDocumentRecipients = async ({
       });
     }
 
-    const duplicateRecipientWithSameEmail = document.recipients.find(
-      (existingRecipient) =>
-        existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
-    );
-
-    if (duplicateRecipientWithSameEmail) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Duplicate recipient with the same email found: ${duplicateRecipientWithSameEmail.email}`,
-      });
-    }
-
     if (!canRecipientBeModified(originalRecipient, document.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',

@@ -85,20 +85,6 @@ export const createDocumentRecipients = async ({
     email: recipient.email.toLowerCase(),
   }));
 
-  const duplicateRecipients = normalizedRecipients.filter((newRecipient) => {
-    const existingRecipient = document.recipients.find(
-      (existingRecipient) => existingRecipient.email === newRecipient.email,
-    );
-
-    return existingRecipient !== undefined;
-  });
-
-  if (duplicateRecipients.length > 0) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `Duplicate recipient(s) found for ${duplicateRecipients.map((recipient) => recipient.email).join(', ')}`,
-    });
-  }
-
   const createdRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       normalizedRecipients.map(async (recipient) => {
