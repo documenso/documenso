@@ -2,19 +2,23 @@ import { DateTime } from 'luxon';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
-export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
+export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd HH:mm';
 
 export const VALID_DATE_FORMAT_VALUES = [
   DEFAULT_DOCUMENT_DATE_FORMAT,
   'yyyy-MM-dd',
-  'dd/MM/yyyy hh:mm a',
-  'MM/dd/yyyy hh:mm a',
+  'dd/MM/yyyy',
+  'MM/dd/yyyy',
+  'dd.MM.yyyy',
+  'yy-MM-dd',
+  'MMMM dd, yyyy',
+  'EEEE, MMMM dd, yyyy',
+  'dd/MM/yyyy HH:mm',
+  'MM/dd/yyyy HH:mm',
   'dd.MM.yyyy HH:mm',
-  'yyyy-MM-dd HH:mm',
-  'yy-MM-dd hh:mm a',
-  'yyyy-MM-dd HH:mm:ss',
-  'MMMM dd, yyyy hh:mm a',
-  'EEEE, MMMM dd, yyyy hh:mm a',
+  'yy-MM-dd HH:mm',
+  'MMMM dd, yyyy HH:mm',
+  'EEEE, MMMM dd, yyyy HH:mm',
   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
 ] as const;
 
@@ -22,9 +26,46 @@ export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
 export const DATE_FORMATS = [
   {
-    key: 'yyyy-MM-dd_hh:mm_a',
-    label: 'YYYY-MM-DD HH:mm a',
+    key: 'yyyy-MM-dd_HH:mm',
+    label: 'YYYY-MM-DD HH:mm',
     value: DEFAULT_DOCUMENT_DATE_FORMAT,
+  },
+  {
+    key: 'DDMMYYYY_TIME',
+    label: 'DD/MM/YYYY HH:mm',
+    value: 'dd/MM/yyyy HH:mm',
+  },
+  {
+    key: 'MMDDYYYY_TIME',
+    label: 'MM/DD/YYYY HH:mm',
+    value: 'MM/dd/yyyy HH:mm',
+  },
+  {
+    key: 'DDMMYYYYHHMM',
+    label: 'DD.MM.YYYY HH:mm',
+    value: 'dd.MM.yyyy HH:mm',
+  },
+
+  {
+    key: 'YYMMDD_TIME',
+    label: 'YY-MM-DD HH:mm',
+    value: 'yy-MM-dd HH:mm',
+  },
+
+  {
+    key: 'MonthDateYear_TIME',
+    label: 'Month Date, Year HH:mm',
+    value: 'MMMM dd, yyyy HH:mm',
+  },
+  {
+    key: 'DayMonthYear_TIME',
+    label: 'Day, Month Year HH:mm',
+    value: 'EEEE, MMMM dd, yyyy HH:mm',
+  },
+  {
+    key: 'ISO8601',
+    label: 'ISO 8601',
+    value: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
   },
   {
     key: 'YYYYMMDD',
@@ -34,47 +75,32 @@ export const DATE_FORMATS = [
   {
     key: 'DDMMYYYY',
     label: 'DD/MM/YYYY',
-    value: 'dd/MM/yyyy hh:mm a',
+    value: 'dd/MM/yyyy',
   },
   {
     key: 'MMDDYYYY',
     label: 'MM/DD/YYYY',
-    value: 'MM/dd/yyyy hh:mm a',
+    value: 'MM/dd/yyyy',
   },
   {
-    key: 'DDMMYYYYHHMM',
-    label: 'DD.MM.YYYY HH:mm',
-    value: 'dd.MM.yyyy HH:mm',
-  },
-  {
-    key: 'YYYYMMDDHHmm',
-    label: 'YYYY-MM-DD HH:mm',
-    value: 'yyyy-MM-dd HH:mm',
+    key: 'DDMMYYYY_DOT',
+    label: 'DD.MM.YYYY',
+    value: 'dd.MM.yyyy',
   },
   {
     key: 'YYMMDD',
     label: 'YY-MM-DD',
-    value: 'yy-MM-dd hh:mm a',
-  },
-  {
-    key: 'YYYYMMDDhhmmss',
-    label: 'YYYY-MM-DD HH:mm:ss',
-    value: 'yyyy-MM-dd HH:mm:ss',
+    value: 'yy-MM-dd',
   },
   {
     key: 'MonthDateYear',
     label: 'Month Date, Year',
-    value: 'MMMM dd, yyyy hh:mm a',
+    value: 'MMMM dd, yyyy',
   },
   {
     key: 'DayMonthYear',
     label: 'Day, Month Year',
-    value: 'EEEE, MMMM dd, yyyy hh:mm a',
-  },
-  {
-    key: 'ISO8601',
-    label: 'ISO 8601',
-    value: "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
+    value: 'EEEE, MMMM dd, yyyy',
   },
 ] satisfies {
   key: string;
