@@ -105,6 +105,7 @@ export const DocumentReadOnlyFields = ({
             <FieldRootContainer
               field={field}
               key={field.id}
+              readonly={true}
               color={
                 showRecipientColors
                   ? getRecipientColorStyles(

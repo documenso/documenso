@@ -239,7 +239,27 @@ export const DocumentEditForm = ({
 
   const onAddSignersFormAutoSave = async (data: TAddSignersFormSchema) => {
     try {
-      await saveSignersData(data);
+      // For autosave, we need to return the recipients response for form state sync
+      const [, recipientsResponse] = await Promise.all([
+        updateDocument({
+          documentId: document.id,
+          meta: {
+            allowDictateNextSigner: data.allowDictateNextSigner,
+            signingOrder: data.signingOrder,
+          },
+        }),
+
+        setRecipients({
+          documentId: document.id,
+          recipients: data.signers.map((signer) => ({
+            ...signer,
+            // Explicitly set to null to indicate we want to remove auth if required.
+            actionAuth: signer.actionAuth ?? [],
+          })),
+        }),
+      ]);
+
+      return recipientsResponse;
     } catch (err) {
       console.error(err);
 
@@ -248,6 +268,8 @@ export const DocumentEditForm = ({
         description: _(msg`An error occurred while adding signers.`),
         variant: 'destructive',
       });
+
+      throw err; // Re-throw so the autosave hook can handle the error
     }
   };
 

@@ -94,10 +94,7 @@ export const setTemplateRecipients = async ({
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) =>
-      !normalizedRecipients.find(
-        (recipient) =>
-          recipient.id === existingRecipient.id || recipient.email === existingRecipient.email,
-      ),
+      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
   );
 
   if (template.directLink !== null) {
@@ -124,8 +121,7 @@ export const setTemplateRecipients = async ({
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
     const existing = existingRecipients.find(
-      (existingRecipient) =>
-        existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
+      (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
     return {
