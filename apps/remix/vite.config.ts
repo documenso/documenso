@@ -42,6 +42,8 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'nodemailer',
+      'remix-flat-routes',
     ],
   },
   optimizeDeps: {
@@ -55,11 +57,14 @@ export default defineConfig({
       'playwright',
       'playwright-core',
       '@playwright/browser-chromium',
+      'nodemailer',
+      'remix-flat-routes',
     ],
   },
   resolve: {
     alias: {
       https: 'node:https',
+      fs: 'node:fs',
       '.prisma/client/default': path.resolve(
         __dirname,
         '../../node_modules/.prisma/client/default.js',
