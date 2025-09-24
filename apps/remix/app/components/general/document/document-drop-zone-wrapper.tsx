@@ -120,21 +120,31 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
       return;
     }
 
-    const errorMessages = errors.map((error) =>
-      match(error.code)
-        .with(ErrorCode.FileTooLarge, () =>
-          _(msg`File is larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
-        )
-        .with(ErrorCode.FileInvalidType, () => _(msg`Only PDF files are allowed`))
-        .with(ErrorCode.FileTooSmall, () => _(msg`File is too small`))
-        .with(ErrorCode.TooManyFiles, () => _(msg`Only one file can be uploaded at a time`))
-        .otherwise(() => _(msg`Unknown error`)),
-    );
+    const errorNodes = errors.map((error, index) => (
+      <span key={index} className="block">
+        {match(error.code)
+          .with(ErrorCode.FileTooLarge, () => (
+            <Trans>File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB</Trans>
+          ))
+          .with(ErrorCode.FileInvalidType, () => <Trans>Only PDF files are allowed</Trans>)
+          .with(ErrorCode.FileTooSmall, () => <Trans>File is too small</Trans>)
+          .with(ErrorCode.TooManyFiles, () => (
+            <Trans>Only one file can be uploaded at a time</Trans>
+          ))
+          .otherwise(() => (
+            <Trans>Unknown error</Trans>
+          ))}
+      </span>
+    ));
 
-    const description =
-      errors.length > 1
-        ? `${file.name}: ${errorMessages.join(' & ')}`
-        : `${file.name}: ${errorMessages[0]}`;
+    const description = (
+      <>
+        <span className="font-medium">
+          {file.name} <Trans>couldn't be uploaded:</Trans>
+        </span>
+        {errorNodes}
+      </>
+    );
 
     toast({
       title: _(msg`Upload failed`),
