@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from './time-zones';
 
-export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd hh:mm a';
+export const DEFAULT_DOCUMENT_DATE_FORMAT = 'yyyy-MM-dd HH:mm';
 
 export const VALID_DATE_FORMAT_VALUES = [
   DEFAULT_DOCUMENT_DATE_FORMAT,
@@ -13,14 +13,12 @@ export const VALID_DATE_FORMAT_VALUES = [
   'yy-MM-dd',
   'MMMM dd, yyyy',
   'EEEE, MMMM dd, yyyy',
-  'dd/MM/yyyy hh:mm a',
-  'MM/dd/yyyy hh:mm a',
+  'dd/MM/yyyy HH:mm',
+  'MM/dd/yyyy HH:mm',
   'dd.MM.yyyy HH:mm',
-  'yyyy-MM-dd HH:mm',
-  'yy-MM-dd hh:mm a',
-  'yyyy-MM-dd HH:mm:ss',
-  'MMMM dd, yyyy hh:mm a',
-  'EEEE, MMMM dd, yyyy hh:mm a',
+  'yy-MM-dd HH:mm',
+  'MMMM dd, yyyy HH:mm',
+  'EEEE, MMMM dd, yyyy HH:mm',
   "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
 ] as const;
 
@@ -28,49 +26,41 @@ export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
 export const DATE_FORMATS = [
   {
-    key: 'yyyy-MM-dd_hh:mm_a',
-    label: 'YYYY-MM-DD HH:mm a',
+    key: 'yyyy-MM-dd_HH:mm',
+    label: 'YYYY-MM-DD HH:mm',
     value: DEFAULT_DOCUMENT_DATE_FORMAT,
   },
   {
     key: 'DDMMYYYY_TIME',
-    label: 'DD/MM/YYYY HH:mm a',
-    value: 'dd/MM/yyyy hh:mm a',
+    label: 'DD/MM/YYYY HH:mm',
+    value: 'dd/MM/yyyy HH:mm',
   },
   {
     key: 'MMDDYYYY_TIME',
-    label: 'MM/DD/YYYY HH:mm a',
-    value: 'MM/dd/yyyy hh:mm a',
+    label: 'MM/DD/YYYY HH:mm',
+    value: 'MM/dd/yyyy HH:mm',
   },
   {
     key: 'DDMMYYYYHHMM',
     label: 'DD.MM.YYYY HH:mm',
     value: 'dd.MM.yyyy HH:mm',
   },
-  {
-    key: 'YYYYMMDDHHmm',
-    label: 'YYYY-MM-DD HH:mm',
-    value: 'yyyy-MM-dd HH:mm',
-  },
+
   {
     key: 'YYMMDD_TIME',
-    label: 'YY-MM-DD HH:mm a',
-    value: 'yy-MM-dd hh:mm a',
+    label: 'YY-MM-DD HH:mm',
+    value: 'yy-MM-dd HH:mm',
   },
-  {
-    key: 'YYYYMMDDhhmmss',
-    label: 'YYYY-MM-DD HH:mm:ss',
-    value: 'yyyy-MM-dd HH:mm:ss',
-  },
+
   {
     key: 'MonthDateYear_TIME',
-    label: 'Month Date, Year HH:mm a',
-    value: 'MMMM dd, yyyy hh:mm a',
+    label: 'Month Date, Year HH:mm',
+    value: 'MMMM dd, yyyy HH:mm',
   },
   {
     key: 'DayMonthYear_TIME',
-    label: 'Day, Month Year HH:mm a',
-    value: 'EEEE, MMMM dd, yyyy hh:mm a',
+    label: 'Day, Month Year HH:mm',
+    value: 'EEEE, MMMM dd, yyyy HH:mm',
   },
   {
     key: 'ISO8601',
