@@ -33,9 +33,14 @@ export type ValidDateFormat = (typeof VALID_DATE_FORMAT_VALUES)[number];
 
 export const DATE_FORMATS = [
   {
+    key: 'yyyy-MM-dd_HH:mm_12H',
+    label: 'YYYY-MM-DD hh:mm AM/PM',
+    value: DEFAULT_DOCUMENT_DATE_FORMAT,
+  },
+  {
     key: 'yyyy-MM-dd_HH:mm',
     label: 'YYYY-MM-DD HH:mm',
-    value: DEFAULT_DOCUMENT_DATE_FORMAT,
+    value: 'yyyy-MM-dd HH:mm',
   },
   {
     key: 'DDMMYYYY_TIME',
