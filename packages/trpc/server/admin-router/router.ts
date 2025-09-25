@@ -12,6 +12,7 @@ import { findDocumentsRoute } from './find-documents';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getUserRoute } from './get-user';
+import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
@@ -26,6 +27,9 @@ export const adminRouter = router({
     get: getAdminOrganisationRoute,
     create: createAdminOrganisationRoute,
     update: updateAdminOrganisationRoute,
+  },
+  organisationMember: {
+    promoteToOwner: promoteMemberToOwnerRoute,
   },
   claims: {
     find: findSubscriptionClaimsRoute,
