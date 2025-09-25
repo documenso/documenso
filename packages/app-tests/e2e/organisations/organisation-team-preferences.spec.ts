@@ -30,7 +30,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Australia/Perth' }).click();
 
   // Set default date
-  await page.getByRole('combobox').filter({ hasText: 'yyyy-MM-dd HH:mm' }).click();
+  await page.getByRole('combobox').filter({ hasText: 'yyyy-MM-dd hh:mm AM/PM' }).click();
   await page.getByRole('option', { name: 'DD/MM/YYYY', exact: true }).click();
 
   await page.getByTestId('signature-types-trigger').click();
