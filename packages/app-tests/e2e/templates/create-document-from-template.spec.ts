@@ -47,8 +47,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   // Set advanced options.
   await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm' }).click();
-  await page.getByLabel('DD/MM/YYYY HH:mm').click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD hh:mm a' }).click();
+  await page.getByLabel('DD/MM/YYYY HH:mm', { exact: true }).click();
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
@@ -150,8 +150,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   // Set advanced options.
   await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm' }).click();
-  await page.getByLabel('DD/MM/YYYY HH:mm').click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD hh:mm a' }).click();
+  await page.getByLabel('DD/MM/YYYY HH:mm', { exact: true }).click();
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
