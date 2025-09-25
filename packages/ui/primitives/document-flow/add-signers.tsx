@@ -755,7 +755,6 @@ export const AddSignersFormPartial = ({
                                           handleRecipientAutoCompleteSelect(index, suggestion)
                                         }
                                         onSearchQueryChange={(query) => {
-                                          console.log('onSearchQueryChange', query);
                                           field.onChange(query);
                                           setRecipientSearchQuery(query);
                                         }}
