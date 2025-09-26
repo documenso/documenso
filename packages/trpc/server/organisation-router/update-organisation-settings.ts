@@ -1,3 +1,5 @@
+import { OrganisationType } from '@prisma/client';
+
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
@@ -101,6 +103,19 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     ) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
         message: 'At least one signature type must be enabled',
+      });
+    }
+
+    const isPersonalOrganisation = organisation.type === OrganisationType.PERSONAL;
+    const currentIncludeSenderDetails =
+      organisation.organisationGlobalSettings.includeSenderDetails;
+
+    const isChangingIncludeSenderDetails =
+      includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
+
+    if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Personal organisations cannot update the sender details',
       });
     }
 
