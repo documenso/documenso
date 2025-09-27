@@ -11,6 +11,13 @@ import { Button } from '@documenso/ui/primitives/button';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Switch } from '@documenso/ui/primitives/switch';
 
 export type RadioFieldAdvancedSettingsProps = {
@@ -35,6 +42,9 @@ export const RadioFieldAdvancedSettings = ({
   );
   const [readOnly, setReadOnly] = useState(fieldState.readOnly ?? false);
   const [required, setRequired] = useState(fieldState.required ?? false);
+  const [direction, setDirection] = useState<'vertical' | 'horizontal'>(
+    fieldState.direction ?? 'vertical',
+  );
 
   const addValue = () => {
     const newId = values.length > 0 ? Math.max(...values.map((val) => val.id)) + 1 : 1;
@@ -69,10 +79,19 @@ export const RadioFieldAdvancedSettings = ({
   const handleToggleChange = (field: keyof RadioFieldMeta, value: string | boolean) => {
     const readOnly = field === 'readOnly' ? Boolean(value) : Boolean(fieldState.readOnly);
     const required = field === 'required' ? Boolean(value) : Boolean(fieldState.required);
+    const currentDirection =
+      field === 'direction' && String(value) === 'horizontal' ? 'horizontal' : 'vertical';
     setReadOnly(readOnly);
     setRequired(required);
+    setDirection(currentDirection);
 
-    const errors = validateRadioField(String(value), { readOnly, required, values, type: 'radio' });
+    const errors = validateRadioField(String(value), {
+      readOnly,
+      required,
+      values,
+      type: 'radio',
+      direction: currentDirection,
+    });
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -97,7 +116,13 @@ export const RadioFieldAdvancedSettings = ({
   }, [fieldState.values]);
 
   useEffect(() => {
-    const errors = validateRadioField(undefined, { readOnly, required, values, type: 'radio' });
+    const errors = validateRadioField(undefined, {
+      readOnly,
+      required,
+      values,
+      type: 'radio',
+      direction,
+    });
     handleErrors(errors);
   }, [values]);
 
@@ -115,6 +140,27 @@ export const RadioFieldAdvancedSettings = ({
             value={fieldState.label}
             onChange={(e) => handleFieldChange('label', e.target.value)}
           />
+        </div>
+        <div>
+          <Label>
+            <Trans>Direction</Trans>
+          </Label>
+          <Select
+            value={fieldState.direction ?? 'vertical'}
+            onValueChange={(val) => handleToggleChange('direction', val)}
+          >
+            <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
+              <SelectValue placeholder={_(msg`Select direction`)} />
+            </SelectTrigger>
+            <SelectContent position="popper">
+              <SelectItem value="vertical">
+                <Trans>Vertical</Trans>
+              </SelectItem>
+              <SelectItem value="horizontal">
+                <Trans>Horizontal</Trans>
+              </SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="flex flex-row items-center gap-2">
           <Switch
