@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-08-08 04:19\n"
+"PO-Revision-Date: 2025-09-28 14:03\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -24,7 +24,7 @@ msgstr " Activer la signature par lien direct"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
-msgstr ".Des documents PDF acceptés (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}Mo)"
+msgstr "Documents .PDF acceptés (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}Mo)"
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
@@ -3892,7 +3892,7 @@ msgstr "Groupes"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to approve this document"
-msgstr "t'a invité à approuver ce document"
+msgstr "vous a invité à approuver ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to assist this document"
@@ -3900,11 +3900,11 @@ msgstr "vous a invité à aider ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to sign this document"
-msgstr "t'a invité à signer ce document"
+msgstr "vous a invité à signer ce document"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 msgid "has invited you to view this document"
-msgstr "t'a invité à voir ce document"
+msgstr "vous a invité à voir ce document"
 
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
@@ -8579,7 +8579,7 @@ msgstr "Bienvenue"
 
 #: apps/remix/app/routes/_unauthenticated+/signin.tsx
 msgid "Welcome back, we are lucky to have you."
-msgstr "Contentieux, nous avons de la chance de vous avoir."
+msgstr "Bon retour, nous sommes heureux de vous retrouver."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "Welcome back! Here's an overview of your account."
@@ -8931,7 +8931,7 @@ msgstr "Vous avez atteint la limite maximale de {0} modèles directs. <0>Mettez 
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to adjust your plan."
-msgstr "Vous avez atteint le nombre maximum d'équipes pour votre plan. Veuillez contacter les ventes à <0>{SUPPORT_EMAIL}</0> si vous souhaitez ajuster votre plan."
+msgstr "Vous avez atteint le nombre maximum d'équipes pour votre abonnement. Veuillez contacter le service commercial à <0>{SUPPORT_EMAIL}</0> si vous souhaitez ajuster votre plan."
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
@@ -9210,11 +9210,11 @@ msgstr "Votre organisation personnelle"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>{SUPPORT_EMAIL}</0> if you would like to discuss your options."
-msgstr "Votre plan ne supporte pas l'invitation de membres. Veuillez mettre à niveau ou contacter les ventes à <0>{SUPPORT_EMAIL}</0> si vous souhaitez discuter de vos options."
+msgstr "Votre abonnement n'inclut pas l'invitation de membres. Veuillez modifier votre abonnement ou contacter le service commercial à <0>{SUPPORT_EMAIL}</0> si vous souhaitez discuter de vos options."
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "Your plan is no longer valid. Please subscribe to a new plan to continue using Documenso."
-msgstr "Votre plan n'est plus valide. Veuillez souscrire à un nouveau plan pour continuer à utiliser Documenso."
+msgstr "Votre abonnement n'est plus valide. Veuillez souscrire à un nouvel abonnement pour continuer à utiliser Documenso."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."
