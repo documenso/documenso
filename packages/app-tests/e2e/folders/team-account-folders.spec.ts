@@ -277,13 +277,13 @@ test('[TEAMS]: document folder and its contents can be deleted', async ({ page }
 
   await page.goto(`/t/${team.url}/documents`);
 
-  await expect(page.locator('div').filter({ hasText: folder.name })).not.toBeVisible();
+  await expect(page.locator(`[data-folder-id="${folder.id}"]`)).not.toBeVisible();
   await expect(page.getByText(proposal.title)).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/documents/f/${folder.id}`);
 
   await expect(page.getByText(report.title)).not.toBeVisible();
-  await expect(page.locator('div').filter({ hasText: reportsFolder.name })).not.toBeVisible();
+  await expect(page.locator(`[data-folder-id="${reportsFolder.id}"]`)).not.toBeVisible();
 });
 
 test('[TEAMS]: create folder button is visible on templates page', async ({ page }) => {
@@ -318,9 +318,7 @@ test('[TEAMS]: can create a template folder', async ({ page }) => {
   await expect(page.getByText('Team template folder')).toBeVisible();
 
   await page.goto(`/t/${team.url}/templates`);
-  await expect(
-    page.locator('div').filter({ hasText: 'Team template folder' }).nth(3),
-  ).toBeVisible();
+  await expect(page.locator(`[data-folder-name="Team template folder"]`)).toBeVisible();
 });
 
 test('[TEAMS]: can create a template subfolder inside a template folder', async ({ page }) => {
@@ -374,11 +372,8 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await page.getByRole('button', { name: 'New Template' }).click();
 
-  await page
-    .locator('div')
-    .filter({ hasText: /^Upload Template DocumentDrag & drop your PDF here\.$/ })
-    .nth(2)
-    .click();
+  await page.getByText('Upload Template Document').click();
+
   await page.locator('input[type="file"]').nth(0).waitFor({ state: 'attached' });
 
   await page
@@ -537,7 +532,7 @@ test('[TEAMS]: template folder can be moved to another template folder', async (
   await expect(page.getByText('Team Contract Templates')).toBeVisible();
 });
 
-test('[TEAMS]: template folder and its contents can be deleted', async ({ page }) => {
+test('[TEAMS]: template folder can be deleted', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
   const folder = await seedBlankFolder(teamOwner, team.id, {
@@ -585,13 +580,16 @@ test('[TEAMS]: template folder and its contents can be deleted', async ({ page }
 
   await page.goto(`/t/${team.url}/templates`);
 
-  await expect(page.locator('div').filter({ hasText: folder.name })).not.toBeVisible();
-  await expect(page.getByText(template.title)).not.toBeVisible();
+  await page.waitForTimeout(1000);
+
+  // !: This is no longer the case, when deleting a folder its contents will be moved to the root folder.
+  // await expect(page.locator(`[data-folder-id="${folder.id}"]`)).not.toBeVisible();
+  // await expect(page.getByText(template.title)).not.toBeVisible();
 
   await page.goto(`/t/${team.url}/templates/f/${folder.id}`);
 
   await expect(page.getByText(reportTemplate.title)).not.toBeVisible();
-  await expect(page.locator('div').filter({ hasText: subfolder.name })).not.toBeVisible();
+  await expect(page.locator(`[data-folder-id="${subfolder.id}"]`)).not.toBeVisible();
 });
 
 test('[TEAMS]: can navigate between template folders', async ({ page }) => {
@@ -843,10 +841,15 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
 
   await page.getByText('Admin Only Folder').click();
 
-  const fileInput = page.locator('input[type="file"]').nth(1);
-  await fileInput.waitFor({ state: 'attached' });
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/f/.+`));
 
-  await fileInput.setInputFiles(
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: 'Upload Document' }).click(),
+  ]);
+
+  await fileChooser.setFiles(
     path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
   );
 

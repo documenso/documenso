@@ -216,7 +216,7 @@ export const AddTemplateSettingsFormPartial = ({
                   </FormLabel>
 
                   <FormControl>
-                    <Input className="bg-background" {...field} onBlur={handleAutoSave} />
+                    <Input className="bg-background" {...field} maxLength={255} onBlur={handleAutoSave} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -519,7 +519,7 @@ export const AddTemplateSettingsFormPartial = ({
                             </FormLabel>
 
                             <FormControl>
-                              <Input {...field} />
+                              <Input {...field} maxLength={254} />
                             </FormControl>
 
                             <FormMessage />
@@ -539,7 +539,7 @@ export const AddTemplateSettingsFormPartial = ({
                             </FormLabel>
 
                             <FormControl>
-                              <Input {...field} onBlur={handleAutoSave} />
+                              <Input {...field} maxLength={254} onBlur={handleAutoSave} />
                             </FormControl>
 
                             <FormMessage />
@@ -569,6 +569,7 @@ export const AddTemplateSettingsFormPartial = ({
                               <Textarea
                                 className="bg-background h-16 resize-none"
                                 {...field}
+                                maxLength={5000}
                                 onBlur={handleAutoSave}
                               />
                             </FormControl>
@@ -623,7 +624,7 @@ export const AddTemplateSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
+                            <Input className="bg-background" {...field} maxLength={255} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
@@ -714,7 +715,7 @@ export const AddTemplateSettingsFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input className="bg-background" {...field} onBlur={handleAutoSave} />
+                            <Input className="bg-background" {...field} maxLength={255} onBlur={handleAutoSave} />
                           </FormControl>
 
                           <FormMessage />
