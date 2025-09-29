@@ -33,12 +33,14 @@ import {
   ZRadioFieldMeta,
   ZTextFieldMeta,
 } from '../../types/field-meta';
+import { getFontTypeForText } from '../../utils/font-detection';
 import { getPageSize } from './get-page-size';
 
 export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignature) => {
-  const [fontCaveat, fontNoto] = await Promise.all([
+  const [fontCaveat, fontNoto, fontNotoThai] = await Promise.all([
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/caveat.ttf`).then(async (res) => res.arrayBuffer()),
     fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(async (res) => res.arrayBuffer()),
+    fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans-thai.ttf`).then(async (res) => res.arrayBuffer()),
   ]);
 
   const isSignatureField = isSignatureFieldType(field.type);
@@ -128,10 +130,27 @@ export const insertFieldInPDF = async (pdf: PDFDocument, field: FieldWithSignatu
     });
   }
 
-  const font = await pdf.embedFont(
-    isSignatureField ? fontCaveat : fontNoto,
-    isSignatureField ? { features: { calt: false } } : undefined,
-  );
+  // Determine the appropriate font based on text content and field type
+  const fontType = getFontTypeForText(field.customText || '', isSignatureField);
+
+  let selectedFont: ArrayBuffer;
+  let fontOptions: { features?: { calt: boolean } } | undefined;
+
+  switch (fontType) {
+    case 'handwriting':
+      selectedFont = fontCaveat;
+      fontOptions = { features: { calt: false } };
+      break;
+    case 'thai':
+      selectedFont = fontNotoThai;
+      fontOptions = undefined;
+      break;
+    default:
+      selectedFont = fontNoto;
+      fontOptions = undefined;
+  }
+
+  const font = await pdf.embedFont(selectedFont, fontOptions);
 
   if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
     await pdf.embedFont(fontCaveat);
