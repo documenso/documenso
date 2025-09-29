@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { type Recipient, SigningStatus } from '@prisma/client';
 import { History } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -85,6 +85,11 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     formState: { isSubmitting },
   } = form;
 
+  const selectedRecipients = useWatch({
+    control: form.control,
+    name: 'recipients',
+  });
+
   const onFormSubmit = async ({ recipients }: TResendDocumentFormSchema) => {
     try {
       await resendDocument({ documentId: document.id, recipients });
@@ -151,7 +156,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
 
                       <FormControl>
                         <Checkbox
-                          className="h-5 w-5 rounded-full"
+                          className="h-5 w-5 rounded-full border border-neutral-400"
                           value={recipient.id}
                           checked={value.includes(recipient.id)}
                           onCheckedChange={(checked: boolean) =>
@@ -182,7 +187,13 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
               </Button>
             </DialogClose>
 
-            <Button className="flex-1" loading={isSubmitting} type="submit" form={FORM_ID}>
+            <Button
+              className="flex-1"
+              loading={isSubmitting}
+              type="submit"
+              form={FORM_ID}
+              disabled={isSubmitting || selectedRecipients.length === 0}
+            >
               <Trans>Send reminder</Trans>
             </Button>
           </div>

@@ -30,8 +30,8 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   await page.getByRole('option', { name: 'Australia/Perth' }).click();
 
   // Set default date
-  await page.getByRole('combobox').filter({ hasText: 'yyyy-MM-dd hh:mm a' }).click();
-  await page.getByRole('option', { name: 'DD/MM/YYYY' }).click();
+  await page.getByRole('combobox').filter({ hasText: 'yyyy-MM-dd hh:mm AM/PM' }).click();
+  await page.getByRole('option', { name: 'DD/MM/YYYY', exact: true }).click();
 
   await page.getByTestId('signature-types-trigger').click();
   await page.getByRole('option', { name: 'Draw' }).click();
@@ -51,7 +51,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(teamSettings.documentVisibility).toEqual(DocumentVisibility.MANAGER_AND_ABOVE);
   expect(teamSettings.documentLanguage).toEqual('de');
   expect(teamSettings.documentTimezone).toEqual('Australia/Perth');
-  expect(teamSettings.documentDateFormat).toEqual('dd/MM/yyyy hh:mm a');
+  expect(teamSettings.documentDateFormat).toEqual('dd/MM/yyyy');
   expect(teamSettings.includeSenderDetails).toEqual(false);
   expect(teamSettings.includeSigningCertificate).toEqual(false);
   expect(teamSettings.typedSignatureEnabled).toEqual(true);
@@ -72,7 +72,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
 
   // Override team date format settings
   await page.getByTestId('document-date-format-trigger').click();
-  await page.getByRole('option', { name: 'MM/DD/YYYY' }).click();
+  await page.getByRole('option', { name: 'MM/DD/YYYY', exact: true }).click();
 
   await page.getByRole('button', { name: 'Update' }).first().click();
   await expect(page.getByText('Your document preferences have been updated').first()).toBeVisible();
@@ -85,7 +85,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(updatedTeamSettings.documentVisibility).toEqual(DocumentVisibility.EVERYONE);
   expect(updatedTeamSettings.documentLanguage).toEqual('pl');
   expect(updatedTeamSettings.documentTimezone).toEqual('Europe/London');
-  expect(updatedTeamSettings.documentDateFormat).toEqual('MM/dd/yyyy hh:mm a');
+  expect(updatedTeamSettings.documentDateFormat).toEqual('MM/dd/yyyy');
   expect(updatedTeamSettings.includeSenderDetails).toEqual(false);
   expect(updatedTeamSettings.includeSigningCertificate).toEqual(false);
   expect(updatedTeamSettings.typedSignatureEnabled).toEqual(true);
@@ -108,7 +108,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
   expect(documentMeta.drawSignatureEnabled).toEqual(false);
   expect(documentMeta.language).toEqual('pl');
   expect(documentMeta.timezone).toEqual('Europe/London');
-  expect(documentMeta.dateFormat).toEqual('MM/dd/yyyy hh:mm a');
+  expect(documentMeta.dateFormat).toEqual('MM/dd/yyyy');
 });
 
 test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
