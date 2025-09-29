@@ -4,7 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
-import { useDropzone } from 'react-dropzone';
+import { ErrorCode, type FileRejection, useDropzone } from 'react-dropzone';
 import { Link, useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -108,15 +108,51 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
     }
   };
 
-  const onFileDropRejected = () => {
+  const onFileDropRejected = (fileRejections: FileRejection[]) => {
+    if (!fileRejections.length) {
+      return;
+    }
+
+    // Since users can only upload only one file (no multi-upload), we only handle the first file rejection
+    const { file, errors } = fileRejections[0];
+
+    if (!errors.length) {
+      return;
+    }
+
+    const errorNodes = errors.map((error, index) => (
+      <span key={index} className="block">
+        {match(error.code)
+          .with(ErrorCode.FileTooLarge, () => (
+            <Trans>File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB</Trans>
+          ))
+          .with(ErrorCode.FileInvalidType, () => <Trans>Only PDF files are allowed</Trans>)
+          .with(ErrorCode.FileTooSmall, () => <Trans>File is too small</Trans>)
+          .with(ErrorCode.TooManyFiles, () => (
+            <Trans>Only one file can be uploaded at a time</Trans>
+          ))
+          .otherwise(() => (
+            <Trans>Unknown error</Trans>
+          ))}
+      </span>
+    ));
+
+    const description = (
+      <>
+        <span className="font-medium">
+          {file.name} <Trans>couldn't be uploaded:</Trans>
+        </span>
+        {errorNodes}
+      </>
+    );
+
     toast({
-      title: _(msg`Your document failed to upload.`),
-      description: _(msg`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`),
+      title: _(msg`Upload failed`),
+      description,
       duration: 5000,
       variant: 'destructive',
     });
   };
-
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
@@ -129,8 +165,8 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
         void onFileDrop(acceptedFile);
       }
     },
-    onDropRejected: () => {
-      void onFileDropRejected();
+    onDropRejected: (fileRejections) => {
+      onFileDropRejected(fileRejections);
     },
     noClick: true,
     noDragEventsBubbling: true,
