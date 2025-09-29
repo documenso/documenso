@@ -3,10 +3,11 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility, OrganisationType } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
 import { DOCUMENT_SIGNATURE_TYPES, DocumentSignatureType } from '@documenso/lib/constants/document';
@@ -86,8 +87,10 @@ export const DocumentPreferencesForm = ({
 }: DocumentPreferencesFormProps) => {
   const { t } = useLingui();
   const { user, organisations } = useSession();
+  const currentOrganisation = useCurrentOrganisation();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
+  const isPersonalOrganisation = currentOrganisation.type === OrganisationType.PERSONAL;
 
   const placeholderEmail = user.email ?? 'user@example.com';
 
@@ -331,7 +334,7 @@ export const DocumentPreferencesForm = ({
             )}
           />
 
-          {!isPersonalLayoutMode && (
+          {!isPersonalLayoutMode && !isPersonalOrganisation && (
             <FormField
               control={form.control}
               name="includeSenderDetails"
