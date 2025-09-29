@@ -182,7 +182,7 @@ export const TemplateEditForm = ({
   };
 
   const saveTemplatePlaceholderData = async (data: TAddTemplatePlacholderRecipientsFormSchema) => {
-    return Promise.all([
+    const [, recipients] = await Promise.all([
       updateTemplateSettings({
         templateId: template.id,
         meta: {
@@ -196,6 +196,8 @@ export const TemplateEditForm = ({
         recipients: data.signers,
       }),
     ]);
+
+    return recipients;
   };
 
   const onAddTemplatePlaceholderFormSubmit = async (
@@ -218,7 +220,7 @@ export const TemplateEditForm = ({
     data: TAddTemplatePlacholderRecipientsFormSchema,
   ) => {
     try {
-      await saveTemplatePlaceholderData(data);
+      return await saveTemplatePlaceholderData(data);
     } catch (err) {
       console.error(err);
 
@@ -227,6 +229,8 @@ export const TemplateEditForm = ({
         description: _(msg`An error occurred while auto-saving the template placeholders.`),
         variant: 'destructive',
       });
+
+      throw err;
     }
   };
 
