@@ -27,14 +27,20 @@ type DocumentSigningFieldsInsertedProps = {
    * Defaults to left.
    */
   textAlign?: 'left' | 'center' | 'right';
+
+  /**
+   * The font size of the field in pixels.
+   */
+  fontSize?: number;
 };
 
 export const DocumentSigningFieldsInserted = ({
   children,
   textAlign = 'left',
+  fontSize,
 }: DocumentSigningFieldsInsertedProps) => {
   return (
-    <div className="flex h-full w-full items-center overflow-hidden">
+    <div className="flex h-full w-full items-center overflow-visible">
       <p
         className={cn(
           'text-foreground w-full whitespace-pre-wrap text-left text-[clamp(0.425rem,25cqw,0.825rem)] duration-200',
@@ -43,6 +49,7 @@ export const DocumentSigningFieldsInserted = ({
             '!text-right': textAlign === 'right',
           },
         )}
+        style={{ fontSize: `${fontSize}px` }}
       >
         {children}
       </p>

@@ -157,6 +157,7 @@ export const DocumentSigningDateField = ({
                 '!text-right': parsedFieldMeta?.textAlign === 'right',
               },
             )}
+            style={{ fontSize: `${parsedFieldMeta?.fontSize}px` }}
           >
             {localDateString}
           </p>
