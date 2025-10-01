@@ -160,6 +160,14 @@ export const DocumentSigningPageView = ({
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
+        {document.team.teamGlobalSettings.brandingEnabled &&
+          document.team.teamGlobalSettings.brandingLogo && (
+            <img
+              src={`/api/branding/logo/team/${document.teamId}`}
+              alt={`${document.team.name}'s Logo`}
+              className="mb-4 h-12 w-12 md:mb-2"
+            />
+          )}
         <h1
           className="block max-w-[20rem] truncate text-2xl font-semibold sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}

@@ -9,10 +9,10 @@ import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 
 import { FolderGrid } from '~/components/general/folder/folder-grid';
+import { TemplateDropZoneWrapper } from '~/components/general/template/template-drop-zone-wrapper';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
-import { TemplateDropZoneWrapper } from '~/components/general/template/template-drop-zone-wrapper';
 
 export function meta() {
   return appMetaTags('Templates');

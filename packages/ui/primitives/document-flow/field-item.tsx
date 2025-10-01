@@ -299,6 +299,8 @@ export const FieldItem = ({
         }}
         ref={$el}
         data-field-id={field.nativeId}
+        data-field-type={field.type}
+        data-recipient-id={field.recipientId}
       >
         <FieldContent field={field} />
 

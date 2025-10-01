@@ -47,14 +47,7 @@ export const ZCreateEmbeddingDocumentRequestSchema = z.object({
           .optional(),
       }),
     )
-    .refine(
-      (recipients) => {
-        const emails = recipients.map((recipient) => recipient.email);
 
-        return new Set(emails).size === emails.length;
-      },
-      { message: 'Recipients must have unique emails' },
-    )
     .optional(),
   meta: z
     .object({

@@ -1,10 +1,12 @@
 import { RecipientRole } from '@prisma/client';
 import { data } from 'react-router';
+import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
 import { match } from 'ts-pattern';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
+import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
@@ -23,6 +25,8 @@ import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 import type { Route } from './+types/sign.$url';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const { requestMetadata } = getOptionalLoaderContext();
+
   if (!params.url) {
     throw new Response('Not found', { status: 404 });
   }
@@ -101,6 +105,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       },
     );
   }
+
+  await viewedDocument({
+    token,
+    requestMetadata,
+    recipientAccessAuth: derivedRecipientAccessAuth,
+  });
 
   const allRecipients =
     recipient.role === RecipientRole.ASSISTANT
