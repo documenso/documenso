@@ -188,9 +188,11 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
   }
 
   const textAlign = fieldMeta && 'textAlign' in fieldMeta ? fieldMeta.textAlign : 'left';
+  const fontSize = fieldMeta && 'fontSize' in fieldMeta ? fieldMeta.fontSize : undefined;
+  const fontSizeStyle = fontSize ? { fontSize: `${fontSize}px` } : {};
 
   return (
-    <div className="flex h-full w-full items-center overflow-hidden">
+    <div className="overflow-visibile flex h-full w-full items-center">
       <p
         className={cn(
           'text-foreground w-full whitespace-pre-wrap text-left text-[clamp(0.07rem,25cqw,0.825rem)] duration-200',
@@ -200,6 +202,7 @@ export const FieldContent = ({ field, documentMeta }: FieldIconProps) => {
             'font-signature text-[clamp(0.07rem,25cqw,1.125rem)]': isSignatureField,
           },
         )}
+        style={fontSizeStyle}
       >
         {textToDisplay || labelToDisplay}
       </p>

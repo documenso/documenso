@@ -253,7 +253,10 @@ export const DocumentSigningNumberField = ({
       )}
 
       {field.inserted && (
-        <DocumentSigningFieldsInserted textAlign={parsedFieldMeta?.textAlign}>
+        <DocumentSigningFieldsInserted
+          textAlign={parsedFieldMeta?.textAlign}
+          fontSize={parsedFieldMeta?.fontSize}
+        >
           {field.customText}
         </DocumentSigningFieldsInserted>
       )}
