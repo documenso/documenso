@@ -290,6 +290,7 @@ export const createDocumentFromTemplate = async ({
           fields: true,
         },
       },
+      attachments: true,
       templateDocumentData: true,
       templateMeta: true,
     },
@@ -398,6 +399,15 @@ export const createDocumentFromTemplate = async ({
         }),
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
+        attachments: {
+          create: template.attachments.map((attachment) => ({
+            type: attachment.type,
+            label: attachment.label,
+            url: attachment.url,
+            createdAt: attachment.createdAt,
+            updatedAt: attachment.updatedAt,
+          })),
+        },
         documentMeta: {
           create: extractDerivedDocumentMeta(settings, {
             subject: override?.subject || template.templateMeta?.subject,

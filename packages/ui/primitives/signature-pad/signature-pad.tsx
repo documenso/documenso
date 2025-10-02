@@ -1,9 +1,9 @@
 import type { HTMLAttributes } from 'react';
 import { useState } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { KeyboardIcon, UploadCloudIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
-import { Trans } from '@lingui/react/macro';
 
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
