@@ -27,7 +27,7 @@ export const findTeams = async ({
   orderBy,
 }: FindTeamsOptions) => {
   const orderByColumn = orderBy?.column ?? 'name';
-  const orderByDirection = orderBy?.direction ?? 'desc';
+  const orderByDirection = orderBy?.direction ?? 'asc';
 
   const whereClause: Prisma.TeamWhereInput = {
     organisation: {
