@@ -417,11 +417,11 @@ export const DirectTemplateSigningForm = ({
 
           <DocumentSigningCompleteDialog
             isSubmitting={isSubmitting}
-            onSignatureComplete={handleSubmit}
+            onSignatureComplete={async () => handleSubmit()}
             documentTitle={template.title}
             fields={localFields}
             fieldsValidated={fieldsValidated}
-            role={directRecipient.role}
+            recipient={directRecipient}
           />
         </div>
       </DocumentFlowFormContainerFooter>

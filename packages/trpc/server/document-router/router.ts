@@ -1,4 +1,5 @@
 import { router } from '../trpc';
+import { accessAuthRequest2FAEmailRoute } from './access-auth-request-2fa-email';
 import { createDocumentRoute } from './create-document';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
@@ -37,6 +38,10 @@ export const documentRouter = router({
   // Internal document routes for custom frontend requests.
   getDocumentByToken: getDocumentByTokenRoute,
   findDocumentsInternal: findDocumentsInternalRoute,
+
+  accessAuth: router({
+    request2FAEmail: accessAuthRequest2FAEmailRoute,
+  }),
 
   auditLog: {
     find: findDocumentAuditLogsRoute,

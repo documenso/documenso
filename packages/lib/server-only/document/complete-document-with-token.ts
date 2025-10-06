@@ -18,7 +18,8 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
-import type { TRecipientActionAuth } from '../../types/document-auth';
+import type { TRecipientAccessAuth, TRecipientActionAuth } from '../../types/document-auth';
+import { DocumentAuth } from '../../types/document-auth';
 import {
   ZWebhookDocumentSchema,
   mapDocumentToWebhookDocumentPayload,
@@ -26,6 +27,7 @@ import {
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { isRecipientAuthorized } from './is-recipient-authorized';
 import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
@@ -33,6 +35,7 @@ export type CompleteDocumentWithTokenOptions = {
   documentId: number;
   userId?: number;
   authOptions?: TRecipientActionAuth;
+  accessAuthOptions?: TRecipientAccessAuth;
   requestMetadata?: RequestMetadata;
   nextSigner?: {
     email: string;
@@ -64,6 +67,8 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
 export const completeDocumentWithToken = async ({
   token,
   documentId,
+  userId,
+  accessAuthOptions,
   requestMetadata,
   nextSigner,
 }: CompleteDocumentWithTokenOptions) => {
@@ -111,24 +116,57 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
-  // Document reauth for completing documents is currently not required.
+  // Check ACCESS AUTH 2FA validation during document completion
+  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+    documentAuth: document.authOptions,
+    recipientAuth: recipient.authOptions,
+  });
 
-  // const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
-  //   documentAuth: document.authOptions,
-  //   recipientAuth: recipient.authOptions,
-  // });
+  if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
+    if (!accessAuthOptions) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Access authentication required',
+      });
+    }
 
-  // const isValid = await isRecipientAuthorized({
-  //   type: 'ACTION',
-  //   document: document,
-  //   recipient: recipient,
-  //   userId,
-  //   authOptions,
-  // });
+    const isValid = await isRecipientAuthorized({
+      type: 'ACCESS_2FA',
+      documentAuthOptions: document.authOptions,
+      recipient: recipient,
+      userId, // Can be undefined for non-account recipients
+      authOptions: accessAuthOptions,
+    });
 
-  // if (!isValid) {
-  //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
-  // }
+    if (!isValid) {
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
+          documentId: document.id,
+          data: {
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            recipientEmail: recipient.email,
+          },
+        }),
+      });
+
+      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
+        message: 'Invalid 2FA authentication',
+      });
+    }
+
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
+        documentId: document.id,
+        data: {
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          recipientEmail: recipient.email,
+        },
+      }),
+    });
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
