@@ -3,12 +3,12 @@ import { DocumentSigningOrder, DocumentStatus, RecipientRole, SigningStatus } fr
 import { Clock8 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 import { getOptionalLoaderContext } from 'server/utils/get-loader-session';
+import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
 import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
@@ -20,6 +20,7 @@ import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get
 import { getRecipientsForAssistant } from '@documenso/lib/server-only/recipient/get-recipients-for-assistant';
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
+import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { isRecipientExpired } from '@documenso/lib/utils/expiry';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
@@ -100,16 +101,16 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     recipientAuth: recipient.authOptions,
   });
 
-  const isDocumentAccessValid = await isRecipientAuthorized({
-    type: 'ACCESS',
-    documentAuthOptions: document.authOptions,
-    recipient,
-    userId: user?.id,
-  });
+  const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
+    match(accesssAuth)
+      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
+      .exhaustive(),
+  );
 
   let recipientHasAccount: boolean | null = null;
 
-  if (!isDocumentAccessValid) {
+  if (!isAccessAuthValid) {
     recipientHasAccount = await getUserByEmail({ email: recipient.email })
       .then((user) => !!user)
       .catch(() => false);

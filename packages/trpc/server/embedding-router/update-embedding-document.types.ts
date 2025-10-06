@@ -30,36 +30,27 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
   documentId: z.number(),
   title: ZDocumentTitleSchema,
   externalId: ZDocumentExternalIdSchema.optional(),
-  recipients: z
-    .array(
-      z.object({
-        id: z.number().optional(),
-        email: z.string().toLowerCase().email().min(1),
-        name: z.string(),
-        role: z.nativeEnum(RecipientRole),
-        signingOrder: z.number().optional(),
-        fields: ZFieldAndMetaSchema.and(
-          z.object({
-            id: z.number().optional(),
-            pageNumber: ZFieldPageNumberSchema,
-            pageX: ZFieldPageXSchema,
-            pageY: ZFieldPageYSchema,
-            width: ZFieldWidthSchema,
-            height: ZFieldHeightSchema,
-          }),
-        )
-          .array()
-          .optional(),
-      }),
-    )
-    .refine(
-      (recipients) => {
-        const emails = recipients.map((recipient) => recipient.email);
-
-        return new Set(emails).size === emails.length;
-      },
-      { message: 'Recipients must have unique emails' },
-    ),
+  recipients: z.array(
+    z.object({
+      id: z.number().optional(),
+      email: z.string().toLowerCase().email().min(1),
+      name: z.string(),
+      role: z.nativeEnum(RecipientRole),
+      signingOrder: z.number().optional(),
+      fields: ZFieldAndMetaSchema.and(
+        z.object({
+          id: z.number().optional(),
+          pageNumber: ZFieldPageNumberSchema,
+          pageX: ZFieldPageXSchema,
+          pageY: ZFieldPageYSchema,
+          width: ZFieldWidthSchema,
+          height: ZFieldHeightSchema,
+        }),
+      )
+        .array()
+        .optional(),
+    }),
+  ),
   meta: z
     .object({
       subject: ZDocumentMetaSubjectSchema.optional(),

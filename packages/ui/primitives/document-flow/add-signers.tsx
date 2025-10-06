@@ -1,4 +1,4 @@
-import React, { useCallback, useId, useMemo, useRef, useState } from 'react';
+import { useCallback, useId, useMemo, useRef, useState } from 'react';
 
 import type { DropResult, SensorAPI } from '@hello-pangea/dnd';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
@@ -15,11 +15,13 @@ import { prop, sortBy } from 'remeda';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
 import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
@@ -29,6 +31,8 @@ import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
 } from '../../components/document/document-read-only-fields';
+import type { RecipientAutoCompleteOption } from '../../components/recipient/recipient-autocomplete-input';
+import { RecipientAutoCompleteInput } from '../../components/recipient/recipient-autocomplete-input';
 import { Button } from '../button';
 import { Checkbox } from '../checkbox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../form/form';
@@ -49,6 +53,10 @@ import {
 import { SigningOrderConfirmation } from './signing-order-confirmation';
 import type { DocumentFlowStep } from './types';
 
+type AutoSaveResponse = {
+  recipients: Recipient[];
+};
+
 export type AddSignersFormProps = {
   documentFlow: DocumentFlowStep;
   recipients: Recipient[];
@@ -56,7 +64,7 @@ export type AddSignersFormProps = {
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
   onSubmit: (_data: TAddSignersFormSchema) => void;
-  onAutoSave: (_data: TAddSignersFormSchema) => Promise<void>;
+  onAutoSave: (_data: TAddSignersFormSchema) => Promise<AutoSaveResponse>;
   isDocumentPdfLoaded: boolean;
 };
 
@@ -75,12 +83,27 @@ export const AddSignersFormPartial = ({
   const { remaining } = useLimits();
   const { user } = useSession();
 
+  const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+
+  const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
+
   const initialId = useId();
   const $sensorApi = useRef<SensorAPI | null>(null);
 
   const { currentStep, totalSteps, previousStep } = useStep();
 
   const organisation = useCurrentOrganisation();
+
+  const { data: recipientSuggestionsData, isLoading } = trpc.recipient.suggestions.find.useQuery(
+    {
+      query: debouncedRecipientSearchQuery,
+    },
+    {
+      enabled: debouncedRecipientSearchQuery.length > 1,
+    },
+  );
+
+  const recipientSuggestions = recipientSuggestionsData?.results || [];
 
   const defaultRecipients = [
     {
@@ -189,7 +212,44 @@ export const AddSignersFormPartial = ({
 
     const formData = form.getValues();
 
-    scheduleSave(formData);
+    scheduleSave(formData, (response) => {
+      // Sync the response recipients back to form state to prevent duplicates
+      if (response?.recipients) {
+        const currentSigners = form.getValues('signers');
+        const updatedSigners = currentSigners.map((signer) => {
+          // Find the matching recipient from the response using nativeId
+          const matchingRecipient = response.recipients.find(
+            (recipient) => recipient.id === signer.nativeId,
+          );
+
+          if (matchingRecipient) {
+            // Update the signer with the server-returned data, especially the ID
+            return {
+              ...signer,
+              nativeId: matchingRecipient.id,
+            };
+          }
+
+          // For new signers without nativeId, match by email and update with server ID
+          if (!signer.nativeId) {
+            const newRecipient = response.recipients.find(
+              (recipient) => recipient.email === signer.email,
+            );
+            if (newRecipient) {
+              return {
+                ...signer,
+                nativeId: newRecipient.id,
+              };
+            }
+          }
+
+          return signer;
+        });
+
+        // Update the form state with the synced data
+        form.setValue('signers', updatedSigners, { shouldValidate: false });
+      }
+    });
   };
 
   const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
@@ -286,10 +346,12 @@ export const AddSignersFormPartial = ({
     }
   };
 
-  const onKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && event.target instanceof HTMLInputElement) {
-      onAddSigner();
-    }
+  const handleRecipientAutoCompleteSelect = (
+    index: number,
+    suggestion: RecipientAutoCompleteOption,
+  ) => {
+    setValue(`signers.${index}.email`, suggestion.email);
+    setValue(`signers.${index}.name`, suggestion.name || '');
   };
 
   const onDragEnd = useCallback(
@@ -679,17 +741,26 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <RecipientAutoCompleteInput
                                         type="email"
                                         placeholder={_(msg`Email`)}
-                                        {...field}
+                                        value={field.value}
                                         disabled={
                                           snapshot.isDragging ||
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
+                                        options={recipientSuggestions}
+                                        onSelect={(suggestion) =>
+                                          handleRecipientAutoCompleteSelect(index, suggestion)
+                                        }
+                                        onSearchQueryChange={(query) => {
+                                          field.onChange(query);
+                                          setRecipientSearchQuery(query);
+                                        }}
+                                        loading={isLoading}
                                         data-testid="signer-email-input"
-                                        onKeyDown={onKeyDown}
+                                        maxLength={254}
                                         onBlur={handleAutoSave}
                                       />
                                     </FormControl>
@@ -719,7 +790,8 @@ export const AddSignersFormPartial = ({
                                     )}
 
                                     <FormControl>
-                                      <Input
+                                      <RecipientAutoCompleteInput
+                                        type="text"
                                         placeholder={_(msg`Name`)}
                                         {...field}
                                         disabled={
@@ -727,7 +799,16 @@ export const AddSignersFormPartial = ({
                                           isSubmitting ||
                                           !canRecipientBeModified(signer.nativeId)
                                         }
-                                        onKeyDown={onKeyDown}
+                                        options={recipientSuggestions}
+                                        onSelect={(suggestion) =>
+                                          handleRecipientAutoCompleteSelect(index, suggestion)
+                                        }
+                                        onSearchQueryChange={(query) => {
+                                          field.onChange(query);
+                                          setRecipientSearchQuery(query);
+                                        }}
+                                        loading={isLoading}
+                                        maxLength={255}
                                         onBlur={handleAutoSave}
                                       />
                                     </FormControl>

@@ -41,6 +41,11 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
   'DOCUMENT_RECIPIENT_EXPIRY_EXTENDED', // When a recipient's expiry is extended via resend.
+
+  // ACCESS AUTH 2FA events.
+  'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
+  'DOCUMENT_ACCESS_AUTH_2FA_VALIDATED', // When ACCESS AUTH 2FA is successfully validated.
+  'DOCUMENT_ACCESS_AUTH_2FA_FAILED', // When ACCESS AUTH 2FA validation fails.
 ]);
 
 export const ZDocumentAuditLogEmailTypeSchema = z.enum([
@@ -489,6 +494,42 @@ export const ZDocumentAuditLogEventDocumentRecipientRejectedSchema = z.object({
 });
 
 /**
+ * Event: Document recipient requested a 2FA token.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientRequested2FAEmailSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
+/**
+ * Event: Document recipient validated a 2FA token.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientValidated2FAEmailSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
+/**
+ * Event: Document recipient failed to validate a 2FA token.
+ */
+export const ZDocumentAuditLogEventDocumentRecipientFailed2FAEmailSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED),
+  data: z.object({
+    recipientEmail: z.string(),
+    recipientName: z.string(),
+    recipientId: z.number(),
+  }),
+});
+
+/**
  * Event: Document sent.
  */
 export const ZDocumentAuditLogEventDocumentSentSchema = z.object({
@@ -642,6 +683,9 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentViewedSchema,
     ZDocumentAuditLogEventDocumentRecipientCompleteSchema,
     ZDocumentAuditLogEventDocumentRecipientRejectedSchema,
+    ZDocumentAuditLogEventDocumentRecipientRequested2FAEmailSchema,
+    ZDocumentAuditLogEventDocumentRecipientValidated2FAEmailSchema,
+    ZDocumentAuditLogEventDocumentRecipientFailed2FAEmailSchema,
     ZDocumentAuditLogEventDocumentSentSchema,
     ZDocumentAuditLogEventDocumentTitleUpdatedSchema,
     ZDocumentAuditLogEventDocumentExternalIdUpdatedSchema,

@@ -4,6 +4,7 @@ import { z } from 'zod';
 
 import { GoogleAuthOptions, OidcAuthOptions } from '../config';
 import { handleOAuthAuthorizeUrl } from '../lib/utils/handle-oauth-authorize-url';
+import { getOrganisationAuthenticationPortalOptions } from '../lib/utils/organisation-portal';
 import type { HonoAuthContext } from '../types/context';
 
 const ZOAuthAuthorizeSchema = z.object({
@@ -33,5 +34,21 @@ export const oauthRoute = new Hono<HonoAuthContext>()
       c,
       clientOptions: OidcAuthOptions,
       redirectPath,
+    });
+  })
+  /**
+   * Organisation OIDC authorize endpoint.
+   */
+  .post('/authorize/oidc/org/:orgUrl', async (c) => {
+    const orgUrl = c.req.param('orgUrl');
+
+    const { clientOptions } = await getOrganisationAuthenticationPortalOptions({
+      type: 'url',
+      organisationUrl: orgUrl,
+    });
+
+    return await handleOAuthAuthorizeUrl({
+      c,
+      clientOptions,
     });
   });

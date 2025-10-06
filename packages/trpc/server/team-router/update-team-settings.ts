@@ -1,7 +1,10 @@
 import { Prisma } from '@prisma/client';
+import { OrganisationType } from '@prisma/client';
 
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
@@ -95,6 +98,35 @@ export const updateTeamSettingsRoute = authenticatedProcedure
           message: 'Email not found',
         });
       }
+    }
+
+    const organisation = await prisma.organisation.findFirst({
+      where: buildOrganisationWhereQuery({
+        organisationId: team.organisationId,
+        userId: user.id,
+        roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['MANAGE_ORGANISATION'],
+      }),
+      select: {
+        type: true,
+        organisationGlobalSettings: {
+          select: {
+            includeSenderDetails: true,
+          },
+        },
+      },
+    });
+
+    const isPersonalOrganisation = organisation?.type === OrganisationType.PERSONAL;
+    const currentIncludeSenderDetails =
+      organisation?.organisationGlobalSettings.includeSenderDetails;
+
+    const isChangingIncludeSenderDetails =
+      includeSenderDetails !== undefined && includeSenderDetails !== currentIncludeSenderDetails;
+
+    if (isPersonalOrganisation && isChangingIncludeSenderDetails) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: 'Personal teams cannot update the sender details',
+      });
     }
 
     await prisma.team.update({

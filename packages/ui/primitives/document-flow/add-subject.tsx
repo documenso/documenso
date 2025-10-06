@@ -262,7 +262,7 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} maxLength={254} />
                           </FormControl>
 
                           <FormMessage />
@@ -300,7 +300,7 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Input {...field} />
+                            <Input {...field} maxLength={255} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -326,7 +326,11 @@ export const AddSubjectFormPartial = ({
                           </FormLabel>
 
                           <FormControl>
-                            <Textarea className="bg-background mt-2 h-16 resize-none" {...field} />
+                            <Textarea
+                              className="bg-background mt-2 h-16 resize-none"
+                              {...field}
+                              maxLength={5000}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>

@@ -12,7 +12,7 @@ import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-form
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
@@ -46,6 +46,7 @@ import { DocumentSigningRejectDialog } from '~/components/general/document-signi
 import { DocumentSigningSignatureField } from '~/components/general/document-signing/document-signing-signature-field';
 import { DocumentSigningTextField } from '~/components/general/document-signing/document-signing-text-field';
 
+import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningCompleteDialog } from './document-signing-complete-dialog';
 import { DocumentSigningRecipientProvider } from './document-signing-recipient-provider';
 
@@ -69,6 +70,12 @@ export const DocumentSigningPageView = ({
   includeSenderDetails,
 }: DocumentSigningPageViewProps) => {
   const { documentData, documentMeta } = document;
+
+  const { derivedRecipientAccessAuth, user: authUser } = useRequiredDocumentSigningAuthContext();
+
+  const hasAuthenticator = authUser?.twoFactorEnabled
+    ? authUser.twoFactorEnabled && authUser.email === recipient.email
+    : false;
 
   const navigate = useNavigate();
   const analytics = useAnalytics();
@@ -94,14 +101,16 @@ export const DocumentSigningPageView = ({
     validateFieldsInserted(fieldsRequiringValidation);
   };
 
-  const completeDocument = async (
-    authOptions?: TRecipientActionAuth,
-    nextSigner?: { email: string; name: string },
-  ) => {
+  const completeDocument = async (options: {
+    accessAuthOptions?: TRecipientAccessAuth;
+    nextSigner?: { email: string; name: string };
+  }) => {
+    const { accessAuthOptions, nextSigner } = options;
+
     const payload = {
       token: recipient.token,
       documentId: document.id,
-      authOptions,
+      accessAuthOptions,
       ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
     };
 
@@ -160,6 +169,14 @@ export const DocumentSigningPageView = ({
   return (
     <DocumentSigningRecipientProvider recipient={recipient} targetSigner={targetSigner}>
       <div className="mx-auto w-full max-w-screen-xl sm:px-6">
+        {document.team.teamGlobalSettings.brandingEnabled &&
+          document.team.teamGlobalSettings.brandingLogo && (
+            <img
+              src={`/api/branding/logo/team/${document.teamId}`}
+              alt={`${document.team.name}'s Logo`}
+              className="mb-4 h-12 w-12 md:mb-2"
+            />
+          )}
         <h1
           className="block max-w-[20rem] truncate text-2xl font-semibold sm:mt-4 md:max-w-[30rem] md:text-3xl"
           title={document.title}
@@ -257,10 +274,10 @@ export const DocumentSigningPageView = ({
                           fields={fields}
                           fieldsValidated={fieldsValidated}
                           disabled={!isRecipientsTurn}
-                          onSignatureComplete={async (nextSigner) => {
-                            await completeDocument(undefined, nextSigner);
-                          }}
-                          role={recipient.role}
+                          onSignatureComplete={async (nextSigner) =>
+                            completeDocument({ nextSigner })
+                          }
+                          recipient={recipient}
                           allowDictateNextSigner={
                             nextRecipient && documentMeta?.allowDictateNextSigner
                           }
