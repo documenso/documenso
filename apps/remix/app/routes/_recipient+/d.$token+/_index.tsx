@@ -47,10 +47,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   });
 
   // Ensure typesafety when we add more options.
-  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
-    .with(DocumentAccessAuth.ACCOUNT, () => Boolean(session.user))
-    .with(undefined, () => true)
-    .exhaustive();
+  const isAccessAuthValid = derivedRecipientAccessAuth.every((auth) =>
+    match(auth)
+      .with(DocumentAccessAuth.ACCOUNT, () => Boolean(session.user))
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true)
+      .exhaustive(),
+  );
 
   if (!isAccessAuthValid) {
     return superLoaderJson({
