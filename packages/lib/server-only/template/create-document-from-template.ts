@@ -186,6 +186,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'radio',
         label: field.label,
         values: newValues,
+        direction: radioMeta.direction ?? 'vertical',
       };
 
       return meta;
