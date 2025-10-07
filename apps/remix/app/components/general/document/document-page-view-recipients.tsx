@@ -158,6 +158,14 @@ export const DocumentPageViewRecipients = ({
                   </PopoverHover>
                 )}
 
+              {document.status !== DocumentStatus.DRAFT &&
+                recipient.signingStatus === SigningStatus.EXPIRED && (
+                  <Badge variant="warning">
+                    <Clock className="mr-1 h-3 w-3" />
+                    <Trans>Expired</Trans>
+                  </Badge>
+                )}
+
               {document.status === DocumentStatus.PENDING &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
                 recipient.role !== RecipientRole.CC && (

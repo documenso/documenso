@@ -15,6 +15,7 @@ export const getRecipientsStats = async () => {
     [SigningStatus.SIGNED]: 0,
     [SigningStatus.NOT_SIGNED]: 0,
     [SigningStatus.REJECTED]: 0,
+    [SigningStatus.EXPIRED]: 0,
     [SendStatus.SENT]: 0,
     [SendStatus.NOT_SENT]: 0,
   };
