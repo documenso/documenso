@@ -527,8 +527,6 @@ model Recipient {
   fields            Field[]
   signatures        Signature[]
 
-  @@unique([documentId, email])
-  @@unique([templateId, email])
   @@index([documentId])
   @@index([templateId])
   @@index([token])
