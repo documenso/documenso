@@ -2,7 +2,10 @@ import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
 
-import { EMAIL_VERIFICATION_STATE } from '../../constants/email';
+import {
+  EMAIL_VERIFICATION_STATE,
+  USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
+} from '../../constants/email';
 import { jobsClient } from '../../jobs/client';
 
 export type VerifyEmailProps = {
@@ -12,10 +15,17 @@ export type VerifyEmailProps = {
 export const verifyEmail = async ({ token }: VerifyEmailProps) => {
   const verificationToken = await prisma.verificationToken.findFirst({
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
     },
     where: {
       token,
+      identifier: USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
     },
   });
 

@@ -10,15 +10,26 @@ For the digital signature of your documents you need a signing certificate in .p
 
    `openssl req -new -x509 -key private.key -out certificate.crt -days 365`
 
-   This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The -days parameter sets the number of days for which the certificate is valid.
+   This will prompt you to enter some information, such as the Common Name (CN) for the certificate. Make sure you enter the correct information. The `-days` parameter sets the number of days for which the certificate is valid.
 
-3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following command to do this:
+3. Combine the private key and the self-signed certificate to create the p12 certificate. You can run the following commands to do this:
 
-   `openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt`
+   ```bash
+   # Set certificate password securely (won't appear in command history)
+   read -s -p "Enter certificate password: " CERT_PASS
+   echo
+   
+   # Create the p12 certificate using the environment variable
+   openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+       -password env:CERT_PASS \
+       -keypbe PBE-SHA1-3DES \
+       -certpbe PBE-SHA1-3DES \
+       -macalg sha1
+   ```
 
-4. You will be prompted to enter a password for the p12 file. Choose a strong password and remember it, as you will need it to use the certificate (**can be empty for dev certificates**)
+4. **IMPORTANT**: A certificate password is required to prevent signing failures. Make sure to use a strong password (minimum 4 characters) when prompted. Certificates without passwords will cause "Failed to get private key bags" errors during document signing.
 
-5. Place the certificate `/apps/web/resources/certificate.p12` (If the path does not exist, it needs to be created)
+5. Place the certificate `/apps/remix/resources/certificate.p12` (If the path does not exist, it needs to be created)
 
 ## Docker
 

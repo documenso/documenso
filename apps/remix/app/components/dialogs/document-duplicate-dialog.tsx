@@ -36,11 +36,12 @@ export const DocumentDuplicateDialog = ({
 
   const team = useCurrentTeam();
 
-  const { data: document, isLoading } = trpcReact.document.getDocumentById.useQuery(
+  const { data: document, isLoading } = trpcReact.document.get.useQuery(
     {
       documentId: id,
     },
     {
+      queryHash: `document-duplicate-dialog-${id}`,
       enabled: open === true,
     },
   );
@@ -55,7 +56,7 @@ export const DocumentDuplicateDialog = ({
   const documentsPath = formatDocumentsPath(team.url);
 
   const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
-    trpcReact.document.duplicateDocument.useMutation({
+    trpcReact.document.duplicate.useMutation({
       onSuccess: async ({ documentId }) => {
         toast({
           title: _(msg`Document Duplicated`),

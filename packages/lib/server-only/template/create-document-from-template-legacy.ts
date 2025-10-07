@@ -19,6 +19,8 @@ export type CreateDocumentFromTemplateLegacyOptions = {
   }[];
 };
 
+// !TODO: Make this work
+
 /**
  * Legacy server function for /api/v1
  */
@@ -58,6 +60,15 @@ export const createDocumentFromTemplateLegacy = async ({
     },
   });
 
+  const recipientsToCreate = template.recipients.map((recipient) => ({
+    id: recipient.id,
+    email: recipient.email,
+    name: recipient.name,
+    role: recipient.role,
+    signingOrder: recipient.signingOrder,
+    token: nanoid(),
+  }));
+
   const document = await prisma.document.create({
     data: {
       qrToken: prefixedId('qr'),
@@ -70,12 +81,12 @@ export const createDocumentFromTemplateLegacy = async ({
       documentDataId: documentData.id,
       useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
       recipients: {
-        create: template.recipients.map((recipient) => ({
+        create: recipientsToCreate.map((recipient) => ({
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
           signingOrder: recipient.signingOrder,
-          token: nanoid(),
+          token: recipient.token,
         })),
       },
       documentMeta: {
@@ -95,9 +106,11 @@ export const createDocumentFromTemplateLegacy = async ({
 
   await prisma.field.createMany({
     data: template.fields.map((field) => {
-      const recipient = template.recipients.find((recipient) => recipient.id === field.recipientId);
+      const recipient = recipientsToCreate.find((recipient) => recipient.id === field.recipientId);
 
-      const documentRecipient = document.recipients.find((doc) => doc.email === recipient?.email);
+      const documentRecipient = document.recipients.find(
+        (documentRecipient) => documentRecipient.token === recipient?.token,
+      );
 
       if (!documentRecipient) {
         throw new Error('Recipient not found.');
@@ -118,28 +131,32 @@ export const createDocumentFromTemplateLegacy = async ({
     }),
   });
 
+  // Replicate the old logic, get by index and create if we exceed the number of existing recipients.
   if (recipients && recipients.length > 0) {
-    document.recipients = await Promise.all(
+    await Promise.all(
       recipients.map(async (recipient, index) => {
         const existingRecipient = document.recipients.at(index);
 
-        return await prisma.recipient.upsert({
-          where: {
-            documentId_email: {
+        if (existingRecipient) {
+          return await prisma.recipient.update({
+            where: {
+              id: existingRecipient.id,
               documentId: document.id,
-              email: existingRecipient?.email ?? recipient.email,
             },
-          },
-          update: {
-            name: recipient.name,
-            email: recipient.email,
-            role: recipient.role,
-            signingOrder: recipient.signingOrder,
-          },
-          create: {
+            data: {
+              name: recipient.name,
+              email: recipient.email,
+              role: recipient.role,
+              signingOrder: recipient.signingOrder,
+            },
+          });
+        }
+
+        return await prisma.recipient.create({
+          data: {
             documentId: document.id,
-            email: recipient.email,
             name: recipient.name,
+            email: recipient.email,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             token: nanoid(),
@@ -149,5 +166,18 @@ export const createDocumentFromTemplateLegacy = async ({
     );
   }
 
-  return document;
+  // Gross but we need to do the additional fetch since we mutate above.
+  const updatedRecipients = await prisma.recipient.findMany({
+    where: {
+      documentId: document.id,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return {
+    ...document,
+    recipients: updatedRecipients,
+  };
 };
