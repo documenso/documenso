@@ -33,7 +33,7 @@ export const ZNoBodyMutationSchema = null;
  */
 export const ZGetDocumentsQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
-  perPage: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(10),
 });
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
@@ -310,12 +310,11 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     )
     .refine(
       (schema) => {
-        const emails = schema.map((signer) => signer.email.toLowerCase());
         const ids = schema.map((signer) => signer.id);
 
-        return new Set(emails).size === emails.length && new Set(ids).size === ids.length;
+        return new Set(ids).size === ids.length;
       },
-      { message: 'Recipient IDs and emails must be unique' },
+      { message: 'Recipient IDs must be unique' },
     ),
   meta: z
     .object({
@@ -637,5 +636,5 @@ export const ZSuccessfulGetTemplatesResponseSchema = z.object({
 
 export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
-  perPage: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(10),
 });

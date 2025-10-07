@@ -16,3 +16,5 @@ export const EMAIL_VERIFICATION_STATE = {
   EXPIRED: 'EXPIRED',
   ALREADY_VERIFIED: 'ALREADY_VERIFIED',
 } as const;
+
+export const USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER = 'confirmation-email';

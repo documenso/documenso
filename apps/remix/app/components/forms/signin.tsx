@@ -114,7 +114,7 @@ export const SignInForm = ({
   }, [returnTo]);
 
   const { mutateAsync: createPasskeySigninOptions } =
-    trpc.auth.createPasskeySigninOptions.useMutation();
+    trpc.auth.passkey.createSigninOptions.useMutation();
 
   const form = useForm<TSignInFormSchema>({
     values: {

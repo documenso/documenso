@@ -15,7 +15,6 @@ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
-  isTemplateRecipientEmailPlaceholder,
 } from '@documenso/lib/constants/template';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
@@ -46,50 +45,22 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-const ZAddRecipientsForNewDocumentSchema = z
-  .object({
-    distributeDocument: z.boolean(),
-    useCustomDocument: z.boolean().default(false),
-    customDocumentData: z
-      .any()
-      .refine((data) => data instanceof File || data === undefined)
-      .optional(),
-    recipients: z.array(
-      z.object({
-        id: z.number(),
-        email: z.string().email(),
-        name: z.string(),
-        signingOrder: z.number().optional(),
-      }),
-    ),
-  })
-  // Display exactly which rows are duplicates.
-  .superRefine((items, ctx) => {
-    const uniqueEmails = new Map<string, number>();
-
-    for (const [index, recipients] of items.recipients.entries()) {
-      const email = recipients.email.toLowerCase();
-
-      const firstFoundIndex = uniqueEmails.get(email);
-
-      if (firstFoundIndex === undefined) {
-        uniqueEmails.set(email, index);
-        continue;
-      }
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['recipients', index, 'email'],
-      });
-
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: 'Emails must be unique',
-        path: ['recipients', firstFoundIndex, 'email'],
-      });
-    }
-  });
+const ZAddRecipientsForNewDocumentSchema = z.object({
+  distributeDocument: z.boolean(),
+  useCustomDocument: z.boolean().default(false),
+  customDocumentData: z
+    .any()
+    .refine((data) => data instanceof File || data === undefined)
+    .optional(),
+  recipients: z.array(
+    z.object({
+      id: z.number(),
+      email: z.string().email(),
+      name: z.string(),
+      signingOrder: z.number().optional(),
+    }),
+  ),
+});
 
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
@@ -278,14 +249,7 @@ export function TemplateUseDialog({
                           )}
 
                           <FormControl>
-                            <Input
-                              {...field}
-                              placeholder={
-                                isTemplateRecipientEmailPlaceholder(field.value)
-                                  ? ''
-                                  : _(msg`Email`)
-                              }
-                            />
+                            <Input {...field} aria-label="Email" placeholder={_(msg`Email`)} />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -306,6 +270,7 @@ export function TemplateUseDialog({
                           <FormControl>
                             <Input
                               {...field}
+                              aria-label="Name"
                               placeholder={recipients[index].name || _(msg`Name`)}
                             />
                           </FormControl>
