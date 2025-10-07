@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
+  ZRecipientAccessAuthSchema,
   ZRecipientAccessAuthTypesSchema,
   ZRecipientActionAuthSchema,
   ZRecipientActionAuthTypesSchema,
@@ -164,6 +165,7 @@ export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
   authOptions: ZRecipientActionAuthSchema.optional(),
+  accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({
       email: z.string().email().max(254),
