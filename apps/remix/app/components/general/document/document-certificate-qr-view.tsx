@@ -86,7 +86,7 @@ export const DocumentCertificateQRView = ({
           <h1 className="text-xl font-medium">{title}</h1>
           <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
             <p>
-              <Plural one={`# recipient`} other={`# recipients`} value={recipientCount} />
+              <Plural one="1 Recipient" other="# Recipients" value={recipientCount} />
             </p>
 
             <p>
