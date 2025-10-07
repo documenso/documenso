@@ -90,6 +90,9 @@ model TeamProfile {
 enum UserSecurityAuditLogType {
   ACCOUNT_PROFILE_UPDATE
   ACCOUNT_SSO_LINK
+  ACCOUNT_SSO_UNLINK
+  ORGANISATION_SSO_LINK
+  ORGANISATION_SSO_UNLINK
   AUTH_2FA_DISABLE
   AUTH_2FA_ENABLE
   PASSKEY_CREATED
@@ -157,6 +160,7 @@ model VerificationToken {
   completed   Boolean  @default(false)
   expires     DateTime
   createdAt   DateTime @default(now())
+  metadata    Json?
   userId      Int
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -277,13 +281,15 @@ model OrganisationClaim {
 }
 
 model Account {
-  id                String  @id @default(cuid())
+  id                String   @id @default(cuid())
+  // When this record was created, unrelated to anything passed back by the provider.
+  createdAt         DateTime @default(now())
   userId            Int
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
+  refresh_token     String?  @db.Text
+  access_token      String?  @db.Text
   expires_at        Int?
   // Some providers return created_at so we need to make it optional
   created_at        Int?
@@ -291,7 +297,7 @@ model Account {
   ext_expires_in    Int?
   token_type        String?
   scope             String?
-  id_token          String? @db.Text
+  id_token          String?  @db.Text
   session_state     String?
   password          String?
 
@@ -521,8 +527,6 @@ model Recipient {
   fields            Field[]
   signatures        Signature[]
 
-  @@unique([documentId, email])
-  @@unique([templateId, email])
   @@index([documentId])
   @@index([templateId])
   @@index([token])
@@ -632,6 +636,9 @@ model Organisation {
 
   organisationGlobalSettingsId String                     @unique
   organisationGlobalSettings   OrganisationGlobalSettings @relation(fields: [organisationGlobalSettingsId], references: [id])
+
+  organisationAuthenticationPortalId String                           @unique
+  organisationAuthenticationPortal   OrganisationAuthenticationPortal @relation(fields: [organisationAuthenticationPortalId], references: [id])
 }
 
 model OrganisationMember {
@@ -1025,4 +1032,19 @@ model OrganisationEmail {
 
   organisationGlobalSettings OrganisationGlobalSettings[]
   teamGlobalSettings         TeamGlobalSettings[]
+}
+
+model OrganisationAuthenticationPortal {
+  id           String        @id
+  organisation Organisation?
+
+  enabled Boolean @default(false)
+
+  clientId     String @default("")
+  clientSecret String @default("")
+  wellKnownUrl String @default("")
+
+  defaultOrganisationRole OrganisationMemberRole @default(MEMBER)
+  autoProvisionUsers      Boolean                @default(true)
+  allowedDomains          String[]               @default([])
 }

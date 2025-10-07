@@ -80,17 +80,6 @@ export const updateTemplateRecipients = async ({
       });
     }
 
-    const duplicateRecipientWithSameEmail = template.recipients.find(
-      (existingRecipient) =>
-        existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
-    );
-
-    if (duplicateRecipientWithSameEmail) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Duplicate recipient with the same email found: ${duplicateRecipientWithSameEmail.email}`,
-      });
-    }
-
     return {
       originalRecipient,
       recipientUpdateData: recipient,

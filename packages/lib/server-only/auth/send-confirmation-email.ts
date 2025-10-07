@@ -8,7 +8,10 @@ import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
-import { env } from '../../utils/env';
+import {
+  DOCUMENSO_INTERNAL_EMAIL,
+  USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
+} from '../../constants/email';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 
 export interface SendConfirmationEmailProps {
@@ -16,15 +19,15 @@ export interface SendConfirmationEmailProps {
 }
 
 export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailProps) => {
-  const NEXT_PRIVATE_SMTP_FROM_NAME = env('NEXT_PRIVATE_SMTP_FROM_NAME');
-  const NEXT_PRIVATE_SMTP_FROM_ADDRESS = env('NEXT_PRIVATE_SMTP_FROM_ADDRESS');
-
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
     },
     include: {
       verificationTokens: {
+        where: {
+          identifier: USER_SIGNUP_VERIFICATION_TOKEN_IDENTIFIER,
+        },
         orderBy: {
           createdAt: 'desc',
         },
@@ -41,8 +44,6 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const confirmationLink = `${assetBaseUrl}/verify-email/${verificationToken.token}`;
-  const senderName = NEXT_PRIVATE_SMTP_FROM_NAME || 'Documenso';
-  const senderAddress = NEXT_PRIVATE_SMTP_FROM_ADDRESS || 'noreply@documenso.com';
 
   const confirmationTemplate = createElement(ConfirmEmailTemplate, {
     assetBaseUrl,
@@ -61,10 +62,7 @@ export const sendConfirmationEmail = async ({ userId }: SendConfirmationEmailPro
       address: user.email,
       name: user.name || '',
     },
-    from: {
-      name: senderName,
-      address: senderAddress,
-    },
+    from: DOCUMENSO_INTERNAL_EMAIL,
     subject: i18n._(msg`Please confirm your email`),
     html,
     text,
