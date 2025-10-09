@@ -4,15 +4,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient, SigningStatus } from '@prisma/client';
+import { type Recipient, SigningStatus, type Team, type User } from '@prisma/client';
 import { History } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
-import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -43,7 +43,11 @@ import { StackAvatar } from '../general/stack-avatar';
 const FORM_ID = 'resend-email';
 
 export type DocumentResendDialogProps = {
-  document: TDocumentRow;
+  document: Pick<Document, 'id' | 'userId' | 'teamId' | 'status'> & {
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
+    team: Pick<Team, 'id' | 'url'> | null;
+  };
   recipients: Recipient[];
 };
 

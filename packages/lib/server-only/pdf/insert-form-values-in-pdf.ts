@@ -1,4 +1,10 @@
-import { PDFCheckBox, PDFDocument, PDFDropdown, PDFRadioGroup, PDFTextField } from 'pdf-lib';
+import {
+  PDFCheckBox,
+  PDFDocument,
+  PDFDropdown,
+  PDFRadioGroup,
+  PDFTextField,
+} from '@cantoo/pdf-lib';
 
 export type InsertFormValuesInPdfOptions = {
   pdf: Buffer;

@@ -1,8 +1,8 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
-import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
+import type { Recipient, TemplateDirectLink } from '@prisma/client';
+import { Copy, Edit, FolderIcon, MoreHorizontal, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
@@ -16,12 +16,17 @@ import {
 
 import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDeleteDialog } from '../dialogs/template-delete-dialog';
-import { TemplateDirectLinkDialog } from '../dialogs/template-direct-link-dialog';
 import { TemplateDuplicateDialog } from '../dialogs/template-duplicate-dialog';
 import { TemplateMoveToFolderDialog } from '../dialogs/template-move-to-folder-dialog';
 
 export type TemplatesTableActionDropdownProps = {
-  row: Template & {
+  row: {
+    id: number;
+    userId: number;
+    teamId: number;
+    title: string;
+    folderId?: string | null;
+    envelopeId: string;
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
     recipients: Recipient[];
   };
@@ -39,14 +44,13 @@ export const TemplatesTableActionDropdown = ({
   const { user } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isMoveToFolderDialogOpen, setMoveToFolderDialogOpen] = useState(false);
 
   const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
 
-  const formatPath = `${templateRootPath}/${row.id}/edit`;
+  const formatPath = `${templateRootPath}/${row.envelopeId}/edit`;
 
   return (
     <DropdownMenu>
@@ -70,11 +74,6 @@ export const TemplatesTableActionDropdown = ({
         >
           <Copy className="mr-2 h-4 w-4" />
           <Trans>Duplicate</Trans>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem onClick={() => setTemplateDirectLinkDialogOpen(true)}>
-          <Share2Icon className="mr-2 h-4 w-4" />
-          <Trans>Direct link</Trans>
         </DropdownMenuItem>
 
         <DropdownMenuItem onClick={() => setMoveToFolderDialogOpen(true)}>
@@ -106,12 +105,6 @@ export const TemplatesTableActionDropdown = ({
         id={row.id}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
-      />
-
-      <TemplateDirectLinkDialog
-        template={row}
-        open={isTemplateDirectLinkDialogOpen}
-        onOpenChange={setTemplateDirectLinkDialogOpen}
       />
 
       <TemplateDeleteDialog

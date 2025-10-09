@@ -54,7 +54,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   const document = await getDocumentWithDetailsById({
-    documentId,
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
     userId: result?.userId,
     teamId: result?.teamId ?? undefined,
   }).catch(() => null);
@@ -232,6 +235,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
             .map<any>((f) => ({
               ...f,
               id: f.nativeId,
+              envelopeItemId: document.documentData.envelopeItemId,
               pageX: f.pageX,
               pageY: f.pageY,
               width: f.pageWidth,

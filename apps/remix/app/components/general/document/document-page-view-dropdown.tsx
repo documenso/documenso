@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { DocumentStatus } from '@prisma/client';
 import {
   Copy,
@@ -19,7 +18,9 @@ import { Link, useNavigate } from 'react-router';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
@@ -39,14 +40,10 @@ import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/d
 import { useCurrentTeam } from '~/providers/team';
 
 export type DocumentPageViewDropdownProps = {
-  document: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'> | null;
-  };
+  envelope: TEnvelope;
 };
 
-export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownProps) => {
+export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownProps) => {
   const { user } = useSession();
   const { toast } = useToast();
   const { _ } = useLingui();
@@ -57,14 +54,14 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
 
-  const recipient = document.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
-  const isOwner = document.user.id === user.id;
-  const isDraft = document.status === DocumentStatus.DRAFT;
-  const isPending = document.status === DocumentStatus.PENDING;
-  const isDeleted = document.deletedAt !== null;
-  const isComplete = isDocumentCompleted(document);
-  const isCurrentTeamDocument = team && document.team?.url === team.url;
+  const isOwner = envelope.userId === user.id;
+  const isDraft = envelope.status === DocumentStatus.DRAFT;
+  const isPending = envelope.status === DocumentStatus.PENDING;
+  const isDeleted = envelope.deletedAt !== null;
+  const isComplete = isDocumentCompleted(envelope);
+  const isCurrentTeamDocument = team && envelope.teamId === team.id;
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team.url);
@@ -73,7 +70,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
     try {
       const documentWithData = await trpcClient.document.get.query(
         {
-          documentId: document.id,
+          documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         },
         {
           context: {
@@ -88,7 +85,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         return;
       }
 
-      await downloadPDF({ documentData, fileName: document.title });
+      await downloadPDF({ documentData, fileName: envelope.title });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -102,7 +99,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
     try {
       const documentWithData = await trpcClient.document.get.query(
         {
-          documentId: document.id,
+          documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         },
         {
           context: {
@@ -117,7 +114,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         return;
       }
 
-      await downloadPDF({ documentData, fileName: document.title, version: 'original' });
+      await downloadPDF({ documentData, fileName: envelope.title, version: 'original' });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -127,7 +124,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
     }
   };
 
-  const nonSignedRecipients = document.recipients.filter((item) => item.signingStatus !== 'SIGNED');
+  const nonSignedRecipients = envelope.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
     <DropdownMenu>
@@ -142,7 +139,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
         {(isOwner || isCurrentTeamDocument) && !isComplete && (
           <DropdownMenuItem asChild>
-            <Link to={`${documentsPath}/${document.id}/edit`}>
+            <Link to={`${documentsPath}/${envelope.id}/edit`}>
               <Edit className="mr-2 h-4 w-4" />
               <Trans>Edit</Trans>
             </Link>
@@ -162,7 +159,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
         </DropdownMenuItem>
 
         <DropdownMenuItem asChild>
-          <Link to={`${documentsPath}/${document.id}/logs`}>
+          <Link to={`${documentsPath}/${envelope.id}/logs`}>
             <ScrollTextIcon className="mr-2 h-4 w-4" />
             <Trans>Audit Logs</Trans>
           </Link>
@@ -184,7 +181,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
         {canManageDocument && (
           <DocumentRecipientLinkCopyDialog
-            recipients={document.recipients}
+            recipients={envelope.recipients}
             trigger={
               <DropdownMenuItem
                 disabled={!isPending || isDeleted}
@@ -197,10 +194,16 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
           />
         )}
 
-        <DocumentResendDialog document={document} recipients={nonSignedRecipients} />
+        <DocumentResendDialog
+          document={{
+            ...envelope,
+            id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+          }}
+          recipients={nonSignedRecipients}
+        />
 
         <DocumentShareButton
-          documentId={document.id}
+          documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
           token={isOwner ? undefined : recipient?.token}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
@@ -214,9 +217,9 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
       </DropdownMenuContent>
 
       <DocumentDeleteDialog
-        id={document.id}
-        status={document.status}
-        documentTitle={document.title}
+        id={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+        status={envelope.status}
+        documentTitle={envelope.title}
         open={isDeleteDialogOpen}
         canManageDocument={canManageDocument}
         onOpenChange={setDeleteDialogOpen}
@@ -227,7 +230,7 @@ export const DocumentPageViewDropdown = ({ document }: DocumentPageViewDropdownP
 
       {isDuplicateDialogOpen && (
         <DocumentDuplicateDialog
-          id={document.id}
+          id={mapSecondaryIdToDocumentId(envelope.secondaryId)}
           open={isDuplicateDialogOpen}
           onOpenChange={setDuplicateDialogOpen}
         />

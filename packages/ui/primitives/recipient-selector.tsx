@@ -21,6 +21,7 @@ export interface RecipientSelectorProps {
   selectedRecipient: Recipient | null;
   onSelectedRecipientChange: (recipient: Recipient) => void;
   recipients: Recipient[];
+  align?: 'center' | 'end' | 'start';
 }
 
 export const RecipientSelector = ({
@@ -28,6 +29,7 @@ export const RecipientSelector = ({
   selectedRecipient,
   onSelectedRecipientChange,
   recipients,
+  align = 'start',
 }: RecipientSelectorProps) => {
   const { _ } = useLingui();
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
@@ -83,7 +85,7 @@ export const RecipientSelector = ({
                 recipients.findIndex((r) => r.id === selectedRecipient?.id),
                 0,
               ),
-            ).base,
+            ).comboxBoxTrigger,
             className,
           )}
         >
@@ -101,8 +103,8 @@ export const RecipientSelector = ({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="p-0" align="start">
-        <Command value={selectedRecipient?.email}>
+      <PopoverContent className="p-0" align={align}>
+        <Command value={selectedRecipient ? selectedRecipient.id.toString() : undefined}>
           <CommandInput />
 
           <CommandEmpty>
@@ -149,7 +151,7 @@ export const RecipientSelector = ({
                 >
                   <span
                     className={cn('text-foreground/70 truncate', {
-                      'text-foreground/80': recipient === selectedRecipient,
+                      'text-foreground/80': recipient.id === selectedRecipient?.id,
                     })}
                   >
                     {recipient.name && (
@@ -164,10 +166,10 @@ export const RecipientSelector = ({
                   <div className="ml-auto flex items-center justify-center">
                     {recipient.sendStatus !== SendStatus.SENT ? (
                       <Check
-                        aria-hidden={recipient !== selectedRecipient}
+                        aria-hidden={recipient.id !== selectedRecipient?.id}
                         className={cn('h-4 w-4 flex-shrink-0', {
-                          'opacity-0': recipient !== selectedRecipient,
-                          'opacity-100': recipient === selectedRecipient,
+                          'opacity-0': recipient.id !== selectedRecipient?.id,
+                          'opacity-100': recipient.id === selectedRecipient?.id,
                         })}
                       />
                     ) : (

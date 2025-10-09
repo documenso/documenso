@@ -44,7 +44,9 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
   const [showTemplateCreateDialog, setShowTemplateCreateDialog] = useState(false);
   const [isUploadingFile, setIsUploadingFile] = useState(false);
 
-  const onFileDrop = async (file: File) => {
+  const onFileDrop = async (files: File[]) => {
+    const file = files[0];
+
     if (isUploadingFile) {
       return;
     }
@@ -54,7 +56,7 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
     try {
       const response = await putPdfFile(file);
 
-      const { id } = await createTemplate({
+      const { legacyTemplateId: id } = await createTemplate({
         title: file.name,
         templateDocumentDataId: response.id,
         folderId: folderId,

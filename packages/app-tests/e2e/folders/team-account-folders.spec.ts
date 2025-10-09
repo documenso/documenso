@@ -44,12 +44,6 @@ test('[TEAMS]: can create document folder', async ({ page }) => {
 test('[TEAMS]: can create document subfolder within a document folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
-  await apiSignin({
-    page,
-    email: teamOwner.email,
-    redirectPath: `/t/${team.url}`,
-  });
-
   const teamFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Folder',
@@ -57,7 +51,11 @@ test('[TEAMS]: can create document subfolder within a document folder', async ({
     },
   });
 
-  await page.goto(`/t/${team.url}/documents/f/${teamFolder.id}`);
+  await apiSignin({
+    page,
+    email: teamOwner.email,
+    redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
+  });
 
   await page.getByTestId('folder-create-button').click();
 
@@ -383,12 +381,10 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await page.waitForTimeout(3000);
 
-  await page.getByRole('button', { name: 'Create' }).click();
-
-  await page.waitForTimeout(1000);
-
+  // Expect redirect.
   await expect(page.getByText('documenso-supporter-pledge.pdf')).toBeVisible();
 
+  // Return to folder and verify file is visible.
   await page.goto(`/t/${team.url}/templates/f/${folder.id}`);
   await expect(page.getByText('documenso-supporter-pledge.pdf')).toBeVisible();
 });

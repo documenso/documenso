@@ -1,6 +1,8 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface GetRecipientsForTemplateOptions {
   templateId: number;
@@ -13,15 +15,19 @@ export const getRecipientsForTemplate = async ({
   userId,
   teamId,
 }: GetRecipientsForTemplateOptions) => {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
+      id: templateId,
+    },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
   const recipients = await prisma.recipient.findMany({
     where: {
-      templateId,
-      template: {
-        team: buildTeamWhereQuery({
-          teamId,
-          userId,
-        }),
-      },
+      envelope: envelopeWhereInput,
     },
     orderBy: {
       id: 'asc',

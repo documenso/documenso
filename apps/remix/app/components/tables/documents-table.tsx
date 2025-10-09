@@ -180,7 +180,7 @@ const DataTableTitle = ({ row, teamUrl }: DataTableTitleProps) => {
   const isCurrentTeamDocument = teamUrl && row.team?.url === teamUrl;
 
   const documentsPath = formatDocumentsPath(teamUrl);
-  const formatPath = `${documentsPath}/${row.id}`;
+  const formatPath = `${documentsPath}/${row.envelopeId}`;
 
   return match({
     isOwner,

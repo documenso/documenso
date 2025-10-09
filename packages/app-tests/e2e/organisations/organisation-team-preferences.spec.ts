@@ -96,7 +96,7 @@ test('[ORGANISATIONS]: manage document preferences', async ({ page }) => {
 
   const documentMeta = await prisma.documentMeta.findFirstOrThrow({
     where: {
-      documentId: document.id,
+      id: document.documentMetaId,
     },
   });
 
@@ -272,7 +272,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   const teamOverrideDocumentMeta = await prisma.documentMeta.findFirstOrThrow({
     where: {
-      documentId: teamOverrideDocument.id,
+      id: teamOverrideDocument.documentMetaId,
     },
   });
 
@@ -317,7 +317,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
 
   const documentMeta = await prisma.documentMeta.findFirstOrThrow({
     where: {
-      documentId: document.id,
+      id: document.documentMetaId,
     },
   });
 

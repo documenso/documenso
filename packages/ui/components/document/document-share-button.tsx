@@ -60,7 +60,7 @@ export const DocumentShareButton = ({
     mutateAsync: createOrGetShareLink,
     data: shareLink,
     isPending: isCreatingOrGettingShareLink,
-  } = trpc.shareLink.createOrGetShareLink.useMutation();
+  } = trpc.document.share.useMutation();
 
   const isLoading = isCreatingOrGettingShareLink || isCopyingShareLink;
 

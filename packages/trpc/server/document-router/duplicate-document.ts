@@ -22,8 +22,11 @@ export const duplicateDocumentRoute = authenticatedProcedure
     });
 
     return await duplicateDocument({
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       userId: user.id,
       teamId,
-      documentId,
     });
   });

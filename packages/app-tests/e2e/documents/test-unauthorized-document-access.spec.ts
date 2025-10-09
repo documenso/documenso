@@ -28,7 +28,7 @@ test.describe('Unauthorized Access to Documents', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/documents/${document.id}`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 
   test('should block unauthorized access to the draft document edit page', async ({ page }) => {
@@ -44,7 +44,7 @@ test.describe('Unauthorized Access to Documents', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/documents/${document.id}/edit`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 
   test('should block unauthorized access to the pending document page', async ({ page }) => {
@@ -61,7 +61,7 @@ test.describe('Unauthorized Access to Documents', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/documents/${document.id}`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 
   test('should block unauthorized access to pending document edit page', async ({ page }) => {
@@ -78,7 +78,7 @@ test.describe('Unauthorized Access to Documents', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/documents/${document.id}/edit`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 
   test('should block unauthorized access to completed document page', async ({ page }) => {
@@ -95,6 +95,6 @@ test.describe('Unauthorized Access to Documents', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/documents/${document.id}`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 });

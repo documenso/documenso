@@ -19,9 +19,11 @@ import { AppNavMobile } from './app-nav-mobile';
 import { MenuSwitcher } from './menu-switcher';
 import { OrgMenuSwitcher } from './org-menu-switcher';
 
-export type HeaderProps = HTMLAttributes<HTMLDivElement>;
+export type HeaderProps = HTMLAttributes<HTMLDivElement> & {
+  restrictWidth?: boolean;
+};
 
-export const Header = ({ className, ...props }: HeaderProps) => {
+export const Header = ({ className, restrictWidth = true, ...props }: HeaderProps) => {
   const params = useParams();
 
   const { organisations } = useSession();
@@ -58,9 +60,16 @@ export const Header = ({ className, ...props }: HeaderProps) => {
       )}
       {...props}
     >
-      <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
+      <div
+        className={cn(
+          'mx-auto flex w-full items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8',
+          {
+            'max-w-screen-xl': restrictWidth,
+          },
+        )}
+      >
         <Link
-          to={`${getRootHref(params, { returnEmptyRootString: true })}`}
+          to={getRootHref(params)}
           className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
           <BrandingLogo className="h-6 w-auto" />

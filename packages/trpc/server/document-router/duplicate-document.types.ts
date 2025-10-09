@@ -16,7 +16,8 @@ export const ZDuplicateDocumentRequestSchema = z.object({
 });
 
 export const ZDuplicateDocumentResponseSchema = z.object({
-  documentId: z.number(),
+  id: z.string().describe('The envelope ID'),
+  documentId: z.number().describe('The legacy document ID'),
 });
 
 export type TDuplicateDocumentRequest = z.infer<typeof ZDuplicateDocumentRequestSchema>;

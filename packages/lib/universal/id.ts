@@ -11,6 +11,10 @@ export const prefixedId = (prefix: string, length = 16) => {
 };
 
 type DatabaseIdPrefix =
+  | 'document'
+  | 'template'
+  | 'envelope'
+  | 'envelope_item'
   | 'email_domain'
   | 'org'
   | 'org_email'

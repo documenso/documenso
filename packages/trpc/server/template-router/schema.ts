@@ -109,9 +109,21 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   customDocumentDataId: z
     .string()
     .describe(
-      'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      '[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
+  customDocumentData: z
+    .array(
+      z.object({
+        documentDataId: z.string(),
+        envelopeItemId: z.string(),
+      }),
+    )
+    .describe(
+      'The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+
   folderId: z
     .string()
     .describe(
@@ -146,11 +158,13 @@ export const ZCreateTemplateDirectLinkRequestSchema = z.object({
 
 const GenericDirectLinkResponseSchema = TemplateDirectLinkSchema.pick({
   id: true,
-  templateId: true,
   token: true,
   createdAt: true,
   enabled: true,
   directTemplateRecipientId: true,
+  // envelopeId: true, // Todo: Envelopes
+}).extend({
+  templateId: z.number(),
 });
 
 export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
@@ -194,6 +208,10 @@ export const ZCreateTemplateV2ResponseSchema = z.object({
   uploadUrl: z.string().min(1),
 });
 
+export const ZCreateTemplateResponseSchema = z.object({
+  legacyTemplateId: z.number(),
+});
+
 export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
   data: z
@@ -207,6 +225,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
       publicDescription: ZTemplatePublicDescriptionSchema.optional(),
       type: z.nativeEnum(TemplateType).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
+      folderId: z.string().nullish(),
     })
     .optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),

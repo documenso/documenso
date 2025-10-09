@@ -26,9 +26,11 @@ import { Card, CardContent } from './card';
 
 export type DocumentDropzoneProps = {
   className?: string;
+  allowMultiple?: boolean;
   disabled?: boolean;
+  disabledHeading?: MessageDescriptor;
   disabledMessage?: MessageDescriptor;
-  onDrop?: (_file: File) => void | Promise<void>;
+  onDrop?: (_file: File[]) => void | Promise<void>;
   onDropRejected?: () => void | Promise<void>;
   type?: 'document' | 'template';
   [key: string]: unknown;
@@ -36,9 +38,11 @@ export type DocumentDropzoneProps = {
 
 export const DocumentDropzone = ({
   className,
+  allowMultiple,
   onDrop,
   onDropRejected,
   disabled,
+  disabledHeading,
   disabledMessage = msg`You cannot upload documents at this time.`,
   type = 'document',
   ...props
@@ -51,11 +55,11 @@ export const DocumentDropzone = ({
     accept: {
       'application/pdf': ['.pdf'],
     },
-    multiple: false,
+    multiple: allowMultiple,
     disabled,
-    onDrop: ([acceptedFile]) => {
-      if (acceptedFile && onDrop) {
-        void onDrop(acceptedFile);
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0 && onDrop) {
+        void onDrop(acceptedFiles);
       }
     },
     onDropRejected: () => {
@@ -67,7 +71,9 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: disabled ? msg`You have reached your document limit.` : msg`Add a document`,
+    document: disabled
+      ? disabledHeading || msg`You have reached your document limit.`
+      : msg`Add a document`,
     template: msg`Upload Template Document`,
   };
 
@@ -153,7 +159,7 @@ export const DocumentDropzone = ({
 
           <input {...getInputProps()} />
 
-          <p className="text-foreground mt-8 font-medium">{_(heading[type])}</p>
+          <p className="text-foreground mt-6 font-medium">{_(heading[type])}</p>
 
           <p className="text-muted-foreground/80 mt-1 text-center text-sm">
             {_(disabled ? disabledMessage : msg`Drag & drop your PDF here.`)}

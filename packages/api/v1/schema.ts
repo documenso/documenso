@@ -8,8 +8,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-  TemplateType,
 } from '@prisma/client';
+import { TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -49,7 +49,6 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
   teamId: z.number().nullish(),
   title: z.string(),
   status: z.string(),
-  documentDataId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   completedAt: z.date().nullable(),
@@ -545,7 +544,6 @@ export const ZTemplateSchema = z.object({
   title: z.string(),
   userId: z.number(),
   teamId: z.number().nullish(),
-  templateDocumentDataId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

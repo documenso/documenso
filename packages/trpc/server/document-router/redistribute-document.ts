@@ -26,7 +26,10 @@ export const redistributeDocumentRoute = authenticatedProcedure
     await resendDocument({
       userId: ctx.user.id,
       teamId,
-      documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       recipients,
       requestMetadata: ctx.metadata,
     });

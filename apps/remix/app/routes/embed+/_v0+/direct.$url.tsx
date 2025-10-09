@@ -11,7 +11,6 @@ import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { EmbedDirectTemplateClientPage } from '~/components/embed/embed-direct-template-client-page';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';
 import { DocumentSigningProvider } from '~/components/general/document-signing/document-signing-provider';
-import { DocumentSigningRecipientProvider } from '~/components/general/document-signing/document-signing-recipient-provider';
 import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
 
 import type { Route } from './+types/direct.$url';
@@ -119,18 +118,16 @@ export default function EmbedDirectTemplatePage() {
         recipient={recipient}
         user={user}
       >
-        <DocumentSigningRecipientProvider recipient={recipient}>
-          <EmbedDirectTemplateClientPage
-            token={token}
-            updatedAt={template.updatedAt}
-            documentData={template.templateDocumentData}
-            recipient={recipient}
-            fields={fields}
-            metadata={template.templateMeta}
-            hidePoweredBy={hidePoweredBy}
-            allowWhiteLabelling={allowEmbedSigningWhitelabel}
-          />
-        </DocumentSigningRecipientProvider>
+        <EmbedDirectTemplateClientPage
+          token={token}
+          updatedAt={template.updatedAt}
+          documentData={template.templateDocumentData}
+          recipient={recipient}
+          fields={fields}
+          metadata={template.templateMeta}
+          hidePoweredBy={hidePoweredBy}
+          allowWhiteLabelling={allowEmbedSigningWhitelabel}
+        />
       </DocumentSigningAuthProvider>
     </DocumentSigningProvider>
   );

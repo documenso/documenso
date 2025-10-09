@@ -1,8 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -17,7 +19,7 @@ const setupDocumentAndNavigateToSignersStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -47,7 +49,7 @@ test.describe('AutoSave Signers Step', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForDocument({
-        documentId: document.id,
+        documentId: mapSecondaryIdToDocumentId(document.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -71,7 +73,7 @@ test.describe('AutoSave Signers Step', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForDocument({
-        documentId: document.id,
+        documentId: mapSecondaryIdToDocumentId(document.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -99,7 +101,7 @@ test.describe('AutoSave Signers Step', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForDocument({
-        documentId: document.id,
+        documentId: mapSecondaryIdToDocumentId(document.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -145,14 +147,18 @@ test.describe('AutoSave Signers Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedDocumentData = await getDocumentById({
-        documentId: document.id,
+      const retrievedDocumentData = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
 
       const retrievedRecipients = await getRecipientsForDocument({
-        documentId: document.id,
+        documentId: mapSecondaryIdToDocumentId(document.secondaryId),
         userId: user.id,
         teamId: team.id,
       });

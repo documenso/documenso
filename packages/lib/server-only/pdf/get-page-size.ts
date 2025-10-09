@@ -1,4 +1,4 @@
-import type { PDFPage } from 'pdf-lib';
+import type { PDFPage } from '@cantoo/pdf-lib';
 
 /**
  * Gets the effective page size for PDF operations.

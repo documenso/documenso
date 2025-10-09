@@ -9,7 +9,6 @@ import {
 import { DateTime } from 'luxon';
 import path from 'node:path';
 
-import { getRecipientByEmail } from '@documenso/lib/server-only/recipient/get-recipient-by-email';
 import { prisma } from '@documenso/prisma';
 import {
   seedBlankDocument,
@@ -23,7 +22,7 @@ import { signSignaturePad } from '../fixtures/signature';
 // Can't use the function in server-only/document due to it indirectly using
 // require imports.
 const getDocumentByToken = async (token: string) => {
-  return await prisma.document.findFirstOrThrow({
+  return await prisma.envelope.findFirstOrThrow({
     where: {
       recipients: {
         some: {
@@ -59,7 +58,7 @@ test('[DOCUMENT_FLOW]: should be able to upload a PDF document', async ({ page }
   await fileChooser.setFiles(path.join(__dirname, '../../../../assets/example.pdf'));
 
   // Wait to be redirected to the edit page.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 });
 
 test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) => {
@@ -115,7 +114,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document', async ({ page }) =>
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -200,7 +199,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
@@ -298,7 +297,7 @@ test('[DOCUMENT_FLOW]: should be able to create a document with multiple recipie
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   // Assert document was created
   await expect(page.getByRole('link', { name: 'Test Title' })).toBeVisible();
@@ -437,14 +436,18 @@ test('[DOCUMENT_FLOW]: should be able to create, send with redirect url, sign a 
   // Assert document was created
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
   await page.getByRole('link', { name: documentTitle }).click();
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   const url = page.url().split('/');
   const documentId = url[url.length - 1];
 
-  const { token } = await getRecipientByEmail({
-    email: 'user1@example.com',
-    documentId: Number(documentId),
+  const { token } = await prisma.recipient.findFirstOrThrow({
+    where: {
+      envelope: {
+        id: documentId,
+      },
+      email: 'user1@example.com',
+    },
   });
 
   await page.goto(`/sign/${token}`);
@@ -500,7 +503,7 @@ test('[DOCUMENT_FLOW]: should be able to sign a document with custom date', asyn
       recipient: {
         email: 'user1@example.com',
       },
-      documentId: Number(document.id),
+      envelopeId: document.id,
     },
   });
 
@@ -583,11 +586,11 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   await expect(page.getByRole('link', { name: documentTitle })).toBeVisible();
 
-  const createdDocument = await prisma.document.findFirst({
+  const createdDocument = await prisma.envelope.findFirst({
     where: { title: documentTitle },
     include: { recipients: true },
   });
@@ -602,13 +605,13 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
     expect(recipient).not.toBeNull();
 
     const fields = await prisma.field.findMany({
-      where: { recipientId: recipient?.id, documentId: createdDocument?.id },
+      where: { recipientId: recipient?.id, envelopeId: createdDocument?.id },
     });
     const recipientField = fields[0];
 
     if (i > 0) {
       const previousRecipient = await prisma.recipient.findFirst({
-        where: { email: `user${i}@example.com`, documentId: createdDocument?.id },
+        where: { email: `user${i}@example.com`, envelopeId: createdDocument?.id },
       });
 
       expect(previousRecipient?.signingStatus).toBe(SigningStatus.SIGNED);
@@ -636,7 +639,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
   // Wait for the document to be signed.
   await page.waitForTimeout(10000);
 
-  const finalDocument = await prisma.document.findFirst({
+  const finalDocument = await prisma.envelope.findFirst({
     where: { id: createdDocument?.id },
   });
 
@@ -648,18 +651,20 @@ test('[DOCUMENT_FLOW]: should prevent out-of-order signing in sequential mode', 
 }) => {
   const { user, team } = await seedUser();
 
-  const { recipients } = await seedPendingDocumentWithFullFields({
+  const { document, recipients } = await seedPendingDocumentWithFullFields({
     teamId: team.id,
     owner: user,
     recipients: ['user1@example.com', 'user2@example.com', 'user3@example.com'],
     fields: [FieldType.SIGNATURE],
     recipientsCreateOptions: [{ signingOrder: 1 }, { signingOrder: 2 }, { signingOrder: 3 }],
-    updateDocumentOptions: {
-      documentMeta: {
-        create: {
-          signingOrder: DocumentSigningOrder.SEQUENTIAL,
-        },
-      },
+  });
+
+  await prisma.documentMeta.update({
+    where: {
+      id: document.documentMetaId,
+    },
+    data: {
+      signingOrder: DocumentSigningOrder.SEQUENTIAL,
     },
   });
 

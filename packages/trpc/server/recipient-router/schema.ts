@@ -82,7 +82,7 @@ export const ZSetDocumentRecipientsRequestSchema = z.object({
   documentId: z.number(),
   recipients: z.array(
     z.object({
-      nativeId: z.number().optional(),
+      id: z.number().optional(),
       email: z.string().toLowerCase().email().min(1).max(254),
       name: z.string().max(255),
       role: z.nativeEnum(RecipientRole),
@@ -136,7 +136,7 @@ export const ZSetTemplateRecipientsRequestSchema = z.object({
   templateId: z.number(),
   recipients: z.array(
     z.object({
-      nativeId: z.number().optional(),
+      id: z.number().optional(),
       email: z
         .string()
         .toLowerCase()

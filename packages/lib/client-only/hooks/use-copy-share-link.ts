@@ -1,5 +1,5 @@
 import { trpc } from '@documenso/trpc/react';
-import type { TCreateOrGetShareLinkMutationSchema } from '@documenso/trpc/server/share-link-router/schema';
+import type { TShareDocumentRequest } from '@documenso/trpc/server/document-router/share-document.types';
 
 import { useCopyToClipboard } from './use-copy-to-clipboard';
 
@@ -12,14 +12,14 @@ export function useCopyShareLink({ onSuccess, onError }: UseCopyShareLinkOptions
   const [, copyToClipboard] = useCopyToClipboard();
 
   const { mutateAsync: createOrGetShareLink, isPending: isCreatingShareLink } =
-    trpc.shareLink.createOrGetShareLink.useMutation();
+    trpc.document.share.useMutation();
 
   /**
    * Copy a newly created, or pre-existing share link to the user's clipboard.
    *
    * @param payload The payload to create or get a share link.
    */
-  const createAndCopyShareLink = async (payload: TCreateOrGetShareLinkMutationSchema) => {
+  const createAndCopyShareLink = async (payload: TShareDocumentRequest) => {
     const valueToCopy = createOrGetShareLink(payload).then(
       (result) => `${window.location.origin}/share/${result.slug}`,
     );

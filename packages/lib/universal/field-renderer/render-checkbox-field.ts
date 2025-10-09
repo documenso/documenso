@@ -1,0 +1,187 @@
+import Konva from 'konva';
+
+import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
+import type { TCheckboxFieldMeta } from '../../types/field-meta';
+import { upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import { calculateFieldPosition, calculateMultiItemPosition } from './field-renderer';
+import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
+
+// Do not change any of these values without consulting with the team.
+const checkboxFieldPadding = 8;
+const checkboxSize = 16;
+const spacingBetweenCheckboxAndText = 8;
+
+export const renderCheckboxFieldElement = (
+  field: FieldToRender,
+  options: RenderFieldElementOptions,
+) => {
+  const { pageWidth, pageHeight, pageLayer, mode } = options;
+
+  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
+
+  const fieldGroup = upsertFieldGroup(field, options);
+
+  // Clear previous children to re-render fresh
+  fieldGroup.removeChildren();
+
+  fieldGroup.add(upsertFieldRect(field, options));
+
+  if (isFirstRender) {
+    pageLayer.add(fieldGroup);
+
+    // Handle rescaling items during transforms.
+    fieldGroup.on('transform', () => {
+      const groupScaleX = fieldGroup.scaleX();
+      const groupScaleY = fieldGroup.scaleY();
+
+      const fieldRect = fieldGroup.findOne('.field-rect');
+
+      if (!fieldRect) {
+        return;
+      }
+
+      const rectWidth = fieldRect.width() * groupScaleX;
+      const rectHeight = fieldRect.height() * groupScaleY;
+
+      // Todo: Envelopes - check sorting more than 10
+      // arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+      const squares = fieldGroup
+        .find('.checkbox-square')
+        .sort((a, b) => a.id().localeCompare(b.id()));
+      const checkmarks = fieldGroup
+        .find('.checkbox-checkmark')
+        .sort((a, b) => a.id().localeCompare(b.id()));
+      const text = fieldGroup.find('.checkbox-text').sort((a, b) => a.id().localeCompare(b.id()));
+
+      const groupedItems = squares.map((square, i) => ({
+        squareElement: square,
+        checkmarkElement: checkmarks[i],
+        textElement: text[i],
+      }));
+
+      groupedItems.forEach((item, i) => {
+        const { squareElement, checkmarkElement, textElement } = item;
+
+        const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
+          calculateMultiItemPosition({
+            fieldWidth: rectWidth,
+            fieldHeight: rectHeight,
+            itemCount: checkboxValues.length,
+            itemIndex: i,
+            itemSize: checkboxSize,
+            spacingBetweenItemAndText: spacingBetweenCheckboxAndText,
+            fieldPadding: checkboxFieldPadding,
+            type: 'checkbox',
+          });
+
+        squareElement.setAttrs({
+          x: itemInputX,
+          y: itemInputY,
+          scaleX: 1,
+          scaleY: 1,
+        });
+
+        checkmarkElement.setAttrs({
+          x: itemInputX,
+          y: itemInputY,
+          scaleX: 1,
+          scaleY: 1,
+        });
+
+        textElement.setAttrs({
+          x: textX,
+          y: textY,
+          scaleX: 1,
+          scaleY: 1,
+          width: textWidth,
+          height: textHeight,
+        });
+      });
+
+      fieldRect.setAttrs({
+        width: rectWidth,
+        height: rectHeight,
+      });
+
+      fieldGroup.scale({
+        x: 1,
+        y: 1,
+      });
+
+      pageLayer.batchDraw();
+    });
+  }
+
+  const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
+  const checkboxValues = checkboxMeta?.values || [];
+
+  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
+
+  checkboxValues.forEach(({ id, value, checked }, index) => {
+    const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
+      calculateMultiItemPosition({
+        fieldWidth,
+        fieldHeight,
+        itemCount: checkboxValues.length,
+        itemIndex: index,
+        itemSize: checkboxSize,
+        spacingBetweenItemAndText: spacingBetweenCheckboxAndText,
+        fieldPadding: checkboxFieldPadding,
+        type: 'checkbox',
+      });
+
+    const square = new Konva.Rect({
+      internalCheckboxId: id,
+      internalCheckboxValue: value,
+      id: `checkbox-square-${index}`,
+      name: 'checkbox-square',
+      x: itemInputX,
+      y: itemInputY,
+      width: checkboxSize,
+      height: checkboxSize,
+      stroke: '#374151',
+      strokeWidth: 2,
+      cornerRadius: 2,
+      fill: 'white',
+    });
+
+    const checkmark = new Konva.Line({
+      internalCheckboxId: id,
+      internalCheckboxValue: value,
+      id: `checkbox-checkmark-${index}`,
+      name: 'checkbox-checkmark',
+      x: itemInputX,
+      y: itemInputY,
+      strokeWidth: 2,
+      stroke: '#111827',
+      points: [3, 8, 7, 12, 13, 4],
+      visible: checked,
+    });
+
+    const text = new Konva.Text({
+      internalCheckboxId: id,
+      internalCheckboxValue: value,
+      id: `checkbox-text-${index}`,
+      name: 'checkbox-text',
+      x: textX,
+      y: textY,
+      text: value,
+      width: textWidth,
+      height: textHeight,
+      fontSize: DEFAULT_STANDARD_FONT_SIZE,
+      fontFamily: 'Inter, system-ui, sans-serif',
+      verticalAlign: 'middle',
+      fill: '#111827', // Todo: Envelopes - Sort colours
+    });
+
+    fieldGroup.add(square);
+    fieldGroup.add(checkmark);
+    fieldGroup.add(text);
+  });
+
+  return {
+    fieldGroup,
+    isFirstRender,
+  };
+};

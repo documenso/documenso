@@ -1,5 +1,9 @@
 import { expect, test } from '@playwright/test';
 
+import {
+  mapSecondaryIdToDocumentId,
+  mapSecondaryIdToTemplateId,
+} from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import {
   seedTeamDocumentWithMeta,
@@ -21,7 +25,9 @@ test('[TEAMS]: check that default team signature settings are all enabled', asyn
   const document = await seedTeamDocumentWithMeta(team);
 
   // Create a document and check the settings
-  await page.goto(`/t/${team.url}/documents/${document.id}/edit`);
+  await page.goto(
+    `/t/${team.url}/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/edit`,
+  );
 
   // Verify that the settings match
   await page.getByRole('button', { name: 'Advanced Options' }).click();
@@ -154,7 +160,7 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
 
     const template = await seedTeamTemplateWithMeta(team);
 
-    await page.goto(`/t/${team.url}/templates/${template.id}`);
+    await page.goto(`/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}`);
     await page.getByRole('button', { name: 'Use' }).click();
 
     // Check the send document checkbox to true
@@ -162,9 +168,10 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await page.getByRole('button', { name: 'Create and send' }).click();
     await page.waitForTimeout(1000);
 
-    const document = await prisma.document.findFirst({
+    const document = await prisma.envelope.findFirst({
       where: {
-        templateId: template.id,
+        // Created from template
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
       },
       include: {
         documentMeta: true,

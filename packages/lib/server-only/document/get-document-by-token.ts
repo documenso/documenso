@@ -1,8 +1,10 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
-import type { DocumentWithRecipient } from '@documenso/prisma/types/document-with-recipient';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { isRecipientAuthorized } from './is-recipient-authorized';
 
 export interface GetDocumentAndSenderByTokenOptions {
@@ -39,8 +41,9 @@ export const getDocumentByToken = async ({ token }: GetDocumentByTokenOptions) =
     throw new Error('Missing token');
   }
 
-  const result = await prisma.document.findFirstOrThrow({
+  const result = await prisma.envelope.findFirstOrThrow({
     where: {
+      type: EnvelopeType.DOCUMENT,
       recipients: {
         some: {
           token,
@@ -64,8 +67,9 @@ export const getDocumentAndSenderByToken = async ({
     throw new Error('Missing token');
   }
 
-  const result = await prisma.document.findFirstOrThrow({
+  const result = await prisma.envelope.findFirstOrThrow({
     where: {
+      type: EnvelopeType.DOCUMENT,
       recipients: {
         some: {
           token,
@@ -80,11 +84,15 @@ export const getDocumentAndSenderByToken = async ({
           name: true,
         },
       },
-      documentData: true,
       documentMeta: true,
       recipients: {
         where: {
           token,
+        },
+      },
+      envelopeItems: {
+        select: {
+          documentData: true,
         },
       },
       team: {
@@ -101,6 +109,12 @@ export const getDocumentAndSenderByToken = async ({
       },
     },
   });
+
+  const firstDocumentData = result.envelopeItems[0].documentData;
+
+  if (!firstDocumentData) {
+    throw new Error('Missing document data');
+  }
 
   const recipient = result.recipients[0];
 
@@ -127,6 +141,8 @@ export const getDocumentAndSenderByToken = async ({
     });
   }
 
+  const legacyDocumentId = mapSecondaryIdToDocumentId(result.secondaryId);
+
   return {
     ...result,
     user: {
@@ -134,64 +150,8 @@ export const getDocumentAndSenderByToken = async ({
       email: result.user.email,
       name: result.user.name,
     },
+    documentData: firstDocumentData,
+    id: legacyDocumentId,
+    envelopeId: result.id,
   };
-};
-
-/**
- * Get a Document and a Recipient by the recipient token.
- */
-export const getDocumentAndRecipientByToken = async ({
-  token,
-  userId,
-  accessAuth,
-  requireAccessAuth = true,
-}: GetDocumentAndRecipientByTokenOptions): Promise<DocumentWithRecipient> => {
-  if (!token) {
-    throw new Error('Missing token');
-  }
-
-  const result = await prisma.document.findFirstOrThrow({
-    where: {
-      recipients: {
-        some: {
-          token,
-        },
-      },
-    },
-    include: {
-      recipients: {
-        where: {
-          token,
-        },
-      },
-      documentData: true,
-    },
-  });
-
-  const [recipient] = result.recipients;
-
-  // Sanity check, should not be possible.
-  if (!recipient) {
-    throw new Error('Missing recipient');
-  }
-
-  let documentAccessValid = true;
-
-  if (requireAccessAuth) {
-    documentAccessValid = await isRecipientAuthorized({
-      type: 'ACCESS',
-      documentAuthOptions: result.authOptions,
-      recipient,
-      userId,
-      authOptions: accessAuth,
-    });
-  }
-
-  if (!documentAccessValid) {
-    throw new AppError(AppErrorCode.UNAUTHORIZED, {
-      message: 'Invalid access values',
-    });
-  }
-
-  return result;
 };

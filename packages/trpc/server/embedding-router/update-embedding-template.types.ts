@@ -34,6 +34,7 @@ const ZFieldSchema = z.object({
   width: ZFieldWidthSchema,
   height: ZFieldHeightSchema,
   fieldMeta: ZFieldMetaSchema.optional(),
+  envelopeItemId: z.string(),
 });
 
 export const ZUpdateEmbeddingTemplateRequestSchema = z.object({

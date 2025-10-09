@@ -2,8 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import type { TemplateDirectLink } from '@prisma/client';
-import { TemplateType } from '@prisma/client';
+import { type TemplateDirectLink, TemplateType } from '@prisma/client';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { useSession } from '@documenso/lib/client-only/providers/session';

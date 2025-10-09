@@ -7,7 +7,7 @@ import { DOCUMENSO_ENCRYPTION_KEY } from '../../../constants/crypto';
 const ISSUER = 'Documenso Email 2FA';
 
 export type GenerateTwoFactorCredentialsFromEmailOptions = {
-  documentId: number;
+  envelopeId: string;
   email: string;
 };
 
@@ -18,14 +18,14 @@ export type GenerateTwoFactorCredentialsFromEmailOptions = {
  * @returns Object containing the token and the 6-digit code
  */
 export const generateTwoFactorCredentialsFromEmail = ({
-  documentId,
+  envelopeId,
   email,
 }: GenerateTwoFactorCredentialsFromEmailOptions) => {
   if (!DOCUMENSO_ENCRYPTION_KEY) {
     throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
   }
 
-  const identity = `email-2fa|v1|email:${email}|id:${documentId}`;
+  const identity = `email-2fa|v1|email:${email}|id:${envelopeId}`;
 
   const secret = hmac(sha256, DOCUMENSO_ENCRYPTION_KEY, identity);
 
