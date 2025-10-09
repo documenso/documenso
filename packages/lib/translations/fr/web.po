@@ -1490,7 +1490,7 @@ msgstr "Version de l'application"
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
 msgid "Approve"
-msgstr ""
+msgstr "approuver"
 
 #: apps/remix/app/components/tables/inbox-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
@@ -1587,7 +1587,7 @@ msgstr "Équipes assignées"
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
 msgid "Assist"
-msgstr ""
+msgstr "assister"
 
 #: apps/remix/app/components/general/document-signing/document-signing-page-view.tsx
 #: packages/email/template-components/template-document-invite.tsx
@@ -1923,7 +1923,7 @@ msgstr ""
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
 msgid "CC"
-msgstr ""
+msgstr "recevoir en copie"
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role progressive verb"
@@ -2271,7 +2271,7 @@ msgstr "Continuer en approuvant le document."
 
 #: packages/email/template-components/template-document-invite.tsx
 msgid "Continue by assisting with the document."
-msgstr "Continuez en aidant avec le document."
+msgstr "Continuer en aidant avec le document."
 
 #: packages/email/template-components/template-document-completed.tsx
 msgid "Continue by downloading the document."
@@ -6612,7 +6612,7 @@ msgstr "Afficher des modèles dans votre profil public pour que votre audience p
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
 msgid "Sign"
-msgstr ""
+msgstr "signer"
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -8620,7 +8620,7 @@ msgstr "Vertical"
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role action verb"
 msgid "View"
-msgstr ""
+msgstr "consulter"
 
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
