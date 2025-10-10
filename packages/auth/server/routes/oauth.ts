@@ -50,5 +50,6 @@ export const oauthRoute = new Hono<HonoAuthContext>()
     return await handleOAuthAuthorizeUrl({
       c,
       clientOptions,
+      prompt: 'select_account',
     });
   });

@@ -8,7 +8,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
 import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -34,10 +34,10 @@ export type DocumentSigningFormProps = {
   isRecipientsTurn: boolean;
   allRecipients?: RecipientWithFields[];
   setSelectedSignerId?: (id: number | null) => void;
-  completeDocument: (
-    authOptions?: TRecipientActionAuth,
-    nextSigner?: { email: string; name: string },
-  ) => Promise<void>;
+  completeDocument: (options: {
+    accessAuthOptions?: TRecipientAccessAuth;
+    nextSigner?: { email: string; name: string };
+  }) => Promise<void>;
   isSubmitting: boolean;
   fieldsValidated: () => void;
   nextRecipient?: RecipientWithFields;
@@ -105,7 +105,7 @@ export const DocumentSigningForm = ({
     setIsAssistantSubmitting(true);
 
     try {
-      await completeDocument(undefined, nextSigner);
+      await completeDocument({ nextSigner });
     } catch (err) {
       toast({
         title: 'Error',
@@ -149,10 +149,10 @@ export const DocumentSigningForm = ({
                     documentTitle={document.title}
                     fields={fields}
                     fieldsValidated={localFieldsValidated}
-                    onSignatureComplete={async (nextSigner) => {
-                      await completeDocument(undefined, nextSigner);
-                    }}
-                    role={recipient.role}
+                    onSignatureComplete={async (nextSigner, accessAuthOptions) =>
+                      completeDocument({ nextSigner, accessAuthOptions })
+                    }
+                    recipient={recipient}
                     allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
                     defaultNextSigner={
                       nextRecipient
@@ -309,10 +309,13 @@ export const DocumentSigningForm = ({
                   fields={fields}
                   fieldsValidated={localFieldsValidated}
                   disabled={!isRecipientsTurn}
-                  onSignatureComplete={async (nextSigner) => {
-                    await completeDocument(undefined, nextSigner);
-                  }}
-                  role={recipient.role}
+                  onSignatureComplete={async (nextSigner, accessAuthOptions) =>
+                    completeDocument({
+                      accessAuthOptions,
+                      nextSigner,
+                    })
+                  }
+                  recipient={recipient}
                   allowDictateNextSigner={
                     nextRecipient && document.documentMeta?.allowDictateNextSigner
                   }
