@@ -476,6 +476,36 @@ export const formatDocumentAuditLogAction = (
         identified: result,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} requested a 2FA token for the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} validated a 2FA token for the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} failed to validate a 2FA token for the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT }, ({ data }) => ({
       anonymous: data.isResending ? msg`Email resent` : msg`Email sent`,
       identified: data.isResending

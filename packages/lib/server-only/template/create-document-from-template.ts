@@ -53,7 +53,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type FinalRecipient = Pick<
   Recipient,
-  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder'
+  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder' | 'token'
 > & {
   templateRecipientId: number;
   fields: Field[];
@@ -351,6 +351,7 @@ export const createDocumentFromTemplate = async ({
       role: templateRecipient.role,
       signingOrder: foundRecipient?.signingOrder ?? templateRecipient.signingOrder,
       authOptions: templateRecipient.authOptions,
+      token: nanoid(),
     };
   });
 
@@ -451,7 +452,7 @@ export const createDocumentFromTemplate = async ({
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
-                token: nanoid(),
+                token: recipient.token,
               };
             }),
           },
@@ -510,8 +511,8 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
-    Object.values(finalRecipients).forEach(({ email, fields }) => {
-      const recipient = document.recipients.find((recipient) => recipient.email === email);
+    Object.values(finalRecipients).forEach(({ token, fields }) => {
+      const recipient = document.recipients.find((recipient) => recipient.token === token);
 
       if (!recipient) {
         throw new Error('Recipient not found.');

@@ -101,12 +101,7 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
         name: z.string().max(255).optional(),
       }),
     )
-    .describe('The information of the recipients to create the document with.')
-    .refine((recipients) => {
-      const emails = recipients.map((signer) => signer.email);
-
-      return new Set(emails).size === emails.length;
-    }, 'Recipients must have unique emails'),
+    .describe('The information of the recipients to create the document with.'),
   distributeDocument: z
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -61,7 +62,10 @@ import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { Form } from '../form/form';
 import { useStep } from '../stepper';
-import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
+import {
+  type TAddTemplateFieldsFormSchema,
+  ZAddTemplateFieldsFormSchema,
+} from './add-template-fields.types';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -112,7 +116,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
-        signerId: field.recipientId ?? -1,
+        recipientId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         signerToken:
@@ -120,6 +124,7 @@ export const AddTemplateFieldsFormPartial = ({
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
+    resolver: zodResolver(ZAddTemplateFieldsFormSchema),
   });
 
   const onFormSubmit = form.handleSubmit(onSubmit);
@@ -170,7 +175,7 @@ export const AddTemplateFieldsFormPartial = ({
             nativeId: undefined,
             formId: nanoid(12),
             signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-            signerId: selectedSigner?.id ?? lastActiveField.signerId,
+            recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
             signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
             pageX: lastActiveField.pageX + 3,
             pageY: lastActiveField.pageY + 3,
@@ -197,7 +202,7 @@ export const AddTemplateFieldsFormPartial = ({
               nativeId: undefined,
               formId: nanoid(12),
               signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-              signerId: selectedSigner?.id ?? lastActiveField.signerId,
+              recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
               signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
               pageNumber,
             };
@@ -240,7 +245,7 @@ export const AddTemplateFieldsFormPartial = ({
           formId: nanoid(12),
           nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
-          signerId: selectedSigner?.id ?? copiedField.signerId,
+          recipientId: selectedSigner?.id ?? copiedField.recipientId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
@@ -371,7 +376,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
-        signerId: selectedSigner.id,
+        recipientId: selectedSigner.id,
         signerToken: selectedSigner.token ?? '',
         fieldMeta: undefined,
       };
@@ -597,14 +602,14 @@ export const AddTemplateFieldsFormPartial = ({
               )}
 
               {localFields.map((field, index) => {
-                const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 
                 return (
                   <FieldItem
                     key={index}
                     recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                     field={field}
-                    disabled={selectedSigner?.email !== field.signerEmail}
+                    disabled={selectedSigner?.id !== field.recipientId}
                     minHeight={MIN_HEIGHT_PX}
                     minWidth={MIN_WIDTH_PX}
                     defaultHeight={DEFAULT_HEIGHT_PX}

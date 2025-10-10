@@ -573,6 +573,7 @@ test('[DOCUMENT_FLOW]: should be able to create and sign a document with 3 recip
         y: 100 * i,
       },
     });
+
     await page.getByText(`User ${i} (user${i}@example.com)`).click();
   }
 

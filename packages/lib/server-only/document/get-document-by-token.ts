@@ -92,6 +92,12 @@ export const getDocumentAndSenderByToken = async ({
         select: {
           name: true,
           teamEmail: true,
+          teamGlobalSettings: {
+            select: {
+              brandingEnabled: true,
+              brandingLogo: true,
+            },
+          },
         },
       },
     },
