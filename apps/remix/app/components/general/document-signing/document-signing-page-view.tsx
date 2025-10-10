@@ -32,6 +32,7 @@ import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
+import { DocumentSigningAttachmentsDialog } from '~/components/general/document-signing/document-signing-attachments-dialog';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
 import { DocumentSigningCheckboxField } from '~/components/general/document-signing/document-signing-checkbox-field';
 import { DocumentSigningDateField } from '~/components/general/document-signing/document-signing-date-field';
@@ -231,7 +232,10 @@ export const DocumentSigningPageView = ({
             </span>
           </div>
 
-          <DocumentSigningRejectDialog document={document} token={recipient.token} />
+          <div className="flex gap-2">
+            <DocumentSigningAttachmentsDialog document={document} />
+            <DocumentSigningRejectDialog document={document} token={recipient.token} />
+          </div>
         </div>
 
         <div className="relative mt-4 flex w-full flex-col gap-x-6 gap-y-8 sm:mt-8 md:flex-row lg:gap-x-8 lg:gap-y-0">

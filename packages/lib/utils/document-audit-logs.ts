@@ -522,6 +522,10 @@ export const formatDocumentAuditLogAction = (
         context: `Audit log format`,
       }),
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ATTACHMENTS_UPDATED }, () => ({
+      anonymous: msg`Document attachments updated`,
+      identified: msg`${prefix} updated the document attachments`,
+    }))
     .exhaustive();
 
   return {
