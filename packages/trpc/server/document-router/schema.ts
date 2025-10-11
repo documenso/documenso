@@ -89,3 +89,13 @@ export const ZDocumentMetaDrawSignatureEnabledSchema = z
 export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using an uploaded signature.');
+
+export const ZDocumentExpiryAmountSchema = z
+  .number()
+  .int()
+  .min(1)
+  .describe('The amount for expiry duration (e.g., 3 for "3 days").');
+
+export const ZDocumentExpiryUnitSchema = z
+  .enum(['minutes', 'hours', 'days', 'weeks', 'months'])
+  .describe('The unit for expiry duration (e.g., "days" for "3 days").');

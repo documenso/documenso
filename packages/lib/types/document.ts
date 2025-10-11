@@ -60,6 +60,8 @@ export const ZDocumentSchema = DocumentSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
+    expiryAmount: true,
+    expiryUnit: true,
   }).nullable(),
   folder: FolderSchema.pick({
     id: true,

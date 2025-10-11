@@ -34,6 +34,8 @@ export type CreateDocumentOptions = {
   userTimezone?: string;
   requestMetadata: ApiRequestMetadata;
   folderId?: string;
+  expiryAmount?: number;
+  expiryUnit?: string;
 };
 
 export const createDocument = async ({
@@ -48,6 +50,8 @@ export const createDocument = async ({
   timezone,
   userTimezone,
   folderId,
+  expiryAmount,
+  expiryUnit,
 }: CreateDocumentOptions) => {
   const team = await getTeamById({ userId, teamId });
 
@@ -126,6 +130,8 @@ export const createDocument = async ({
         documentMeta: {
           create: extractDerivedDocumentMeta(settings, {
             timezone: timezoneToUse,
+            expiryAmount,
+            expiryUnit,
           }),
         },
       },

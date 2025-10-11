@@ -15,6 +15,38 @@ export const isDocumentCompleted = (document: Pick<Document, 'status'> | Documen
   return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
 };
 
+const getExpiryAmount = (
+  meta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
+): number | null => {
+  if (!meta) return null;
+
+  if ('expiryAmount' in meta && meta.expiryAmount !== undefined) {
+    return meta.expiryAmount;
+  }
+
+  if ('defaultExpiryAmount' in meta && meta.defaultExpiryAmount !== undefined) {
+    return meta.defaultExpiryAmount;
+  }
+
+  return null;
+};
+
+const getExpiryUnit = (
+  meta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
+): string | null => {
+  if (!meta) return null;
+
+  if ('expiryUnit' in meta && meta.expiryUnit !== undefined) {
+    return meta.expiryUnit;
+  }
+
+  if ('defaultExpiryUnit' in meta && meta.defaultExpiryUnit !== undefined) {
+    return meta.defaultExpiryUnit;
+  }
+
+  return null;
+};
+
 /**
  * Extracts the derived document meta which should be used when creating a document
  * from scratch, or from a template.
@@ -58,5 +90,9 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+
+    // Expiry settings.
+    expiryAmount: getExpiryAmount(meta),
+    expiryUnit: getExpiryUnit(meta),
   } satisfies Omit<DocumentMeta, 'id' | 'documentId'>;
 };
