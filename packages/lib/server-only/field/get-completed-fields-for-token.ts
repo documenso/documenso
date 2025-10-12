@@ -6,7 +6,7 @@ export type GetCompletedFieldsForTokenOptions = {
   token: string;
 };
 
-// Todo: Envelopes - This needs to be redone since we need to determine which document to show the fields on.
+// Note: You many need to filter this on a per envelope item ID basis.
 export const getCompletedFieldsForToken = async ({ token }: GetCompletedFieldsForTokenOptions) => {
   return await prisma.field.findMany({
     where: {

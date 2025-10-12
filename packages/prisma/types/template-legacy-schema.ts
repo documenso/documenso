@@ -21,7 +21,7 @@ export const TemplateSchema = z.object({
    * [DocumentAuthOptions]
    */
   authOptions: ZDocumentAuthOptionsSchema.nullable(),
-  // templateDocumentDataId: z.string(), // Todo: Migration - Removal.
+  templateDocumentDataId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   publicTitle: z.string(),

@@ -314,8 +314,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const deletedEnvelope = await deleteDocument({
-        id: legacyDocumentId,
+      const deletedDocument = await deleteDocument({
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
         userId: user.id,
         teamId: team.id,
         requestMetadata: metadata,
@@ -325,14 +328,14 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         status: 200,
         body: {
           id: legacyDocumentId,
-          externalId: deletedEnvelope.externalId,
-          userId: deletedEnvelope.userId,
-          teamId: deletedEnvelope.teamId,
-          title: deletedEnvelope.title,
-          status: deletedEnvelope.status,
-          createdAt: deletedEnvelope.createdAt,
-          updatedAt: deletedEnvelope.updatedAt,
-          completedAt: deletedEnvelope.completedAt,
+          externalId: deletedDocument.externalId,
+          userId: deletedDocument.userId,
+          teamId: deletedDocument.teamId,
+          title: deletedDocument.title,
+          status: deletedDocument.status,
+          createdAt: deletedDocument.createdAt,
+          updatedAt: deletedDocument.updatedAt,
+          completedAt: deletedDocument.completedAt,
         },
       };
     } catch (err) {
@@ -409,6 +412,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const envelope = await createEnvelope({
         userId: user.id,
         teamId: team.id,
+        internalVersion: 1,
         data: {
           title: body.title,
           type: EnvelopeType.DOCUMENT,
@@ -446,7 +450,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const { recipients } = await setDocumentRecipients({
         userId: user.id,
         teamId: team.id,
-        documentId: legacyDocumentId,
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
         recipients: body.recipients,
         requestMetadata: metadata,
       });
@@ -542,6 +549,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       const createdTemplate = await createEnvelope({
         userId: user.id,
         teamId: team.id,
+        internalVersion: 1,
         data: {
           type: EnvelopeType.TEMPLATE,
           envelopeItems: [
@@ -564,7 +572,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       });
 
       const fullTemplate = await getTemplateById({
-        id: mapSecondaryIdToTemplateId(createdTemplate.secondaryId),
+        id: {
+          type: 'envelopeId',
+          id: createdTemplate.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -597,7 +608,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const deletedTemplate = await deleteTemplate({
-        id: Number(templateId),
+        id: {
+          type: 'templateId',
+          id: Number(templateId),
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -638,7 +652,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const template = await getTemplateById({
-        id: Number(templateId),
+        id: {
+          type: 'templateId',
+          id: Number(templateId),
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -1090,7 +1107,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     try {
       await resendDocument({
         userId: user.id,
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         recipients,
         teamId: team.id,
         requestMetadata: metadata,
@@ -1171,7 +1191,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const { recipients: newRecipients } = await setDocumentRecipients({
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         userId: user.id,
         teamId: team.id,
         recipients: [

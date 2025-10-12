@@ -23,6 +23,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     select: {
       id: true,
       secondaryId: true,
+      internalVersion: true,
       title: true,
       completedAt: true,
       team: {
@@ -32,6 +33,11 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
       },
       envelopeItems: {
         select: {
+          id: true,
+          title: true,
+          order: true,
+          documentDataId: true,
+          envelopeId: true,
           documentData: {
             select: {
               id: true,
@@ -50,16 +56,18 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
     },
   });
 
-  // Todo: Envelopes
-  if (!result.envelopeItems[0].documentData) {
+  const firstDocumentData = result.envelopeItems[0].documentData;
+
+  if (!firstDocumentData) {
     throw new Error('Missing document data');
   }
 
   return {
     id: mapSecondaryIdToDocumentId(result.secondaryId),
+    internalVersion: result.internalVersion,
     title: result.title,
     completedAt: result.completedAt,
-    documentData: result.envelopeItems[0].documentData,
+    envelopeItems: result.envelopeItems,
     recipientCount: result._count.recipients,
     documentTeamUrl: result.team.url,
   };

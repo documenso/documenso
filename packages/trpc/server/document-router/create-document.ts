@@ -36,6 +36,7 @@ export const createDocumentRoute = authenticatedProcedure
     const document = await createEnvelope({
       userId: user.id,
       teamId,
+      internalVersion: 1,
       data: {
         type: EnvelopeType.DOCUMENT,
         title,

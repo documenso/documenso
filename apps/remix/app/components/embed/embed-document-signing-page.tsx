@@ -277,7 +277,7 @@ export const EmbedSignDocumentClientPage = ({
         {allowDocumentRejection && (
           <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
             <DocumentSigningRejectDialog
-              document={{ id: documentId }}
+              documentId={documentId}
               token={token}
               onRejected={onDocumentRejected}
             />

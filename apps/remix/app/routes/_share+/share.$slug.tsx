@@ -82,7 +82,8 @@ export default function SharePage() {
         documentId={document.id}
         title={document.title}
         documentTeamUrl={document.documentTeamUrl}
-        documentData={document.documentData} // Todo: Envelopes
+        internalVersion={document.internalVersion}
+        envelopeItems={document.envelopeItems}
         recipientCount={document.recipientCount}
         completedDate={document.completedAt ?? undefined}
       />

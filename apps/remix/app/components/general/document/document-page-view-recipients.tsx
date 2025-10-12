@@ -2,7 +2,6 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
-import type { Recipient } from '@prisma/client';
 import {
   AlertTriangle,
   CheckIcon,
@@ -17,9 +16,9 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -28,20 +27,18 @@ import { PopoverHover } from '@documenso/ui/primitives/popover';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewRecipientsProps = {
-  document: Document & {
-    recipients: Recipient[];
-  };
+  envelope: TEnvelope;
   documentRootPath: string;
 };
 
 export const DocumentPageViewRecipients = ({
-  document,
+  envelope,
   documentRootPath,
 }: DocumentPageViewRecipientsProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const recipients = document.recipients;
+  const recipients = envelope.recipients;
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
@@ -50,9 +47,9 @@ export const DocumentPageViewRecipients = ({
           <Trans>Recipients</Trans>
         </h1>
 
-        {!isDocumentCompleted(document.status) && (
+        {!isDocumentCompleted(envelope.status) && (
           <Link
-            to={`${documentRootPath}/${document.id}/edit?step=signers`}
+            to={`${documentRootPath}/${envelope.id}/edit?step=signers`}
             title={_(msg`Modify recipients`)}
             className="flex flex-row items-center justify-between"
           >
@@ -85,7 +82,7 @@ export const DocumentPageViewRecipients = ({
             />
 
             <div className="flex flex-row items-center">
-              {document.status !== DocumentStatus.DRAFT &&
+              {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.SIGNED && (
                   <Badge variant="default">
                     {match(recipient.role)
@@ -96,7 +93,7 @@ export const DocumentPageViewRecipients = ({
                         </>
                       ))
                       .with(RecipientRole.CC, () =>
-                        document.status === DocumentStatus.COMPLETED ? (
+                        envelope.status === DocumentStatus.COMPLETED ? (
                           <>
                             <MailIcon className="mr-1 h-3 w-3" />
                             <Trans>Sent</Trans>
@@ -131,7 +128,7 @@ export const DocumentPageViewRecipients = ({
                   </Badge>
                 )}
 
-              {document.status !== DocumentStatus.DRAFT &&
+              {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED && (
                   <Badge variant="secondary">
                     <Clock className="mr-1 h-3 w-3" />
@@ -139,7 +136,7 @@ export const DocumentPageViewRecipients = ({
                   </Badge>
                 )}
 
-              {document.status !== DocumentStatus.DRAFT &&
+              {envelope.status !== DocumentStatus.DRAFT &&
                 recipient.signingStatus === SigningStatus.REJECTED && (
                   <PopoverHover
                     trigger={
@@ -159,7 +156,7 @@ export const DocumentPageViewRecipients = ({
                   </PopoverHover>
                 )}
 
-              {document.status === DocumentStatus.PENDING &&
+              {envelope.status === DocumentStatus.PENDING &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
                 recipient.role !== RecipientRole.CC && (
                   <CopyTextButton

@@ -3,7 +3,6 @@ import { customAlphabet } from 'nanoid';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createDocumentAuthOptions } from '@documenso/lib/utils/document-auth';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
 import { seedTeam } from '@documenso/prisma/seed/teams';
 import { seedDirectTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
@@ -35,7 +34,7 @@ test('[DIRECT_TEMPLATES]: create direct link for template', async ({ page }) => 
     redirectPath: `/t/${team.url}/templates`,
   });
 
-  const url = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${mapSecondaryIdToTemplateId(teamTemplate.secondaryId)}`;
+  const url = `${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${teamTemplate.id}`;
 
   // Owner should see list of templates with no direct link badge.
   await page.goto(url);
@@ -78,7 +77,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
   // Navigate to template settings and disable access.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
   await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Direct link' }).click();
+  await page.getByTestId('template-direct-link').click();
   await page.getByRole('switch').click();
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
@@ -112,7 +111,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
   // Navigate to template settings and delete the access.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
   await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Direct link' }).click();
+  await page.getByTestId('template-direct-link').click();
   await page.getByRole('button', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.getByText('Direct template link deleted').first()).toBeVisible();
@@ -172,6 +171,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
+  await page.waitForTimeout(100);
   await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
 
   await page.getByRole('button', { name: 'Continue' }).click();

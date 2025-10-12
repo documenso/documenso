@@ -30,7 +30,7 @@ export const ZRecipientSchema = RecipientSchema.pick({
 }).extend({
   fields: ZFieldSchema.array(),
 
-  // Todo: Migration - Backwards compatibility.
+  // Backwards compatibility.
   documentId: z.number().nullish(),
   templateId: z.number().nullish(),
 });
@@ -55,7 +55,7 @@ export const ZRecipientLiteSchema = RecipientSchema.pick({
   signingOrder: true,
   rejectionReason: true,
 }).extend({
-  // Todo: Migration - Backwards compatibility.
+  // Backwards compatibility.
   documentId: z.number().nullish(),
   templateId: z.number().nullish(),
 });
@@ -91,7 +91,7 @@ export const ZRecipientManySchema = RecipientSchema.pick({
     url: true,
   }).nullable(),
 
-  // Todo: Migration - Backwards compatibility.
+  // Backwards compatibility.
   documentId: z.number().nullish(),
   templateId: z.number().nullish(),
 });

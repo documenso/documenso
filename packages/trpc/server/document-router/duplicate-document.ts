@@ -1,4 +1,4 @@
-import { duplicateDocument } from '@documenso/lib/server-only/document/duplicate-document-by-id';
+import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -21,7 +21,7 @@ export const duplicateDocumentRoute = authenticatedProcedure
       },
     });
 
-    return await duplicateDocument({
+    const duplicatedEnvelope = await duplicateEnvelope({
       id: {
         type: 'documentId',
         id: documentId,
@@ -29,4 +29,9 @@ export const duplicateDocumentRoute = authenticatedProcedure
       userId: user.id,
       teamId,
     });
+
+    return {
+      id: duplicatedEnvelope.id,
+      documentId: duplicatedEnvelope.legacyId.id,
+    };
   });

@@ -1,3 +1,4 @@
+import type { DocumentData, Envelope, EnvelopeItem } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -64,6 +65,7 @@ export const sendDocument = async ({
               type: true,
               id: true,
               data: true,
+              initialData: true,
             },
           },
         },
@@ -100,46 +102,16 @@ export const sendDocument = async ({
     recipientsToNotify.filter((r) => r.sendStatus !== SendStatus.SENT);
   }
 
-  const envelopeItem = envelope.envelopeItems[0];
-  const documentData = envelopeItem?.documentData;
-
-  // Todo: Envelopes
-  if (!envelopeItem || !documentData || envelope.envelopeItems.length !== 1) {
-    throw new Error('Invalid document data');
+  if (envelope.envelopeItems.length === 0) {
+    throw new Error('Missing envelope items');
   }
 
-  // Todo: Envelopes need to support multiple envelope items.
   if (envelope.formValues) {
-    const file = await getFileServerSide(documentData);
-
-    const prefilled = await insertFormValuesInPdf({
-      pdf: Buffer.from(file),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      formValues: envelope.formValues as Record<string, string | number | boolean>,
-    });
-
-    let fileName = envelope.title;
-
-    if (!envelope.title.endsWith('.pdf')) {
-      fileName = `${envelope.title}.pdf`;
-    }
-
-    const newDocumentData = await putPdfFileServerSide({
-      name: fileName,
-      type: 'application/pdf',
-      arrayBuffer: async () => Promise.resolve(prefilled),
-    });
-
-    const result = await prisma.envelopeItem.update({
-      where: {
-        id: envelopeItem.id,
-      },
-      data: {
-        documentDataId: newDocumentData.id,
-      },
-    });
-
-    Object.assign(document, result);
+    await Promise.all(
+      envelope.envelopeItems.map(async (envelopeItem) => {
+        await injectFormValuesIntoDocument(envelope, envelopeItem);
+      }),
+    );
   }
 
   // Commented out server side checks for minimum 1 signature per signer now since we need to
@@ -254,4 +226,39 @@ export const sendDocument = async ({
   });
 
   return updatedEnvelope;
+};
+
+const injectFormValuesIntoDocument = async (
+  envelope: Envelope,
+  envelopeItem: Pick<EnvelopeItem, 'id'> & { documentData: DocumentData },
+) => {
+  const file = await getFileServerSide(envelopeItem.documentData);
+
+  const prefilled = await insertFormValuesInPdf({
+    pdf: Buffer.from(file),
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    formValues: envelope.formValues as Record<string, string | number | boolean>,
+  });
+
+  let fileName = envelope.title;
+
+  if (!envelope.title.endsWith('.pdf')) {
+    fileName = `${envelope.title}.pdf`;
+  }
+
+  const newDocumentData = await putPdfFileServerSide({
+    name: fileName,
+    type: 'application/pdf',
+    arrayBuffer: async () => Promise.resolve(prefilled),
+  });
+
+  await prisma.envelopeItem.update({
+    where: {
+      id: envelopeItem.id,
+    },
+    data: {
+      // Todo: Envelopes [PRE-MAIN] - Should this also replace the initial data? Because if it's resealed we use the initial data thus lose the form values.
+      documentDataId: newDocumentData.id,
+    },
+  });
 };

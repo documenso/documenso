@@ -1,3 +1,4 @@
+import { EnvelopeType } from '@prisma/client';
 import { TRPCError } from '@trpc/server';
 import { DateTime } from 'luxon';
 
@@ -23,8 +24,9 @@ export const accessAuthRequest2FAEmailRoute = procedure
       const user = ctx.user;
 
       // Get document and recipient by token
-      const document = await prisma.document.findFirst({
+      const envelope = await prisma.envelope.findFirst({
         where: {
+          type: EnvelopeType.DOCUMENT,
           recipients: {
             some: {
               token,
@@ -40,17 +42,17 @@ export const accessAuthRequest2FAEmailRoute = procedure
         },
       });
 
-      if (!document) {
+      if (!envelope) {
         throw new TRPCError({
           code: 'NOT_FOUND',
           message: 'Document not found',
         });
       }
 
-      const [recipient] = document.recipients;
+      const [recipient] = envelope.recipients;
 
       const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
-        documentAuth: document.authOptions,
+        documentAuth: envelope.authOptions,
         recipientAuth: recipient.authOptions,
       });
 
@@ -72,7 +74,7 @@ export const accessAuthRequest2FAEmailRoute = procedure
 
       await send2FATokenEmail({
         token,
-        documentId: document.id,
+        envelopeId: envelope.id,
       });
 
       return {

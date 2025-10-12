@@ -1,4 +1,5 @@
-import { EnvelopeType } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -138,4 +139,29 @@ export const mapSecondaryIdToTemplateId = (secondaryId: string) => {
   }
 
   return parseInt(parsed.data.split('_')[1]);
+};
+
+export const canEnvelopeItemsBeModified = (
+  envelope: Pick<Envelope, 'completedAt' | 'deletedAt' | 'type' | 'status'>,
+  recipients: Recipient[],
+) => {
+  if (envelope.completedAt || envelope.deletedAt || envelope.status !== DocumentStatus.DRAFT) {
+    return false;
+  }
+
+  if (envelope.type === EnvelopeType.TEMPLATE) {
+    return true;
+  }
+
+  if (
+    recipients.some(
+      (recipient) =>
+        recipient.signingStatus === SigningStatus.SIGNED ||
+        recipient.sendStatus === SendStatus.SENT,
+    )
+  ) {
+    return false;
+  }
+
+  return true;
 };

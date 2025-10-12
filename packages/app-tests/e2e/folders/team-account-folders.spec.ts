@@ -44,12 +44,6 @@ test('[TEAMS]: can create document folder', async ({ page }) => {
 test('[TEAMS]: can create document subfolder within a document folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
-  await apiSignin({
-    page,
-    email: teamOwner.email,
-    redirectPath: `/t/${team.url}`,
-  });
-
   const teamFolder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Folder',
@@ -57,7 +51,11 @@ test('[TEAMS]: can create document subfolder within a document folder', async ({
     },
   });
 
-  await page.goto(`/t/${team.url}/documents/f/${teamFolder.id}`);
+  await apiSignin({
+    page,
+    email: teamOwner.email,
+    redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
+  });
 
   await page.getByTestId('folder-create-button').click();
 

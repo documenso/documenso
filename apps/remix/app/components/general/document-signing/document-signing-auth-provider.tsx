@@ -24,14 +24,16 @@ type PasskeyData = {
   isError: boolean;
 };
 
+type SigningAuthRecipient = Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
+
 export type DocumentSigningAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
   documentAuthOptions: Envelope['authOptions'];
   documentAuthOption: TDocumentAuthOptions;
   setDocumentAuthOptions: (_value: Envelope['authOptions']) => void;
-  recipient: Recipient;
+  recipient: SigningAuthRecipient;
   recipientAuthOption: TRecipientAuthOptions;
-  setRecipient: (_value: Recipient) => void;
+  setRecipient: (_value: SigningAuthRecipient) => void;
   derivedRecipientAccessAuth: TRecipientAccessAuthTypes[];
   derivedRecipientActionAuth: TRecipientActionAuthTypes[];
   isAuthRedirectRequired: boolean;
@@ -62,7 +64,7 @@ export const useRequiredDocumentSigningAuthContext = () => {
 
 export interface DocumentSigningAuthProviderProps {
   documentAuthOptions: Envelope['authOptions'];
-  recipient: Recipient;
+  recipient: SigningAuthRecipient;
   user?: SessionUser | null;
   children: React.ReactNode;
 }

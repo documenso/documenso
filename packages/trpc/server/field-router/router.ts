@@ -259,10 +259,8 @@ export const fieldRouter = router({
 
   /**
    * @private
-   *
-   * Todo: Refactor to setFieldsForDocument function.
    */
-  addFields: authenticatedProcedure
+  setFieldsForDocument: authenticatedProcedure
     .input(ZSetDocumentFieldsRequestSchema)
     .output(ZSetDocumentFieldsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -276,13 +274,16 @@ export const fieldRouter = router({
       });
 
       return await setFieldsForDocument({
-        documentId,
         userId: ctx.user.id,
         teamId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         fields: fields.map((field) => ({
-          id: field.nativeId,
-          signerEmail: field.signerEmail,
+          id: field.id,
           recipientId: field.recipientId,
+          envelopeItemId: field.envelopeItemId,
           type: field.type,
           pageNumber: field.pageNumber,
           pageX: field.pageX,
@@ -508,10 +509,8 @@ export const fieldRouter = router({
 
   /**
    * @private
-   *
-   * Todo: Refactor to setFieldsForTemplate.
    */
-  addTemplateFields: authenticatedProcedure
+  setFieldsForTemplate: authenticatedProcedure
     .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -525,13 +524,16 @@ export const fieldRouter = router({
       });
 
       return await setFieldsForTemplate({
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         userId: ctx.user.id,
         teamId,
         fields: fields.map((field) => ({
-          id: field.nativeId,
-          signerEmail: field.signerEmail,
+          id: field.id,
           recipientId: field.recipientId,
+          envelopeItemId: field.envelopeItemId,
           type: field.type,
           pageNumber: field.pageNumber,
           pageX: field.pageX,

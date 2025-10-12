@@ -25,20 +25,21 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
 import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
 
 import type { Route } from './+types/documents.$id';
 
 export async function loader({ params }: Route.LoaderArgs) {
-  const id = Number(params.id);
+  const id = params.id;
 
-  if (isNaN(id)) {
+  if (!id || !id.startsWith('envelope_')) {
     throw redirect('/admin/documents');
   }
 
   const envelope = await unsafeGetEntireEnvelope({
     id: {
-      type: 'documentId',
+      type: 'envelopeId',
       id,
     },
     type: EnvelopeType.DOCUMENT,
@@ -57,8 +58,8 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
     trpc.admin.document.reseal.useMutation({
       onSuccess: () => {
         toast({
-          title: _(msg`Success`),
-          description: _(msg`Document resealed`),
+          title: _(msg`Sealing job started`),
+          description: _(msg`See the background jobs tab for the status`),
         });
       },
       onError: () => {
@@ -163,6 +164,12 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
             </AccordionItem>
           ))}
         </Accordion>
+      </div>
+
+      <hr className="my-4" />
+
+      <div className="mt-4">
+        <AdminDocumentJobsTable envelopeId={envelope.id} />
       </div>
 
       <hr className="my-4" />

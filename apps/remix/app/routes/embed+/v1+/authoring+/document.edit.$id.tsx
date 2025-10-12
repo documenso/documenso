@@ -235,6 +235,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
             .map<any>((f) => ({
               ...f,
               id: f.nativeId,
+              envelopeItemId: document.documentData.envelopeItemId,
               pageX: f.pageX,
               pageY: f.pageY,
               width: f.pageWidth,

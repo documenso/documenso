@@ -1,4 +1,4 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
@@ -31,12 +31,16 @@ export const ZTemplateSchema = TemplateSchema.pick({
   publicDescription: true,
   folderId: true,
 }).extend({
+  envelopeId: z.string(),
+
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   templateDocumentData: DocumentDataSchema.pick({
     type: true,
     id: true,
     data: true,
     initialData: true,
+  }).extend({
+    envelopeItemId: z.string(),
   }),
   templateMeta: DocumentMetaSchema.pick({
     id: true,
@@ -98,6 +102,8 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   publicDescription: true,
   folderId: true,
   useLegacyFieldInsertion: true,
+}).extend({
+  envelopeId: z.string(),
 });
 
 export type TTemplateLite = z.infer<typeof ZTemplateLiteSchema>;
@@ -121,6 +127,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
+  envelopeId: z.string(),
   team: TeamSchema.pick({
     id: true,
     url: true,

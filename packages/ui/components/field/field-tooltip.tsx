@@ -51,6 +51,7 @@ export function FieldToolTip({ children, color, className = '', field }: FieldTo
 
   return createPortal(
     <div
+      id="field-tooltip"
       className={cn('pointer-events-none absolute')}
       style={{
         top: `${coords.y}px`,

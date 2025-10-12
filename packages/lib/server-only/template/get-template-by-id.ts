@@ -3,21 +3,19 @@ import { EnvelopeType } from '@prisma/client';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type GetTemplateByIdOptions = {
-  id: number;
+  id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
 };
 
 export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'templateId',
-      id,
-    },
+    id,
     type: EnvelopeType.TEMPLATE,
     userId,
     teamId,
@@ -30,6 +28,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       documentMeta: true,
       envelopeItems: {
         select: {
+          id: true,
           documentData: true,
         },
       },
@@ -52,7 +51,6 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
     });
   }
 
-  // Todo: Envelopes
   const firstTemplateDocumentData = envelope.envelopeItems[0].documentData;
 
   if (!firstTemplateDocumentData) {
@@ -68,8 +66,12 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
 
   return {
     ...rest,
+    envelopeId: envelope.id,
     type: envelope.templateType,
-    templateDocumentData: firstTemplateDocumentData,
+    templateDocumentData: {
+      ...firstTemplateDocumentData,
+      envelopeItemId: envelope.envelopeItems[0].id,
+    },
     templateMeta: envelope.documentMeta,
     fields: envelope.fields.map((field) => ({
       ...field,

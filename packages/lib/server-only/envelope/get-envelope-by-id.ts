@@ -45,6 +45,9 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
         include: {
           documentData: true,
         },
+        orderBy: {
+          order: 'asc',
+        },
       },
       folder: true,
       documentMeta: true,
@@ -55,12 +58,24 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
           email: true,
         },
       },
-      recipients: true,
+      recipients: {
+        orderBy: {
+          id: 'asc',
+        },
+      },
       fields: true,
       team: {
         select: {
           id: true,
           url: true,
+        },
+      },
+      directLink: {
+        select: {
+          directTemplateRecipientId: true,
+          enabled: true,
+          id: true,
+          token: true,
         },
       },
     },
@@ -72,7 +87,14 @@ export const getEnvelopeById = async ({ id, userId, teamId, type }: GetEnvelopeB
     });
   }
 
-  return envelope;
+  return {
+    ...envelope,
+    user: {
+      id: envelope.user.id,
+      name: envelope.user.name || '',
+      email: envelope.user.email,
+    },
+  };
 };
 
 export type GetEnvelopeByIdResponse = Awaited<ReturnType<typeof getEnvelopeById>>;
@@ -111,6 +133,15 @@ export const getEnvelopeWhereInput = async ({
   teamId,
   type,
 }: GetEnvelopeWhereInputOptions) => {
+  // Backup validation incase something goes wrong.
+  if (!id.id || !userId || !teamId || type === undefined) {
+    console.error(`[CRTICAL ERROR]: MUST NEVER HAPPEN`);
+
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Envelope ID not found',
+    });
+  }
+
   // Validate that the user belongs to the team provided.
   const team = await getTeamById({ teamId, userId });
 

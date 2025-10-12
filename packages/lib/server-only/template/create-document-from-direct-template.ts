@@ -35,6 +35,8 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isRequiredField } from '../../utils/advanced-fields-helpers';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import type { CreateDocumentAuditLogDataResponse } from '../../utils/document-audit-logs';
@@ -107,7 +109,7 @@ export const createDocumentFromDirectTemplate = async ({
       },
       directLink: true,
       envelopeItems: {
-        select: {
+        include: {
           documentData: true,
         },
       },
@@ -129,10 +131,8 @@ export const createDocumentFromDirectTemplate = async ({
   const directTemplateEnvelopeLegacyId = mapSecondaryIdToTemplateId(
     directTemplateEnvelope.secondaryId,
   );
-  const firstEnvelopeItem = directTemplateEnvelope.envelopeItems[0];
 
-  // Todo: Envelopes
-  if (directTemplateEnvelope.envelopeItems.length !== 1 || !firstEnvelopeItem) {
+  if (directTemplateEnvelope.envelopeItems.length < 1) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Invalid number of envelope items',
     });
@@ -228,7 +228,7 @@ export const createDocumentFromDirectTemplate = async ({
         recipient: {
           authOptions: directTemplateRecipient.authOptions,
           email: directRecipientEmail,
-          documentId: template.id,
+          envelopeId: directTemplateEnvelope.id,
         },
         field: templateField,
         userId: user?.id,
@@ -289,14 +289,43 @@ export const createDocumentFromDirectTemplate = async ({
 
   const initialRequestTime = new Date();
 
-  // Todo: Envelopes
-  const documentData = await prisma.documentData.create({
-    data: {
-      type: firstEnvelopeItem.documentData.type,
-      data: firstEnvelopeItem.documentData.data,
-      initialData: firstEnvelopeItem.documentData.initialData,
-    },
-  });
+  // Key = original envelope item ID
+  // Value = duplicated envelope item ID.
+  const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
+
+  // Duplicate the envelope item data.
+  const envelopeItemsToCreate = await Promise.all(
+    directTemplateEnvelope.envelopeItems.map(async (item, i) => {
+      const buffer = await getFileServerSide(item.documentData);
+
+      const titleToUse = item.title || directTemplateEnvelope.title;
+
+      const duplicatedFile = await putPdfFileServerSide({
+        name: titleToUse,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(buffer),
+      });
+
+      const newDocumentData = await prisma.documentData.create({
+        data: {
+          type: duplicatedFile.type,
+          data: duplicatedFile.data,
+          initialData: duplicatedFile.initialData,
+        },
+      });
+
+      const newEnvelopeItemId = prefixedId('envelope_item');
+
+      oldEnvelopeItemToNewEnvelopeItemIdMap[item.id] = newEnvelopeItemId;
+
+      return {
+        id: newEnvelopeItemId,
+        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        documentDataId: newDocumentData.id,
+        order: item.order !== undefined ? item.order : i + 1,
+      };
+    }),
+  );
 
   const documentMeta = await prisma.documentMeta.create({
     data: derivedDocumentMeta,
@@ -311,6 +340,7 @@ export const createDocumentFromDirectTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
+        internalVersion: 1,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,
@@ -322,10 +352,8 @@ export const createDocumentFromDirectTemplate = async ({
         externalId: directTemplateExternalId,
         visibility: settings.documentVisibility,
         envelopeItems: {
-          create: {
-            id: prefixedId('envelope_item'),
-            title: directTemplateEnvelope.title, // Todo: Envelopes use item title instead
-            documentDataId: documentData.id,
+          createMany: {
+            data: envelopeItemsToCreate,
           },
         },
         authOptions: createDocumentAuthOptions({
@@ -374,8 +402,6 @@ export const createDocumentFromDirectTemplate = async ({
       },
     });
 
-    const envelopeItemId = createdEnvelope.envelopeItems[0].id;
-
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
     Object.values(nonDirectTemplateRecipients).forEach((templateRecipient) => {
@@ -390,7 +416,7 @@ export const createDocumentFromDirectTemplate = async ({
       nonDirectRecipientFieldsToCreate = nonDirectRecipientFieldsToCreate.concat(
         templateRecipient.fields.map((field) => ({
           envelopeId: createdEnvelope.id,
-          envelopeItemId: envelopeItemId, // Todo: Envelopes
+          envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
           recipientId: recipient.id,
           type: field.type,
           page: field.page,
@@ -432,7 +458,7 @@ export const createDocumentFromDirectTemplate = async ({
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => ({
               envelopeId: createdEnvelope.id,
-              envelopeItemId: envelopeItemId, // Todo: Envelopes
+              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
               type: templateField.type,
               page: templateField.page,
               positionX: templateField.positionX,
@@ -463,7 +489,7 @@ export const createDocumentFromDirectTemplate = async ({
           const field = await tx.field.create({
             data: {
               envelopeId: createdEnvelope.id,
-              envelopeItemId: envelopeItemId, // Todo: Envelopes
+              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
               recipientId: createdDirectRecipient.id,
               type: templateField.type,
               page: templateField.page,

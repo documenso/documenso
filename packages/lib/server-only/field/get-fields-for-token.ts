@@ -6,7 +6,7 @@ export type GetFieldsForTokenOptions = {
   token: string;
 };
 
-// Todo: Envelopes, this will return all fields, might need to filter based on actual documentId.
+// Note: You many need to filter this on a per envelope item ID basis.
 export const getFieldsForToken = async ({ token }: GetFieldsForTokenOptions) => {
   if (!token) {
     throw new Error('Missing token');

@@ -7,11 +7,13 @@ import type { User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import type { Template } from '@documenso/prisma/types/template-legacy-schema';
 
 export type TemplatePageViewInformationProps = {
   userId: number;
-  template: Template & {
+  template: {
+    userId: number;
+    createdAt: Date;
+    updatedAt: Date;
     user: Pick<User, 'id' | 'name' | 'email'>;
   };
 };

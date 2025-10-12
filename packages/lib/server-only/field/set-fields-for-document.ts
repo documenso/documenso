@@ -24,13 +24,14 @@ import {
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   fields: FieldData[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -38,15 +39,12 @@ export interface SetFieldsForDocumentOptions {
 export const setFieldsForDocument = async ({
   userId,
   teamId,
-  documentId,
+  id,
   fields,
   requestMetadata,
 }: SetFieldsForDocumentOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
+    id,
     type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
@@ -69,10 +67,7 @@ export const setFieldsForDocument = async ({
     },
   });
 
-  // Todo: Envelopes
-  const firstEnvelopeItemId = envelope?.envelopeItems[0]?.id;
-
-  if (!envelope || !firstEnvelopeItemId) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
@@ -95,6 +90,17 @@ export const setFieldsForDocument = async ({
 
     const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
 
+    // Check whether the field is being attached to an allowed envelope item.
+    const foundEnvelopeItem = envelope.envelopeItems.find(
+      (envelopeItem) => envelopeItem.id === field.envelopeItemId,
+    );
+
+    if (!foundEnvelopeItem) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Envelope item ${field.envelopeItemId} not found`,
+      });
+    }
+
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -114,6 +120,14 @@ export const setFieldsForDocument = async ({
       });
     }
 
+    // Prevent creating new fields when recipient has interacted with the document.
+    if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'Cannot modify a field where the recipient has already interacted with the document',
+      });
+    }
+
     return {
       ...field,
       _persisted: existing,
@@ -124,7 +138,7 @@ export const setFieldsForDocument = async ({
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedFields.map(async (field) => {
-        const fieldSignerEmail = field.signerEmail.toLowerCase();
+        const fieldSignerEmail = field._recipient.email.toLowerCase();
 
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
@@ -207,6 +221,7 @@ export const setFieldsForDocument = async ({
           where: {
             id: field._persisted?.id ?? -1,
             envelopeId: envelope.id,
+            envelopeItemId: field.envelopeItemId,
           },
           update: {
             page: field.pageNumber,
@@ -217,8 +232,6 @@ export const setFieldsForDocument = async ({
             fieldMeta: parsedFieldMeta,
           },
           create: {
-            envelopeId: envelope.id,
-            envelopeItemId: firstEnvelopeItemId, // Todo: Envelopes
             type: field.type,
             page: field.pageNumber,
             positionX: field.pageX,
@@ -228,7 +241,23 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
-            recipientId: field._recipient.id,
+            envelope: {
+              connect: {
+                id: envelope.id,
+              },
+            },
+            envelopeItem: {
+              connect: {
+                id: field.envelopeItemId,
+                envelopeId: envelope.id,
+              },
+            },
+            recipient: {
+              connect: {
+                id: field._recipient.id,
+                envelopeId: envelope.id,
+              },
+            },
           },
         });
 
@@ -325,8 +354,8 @@ export const setFieldsForDocument = async ({
  */
 type FieldData = {
   id?: number | null;
+  envelopeItemId: string;
   type: FieldType;
-  signerEmail: string;
   recipientId: number;
   pageNumber: number;
   pageX: number;
@@ -341,6 +370,7 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
   const newFieldMeta = newFieldData.fieldMeta || null;
 
   return (
+    field.envelopeItemId !== newFieldData.envelopeItemId ||
     field.type !== newFieldData.type ||
     field.page !== newFieldData.pageNumber ||
     field.positionX.toNumber() !== newFieldData.pageX ||

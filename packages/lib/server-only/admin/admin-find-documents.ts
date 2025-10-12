@@ -15,7 +15,7 @@ export const adminFindDocuments = async ({
   page = 1,
   perPage = 10,
 }: AdminFindDocumentsOptions) => {
-  const termFilters: Prisma.EnvelopeWhereInput | undefined = !query
+  let termFilters: Prisma.EnvelopeWhereInput | undefined = !query
     ? undefined
     : {
         title: {
@@ -23,6 +23,34 @@ export const adminFindDocuments = async ({
           mode: 'insensitive',
         },
       };
+
+  if (query && query.startsWith('envelope_')) {
+    termFilters = {
+      id: {
+        equals: query,
+      },
+    };
+  }
+
+  if (query && query.startsWith('document_')) {
+    termFilters = {
+      secondaryId: {
+        equals: query,
+      },
+    };
+  }
+
+  if (query) {
+    const isQueryAnInteger = !isNaN(parseInt(query));
+
+    if (isQueryAnInteger) {
+      termFilters = {
+        secondaryId: {
+          equals: `document_${query}`,
+        },
+      };
+    }
+  }
 
   const [data, count] = await Promise.all([
     prisma.envelope.findMany({

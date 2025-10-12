@@ -1,6 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -80,7 +79,7 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Save the settings by going to the next step.

@@ -4,10 +4,6 @@ import fs from 'fs';
 import path from 'path';
 
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import {
-  mapDocumentIdToSecondaryId,
-  mapSecondaryIdToTemplateId,
-} from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
@@ -33,7 +29,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -79,13 +75,13 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       recipients: true,
@@ -136,7 +132,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title.
@@ -182,13 +178,13 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       recipients: true,
@@ -244,7 +240,7 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -288,13 +284,13 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       envelopeItems: {
@@ -343,7 +339,7 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -387,13 +383,13 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       envelopeItems: {
@@ -438,7 +434,7 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title
@@ -467,13 +463,13 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the template's document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       envelopeItems: {
@@ -519,7 +515,7 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await apiSignin({
     page,
     email: owner.email,
-    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
+    redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
   // Set template title and visibility
@@ -558,13 +554,13 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct visibility
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
   const document = await prisma.envelope.findFirstOrThrow({
     where: {
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
+      id: documentId,
     },
     include: {
       envelopeItems: {

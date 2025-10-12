@@ -11,6 +11,7 @@ import {
   ZCreateEmbeddingDocumentResponseSchema,
 } from './create-embedding-document.types';
 
+// Todo: Envelopes - This only supports V1 documents/templates.
 export const createEmbeddingDocumentRoute = procedure
   .input(ZCreateEmbeddingDocumentRequestSchema)
   .output(ZCreateEmbeddingDocumentResponseSchema)
@@ -33,6 +34,7 @@ export const createEmbeddingDocumentRoute = procedure
       const { title, documentDataId, externalId, recipients, meta } = input;
 
       const envelope = await createEnvelope({
+        internalVersion: 1,
         data: {
           type: EnvelopeType.DOCUMENT,
           title,

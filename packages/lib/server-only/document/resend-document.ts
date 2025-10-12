@@ -25,12 +25,13 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { isDocumentCompleted } from '../../utils/document';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type ResendDocumentOptions = {
-  documentId: number;
+  id: EnvelopeIdOptions;
   userId: number;
   recipients: number[];
   teamId: number;
@@ -38,7 +39,7 @@ export type ResendDocumentOptions = {
 };
 
 export const resendDocument = async ({
-  documentId,
+  id,
   userId,
   recipients,
   teamId,
@@ -56,10 +57,7 @@ export const resendDocument = async ({
   });
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
+    id,
     type: EnvelopeType.DOCUMENT,
     userId,
     teamId,

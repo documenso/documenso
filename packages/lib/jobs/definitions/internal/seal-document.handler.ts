@@ -1,3 +1,5 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
+import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentStatus,
   EnvelopeType,
@@ -7,7 +9,6 @@ import {
 } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
-import { PDFDocument } from 'pdf-lib';
 
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
@@ -20,7 +21,8 @@ import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificat
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
-import { insertFieldInPDF } from '../../../server-only/pdf/insert-field-in-pdf';
+import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
+import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf-v2';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
@@ -36,7 +38,7 @@ import { putPdfFileServerSide } from '../../../universal/upload/put-file.server'
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
-import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
+import { mapDocumentIdToSecondaryId, mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -58,16 +60,20 @@ export const run = async ({
       documentMeta: true,
       recipients: true,
       envelopeItems: {
-        select: {
-          documentDataId: true,
+        include: {
+          documentData: true,
+          field: {
+            include: {
+              signature: true,
+            },
+          },
         },
       },
     },
   });
 
-  // Todo: Envelopes
-  if (envelope.envelopeItems.length !== 1) {
-    throw new Error('1 Envelope item required');
+  if (envelope.envelopeItems.length === 0) {
+    throw new Error('At least one envelope item required');
   }
 
   const settings = await getTeamSettings({
@@ -93,19 +99,25 @@ export const run = async ({
   });
 
   // This is the same case as above.
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const documentDataId = await io.runTask('get-document-data-id', async () => {
-    return envelope.envelopeItems[0].documentDataId;
-  });
-
-  const documentData = await prisma.documentData.findFirst({
-    where: {
-      id: documentDataId,
+  let envelopeItems: typeof envelope.envelopeItems = await io.runTask(
+    'get-document-data-id', // Todo: Envelopes [PRE-MAIN] - Fix these messed up types.
+    // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-explicit-any
+    async (): Promise<any> => {
+      return envelope.envelopeItems.map((envelopeItem) => ({
+        ...envelopeItem,
+        fields: envelopeItem.field.map((field) => ({
+          ...field,
+          positionX: Number(field.positionX),
+          positionY: Number(field.positionY),
+          width: Number(field.width),
+          height: Number(field.height),
+        })),
+      }));
     },
-  });
+  );
 
-  if (!documentData) {
-    throw new Error(`Document ${envelope.id} has no document data`);
+  if (envelopeItems.length < 1) {
+    throw new Error(`Document ${envelope.id} has no envelope items`);
   }
 
   const recipients = await prisma.recipient.findMany({
@@ -144,7 +156,13 @@ export const run = async ({
   if (isResealing) {
     // If we're resealing we want to use the initial data for the document
     // so we aren't placing fields on top of eachother.
-    documentData.data = documentData.initialData;
+    envelopeItems = envelopeItems.map((envelopeItem) => ({
+      ...envelopeItem,
+      documentData: {
+        ...envelopeItem.documentData,
+        data: envelopeItem.documentData.initialData,
+      },
+    }));
   }
 
   if (!envelope.qrToken) {
@@ -158,97 +176,28 @@ export const run = async ({
     });
   }
 
-  const pdfData = await getFileServerSide(documentData);
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  const certificateData = settings.includeSigningCertificate
-    ? await getCertificatePdf({
-        documentId,
-        language: envelope.documentMeta?.language,
-      }).catch((e) => {
-        console.log('Failed to get certificate PDF');
-        console.error(e);
-
-        return null;
-      })
-    : null;
-
-  const auditLogData = settings.includeAuditLog
-    ? await getAuditLogsPdf({
-        documentId,
-        language: envelope.documentMeta?.language,
-      }).catch((e) => {
-        console.log('Failed to get audit logs PDF');
-        console.error(e);
-
-        return null;
-      })
-    : null;
-
-  const newDataId = await io.runTask('decorate-and-sign-pdf', async () => {
-    const pdfDoc = await PDFDocument.load(pdfData);
-
-    // Normalize and flatten layers that could cause issues with the signature
-    normalizeSignatureAppearances(pdfDoc);
-    await flattenForm(pdfDoc);
-    flattenAnnotations(pdfDoc);
-
-    // Add rejection stamp if the document is rejected
-    if (isRejected && rejectionReason) {
-      await addRejectionStampToPdf(pdfDoc, rejectionReason);
-    }
-
-    if (certificateData) {
-      const certificateDoc = await PDFDocument.load(certificateData);
-
-      const certificatePages = await pdfDoc.copyPages(
-        certificateDoc,
-        certificateDoc.getPageIndices(),
-      );
-
-      certificatePages.forEach((page) => {
-        pdfDoc.addPage(page);
-      });
-    }
-
-    if (auditLogData) {
-      const auditLogDoc = await PDFDocument.load(auditLogData);
-
-      const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
-
-      auditLogPages.forEach((page) => {
-        pdfDoc.addPage(page);
-      });
-    }
-
-    for (const field of fields) {
-      if (field.inserted) {
-        envelope.useLegacyFieldInsertion
-          ? await legacy_insertFieldInPDF(pdfDoc, field)
-          : await insertFieldInPDF(pdfDoc, field);
-      }
-    }
-
-    // Re-flatten the form to handle our checkbox and radio fields that
-    // create native arcoFields
-    await flattenForm(pdfDoc);
-
-    const pdfBytes = await pdfDoc.save();
-    const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
-
-    // Todo: Envelopes - Use the envelope item title instead.
-    const { name } = path.parse(envelope.title);
-
-    // Add suffix based on document status
-    const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
-
-    const documentData = await putPdfFileServerSide({
-      name: `${name}${suffix}`,
-      type: 'application/pdf',
-      arrayBuffer: async () => Promise.resolve(pdfBuffer),
-    });
-
-    return documentData.id;
+  const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
+    legacyDocumentId,
+    documentMeta: envelope.documentMeta,
+    settings,
   });
+
+  const newDocumentData = await Promise.all(
+    envelopeItems.map(async (envelopeItem) =>
+      io.runTask('decorate-and-sign-pdf', async () =>
+        decorateAndSignPdf({
+          envelope,
+          envelopeItem,
+          isRejected,
+          rejectionReason,
+          certificateData,
+          auditLogData,
+        }),
+      ),
+    ),
+  );
 
   const postHog = PostHogServerClient();
 
@@ -265,11 +214,22 @@ export const run = async ({
 
   await io.runTask('update-document', async () => {
     await prisma.$transaction(async (tx) => {
-      const newData = await tx.documentData.findFirstOrThrow({
-        where: {
-          id: newDataId,
-        },
-      });
+      for (const { oldDocumentDataId, newDocumentDataId } of newDocumentData) {
+        const newData = await tx.documentData.findFirstOrThrow({
+          where: {
+            id: newDocumentDataId,
+          },
+        });
+
+        await tx.documentData.update({
+          where: {
+            id: oldDocumentDataId,
+          },
+          data: {
+            data: newData.data,
+          },
+        });
+      }
 
       await tx.envelope.update({
         where: {
@@ -278,15 +238,6 @@ export const run = async ({
         data: {
           status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
           completedAt: new Date(),
-        },
-      });
-
-      await tx.documentData.update({
-        where: {
-          id: documentData.id,
-        },
-        data: {
-          data: newData.data,
         },
       });
 
@@ -338,4 +289,142 @@ export const run = async ({
     userId: updatedEnvelope.userId,
     teamId: updatedEnvelope.teamId ?? undefined,
   });
+};
+
+type DecorateAndSignPdfOptions = {
+  envelope: Pick<Envelope, 'id' | 'title' | 'useLegacyFieldInsertion' | 'internalVersion'>;
+  envelopeItem: EnvelopeItem & { documentData: DocumentData; field: Field[] };
+  isRejected: boolean;
+  rejectionReason: string;
+  certificateData: Buffer | null;
+  auditLogData: Buffer | null;
+};
+
+/**
+ * Fetch, normalize, flatten and insert fields into a PDF document.
+ */
+const decorateAndSignPdf = async ({
+  envelope,
+  envelopeItem,
+  isRejected,
+  rejectionReason,
+  certificateData,
+  auditLogData,
+}: DecorateAndSignPdfOptions) => {
+  const pdfData = await getFileServerSide(envelopeItem.documentData);
+
+  const pdfDoc = await PDFDocument.load(pdfData);
+
+  // Normalize and flatten layers that could cause issues with the signature
+  normalizeSignatureAppearances(pdfDoc);
+  await flattenForm(pdfDoc);
+  flattenAnnotations(pdfDoc);
+
+  // Add rejection stamp if the document is rejected
+  if (isRejected && rejectionReason) {
+    await addRejectionStampToPdf(pdfDoc, rejectionReason);
+  }
+
+  if (certificateData) {
+    const certificateDoc = await PDFDocument.load(certificateData);
+
+    const certificatePages = await pdfDoc.copyPages(
+      certificateDoc,
+      certificateDoc.getPageIndices(),
+    );
+
+    certificatePages.forEach((page) => {
+      pdfDoc.addPage(page);
+    });
+  }
+
+  if (auditLogData) {
+    const auditLogDoc = await PDFDocument.load(auditLogData);
+
+    const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
+
+    auditLogPages.forEach((page) => {
+      pdfDoc.addPage(page);
+    });
+  }
+
+  for (const field of envelopeItem.field) {
+    if (field.inserted) {
+      if (envelope.internalVersion === 2) {
+        await insertFieldInPDFV2(pdfDoc, field);
+      } else if (envelope.useLegacyFieldInsertion) {
+        await legacy_insertFieldInPDF(pdfDoc, field);
+      } else {
+        await insertFieldInPDFV1(pdfDoc, field);
+      }
+    }
+  }
+
+  // Re-flatten the form to handle our checkbox and radio fields that
+  // create native arcoFields
+  await flattenForm(pdfDoc);
+
+  const pdfBytes = await pdfDoc.save();
+
+  const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
+
+  const { name } = path.parse(envelopeItem.title);
+
+  // Add suffix based on document status
+  const suffix = isRejected ? '_rejected.pdf' : '_signed.pdf';
+
+  const newDocumentData = await putPdfFileServerSide({
+    name: `${name}${suffix}`,
+    type: 'application/pdf',
+    arrayBuffer: async () => Promise.resolve(pdfBuffer),
+  });
+
+  return {
+    oldDocumentDataId: envelopeItem.documentData.id,
+    newDocumentDataId: newDocumentData.id,
+  };
+};
+
+export const getCertificateAndAuditLogData = async ({
+  legacyDocumentId,
+  documentMeta,
+  settings,
+}: {
+  legacyDocumentId: number;
+  documentMeta: DocumentMeta;
+  settings: { includeSigningCertificate: boolean; includeAuditLog: boolean };
+}) => {
+  const getCertificateDataPromise = settings.includeSigningCertificate
+    ? getCertificatePdf({
+        documentId: legacyDocumentId,
+        language: documentMeta.language,
+      }).catch((e) => {
+        console.log('Failed to get certificate PDF');
+        console.error(e);
+
+        return null;
+      })
+    : null;
+
+  const getAuditLogDataPromise = settings.includeAuditLog
+    ? getAuditLogsPdf({
+        documentId: legacyDocumentId,
+        language: documentMeta.language,
+      }).catch((e) => {
+        console.log('Failed to get audit logs PDF');
+        console.error(e);
+
+        return null;
+      })
+    : null;
+
+  const [certificateData, auditLogData] = await Promise.all([
+    getCertificateDataPromise,
+    getAuditLogDataPromise,
+  ]);
+
+  return {
+    certificateData,
+    auditLogData,
+  };
 };

@@ -12,6 +12,7 @@ import {
   ZCreateEmbeddingTemplateResponseSchema,
 } from './create-embedding-template.types';
 
+// Todo: Envelopes - This only supports V1 documents/templates.
 export const createEmbeddingTemplateRoute = procedure
   .input(ZCreateEmbeddingTemplateRequestSchema)
   .output(ZCreateEmbeddingTemplateResponseSchema)
@@ -35,6 +36,7 @@ export const createEmbeddingTemplateRoute = procedure
 
       // First create the template
       const template = await createEnvelope({
+        internalVersion: 1,
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
         data: {
@@ -46,11 +48,10 @@ export const createEmbeddingTemplateRoute = procedure
             },
           ],
         },
-        meta, // Todo: Migration - Test this.
+        meta,
         requestMetadata: metadata,
       });
 
-      // Todo: Envelopes - Support multiple items.
       const firstEnvelopeItem = template.envelopeItems[0];
 
       await Promise.all(

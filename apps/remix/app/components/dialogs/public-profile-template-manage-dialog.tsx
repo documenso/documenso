@@ -52,7 +52,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { useCurrentTeam } from '~/providers/team';
 
 export type ManagePublicTemplateDialogProps = {
-  directTemplates: (Template & {
+  directTemplates: (Omit<Template, 'templateDocumentDataId'> & {
     directLink: Pick<TemplateDirectLink, 'token' | 'enabled'>;
   })[];
   initialTemplateId?: number | null;

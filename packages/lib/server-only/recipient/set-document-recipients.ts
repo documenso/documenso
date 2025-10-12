@@ -27,6 +27,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
@@ -35,7 +36,7 @@ import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 export interface SetDocumentRecipientsOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -43,15 +44,12 @@ export interface SetDocumentRecipientsOptions {
 export const setDocumentRecipients = async ({
   userId,
   teamId,
-  documentId,
+  id,
   recipients,
   requestMetadata,
 }: SetDocumentRecipientsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
+    id,
     type: EnvelopeType.DOCUMENT,
     userId,
     teamId,

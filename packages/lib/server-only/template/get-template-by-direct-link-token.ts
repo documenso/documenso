@@ -58,6 +58,7 @@ export const getTemplateByDirectLinkToken = async ({
   // Backwards compatibility mapping.
   return {
     id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    envelopeId: envelope.id,
     type: envelope.templateType,
     visibility: envelope.visibility,
     externalId: envelope.externalId,
@@ -70,7 +71,10 @@ export const getTemplateByDirectLinkToken = async ({
     publicTitle: envelope.publicTitle,
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
-    templateDocumentData: firstDocumentData,
+    templateDocumentData: {
+      ...firstDocumentData,
+      envelopeItemId: envelope.envelopeItems[0].id,
+    },
     directLink,
     templateMeta: envelope.documentMeta,
     recipients: recipientsWithMappedFields,

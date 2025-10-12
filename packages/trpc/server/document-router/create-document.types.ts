@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
-import { ZDocumentMetaTimezoneSchema, ZDocumentTitleSchema } from './schema';
+import { ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
+
+import { ZDocumentTitleSchema } from './schema';
 
 // Currently not in use until we allow passthrough documents on create.
 // export const createDocumentMeta: TrpcRouteMeta = {

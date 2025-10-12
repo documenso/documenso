@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -37,13 +36,13 @@ const ZRejectDocumentFormSchema = z.object({
 type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;
 
 export interface DocumentSigningRejectDialogProps {
-  document: Pick<Document, 'id'>;
+  documentId: number;
   token: string;
   onRejected?: (reason: string) => void | Promise<void>;
 }
 
 export function DocumentSigningRejectDialog({
-  document,
+  documentId,
   token,
   onRejected,
 }: DocumentSigningRejectDialogProps) {
@@ -66,7 +65,7 @@ export function DocumentSigningRejectDialog({
   const onRejectDocument = async ({ reason }: TRejectDocumentFormSchema) => {
     try {
       await rejectDocumentWithToken({
-        documentId: document.id,
+        documentId,
         token,
         reason,
       });

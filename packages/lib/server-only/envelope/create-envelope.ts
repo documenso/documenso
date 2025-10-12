@@ -16,7 +16,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateDocumentTemporaryRequest } from '@documenso/trpc/server/document-router/create-document-temporary.types';
+import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
@@ -37,11 +37,12 @@ export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
   normalizePdf?: boolean;
+  internalVersion: 1 | 2;
   data: {
     type: EnvelopeType;
     title: string;
     externalId?: string;
-    envelopeItems: { title?: string; documentDataId: string }[];
+    envelopeItems: { title?: string; documentDataId: string; order?: number }[];
     formValues?: TDocumentFormValues;
 
     timezone?: string;
@@ -54,7 +55,7 @@ export type CreateEnvelopeOptions = {
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    recipients?: TCreateDocumentTemporaryRequest['recipients'];
+    recipients?: TCreateEnvelopeRequest['recipients'];
     folderId?: string;
   };
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
@@ -68,6 +69,7 @@ export const createEnvelope = async ({
   data,
   meta,
   requestMetadata,
+  internalVersion,
 }: CreateEnvelopeOptions) => {
   const {
     type,
@@ -124,7 +126,14 @@ export const createEnvelope = async ({
     teamId,
   });
 
-  let envelopeItems: { title?: string; documentDataId: string }[] = data.envelopeItems;
+  if (data.envelopeItems.length !== 1 && internalVersion === 1) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Envelope items must have exactly 1 item for version 1',
+    });
+  }
+
+  let envelopeItems: { title?: string; documentDataId: string; order?: number }[] =
+    data.envelopeItems;
 
   if (normalizePdf) {
     envelopeItems = await Promise.all(
@@ -145,15 +154,18 @@ export const createEnvelope = async ({
 
         const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
+        const titleToUse = item.title || title;
+
         const newDocumentData = await putPdfFileServerSide({
-          name: title.endsWith('.pdf') ? title : `${title}.pdf`,
+          name: titleToUse,
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(normalizedPdf),
         });
 
         return {
-          title: item.title,
+          title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
           documentDataId: newDocumentData.id,
+          order: item.order,
         };
       }),
     );
@@ -219,15 +231,17 @@ export const createEnvelope = async ({
       data: {
         id: prefixedId('envelope'),
         secondaryId,
+        internalVersion,
         type,
         title,
         qrToken: prefixedId('qr'),
         externalId,
         envelopeItems: {
           createMany: {
-            data: envelopeItems.map((item) => ({
+            data: envelopeItems.map((item, i) => ({
               id: prefixedId('envelope_item'),
               title: item.title || title,
+              order: item.order !== undefined ? item.order : i + 1,
               documentDataId: item.documentDataId,
             })),
           },
@@ -238,7 +252,7 @@ export const createEnvelope = async ({
         visibility,
         folderId,
         formValues,
-        source: DocumentSource.DOCUMENT, // Todo: Migration
+        source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.NONE,
         documentMetaId: documentMeta.id,
 
         // Template specific fields.
@@ -251,15 +265,51 @@ export const createEnvelope = async ({
       },
     });
 
-    // Todo: Envelopes - Support multiple envelope items.
-    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
-
     await Promise.all(
       (data.recipients || []).map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],
         });
+
+        // Todo: Envelopes - Allow fields.
+        // const recipientFieldsToCreate = (recipient.fields || []).map((field) => {
+        //   let envelopeItemId = envelope.envelopeItems[0].id;?
+
+        //   const foundEnvelopeItem = envelope.envelopeItems.find(
+        //     (item) => item.documentDataId === field.documentDataId,
+        //   );
+
+        //   if (field.documentDataId && !foundEnvelopeItem) {
+        //     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        //       message: 'Envelope item not found',
+        //     });
+        //   }
+
+        //   if (foundEnvelopeItem) {
+        //     envelopeItemId = foundEnvelopeItem.id;
+        //   }
+
+        //   if (!envelopeItemId) {
+        //     throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        //       message: 'Envelope item not found',
+        //     });
+        //   }
+
+        //   return {
+        //     envelopeId: envelope.id,
+        //     envelopeItemId,
+        //     type: field.type,
+        //     page: field.page,
+        //     positionX: field.positionX,
+        //     positionY: field.positionY,
+        //     width: field.width,
+        //     height: field.height,
+        //     customText: '',
+        //     inserted: false,
+        //     fieldMeta: field.fieldMeta || undefined,
+        //   };
+        // });
 
         await tx.recipient.create({
           data: {
@@ -273,23 +323,11 @@ export const createEnvelope = async ({
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions: recipientAuthOptions,
-            fields: {
-              createMany: {
-                data: (recipient.fields || []).map((field) => ({
-                  envelopeId: envelope.id,
-                  envelopeItemId: firstEnvelopeItemId,
-                  type: field.type,
-                  page: field.pageNumber,
-                  positionX: field.pageX,
-                  positionY: field.pageY,
-                  width: field.width,
-                  height: field.height,
-                  customText: '',
-                  inserted: false,
-                  fieldMeta: field.fieldMeta,
-                })),
-              },
-            },
+            // fields: {
+            //   createMany: {
+            //     data: recipientFieldsToCreate,
+            //   },
+            // },
           },
         });
       }),

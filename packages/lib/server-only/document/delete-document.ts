@@ -20,14 +20,14 @@ import {
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { isDocumentCompleted } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { type EnvelopeIdOptions, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getMemberRoles } from '../team/get-member-roles';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type DeleteDocumentOptions = {
-  id: number;
+  id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
   requestMetadata: ApiRequestMetadata;
@@ -53,7 +53,7 @@ export const deleteDocument = async ({
 
   // Note: This is an unsafe request, we validate the ownership later in the function.
   const envelope = await prisma.envelope.findUnique({
-    where: unsafeBuildEnvelopeIdQuery({ type: 'documentId', id }, EnvelopeType.DOCUMENT),
+    where: unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
     include: {
       recipients: true,
       documentMeta: true,

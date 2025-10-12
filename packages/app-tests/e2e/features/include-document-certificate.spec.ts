@@ -1,6 +1,6 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
-import { PDFDocument } from 'pdf-lib';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
 import { getFile } from '@documenso/lib/universal/upload/get-file';

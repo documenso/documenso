@@ -108,7 +108,7 @@ export const completeDocumentWithToken = async ({
 
   const fields = await prisma.field.findMany({
     where: {
-      envelopeId: envelope.id, // Todo: Envelopes - Need to support multi docs.
+      envelopeId: envelope.id,
       recipientId: recipient.id,
     },
   });

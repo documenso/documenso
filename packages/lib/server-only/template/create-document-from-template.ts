@@ -41,6 +41,8 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
+import { getFileServerSide } from '../../universal/upload/get-file.server';
+import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -77,7 +79,17 @@ export type CreateDocumentFromTemplateOptions = {
   }[];
   folderId?: string;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
-  customDocumentDataId?: string;
+
+  customDocumentData?: {
+    documentDataId: string;
+
+    /**
+     * The envelope item ID which will be updated to use the custom document data.
+     *
+     * If undefined, will use the first envelope item. This is done for backwards compatibility reasons.
+     */
+    envelopeItemId?: string;
+  }[];
 
   /**
    * Values that will override the predefined values in the template.
@@ -278,7 +290,7 @@ export const createDocumentFromTemplate = async ({
   userId,
   teamId,
   recipients,
-  customDocumentDataId,
+  customDocumentData = [],
   override,
   requestMetadata,
   folderId,
@@ -331,11 +343,11 @@ export const createDocumentFromTemplate = async ({
   }
 
   const legacyTemplateId = mapSecondaryIdToTemplateId(template.secondaryId);
+  const finalEnvelopeTitle = override?.title || template.title;
 
-  // Todo: Envelopes
-  if (template.envelopeItems.length !== 1) {
+  if (template.envelopeItems.length < 1) {
     throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: 'Template must have exactly 1 envelope item',
+      message: 'Template must have at least 1 envelope item',
     });
   }
 
@@ -376,32 +388,73 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  // Todo: Envelopes
-  let parentDocumentData = template.envelopeItems[0].documentData;
+  const firstEnvelopeItemId = template.envelopeItems[0].id;
 
-  if (customDocumentDataId) {
-    const customDocumentData = await prisma.documentData.findFirst({
-      where: {
-        id: customDocumentDataId,
-      },
-    });
+  // Key = original envelope item ID
+  // Value = duplicated envelope item ID.
+  const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
-    if (!customDocumentData) {
-      throw new AppError(AppErrorCode.NOT_FOUND, {
-        message: 'Custom document data not found',
+  // Duplicate the envelope item data.
+  // Todo: Envelopes - Ask if it's okay to just use the documentDataId? Or should it be duplicated?
+  // Note: This is duplicated in createDocumentFromDirectTemplate
+  const envelopeItemsToCreate = await Promise.all(
+    template.envelopeItems.map(async (item, i) => {
+      let documentDataIdToDuplicate = item.documentDataId;
+
+      const foundCustomDocumentData = customDocumentData.find(
+        (customDocumentDataItem) =>
+          customDocumentDataItem.envelopeItemId || firstEnvelopeItemId === item.id,
+      );
+
+      if (foundCustomDocumentData) {
+        documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
+      }
+
+      const documentDataToDuplicate = await prisma.documentData.findFirst({
+        where: {
+          id: documentDataIdToDuplicate,
+        },
       });
-    }
 
-    parentDocumentData = customDocumentData;
-  }
+      if (!documentDataToDuplicate) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Document data not found',
+        });
+      }
 
-  const documentData = await prisma.documentData.create({
-    data: {
-      type: parentDocumentData.type,
-      data: parentDocumentData.data,
-      initialData: parentDocumentData.initialData,
-    },
-  });
+      const buffer = await getFileServerSide(documentDataToDuplicate);
+
+      // Todo: Envelopes [PRE-MAIN] - Should we normalize? Should be part of the upload.
+      // const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+
+      const titleToUse = item.title || finalEnvelopeTitle;
+
+      const duplicatedFile = await putPdfFileServerSide({
+        name: titleToUse,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(buffer),
+      });
+
+      const newDocumentData = await prisma.documentData.create({
+        data: {
+          type: duplicatedFile.type,
+          data: duplicatedFile.data,
+          initialData: duplicatedFile.initialData,
+        },
+      });
+
+      const newEnvelopeItemId = prefixedId('envelope_item');
+
+      oldEnvelopeItemToNewEnvelopeItemIdMap[item.id] = newEnvelopeItemId;
+
+      return {
+        id: newEnvelopeItemId,
+        title: titleToUse.endsWith('.pdf') ? titleToUse.slice(0, -4) : titleToUse,
+        documentDataId: newDocumentData.id,
+        order: item.order !== undefined ? item.order : i + 1,
+      };
+    }),
+  );
 
   const incrementedDocumentId = await incrementDocumentId();
 
@@ -433,6 +486,7 @@ export const createDocumentFromTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
+        internalVersion: template.internalVersion,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE,
         externalId: externalId || template.externalId,
@@ -440,12 +494,10 @@ export const createDocumentFromTemplate = async ({
         userId,
         folderId,
         teamId: template.teamId,
-        title: override?.title || template.title,
+        title: finalEnvelopeTitle,
         envelopeItems: {
-          create: {
-            id: prefixedId('envelope_item'),
-            title: override?.title || template.title,
-            documentDataId: documentData.id,
+          createMany: {
+            data: envelopeItemsToCreate,
           },
         },
         authOptions: createDocumentAuthOptions({
@@ -494,8 +546,6 @@ export const createDocumentFromTemplate = async ({
         },
       },
     });
-
-    const envelopeItemId = envelope.envelopeItems[0].id;
 
     let fieldsToCreate: Omit<Field, 'id' | 'secondaryId'>[] = [];
 
@@ -552,8 +602,8 @@ export const createDocumentFromTemplate = async ({
           const prefillField = prefillFields?.find((value) => value.id === field.id);
 
           const payload = {
-            envelopeItemId,
-            envelopeId: envelope.id, // Todo: Envelopes
+            envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
+            envelopeId: envelope.id,
             recipientId: recipient.id,
             type: field.type,
             page: field.page,

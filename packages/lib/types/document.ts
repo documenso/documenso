@@ -32,9 +32,13 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
   teamId: true,
   folderId: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
-  templateId: z.number().nullish(),
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
 
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   documentData: DocumentDataSchema.pick({
@@ -42,6 +46,8 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     id: true,
     data: true,
     initialData: true,
+  }).extend({
+    envelopeItemId: z.string(),
   }),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
@@ -100,9 +106,13 @@ export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
-  templateId: z.number().nullish(),
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
 });
 
 export type TDocumentLite = z.infer<typeof ZDocumentLiteSchema>;
@@ -128,9 +138,13 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
-  // Which "Template" the document was created from. Legacy field for backwards compatibility.
-  // The actual field is now called `createdFromDocumentId`.
-  templateId: z.number().nullish(),
+  envelopeId: z.string(),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
 
   user: UserSchema.pick({
     id: true,

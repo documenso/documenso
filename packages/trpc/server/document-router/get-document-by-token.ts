@@ -34,7 +34,6 @@ export const getDocumentByTokenRoute = authenticatedProcedure
       },
     });
 
-    // Todo: Envelopes
     const firstDocumentData = envelope?.envelopeItems[0].documentData;
 
     if (!envelope || !firstDocumentData) {

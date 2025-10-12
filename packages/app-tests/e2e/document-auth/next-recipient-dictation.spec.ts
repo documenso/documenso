@@ -295,19 +295,13 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow assistant to dictate next signer'
       { signingOrder: 2, role: RecipientRole.SIGNER },
       { signingOrder: 3, role: RecipientRole.SIGNER },
     ],
-    updateDocumentOptions: {
-      documentMeta: {
-        upsert: {
-          create: {
-            allowDictateNextSigner: true,
-            signingOrder: DocumentSigningOrder.SEQUENTIAL,
-          },
-          update: {
-            allowDictateNextSigner: true,
-            signingOrder: DocumentSigningOrder.SEQUENTIAL,
-          },
-        },
-      },
+  });
+
+  await prisma.documentMeta.update({
+    where: { id: document.documentMetaId },
+    data: {
+      allowDictateNextSigner: true,
+      signingOrder: DocumentSigningOrder.SEQUENTIAL,
     },
   });
 

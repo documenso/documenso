@@ -1,5 +1,4 @@
-import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import { updateDocument } from '@documenso/lib/server-only/document/update-document';
+import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
@@ -28,44 +27,22 @@ export const updateDocumentRoute = authenticatedProcedure
 
     const userId = ctx.user.id;
 
-    if (Object.values(meta).length > 0) {
-      await updateDocumentMeta({
-        userId: ctx.user.id,
-        teamId,
-        id: {
-          type: 'documentId',
-          id: documentId,
-        },
-        subject: meta.subject,
-        message: meta.message,
-        timezone: meta.timezone,
-        dateFormat: meta.dateFormat,
-        language: meta.language,
-        typedSignatureEnabled: meta.typedSignatureEnabled,
-        uploadSignatureEnabled: meta.uploadSignatureEnabled,
-        drawSignatureEnabled: meta.drawSignatureEnabled,
-        redirectUrl: meta.redirectUrl,
-        distributionMethod: meta.distributionMethod,
-        signingOrder: meta.signingOrder,
-        allowDictateNextSigner: meta.allowDictateNextSigner,
-        emailId: meta.emailId,
-        emailReplyTo: meta.emailReplyTo,
-        emailSettings: meta.emailSettings,
-        requestMetadata: ctx.metadata,
-      });
-    }
-
-    const envelope = await updateDocument({
+    const envelope = await updateEnvelope({
       userId,
       teamId,
-      documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       data,
+      meta,
       requestMetadata: ctx.metadata,
     });
 
     const mappedDocument = {
       ...envelope,
       id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      envelopeId: envelope.id,
     };
 
     return mappedDocument;

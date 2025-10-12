@@ -16,16 +16,18 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
   teamId: number;
-  templateId: number;
+  id: EnvelopeIdOptions;
   fields: {
     id?: number | null;
+    envelopeItemId: string;
     type: FieldType;
-    signerEmail: string;
     recipientId: number;
     pageNumber: number;
     pageX: number;
@@ -39,14 +41,11 @@ export type SetFieldsForTemplateOptions = {
 export const setFieldsForTemplate = async ({
   userId,
   teamId,
-  templateId,
+  id,
   fields,
 }: SetFieldsForTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'templateId',
-      id: templateId,
-    },
+    id,
     type: EnvelopeType.TEMPLATE,
     userId,
     teamId,
@@ -55,6 +54,7 @@ export const setFieldsForTemplate = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
+      recipients: true,
       envelopeItems: {
         select: {
           id: true,
@@ -68,11 +68,10 @@ export const setFieldsForTemplate = async ({
     },
   });
 
-  // Todo: Envelopes
-  const firstEnvelopeItemId = envelope?.envelopeItems[0]?.id;
-
-  if (!envelope || !firstEnvelopeItemId) {
-    throw new Error('Template not found');
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
   const existingFields = envelope.fields;
@@ -84,9 +83,30 @@ export const setFieldsForTemplate = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+    // Check whether the field is being attached to an allowed envelope item.
+    const foundEnvelopeItem = envelope.envelopeItems.find(
+      (envelopeItem) => envelopeItem.id === field.envelopeItemId,
+    );
+
+    if (!foundEnvelopeItem) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Envelope item ${field.envelopeItemId} not found`,
+      });
+    }
+
+    // Each field MUST have a recipient associated with it.
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient not found for field ${field.id}`,
+      });
+    }
+
     return {
       ...field,
       _persisted: existing,
+      _recipient: recipient,
     };
   });
 
@@ -159,7 +179,7 @@ export const setFieldsForTemplate = async ({
         where: {
           id: field._persisted?.id ?? -1,
           envelopeId: envelope.id,
-          envelopeItemId: firstEnvelopeItemId, // Todo: Envelopes
+          envelopeItemId: field.envelopeItemId,
         },
         update: {
           page: field.pageNumber,
@@ -186,12 +206,13 @@ export const setFieldsForTemplate = async ({
           },
           envelopeItem: {
             connect: {
-              id: firstEnvelopeItemId, // Todo: Envelopes
+              id: field.envelopeItemId,
+              envelopeId: envelope.id,
             },
           },
           recipient: {
             connect: {
-              id: field.recipientId,
+              id: field._recipient.id,
               envelopeId: envelope.id,
             },
           },

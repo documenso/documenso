@@ -68,5 +68,6 @@ export const toggleTemplateDirectLink = async ({
     enabled: updatedDirectLink.enabled,
     directTemplateRecipientId: updatedDirectLink.directTemplateRecipientId,
     templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    envelopeId: envelope.id,
   };
 };

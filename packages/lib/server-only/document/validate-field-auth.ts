@@ -7,7 +7,7 @@ import { isRecipientAuthorized } from './is-recipient-authorized';
 
 export type ValidateFieldAuthOptions = {
   documentAuthOptions: Envelope['authOptions'];
-  recipient: Pick<Recipient, 'authOptions' | 'email'>;
+  recipient: Pick<Recipient, 'authOptions' | 'email' | 'envelopeId'>;
   field: Field;
   userId?: number;
   authOptions?: TRecipientActionAuth;

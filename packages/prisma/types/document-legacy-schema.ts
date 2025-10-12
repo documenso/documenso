@@ -2,6 +2,7 @@
  * Legacy Document schema to confirm backwards API compatibility since
  * we migrated Documents to Envelopes.
  */
+import { DocumentSource } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
@@ -10,8 +11,6 @@ import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-va
 import DocumentStatusSchema from '../generated/zod/inputTypeSchemas/DocumentStatusSchema';
 import DocumentVisibilitySchema from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
 
-const DocumentSourceSchema = z.enum(['DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_LINK']);
-
 /////////////////////////////////////////
 // DOCUMENT SCHEMA
 /////////////////////////////////////////
@@ -19,7 +18,7 @@ const DocumentSourceSchema = z.enum(['DOCUMENT', 'TEMPLATE', 'TEMPLATE_DIRECT_LI
 export const LegacyDocumentSchema = z.object({
   visibility: DocumentVisibilitySchema,
   status: DocumentStatusSchema,
-  source: DocumentSourceSchema,
+  source: z.nativeEnum(DocumentSource),
   id: z.number(),
   qrToken: z
     .string()
@@ -40,7 +39,7 @@ export const LegacyDocumentSchema = z.object({
    */
   formValues: ZDocumentFormValuesSchema.nullable(),
   title: z.string(),
-  // documentDataId: z.string(), // Todo: Migration
+  documentDataId: z.string(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
   completedAt: z.coerce.date().nullable(),
