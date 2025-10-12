@@ -1,7 +1,8 @@
 import fontkit from '@pdf-lib/fontkit';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-import { CAVEAT_FONT_PATH } from '../../constants/pdf';
+import { CAVEAT_FONT_PATH, NOTO_SANS_FONT_PATH, NOTO_SANS_THAI_FONT_PATH } from '../../constants/pdf';
+import { getFontTypeForText } from '../../utils/font-detection';
 
 export async function insertTextInPDF(
   pdfAsBase64: string,
@@ -12,15 +13,31 @@ export async function insertTextInPDF(
   useHandwritingFont = true,
   customFontSize?: number,
 ): Promise<string> {
-  // Fetch the font file from the public URL.
-  const fontResponse = await fetch(CAVEAT_FONT_PATH());
-  const fontCaveat = await fontResponse.arrayBuffer();
+  // Determine the appropriate font based on text content
+  const fontType = getFontTypeForText(text, useHandwritingFont);
+
+  let fontBuffer: ArrayBuffer | undefined;
+
+  // Fetch the appropriate font based on content
+  if (fontType === 'handwriting') {
+    const fontResponse = await fetch(CAVEAT_FONT_PATH());
+    fontBuffer = await fontResponse.arrayBuffer();
+  } else if (fontType === 'thai') {
+    const fontResponse = await fetch(NOTO_SANS_THAI_FONT_PATH());
+    fontBuffer = await fontResponse.arrayBuffer();
+  } else if (fontType === 'standard') {
+    const fontResponse = await fetch(NOTO_SANS_FONT_PATH());
+    fontBuffer = await fontResponse.arrayBuffer();
+  }
 
   const pdfDoc = await PDFDocument.load(pdfAsBase64);
 
   pdfDoc.registerFontkit(fontkit);
 
-  const font = await pdfDoc.embedFont(useHandwritingFont ? fontCaveat : StandardFonts.Helvetica);
+  const font = await pdfDoc.embedFont(
+    fontBuffer || StandardFonts.Helvetica,
+    fontType === 'handwriting' ? { features: { calt: false } } : undefined
+  );
 
   const pages = pdfDoc.getPages();
   const pdfPage = pages[page];
