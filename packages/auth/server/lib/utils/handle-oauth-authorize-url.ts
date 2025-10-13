@@ -23,12 +23,17 @@ type HandleOAuthAuthorizeUrlOptions = {
    * Optional redirect path to redirect the user somewhere on the app after authorization.
    */
   redirectPath?: string;
+
+  /**
+   * Optional prompt to pass to the authorization endpoint.
+   */
+  prompt?: 'login' | 'consent' | 'select_account';
 };
 
 const oauthCookieMaxAge = 60 * 10; // 10 minutes.
 
 export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOptions) => {
-  const { c, clientOptions, redirectPath } = options;
+  const { c, clientOptions, redirectPath, prompt = 'login' } = options;
 
   if (!clientOptions.clientId || !clientOptions.clientSecret) {
     throw new AppError(AppErrorCode.NOT_SETUP);
@@ -57,8 +62,8 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
     scopes,
   );
 
-  // Allow user to select account during login.
-  url.searchParams.append('prompt', 'login');
+  // Pass the prompt to the authorization endpoint.
+  url.searchParams.append('prompt', prompt);
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,
