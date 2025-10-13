@@ -88,7 +88,7 @@ export const createEnvelopeFields = async ({
     // The item to attach the fields to MUST belong to the document.
     if (
       field.envelopeItemId &&
-      !envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId) // Todo: Migration test this
+      !envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === field.envelopeItemId)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Item to attach fields to must belong to the document',

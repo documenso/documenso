@@ -3296,7 +3296,6 @@ msgstr "Document external ID updated"
 msgid "Document found in your account"
 msgstr "Document found in your account"
 
-#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
 msgstr "Document ID"
@@ -3956,6 +3955,10 @@ msgstr "Envelope distributed"
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "Envelope Duplicated"
 msgstr "Envelope Duplicated"
+
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+msgid "Envelope ID"
+msgstr "Envelope ID"
 
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Envelope resent"

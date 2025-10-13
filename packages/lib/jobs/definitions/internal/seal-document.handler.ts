@@ -99,19 +99,13 @@ export const run = async ({
   });
 
   // This is the same case as above.
-  let envelopeItems: typeof envelope.envelopeItems = await io.runTask(
-    'get-document-data-id', // Todo: Envelopes [PRE-MAIN] - Fix these messed up types.
-    // eslint-disable-next-line @typescript-eslint/require-await, @typescript-eslint/no-explicit-any
-    async (): Promise<any> => {
-      return envelope.envelopeItems.map((envelopeItem) => ({
-        ...envelopeItem,
-        fields: envelopeItem.field.map((field) => ({
-          ...field,
-          positionX: Number(field.positionX),
-          positionY: Number(field.positionY),
-          width: Number(field.width),
-          height: Number(field.height),
-        })),
+  let envelopeItems = await io.runTask(
+    'get-document-data-id',
+    // eslint-disable-next-line @typescript-eslint/require-await
+    async () => {
+      // eslint-disable-next-line unused-imports/no-unused-vars
+      return envelope.envelopeItems.map(({ field, ...rest }) => ({
+        ...rest,
       }));
     },
   );
@@ -186,16 +180,25 @@ export const run = async ({
 
   const newDocumentData = await Promise.all(
     envelopeItems.map(async (envelopeItem) =>
-      io.runTask('decorate-and-sign-pdf', async () =>
-        decorateAndSignPdf({
+      io.runTask('decorate-and-sign-pdf', async () => {
+        const envelopeItemFields = envelope.envelopeItems.find(
+          (item) => item.id === envelopeItem.id,
+        )?.field;
+
+        if (!envelopeItemFields) {
+          throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+        }
+
+        return decorateAndSignPdf({
           envelope,
           envelopeItem,
+          envelopeItemFields,
           isRejected,
           rejectionReason,
           certificateData,
           auditLogData,
-        }),
-      ),
+        });
+      }),
     ),
   );
 
@@ -293,7 +296,8 @@ export const run = async ({
 
 type DecorateAndSignPdfOptions = {
   envelope: Pick<Envelope, 'id' | 'title' | 'useLegacyFieldInsertion' | 'internalVersion'>;
-  envelopeItem: EnvelopeItem & { documentData: DocumentData; field: Field[] };
+  envelopeItem: EnvelopeItem & { documentData: DocumentData };
+  envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
   certificateData: Buffer | null;
@@ -306,6 +310,7 @@ type DecorateAndSignPdfOptions = {
 const decorateAndSignPdf = async ({
   envelope,
   envelopeItem,
+  envelopeItemFields,
   isRejected,
   rejectionReason,
   certificateData,
@@ -348,7 +353,7 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  for (const field of envelopeItem.field) {
+  for (const field of envelopeItemFields) {
     if (field.inserted) {
       if (envelope.internalVersion === 2) {
         await insertFieldInPDFV2(pdfDoc, field);

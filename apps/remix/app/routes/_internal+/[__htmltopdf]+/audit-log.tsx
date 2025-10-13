@@ -70,6 +70,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       id: mapSecondaryIdToDocumentId(envelope.secondaryId),
       title: envelope.title,
       status: envelope.status,
+      envelopeId: envelope.id,
       user: {
         name: envelope.user.name,
         email: envelope.user.email,
@@ -109,10 +110,9 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
       <Card>
         <CardContent className="grid grid-cols-2 gap-4 p-6 text-sm print:text-xs">
           <p>
-            {/* Todo: Envelopes - [PRE-MAIN] Should we should envelope ID instead here? */}
-            <span className="font-medium">{_(msg`Document ID`)}</span>
+            <span className="font-medium">{_(msg`Envelope ID`)}</span>
 
-            <span className="mt-1 block break-words">{document.id}</span>
+            <span className="mt-1 block break-words">{document.envelopeId}</span>
           </p>
 
           <p>

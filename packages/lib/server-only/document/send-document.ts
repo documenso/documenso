@@ -257,7 +257,6 @@ const injectFormValuesIntoDocument = async (
       id: envelopeItem.id,
     },
     data: {
-      // Todo: Envelopes [PRE-MAIN] - Should this also replace the initial data? Because if it's resealed we use the initial data thus lose the form values.
       documentDataId: newDocumentData.id,
     },
   });

@@ -395,7 +395,6 @@ export const createDocumentFromTemplate = async ({
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
 
   // Duplicate the envelope item data.
-  // Todo: Envelopes - Ask if it's okay to just use the documentDataId? Or should it be duplicated?
   // Note: This is duplicated in createDocumentFromDirectTemplate
   const envelopeItemsToCreate = await Promise.all(
     template.envelopeItems.map(async (item, i) => {
@@ -423,9 +422,6 @@ export const createDocumentFromTemplate = async ({
       }
 
       const buffer = await getFileServerSide(documentDataToDuplicate);
-
-      // Todo: Envelopes [PRE-MAIN] - Should we normalize? Should be part of the upload.
-      // const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
 
       const titleToUse = item.title || finalEnvelopeTitle;
 

@@ -775,7 +775,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           name: recipient.name,
           email: recipient.email,
           signingOrder: recipient.signingOrder,
-          role: recipient.role, // Todo: Migration - Should you actually be able to change the role???
+          role: recipient.role, // You probably shouldn't be able to change the role.
         };
       });
 
