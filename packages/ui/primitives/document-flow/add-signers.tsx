@@ -216,6 +216,7 @@ export const AddSignersFormPartial = ({
       // Sync the response recipients back to form state to prevent duplicates
       if (response?.recipients) {
         const currentSigners = form.getValues('signers');
+
         const updatedSigners = currentSigners.map((signer) => {
           // Find the matching recipient from the response using nativeId
           const matchingRecipient = response.recipients.find(
@@ -228,10 +229,9 @@ export const AddSignersFormPartial = ({
               ...signer,
               nativeId: matchingRecipient.id,
             };
-          }
-
-          // For new signers without nativeId, match by email and update with server ID
-          if (!signer.nativeId) {
+          } else if (!signer.nativeId) {
+            // For new signers without nativeId, match by email and update with server ID
+            // Bug: Multiple recipients with the same email will be matched incorrectly here.
             const newRecipient = response.recipients.find(
               (recipient) => recipient.email === signer.email,
             );
