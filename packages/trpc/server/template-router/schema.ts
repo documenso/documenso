@@ -26,7 +26,7 @@ import {
   ZTemplateManySchema,
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
+import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
@@ -156,15 +156,14 @@ export const ZCreateTemplateDirectLinkRequestSchema = z.object({
     .optional(),
 });
 
-const GenericDirectLinkResponseSchema = TemplateDirectLinkSchema.pick({
+const GenericDirectLinkResponseSchema = LegacyTemplateDirectLinkSchema.pick({
   id: true,
   token: true,
   createdAt: true,
   enabled: true,
   directTemplateRecipientId: true,
   envelopeId: true,
-}).extend({
-  templateId: z.number(),
+  templateId: true,
 });
 
 export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;

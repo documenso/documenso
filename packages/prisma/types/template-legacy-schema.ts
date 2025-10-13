@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 
 import { DocumentVisibilitySchema } from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
+import TemplateDirectLinkSchema from '../generated/zod/modelSchema/TemplateDirectLinkSchema';
 
 export const TemplateTypeSchema = z.nativeEnum(TemplateType);
 
@@ -33,3 +34,7 @@ export const TemplateSchema = z.object({
 });
 
 export type Template = z.infer<typeof TemplateSchema>;
+
+export const LegacyTemplateDirectLinkSchema = TemplateDirectLinkSchema.extend({
+  templateId: z.number(),
+});

@@ -75,7 +75,10 @@ export const getTemplateByDirectLinkToken = async ({
       ...firstDocumentData,
       envelopeItemId: envelope.envelopeItems[0].id,
     },
-    directLink,
+    directLink: {
+      ...directLink,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    },
     templateMeta: envelope.documentMeta,
     recipients: recipientsWithMappedFields,
     fields: recipientsWithMappedFields.flatMap((recipient) => recipient.fields),

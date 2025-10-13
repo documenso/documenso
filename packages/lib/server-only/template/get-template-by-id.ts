@@ -77,6 +77,12 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       ...field,
       templateId: legacyTemplateId,
     })),
+    directLink: envelope.directLink
+      ? {
+          ...envelope.directLink,
+          templateId: legacyTemplateId,
+        }
+      : null,
     id: mapSecondaryIdToTemplateId(envelope.secondaryId),
   };
 };

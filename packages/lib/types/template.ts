@@ -4,9 +4,11 @@ import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
-import { TemplateSchema } from '@documenso/prisma/types/template-legacy-schema';
+import {
+  LegacyTemplateDirectLinkSchema,
+  TemplateSchema,
+} from '@documenso/prisma/types/template-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
@@ -60,7 +62,7 @@ export const ZTemplateSchema = TemplateSchema.pick({
     emailId: true,
     emailReplyTo: true,
   }),
-  directLink: TemplateDirectLinkSchema.nullable(),
+  directLink: LegacyTemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({
     id: true,
     name: true,
@@ -138,7 +140,7 @@ export const ZTemplateManySchema = TemplateSchema.pick({
     signingOrder: true,
     distributionMethod: true,
   }).nullable(),
-  directLink: TemplateDirectLinkSchema.pick({
+  directLink: LegacyTemplateDirectLinkSchema.pick({
     token: true,
     enabled: true,
   }).nullable(),
