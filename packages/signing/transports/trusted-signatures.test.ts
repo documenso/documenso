@@ -83,6 +83,7 @@ describe('requestSignatureFromAPI', () => {
         headers: expect.objectContaining({
           'User-Agent': 'Documenso',
           'Content-Type': 'application/json',
+          'X-Authorization': expect.any(String),
           'X-Authorization-Key': mockApiKeyId,
           'X-Authorization-Algorithm': 'HmacSHA256',
           'X-Authorization-Time': fixedDate.toISOString(),
