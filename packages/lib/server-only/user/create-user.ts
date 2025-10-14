@@ -15,7 +15,7 @@ export interface CreateUserOptions {
 }
 
 export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
-  // ✅ Domain whitelist kontrolü
+  // ✅ Domain whitelist check
   const allowedDomains =
     process.env.SIGNUPS_DOMAINS_WHITELIST?.split(',').map((d) => d.trim()) || [];
   const userDomain = email.split('@')[1];
