@@ -7,15 +7,6 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import {
-  ZTemplateLiteSchema,
-  ZTemplateManySchema,
-  ZTemplateSchema,
-} from '@documenso/lib/types/template';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -27,7 +18,16 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '../document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import {
+  ZTemplateLiteSchema,
+  ZTemplateManySchema,
+  ZTemplateSchema,
+} from '@documenso/lib/types/template';
+import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -109,9 +109,21 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   customDocumentDataId: z
     .string()
     .describe(
-      'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      '[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
+  customDocumentData: z
+    .array(
+      z.object({
+        documentDataId: z.string(),
+        envelopeItemId: z.string(),
+      }),
+    )
+    .describe(
+      'The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+
   folderId: z
     .string()
     .describe(
@@ -144,13 +156,14 @@ export const ZCreateTemplateDirectLinkRequestSchema = z.object({
     .optional(),
 });
 
-const GenericDirectLinkResponseSchema = TemplateDirectLinkSchema.pick({
+const GenericDirectLinkResponseSchema = LegacyTemplateDirectLinkSchema.pick({
   id: true,
-  templateId: true,
   token: true,
   createdAt: true,
   enabled: true,
   directTemplateRecipientId: true,
+  envelopeId: true,
+  templateId: true,
 });
 
 export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
@@ -194,6 +207,10 @@ export const ZCreateTemplateV2ResponseSchema = z.object({
   uploadUrl: z.string().min(1),
 });
 
+export const ZCreateTemplateResponseSchema = z.object({
+  legacyTemplateId: z.number(),
+});
+
 export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
   data: z
@@ -207,6 +224,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
       publicDescription: ZTemplatePublicDescriptionSchema.optional(),
       type: z.nativeEnum(TemplateType).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
+      folderId: z.string().nullish(),
     })
     .optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),

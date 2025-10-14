@@ -212,7 +212,7 @@ export const MultiSignDocumentSigningView = ({
               {allowDocumentRejection && (
                 <div className="embed--Actions mb-4 mt-8 flex w-full flex-row-reverse items-baseline justify-between">
                   <DocumentSigningRejectDialog
-                    document={document}
+                    documentId={document.id}
                     token={token}
                     onRejected={onRejected}
                   />

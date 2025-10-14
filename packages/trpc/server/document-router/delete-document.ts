@@ -25,7 +25,10 @@ export const deleteDocumentRoute = authenticatedProcedure
     const userId = ctx.user.id;
 
     await deleteDocument({
-      id: documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       userId,
       teamId,
       requestMetadata: ctx.metadata,

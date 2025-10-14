@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
-import type { DocumentData } from '@prisma/client';
+import type { DocumentData, EnvelopeItem } from '@prisma/client';
 import { DateTime } from 'luxon';
 
+import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -16,13 +19,16 @@ import {
 } from '@documenso/ui/primitives/dialog';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
 
+import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
+import EnvelopeGenericPageRenderer from '../envelope-editor/envelope-generic-page-renderer';
 import { ShareDocumentDownloadButton } from '../share-document-download-button';
 
 export type DocumentCertificateQRViewProps = {
   documentId: number;
   title: string;
-  documentData: DocumentData;
-  password?: string | null;
+  internalVersion: number;
+  envelopeItems: (EnvelopeItem & { documentData: DocumentData })[];
+  documentTeamUrl: string;
   recipientCount?: number;
   completedDate?: Date;
 };
@@ -30,31 +36,32 @@ export type DocumentCertificateQRViewProps = {
 export const DocumentCertificateQRView = ({
   documentId,
   title,
-  documentData,
-  password,
+  internalVersion,
+  envelopeItems,
+  documentTeamUrl,
   recipientCount = 0,
   completedDate,
 }: DocumentCertificateQRViewProps) => {
-  const { data: documentUrl } = trpc.shareLink.getDocumentInternalUrlForQRCode.useQuery({
+  const { data: documentViaUser } = trpc.document.get.useQuery({
     documentId,
   });
 
-  const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentUrl);
+  const [isDialogOpen, setIsDialogOpen] = useState(() => !!documentViaUser);
 
   const formattedDate = completedDate
     ? DateTime.fromJSDate(completedDate).toLocaleString(DateTime.DATETIME_MED)
     : '';
 
   useEffect(() => {
-    if (documentUrl) {
+    if (documentViaUser) {
       setIsDialogOpen(true);
     }
-  }, [documentUrl]);
+  }, [documentViaUser]);
 
   return (
     <div className="mx-auto w-full max-w-screen-md">
       {/* Dialog for internal document link */}
-      {documentUrl && (
+      {documentViaUser && (
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -72,7 +79,11 @@ export const DocumentCertificateQRView = ({
 
             <DialogFooter className="flex flex-row justify-end gap-2">
               <Button asChild>
-                <a href={documentUrl} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={`${formatDocumentsPath(documentTeamUrl)}/${documentViaUser.envelopeId}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <Trans>Go to document</Trans>
                 </a>
               </Button>
@@ -95,11 +106,21 @@ export const DocumentCertificateQRView = ({
           </div>
         </div>
 
-        <ShareDocumentDownloadButton title={title} documentData={documentData} />
+        <ShareDocumentDownloadButton title={title} documentData={envelopeItems[0].documentData} />
       </div>
 
       <div className="mt-12 w-full">
-        <PDFViewer key={documentData.id} documentData={documentData} password={password} />
+        {internalVersion === 2 ? (
+          <EnvelopeRenderProvider envelope={{ envelopeItems }}>
+            <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
+
+            <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+          </EnvelopeRenderProvider>
+        ) : (
+          <>
+            <PDFViewer key={envelopeItems[0].id} documentData={envelopeItems[0].documentData} />
+          </>
+        )}
       </div>
     </div>
   );

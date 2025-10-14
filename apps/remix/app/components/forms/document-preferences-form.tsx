@@ -17,12 +17,12 @@ import {
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaTimezoneSchema,
-} from '@documenso/trpc/server/document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
 import { Alert } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';

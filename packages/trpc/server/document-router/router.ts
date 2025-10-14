@@ -17,6 +17,7 @@ import { getDocumentByTokenRoute } from './get-document-by-token';
 import { getInboxCountRoute } from './get-inbox-count';
 import { redistributeDocumentRoute } from './redistribute-document';
 import { searchDocumentRoute } from './search-document';
+import { shareDocumentRoute } from './share-document';
 import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
@@ -30,6 +31,7 @@ export const documentRouter = router({
   distribute: distributeDocumentRoute,
   redistribute: redistributeDocumentRoute,
   search: searchDocumentRoute,
+  share: shareDocumentRoute,
 
   // Temporary v2 beta routes to be removed once V2 is fully released.
   download: downloadDocumentRoute,

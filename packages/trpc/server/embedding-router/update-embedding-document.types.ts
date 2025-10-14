@@ -2,17 +2,6 @@ import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
-  ZFieldHeightSchema,
-  ZFieldPageNumberSchema,
-  ZFieldPageXSchema,
-  ZFieldPageYSchema,
-  ZFieldWidthSchema,
-} from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
-import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/generated/types';
-
-import {
-  ZDocumentExternalIdSchema,
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
   ZDocumentMetaDrawSignatureEnabledSchema,
@@ -23,8 +12,18 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-  ZDocumentTitleSchema,
-} from '../document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import {
+  ZFieldHeightSchema,
+  ZFieldPageNumberSchema,
+  ZFieldPageXSchema,
+  ZFieldPageYSchema,
+  ZFieldWidthSchema,
+} from '@documenso/lib/types/field';
+import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { DocumentSigningOrder, RecipientRole } from '@documenso/prisma/generated/types';
+
+import { ZDocumentExternalIdSchema, ZDocumentTitleSchema } from '../document-router/schema';
 
 export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
   documentId: z.number(),
@@ -37,6 +36,8 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
+      // We have an any cast so any changes here you need to update it in the embeding document edit page
+      // Search: "map<any>" to find it
       fields: ZFieldAndMetaSchema.and(
         z.object({
           id: z.number().optional(),
@@ -45,6 +46,7 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
           pageY: ZFieldPageYSchema,
           width: ZFieldWidthSchema,
           height: ZFieldHeightSchema,
+          envelopeItemId: z.string(),
         }),
       )
         .array()

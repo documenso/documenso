@@ -1,8 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { incrementDocumentId } from '@documenso/lib/server-only/envelope/increment-id';
+import { prefixedId } from '@documenso/lib/universal/id';
+
 import { prisma } from '..';
-import { DocumentDataType, DocumentSource } from '../client';
+import { DocumentDataType, DocumentSource, EnvelopeType } from '../client';
 import { seedPendingDocument } from './documents';
 import { seedDirectTemplate, seedTemplate } from './templates';
 import { seedUser } from './users';
@@ -52,11 +55,29 @@ export const seedDatabase = async () => {
   for (let i = 1; i <= 4; i++) {
     const documentData = await createDocumentData({ documentData: examplePdf });
 
-    await prisma.document.create({
+    const documentId = await incrementDocumentId();
+
+    const documentMeta = await prisma.documentMeta.create({
+      data: {},
+    });
+
+    await prisma.envelope.create({
       data: {
+        id: prefixedId('envelope'),
+        secondaryId: documentId.formattedDocumentId,
+        internalVersion: 1,
+        type: EnvelopeType.DOCUMENT,
+        documentMetaId: documentMeta.id,
         source: DocumentSource.DOCUMENT,
         title: `Example Document ${i}`,
-        documentDataId: documentData.id,
+        envelopeItems: {
+          create: {
+            id: prefixedId('envelope_item'),
+            title: `Example Document ${i}`,
+            documentDataId: documentData.id,
+            order: 1,
+          },
+        },
         userId: exampleUser.user.id,
         teamId: exampleUser.team.id,
         recipients: {
@@ -73,11 +94,29 @@ export const seedDatabase = async () => {
   for (let i = 1; i <= 4; i++) {
     const documentData = await createDocumentData({ documentData: examplePdf });
 
-    await prisma.document.create({
+    const documentId = await incrementDocumentId();
+
+    const documentMeta = await prisma.documentMeta.create({
+      data: {},
+    });
+
+    await prisma.envelope.create({
       data: {
+        id: prefixedId('envelope'),
+        secondaryId: documentId.formattedDocumentId,
+        internalVersion: 1,
+        type: EnvelopeType.DOCUMENT,
         source: DocumentSource.DOCUMENT,
         title: `Document ${i}`,
-        documentDataId: documentData.id,
+        documentMetaId: documentMeta.id,
+        envelopeItems: {
+          create: {
+            id: prefixedId('envelope_item'),
+            title: `Document ${i}`,
+            documentDataId: documentData.id,
+            order: 1,
+          },
+        },
         userId: adminUser.user.id,
         teamId: adminUser.team.id,
         recipients: {

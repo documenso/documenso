@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, Template, TemplateDirectLink } from '@prisma/client';
+import type { Recipient, TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -21,7 +21,13 @@ import { TemplateDuplicateDialog } from '../dialogs/template-duplicate-dialog';
 import { TemplateMoveToFolderDialog } from '../dialogs/template-move-to-folder-dialog';
 
 export type TemplatesTableActionDropdownProps = {
-  row: Template & {
+  row: {
+    id: number;
+    userId: number;
+    teamId: number;
+    title: string;
+    folderId?: string | null;
+    envelopeId: string;
     directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
     recipients: Recipient[];
   };
@@ -39,14 +45,13 @@ export const TemplatesTableActionDropdown = ({
   const { user } = useSession();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [isTemplateDirectLinkDialogOpen, setTemplateDirectLinkDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
   const [isMoveToFolderDialogOpen, setMoveToFolderDialogOpen] = useState(false);
 
   const isOwner = row.userId === user.id;
   const isTeamTemplate = row.teamId === teamId;
 
-  const formatPath = `${templateRootPath}/${row.id}/edit`;
+  const formatPath = `${templateRootPath}/${row.envelopeId}/edit`;
 
   return (
     <DropdownMenu>
@@ -72,10 +77,20 @@ export const TemplatesTableActionDropdown = ({
           <Trans>Duplicate</Trans>
         </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={() => setTemplateDirectLinkDialogOpen(true)}>
-          <Share2Icon className="mr-2 h-4 w-4" />
-          <Trans>Direct link</Trans>
-        </DropdownMenuItem>
+        <TemplateDirectLinkDialog
+          templateId={row.id}
+          recipients={row.recipients}
+          directLink={row.directLink}
+          trigger={
+            <div
+              data-testid="template-direct-link"
+              className="hover:bg-accent hover:text-accent-foreground relative flex cursor-pointer select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none transition-colors"
+            >
+              <Share2Icon className="mr-2 h-4 w-4" />
+              <Trans>Direct link</Trans>
+            </div>
+          }
+        />
 
         <DropdownMenuItem onClick={() => setMoveToFolderDialogOpen(true)}>
           <FolderIcon className="mr-2 h-4 w-4" />
@@ -106,12 +121,6 @@ export const TemplatesTableActionDropdown = ({
         id={row.id}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
-      />
-
-      <TemplateDirectLinkDialog
-        template={row}
-        open={isTemplateDirectLinkDialogOpen}
-        onOpenChange={setTemplateDirectLinkDialogOpen}
       />
 
       <TemplateDeleteDialog

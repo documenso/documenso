@@ -48,7 +48,7 @@ const PDFLoader = () => (
 
 export type PDFViewerProps = {
   className?: string;
-  documentData: DocumentData;
+  documentData: Pick<DocumentData, 'type' | 'data'>;
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   [key: string]: unknown;
