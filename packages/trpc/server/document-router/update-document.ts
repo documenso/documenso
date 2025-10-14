@@ -5,8 +5,8 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateDocumentRequestSchema,
   ZUpdateDocumentResponseSchema,
+  updateDocumentMeta,
 } from './update-document.types';
-import { updateDocumentMeta } from './update-document.types';
 
 /**
  * Public route.
@@ -47,6 +47,7 @@ export const updateDocumentRoute = authenticatedProcedure
         emailId: meta.emailId,
         emailReplyTo: meta.emailReplyTo,
         emailSettings: meta.emailSettings,
+        reminderInterval: meta.reminderInterval,
         requestMetadata: ctx.metadata,
       });
     }

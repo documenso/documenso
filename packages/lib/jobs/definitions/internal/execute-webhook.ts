@@ -20,6 +20,7 @@ export const EXECUTE_WEBHOOK_JOB_DEFINITION = {
   name: 'Execute Webhook',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: EXECUTE_WEBHOOK_JOB_DEFINITION_ID,
     schema: EXECUTE_WEBHOOK_JOB_DEFINITION_SCHEMA,
   },
