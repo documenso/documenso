@@ -15,6 +15,16 @@ export interface CreateUserOptions {
 }
 
 export const createUser = async ({ name, email, password, signature }: CreateUserOptions) => {
+  // ✅ Domain whitelist kontrolü
+  const allowedDomains =
+    process.env.SIGNUPS_DOMAINS_WHITELIST?.split(',').map((d) => d.trim()) || [];
+  const userDomain = email.split('@')[1];
+
+  if (allowedDomains.length > 0 && !allowedDomains.includes(userDomain)) {
+    // AppError değil, direkt Error fırlat
+    throw new Error(`Signup not allowed for domain: ${userDomain}`);
+  }
+
   const hashedPassword = await hash(password, SALT_ROUNDS);
 
   const userExists = await prisma.user.findFirst({
