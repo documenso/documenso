@@ -98,7 +98,8 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
       documentMetaId: createdDocumentMeta.id,
       authOptions: envelope.authOptions || undefined,
       visibility: envelope.visibility,
-      source: DocumentSource.NONE,
+      source:
+        envelope.type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
     },
     include: {
       recipients: true,

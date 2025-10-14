@@ -5516,7 +5516,6 @@ msgid "No worries, it happens! Enter your email and we'll email you a special li
 msgstr "Nie martw się, to się zdarza! Wprowadź swój e-mail, a my wyślemy Ci specjalny link do zresetowania hasła."
 
 #: apps/remix/app/components/tables/admin-claims-table.tsx
-#: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: packages/lib/constants/document.ts

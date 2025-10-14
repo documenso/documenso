@@ -287,7 +287,7 @@ SELECT
     NULL,
     t."title",
     'DRAFT',
-    'NONE'::"DocumentSource",
+    'TEMPLATE'::"DocumentSource",
     NULL,
     1,
     t."useLegacyFieldInsertion",

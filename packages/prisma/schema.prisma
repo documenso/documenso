@@ -330,7 +330,6 @@ enum DocumentSource {
   DOCUMENT
   TEMPLATE
   TEMPLATE_DIRECT_LINK
-  NONE
 }
 
 enum DocumentVisibility {

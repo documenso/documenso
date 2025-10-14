@@ -117,17 +117,11 @@ export const TemplatePageViewRecentActivity = ({
                   className="text-muted-foreground dark:text-muted-foreground/70 flex-auto truncate py-0.5 text-xs leading-5"
                 >
                   {match(document.source)
-                    .with(
-                      DocumentSource.DOCUMENT,
-                      DocumentSource.TEMPLATE,
-                      DocumentSource.NONE,
-                      () => (
-                        <Trans>
-                          Document created by{' '}
-                          <span className="font-bold">{document.user.name}</span>
-                        </Trans>
-                      ),
-                    )
+                    .with(DocumentSource.DOCUMENT, DocumentSource.TEMPLATE, () => (
+                      <Trans>
+                        Document created by <span className="font-bold">{document.user.name}</span>
+                      </Trans>
+                    ))
                     .with(DocumentSource.TEMPLATE_DIRECT_LINK, () => (
                       <Trans>
                         Document created using a <span className="font-bold">direct link</span>

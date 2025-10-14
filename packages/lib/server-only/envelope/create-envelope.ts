@@ -252,7 +252,7 @@ export const createEnvelope = async ({
         visibility,
         folderId,
         formValues,
-        source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.NONE,
+        source: type === EnvelopeType.DOCUMENT ? DocumentSource.DOCUMENT : DocumentSource.TEMPLATE,
         documentMetaId: documentMeta.id,
 
         // Template specific fields.
