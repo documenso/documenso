@@ -100,7 +100,7 @@ export const TemplateEditForm = ({
     },
   });
 
-  const { mutateAsync: addTemplateFields } = trpc.field.addTemplateFields.useMutation({
+  const { mutateAsync: addTemplateFields } = trpc.field.setFieldsForTemplate.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
       utils.template.getTemplateById.setData(
@@ -193,7 +193,10 @@ export const TemplateEditForm = ({
 
       setRecipients({
         templateId: template.id,
-        recipients: data.signers,
+        recipients: data.signers.map((signer) => ({
+          ...signer,
+          id: signer.nativeId,
+        })),
       }),
     ]);
 
@@ -237,7 +240,11 @@ export const TemplateEditForm = ({
   const saveFieldsData = async (data: TAddTemplateFieldsFormSchema) => {
     return addTemplateFields({
       templateId: template.id,
-      fields: data.fields,
+      fields: data.fields.map((field) => ({
+        ...field,
+        id: field.nativeId,
+        envelopeItemId: template.templateDocumentData.envelopeItemId,
+      })),
     });
   };
 

@@ -3,6 +3,7 @@ import { ChevronLeft } from 'lucide-react';
 import { Link, Outlet, isRouteErrorResponse } from 'react-router';
 
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { Header as AuthenticatedHeader } from '~/components/general/app-header';
@@ -16,14 +17,23 @@ import type { Route } from './+types/_layout';
  *
  * Such as direct template access, or signing.
  */
-export default function RecipientLayout() {
+export default function RecipientLayout({ matches }: Route.ComponentProps) {
   const { sessionData } = useOptionalSession();
+
+  // Hide the header for signing routes.
+  const hideHeader = matches.some(
+    (match) => match?.id === 'routes/_recipient+/sign.$token+/_index',
+  );
 
   return (
     <div className="min-h-screen">
-      {sessionData?.user && <AuthenticatedHeader />}
+      {!hideHeader && sessionData?.user && <AuthenticatedHeader />}
 
-      <main className="mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8">
+      <main
+        className={cn({
+          'mb-8 mt-8 px-4 md:mb-12 md:mt-12 md:px-8': !hideHeader,
+        })}
+      >
         <Outlet />
       </main>
     </div>

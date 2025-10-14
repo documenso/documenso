@@ -19,7 +19,7 @@ test('[DOCUMENT_AUTH]: should grant access when not required', async ({ page }) 
 
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId: document.id,
+      envelopeId: document.id,
     },
   });
 
@@ -52,7 +52,7 @@ test('[DOCUMENT_AUTH]: should allow or deny access when required', async ({ page
 
   const recipients = await prisma.recipient.findMany({
     where: {
-      documentId: document.id,
+      envelopeId: document.id,
     },
   });
 

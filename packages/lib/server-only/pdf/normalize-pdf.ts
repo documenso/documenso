@@ -1,4 +1,4 @@
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument } from '@cantoo/pdf-lib';
 
 import { flattenAnnotations } from './flatten-annotations';
 import { flattenForm, removeOptionalContentGroups } from './flatten-form';

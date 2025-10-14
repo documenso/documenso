@@ -1,4 +1,6 @@
-import type { Field } from '@prisma/client';
+import { type Envelope, type Field } from '@prisma/client';
+
+import { extractLegacyIds } from '../universal/id';
 
 /**
  * Sort the fields by the Y position on the document.
@@ -62,4 +64,16 @@ export const validateFieldsUninserted = (): boolean => {
   }
 
   return errorElements.length === 0;
+};
+
+export const mapFieldToLegacyField = (
+  field: Field,
+  envelope: Pick<Envelope, 'type' | 'secondaryId'>,
+) => {
+  const legacyId = extractLegacyIds(envelope);
+
+  return {
+    ...field,
+    ...legacyId,
+  };
 };
