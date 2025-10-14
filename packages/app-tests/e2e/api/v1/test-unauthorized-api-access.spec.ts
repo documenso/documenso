@@ -7,7 +7,7 @@ import {
   mapSecondaryIdToTemplateId,
 } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
-import { FieldType } from '@documenso/prisma/client';
+import { DocumentDataType, FieldType } from '@documenso/prisma/client';
 import {
   seedBlankDocument,
   seedCompletedDocument,
@@ -116,6 +116,15 @@ test.describe('Document Access API V1', () => {
 
       const documentA = await seedCompletedDocument(userA, teamA.id, ['test@example.com'], {
         createDocumentOptions: { title: 'Document 1 - Completed' },
+      });
+
+      await prisma.documentData.update({
+        where: {
+          id: documentA.envelopeItems[0].documentDataId,
+        },
+        data: {
+          type: DocumentDataType.S3_PATH,
+        },
       });
 
       const resA = await request.get(
