@@ -23,6 +23,8 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
+import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
@@ -106,8 +108,10 @@ export const templateRouter = router({
             folderId: envelope.folderId,
             useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
             team: envelope.team,
-            fields: envelope.fields,
-            recipients: envelope.recipients,
+            fields: envelope.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+            recipients: envelope.recipients.map((recipient) =>
+              mapRecipientToLegacyRecipient(recipient, envelope),
+            ),
             templateMeta: envelope.documentMeta,
             directLink: envelope.directLink,
           };

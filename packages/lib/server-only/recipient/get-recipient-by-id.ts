@@ -1,5 +1,4 @@
 import { EnvelopeType } from '@prisma/client';
-import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 
@@ -48,14 +47,16 @@ export const getRecipientById = async ({
     });
   }
 
-  const legacyId = match(type)
-    .with(EnvelopeType.DOCUMENT, () => ({
-      documentId: mapSecondaryIdToDocumentId(recipient.envelope.secondaryId),
-    }))
-    .with(EnvelopeType.TEMPLATE, () => ({
-      templateId: mapSecondaryIdToTemplateId(recipient.envelope.secondaryId),
-    }))
-    .exhaustive();
+  const legacyId = {
+    documentId:
+      type === EnvelopeType.DOCUMENT
+        ? mapSecondaryIdToDocumentId(recipient.envelope.secondaryId)
+        : null,
+    templateId:
+      type === EnvelopeType.TEMPLATE
+        ? mapSecondaryIdToTemplateId(recipient.envelope.secondaryId)
+        : null,
+  };
 
   // Backwards compatibility mapping.
   return {

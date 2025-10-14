@@ -68,13 +68,23 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
     ...rest,
     envelopeId: envelope.id,
     type: envelope.templateType,
+    templateDocumentDataId: firstTemplateDocumentData.id,
     templateDocumentData: {
       ...firstTemplateDocumentData,
       envelopeItemId: envelope.envelopeItems[0].id,
     },
-    templateMeta: envelope.documentMeta,
+    templateMeta: {
+      ...envelope.documentMeta,
+      templateId: legacyTemplateId,
+    },
     fields: envelope.fields.map((field) => ({
       ...field,
+      documentId: null,
+      templateId: legacyTemplateId,
+    })),
+    recipients: envelope.recipients.map((recipient) => ({
+      ...recipient,
+      documentId: null,
       templateId: legacyTemplateId,
     })),
     directLink: envelope.directLink

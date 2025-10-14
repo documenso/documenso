@@ -265,6 +265,8 @@ export const createEnvelope = async ({
       },
     });
 
+    const firstEnvelopeItem = envelope.envelopeItems[0];
+
     await Promise.all(
       (data.recipients || []).map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
@@ -272,44 +274,37 @@ export const createEnvelope = async ({
           actionAuth: recipient.actionAuth ?? [],
         });
 
-        // Todo: Envelopes - Allow fields.
-        // const recipientFieldsToCreate = (recipient.fields || []).map((field) => {
-        //   let envelopeItemId = envelope.envelopeItems[0].id;?
+        const recipientFieldsToCreate = (recipient.fields || []).map((field) => {
+          let envelopeItemId = firstEnvelopeItem.id;
 
-        //   const foundEnvelopeItem = envelope.envelopeItems.find(
-        //     (item) => item.documentDataId === field.documentDataId,
-        //   );
+          if (field.documentDataId) {
+            const foundEnvelopeItem = envelope.envelopeItems.find(
+              (item) => item.documentDataId === field.documentDataId,
+            );
 
-        //   if (field.documentDataId && !foundEnvelopeItem) {
-        //     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        //       message: 'Envelope item not found',
-        //     });
-        //   }
+            if (!foundEnvelopeItem) {
+              throw new AppError(AppErrorCode.NOT_FOUND, {
+                message: 'Document data not found',
+              });
+            }
 
-        //   if (foundEnvelopeItem) {
-        //     envelopeItemId = foundEnvelopeItem.id;
-        //   }
+            envelopeItemId = foundEnvelopeItem.id;
+          }
 
-        //   if (!envelopeItemId) {
-        //     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        //       message: 'Envelope item not found',
-        //     });
-        //   }
-
-        //   return {
-        //     envelopeId: envelope.id,
-        //     envelopeItemId,
-        //     type: field.type,
-        //     page: field.page,
-        //     positionX: field.positionX,
-        //     positionY: field.positionY,
-        //     width: field.width,
-        //     height: field.height,
-        //     customText: '',
-        //     inserted: false,
-        //     fieldMeta: field.fieldMeta || undefined,
-        //   };
-        // });
+          return {
+            envelopeId: envelope.id,
+            envelopeItemId,
+            type: field.type,
+            page: field.page,
+            positionX: field.positionX,
+            positionY: field.positionY,
+            width: field.width,
+            height: field.height,
+            customText: '',
+            inserted: false,
+            fieldMeta: field.fieldMeta || undefined,
+          };
+        });
 
         await tx.recipient.create({
           data: {
@@ -323,11 +318,11 @@ export const createEnvelope = async ({
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
             authOptions: recipientAuthOptions,
-            // fields: {
-            //   createMany: {
-            //     data: recipientFieldsToCreate,
-            //   },
-            // },
+            fields: {
+              createMany: {
+                data: recipientFieldsToCreate,
+              },
+            },
           },
         });
       }),

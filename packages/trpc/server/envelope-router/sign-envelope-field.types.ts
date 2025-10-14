@@ -57,7 +57,10 @@ export const ZSignEnvelopeFieldRequestSchema = z.object({
 });
 
 export const ZSignEnvelopeFieldResponseSchema = z.object({
-  signedField: ZFieldSchema.extend({
+  signedField: ZFieldSchema.omit({
+    templateId: true,
+    documentId: true,
+  }).extend({
     signature: SignatureSchema.nullish(),
   }),
 });

@@ -48,10 +48,12 @@ export const getTemplateByDirectLinkToken = async ({
 
   const recipientsWithMappedFields = envelope.recipients.map((recipient) => ({
     ...recipient,
+    templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    documentId: null,
     fields: recipient.fields.map((field) => ({
       ...field,
       templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
-      documentId: undefined,
+      documentId: null,
     })),
   }));
 
@@ -71,6 +73,7 @@ export const getTemplateByDirectLinkToken = async ({
     publicTitle: envelope.publicTitle,
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
+    templateDocumentDataId: firstDocumentData.id,
     templateDocumentData: {
       ...firstDocumentData,
       envelopeItemId: envelope.envelopeItems[0].id,
@@ -79,7 +82,10 @@ export const getTemplateByDirectLinkToken = async ({
       ...directLink,
       templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
     },
-    templateMeta: envelope.documentMeta,
+    templateMeta: {
+      ...envelope.documentMeta,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    },
     recipients: recipientsWithMappedFields,
     fields: recipientsWithMappedFields.flatMap((recipient) => recipient.fields),
   };

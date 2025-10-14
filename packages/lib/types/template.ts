@@ -35,6 +35,9 @@ export const ZTemplateSchema = TemplateSchema.pick({
 }).extend({
   envelopeId: z.string(),
 
+  // Backwards compatibility.
+  templateDocumentDataId: z.string().default(''),
+
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   templateDocumentData: DocumentDataSchema.pick({
     type: true,
@@ -61,6 +64,8 @@ export const ZTemplateSchema = TemplateSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
+  }).extend({
+    templateId: z.number().nullable(),
   }),
   directLink: LegacyTemplateDirectLinkSchema.nullable(),
   user: UserSchema.pick({
@@ -106,6 +111,9 @@ export const ZTemplateLiteSchema = TemplateSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+
+  // Backwards compatibility.
+  templateDocumentDataId: z.string().default(''),
 });
 
 export type TTemplateLite = z.infer<typeof ZTemplateLiteSchema>;
@@ -144,6 +152,8 @@ export const ZTemplateManySchema = TemplateSchema.pick({
     token: true,
     enabled: true,
   }).nullable(),
+  // Backwards compatibility.
+  templateDocumentDataId: z.string().default(''),
 });
 
 export type TTemplateMany = z.infer<typeof ZTemplateManySchema>;

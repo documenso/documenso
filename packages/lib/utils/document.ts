@@ -12,6 +12,7 @@ import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
 import type { TDocumentLite, TDocumentMany } from '../types/document';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
 import { mapSecondaryIdToDocumentId } from './envelope';
+import { mapRecipientToLegacyRecipient } from './recipients';
 
 export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
@@ -84,6 +85,7 @@ export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => 
     formValues: envelope.formValues,
     title: envelope.title,
     createdAt: envelope.createdAt,
+    documentDataId: '', // Backwards compatibility.
     updatedAt: envelope.updatedAt,
     completedAt: envelope.completedAt,
     deletedAt: envelope.deletedAt,
@@ -122,6 +124,7 @@ export const mapEnvelopesToDocumentMany = (
     formValues: envelope.formValues,
     title: envelope.title,
     createdAt: envelope.createdAt,
+    documentDataId: '', // Backwards compatibility.
     updatedAt: envelope.updatedAt,
     completedAt: envelope.completedAt,
     deletedAt: envelope.deletedAt,
@@ -138,6 +141,8 @@ export const mapEnvelopesToDocumentMany = (
       id: envelope.teamId,
       url: envelope.team.url,
     },
-    recipients: envelope.recipients,
+    recipients: envelope.recipients.map((recipient) =>
+      mapRecipientToLegacyRecipient(recipient, envelope),
+    ),
   };
 };

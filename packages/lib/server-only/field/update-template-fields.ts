@@ -4,6 +4,7 @@ import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
@@ -110,6 +111,6 @@ export const updateTemplateFields = async ({
   });
 
   return {
-    fields: updatedFields,
+    fields: updatedFields.map((field) => mapFieldToLegacyField(field, envelope)),
   };
 };

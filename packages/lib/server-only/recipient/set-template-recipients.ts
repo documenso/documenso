@@ -14,7 +14,7 @@ import {
 } from '../../types/document-auth';
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetTemplateRecipientsOptions = {
@@ -211,6 +211,10 @@ export const setTemplateRecipients = async ({
   });
 
   return {
-    recipients: [...filteredRecipients, ...persistedRecipients],
+    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+      ...recipient,
+      documentId: null,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    })),
   };
 };

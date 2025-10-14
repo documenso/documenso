@@ -39,7 +39,16 @@ export const createEmbeddingDocumentRoute = procedure
           type: EnvelopeType.DOCUMENT,
           title,
           externalId,
-          recipients,
+          recipients: (recipients || []).map((recipient) => ({
+            ...recipient,
+            fields: (recipient.fields || []).map((field) => ({
+              ...field,
+              page: field.pageNumber,
+              positionX: field.pageX,
+              positionY: field.pageY,
+              documentDataId,
+            })),
+          })),
           envelopeItems: [
             {
               documentDataId,

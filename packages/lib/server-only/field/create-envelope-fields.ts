@@ -8,6 +8,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
@@ -162,6 +163,6 @@ export const createEnvelopeFields = async ({
   });
 
   return {
-    fields: createdFields,
+    fields: createdFields.map((field) => mapFieldToLegacyField(field, envelope)),
   };
 };

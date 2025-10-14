@@ -116,9 +116,14 @@ const ZEnvelopeForSigningResponse = z.object({
     signingOrder: true,
     rejectionReason: true,
   }).extend({
-    fields: ZFieldSchema.extend({
-      signature: SignatureSchema.nullish(),
-    }).array(),
+    fields: ZFieldSchema.omit({
+      documentId: true,
+      templateId: true,
+    })
+      .extend({
+        signature: SignatureSchema.nullish(),
+      })
+      .array(),
   }),
   recipientSignature: SignatureSchema.pick({
     signatureImageAsBase64: true,

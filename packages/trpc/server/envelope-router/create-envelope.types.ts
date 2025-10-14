@@ -7,6 +7,14 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
+import {
+  ZFieldHeightSchema,
+  ZFieldPageNumberSchema,
+  ZFieldPageXSchema,
+  ZFieldPageYSchema,
+  ZFieldWidthSchema,
+} from '@documenso/lib/types/field';
+import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import {
   ZDocumentExternalIdSchema,
@@ -48,18 +56,22 @@ export const ZCreateEnvelopeRequestSchema = z.object({
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({
-        // Todo: Envelopes ?
-        // fields: ZFieldAndMetaSchema.and(
-        //   z.object({
-        //     pageNumber: ZFieldPageNumberSchema,
-        //     pageX: ZFieldPageXSchema,
-        //     pageY: ZFieldPageYSchema,
-        //     width: ZFieldWidthSchema,
-        //     height: ZFieldHeightSchema,
-        //   }),
-        // )
-        //   .array()
-        //   .optional(),
+        fields: ZFieldAndMetaSchema.and(
+          z.object({
+            documentDataId: z
+              .string()
+              .describe(
+                'The ID of the document data to create the field on. If empty, the first document data will be used.',
+              ),
+            page: ZFieldPageNumberSchema,
+            positionX: ZFieldPageXSchema,
+            positionY: ZFieldPageYSchema,
+            width: ZFieldWidthSchema,
+            height: ZFieldHeightSchema,
+          }),
+        )
+          .array()
+          .optional(),
       }),
     )
     .optional(),

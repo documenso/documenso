@@ -1,4 +1,8 @@
+import type { Envelope } from '@prisma/client';
+import { EnvelopeType } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
+
+import { mapSecondaryIdToDocumentId, mapSecondaryIdToTemplateId } from '../utils/envelope';
 
 export const alphaid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 21);
 
@@ -29,3 +33,16 @@ type DatabaseIdPrefix =
   | 'team_setting';
 
 export const generateDatabaseId = (prefix: DatabaseIdPrefix) => prefixedId(prefix, 16);
+
+export const extractLegacyIds = (envelope: Pick<Envelope, 'type' | 'secondaryId'>) => {
+  return {
+    documentId:
+      envelope.type === EnvelopeType.DOCUMENT
+        ? mapSecondaryIdToDocumentId(envelope.secondaryId)
+        : null,
+    templateId:
+      envelope.type === EnvelopeType.TEMPLATE
+        ? mapSecondaryIdToTemplateId(envelope.secondaryId)
+        : null,
+  };
+};

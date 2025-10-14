@@ -3,6 +3,7 @@ import type { EnvelopeType } from '@prisma/client';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
@@ -56,5 +57,5 @@ export const getFieldById = async ({
     });
   }
 
-  return field;
+  return mapFieldToLegacyField(field, envelope);
 };

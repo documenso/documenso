@@ -12,6 +12,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateDocumentRecipientsOptions {
@@ -133,6 +134,8 @@ export const createDocumentRecipients = async ({
   });
 
   return {
-    recipients: createdRecipients,
+    recipients: createdRecipients.map((recipient) =>
+      mapRecipientToLegacyRecipient(recipient, envelope),
+    ),
   };
 };

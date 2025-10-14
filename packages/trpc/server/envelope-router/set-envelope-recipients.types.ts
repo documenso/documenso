@@ -20,7 +20,10 @@ export const ZSetEnvelopeRecipientsRequestSchema = z.object({
 });
 
 export const ZSetEnvelopeRecipientsResponseSchema = z.object({
-  recipients: ZRecipientLiteSchema.array(),
+  recipients: ZRecipientLiteSchema.omit({
+    documentId: true,
+    templateId: true,
+  }).array(),
 });
 
 export type TSetEnvelopeRecipientsRequest = z.infer<typeof ZSetEnvelopeRecipientsRequestSchema>;

@@ -40,6 +40,9 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     .nullish()
     .describe('The ID of the template that the document was created from, if any.'),
 
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
+
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   documentData: DocumentDataSchema.pick({
     type: true,
@@ -66,7 +69,11 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
-  }).nullable(),
+  }).extend({
+    password: z.string().nullable().default(null),
+    documentId: z.number().default(-1).optional(),
+  }),
+
   folder: FolderSchema.pick({
     id: true,
     name: true,
@@ -108,6 +115,9 @@ export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
 }).extend({
   envelopeId: z.string(),
 
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
+
   // Which "Template" the document was created from.
   templateId: z
     .number()
@@ -139,6 +149,9 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
 
   // Which "Template" the document was created from.
   templateId: z

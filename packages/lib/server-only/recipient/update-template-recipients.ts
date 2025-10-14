@@ -10,6 +10,8 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateTemplateRecipientsOptions {
@@ -156,6 +158,11 @@ export const updateTemplateRecipients = async ({
   });
 
   return {
-    recipients: updatedRecipients,
+    recipients: updatedRecipients.map((recipient) => ({
+      ...recipient,
+      documentId: null,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+    })),
   };
 };

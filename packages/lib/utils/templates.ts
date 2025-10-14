@@ -65,5 +65,6 @@ export const mapEnvelopeToTemplateLite = (envelope: Envelope): TTemplateLite => 
     publicDescription: envelope.publicDescription,
     folderId: envelope.folderId,
     useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+    templateDocumentDataId: '',
   };
 };

@@ -27,7 +27,7 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
@@ -344,7 +344,11 @@ export const setDocumentRecipients = async ({
   });
 
   return {
-    recipients: [...filteredRecipients, ...persistedRecipients],
+    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+      ...recipient,
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      templateId: null,
+    })),
   };
 };
 

@@ -40,6 +40,7 @@ export const getDocumentWithDetailsById = async ({
     fields: envelope.fields.map((field) => ({
       ...field,
       documentId: legacyDocumentId,
+      templateId: null,
     })),
     user: {
       id: envelope.userId,
@@ -50,6 +51,16 @@ export const getDocumentWithDetailsById = async ({
       id: envelope.teamId,
       url: envelope.team.url,
     },
-    recipients: envelope.recipients,
+    recipients: envelope.recipients.map((recipient) => ({
+      ...recipient,
+      documentId: legacyDocumentId,
+      templateId: null,
+    })),
+    documentDataId: firstDocumentData.id,
+    documentMeta: {
+      ...envelope.documentMeta,
+      documentId: legacyDocumentId,
+      password: null,
+    },
   };
 };

@@ -8,6 +8,7 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateTemplateRecipientsOptions {
@@ -107,6 +108,8 @@ export const createTemplateRecipients = async ({
   });
 
   return {
-    recipients: createdRecipients,
+    recipients: createdRecipients.map((recipient) =>
+      mapRecipientToLegacyRecipient(recipient, template),
+    ),
   };
 };
