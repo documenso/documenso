@@ -58,10 +58,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     documentAuth: template.authOptions,
   });
 
-  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
-    .with(DocumentAccessAuth.ACCOUNT, () => !!user)
-    .with(undefined, () => true)
-    .exhaustive();
+  const isAccessAuthValid = derivedRecipientAccessAuth.every((auth) =>
+    match(auth)
+      .with(DocumentAccessAuth.ACCOUNT, () => !!user)
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => false) // Not supported for direct links
+      .exhaustive(),
+  );
 
   if (!isAccessAuthValid) {
     throw data(

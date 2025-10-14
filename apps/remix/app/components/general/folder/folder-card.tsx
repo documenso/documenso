@@ -54,7 +54,7 @@ export const FolderCard = ({
   };
 
   return (
-    <Link to={formatPath()} key={folder.id}>
+    <Link to={formatPath()} data-folder-id={folder.id} data-folder-name={folder.name}>
       <Card className="hover:bg-muted/50 border-border h-full border transition-all">
         <CardContent className="p-4">
           <div className="flex min-w-0 items-center gap-3">

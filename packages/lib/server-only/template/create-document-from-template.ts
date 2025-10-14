@@ -2,6 +2,7 @@ import type { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/c
 import {
   DocumentSource,
   type Field,
+  FolderType,
   type Recipient,
   RecipientRole,
   SendStatus,
@@ -52,7 +53,7 @@ import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 type FinalRecipient = Pick<
   Recipient,
-  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder'
+  'name' | 'email' | 'role' | 'authOptions' | 'signingOrder' | 'token'
 > & {
   templateRecipientId: number;
   fields: Field[];
@@ -69,6 +70,7 @@ export type CreateDocumentFromTemplateOptions = {
     email: string;
     signingOrder?: number | null;
   }[];
+  folderId?: string;
   prefillFields?: TFieldMetaPrefillFieldsSchema[];
   customDocumentDataId?: string;
 
@@ -274,6 +276,7 @@ export const createDocumentFromTemplate = async ({
   customDocumentDataId,
   override,
   requestMetadata,
+  folderId,
   prefillFields,
 }: CreateDocumentFromTemplateOptions) => {
   const template = await prisma.template.findUnique({
@@ -296,6 +299,22 @@ export const createDocumentFromTemplate = async ({
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
+  }
+
+  if (folderId) {
+    const folder = await prisma.folder.findUnique({
+      where: {
+        id: folderId,
+        type: FolderType.DOCUMENT,
+        team: buildTeamWhereQuery({ teamId, userId }),
+      },
+    });
+
+    if (!folder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Folder not found',
+      });
+    }
   }
 
   const settings = await getTeamSettings({
@@ -331,6 +350,7 @@ export const createDocumentFromTemplate = async ({
       role: templateRecipient.role,
       signingOrder: foundRecipient?.signingOrder ?? templateRecipient.signingOrder,
       authOptions: templateRecipient.authOptions,
+      token: nanoid(),
     };
   });
 
@@ -368,6 +388,7 @@ export const createDocumentFromTemplate = async ({
         externalId: externalId || template.externalId,
         templateId: template.id,
         userId,
+        folderId,
         teamId: template.teamId,
         title: override?.title || template.title,
         documentDataId: documentData.id,
@@ -421,7 +442,7 @@ export const createDocumentFromTemplate = async ({
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
-                token: nanoid(),
+                token: recipient.token,
               };
             }),
           },
@@ -480,8 +501,8 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
-    Object.values(finalRecipients).forEach(({ email, fields }) => {
-      const recipient = document.recipients.find((recipient) => recipient.email === email);
+    Object.values(finalRecipients).forEach(({ token, fields }) => {
+      const recipient = document.recipients.find((recipient) => recipient.token === token);
 
       if (!recipient) {
         throw new Error('Recipient not found.');

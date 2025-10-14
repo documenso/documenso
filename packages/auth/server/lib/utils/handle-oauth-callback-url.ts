@@ -20,70 +20,10 @@ type HandleOAuthCallbackUrlOptions = {
 export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOptions) => {
   const { c, clientOptions } = options;
 
-  if (!clientOptions.clientId || !clientOptions.clientSecret) {
-    throw new AppError(AppErrorCode.NOT_SETUP);
-  }
-
-  const { token_endpoint } = await getOpenIdConfiguration(clientOptions.wellKnownUrl, {
-    requiredScopes: clientOptions.scope,
-  });
-
-  const oAuthClient = new OAuth2Client(
-    clientOptions.clientId,
-    clientOptions.clientSecret,
-    clientOptions.redirectUrl,
-  );
-
   const requestMeta = c.get('requestMetadata');
 
-  const code = c.req.query('code');
-  const state = c.req.query('state');
-
-  const storedState = deleteCookie(c, `${clientOptions.id}_oauth_state`);
-  const storedCodeVerifier = deleteCookie(c, `${clientOptions.id}_code_verifier`);
-  const storedRedirectPath = deleteCookie(c, `${clientOptions.id}_redirect_path`) ?? '';
-
-  if (!code || !storedState || state !== storedState || !storedCodeVerifier) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Invalid or missing state',
-    });
-  }
-
-  // eslint-disable-next-line prefer-const
-  let [redirectState, redirectPath] = storedRedirectPath.split(' ');
-
-  if (redirectState !== storedState || !redirectPath) {
-    redirectPath = '/';
-  }
-
-  const tokens = await oAuthClient.validateAuthorizationCode(
-    token_endpoint,
-    code,
-    storedCodeVerifier,
-  );
-
-  const accessToken = tokens.accessToken();
-  const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
-  const idToken = tokens.idToken();
-
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
-
-  const email = claims.email;
-  const name = claims.name;
-  const sub = claims.sub;
-
-  if (typeof email !== 'string' || typeof name !== 'string' || typeof sub !== 'string') {
-    throw new AppError(AuthenticationErrorCode.InvalidRequest, {
-      message: 'Invalid claims',
-    });
-  }
-
-  if (claims.email_verified !== true && !clientOptions.bypassEmailVerification) {
-    throw new AppError(AuthenticationErrorCode.UnverifiedEmail, {
-      message: 'Account email is not verified',
-    });
-  }
+  const { email, name, sub, accessToken, accessTokenExpiresAt, idToken, redirectPath } =
+    await validateOauth({ c, clientOptions });
 
   // Find the account if possible.
   const existingAccount = await prisma.account.findFirst({
@@ -92,7 +32,11 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
       providerAccountId: sub,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+        },
+      },
     },
   });
 
@@ -106,6 +50,10 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   const userWithSameEmail = await prisma.user.findFirst({
     where: {
       email: email,
+    },
+    select: {
+      id: true,
+      emailVerified: true,
     },
   });
 
@@ -190,4 +138,93 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
   await onAuthorize({ userId: createdUser.id }, c);
 
   return c.redirect(redirectPath, 302);
+};
+
+export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
+  const { c, clientOptions } = options;
+
+  if (!clientOptions.clientId || !clientOptions.clientSecret) {
+    throw new AppError(AppErrorCode.NOT_SETUP);
+  }
+
+  const { token_endpoint } = await getOpenIdConfiguration(clientOptions.wellKnownUrl, {
+    requiredScopes: clientOptions.scope,
+  });
+
+  const oAuthClient = new OAuth2Client(
+    clientOptions.clientId,
+    clientOptions.clientSecret,
+    clientOptions.redirectUrl,
+  );
+
+  const code = c.req.query('code');
+  const state = c.req.query('state');
+
+  const storedState = deleteCookie(c, `${clientOptions.id}_oauth_state`);
+  const storedCodeVerifier = deleteCookie(c, `${clientOptions.id}_code_verifier`);
+  const storedRedirectPath = deleteCookie(c, `${clientOptions.id}_redirect_path`) ?? '';
+
+  if (!code || !storedState || state !== storedState || !storedCodeVerifier) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Invalid or missing state',
+    });
+  }
+
+  // eslint-disable-next-line prefer-const
+  let [redirectState, redirectPath] = storedRedirectPath.split(' ');
+
+  if (redirectState !== storedState || !redirectPath) {
+    redirectPath = '/';
+  }
+
+  const tokens = await oAuthClient.validateAuthorizationCode(
+    token_endpoint,
+    code,
+    storedCodeVerifier,
+  );
+
+  const accessToken = tokens.accessToken();
+  const accessTokenExpiresAt = tokens.accessTokenExpiresAt();
+  const idToken = tokens.idToken();
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  const claims = decodeIdToken(tokens.idToken()) as Record<string, unknown>;
+
+  const email = claims.email;
+  const name = claims.name;
+  const sub = claims.sub;
+
+  if (typeof email !== 'string') {
+    throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+      message: 'Missing email',
+    });
+  }
+
+  if (typeof name !== 'string') {
+    throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+      message: 'Missing name',
+    });
+  }
+
+  if (typeof sub !== 'string') {
+    throw new AppError(AuthenticationErrorCode.InvalidRequest, {
+      message: 'Missing sub claim',
+    });
+  }
+
+  if (claims.email_verified !== true && !clientOptions.bypassEmailVerification) {
+    throw new AppError(AuthenticationErrorCode.UnverifiedEmail, {
+      message: 'Account email is not verified',
+    });
+  }
+
+  return {
+    email,
+    name,
+    sub,
+    accessToken,
+    accessTokenExpiresAt,
+    idToken,
+    redirectPath,
+  };
 };

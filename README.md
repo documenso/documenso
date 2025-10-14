@@ -217,8 +217,6 @@ For detailed instructions on how to configure and run the Docker container, plea
 
 We support a variety of deployment methods, and are actively working on adding more. Stay tuned for updates!
 
-> Please note that the below deployment methods are for v0.9, we will update these to v1.0 once it has been released.
-
 ### Fetch, configure, and build
 
 First, clone the code from Github:
@@ -261,7 +259,7 @@ npm run start
 
 This will start the server on `localhost:3000`. For now, any reverse proxy can then do the frontend and SSL termination.
 
-> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+> If you want to run with another port than 3000, you can start the application with `next -p <ANY PORT>` from the `apps/remix` folder.
 
 ### Run as a service
 

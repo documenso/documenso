@@ -33,7 +33,7 @@ export const ZNoBodyMutationSchema = null;
  */
 export const ZGetDocumentsQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
-  perPage: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(10),
 });
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
@@ -136,6 +136,12 @@ export type TUploadDocumentSuccessfulSchema = z.infer<typeof ZUploadDocumentSucc
 export const ZCreateDocumentMutationSchema = z.object({
   title: z.string().min(1),
   externalId: z.string().nullish(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+    )
+    .optional(),
   recipients: z.array(
     z.object({
       name: z.string().min(1),
@@ -287,6 +293,12 @@ export type TCreateDocumentFromTemplateMutationResponseSchema = z.infer<
 export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
   title: z.string().optional(),
   externalId: z.string().optional(),
+  folderId: z
+    .string()
+    .describe(
+      'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
+    )
+    .optional(),
   recipients: z
     .array(
       z.object({
@@ -298,12 +310,11 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     )
     .refine(
       (schema) => {
-        const emails = schema.map((signer) => signer.email.toLowerCase());
         const ids = schema.map((signer) => signer.id);
 
-        return new Set(emails).size === emails.length && new Set(ids).size === ids.length;
+        return new Set(ids).size === ids.length;
       },
-      { message: 'Recipient IDs and emails must be unique' },
+      { message: 'Recipient IDs must be unique' },
     ),
   meta: z
     .object({
@@ -625,5 +636,5 @@ export const ZSuccessfulGetTemplatesResponseSchema = z.object({
 
 export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
-  perPage: z.coerce.number().min(1).optional().default(1),
+  perPage: z.coerce.number().min(1).optional().default(10),
 });

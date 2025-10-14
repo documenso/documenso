@@ -33,7 +33,7 @@ export default function AdminDocumentsPage() {
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
   const { data: findDocumentsData, isPending: isFindDocumentsLoading } =
-    trpc.admin.findDocuments.useQuery(
+    trpc.admin.document.find.useQuery(
       {
         query: debouncedTerm,
         page: page || 1,

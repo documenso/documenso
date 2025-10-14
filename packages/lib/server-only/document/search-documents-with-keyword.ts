@@ -1,6 +1,5 @@
-import { DocumentStatus } from '@prisma/client';
 import type { Document, Recipient, User } from '@prisma/client';
-import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
+import { DocumentStatus, DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import {
@@ -19,7 +18,7 @@ export type SearchDocumentsWithKeywordOptions = {
 export const searchDocumentsWithKeyword = async ({
   query,
   userId,
-  limit = 5,
+  limit = 20,
 }: SearchDocumentsWithKeywordOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -122,6 +121,7 @@ export const searchDocumentsWithKeyword = async ({
         },
       },
     },
+    distinct: ['id'],
     orderBy: {
       createdAt: 'desc',
     },
@@ -129,6 +129,7 @@ export const searchDocumentsWithKeyword = async ({
   });
 
   const isOwner = (document: Document, user: User) => document.userId === user.id;
+
   const getSigningLink = (recipients: Recipient[], user: User) =>
     `/sign/${recipients.find((r) => r.email === user.email)?.token}`;
 
@@ -164,7 +165,7 @@ export const searchDocumentsWithKeyword = async ({
 
       if (isOwner(document, user)) {
         documentPath = `${formatDocumentsPath(document.team?.url)}/${document.id}`;
-      } else if (document.teamId && document.team) {
+      } else if (document.teamId && document.team.teamGroups.length > 0) {
         documentPath = `${formatDocumentsPath(document.team.url)}/${document.id}`;
       } else {
         documentPath = getSigningLink(recipients, user);

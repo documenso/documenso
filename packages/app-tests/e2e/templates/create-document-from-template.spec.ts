@@ -47,8 +47,8 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
 
   // Set advanced options.
   await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
-  await page.getByLabel('DD/MM/YYYY').click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD hh:mm AM/PM' }).click();
+  await page.getByLabel('DD/MM/YYYY HH:mm', { exact: true }).click();
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
@@ -96,7 +96,7 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   expect(document.title).toEqual('TEMPLATE_TITLE');
   expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
 
-  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
+  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy HH:mm');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
@@ -150,8 +150,8 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   // Set advanced options.
   await page.getByRole('button', { name: 'Advanced Options' }).click();
-  await page.locator('button').filter({ hasText: 'YYYY-MM-DD HH:mm a' }).click();
-  await page.getByLabel('DD/MM/YYYY').click();
+  await page.locator('button').filter({ hasText: 'YYYY-MM-DD hh:mm AM/PM' }).click();
+  await page.getByLabel('DD/MM/YYYY HH:mm', { exact: true }).click();
 
   await page.locator('.time-zone-field').click();
   await page.getByRole('option', { name: 'Etc/UTC' }).click();
@@ -200,7 +200,7 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
 
   expect(document.title).toEqual('TEMPLATE_TITLE');
   expect(documentAuth.documentAuthOption.globalAccessAuth).toContain('ACCOUNT');
-  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy hh:mm a');
+  expect(document.documentMeta?.dateFormat).toEqual('dd/MM/yyyy HH:mm');
   expect(document.documentMeta?.message).toEqual('MESSAGE');
   expect(document.documentMeta?.redirectUrl).toEqual('https://documenso.com');
   expect(document.documentMeta?.subject).toEqual('SUBJECT');
