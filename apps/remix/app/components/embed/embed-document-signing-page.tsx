@@ -3,7 +3,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta } from '@prisma/client';
 import {
   type DocumentData,
   type Field,
@@ -15,12 +15,14 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import {
+  type DocumentField,
+  DocumentReadOnlyFields,
+} from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -50,7 +52,7 @@ export type EmbedSignDocumentClientPageProps = {
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
@@ -275,7 +277,7 @@ export const EmbedSignDocumentClientPage = ({
         {allowDocumentRejection && (
           <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
             <DocumentSigningRejectDialog
-              document={{ id: documentId }}
+              documentId={documentId}
               token={token}
               onRejected={onDocumentRejected}
             />

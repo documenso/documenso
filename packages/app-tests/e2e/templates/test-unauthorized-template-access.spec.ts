@@ -24,7 +24,7 @@ test.describe('Unauthorized Access to Templates', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${template.id}`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 
   test('should block unauthorized access to the template edit page', async ({ page }) => {
@@ -40,6 +40,6 @@ test.describe('Unauthorized Access to Templates', () => {
     });
 
     await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/templates/${template.id}/edit`);
-    await expect(page.getByRole('heading', { name: 'Oops! Something went wrong.' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Team not found' })).toBeVisible();
   });
 });

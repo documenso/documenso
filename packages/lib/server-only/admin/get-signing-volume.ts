@@ -1,4 +1,4 @@
-import { DocumentStatus, SubscriptionStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, SubscriptionStatus } from '@prisma/client';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
 
@@ -31,22 +31,23 @@ export async function getSigningVolume({
     .selectFrom('Subscription as s')
     .innerJoin('Organisation as o', 's.organisationId', 'o.id')
     .leftJoin('Team as t', 'o.id', 't.organisationId')
-    .leftJoin('Document as d', (join) =>
+    .leftJoin('Envelope as e', (join) =>
       join
-        .onRef('t.id', '=', 'd.teamId')
-        .on('d.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('d.deletedAt', 'is', null),
+        .onRef('t.id', '=', 'e.teamId')
+        .on('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('e.deletedAt', 'is', null),
     )
     .where(sql`s.status = ${SubscriptionStatus.ACTIVE}::"SubscriptionStatus"`)
     .where((eb) =>
       eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
     )
+    .where('e.type', '=', EnvelopeType.DOCUMENT)
     .select([
       's.id as id',
       's.createdAt as createdAt',
       's.planId as planId',
       sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
+      sql<number>`COUNT(DISTINCT e.id)`.as('signingVolume'),
     ])
     .groupBy(['s.id', 'o.name']);
 

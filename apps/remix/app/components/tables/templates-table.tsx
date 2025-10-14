@@ -56,7 +56,7 @@ export const TemplatesTable = ({
   const formatTemplateLink = (row: TemplatesTableRow) => {
     const path = formatTemplatesPath(team.url);
 
-    return `${path}/${row.id}`;
+    return `${path}/${row.envelopeId}`;
   };
 
   const columns = useMemo(() => {

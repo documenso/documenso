@@ -384,6 +384,7 @@ export function TemplateUseDialog({
                           className="text-muted-foreground ml-2 flex items-center text-sm"
                           htmlFor="useCustomDocument"
                         >
+                          {/* Todo: Envelopes - How will this work? */}
                           <Trans>Upload custom document</Trans>
                           <Tooltip>
                             <TooltipTrigger type="button">

@@ -50,7 +50,7 @@ test('[DOCUMENT_FLOW]: Simple duplicate recipients test', async ({ page }) => {
   await page.waitForTimeout(2500);
   await page.getByRole('button', { name: 'Send' }).click();
 
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
   await expect(page.getByRole('link', { name: document.title })).toBeVisible();
 });

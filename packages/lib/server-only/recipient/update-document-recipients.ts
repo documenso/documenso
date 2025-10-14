@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -16,13 +16,15 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified } from '../../utils/recipients';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateDocumentRecipientsOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -30,18 +32,19 @@ export interface UpdateDocumentRecipientsOptions {
 export const updateDocumentRecipients = async ({
   userId,
   teamId,
-  documentId,
+  id,
   recipients,
   requestMetadata,
 }: UpdateDocumentRecipientsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       fields: true,
       recipients: true,
@@ -57,13 +60,13 @@ export const updateDocumentRecipients = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
@@ -74,14 +77,14 @@ export const updateDocumentRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
   }
 
   const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = document.recipients.find(
+    const originalRecipient = envelope.recipients.find(
       (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
@@ -91,7 +94,7 @@ export const updateDocumentRecipients = async ({
       });
     }
 
-    if (!canRecipientBeModified(originalRecipient, document.fields)) {
+    if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',
       });
@@ -123,14 +126,14 @@ export const updateDocumentRecipients = async ({
         const updatedRecipient = await tx.recipient.update({
           where: {
             id: originalRecipient.id,
-            documentId,
+            envelopeId: envelope.id,
           },
           data: {
             name: mergedRecipient.name,
             email: mergedRecipient.email,
             role: mergedRecipient.role,
             signingOrder: mergedRecipient.signingOrder,
-            documentId,
+            envelopeId: envelope.id,
             sendStatus:
               mergedRecipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
@@ -164,7 +167,7 @@ export const updateDocumentRecipients = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 recipientEmail: updatedRecipient.email,
@@ -183,7 +186,12 @@ export const updateDocumentRecipients = async ({
   });
 
   return {
-    recipients: updatedRecipients,
+    recipients: updatedRecipients.map((recipient) => ({
+      ...recipient,
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      templateId: null,
+      fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+    })),
   };
 };
 
