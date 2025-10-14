@@ -1,6 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { FieldType, SigningStatus } from '@prisma/client';
+import { EnvelopeType, FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
 import { prop, sortBy } from 'remeda';
@@ -14,12 +14,13 @@ import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_SIGNING_REASONS,
 } from '@documenso/lib/constants/recipient-roles';
-import { getEntireDocument } from '@documenso/lib/server-only/admin/get-entire-document';
+import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { getDocumentCertificateAuditLogs } from '@documenso/lib/server-only/document/get-document-certificate-audit-logs';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import {
@@ -55,26 +56,45 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const documentId = Number(rawDocumentId);
 
-  const document = await getEntireDocument({
-    id: documentId,
+  const envelope = await unsafeGetEntireEnvelope({
+    id: {
+      type: 'documentId',
+      id: documentId,
+    },
+    type: EnvelopeType.DOCUMENT,
   }).catch(() => null);
 
-  if (!document) {
+  if (!envelope) {
     throw redirect('/');
   }
 
-  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: document.teamId });
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
 
-  const documentLanguage = ZSupportedLanguageCodeSchema.parse(document.documentMeta?.language);
+  const documentLanguage = ZSupportedLanguageCodeSchema.parse(envelope.documentMeta?.language);
 
   const auditLogs = await getDocumentCertificateAuditLogs({
-    id: documentId,
+    envelopeId: envelope.id,
   });
 
   const messages = await getTranslations(documentLanguage);
 
   return {
-    document,
+    document: {
+      id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      title: envelope.title,
+      status: envelope.status,
+      user: {
+        name: envelope.user.name,
+        email: envelope.user.email,
+      },
+      qrToken: envelope.qrToken,
+      authOptions: envelope.authOptions,
+      recipients: envelope.recipients,
+      createdAt: envelope.createdAt,
+      updatedAt: envelope.updatedAt,
+      deletedAt: envelope.deletedAt,
+      documentMeta: envelope.documentMeta,
+    },
     hidePoweredBy: organisationClaim.flags.hidePoweredBy,
     documentLanguage,
     auditLogs,
@@ -151,6 +171,7 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
 
       authLevel = match(accessAuthMethod)
         .with('ACCOUNT', () => _(msg`Account Authentication`))
+        .with('TWO_FACTOR_AUTH', () => _(msg`Two-Factor Authentication`))
         .with(undefined, () => _(msg`Email`))
         .exhaustive();
     }

@@ -1,3 +1,5 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { completeDocumentWithToken } from '@documenso/lib/server-only/document/complete-document-with-token';
 import { rejectDocumentWithToken } from '@documenso/lib/server-only/document/reject-document-with-token';
 import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
@@ -12,6 +14,7 @@ import { updateTemplateRecipients } from '@documenso/lib/server-only/recipient/u
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
+import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
 import {
   ZCompleteDocumentWithTokenMutationSchema,
   ZCreateDocumentRecipientRequestSchema,
@@ -42,6 +45,10 @@ import {
 } from './schema';
 
 export const recipientRouter = router({
+  suggestions: {
+    find: findRecipientSuggestionsRoute,
+  },
+
   /**
    * @public
    */
@@ -72,6 +79,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         recipientId,
+        type: EnvelopeType.DOCUMENT,
       });
     }),
 
@@ -103,7 +111,10 @@ export const recipientRouter = router({
       const createdRecipients = await createDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients: [recipient],
         requestMetadata: ctx.metadata,
       });
@@ -139,7 +150,10 @@ export const recipientRouter = router({
       return await createDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients,
         requestMetadata: ctx.metadata,
       });
@@ -173,7 +187,10 @@ export const recipientRouter = router({
       const updatedRecipients = await updateDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients: [recipient],
         requestMetadata: ctx.metadata,
       });
@@ -209,7 +226,10 @@ export const recipientRouter = router({
       return await updateDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients,
         requestMetadata: ctx.metadata,
       });
@@ -268,9 +288,12 @@ export const recipientRouter = router({
       return await setDocumentRecipients({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         recipients: recipients.map((recipient) => ({
-          id: recipient.nativeId,
+          id: recipient.id,
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
@@ -311,6 +334,7 @@ export const recipientRouter = router({
         userId: ctx.user.id,
         teamId,
         recipientId,
+        type: EnvelopeType.TEMPLATE,
       });
     }),
 
@@ -502,9 +526,12 @@ export const recipientRouter = router({
       return await setTemplateRecipients({
         userId: ctx.user.id,
         teamId,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         recipients: recipients.map((recipient) => ({
-          id: recipient.nativeId,
+          id: recipient.id,
           email: recipient.email,
           name: recipient.name,
           role: recipient.role,
@@ -520,7 +547,7 @@ export const recipientRouter = router({
   completeDocumentWithToken: procedure
     .input(ZCompleteDocumentWithTokenMutationSchema)
     .mutation(async ({ input, ctx }) => {
-      const { token, documentId, authOptions, nextSigner } = input;
+      const { token, documentId, authOptions, accessAuthOptions, nextSigner } = input;
 
       ctx.logger.info({
         input: {
@@ -528,10 +555,14 @@ export const recipientRouter = router({
         },
       });
 
-      return await completeDocumentWithToken({
+      await completeDocumentWithToken({
         token,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         authOptions,
+        accessAuthOptions,
         nextSigner,
         userId: ctx.user?.id,
         requestMetadata: ctx.metadata.requestMetadata,
@@ -554,7 +585,10 @@ export const recipientRouter = router({
 
       return await rejectDocumentWithToken({
         token,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         reason,
         requestMetadata: ctx.metadata.requestMetadata,
       });

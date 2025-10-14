@@ -23,7 +23,7 @@ export const getRecipientsForAssistant = async ({ token }: GetRecipientsForAssis
 
   let recipients = await prisma.recipient.findMany({
     where: {
-      documentId: assistant.documentId,
+      envelopeId: assistant.envelopeId,
       signingOrder: {
         gte: assistant.signingOrder ?? 0,
       },
@@ -39,7 +39,7 @@ export const getRecipientsForAssistant = async ({ token }: GetRecipientsForAssis
               type: {
                 not: FieldType.SIGNATURE,
               },
-              documentId: assistant.documentId,
+              envelopeId: assistant.envelopeId,
             },
           ],
         },

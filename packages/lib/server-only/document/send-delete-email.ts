@@ -14,29 +14,36 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
 export interface SendDeleteEmailOptions {
-  documentId: number;
+  envelopeId: string;
   reason: string;
 }
 
-export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOptions) => {
-  const document = await prisma.document.findFirst({
+// Note: Currently only sent by Admin function
+export const sendDeleteEmail = async ({ envelopeId, reason }: SendDeleteEmailOptions) => {
+  const envelope = await prisma.envelope.findFirst({
     where: {
-      id: documentId,
+      id: envelopeId,
     },
     include: {
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
   const isDocumentDeletedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).documentDeleted;
 
   if (!isDocumentDeletedEmailEnabled) {
@@ -47,17 +54,17 @@ export const sendDeleteEmail = async ({ documentId, reason }: SendDeleteEmailOpt
     emailType: 'INTERNAL',
     source: {
       type: 'team',
-      teamId: document.teamId,
+      teamId: envelope.teamId,
     },
-    meta: document.documentMeta,
+    meta: envelope.documentMeta,
   });
 
-  const { email, name } = document.user;
+  const { email, name } = envelope.user;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   const template = createElement(DocumentSuperDeleteEmailTemplate, {
-    documentName: document.title,
+    documentName: envelope.title,
     reason,
     assetBaseUrl,
   });

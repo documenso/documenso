@@ -21,7 +21,7 @@ export function meta() {
 export default function ApiTokensPage() {
   const { i18n } = useLingui();
 
-  const { data: tokens } = trpc.apiToken.getTokens.useQuery();
+  const { data: tokens } = trpc.apiToken.getMany.useQuery();
 
   const team = useOptionalCurrentTeam();
 

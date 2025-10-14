@@ -12,10 +12,8 @@ import { parseToIntegerArray } from '@documenso/lib/utils/params';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
 import { trpc } from '@documenso/trpc/react';
-import {
-  type TFindDocumentsInternalResponse,
-  ZFindDocumentsInternalRequestSchema,
-} from '@documenso/trpc/server/document-router/schema';
+import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
+import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
@@ -110,6 +108,7 @@ export default function DocumentsPage() {
     }
   }, [data?.stats]);
 
+  // Todo: Envelopes - Change the dropzone wrapper to create to V2 documents after we're ready.
   return (
     <DocumentDropZoneWrapper>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">

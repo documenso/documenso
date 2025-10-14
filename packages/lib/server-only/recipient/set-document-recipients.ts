@@ -2,7 +2,7 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import type { Recipient } from '@prisma/client';
-import { RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
@@ -27,15 +27,16 @@ import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
 import { getEmailContext } from '../email/get-email-context';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface SetDocumentRecipientsOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -43,18 +44,19 @@ export interface SetDocumentRecipientsOptions {
 export const setDocumentRecipients = async ({
   userId,
   teamId,
-  documentId,
+  id,
   recipients,
   requestMetadata,
 }: SetDocumentRecipientsOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       fields: true,
       documentMeta: true,
@@ -67,6 +69,7 @@ export const setDocumentRecipients = async ({
           },
         },
       },
+      recipients: true,
     },
   });
 
@@ -81,11 +84,11 @@ export const setDocumentRecipients = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new Error('Document already complete');
   }
 
@@ -95,7 +98,7 @@ export const setDocumentRecipients = async ({
       type: 'team',
       teamId,
     },
-    meta: document.documentMeta,
+    meta: envelope.documentMeta,
   });
 
   const recipientsHaveActionAuth = recipients.some(
@@ -103,7 +106,7 @@ export const setDocumentRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !document.team.organisation.organisationClaim.flags.cfr21) {
+  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
@@ -114,33 +117,25 @@ export const setDocumentRecipients = async ({
     email: recipient.email.toLowerCase(),
   }));
 
-  const existingRecipients = await prisma.recipient.findMany({
-    where: {
-      documentId,
-    },
-  });
+  const existingRecipients = envelope.recipients;
 
   const removedRecipients = existingRecipients.filter(
     (existingRecipient) =>
-      !normalizedRecipients.find(
-        (recipient) =>
-          recipient.id === existingRecipient.id || recipient.email === existingRecipient.email,
-      ),
+      !normalizedRecipients.find((recipient) => recipient.id === existingRecipient.id),
   );
 
   const linkedRecipients = normalizedRecipients.map((recipient) => {
     const existing = existingRecipients.find(
-      (existingRecipient) =>
-        existingRecipient.id === recipient.id || existingRecipient.email === recipient.email,
+      (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
     const canPersistedRecipientBeModified =
-      existing && canRecipientBeModified(existing, document.fields);
+      existing && canRecipientBeModified(existing, envelope.fields);
 
     if (
       existing &&
       hasRecipientBeenChanged(existing, recipient) &&
-      !canRecipientBeModified(existing, document.fields)
+      !canRecipientBeModified(existing, envelope.fields)
     ) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Cannot modify a recipient who has already interacted with the document',
@@ -176,14 +171,14 @@ export const setDocumentRecipients = async ({
         const upsertedRecipient = await tx.recipient.upsert({
           where: {
             id: recipient._persisted?.id ?? -1,
-            documentId,
+            envelopeId: envelope.id,
           },
           update: {
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
-            documentId,
+            envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
@@ -195,7 +190,7 @@ export const setDocumentRecipients = async ({
             role: recipient.role,
             signingOrder: recipient.signingOrder,
             token: nanoid(),
-            documentId,
+            envelopeId: envelope.id,
             sendStatus: recipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
               recipient.role === RecipientRole.CC ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
@@ -234,7 +229,7 @@ export const setDocumentRecipients = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 changes,
@@ -249,7 +244,7 @@ export const setDocumentRecipients = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
@@ -282,7 +277,7 @@ export const setDocumentRecipients = async ({
         data: removedRecipients.map((recipient) =>
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
-            documentId: documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               recipientEmail: recipient.email,
@@ -296,7 +291,7 @@ export const setDocumentRecipients = async ({
     });
 
     const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-      document.documentMeta,
+      envelope.documentMeta,
     ).recipientRemoved;
 
     // Send emails to deleted recipients.
@@ -309,7 +304,7 @@ export const setDocumentRecipients = async ({
         const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
         const template = createElement(RecipientRemovedFromDocumentTemplate, {
-          documentName: document.title,
+          documentName: envelope.title,
           inviterName: user.name || undefined,
           assetBaseUrl,
         });
@@ -349,7 +344,11 @@ export const setDocumentRecipients = async ({
   });
 
   return {
-    recipients: [...filteredRecipients, ...persistedRecipients],
+    recipients: [...filteredRecipients, ...persistedRecipients].map((recipient) => ({
+      ...recipient,
+      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      templateId: null,
+    })),
   };
 };
 

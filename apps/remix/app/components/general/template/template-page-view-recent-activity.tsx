@@ -18,7 +18,7 @@ export const TemplatePageViewRecentActivity = ({
   templateId,
   documentRootPath,
 }: TemplatePageViewRecentActivityProps) => {
-  const { data, isLoading, isLoadingError, refetch } = trpc.document.findDocuments.useQuery({
+  const { data, isLoading, isLoadingError, refetch } = trpc.document.find.useQuery({
     templateId,
     orderByColumn: 'createdAt',
     orderByDirection: 'asc',
@@ -113,7 +113,7 @@ export const TemplatePageViewRecentActivity = ({
                 </div>
 
                 <Link
-                  to={`${documentRootPath}/${document.id}`}
+                  to={`${documentRootPath}/${document.envelopeId}`}
                   className="text-muted-foreground dark:text-muted-foreground/70 flex-auto truncate py-0.5 text-xs leading-5"
                 >
                   {match(document.source)

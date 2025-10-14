@@ -4,15 +4,15 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Recipient, SigningStatus } from '@prisma/client';
+import { type Recipient, SigningStatus, type Team, type User } from '@prisma/client';
 import { History } from 'lucide-react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import * as z from 'zod';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getRecipientType } from '@documenso/lib/client-only/recipient-type';
-import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+import type { Document } from '@documenso/prisma/types/document-legacy-schema';
 import { trpc as trpcReact } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -43,7 +43,11 @@ import { StackAvatar } from '../general/stack-avatar';
 const FORM_ID = 'resend-email';
 
 export type DocumentResendDialogProps = {
-  document: TDocumentRow;
+  document: Pick<Document, 'id' | 'userId' | 'teamId' | 'status'> & {
+    user: Pick<User, 'id' | 'name' | 'email'>;
+    recipients: Recipient[];
+    team: Pick<Team, 'id' | 'url'> | null;
+  };
   recipients: Recipient[];
 };
 
@@ -71,7 +75,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     document.status !== 'PENDING' ||
     !recipients.some((r) => r.signingStatus === SigningStatus.NOT_SIGNED);
 
-  const { mutateAsync: resendDocument } = trpcReact.document.resendDocument.useMutation();
+  const { mutateAsync: resendDocument } = trpcReact.document.redistribute.useMutation();
 
   const form = useForm<TResendDocumentFormSchema>({
     resolver: zodResolver(ZResendDocumentFormSchema),
@@ -84,6 +88,11 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
     handleSubmit,
     formState: { isSubmitting },
   } = form;
+
+  const selectedRecipients = useWatch({
+    control: form.control,
+    name: 'recipients',
+  });
 
   const onFormSubmit = async ({ recipients }: TResendDocumentFormSchema) => {
     try {
@@ -151,7 +160,7 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
 
                       <FormControl>
                         <Checkbox
-                          className="h-5 w-5 rounded-full"
+                          className="h-5 w-5 rounded-full border border-neutral-400"
                           value={recipient.id}
                           checked={value.includes(recipient.id)}
                           onCheckedChange={(checked: boolean) =>
@@ -182,7 +191,13 @@ export const DocumentResendDialog = ({ document, recipients }: DocumentResendDia
               </Button>
             </DialogClose>
 
-            <Button className="flex-1" loading={isSubmitting} type="submit" form={FORM_ID}>
+            <Button
+              className="flex-1"
+              loading={isSubmitting}
+              type="submit"
+              form={FORM_ID}
+              disabled={isSubmitting || selectedRecipients.length === 0}
+            >
               <Trans>Send reminder</Trans>
             </Button>
           </div>

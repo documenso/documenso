@@ -37,6 +37,7 @@ const ZDocumentAuthPasswordSchema = z.object({
 const ZDocumentAuth2FASchema = z.object({
   type: z.literal(DocumentAuth.TWO_FACTOR_AUTH),
   token: z.string().min(4).max(10),
+  method: z.enum(['email', 'authenticator']).default('authenticator').optional(),
 });
 
 /**
@@ -55,9 +56,12 @@ export const ZDocumentAuthMethodsSchema = z.discriminatedUnion('type', [
  *
  * Must keep these two in sync.
  */
-export const ZDocumentAccessAuthSchema = z.discriminatedUnion('type', [ZDocumentAuthAccountSchema]);
+export const ZDocumentAccessAuthSchema = z.discriminatedUnion('type', [
+  ZDocumentAuthAccountSchema,
+  ZDocumentAuth2FASchema,
+]);
 export const ZDocumentAccessAuthTypesSchema = z
-  .enum([DocumentAuth.ACCOUNT])
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH])
   .describe('The type of authentication required for the recipient to access the document.');
 
 /**
@@ -89,9 +93,10 @@ export const ZDocumentActionAuthTypesSchema = z
  */
 export const ZRecipientAccessAuthSchema = z.discriminatedUnion('type', [
   ZDocumentAuthAccountSchema,
+  ZDocumentAuth2FASchema,
 ]);
 export const ZRecipientAccessAuthTypesSchema = z
-  .enum([DocumentAuth.ACCOUNT])
+  .enum([DocumentAuth.ACCOUNT, DocumentAuth.TWO_FACTOR_AUTH])
   .describe('The type of authentication required for the recipient to access the document.');
 
 /**

@@ -3,7 +3,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta } from '@prisma/client';
 import {
   type DocumentData,
   type Field,
@@ -15,12 +15,14 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import {
+  type DocumentField,
+  DocumentReadOnlyFields,
+} from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -50,7 +52,7 @@ export type EmbedSignDocumentClientPageProps = {
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
@@ -89,7 +91,7 @@ export const EmbedSignDocumentClientPage = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [isNameLocked, setIsNameLocked] = useState(false);
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
-  const [showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
+  const [_showOtherRecipientsCompletedFields, setShowOtherRecipientsCompletedFields] =
     useState(false);
 
   const [allowDocumentRejection, setAllowDocumentRejection] = useState(false);
@@ -106,6 +108,8 @@ export const EmbedSignDocumentClientPage = ({
     fields.filter((field) => field.inserted),
   ];
 
+  const highestPendingPageNumber = Math.max(...pendingFields.map((field) => field.page));
+
   const { mutateAsync: completeDocumentWithToken, isPending: isSubmitting } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
@@ -115,6 +119,8 @@ export const EmbedSignDocumentClientPage = ({
   );
 
   const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+
+  const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
 
   const assistantSignersId = useId();
 
@@ -271,7 +277,7 @@ export const EmbedSignDocumentClientPage = ({
         {allowDocumentRejection && (
           <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
             <DocumentSigningRejectDialog
-              document={{ id: documentId }}
+              documentId={documentId}
               token={token}
               onRejected={onDocumentRejected}
             />
@@ -305,19 +311,36 @@ export const EmbedSignDocumentClientPage = ({
                     )}
                   </h3>
 
-                  <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
-                    {isExpanded ? (
-                      <LucideChevronDown
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(false)}
-                      />
-                    ) : (
-                      <LucideChevronUp
-                        className="text-muted-foreground h-5 w-5"
-                        onClick={() => setIsExpanded(true)}
-                      />
-                    )}
-                  </Button>
+                  {isExpanded ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : pendingFields.length > 0 ? (
+                    <Button
+                      variant="outline"
+                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      onClick={() => setIsExpanded(true)}
+                    >
+                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                    </Button>
+                  ) : (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="md:hidden"
+                      disabled={
+                        isThrottled || (!isAssistantMode && hasSignatureField && !signatureValid)
+                      }
+                      loading={isSubmitting}
+                      onClick={() => throttledOnCompleteClick()}
+                    >
+                      <Trans>Complete</Trans>
+                    </Button>
+                  )}
                 </div>
               </div>
 
@@ -465,7 +488,9 @@ export const EmbedSignDocumentClientPage = ({
             </div>
           </div>
 
-          <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+          <ElementVisible
+            target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPendingPageNumber}"]`}
+          >
             {showPendingFieldTooltip && pendingFields.length > 0 && (
               <FieldToolTip key={pendingFields[0].id} field={pendingFields[0]} color="warning">
                 <Trans>Click to insert field</Trans>

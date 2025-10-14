@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
-import { SendStatus } from '@prisma/client';
+import { EnvelopeType, SendStatus } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import RecipientRemovedFromDocumentTemplate from '@documenso/email/templates/recipient-removed-from-document';
@@ -30,9 +30,10 @@ export const deleteDocumentRecipient = async ({
   teamId,
   recipientId,
   requestMetadata,
-}: DeleteDocumentRecipientOptions): Promise<void> => {
-  const document = await prisma.document.findFirst({
+}: DeleteDocumentRecipientOptions) => {
+  const envelope = await prisma.envelope.findFirst({
     where: {
+      type: EnvelopeType.DOCUMENT,
       recipients: {
         some: {
           id: recipientId,
@@ -62,13 +63,13 @@ export const deleteDocumentRecipient = async ({
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
@@ -80,7 +81,7 @@ export const deleteDocumentRecipient = async ({
     });
   }
 
-  const recipientToDelete = document.recipients[0];
+  const recipientToDelete = envelope.recipients[0];
 
   if (!recipientToDelete || recipientToDelete.id !== recipientId) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -88,17 +89,11 @@ export const deleteDocumentRecipient = async ({
     });
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.recipient.delete({
-      where: {
-        id: recipientId,
-      },
-    });
-
+  const deletedRecipient = await prisma.$transaction(async (tx) => {
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
-        documentId: document.id,
+        envelopeId: envelope.id,
         metadata: requestMetadata,
         data: {
           recipientEmail: recipientToDelete.email,
@@ -108,10 +103,16 @@ export const deleteDocumentRecipient = async ({
         },
       }),
     });
+
+    return await tx.recipient.delete({
+      where: {
+        id: recipientId,
+      },
+    });
   });
 
   const isRecipientRemovedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientRemoved;
 
   // Send email to deleted recipient.
@@ -119,8 +120,8 @@ export const deleteDocumentRecipient = async ({
     const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
     const template = createElement(RecipientRemovedFromDocumentTemplate, {
-      documentName: document.title,
-      inviterName: document.team?.name || user.name || undefined,
+      documentName: envelope.title,
+      inviterName: envelope.team?.name || user.name || undefined,
       assetBaseUrl,
     });
 
@@ -128,9 +129,9 @@ export const deleteDocumentRecipient = async ({
       emailType: 'RECIPIENT',
       source: {
         type: 'team',
-        teamId: document.teamId,
+        teamId: envelope.teamId,
       },
-      meta: document.documentMeta,
+      meta: envelope.documentMeta,
     });
 
     const [html, text] = await Promise.all([
@@ -152,4 +153,6 @@ export const deleteDocumentRecipient = async ({
       text,
     });
   }
+
+  return deletedRecipient;
 };

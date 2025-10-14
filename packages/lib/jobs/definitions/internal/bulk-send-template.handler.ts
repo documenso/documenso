@@ -37,7 +37,10 @@ export const run = async ({
   const { userId, teamId, templateId, csvContent, sendImmediately, requestMetadata } = payload;
 
   const template = await getTemplateById({
-    id: templateId,
+    id: {
+      type: 'templateId',
+      id: templateId,
+    },
     userId,
     teamId,
   });
@@ -99,9 +102,12 @@ export const run = async ({
         }
       }
 
-      const document = await io.runTask(`create-document-${rowIndex}`, async () => {
+      const envelope = await io.runTask(`create-document-${rowIndex}`, async () => {
         return await createDocumentFromTemplate({
-          templateId: template.id,
+          id: {
+            type: 'templateId',
+            id: template.id,
+          },
           userId,
           teamId,
           recipients: recipients.map((recipient, index) => {
@@ -124,7 +130,10 @@ export const run = async ({
       if (sendImmediately) {
         await io.runTask(`send-document-${rowIndex}`, async () => {
           await sendDocument({
-            documentId: document.id,
+            id: {
+              type: 'envelopeId',
+              id: envelope.id,
+            },
             userId,
             teamId,
             requestMetadata: {

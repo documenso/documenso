@@ -72,12 +72,12 @@ export const DocumentsTableActionDropdown = ({
   const canManageDocument = Boolean(isOwner || isCurrentTeamDocument);
 
   const documentsPath = formatDocumentsPath(team.url);
-  const formatPath = `${documentsPath}/${row.id}/edit`;
+  const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
 
   const onDownloadClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query({
+        ? await trpcClient.document.get.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
@@ -103,7 +103,7 @@ export const DocumentsTableActionDropdown = ({
   const onDownloadOriginalClick = async () => {
     try {
       const document = !recipient
-        ? await trpcClient.document.getDocumentById.query({
+        ? await trpcClient.document.get.query({
             documentId: row.id,
           })
         : await trpcClient.document.getDocumentByToken.query({
@@ -139,32 +139,35 @@ export const DocumentsTableActionDropdown = ({
           <Trans>Action</Trans>
         </DropdownMenuLabel>
 
-        {!isDraft && recipient && recipient?.role !== RecipientRole.CC && (
-          <DropdownMenuItem disabled={!recipient || isComplete} asChild>
-            <Link to={`/sign/${recipient?.token}`}>
-              {recipient?.role === RecipientRole.VIEWER && (
-                <>
-                  <EyeIcon className="mr-2 h-4 w-4" />
-                  <Trans>View</Trans>
-                </>
-              )}
+        {!isDraft &&
+          recipient &&
+          recipient?.role !== RecipientRole.CC &&
+          recipient?.role !== RecipientRole.ASSISTANT && (
+            <DropdownMenuItem disabled={!recipient || isComplete} asChild>
+              <Link to={`/sign/${recipient?.token}`}>
+                {recipient?.role === RecipientRole.VIEWER && (
+                  <>
+                    <EyeIcon className="mr-2 h-4 w-4" />
+                    <Trans>View</Trans>
+                  </>
+                )}
 
-              {recipient?.role === RecipientRole.SIGNER && (
-                <>
-                  <Pencil className="mr-2 h-4 w-4" />
-                  <Trans>Sign</Trans>
-                </>
-              )}
+                {recipient?.role === RecipientRole.SIGNER && (
+                  <>
+                    <Pencil className="mr-2 h-4 w-4" />
+                    <Trans>Sign</Trans>
+                  </>
+                )}
 
-              {recipient?.role === RecipientRole.APPROVER && (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  <Trans>Approve</Trans>
-                </>
-              )}
-            </Link>
-          </DropdownMenuItem>
-        )}
+                {recipient?.role === RecipientRole.APPROVER && (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    <Trans>Approve</Trans>
+                  </>
+                )}
+              </Link>
+            </DropdownMenuItem>
+          )}
 
         <DropdownMenuItem disabled={!canManageDocument || isComplete} asChild>
           <Link to={formatPath}>

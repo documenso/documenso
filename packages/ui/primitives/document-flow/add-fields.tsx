@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -18,9 +19,9 @@ import {
 } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
-import { prop, sortBy } from 'remeda';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import {
@@ -45,7 +46,7 @@ import { Form } from '../form/form';
 import { RecipientSelector } from '../recipient-selector';
 import { useStep } from '../stepper';
 import { useToast } from '../use-toast';
-import type { TAddFieldsFormSchema } from './add-fields.types';
+import { type TAddFieldsFormSchema, ZAddFieldsFormSchema } from './add-fields.types';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
@@ -74,6 +75,7 @@ export type FieldFormType = {
   pageWidth: number;
   pageHeight: number;
   signerEmail: string;
+  recipientId: number;
   fieldMeta?: FieldMeta;
 };
 
@@ -83,6 +85,7 @@ export type AddFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddFieldsFormSchema) => void;
+  onAutoSave: (_data: TAddFieldsFormSchema) => Promise<void>;
   canGoBack?: boolean;
   isDocumentPdfLoaded: boolean;
   teamId: number;
@@ -94,6 +97,7 @@ export const AddFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  onAutoSave,
   canGoBack = false,
   isDocumentPdfLoaded,
   teamId,
@@ -115,7 +119,7 @@ export const AddFieldsFormPartial = ({
     defaultValues: {
       fields: fields.map((field) => ({
         nativeId: field.id,
-        formId: `${field.id}-${field.documentId}`,
+        formId: `${field.id}-${field.envelopeItemId}`,
         pageNumber: field.page,
         type: field.type,
         pageX: Number(field.positionX),
@@ -124,9 +128,11 @@ export const AddFieldsFormPartial = ({
         pageHeight: Number(field.height),
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
+        recipientId: field.recipientId,
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
+    resolver: zodResolver(ZAddFieldsFormSchema),
   });
 
   useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
@@ -320,6 +326,7 @@ export const AddFieldsFormPartial = ({
 
       const field = {
         formId: nanoid(12),
+        nativeId: undefined,
         type: selectedField,
         pageNumber,
         pageX,
@@ -327,6 +334,7 @@ export const AddFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
+        recipientId: selectedSigner.id,
         fieldMeta: undefined,
       };
 
@@ -411,6 +419,7 @@ export const AddFieldsFormPartial = ({
             nativeId: undefined,
             formId: nanoid(12),
             signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+            recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
             pageX: lastActiveField.pageX + 3,
             pageY: lastActiveField.pageY + 3,
           };
@@ -435,6 +444,7 @@ export const AddFieldsFormPartial = ({
               nativeId: undefined,
               formId: nanoid(12),
               signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
+              recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
               pageNumber,
             };
 
@@ -467,6 +477,7 @@ export const AddFieldsFormPartial = ({
           nativeId: undefined,
           formId: nanoid(12),
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
+          recipientId: selectedSigner?.id ?? copiedField.recipientId,
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
@@ -539,29 +550,6 @@ export const AddFieldsFormPartial = ({
     return recipientsByRole;
   }, [recipients]);
 
-  const recipientsByRoleToDisplay = useMemo(() => {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    return (Object.entries(recipientsByRole) as [RecipientRole, Recipient[]][])
-      .filter(
-        ([role]) =>
-          role !== RecipientRole.CC &&
-          role !== RecipientRole.VIEWER &&
-          role !== RecipientRole.ASSISTANT,
-      )
-      .map(
-        ([role, roleRecipients]) =>
-          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-          [
-            role,
-            sortBy(
-              roleRecipients,
-              [(r) => r.signingOrder || Number.MAX_SAFE_INTEGER, 'asc'],
-              [prop('id'), 'asc'],
-            ),
-          ] as [RecipientRole, Recipient[]],
-      );
-  }, [recipientsByRole]);
-
   const handleAdvancedSettings = () => {
     setShowAdvancedSettings((prev) => !prev);
   };
@@ -590,6 +578,20 @@ export const AddFieldsFormPartial = ({
     }
   };
 
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = async () => {
+    const isFormValid = await form.trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    const formData = form.getValues();
+
+    scheduleSave(formData);
+  };
+
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -603,7 +605,14 @@ export const AddFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           isDocumentPdfLoaded={isDocumentPdfLoaded}
-          onSave={handleSavedFieldSettings}
+          onSave={(fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            void handleAutoSave();
+          }}
+          onAutoSave={async (fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            await handleAutoSave();
+          }}
         />
       ) : (
         <>
@@ -639,7 +648,7 @@ export const AddFieldsFormPartial = ({
 
               {isDocumentPdfLoaded &&
                 localFields.map((field, index) => {
-                  const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                  const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
                   const hasFieldError =
                     emptyCheckboxFields.find((f) => f.formId === field.formId) ||
                     emptyRadioFields.find((f) => f.formId === field.formId) ||
@@ -660,14 +669,26 @@ export const AddFieldsFormPartial = ({
                       defaultWidth={DEFAULT_WIDTH_PX}
                       passive={isFieldWithinBounds && !!selectedField}
                       onFocus={() => setLastActiveField(field)}
-                      onBlur={() => setLastActiveField(null)}
+                      onBlur={() => {
+                        setLastActiveField(null);
+                        void handleAutoSave();
+                      }}
                       onMouseEnter={() => setLastActiveField(field)}
                       onMouseLeave={() => setLastActiveField(null)}
                       onResize={(options) => onFieldResize(options, index)}
                       onMove={(options) => onFieldMove(options, index)}
-                      onRemove={() => remove(index)}
-                      onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                      onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                      onRemove={() => {
+                        remove(index);
+                        void handleAutoSave();
+                      }}
+                      onDuplicate={() => {
+                        onFieldCopy(null, { duplicate: true });
+                        void handleAutoSave();
+                      }}
+                      onDuplicateAllPages={() => {
+                        onFieldCopy(null, { duplicateAll: true });
+                        void handleAutoSave();
+                      }}
                       onAdvancedSettings={() => {
                         setCurrentField(field);
                         handleAdvancedSettings();

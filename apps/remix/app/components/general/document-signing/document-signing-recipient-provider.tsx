@@ -10,7 +10,10 @@ export interface DocumentSigningRecipientContextValue {
    * In regular mode, this is the actual signer.
    * In assistant mode, this is the recipient who is helping fill out the document.
    */
-  recipient: Recipient | RecipientWithFields;
+  recipient: Pick<
+    Recipient | RecipientWithFields,
+    'name' | 'email' | 'token' | 'role' | 'authOptions'
+  >;
 
   /**
    * Only present in assistant mode.
@@ -29,7 +32,10 @@ const DocumentSigningRecipientContext = createContext<DocumentSigningRecipientCo
 );
 
 export interface DocumentSigningRecipientProviderProps extends PropsWithChildren {
-  recipient: Recipient | RecipientWithFields;
+  recipient: Pick<
+    Recipient | RecipientWithFields,
+    'name' | 'email' | 'token' | 'role' | 'authOptions'
+  >;
   targetSigner?: RecipientWithFields | null;
 }
 

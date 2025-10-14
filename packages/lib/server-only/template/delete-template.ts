@@ -1,18 +1,25 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { type EnvelopeIdOptions } from '../../utils/envelope';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type DeleteTemplateOptions = {
-  id: number;
+  id: EnvelopeIdOptions;
   userId: number;
   teamId: number;
 };
 
 export const deleteTemplate = async ({ id, userId, teamId }: DeleteTemplateOptions) => {
-  return await prisma.template.delete({
-    where: {
-      id,
-      team: buildTeamWhereQuery({ teamId, userId }),
-    },
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  return await prisma.envelope.delete({
+    where: envelopeWhereInput,
   });
 };

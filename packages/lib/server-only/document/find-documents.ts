@@ -1,5 +1,5 @@
-import type { Document, DocumentSource, Prisma, Team, TeamEmail, User } from '@prisma/client';
-import { RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
+import type { DocumentSource, Envelope, Prisma, Team, TeamEmail, User } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -22,7 +22,7 @@ export type FindDocumentsOptions = {
   page?: number;
   perPage?: number;
   orderBy?: {
-    column: keyof Omit<Document, 'document'>;
+    column: keyof Pick<Envelope, 'createdAt'>;
     direction: 'asc' | 'desc';
   };
   period?: PeriodSelectorValue;
@@ -49,6 +49,11 @@ export const findDocuments = async ({
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+    },
   });
 
   let team = null;
@@ -64,7 +69,7 @@ export const findDocuments = async ({
   const orderByDirection = orderBy?.direction ?? 'desc';
   const teamMemberRole = team?.currentTeamRole ?? null;
 
-  const searchFilter: Prisma.DocumentWhereInput = {
+  const searchFilter: Prisma.EnvelopeWhereInput = {
     OR: [
       { title: { contains: query, mode: 'insensitive' } },
       { externalId: { contains: query, mode: 'insensitive' } },
@@ -106,7 +111,7 @@ export const findDocuments = async ({
     },
   ];
 
-  let filters: Prisma.DocumentWhereInput | null = findDocumentsFilter(status, user, folderId);
+  let filters: Prisma.EnvelopeWhereInput | null = findDocumentsFilter(status, user, folderId);
 
   if (team) {
     filters = findTeamDocumentsFilter(status, team, visibilityFilters, folderId);
@@ -122,7 +127,7 @@ export const findDocuments = async ({
     };
   }
 
-  let deletedFilter: Prisma.DocumentWhereInput = {
+  let deletedFilter: Prisma.EnvelopeWhereInput = {
     AND: {
       OR: [
         {
@@ -175,7 +180,7 @@ export const findDocuments = async ({
     };
   }
 
-  const whereAndClause: Prisma.DocumentWhereInput['AND'] = [
+  const whereAndClause: Prisma.EnvelopeWhereInput['AND'] = [
     { ...filters },
     { ...deletedFilter },
     { ...searchFilter },
@@ -193,7 +198,8 @@ export const findDocuments = async ({
     });
   }
 
-  const whereClause: Prisma.DocumentWhereInput = {
+  const whereClause: Prisma.EnvelopeWhereInput = {
+    type: EnvelopeType.DOCUMENT,
     AND: whereAndClause,
   };
 
@@ -220,7 +226,7 @@ export const findDocuments = async ({
   }
 
   const [data, count] = await Promise.all([
-    prisma.document.findMany({
+    prisma.envelope.findMany({
       where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
@@ -244,7 +250,7 @@ export const findDocuments = async ({
         },
       },
     }),
-    prisma.document.count({
+    prisma.envelope.count({
       where: whereClause,
     }),
   ]);
@@ -267,10 +273,10 @@ export const findDocuments = async ({
 
 const findDocumentsFilter = (
   status: ExtendedDocumentStatus,
-  user: User,
+  user: Pick<User, 'id' | 'email' | 'name'>,
   folderId?: string | null,
 ) => {
-  return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput>(status)
+  return match<ExtendedDocumentStatus, Prisma.EnvelopeWhereInput>(status)
     .with(ExtendedDocumentStatus.ALL, () => ({
       OR: [
         {
@@ -409,14 +415,14 @@ const findDocumentsFilter = (
 const findTeamDocumentsFilter = (
   status: ExtendedDocumentStatus,
   team: Team & { teamEmail: TeamEmail | null },
-  visibilityFilters: Prisma.DocumentWhereInput[],
+  visibilityFilters: Prisma.EnvelopeWhereInput[],
   folderId?: string,
 ) => {
   const teamEmail = team.teamEmail?.email ?? null;
 
-  return match<ExtendedDocumentStatus, Prisma.DocumentWhereInput | null>(status)
+  return match<ExtendedDocumentStatus, Prisma.EnvelopeWhereInput | null>(status)
     .with(ExtendedDocumentStatus.ALL, () => {
-      const filter: Prisma.DocumentWhereInput = {
+      const filter: Prisma.EnvelopeWhereInput = {
         // Filter to display all documents that belong to the team.
         OR: [
           {
@@ -478,7 +484,7 @@ const findTeamDocumentsFilter = (
       };
     })
     .with(ExtendedDocumentStatus.DRAFT, () => {
-      const filter: Prisma.DocumentWhereInput = {
+      const filter: Prisma.EnvelopeWhereInput = {
         OR: [
           {
             teamId: team.id,
@@ -503,7 +509,7 @@ const findTeamDocumentsFilter = (
       return filter;
     })
     .with(ExtendedDocumentStatus.PENDING, () => {
-      const filter: Prisma.DocumentWhereInput = {
+      const filter: Prisma.EnvelopeWhereInput = {
         OR: [
           {
             teamId: team.id,
@@ -545,7 +551,7 @@ const findTeamDocumentsFilter = (
       return filter;
     })
     .with(ExtendedDocumentStatus.COMPLETED, () => {
-      const filter: Prisma.DocumentWhereInput = {
+      const filter: Prisma.EnvelopeWhereInput = {
         status: ExtendedDocumentStatus.COMPLETED,
         OR: [
           {
@@ -577,7 +583,7 @@ const findTeamDocumentsFilter = (
       return filter;
     })
     .with(ExtendedDocumentStatus.REJECTED, () => {
-      const filter: Prisma.DocumentWhereInput = {
+      const filter: Prisma.EnvelopeWhereInput = {
         status: ExtendedDocumentStatus.REJECTED,
         OR: [
           {

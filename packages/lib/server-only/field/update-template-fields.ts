@@ -1,11 +1,12 @@
-import type { FieldType } from '@prisma/client';
+import { EnvelopeType, type FieldType } from '@prisma/client';
 
 import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateTemplateFieldsOptions {
   userId: number;
@@ -29,25 +30,32 @@ export const updateTemplateFields = async ({
   templateId,
   fields,
 }: UpdateTemplateFieldsOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       fields: true,
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
   const fieldsToUpdate = fields.map((field) => {
-    const originalField = template.fields.find((existingField) => existingField.id === field.id);
+    const originalField = envelope.fields.find((existingField) => existingField.id === field.id);
 
     if (!originalField) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
@@ -55,7 +63,7 @@ export const updateTemplateFields = async ({
       });
     }
 
-    const recipient = template.recipients.find(
+    const recipient = envelope.recipients.find(
       (recipient) => recipient.id === originalField.recipientId,
     );
 
@@ -67,7 +75,7 @@ export const updateTemplateFields = async ({
     }
 
     // Check whether the recipient associated with the field can be modified.
-    if (!canRecipientFieldsBeModified(recipient, template.fields)) {
+    if (!canRecipientFieldsBeModified(recipient, envelope.fields)) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message:
           'Cannot modify a field where the recipient has already interacted with the document',
@@ -103,6 +111,6 @@ export const updateTemplateFields = async ({
   });
 
   return {
-    fields: updatedFields,
+    fields: updatedFields.map((field) => mapFieldToLegacyField(field, envelope)),
   };
 };

@@ -118,6 +118,7 @@ export const ConfigureFieldsView = ({
       sendStatus: signer.disabled ? SendStatus.SENT : SendStatus.NOT_SENT,
       readStatus: signer.disabled ? ReadStatus.OPENED : ReadStatus.NOT_OPENED,
       signingStatus: signer.disabled ? SigningStatus.SIGNED : SigningStatus.NOT_SIGNED,
+      envelopeId: '',
     }));
   }, [configData.signers]);
 
@@ -171,6 +172,8 @@ export const ConfigureFieldsView = ({
     control: control,
     name: 'fields',
   });
+
+  const highestPageNumber = Math.max(...localFields.map((field) => field.pageNumber));
 
   const onFieldCopy = useCallback(
     (event?: KeyboardEvent | null, options?: { duplicate?: boolean; duplicateAll?: boolean }) => {
@@ -540,7 +543,9 @@ export const ConfigureFieldsView = ({
                 <div>
                   <PDFViewer documentData={normalizedDocumentData} />
 
-                  <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+                  <ElementVisible
+                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+                  >
                     {localFields.map((field, index) => {
                       const recipientIndex = recipients.findIndex(
                         (r) => r.id === field.recipientId,

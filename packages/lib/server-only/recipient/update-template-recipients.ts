@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -10,7 +10,9 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface UpdateTemplateRecipientsOptions {
   userId: number;
@@ -33,11 +35,18 @@ export const updateTemplateRecipients = async ({
   templateId,
   recipients,
 }: UpdateTemplateRecipientsOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       team: {
@@ -52,7 +61,7 @@ export const updateTemplateRecipients = async ({
     },
   });
 
-  if (!template) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Template not found',
     });
@@ -63,31 +72,20 @@ export const updateTemplateRecipients = async ({
   );
 
   // Check if user has permission to set the global action auth.
-  if (recipientsHaveActionAuth && !template.team.organisation.organisationClaim.flags.cfr21) {
+  if (recipientsHaveActionAuth && !envelope.team.organisation.organisationClaim.flags.cfr21) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'You do not have permission to set the action auth',
     });
   }
 
   const recipientsToUpdate = recipients.map((recipient) => {
-    const originalRecipient = template.recipients.find(
+    const originalRecipient = envelope.recipients.find(
       (existingRecipient) => existingRecipient.id === recipient.id,
     );
 
     if (!originalRecipient) {
       throw new AppError(AppErrorCode.NOT_FOUND, {
         message: `Recipient with id ${recipient.id} not found`,
-      });
-    }
-
-    const duplicateRecipientWithSameEmail = template.recipients.find(
-      (existingRecipient) =>
-        existingRecipient.email === recipient.email && existingRecipient.id !== recipient.id,
-    );
-
-    if (duplicateRecipientWithSameEmail) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Duplicate recipient with the same email found: ${duplicateRecipientWithSameEmail.email}`,
       });
     }
 
@@ -120,14 +118,14 @@ export const updateTemplateRecipients = async ({
         const updatedRecipient = await tx.recipient.update({
           where: {
             id: originalRecipient.id,
-            templateId,
+            envelopeId: envelope.id,
           },
           data: {
             name: mergedRecipient.name,
             email: mergedRecipient.email,
             role: mergedRecipient.role,
             signingOrder: mergedRecipient.signingOrder,
-            templateId,
+            envelopeId: envelope.id,
             sendStatus:
               mergedRecipient.role === RecipientRole.CC ? SendStatus.SENT : SendStatus.NOT_SENT,
             signingStatus:
@@ -160,6 +158,11 @@ export const updateTemplateRecipients = async ({
   });
 
   return {
-    recipients: updatedRecipients,
+    recipients: updatedRecipients.map((recipient) => ({
+      ...recipient,
+      documentId: null,
+      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
+    })),
   };
 };
