@@ -192,6 +192,8 @@ test('[USER] password update invalidates other sessions but keeps current', asyn
 
   expect(await checkSessionValid(page)).toBe(true);
 
+  const initialCookies = await page.context().cookies();
+
   await page.context().clearCookies();
   await apiSignin({
     page,
@@ -209,8 +211,17 @@ test('[USER] password update invalidates other sessions but keeps current', asyn
   await page.getByRole('button', { name: 'Update password' }).click();
   await expect(page.locator('body')).toContainText('Password updated');
 
+  const finalCookies = await page.context().cookies();
+
+  await page.context().clearCookies();
+  await page.context().addCookies(initialCookies);
+  await page.goto('http://localhost:3000/settings/profile');
+  await expect(page).toHaveURL('http://localhost:3000/signin');
+  expect(await checkSessionValid(page)).toBe(false);
+
+  await page.context().clearCookies();
+  await page.context().addCookies(finalCookies);
   await page.goto('http://localhost:3000/settings/security');
   await expect(page).toHaveURL('http://localhost:3000/settings/security');
-
   expect(await checkSessionValid(page)).toBe(true);
 });
