@@ -128,6 +128,18 @@ export default function EnvelopeEditor() {
     }
   };
 
+  // Watch the URL params and setStep if the step changes.
+  useEffect(() => {
+    const stepParam = searchParams.get('step') || envelopeEditorSteps[0].id;
+
+    const foundStep = envelopeEditorSteps.find((step) => step.id === stepParam);
+
+    if (foundStep && foundStep.id !== currentStep) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      navigateToStep(foundStep.id as EnvelopeEditorStep);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (!isAutosaving) {
       setIsStepLoading(false);
@@ -340,7 +352,6 @@ export default function EnvelopeEditor() {
 
         {/* Main Content - Changes based on current step */}
         <div className="flex-1 overflow-y-auto">
-          <p>{isAutosaving ? 'Autosaving...' : 'Not autosaving'}</p>
           <AnimateGenericFadeInOut key={currentStep}>
             {match({ currentStep, isStepLoading })
               .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)

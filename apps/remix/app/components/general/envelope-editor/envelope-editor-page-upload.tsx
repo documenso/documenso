@@ -224,8 +224,12 @@ export const EnvelopeEditorPageUpload = () => {
     <div className="mx-auto max-w-4xl space-y-6 p-8">
       <Card backdropBlur={false} className="border">
         <CardHeader className="pb-3">
-          <CardTitle>Documents</CardTitle>
-          <CardDescription>Add and configure multiple documents</CardDescription>
+          <CardTitle>
+            <Trans>Documents</Trans>
+          </CardTitle>
+          <CardDescription>
+            <Trans>Add and configure multiple documents</Trans>
+          </CardDescription>
         </CardHeader>
 
         <CardContent>

@@ -26,6 +26,9 @@ export const renderCheckboxFieldElement = (
 
   fieldGroup.add(upsertFieldRect(field, options));
 
+  const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
+  const checkboxValues = checkboxMeta?.values || [];
+
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
 
@@ -72,6 +75,7 @@ export const renderCheckboxFieldElement = (
             itemSize: checkboxSize,
             spacingBetweenItemAndText: spacingBetweenCheckboxAndText,
             fieldPadding: checkboxFieldPadding,
+            direction: checkboxMeta?.direction || 'vertical',
             type: 'checkbox',
           });
 
@@ -113,9 +117,6 @@ export const renderCheckboxFieldElement = (
     });
   }
 
-  const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
-  const checkboxValues = checkboxMeta?.values || [];
-
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   checkboxValues.forEach(({ id, value, checked }, index) => {
@@ -128,6 +129,7 @@ export const renderCheckboxFieldElement = (
         itemSize: checkboxSize,
         spacingBetweenItemAndText: spacingBetweenCheckboxAndText,
         fieldPadding: checkboxFieldPadding,
+        direction: checkboxMeta?.direction || 'vertical',
         type: 'checkbox',
       });
 

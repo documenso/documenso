@@ -135,7 +135,12 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeRecipientSetMutationQuery = trpc.envelope.recipient.set.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ recipients }) => {
+      setEnvelope((prev) => ({
+        ...prev,
+        recipients,
+      }));
+
       setAutosaveError(false);
     },
     onError: (error) => {
@@ -215,14 +220,15 @@ export const EnvelopeEditorProvider = ({
 
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
-      // Todo: Envelopes - Local recipients
       const recipientIndex = envelope.recipients.findIndex(
         (recipient) => recipient.id === recipientId,
       );
 
-      return AVAILABLE_RECIPIENT_COLORS[Math.max(recipientIndex, 0)];
+      return AVAILABLE_RECIPIENT_COLORS[
+        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
+      ];
     },
-    [envelope.recipients], // Todo: Envelopes - Local recipients
+    [envelope.recipients],
   );
 
   const { refetch: reloadEnvelope, isLoading: isReloadingEnvelope } = trpc.envelope.get.useQuery(

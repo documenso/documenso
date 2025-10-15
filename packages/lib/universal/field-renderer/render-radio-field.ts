@@ -26,6 +26,9 @@ export const renderRadioFieldElement = (
 
   fieldGroup.add(upsertFieldRect(field, options));
 
+  const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
+  const radioValues = radioMeta?.values || [];
+
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
 
@@ -66,6 +69,7 @@ export const renderRadioFieldElement = (
             spacingBetweenItemAndText: spacingBetweenRadioAndText,
             fieldPadding: radioFieldPadding,
             type: 'radio',
+            direction: radioMeta?.direction || 'vertical',
           });
 
         circleElement.setAttrs({
@@ -104,9 +108,6 @@ export const renderRadioFieldElement = (
     });
   }
 
-  const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
-  const radioValues = radioMeta?.values || [];
-
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   radioValues.forEach(({ value, checked }, index) => {
@@ -120,6 +121,7 @@ export const renderRadioFieldElement = (
         spacingBetweenItemAndText: spacingBetweenRadioAndText,
         fieldPadding: radioFieldPadding,
         type: 'radio',
+        direction: radioMeta?.direction || 'vertical',
       });
 
     // Circle which represents the radio button.
