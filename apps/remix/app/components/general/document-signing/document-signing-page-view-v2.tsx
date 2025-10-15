@@ -55,7 +55,7 @@ export const DocumentSigningPageViewV2 = () => {
               <Trans>Sign Document</Trans>
 
               <span className="text-muted-foreground ml-2 rounded border bg-gray-50 px-2 py-0.5 text-xs">
-                <Trans>{recipientFieldsRemaining.length} fields remaining</Trans>
+                <Plural one="1 field remaining" other="# fields remaining" value={recipientFieldsRemaining.length} />
               </span>
             </h3>
 
