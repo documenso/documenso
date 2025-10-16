@@ -89,13 +89,13 @@ export const EditorGenericTextAlignField = ({
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="left">
-                  <Trans>Left</Trans>
+                  <Trans comment="Text align">Left</Trans>
                 </SelectItem>
                 <SelectItem value="center">
-                  <Trans>Center</Trans>
+                  <Trans comment="Text align">Center</Trans>
                 </SelectItem>
                 <SelectItem value="right">
-                  <Trans>Right</Trans>
+                  <Trans comment="Text align">Right</Trans>
                 </SelectItem>
               </SelectContent>
             </Select>
