@@ -87,6 +87,7 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
       return {
         fileName: document.title.endsWith('.pdf') ? document.title : document.title + '.pdf',
         content: Buffer.from(file),
+        contentType: 'application/pdf',
       };
     }),
   );
