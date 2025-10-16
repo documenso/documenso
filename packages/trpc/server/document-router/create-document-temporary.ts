@@ -69,7 +69,10 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         recipients,
         folderId,
       },
-      meta,
+      meta: {
+        ...meta,
+        emailSettings: meta?.emailSettings ?? undefined,
+      },
       requestMetadata: ctx.metadata,
     });
 
