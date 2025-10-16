@@ -95,7 +95,7 @@ export const ZCreateDocumentTemporaryRequestSchema = z.object({
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
     })
-    .optional(),
+    .nullish(),
 });
 
 export const ZCreateDocumentTemporaryResponseSchema = z.object({
