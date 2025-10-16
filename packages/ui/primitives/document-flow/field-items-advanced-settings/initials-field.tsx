@@ -66,9 +66,15 @@ export const InitialsFieldAdvancedSettings = ({
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="left">Left</SelectItem>
-            <SelectItem value="center">Center</SelectItem>
-            <SelectItem value="right">Right</SelectItem>
+            <SelectItem value="left">
+              <Trans comment="Text align">Left</Trans>
+            </SelectItem>
+            <SelectItem value="center">
+              <Trans comment="Text align">Center</Trans>
+            </SelectItem>
+            <SelectItem value="right">
+              <Trans comment="Text align">Right</Trans>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
