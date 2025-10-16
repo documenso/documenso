@@ -14,6 +14,8 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+
 export type DocumentPageViewButtonProps = {
   envelope: TEnvelope;
 };
@@ -92,11 +94,27 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
         </Link>
       </Button>
     ))
-    .with({ isComplete: true }, () => (
-      <Button className="w-full" onClick={onDownloadClick}>
-        <Download className="-ml-1 mr-2 inline h-4 w-4" />
-        <Trans>Download</Trans>
-      </Button>
-    ))
+    .with({ isComplete: true }, () =>
+      // Purposefully not using ts-pattern here to catch the alternative case.
+      envelope.internalVersion === 2 ? (
+        <EnvelopeDownloadDialog
+          envelopeId={envelope.id}
+          envelopeStatus={envelope.status}
+          envelopeItems={envelope.envelopeItems}
+          token={recipient?.token}
+          trigger={
+            <Button className="w-full">
+              <Download className="-ml-1 mr-2 inline h-4 w-4" />
+              <Trans>Download</Trans>
+            </Button>
+          }
+        />
+      ) : (
+        <Button className="w-full" onClick={onDownloadClick}>
+          <Download className="-ml-1 mr-2 inline h-4 w-4" />
+          <Trans>Download</Trans>
+        </Button>
+      ),
+    )
     .otherwise(() => null);
 };

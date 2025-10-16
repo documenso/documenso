@@ -1,4 +1,12 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import {
+  PDFDocument,
+  RotationTypes,
+  popGraphicsState,
+  pushGraphicsState,
+  radiansToDegrees,
+  rotateDegrees,
+  translate,
+} from '@cantoo/pdf-lib';
 import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentStatus,
@@ -9,6 +17,8 @@ import {
 } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
+import { groupBy } from 'remeda';
+import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
@@ -21,6 +31,7 @@ import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificat
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
+import { getPageSize } from '../../../server-only/pdf/get-page-size';
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
 import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf-v2';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
@@ -178,9 +189,10 @@ export const run = async ({
     settings,
   });
 
+  // Todo: Envelopes - Is it okay to have dynamic IDs?
   const newDocumentData = await Promise.all(
     envelopeItems.map(async (envelopeItem) =>
-      io.runTask('decorate-and-sign-pdf', async () => {
+      io.runTask(`decorate-and-sign-envelope-item-${envelopeItem.id}`, async () => {
         const envelopeItemFields = envelope.envelopeItems.find(
           (item) => item.id === envelopeItem.id,
         )?.field;
@@ -353,14 +365,95 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  for (const field of envelopeItemFields) {
-    if (field.inserted) {
-      if (envelope.internalVersion === 2) {
-        await insertFieldInPDFV2(pdfDoc, field);
-      } else if (envelope.useLegacyFieldInsertion) {
-        await legacy_insertFieldInPDF(pdfDoc, field);
-      } else {
-        await insertFieldInPDFV1(pdfDoc, field);
+  // Handle V1 and legacy insertions.
+  if (envelope.internalVersion === 1) {
+    for (const field of envelopeItemFields) {
+      if (field.inserted) {
+        if (envelope.useLegacyFieldInsertion) {
+          await legacy_insertFieldInPDF(pdfDoc, field);
+        } else {
+          await insertFieldInPDFV1(pdfDoc, field);
+        }
+      }
+    }
+  }
+
+  // Handle V2 envelope insertions.
+  if (envelope.internalVersion === 2) {
+    const fieldsGroupedByPage = groupBy(envelopeItemFields, (field) => field.page);
+
+    for (const [pageNumber, fields] of Object.entries(fieldsGroupedByPage)) {
+      const page = pdfDoc.getPage(Number(pageNumber) - 1);
+      const pageRotation = page.getRotation();
+
+      let { width: pageWidth, height: pageHeight } = getPageSize(page);
+
+      let pageRotationInDegrees = match(pageRotation.type)
+        .with(RotationTypes.Degrees, () => pageRotation.angle)
+        .with(RotationTypes.Radians, () => radiansToDegrees(pageRotation.angle))
+        .exhaustive();
+
+      // Round to the closest multiple of 90 degrees.
+      pageRotationInDegrees = Math.round(pageRotationInDegrees / 90) * 90;
+
+      // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
+      // However when we load the PDF in the backend, the rotation is applied.
+      // To account for this, we swap the width and height for pages that are rotated by 90/270
+      // degrees. This is so we can calculate the virtual position the field was placed if it
+      // was correctly oriented in the frontend.
+      if (pageRotationInDegrees === 90 || pageRotationInDegrees === 270) {
+        [pageWidth, pageHeight] = [pageHeight, pageWidth];
+      }
+
+      // Rotate the page to the orientation that the react-pdf renders on the frontend.
+      // Note: These transformations are undone at the end of the function.
+      // If you change this if statement, update the if statement at the end as well
+      if (pageRotationInDegrees !== 0) {
+        let translateX = 0;
+        let translateY = 0;
+
+        switch (pageRotationInDegrees) {
+          case 90:
+            translateX = pageHeight;
+            translateY = 0;
+            break;
+          case 180:
+            translateX = pageWidth;
+            translateY = pageHeight;
+            break;
+          case 270:
+            translateX = 0;
+            translateY = pageWidth;
+            break;
+          case 0:
+          default:
+            translateX = 0;
+            translateY = 0;
+        }
+
+        page.pushOperators(pushGraphicsState());
+        page.pushOperators(translate(translateX, translateY), rotateDegrees(pageRotationInDegrees));
+      }
+
+      const renderedPdfOverlay = await insertFieldInPDFV2({
+        pageWidth,
+        pageHeight,
+        fields,
+      });
+
+      const [embeddedPage] = await pdfDoc.embedPdf(renderedPdfOverlay);
+
+      // Draw the SVG on the page
+      page.drawPage(embeddedPage, {
+        x: 0,
+        y: 0,
+        width: pageWidth,
+        height: pageHeight,
+      });
+
+      // Remove the transformations applied to the page if any were applied.
+      if (pageRotationInDegrees !== 0) {
+        page.pushOperators(popGraphicsState());
       }
     }
   }

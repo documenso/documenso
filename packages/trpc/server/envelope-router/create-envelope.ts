@@ -33,12 +33,21 @@ export const createEnvelopeRoute = authenticatedProcedure
       },
     });
 
-    // Todo: Envelopes - Put the claims for number of items into this.
-    const { remaining } = await getServerLimits({ userId: user.id, teamId });
+    const { remaining, maximumEnvelopeItemCount } = await getServerLimits({
+      userId: user.id,
+      teamId,
+    });
 
     if (remaining.documents <= 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
         message: 'You have reached your document limit for this month. Please upgrade your plan.',
+        statusCode: 400,
+      });
+    }
+
+    if (items.length > maximumEnvelopeItemCount) {
+      throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
+        message: `You cannot upload more than ${maximumEnvelopeItemCount} envelope items per envelope`,
         statusCode: 400,
       });
     }

@@ -258,8 +258,9 @@ model SubscriptionClaim {
   name   String
   locked Boolean @default(false)
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
@@ -273,8 +274,9 @@ model OrganisationClaim {
   originalSubscriptionClaimId String?
   organisation                Organisation?
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }

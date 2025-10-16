@@ -31,4 +31,4 @@ export const checkboxValidationSigns = [
     label: 'Select at most',
     value: '<=',
   },
-];
+] as const;

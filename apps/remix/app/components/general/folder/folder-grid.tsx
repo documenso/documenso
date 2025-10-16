@@ -5,6 +5,7 @@ import { FolderType } from '@prisma/client';
 import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -18,6 +19,8 @@ import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialo
 import { DocumentUploadButton } from '~/components/general/document/document-upload-button';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
+
+import { EnvelopeUploadButton } from '../document/envelope-upload-button';
 
 export type FolderGridProps = {
   type: FolderType;
@@ -94,8 +97,9 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {/* Todo: Envelopes - Feature flag */}
-          {/* <EnvelopeUploadButton type={type} folderId={parentId || undefined} /> */}
+          {IS_ENVELOPES_ENABLED && (
+            <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
+          )}
 
           {type === FolderType.DOCUMENT ? (
             <DocumentUploadButton />

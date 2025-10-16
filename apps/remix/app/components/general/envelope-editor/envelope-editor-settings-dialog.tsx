@@ -215,7 +215,6 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const { mutateAsync: updateEnvelope } = trpc.envelope.update.useMutation();
 
-  // Todo: Envelopes - Extract into provider.
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
     envelope.recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
@@ -301,8 +300,6 @@ export const EnvelopeEditorSettingsDialog = ({
     form.reset();
     setActiveTab('general');
   }, [open, form]);
-
-  // Todo: Envelopes - Show error indicator if error is in different tab.
 
   const selectedTab = tabs.find((tab) => tab.id === activeTab);
 

@@ -2,7 +2,12 @@ import Konva from 'konva';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TDropdownFieldMeta } from '../../types/field-meta';
-import { upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import {
+  konvaTextFill,
+  konvaTextFontFamily,
+  upsertFieldGroup,
+  upsertFieldRect,
+} from './field-generic-items';
 import { calculateFieldPosition } from './field-renderer';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 
@@ -26,7 +31,7 @@ const calculateDropdownPosition = (options: CalculateDropdownPositionOptions) =>
   const textY = fieldPadding;
 
   const arrowX = fieldWidth - arrowSize - fieldPadding;
-  const arrowY = fieldHeight / 2;
+  const arrowY = fieldHeight / 2 - arrowSize / 4;
 
   return {
     arrowX,
@@ -111,6 +116,8 @@ export const renderDropdownFieldElement = (
   const dropdownMeta: TDropdownFieldMeta | null = (field.fieldMeta as TDropdownFieldMeta) || null;
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
+  const fontSize = dropdownMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+
   // Todo: Envelopes - Translations
   let selectedValue = 'Select Option';
 
@@ -132,9 +139,9 @@ export const renderDropdownFieldElement = (
     width: textWidth,
     height: textHeight,
     text: selectedValue,
-    fontSize: DEFAULT_STANDARD_FONT_SIZE,
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fill: '#111827',
+    fontSize,
+    fontFamily: konvaTextFontFamily,
+    fill: konvaTextFill,
     verticalAlign: 'middle',
   });
 
