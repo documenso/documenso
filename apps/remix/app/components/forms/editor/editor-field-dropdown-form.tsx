@@ -45,26 +45,32 @@ const ZDropdownFieldFormSchema = z
       .min(1, {
         message: msg`Dropdown must have at least one option`.id,
       })
-      .refine(
-        (data) => {
-          // Todo: Envelopes - This doesn't work.
-          console.log({
-            data,
-          });
-
-          if (data) {
-            const values = data.map((item) => item.value);
-            return new Set(values).size === values.length;
+      .superRefine((values, ctx) => {
+        const seen = new Map<string, number[]>(); // value → indices
+        values.forEach((item, index) => {
+          const key = item.value;
+          if (!seen.has(key)) {
+            seen.set(key, []);
           }
-          return true;
-        },
-        {
-          message: 'Duplicate values are not allowed',
-        },
-      ),
+          seen.get(key)!.push(index);
+        });
+
+        for (const [key, indices] of seen) {
+          if (indices.length > 1 && key.trim() !== '') {
+            for (const i of indices) {
+              ctx.addIssue({
+                code: z.ZodIssueCode.custom,
+                message: msg`Duplicate values are not allowed`.id,
+                path: [i, 'value'],
+              });
+            }
+          }
+        }
+      }),
     required: z.boolean().optional(),
     readOnly: z.boolean().optional(),
   })
+  // Todo: Envelopes - This doesn't work
   .refine(
     (data) => {
       // Default value must be one of the available options
@@ -111,7 +117,20 @@ export const EditorFieldDropdownForm = ({
 
   const addValue = () => {
     const currentValues = form.getValues('values') || [];
-    const newValues = [...currentValues, { value: 'New option' }];
+
+    let newValue = 'New option';
+
+    // Iterate to create a unique value
+    for (let i = 0; i < currentValues.length; i++) {
+      newValue = `New option ${i + 1}`;
+      if (currentValues.some((item) => item.value === `New option ${i + 1}`)) {
+        newValue = `New option ${i + 1}`;
+      } else {
+        break;
+      }
+    }
+
+    const newValues = [...currentValues, { value: newValue }];
 
     form.setValue('values', newValues);
   };
@@ -127,6 +146,10 @@ export const EditorFieldDropdownForm = ({
     newValues.splice(index, 1);
 
     form.setValue('values', newValues);
+
+    if (form.getValues('defaultValue') === newValues[index].value) {
+      form.setValue('defaultValue', undefined);
+    }
   };
 
   useEffect(() => {
@@ -163,20 +186,26 @@ export const EditorFieldDropdownForm = ({
                 </FormLabel>
                 <FormControl>
                   <Select
-                    // Todo: Envelopes - This is buggy, removing/adding should update the default value.
                     {...field}
-                    value={field.value}
-                    onValueChange={(val) => field.onChange(val)}
+                    value={field.value === null ? '-1' : field.value}
+                    onValueChange={(value) => field.onChange(value === undefined ? null : value)}
                   >
+                    {/* Todo: Envelopes - THis is cooked */}
                     <SelectTrigger className="text-muted-foreground bg-background w-full">
                       <SelectValue placeholder={t`Default Value`} />
                     </SelectTrigger>
                     <SelectContent position="popper">
-                      {(formValues.values || []).map((item, index) => (
-                        <SelectItem key={index} value={item.value || ''}>
-                          {item.value}
-                        </SelectItem>
-                      ))}
+                      {(formValues.values || [])
+                        .filter((item) => item.value)
+                        .map((item, index) => (
+                          <SelectItem key={index} value={item.value || ''}>
+                            {item.value}
+                          </SelectItem>
+                        ))}
+
+                      <SelectItem value={'-1'}>
+                        <Trans>None</Trans>
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </FormControl>

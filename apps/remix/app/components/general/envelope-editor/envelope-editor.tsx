@@ -39,10 +39,10 @@ import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-l
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
+import { EnvelopeEditorFieldsPage } from './envelope-editor-fields-page';
 import EnvelopeEditorHeader from './envelope-editor-header';
-import { EnvelopeEditorPageFields } from './envelope-editor-page-fields';
-import { EnvelopeEditorPagePreview } from './envelope-editor-page-preview';
-import { EnvelopeEditorPageUpload } from './envelope-editor-page-upload';
+import { EnvelopeEditorPreviewPage } from './envelope-editor-preview-page';
+import { EnvelopeEditorUploadPage } from './envelope-editor-upload-page';
 
 type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
@@ -163,7 +163,9 @@ export default function EnvelopeEditor() {
               {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
               <span className="text-muted-foreground ml-2 rounded border bg-gray-50 px-2 py-0.5 text-xs">
-                Step {currentStepData.order}/{envelopeEditorSteps.length}
+                <Trans context="The step counter">
+                  Step {currentStepData.order}/{envelopeEditorSteps.length}
+                </Trans>
               </span>
             </h3>
 
@@ -355,9 +357,9 @@ export default function EnvelopeEditor() {
           <AnimateGenericFadeInOut key={currentStep}>
             {match({ currentStep, isStepLoading })
               .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)
-              .with({ currentStep: 'upload' }, () => <EnvelopeEditorPageUpload />)
-              .with({ currentStep: 'addFields' }, () => <EnvelopeEditorPageFields />)
-              .with({ currentStep: 'preview' }, () => <EnvelopeEditorPagePreview />)
+              .with({ currentStep: 'upload' }, () => <EnvelopeEditorUploadPage />)
+              .with({ currentStep: 'addFields' }, () => <EnvelopeEditorFieldsPage />)
+              .with({ currentStep: 'preview' }, () => <EnvelopeEditorPreviewPage />)
               .exhaustive()}
           </AnimateGenericFadeInOut>
         </div>

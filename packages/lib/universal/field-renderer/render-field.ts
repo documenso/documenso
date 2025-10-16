@@ -47,6 +47,7 @@ type RenderFieldOptions = {
    */
   mode: 'edit' | 'sign' | 'export';
 
+  scale: number;
   editable?: boolean;
 };
 
@@ -56,6 +57,7 @@ export const renderField = ({
   pageWidth,
   pageHeight,
   mode,
+  scale,
   editable,
   color,
 }: RenderFieldOptions) => {
@@ -66,6 +68,7 @@ export const renderField = ({
     mode,
     color,
     editable,
+    scale,
   };
 
   return match(field.type)

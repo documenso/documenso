@@ -96,77 +96,80 @@ export const renderSignatureFieldElement = (
 
   const fieldGroup = upsertFieldGroup(field, options);
 
-  // ABOVE IS GENERIC, EXTRACT IT.
+  // Clear previous children and listeners to re-render fresh.
+  fieldGroup.removeChildren();
+  fieldGroup.off('transform');
+
+  // Assign elements to group and any listeners that should only be run on initialization.
+  if (isFirstRender) {
+    pageLayer.add(fieldGroup);
+  }
 
   // Render the field background and text.
   const fieldRect = upsertFieldRect(field, options);
   const fieldText = upsertFieldText(field, options);
 
-  // Assign elements to group and any listeners that should only be run on initialization.
-  if (isFirstRender) {
-    fieldGroup.add(fieldRect);
-    fieldGroup.add(fieldText);
-    pageLayer.add(fieldGroup);
+  fieldGroup.add(fieldRect);
+  fieldGroup.add(fieldText);
 
-    // This is to keep the text inside the field at the same size
-    // when the field is resized. Without this the text would be stretched.
-    fieldGroup.on('transform', () => {
-      const groupScaleX = fieldGroup.scaleX();
-      const groupScaleY = fieldGroup.scaleY();
+  // This is to keep the text inside the field at the same size
+  // when the field is resized. Without this the text would be stretched.
+  fieldGroup.on('transform', () => {
+    const groupScaleX = fieldGroup.scaleX();
+    const groupScaleY = fieldGroup.scaleY();
 
-      // Adjust text scale so it doesn't change while group is resized.
-      fieldText.scaleX(1 / groupScaleX);
-      fieldText.scaleY(1 / groupScaleY);
+    // Adjust text scale so it doesn't change while group is resized.
+    fieldText.scaleX(1 / groupScaleX);
+    fieldText.scaleY(1 / groupScaleY);
 
-      const rectWidth = fieldRect.width() * groupScaleX;
-      const rectHeight = fieldRect.height() * groupScaleY;
+    const rectWidth = fieldRect.width() * groupScaleX;
+    const rectHeight = fieldRect.height() * groupScaleY;
 
-      // // Update text group position and clipping
-      // fieldGroup.clipFunc(function (ctx) {
-      //   ctx.rect(0, 0, rectWidth, rectHeight);
-      // });
+    // // Update text group position and clipping
+    // fieldGroup.clipFunc(function (ctx) {
+    //   ctx.rect(0, 0, rectWidth, rectHeight);
+    // });
 
-      // Update text dimensions
-      fieldText.width(rectWidth); // Account for padding
-      fieldText.height(rectHeight);
+    // Update text dimensions
+    fieldText.width(rectWidth); // Account for padding
+    fieldText.height(rectHeight);
 
-      console.log({
-        rectWidth,
-      });
-
-      // Force Konva to recalculate text layout
-      // textInsideField.getTextHeight(); // This forces recalculation
-      fieldText.height(); // This forces recalculation
-
-      // fieldGroup.draw();
-      fieldGroup.getLayer()?.batchDraw();
+    console.log({
+      rectWidth,
     });
 
-    // Reset the text after transform has ended.
-    fieldGroup.on('transformend', () => {
-      fieldText.scaleX(1);
-      fieldText.scaleY(1);
+    // Force Konva to recalculate text layout
+    // textInsideField.getTextHeight(); // This forces recalculation
+    fieldText.height(); // This forces recalculation
 
-      const rectWidth = fieldRect.width();
-      const rectHeight = fieldRect.height();
+    // fieldGroup.draw();
+    fieldGroup.getLayer()?.batchDraw();
+  });
 
-      // // Update text group position and clipping
-      // fieldGroup.clipFunc(function (ctx) {
-      //   ctx.rect(0, 0, rectWidth, rectHeight);
-      // });
+  // Reset the text after transform has ended.
+  fieldGroup.on('transformend', () => {
+    fieldText.scaleX(1);
+    fieldText.scaleY(1);
 
-      // Update text dimensions
-      fieldText.width(rectWidth); // Account for padding
-      fieldText.height(rectHeight);
+    const rectWidth = fieldRect.width();
+    const rectHeight = fieldRect.height();
 
-      // Force Konva to recalculate text layout
-      // textInsideField.getTextHeight(); // This forces recalculation
-      fieldText.height(); // This forces recalculation
+    // // Update text group position and clipping
+    // fieldGroup.clipFunc(function (ctx) {
+    //   ctx.rect(0, 0, rectWidth, rectHeight);
+    // });
 
-      // fieldGroup.draw();
-      fieldGroup.getLayer()?.batchDraw();
-    });
-  }
+    // Update text dimensions
+    fieldText.width(rectWidth); // Account for padding
+    fieldText.height(rectHeight);
+
+    // Force Konva to recalculate text layout
+    // textInsideField.getTextHeight(); // This forces recalculation
+    fieldText.height(); // This forces recalculation
+
+    // fieldGroup.draw();
+    fieldGroup.getLayer()?.batchDraw();
+  });
 
   // Handle export mode.
   if (mode === 'export') {

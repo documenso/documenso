@@ -3,7 +3,6 @@ import { RotationTypes, radiansToDegrees } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import Konva from 'konva';
 import 'konva/skia-backend';
-import fs from 'node:fs';
 import type { Canvas } from 'skia-canvas';
 import { match } from 'ts-pattern';
 
@@ -86,6 +85,7 @@ export const insertFieldInPDFV2 = async (pdf: PDFDocument, field: FieldWithSigna
 
   // Will render onto the layer.
   renderField({
+    scale: 1,
     field: {
       renderId: field.id.toString(),
       ...field,
@@ -105,10 +105,10 @@ export const insertFieldInPDFV2 = async (pdf: PDFDocument, field: FieldWithSigna
 
   const renderedField = await canvas.toBuffer('svg');
 
-  fs.writeFileSync(
-    `rendered-field-${field.envelopeId}--${field.id}.svg`,
-    renderedField.toString('utf-8'),
-  );
+  // fs.writeFileSync(
+  //   `rendered-field-${field.envelopeId}--${field.id}.svg`,
+  //   renderedField.toString('utf-8'),
+  // );
 
   // Embed the SVG into the PDF
   const svgElement = await pdf.embedSvg(renderedField.toString('utf-8'));

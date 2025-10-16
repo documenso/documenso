@@ -60,7 +60,7 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.DROPDOWN]: msg`Dropdown Settings`,
 };
 
-export const EnvelopeEditorPageFields = () => {
+export const EnvelopeEditorFieldsPage = () => {
   const { envelope, editorFields } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -109,7 +109,7 @@ export const EnvelopeEditorPageFields = () => {
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}
-        <div className="mt-4 flex justify-center">
+        <div className="mt-4 flex justify-center p-4">
           {currentEnvelopeItem !== null ? (
             <PDFViewerKonvaLazy customPageRenderer={EnvelopeEditorFieldsPageRenderer} />
           ) : (

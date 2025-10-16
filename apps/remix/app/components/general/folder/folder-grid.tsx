@@ -19,6 +19,8 @@ import { DocumentUploadButton } from '~/components/general/document/document-upl
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
+import { EnvelopeUploadButton } from '../document/envelope-upload-button';
+
 export type FolderGridProps = {
   type: FolderType;
   parentId: string | null;
@@ -98,7 +100,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
           {/* Todo: Envelopes - Feature flag */}
-          {/* <EnvelopeUploadButton type={type} folderId={parentId || undefined} /> */}
+          <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {type === FolderType.DOCUMENT ? (
             <DocumentUploadButton />

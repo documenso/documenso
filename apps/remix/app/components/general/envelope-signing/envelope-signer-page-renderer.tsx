@@ -1,14 +1,12 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { type Field, FieldType } from '@prisma/client';
-import Konva from 'konva';
-import type { Layer } from 'konva/lib/Layer';
+import { type Field, FieldType, type Signature } from '@prisma/client';
+import type Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
-import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import { usePageContext } from 'react-pdf';
 import { match } from 'ts-pattern';
 
+import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
@@ -28,18 +26,6 @@ import { handleTextFieldClick } from '~/utils/field-signing/text-field';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
 
 export default function EnvelopeSignerPageRenderer() {
-  const pageContext = usePageContext();
-
-  if (!pageContext) {
-    throw new Error('Unable to find Page context.');
-  }
-
-  const { _className, page, rotate, scale } = pageContext;
-
-  if (!page) {
-    throw new Error('Attempted to render page canvas, but no page was specified.');
-  }
-
   const { t } = useLingui();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -58,20 +44,19 @@ export default function EnvelopeSignerPageRenderer() {
     setSignature,
   } = useRequiredEnvelopeSigningContext();
 
-  console.log({ fullName });
+  const {
+    stage,
+    pageLayer,
+    canvasElement,
+    konvaContainer,
+    pageContext,
+    scaledViewport,
+    unscaledViewport,
+  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer));
+
+  const { _className, scale } = pageContext;
 
   const { envelope } = envelopeData;
-
-  const canvasElement = useRef<HTMLCanvasElement>(null);
-  const konvaContainer = useRef<HTMLDivElement>(null);
-
-  const stage = useRef<Konva.Stage | null>(null);
-  const pageLayer = useRef<Layer | null>(null);
-
-  const viewport = useMemo(
-    () => page.getViewport({ scale, rotation: rotate }),
-    [page, rotate, scale],
-  );
 
   const localPageFields = useMemo(
     () =>
@@ -82,45 +67,7 @@ export default function EnvelopeSignerPageRenderer() {
     [recipientFields, pageContext.pageNumber],
   );
 
-  // Custom renderer from Konva examples.
-  useEffect(
-    function drawPageOnCanvas() {
-      if (!page) {
-        return;
-      }
-
-      const { current: canvas } = canvasElement;
-      const { current: container } = konvaContainer;
-
-      if (!canvas || !container) {
-        return;
-      }
-
-      const renderContext: RenderParameters = {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        canvasContext: canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D,
-        viewport,
-      };
-
-      const cancellable = page.render(renderContext);
-      const runningTask = cancellable;
-
-      cancellable.promise.catch(() => {
-        // Intentionally empty
-      });
-
-      void cancellable.promise.then(() => {
-        createPageCanvas(container);
-      });
-
-      return () => {
-        runningTask.cancel();
-      };
-    },
-    [page, viewport],
-  );
-
-  const renderFieldOnLayer = (unparsedField: Field) => {
+  const renderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
@@ -137,6 +84,7 @@ export default function EnvelopeSignerPageRenderer() {
     }
 
     const { fieldGroup } = renderField({
+      scale,
       pageLayer: pageLayer.current,
       field: {
         renderId: fieldToRender.id.toString(),
@@ -145,9 +93,10 @@ export default function EnvelopeSignerPageRenderer() {
         height: Number(fieldToRender.height),
         positionX: Number(fieldToRender.positionX),
         positionY: Number(fieldToRender.positionY),
+        signature: unparsedField.signature,
       },
-      pageWidth: viewport.width,
-      pageHeight: viewport.height,
+      pageWidth: unscaledViewport.width,
+      pageHeight: unscaledViewport.height,
       color,
       mode: 'sign',
     });
@@ -357,29 +306,19 @@ export default function EnvelopeSignerPageRenderer() {
   };
 
   /**
-   * Create the initial Konva page canvas and initialize all fields and interactions.
+   * Initialize the Konva page canvas and all fields and interactions.
    */
-  const createPageCanvas = (container: HTMLDivElement) => {
-    stage.current = new Konva.Stage({
-      container,
-      width: viewport.width,
-      height: viewport.height,
-    });
-
-    // Create the main layer for interactive elements.
-    pageLayer.current = new Konva.Layer();
-    stage.current?.add(pageLayer.current);
-
+  const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     console.log({
       localPageFields,
     });
 
     // Render the fields.
     for (const field of localPageFields) {
-      renderFieldOnLayer(field);
+      renderFieldOnLayer(field); // Todo: Envelopes - [CRITICAL] Handle errors which prevent rendering
     }
 
-    pageLayer.current.batchDraw();
+    currentPageLayer.batchDraw();
   };
 
   /**
@@ -392,7 +331,7 @@ export default function EnvelopeSignerPageRenderer() {
 
     localPageFields.forEach((field) => {
       console.log('Field changed/inserted, rendering on canvas');
-      renderFieldOnLayer(field);
+      renderFieldOnLayer(field); // Todo: Envelopes - [CRITICAL] Handle errors which prevent rendering
     });
 
     pageLayer.current.batchDraw();
@@ -403,14 +342,19 @@ export default function EnvelopeSignerPageRenderer() {
   }
 
   return (
-    <div className="relative" key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}>
+    <div
+      className="relative w-full"
+      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
+    >
+      {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 
+      {/* Canvas the PDF will be rendered on. */}
       <canvas
         className={`${_className}__canvas z-0`}
-        height={viewport.height}
         ref={canvasElement}
-        width={viewport.width}
+        height={scaledViewport.height}
+        width={scaledViewport.width}
       />
     </div>
   );

@@ -12,7 +12,7 @@ export const upsertFieldGroup = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ): Konva.Group => {
-  const { pageWidth, pageHeight, pageLayer, editable } = options;
+  const { pageWidth, pageHeight, pageLayer, editable, scale } = options;
 
   const { fieldX, fieldY, fieldWidth, fieldHeight } = calculateFieldPosition(
     field,
@@ -27,6 +27,9 @@ export const upsertFieldGroup = (
       name: 'field-group',
     });
 
+  const maxXPosition = (pageWidth - fieldWidth) * scale;
+  const maxYPosition = (pageHeight - fieldHeight) * scale;
+
   fieldGroup.setAttrs({
     scaleX: 1,
     scaleY: 1,
@@ -34,8 +37,9 @@ export const upsertFieldGroup = (
     y: fieldY,
     draggable: editable,
     dragBoundFunc: (pos) => {
-      const newX = Math.max(0, Math.min(pageWidth - fieldWidth, pos.x));
-      const newY = Math.max(0, Math.min(pageHeight - fieldHeight, pos.y));
+      const newX = Math.max(0, Math.min(maxXPosition, pos.x));
+      const newY = Math.max(0, Math.min(maxYPosition, pos.y));
+
       return { x: newX, y: newY };
     },
   } satisfies Partial<Konva.GroupConfig>);

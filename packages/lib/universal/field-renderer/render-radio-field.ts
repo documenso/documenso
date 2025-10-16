@@ -1,4 +1,5 @@
 import Konva from 'konva';
+import { match } from 'ts-pattern';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TRadioFieldMeta } from '../../types/field-meta';
@@ -31,86 +32,94 @@ export const renderRadioFieldElement = (
 
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
-
-    // Handle rescaling items during transforms.
-    fieldGroup.on('transform', () => {
-      const groupScaleX = fieldGroup.scaleX();
-      const groupScaleY = fieldGroup.scaleY();
-
-      const fieldRect = fieldGroup.findOne('.field-rect');
-
-      if (!fieldRect) {
-        return;
-      }
-
-      const rectWidth = fieldRect.width() * groupScaleX;
-      const rectHeight = fieldRect.height() * groupScaleY;
-
-      const circles = fieldGroup.find('.radio-circle').sort((a, b) => a.id().localeCompare(b.id()));
-      const checkmarks = fieldGroup.find('.radio-dot').sort((a, b) => a.id().localeCompare(b.id()));
-      const text = fieldGroup.find('.radio-text').sort((a, b) => a.id().localeCompare(b.id()));
-
-      const groupedItems = circles.map((circle, i) => ({
-        circleElement: circle,
-        checkmarkElement: checkmarks[i],
-        textElement: text[i],
-      }));
-
-      groupedItems.forEach((item, i) => {
-        const { circleElement, checkmarkElement, textElement } = item;
-
-        const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
-          calculateMultiItemPosition({
-            fieldWidth: rectWidth,
-            fieldHeight: rectHeight,
-            itemCount: radioValues.length,
-            itemIndex: i,
-            itemSize: radioSize,
-            spacingBetweenItemAndText: spacingBetweenRadioAndText,
-            fieldPadding: radioFieldPadding,
-            type: 'radio',
-            direction: radioMeta?.direction || 'vertical',
-          });
-
-        circleElement.setAttrs({
-          x: itemInputX,
-          y: itemInputY,
-          scaleX: 1,
-          scaleY: 1,
-        });
-
-        checkmarkElement.setAttrs({
-          x: itemInputX,
-          y: itemInputY,
-          scaleX: 1,
-          scaleY: 1,
-        });
-
-        textElement.setAttrs({
-          x: textX,
-          y: textY,
-          scaleX: 1,
-          scaleY: 1,
-          width: textWidth,
-          height: textHeight,
-        });
-      });
-
-      fieldRect.width(rectWidth);
-      fieldRect.height(rectHeight);
-
-      fieldGroup.scale({
-        x: 1,
-        y: 1,
-      });
-
-      pageLayer.batchDraw();
-    });
   }
+
+  fieldGroup.off('transform');
+
+  // Handle rescaling items during transforms.
+  fieldGroup.on('transform', () => {
+    const groupScaleX = fieldGroup.scaleX();
+    const groupScaleY = fieldGroup.scaleY();
+
+    const fieldRect = fieldGroup.findOne('.field-rect');
+
+    if (!fieldRect) {
+      return;
+    }
+
+    const rectWidth = fieldRect.width() * groupScaleX;
+    const rectHeight = fieldRect.height() * groupScaleY;
+
+    const circles = fieldGroup.find('.radio-circle').sort((a, b) => a.id().localeCompare(b.id()));
+    const checkmarks = fieldGroup.find('.radio-dot').sort((a, b) => a.id().localeCompare(b.id()));
+    const text = fieldGroup.find('.radio-text').sort((a, b) => a.id().localeCompare(b.id()));
+
+    const groupedItems = circles.map((circle, i) => ({
+      circleElement: circle,
+      checkmarkElement: checkmarks[i],
+      textElement: text[i],
+    }));
+
+    groupedItems.forEach((item, i) => {
+      const { circleElement, checkmarkElement, textElement } = item;
+
+      const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
+        calculateMultiItemPosition({
+          fieldWidth: rectWidth,
+          fieldHeight: rectHeight,
+          itemCount: radioValues.length,
+          itemIndex: i,
+          itemSize: radioSize,
+          spacingBetweenItemAndText: spacingBetweenRadioAndText,
+          fieldPadding: radioFieldPadding,
+          type: 'radio',
+          direction: radioMeta?.direction || 'vertical',
+        });
+
+      circleElement.setAttrs({
+        x: itemInputX,
+        y: itemInputY,
+        scaleX: 1,
+        scaleY: 1,
+      });
+
+      checkmarkElement.setAttrs({
+        x: itemInputX,
+        y: itemInputY,
+        scaleX: 1,
+        scaleY: 1,
+      });
+
+      textElement.setAttrs({
+        x: textX,
+        y: textY,
+        scaleX: 1,
+        scaleY: 1,
+        width: textWidth,
+        height: textHeight,
+      });
+    });
+
+    fieldRect.width(rectWidth);
+    fieldRect.height(rectHeight);
+
+    fieldGroup.scale({
+      x: 1,
+      y: 1,
+    });
+
+    pageLayer.batchDraw();
+  });
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   radioValues.forEach(({ value, checked }, index) => {
+    const isRadioValueChecked = match(mode)
+      .with('edit', () => checked)
+      .with('sign', () => value === field.customText)
+      .with('export', () => value === field.customText)
+      .exhaustive();
+
     const { itemInputX, itemInputY, textX, textY, textWidth, textHeight } =
       calculateMultiItemPosition({
         fieldWidth,
@@ -146,9 +155,7 @@ export const renderRadioFieldElement = (
       y: itemInputY,
       radius: radioSize / 4,
       fill: '#111827',
-      // Todo: Envelopes
-      visible: value === field.customText,
-      // visible: checked,
+      visible: isRadioValueChecked,
     });
 
     const text = new Konva.Text({

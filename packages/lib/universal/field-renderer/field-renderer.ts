@@ -26,8 +26,9 @@ export type RenderFieldElementOptions = {
   pageLayer: Konva.Layer;
   pageWidth: number;
   pageHeight: number;
-  mode?: 'edit' | 'sign' | 'export';
+  mode: 'edit' | 'sign' | 'export';
   editable?: boolean;
+  scale: number;
   color?: TRecipientColor;
 };
 

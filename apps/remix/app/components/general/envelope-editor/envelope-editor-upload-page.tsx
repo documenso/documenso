@@ -41,7 +41,7 @@ type LocalFile = {
   isError: boolean;
 };
 
-export const EnvelopeEditorPageUpload = () => {
+export const EnvelopeEditorUploadPage = () => {
   const team = useCurrentTeam();
   const { t } = useLingui();
 

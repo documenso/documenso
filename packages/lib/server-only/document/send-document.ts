@@ -56,6 +56,7 @@ export const sendDocument = async ({
       recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
+      fields: true,
       documentMeta: true,
       envelopeItems: {
         select: {
@@ -163,6 +164,16 @@ export const sendDocument = async ({
         recipients: true,
       },
     });
+  }
+
+  const fieldsToAutoInsert = [];
+
+  // Todo: Envelopes - Handle auto-signing
+  if (envelope.internalVersion === 2) {
+    // fieldsToAutoInsert = envelope.fields.filter((field) => !field.inserted);
+    // if (fieldsToAutoInsert.length > 0) {
+    //   //
+    // }
   }
 
   const updatedEnvelope = await prisma.$transaction(async (tx) => {

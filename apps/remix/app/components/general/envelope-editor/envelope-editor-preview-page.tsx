@@ -13,11 +13,9 @@ import { Separator } from '@documenso/ui/primitives/separator';
 
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
-const EnvelopeEditorPagePreviewRenderer = lazy(
-  async () => import('./envelope-editor-page-preview-renderer'),
-);
+const EnvelopeGenericPageRenderer = lazy(async () => import('./envelope-generic-page-renderer'));
 
-export const EnvelopeEditorPagePreview = () => {
+export const EnvelopeEditorPreviewPage = () => {
   const { envelope, editorFields } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -51,7 +49,7 @@ export const EnvelopeEditorPagePreview = () => {
           </Alert>
 
           {currentEnvelopeItem !== null ? (
-            <PDFViewerKonvaLazy customPageRenderer={EnvelopeEditorPagePreviewRenderer} />
+            <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
               <FileTextIcon className="text-muted-foreground h-10 w-10" />
