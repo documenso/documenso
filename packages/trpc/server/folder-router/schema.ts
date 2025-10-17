@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { FolderType, ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
+import { ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
 import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility } from '@documenso/prisma/generated/types';
 
@@ -17,31 +17,6 @@ export const ZSuccessResponseSchema = z.object({
 export const ZGenericSuccessResponse = {
   success: true,
 } satisfies z.infer<typeof ZSuccessResponseSchema>;
-
-export const ZMoveDocumentToFolderResponseSchema = z.object({
-  id: z.number(),
-  userId: z.number(),
-  teamId: z.number(),
-  title: z.string(),
-  status: z.string(),
-  visibility: z.string(),
-  source: z.string(),
-  folderId: z.string().nullable(),
-  type: z.literal(FolderType.DOCUMENT),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
-
-export const ZMoveTemplateToFolderResponseSchema = z.object({
-  id: z.number(),
-  userId: z.number(),
-  teamId: z.number(),
-  title: z.string(),
-  folderId: z.string().nullable(),
-  type: z.literal(FolderType.TEMPLATE),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-});
 
 export const ZFolderSchema = z.object({
   id: z.string(),
@@ -98,26 +73,6 @@ export const ZUpdateFolderResponseSchema = ZFolderSchema;
 export const ZDeleteFolderSchema = z.object({
   id: z.string(),
   type: ZFolderTypeSchema.optional(),
-});
-
-export const ZMoveFolderSchema = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
-  type: ZFolderTypeSchema.optional(),
-});
-
-export const ZMoveFolderResponseSchema = ZFolderSchema;
-
-export const ZMoveDocumentToFolderSchema = z.object({
-  documentId: z.number(),
-  folderId: z.string().nullable().optional(),
-  type: z.enum(['DOCUMENT']).optional(),
-});
-
-export const ZMoveTemplateToFolderSchema = z.object({
-  templateId: z.number(),
-  folderId: z.string().nullable().optional(),
-  type: z.enum(['TEMPLATE']).optional(),
 });
 
 export const ZPinFolderSchema = z.object({
