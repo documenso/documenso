@@ -57,6 +57,8 @@ export const ZCreateFolderSchema = z.object({
   type: ZFolderTypeSchema.optional(),
 });
 
+export const ZCreateFolderResponseSchema = ZFolderSchema;
+
 export const ZUpdateFolderSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -66,14 +68,10 @@ export const ZUpdateFolderSchema = z.object({
 
 export type TUpdateFolderSchema = z.infer<typeof ZUpdateFolderSchema>;
 
+export const ZUpdateFolderResponseSchema = ZFolderSchema;
+
 export const ZDeleteFolderSchema = z.object({
   id: z.string(),
-  type: ZFolderTypeSchema.optional(),
-});
-
-export const ZMoveFolderSchema = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
   type: ZFolderTypeSchema.optional(),
 });
 
