@@ -15,7 +15,7 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
-import { DocumentUploadDropzone } from '~/components/general/document/document-upload';
+import { DocumentUploadButton } from '~/components/general/document/document-upload-button';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -97,8 +97,11 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
+          {/* Todo: Envelopes - Feature flag */}
+          {/* <EnvelopeUploadButton type={type} folderId={parentId || undefined} /> */}
+
           {type === FolderType.DOCUMENT ? (
-            <DocumentUploadDropzone />
+            <DocumentUploadButton />
           ) : (
             <TemplateCreateDialog folderId={parentId ?? undefined} />
           )}

@@ -12,9 +12,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@documenso/tsconfig": "*",
     "@documenso/pdf-sign": "^0.1.0",
-    "pdf-lib": "^1.17.1",
+    "@documenso/tsconfig": "*",
     "ts-pattern": "^5.0.5"
   },
   "devDependencies": {

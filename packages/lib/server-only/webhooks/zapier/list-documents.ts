@@ -1,8 +1,8 @@
-import type { Webhook } from '@prisma/client';
+import { EnvelopeType, type Webhook } from '@prisma/client';
 
-import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
-import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { prisma } from '@documenso/prisma';
 
+import { mapSecondaryIdToDocumentId } from '../../../utils/envelope';
 import { getWebhooksByTeamId } from '../get-webhooks-by-team-id';
 import { validateApiToken } from './validateApiToken';
 
@@ -14,48 +14,73 @@ export const listDocumentsHandler = async (req: Request) => {
       return new Response('Unauthorized', { status: 401 });
     }
 
-    const { user, userId, teamId } = await validateApiToken({ authorization });
+    const { user, teamId } = await validateApiToken({ authorization });
 
-    let allWebhooks: Webhook[] = [];
+    const allWebhooks: Webhook[] = await getWebhooksByTeamId(teamId, user.id);
 
-    const documents = await findDocuments({
-      userId: userId ?? user.id,
-      teamId,
-      perPage: 1,
-    });
-
-    const recipients = await getRecipientsForDocument({
-      documentId: documents.data[0].id,
-      userId: userId ?? user.id,
-      teamId,
-    });
-
-    allWebhooks = await getWebhooksByTeamId(teamId, user.id);
-
-    if (documents && documents.data.length > 0 && allWebhooks.length > 0 && recipients.length > 0) {
-      const testWebhook = {
-        event: allWebhooks[0].eventTriggers.toString(),
-        createdAt: allWebhooks[0].createdAt,
-        webhookEndpoint: allWebhooks[0].webhookUrl,
-        payload: {
-          id: documents.data[0].id,
-          userId: documents.data[0].userId,
-          title: documents.data[0].title,
-          status: documents.data[0].status,
-          documentDataId: documents.data[0].documentDataId,
-          createdAt: documents.data[0].createdAt,
-          updatedAt: documents.data[0].updatedAt,
-          completedAt: documents.data[0].completedAt,
-          deletedAt: documents.data[0].deletedAt,
-          teamId: documents.data[0].teamId,
-          Recipient: recipients,
+    const document = await prisma.envelope.findFirst({
+      where: {
+        userId: user.id,
+        teamId,
+        type: EnvelopeType.DOCUMENT,
+      },
+      include: {
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
         },
-      };
+        recipients: true,
+      },
+    });
 
-      return Response.json([testWebhook]);
+    if (
+      !document ||
+      document.envelopeItems.length === 0 ||
+      document.recipients.length === 0 ||
+      allWebhooks.length === 0
+    ) {
+      return Response.json([]);
     }
 
-    return Response.json([]);
+    const legacyDocumentId = mapSecondaryIdToDocumentId(document.secondaryId);
+
+    const testWebhook = {
+      event: allWebhooks[0].eventTriggers.toString(),
+      createdAt: allWebhooks[0].createdAt,
+      webhookEndpoint: allWebhooks[0].webhookUrl,
+      payload: {
+        id: legacyDocumentId,
+        userId: document.userId,
+        title: document.title,
+        status: document.status,
+        createdAt: document.createdAt,
+        updatedAt: document.updatedAt,
+        completedAt: document.completedAt,
+        deletedAt: document.deletedAt,
+        teamId: document.teamId,
+        Recipient: document.recipients.map((recipient) => ({
+          id: recipient.id,
+          documentId: legacyDocumentId,
+          templateId: null,
+          email: recipient.email,
+          name: recipient.name,
+          token: recipient.token,
+          documentDeletedAt: recipient.documentDeletedAt,
+          expired: recipient.expired,
+          signedAt: recipient.signedAt,
+          authOptions: recipient.authOptions,
+          signingOrder: recipient.signingOrder,
+          rejectionReason: recipient.rejectionReason,
+          role: recipient.role,
+          readStatus: recipient.readStatus,
+          signingStatus: recipient.signingStatus,
+          sendStatus: recipient.sendStatus,
+        })),
+      },
+    };
+
+    return Response.json([testWebhook]);
   } catch (err) {
     console.error(err);
 

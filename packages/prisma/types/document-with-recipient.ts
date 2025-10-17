@@ -1,10 +1,10 @@
-import type { Document, DocumentData, Recipient } from '@prisma/client';
+import type { DocumentData, Envelope, Recipient } from '@prisma/client';
 
-export type DocumentWithRecipients = Document & {
+export type EnvelopeWithRecipients = Envelope & {
   recipients: Recipient[];
 };
 
-export type DocumentWithRecipient = Document & {
+export type EnvelopeWithRecipient = Envelope & {
   recipients: Recipient[];
   documentData: DocumentData;
 };

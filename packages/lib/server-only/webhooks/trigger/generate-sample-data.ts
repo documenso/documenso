@@ -410,7 +410,6 @@ export const generateSampleWebhookPayload = (
         externalId: null,
         userId: 3,
         status: DocumentStatus.PENDING,
-        documentDataId: 'cm6exvn93006hi02ru90a265a',
         documentMeta: {
           ...basePayload.documentMeta,
           id: 'cm6exvn96006ji02rqvzjvwoy',

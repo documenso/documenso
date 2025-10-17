@@ -1,4 +1,4 @@
-import { FieldType } from '@prisma/client';
+import { EnvelopeType, FieldType } from '@prisma/client';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
@@ -16,16 +16,19 @@ import {
 } from '@documenso/lib/types/field-meta';
 import { prisma } from '@documenso/prisma';
 
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetFieldsForTemplateOptions = {
   userId: number;
   teamId: number;
-  templateId: number;
+  id: EnvelopeIdOptions;
   fields: {
     id?: number | null;
+    envelopeItemId: string;
     type: FieldType;
-    signerEmail: string;
     recipientId: number;
     pageNumber: number;
     pageX: number;
@@ -39,28 +42,40 @@ export type SetFieldsForTemplateOptions = {
 export const setFieldsForTemplate = async ({
   userId,
   teamId,
-  templateId,
+  id,
   fields,
 }: SetFieldsForTemplateOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
-      id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
+    include: {
+      recipients: true,
+      envelopeItems: {
+        select: {
+          id: true,
+        },
+      },
+      fields: {
+        include: {
+          recipient: true,
+        },
+      },
     },
   });
 
-  if (!template) {
-    throw new Error('Template not found');
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Document not found',
+    });
   }
 
-  const existingFields = await prisma.field.findMany({
-    where: {
-      templateId,
-    },
-    include: {
-      recipient: true,
-    },
-  });
+  const existingFields = envelope.fields;
 
   const removedFields = existingFields.filter(
     (existingField) => !fields.find((field) => field.id === existingField.id),
@@ -69,9 +84,30 @@ export const setFieldsForTemplate = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+    // Check whether the field is being attached to an allowed envelope item.
+    const foundEnvelopeItem = envelope.envelopeItems.find(
+      (envelopeItem) => envelopeItem.id === field.envelopeItemId,
+    );
+
+    if (!foundEnvelopeItem) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Envelope item ${field.envelopeItemId} not found`,
+      });
+    }
+
+    // Each field MUST have a recipient associated with it.
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient not found for field ${field.id}`,
+      });
+    }
+
     return {
       ...field,
       _persisted: existing,
+      _recipient: recipient,
     };
   });
 
@@ -143,7 +179,8 @@ export const setFieldsForTemplate = async ({
       return prisma.field.upsert({
         where: {
           id: field._persisted?.id ?? -1,
-          templateId,
+          envelopeId: envelope.id,
+          envelopeItemId: field.envelopeItemId,
         },
         update: {
           page: field.pageNumber,
@@ -163,15 +200,21 @@ export const setFieldsForTemplate = async ({
           customText: '',
           inserted: false,
           fieldMeta: parsedFieldMeta,
-          template: {
+          envelope: {
             connect: {
-              id: templateId,
+              id: envelope.id,
+            },
+          },
+          envelopeItem: {
+            connect: {
+              id: field.envelopeItemId,
+              envelopeId: envelope.id,
             },
           },
           recipient: {
             connect: {
-              id: field.recipientId,
-              templateId,
+              id: field._recipient.id,
+              envelopeId: envelope.id,
             },
           },
         },
@@ -198,6 +241,8 @@ export const setFieldsForTemplate = async ({
   });
 
   return {
-    fields: [...filteredFields, ...persistedFields],
+    fields: [...filteredFields, ...persistedFields].map((field) =>
+      mapFieldToLegacyField(field, envelope),
+    ),
   };
 };

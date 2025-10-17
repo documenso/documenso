@@ -3,7 +3,7 @@ import { generateHOTP } from 'oslo/otp';
 import { generateTwoFactorCredentialsFromEmail } from './generate-2fa-credentials-from-email';
 
 export type ValidateTwoFactorTokenFromEmailOptions = {
-  documentId: number;
+  envelopeId: string;
   email: string;
   code: string;
   period?: number;
@@ -11,13 +11,13 @@ export type ValidateTwoFactorTokenFromEmailOptions = {
 };
 
 export const validateTwoFactorTokenFromEmail = async ({
-  documentId,
+  envelopeId,
   email,
   code,
   period = 30_000,
   window = 1,
 }: ValidateTwoFactorTokenFromEmailOptions) => {
-  const { secret } = generateTwoFactorCredentialsFromEmail({ email, documentId });
+  const { secret } = generateTwoFactorCredentialsFromEmail({ email, envelopeId });
 
   let now = Date.now();
 
