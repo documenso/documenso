@@ -27,6 +27,7 @@ const ZRadioFieldFormSchema = z
       .optional(),
     required: z.boolean().optional(),
     readOnly: z.boolean().optional(),
+    direction: z.enum(['vertical', 'horizontal']).optional(),
   })
   .refine(
     (data) => {
@@ -53,6 +54,7 @@ export type EditorFieldRadioFormProps = {
 export const EditorFieldRadioForm = ({
   value = {
     type: 'radio',
+    direction: 'vertical',
   },
   onValueChange,
 }: EditorFieldRadioFormProps) => {
@@ -64,6 +66,7 @@ export const EditorFieldRadioForm = ({
       values: value.values || [{ id: 1, checked: false, value: 'Default value' }],
       required: value.required || false,
       readOnly: value.readOnly || false,
+      direction: value.direction || 'vertical',
     },
   });
 
@@ -100,6 +103,7 @@ export const EditorFieldRadioForm = ({
       onValueChange({
         type: 'radio',
         ...validatedFormValues.data,
+        direction: validatedFormValues.data.direction || 'vertical',
       });
     }
   }, [formValues]);
