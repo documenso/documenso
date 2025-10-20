@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -17,7 +18,7 @@ const setupDocument = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   return { user, team, document };
@@ -41,8 +42,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -63,8 +68,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -85,8 +94,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -107,8 +120,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -129,8 +146,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -152,8 +173,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -173,8 +198,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -195,8 +224,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -227,8 +260,12 @@ test.describe('AutoSave Settings Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrieved = await getDocumentById({
-        documentId: document.id,
+      const retrieved = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });

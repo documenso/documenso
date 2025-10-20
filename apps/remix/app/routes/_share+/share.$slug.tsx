@@ -81,9 +81,10 @@ export default function SharePage() {
       <DocumentCertificateQRView
         documentId={document.id}
         title={document.title}
-        documentData={document.documentData}
-        password={document.documentMeta?.password}
-        recipientCount={document.recipients?.length ?? 0}
+        documentTeamUrl={document.documentTeamUrl}
+        internalVersion={document.internalVersion}
+        envelopeItems={document.envelopeItems}
+        recipientCount={document.recipientCount}
         completedDate={document.completedAt ?? undefined}
       />
     );

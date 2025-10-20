@@ -1,6 +1,8 @@
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
+export const DEFAULT_FIELD_FONT_SIZE = 14;
+
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
   placeholder: z.string().optional(),
@@ -58,10 +60,10 @@ export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
 
 export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('number'),
-  numberFormat: z.string().optional(),
+  numberFormat: z.string().nullish(),
   value: z.string().optional(),
-  minValue: z.number().optional(),
-  maxValue: z.number().optional(),
+  minValue: z.coerce.number().nullish(),
+  maxValue: z.coerce.number().nullish(),
   fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
@@ -227,3 +229,86 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
 ]);
 
 export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
+
+export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
+  type: 'date',
+  fontSize: 14,
+  textAlign: 'left',
+};
+
+export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
+  type: 'text',
+  fontSize: 14,
+  textAlign: 'left',
+  label: '',
+  placeholder: '',
+  text: '',
+  required: false,
+  readOnly: false,
+};
+export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
+  type: 'number',
+  fontSize: 14,
+  textAlign: 'left',
+  label: '',
+  placeholder: '',
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
+  type: 'initials',
+  fontSize: 14,
+  textAlign: 'left',
+};
+
+export const FIELD_NAME_META_DEFAULT_VALUES: TNameFieldMeta = {
+  type: 'name',
+  fontSize: 14,
+  textAlign: 'left',
+};
+
+export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
+  type: 'email',
+  fontSize: 14,
+  textAlign: 'left',
+};
+
+export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
+  type: 'radio',
+  values: [{ id: 1, checked: false, value: '' }],
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
+  type: 'checkbox',
+  values: [{ id: 1, checked: false, value: '' }],
+  validationRule: '',
+  validationLength: 0,
+  required: false,
+  readOnly: false,
+  direction: 'vertical',
+};
+
+export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
+  type: 'dropdown',
+  values: [{ value: 'Option 1' }],
+  defaultValue: '',
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
+  [FieldType.SIGNATURE]: undefined,
+  [FieldType.FREE_SIGNATURE]: undefined,
+  [FieldType.INITIALS]: FIELD_INITIALS_META_DEFAULT_VALUES,
+  [FieldType.NAME]: FIELD_NAME_META_DEFAULT_VALUES,
+  [FieldType.EMAIL]: FIELD_EMAIL_META_DEFAULT_VALUES,
+  [FieldType.DATE]: FIELD_DATE_META_DEFAULT_VALUES,
+  [FieldType.TEXT]: FIELD_TEXT_META_DEFAULT_VALUES,
+  [FieldType.NUMBER]: FIELD_NUMBER_META_DEFAULT_VALUES,
+  [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
+  [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
+  [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
+} as const;

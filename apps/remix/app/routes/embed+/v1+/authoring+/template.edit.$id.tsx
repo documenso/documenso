@@ -54,7 +54,10 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }
 
   const template = await getTemplateById({
-    id: templateId,
+    id: {
+      type: 'templateId',
+      id: templateId,
+    },
     userId: result?.userId,
     teamId: result?.teamId ?? undefined,
   }).catch(() => null);
@@ -227,11 +230,10 @@ export default function EmbeddingAuthoringTemplateEditPage() {
           signingOrder: signer.signingOrder,
           fields: fields
             .filter((field) => field.signerEmail === signer.email)
-            // There's a gnarly discriminated union that makes this hard to satisfy, we're casting for the second
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            .map<any>((f) => ({
+            .map((f) => ({
               ...f,
               id: f.nativeId,
+              envelopeItemId: template.templateDocumentData.envelopeItemId,
               pageX: f.pageX,
               pageY: f.pageY,
               width: f.pageWidth,

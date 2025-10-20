@@ -1,4 +1,4 @@
-import type { Document, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { match } from 'ts-pattern';
 
@@ -17,8 +17,8 @@ import { extractDocumentAuthMethods } from '../../utils/document-auth';
 type IsRecipientAuthorizedOptions = {
   // !: Probably find a better name than 'ACCESS_2FA' if requirements change.
   type: 'ACCESS' | 'ACCESS_2FA' | 'ACTION';
-  documentAuthOptions: Document['authOptions'];
-  recipient: Pick<Recipient, 'authOptions' | 'email' | 'documentId'>;
+  documentAuthOptions: Envelope['authOptions'];
+  recipient: Pick<Recipient, 'authOptions' | 'email' | 'envelopeId'>;
 
   /**
    * The ID of the user who initiated the request.
@@ -125,14 +125,8 @@ export const isRecipientAuthorized = async ({
       }
 
       if (type === 'ACCESS_2FA' && method === 'email') {
-        if (!recipient.documentId) {
-          throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Document ID is required for email 2FA verification',
-          });
-        }
-
         return await validateTwoFactorTokenFromEmail({
-          documentId: recipient.documentId,
+          envelopeId: recipient.envelopeId,
           email: recipient.email,
           code: token,
           window: 10, // 5 minutes worth of tokens
