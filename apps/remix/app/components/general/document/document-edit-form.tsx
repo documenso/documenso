@@ -480,6 +480,17 @@ export const DocumentEditForm = ({
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
+              expiryAmount={document.documentMeta?.expiryAmount}
+              expiryUnit={
+                document.documentMeta?.expiryUnit as
+                  | 'minutes'
+                  | 'hours'
+                  | 'days'
+                  | 'weeks'
+                  | 'months'
+                  | null
+                  | undefined
+              }
               fields={fields}
               onSubmit={onAddSignersFormSubmit}
               onAutoSave={onAddSignersFormAutoSave}
