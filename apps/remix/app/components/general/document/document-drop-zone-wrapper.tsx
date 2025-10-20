@@ -140,7 +140,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
     const description = (
       <>
         <span className="font-medium">
-          {file.name} <Trans>couldn't be uploaded:</Trans>
+          <Trans>{file.name} couldn't be uploaded:</Trans>
         </span>
         {errorNodes}
       </>
