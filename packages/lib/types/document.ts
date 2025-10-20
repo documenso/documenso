@@ -67,6 +67,8 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     allowDictateNextSigner: true,
     language: true,
     emailSettings: true,
+    reminderInterval: true,
+    lastReminderSentAt: true,
     emailId: true,
     emailReplyTo: true,
   }).extend({

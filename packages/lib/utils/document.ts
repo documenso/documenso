@@ -62,6 +62,11 @@ export const extractDerivedDocumentMeta = (
     emailReplyTo: meta.emailReplyTo ?? settings.emailReplyTo,
     emailSettings:
       meta.emailSettings || settings.emailDocumentSettings || DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+
+    // Reminder settings.
+    reminderInterval: ('reminderInterval' in meta ? meta.reminderInterval : undefined) ?? 'NONE',
+    lastReminderSentAt:
+      ('lastReminderSentAt' in meta ? meta.lastReminderSentAt : undefined) ?? null,
   } satisfies Omit<DocumentMeta, 'id'>;
 };
 

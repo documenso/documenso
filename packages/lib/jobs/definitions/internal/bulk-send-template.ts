@@ -23,6 +23,7 @@ export const BULK_SEND_TEMPLATE_JOB_DEFINITION = {
   name: 'Bulk Send Template',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: BULK_SEND_TEMPLATE_JOB_DEFINITION_ID,
     schema: BULK_SEND_TEMPLATE_JOB_DEFINITION_SCHEMA,
   },

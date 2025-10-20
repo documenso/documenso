@@ -167,7 +167,7 @@ test.describe('AutoSave Settings Step', () => {
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(4).click();
+    await page.getByRole('combobox').nth(5).click();
     await page.getByRole('option', { name: 'ISO 8601', exact: true }).click();
 
     await triggerAutosave(page);
@@ -192,7 +192,7 @@ test.describe('AutoSave Settings Step', () => {
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 
-    await page.getByRole('combobox').nth(5).click();
+    await page.getByRole('combobox').nth(6).click();
     await page.getByRole('option', { name: 'Europe/London' }).click();
 
     await triggerAutosave(page);
@@ -254,7 +254,7 @@ test.describe('AutoSave Settings Step', () => {
     const newExternalId = 'MULTI-TEST-123';
     await page.getByRole('textbox', { name: 'External ID' }).fill(newExternalId);
 
-    await page.getByRole('combobox').nth(5).click();
+    await page.getByRole('combobox').nth(6).click();
     await page.getByRole('option', { name: 'Europe/Berlin' }).click();
 
     await triggerAutosave(page);

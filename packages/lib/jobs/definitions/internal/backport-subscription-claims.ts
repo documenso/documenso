@@ -30,6 +30,7 @@ export const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION = {
   name: 'Backport Subscription Claims',
   version: '1.0.0',
   trigger: {
+    type: 'event',
     name: BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_ID,
     schema: BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA,
   },
