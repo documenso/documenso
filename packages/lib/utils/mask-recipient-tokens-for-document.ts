@@ -1,14 +1,14 @@
 import type { User } from '@prisma/client';
 
-import type { DocumentWithRecipients } from '@documenso/prisma/types/document-with-recipient';
+import type { EnvelopeWithRecipients } from '@documenso/prisma/types/document-with-recipient';
 
-export type MaskRecipientTokensForDocumentOptions<T extends DocumentWithRecipients> = {
+export type MaskRecipientTokensForDocumentOptions<T extends EnvelopeWithRecipients> = {
   document: T;
-  user?: User;
+  user?: Pick<User, 'id' | 'email'>;
   token?: string;
 };
 
-export const maskRecipientTokensForDocument = <T extends DocumentWithRecipients>({
+export const maskRecipientTokensForDocument = <T extends EnvelopeWithRecipients>({
   document,
   user,
   token,

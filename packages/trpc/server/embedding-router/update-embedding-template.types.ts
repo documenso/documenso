@@ -3,15 +3,6 @@ import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
-  ZFieldHeightSchema,
-  ZFieldPageNumberSchema,
-  ZFieldPageXSchema,
-  ZFieldPageYSchema,
-  ZFieldWidthSchema,
-} from '@documenso/lib/types/field';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-
-import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
   ZDocumentMetaDrawSignatureEnabledSchema,
@@ -22,8 +13,17 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-  ZDocumentTitleSchema,
-} from '../document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import {
+  ZFieldHeightSchema,
+  ZFieldPageNumberSchema,
+  ZFieldPageXSchema,
+  ZFieldPageYSchema,
+  ZFieldWidthSchema,
+} from '@documenso/lib/types/field';
+import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+
+import { ZDocumentTitleSchema } from '../document-router/schema';
 
 const ZFieldSchema = z.object({
   id: z.number().optional(),
@@ -34,6 +34,7 @@ const ZFieldSchema = z.object({
   width: ZFieldWidthSchema,
   height: ZFieldHeightSchema,
   fieldMeta: ZFieldMetaSchema.optional(),
+  envelopeItemId: z.string(),
 });
 
 export const ZUpdateEmbeddingTemplateRequestSchema = z.object({

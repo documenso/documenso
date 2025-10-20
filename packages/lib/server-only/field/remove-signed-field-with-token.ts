@@ -41,19 +41,19 @@ export const removeSignedFieldWithToken = async ({
       },
     },
     include: {
-      document: true,
+      envelope: true,
       recipient: true,
     },
   });
 
-  const { document } = field;
+  const { envelope } = field;
 
-  if (!document) {
+  if (!envelope) {
     throw new Error(`Document not found for field ${field.id}`);
   }
 
-  if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending`);
+  if (envelope.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${envelope.id} must be pending`);
   }
 
   if (
@@ -89,7 +89,7 @@ export const removeSignedFieldWithToken = async ({
       await tx.documentAuditLog.create({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
-          documentId: document.id,
+          envelopeId: envelope.id,
           user: {
             name: recipient.name,
             email: recipient.email,

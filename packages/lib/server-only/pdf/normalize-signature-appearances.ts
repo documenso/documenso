@@ -1,5 +1,5 @@
-import type { PDFDocument } from 'pdf-lib';
-import { PDFSignature, rectangle } from 'pdf-lib';
+import type { PDFDocument } from '@cantoo/pdf-lib';
+import { PDFSignature, rectangle } from '@cantoo/pdf-lib';
 
 export const normalizeSignatureAppearances = (document: PDFDocument) => {
   const form = document.getForm();

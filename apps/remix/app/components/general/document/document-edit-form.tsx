@@ -59,23 +59,22 @@ export const DocumentEditForm = ({
 
   const utils = trpc.useUtils();
 
-  const { data: document, refetch: refetchDocument } =
-    trpc.document.getDocumentWithDetailsById.useQuery(
-      {
-        documentId: initialDocument.id,
-      },
-      {
-        initialData: initialDocument,
-        ...SKIP_QUERY_BATCH_META,
-      },
-    );
+  const { data: document, refetch: refetchDocument } = trpc.document.get.useQuery(
+    {
+      documentId: initialDocument.id,
+    },
+    {
+      initialData: initialDocument,
+      ...SKIP_QUERY_BATCH_META,
+    },
+  );
 
   const { recipients, fields } = document;
 
-  const { mutateAsync: updateDocument } = trpc.document.updateDocument.useMutation({
+  const { mutateAsync: updateDocument } = trpc.document.update.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -84,23 +83,10 @@ export const DocumentEditForm = ({
     },
   });
 
-  const { mutateAsync: setSigningOrderForDocument } =
-    trpc.document.setSigningOrderForDocument.useMutation({
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-      onSuccess: (newData) => {
-        utils.document.getDocumentWithDetailsById.setData(
-          {
-            documentId: initialDocument.id,
-          },
-          (oldData) => ({ ...(oldData || initialDocument), ...newData, id: Number(newData.id) }),
-        );
-      },
-    });
-
-  const { mutateAsync: addFields } = trpc.field.addFields.useMutation({
+  const { mutateAsync: addFields } = trpc.field.setFieldsForDocument.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ fields: newFields }) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -112,7 +98,7 @@ export const DocumentEditForm = ({
   const { mutateAsync: setRecipients } = trpc.recipient.setDocumentRecipients.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: ({ recipients: newRecipients }) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -121,10 +107,10 @@ export const DocumentEditForm = ({
     },
   });
 
-  const { mutateAsync: sendDocument } = trpc.document.sendDocument.useMutation({
+  const { mutateAsync: sendDocument } = trpc.document.distribute.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (newData) => {
-      utils.document.getDocumentWithDetailsById.setData(
+      utils.document.get.setData(
         {
           documentId: initialDocument.id,
         },
@@ -173,34 +159,37 @@ export const DocumentEditForm = ({
     return initialStep;
   });
 
+  const saveSettingsData = async (data: TAddSettingsFormSchema) => {
+    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+
+    const parsedGlobalAccessAuth = z
+      .array(ZDocumentAccessAuthTypesSchema)
+      .safeParse(data.globalAccessAuth);
+
+    return updateDocument({
+      documentId: document.id,
+      data: {
+        title: data.title,
+        externalId: data.externalId || null,
+        visibility: data.visibility,
+        globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
+        globalActionAuth: data.globalActionAuth ?? [],
+      },
+      meta: {
+        timezone,
+        dateFormat,
+        redirectUrl,
+        language: isValidLanguageCode(language) ? language : undefined,
+        typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
+        uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
+        drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+      },
+    });
+  };
+
   const onAddSettingsFormSubmit = async (data: TAddSettingsFormSchema) => {
     try {
-      const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
-
-      const parsedGlobalAccessAuth = z
-        .array(ZDocumentAccessAuthTypesSchema)
-        .safeParse(data.globalAccessAuth);
-
-      await updateDocument({
-        documentId: document.id,
-        data: {
-          title: data.title,
-          externalId: data.externalId || null,
-          visibility: data.visibility,
-          globalAccessAuth: parsedGlobalAccessAuth.success ? parsedGlobalAccessAuth.data : [],
-          globalActionAuth: data.globalActionAuth ?? [],
-        },
-        meta: {
-          timezone,
-          dateFormat,
-          redirectUrl,
-          language: isValidLanguageCode(language) ? language : undefined,
-          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
-          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
-        },
-      });
-
+      await saveSettingsData(data);
       setStep('signers');
     } catch (err) {
       console.error(err);
@@ -213,18 +202,51 @@ export const DocumentEditForm = ({
     }
   };
 
-  const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
+  const onAddSettingsFormAutoSave = async (data: TAddSettingsFormSchema) => {
     try {
-      await Promise.all([
-        setSigningOrderForDocument({
-          documentId: document.id,
-          signingOrder: data.signingOrder,
-        }),
+      await saveSettingsData(data);
+    } catch (err) {
+      console.error(err);
 
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the document settings.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const saveSignersData = async (data: TAddSignersFormSchema) => {
+    return Promise.all([
+      updateDocument({
+        documentId: document.id,
+        meta: {
+          allowDictateNextSigner: data.allowDictateNextSigner,
+          signingOrder: data.signingOrder,
+        },
+      }),
+
+      setRecipients({
+        documentId: document.id,
+        recipients: data.signers.map((signer) => ({
+          ...signer,
+          id: signer.nativeId,
+          // Explicitly set to null to indicate we want to remove auth if required.
+          actionAuth: signer.actionAuth ?? [],
+        })),
+      }),
+    ]);
+  };
+
+  const onAddSignersFormAutoSave = async (data: TAddSignersFormSchema) => {
+    try {
+      // For autosave, we need to return the recipients response for form state sync
+      const [, recipientsResponse] = await Promise.all([
         updateDocument({
           documentId: document.id,
           meta: {
             allowDictateNextSigner: data.allowDictateNextSigner,
+            signingOrder: data.signingOrder,
           },
         }),
 
@@ -232,11 +254,30 @@ export const DocumentEditForm = ({
           documentId: document.id,
           recipients: data.signers.map((signer) => ({
             ...signer,
+            id: signer.nativeId,
             // Explicitly set to null to indicate we want to remove auth if required.
             actionAuth: signer.actionAuth ?? [],
           })),
         }),
       ]);
+
+      return recipientsResponse;
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while adding signers.`),
+        variant: 'destructive',
+      });
+
+      throw err; // Re-throw so the autosave hook can handle the error
+    }
+  };
+
+  const onAddSignersFormSubmit = async (data: TAddSignersFormSchema) => {
+    try {
+      await saveSignersData(data);
 
       setStep('fields');
     } catch (err) {
@@ -250,12 +291,20 @@ export const DocumentEditForm = ({
     }
   };
 
+  const saveFieldsData = async (data: TAddFieldsFormSchema) => {
+    return addFields({
+      documentId: document.id,
+      fields: data.fields.map((field) => ({
+        ...field,
+        id: field.nativeId,
+        envelopeItemId: document.documentData.envelopeItemId,
+      })),
+    });
+  };
+
   const onAddFieldsFormSubmit = async (data: TAddFieldsFormSchema) => {
     try {
-      await addFields({
-        documentId: document.id,
-        fields: data.fields,
-      });
+      await saveFieldsData(data);
 
       // Clear all field data from localStorage
       for (let i = 0; i < localStorage.length; i++) {
@@ -277,24 +326,60 @@ export const DocumentEditForm = ({
     }
   };
 
-  const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
+  const onAddFieldsFormAutoSave = async (data: TAddFieldsFormSchema) => {
+    try {
+      await saveFieldsData(data);
+      // Don't clear localStorage on auto-save, only on explicit submit
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the fields.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const saveSubjectData = async (data: TAddSubjectFormSchema) => {
     const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } =
       data.meta;
 
-    try {
-      await sendDocument({
-        documentId: document.id,
-        meta: {
-          subject,
-          message,
-          distributionMethod,
-          emailId,
-          emailReplyTo: emailReplyTo || null,
-          emailSettings: emailSettings,
-        },
-      });
+    return updateDocument({
+      documentId: document.id,
+      meta: {
+        subject,
+        message,
+        distributionMethod,
+        emailId,
+        emailReplyTo,
+        emailSettings: emailSettings,
+      },
+    });
+  };
 
-      if (distributionMethod === DocumentDistributionMethod.EMAIL) {
+  const sendDocumentWithSubject = async (data: TAddSubjectFormSchema) => {
+    const { subject, message, distributionMethod, emailId, emailReplyTo, emailSettings } =
+      data.meta;
+
+    return sendDocument({
+      documentId: document.id,
+      meta: {
+        subject,
+        message,
+        distributionMethod,
+        emailId,
+        emailReplyTo: emailReplyTo || null,
+        emailSettings,
+      },
+    });
+  };
+
+  const onAddSubjectFormSubmit = async (data: TAddSubjectFormSchema) => {
+    try {
+      await sendDocumentWithSubject(data);
+
+      if (data.meta.distributionMethod === DocumentDistributionMethod.EMAIL) {
         toast({
           title: _(msg`Document sent`),
           description: _(msg`Your document has been sent successfully.`),
@@ -309,7 +394,7 @@ export const DocumentEditForm = ({
           duration: 5000,
         });
       } else {
-        await navigate(`${documentRootPath}/${document.id}`);
+        await navigate(`${documentRootPath}/${document.envelopeId}`);
       }
     } catch (err) {
       console.error(err);
@@ -317,6 +402,21 @@ export const DocumentEditForm = ({
       toast({
         title: _(msg`Error`),
         description: _(msg`An error occurred while sending the document.`),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onAddSubjectFormAutoSave = async (data: TAddSubjectFormSchema) => {
+    try {
+      // Save form data without sending the document
+      await saveSubjectData(data);
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while auto-saving the subject form.`),
         variant: 'destructive',
       });
     }
@@ -367,25 +467,28 @@ export const DocumentEditForm = ({
               fields={fields}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               onSubmit={onAddSettingsFormSubmit}
+              onAutoSave={onAddSettingsFormAutoSave}
             />
 
             <AddSignersFormPartial
-              key={recipients.length}
+              key={document.id}
               documentFlow={documentFlow.signers}
               recipients={recipients}
               signingOrder={document.documentMeta?.signingOrder}
               allowDictateNextSigner={document.documentMeta?.allowDictateNextSigner}
               fields={fields}
               onSubmit={onAddSignersFormSubmit}
+              onAutoSave={onAddSignersFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
 
             <AddFieldsFormPartial
-              key={fields.length}
+              key={document.id}
               documentFlow={documentFlow.fields}
               recipients={recipients}
               fields={fields}
               onSubmit={onAddFieldsFormSubmit}
+              onAutoSave={onAddFieldsFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
               teamId={team.id}
             />
@@ -397,6 +500,7 @@ export const DocumentEditForm = ({
               recipients={recipients}
               fields={fields}
               onSubmit={onAddSubjectFormSubmit}
+              onAutoSave={onAddSubjectFormAutoSave}
               isDocumentPdfLoaded={isDocumentPdfLoaded}
             />
           </Stepper>

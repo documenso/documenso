@@ -33,7 +33,7 @@ export default function AdminDocumentsPage() {
   const perPage = searchParams?.get?.('perPage') ? Number(searchParams.get('perPage')) : undefined;
 
   const { data: findDocumentsData, isPending: isFindDocumentsLoading } =
-    trpc.admin.findDocuments.useQuery(
+    trpc.admin.document.find.useQuery(
       {
         query: debouncedTerm,
         page: page || 1,
@@ -64,7 +64,7 @@ export default function AdminDocumentsPage() {
         cell: ({ row }) => {
           return (
             <Link
-              to={`/admin/documents/${row.original.id}`}
+              to={`/admin/documents/${row.original.envelopeId}`}
               className="block max-w-[5rem] truncate font-medium hover:underline md:max-w-[10rem]"
             >
               {row.original.title}

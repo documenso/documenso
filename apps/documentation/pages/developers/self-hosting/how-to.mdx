@@ -54,7 +54,7 @@ Install the project dependencies as follows:
 
 ```bash
 npm i
-npm run build:web
+npm run build
 npm run prisma:migrate-deploy
 ```
 
@@ -69,7 +69,7 @@ npm run start
 This will start the server on `localhost:3000`. Any reverse proxy can handle the front end and SSL termination.
 
 <Callout type="info">
- If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/web` folder.
+ If you want to run with another port than `3000`, you can start the application with `next -p <ANY PORT>` from the `apps/remix` folder.
 </Callout>
 
 </Steps>
@@ -119,16 +119,89 @@ NEXT_PRIVATE_SMTP_USERNAME="<your-username>"
 NEXT_PRIVATE_SMTP_PASSWORD="<your-password>"
 ```
 
-### Update the Volume Binding
+### Set Up Your Signing Certificate
 
-The `cert.p12` file is required to sign and encrypt documents, so you must provide your key file. Update the volume binding in the `compose.yml` file to point to your key file:
+<Callout type="warning">
+  This is the most common source of issues for self-hosters. Please follow these steps carefully.
+</Callout>
 
-```yaml
-volumes:
-  - /path/to/your/keyfile.p12:/opt/documenso/cert.p12
-```
+The `cert.p12` file is required to sign and encrypt documents. You have three options:
 
-After updating the volume binding, save the `compose.yml` file and run the following command to start the containers:
+#### Option A: Generate Certificate Inside Container (Recommended)
+
+This method avoids file permission issues by creating the certificate directly inside the Docker container:
+
+1. Start your containers:
+
+   ```bash
+   docker-compose up -d
+   ```
+
+2. Set certificate password securely and generate certificate inside the container:
+
+   ```bash
+   # Set certificate password securely (won't appear in command history)
+   read -s -p "Enter certificate password: " CERT_PASS
+   echo
+
+   # Generate certificate inside container using environment variable
+   docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
+     openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+       -keyout /tmp/private.key \
+       -out /tmp/certificate.crt \
+       -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
+     openssl pkcs12 -export -out /app/certs/cert.p12 \
+       -inkey /tmp/private.key -in /tmp/certificate.crt \
+       -passout env:CERT_PASS && \
+     rm /tmp/private.key /tmp/certificate.crt
+   "
+   ```
+
+3. Add the certificate passphrase to your `.env` file:
+
+   ```bash
+   NEXT_PRIVATE_SIGNING_PASSPHRASE="your_password_here"
+   ```
+
+4. Restart the container to apply changes:
+   ```bash
+   docker-compose restart documenso
+   ```
+
+#### Option B: Use an Existing Certificate File
+
+If you have an existing `.p12` certificate file:
+
+1. **Place your certificate file** in an accessible location on your host system
+2. **Set proper permissions:**
+
+   ```bash
+   # Make sure the certificate is readable
+   chmod 644 /path/to/your/cert.p12
+
+   # For Docker, ensure proper ownership
+   chown 1001:1001 /path/to/your/cert.p12
+   ```
+
+3. **Update the volume binding** in the `compose.yml` file:
+
+   ```yaml
+   volumes:
+     - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
+   ```
+
+4. **Add certificate configuration** to your `.env` file:
+   ```bash
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+   NEXT_PRIVATE_SIGNING_PASSPHRASE=your_certificate_password
+   ```
+
+<Callout type="warning">
+  Your certificate MUST have a password. Certificates without passwords will cause "Failed to get
+  private key bags" errors.
+</Callout>
+
+After setting up your certificate, save the `compose.yml` file and run the following command to start the containers:
 
 ```bash
 docker-compose --env-file ./.env up -d
@@ -249,7 +322,7 @@ After=network.target
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/web
+WorkingDirectory=/var/www/documenso/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always

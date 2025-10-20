@@ -55,7 +55,7 @@ import { DocumentSigningRecipientProvider } from '../document-signing/document-s
 
 export type DirectTemplateSigningFormProps = {
   flowStep: DocumentFlowStep;
-  directRecipient: Recipient;
+  directRecipient: Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
   directRecipientFields: Field[];
   template: Omit<TTemplate, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
@@ -78,6 +78,8 @@ export const DirectTemplateSigningForm = ({
   const [localFields, setLocalFields] = useState<DirectTemplateLocalField[]>(directRecipientFields);
   const [validateUninsertedFields, setValidateUninsertedFields] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const highestPageNumber = Math.max(...localFields.map((field) => field.page));
 
   const fieldsRequiringValidation = useMemo(() => {
     return localFields.filter((field) => isFieldUnsignedAndRequired(field));
@@ -221,7 +223,9 @@ export const DirectTemplateSigningForm = ({
       <DocumentFlowFormContainerHeader title={flowStep.title} description={flowStep.description} />
 
       <DocumentFlowFormContainerContent>
-        <ElementVisible target={PDF_VIEWER_PAGE_SELECTOR}>
+        <ElementVisible
+          target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+        >
           {validateUninsertedFields && uninsertedFields[0] && (
             <FieldToolTip key={uninsertedFields[0].id} field={uninsertedFields[0]} color="warning">
               <Trans>Click to insert field</Trans>
@@ -413,11 +417,11 @@ export const DirectTemplateSigningForm = ({
 
           <DocumentSigningCompleteDialog
             isSubmitting={isSubmitting}
-            onSignatureComplete={handleSubmit}
+            onSignatureComplete={async () => handleSubmit()}
             documentTitle={template.title}
             fields={localFields}
             fieldsValidated={fieldsValidated}
-            role={directRecipient.role}
+            recipient={directRecipient}
           />
         </div>
       </DocumentFlowFormContainerFooter>

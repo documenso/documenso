@@ -1,4 +1,9 @@
-import type { OrganisationGlobalSettings, Prisma, TeamGlobalSettings } from '@prisma/client';
+import type {
+  DocumentVisibility,
+  OrganisationGlobalSettings,
+  Prisma,
+  TeamGlobalSettings,
+} from '@prisma/client';
 
 import type { TeamGroup } from '@documenso/prisma/generated/types';
 import type { TeamMemberRole } from '@documenso/prisma/generated/types';
@@ -6,6 +11,7 @@ import type { TeamMemberRole } from '@documenso/prisma/generated/types';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import {
   LOWEST_TEAM_ROLE,
+  TEAM_DOCUMENT_VISIBILITY_MAP,
   TEAM_MEMBER_ROLE_HIERARCHY,
   TEAM_MEMBER_ROLE_PERMISSIONS_MAP,
 } from '../constants/teams';
@@ -46,6 +52,17 @@ export const canExecuteTeamAction = (
   role: keyof typeof TEAM_MEMBER_ROLE_MAP,
 ) => {
   return TEAM_MEMBER_ROLE_PERMISSIONS_MAP[action].some((i) => i === role);
+};
+
+/**
+ * Determines whether a team role can access the visibility of a document.
+ *
+ * @param action The action the user is trying to execute.
+ * @param role The current role of the user.
+ * @returns Whether the user can execute the action.
+ */
+export const canAccessTeamDocument = (role: TeamMemberRole, visibility: DocumentVisibility) => {
+  return TEAM_DOCUMENT_VISIBILITY_MAP[role].some((i) => i === visibility);
 };
 
 /**
@@ -106,7 +123,7 @@ export const extractTeamSignatureSettings = (
   return signatureTypes;
 };
 
-type BuildTeamWhereQueryOptions = {
+export type BuildTeamWhereQueryOptions = {
   teamId: number | undefined;
   userId: number;
   roles?: TeamMemberRole[];

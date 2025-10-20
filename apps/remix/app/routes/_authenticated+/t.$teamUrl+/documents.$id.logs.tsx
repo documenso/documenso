@@ -2,15 +2,15 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient } from '@prisma/client';
+import { EnvelopeType, type Recipient } from '@prisma/client';
 import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
-import { Link, redirect } from 'react-router';
+import { Link } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
-import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { Card } from '@documenso/ui/primitives/card';
@@ -26,55 +26,60 @@ import { DocumentLogsTable } from '~/components/tables/document-logs-table';
 import type { Route } from './+types/documents.$id.logs';
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const { id, teamUrl } = params;
+
+  if (!id || !teamUrl) {
+    throw new Response('Not Found', { status: 404 });
+  }
+
   const { user } = await getSession(request);
 
-  const team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
-
-  const { id } = params;
-
-  const documentId = Number(id);
+  const team = await getTeamByUrl({ userId: user.id, teamUrl });
 
   const documentRootPath = formatDocumentsPath(team.url);
 
-  if (!documentId || Number.isNaN(documentId)) {
-    throw redirect(documentRootPath);
-  }
-
-  const document = await getDocumentById({
-    documentId,
+  const envelope = await getEnvelopeById({
+    id: {
+      type: 'envelopeId',
+      id,
+    },
+    type: EnvelopeType.DOCUMENT,
     userId: user.id,
-    teamId: team?.id,
+    teamId: team.id,
   }).catch(() => null);
 
-  if (!document || !document.documentData) {
-    throw redirect(documentRootPath);
+  if (!envelope) {
+    throw new Response('Not Found', { status: 404 });
   }
-
-  if (document.folderId) {
-    throw redirect(documentRootPath);
-  }
-
-  const recipients = await getRecipientsForDocument({
-    documentId,
-    userId: user.id,
-    teamId: team?.id,
-  });
 
   logDocumentAccess({
     request,
-    documentId,
+    documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
     userId: user.id,
   });
 
   return {
-    document,
+    // Only return necessary data
+    document: {
+      id: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      envelopeId: envelope.id,
+      title: envelope.title,
+      status: envelope.status,
+      user: {
+        name: envelope.user.name,
+        email: envelope.user.email,
+      },
+      createdAt: envelope.createdAt,
+      updatedAt: envelope.updatedAt,
+      documentMeta: envelope.documentMeta,
+    },
+    recipients: envelope.recipients,
     documentRootPath,
-    recipients,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, documentRootPath, recipients } = loaderData;
+  const { document, recipients, documentRootPath } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -127,7 +132,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link
-        to={`${documentRootPath}/${document.id}`}
+        to={`${documentRootPath}/${document.envelopeId}`}
         className="flex items-center text-[#7AC455] hover:opacity-80"
       >
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />

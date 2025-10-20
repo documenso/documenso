@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -21,6 +22,7 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -60,7 +62,10 @@ import type { FieldFormType } from '../document-flow/add-fields';
 import { FieldAdvancedSettings } from '../document-flow/field-item-advanced-settings';
 import { Form } from '../form/form';
 import { useStep } from '../stepper';
-import type { TAddTemplateFieldsFormSchema } from './add-template-fields.types';
+import {
+  type TAddTemplateFieldsFormSchema,
+  ZAddTemplateFieldsFormSchema,
+} from './add-template-fields.types';
 
 const MIN_HEIGHT_PX = 12;
 const MIN_WIDTH_PX = 36;
@@ -73,6 +78,7 @@ export type AddTemplateFieldsFormProps = {
   recipients: Recipient[];
   fields: Field[];
   onSubmit: (_data: TAddTemplateFieldsFormSchema) => void;
+  onAutoSave: (_data: TAddTemplateFieldsFormSchema) => Promise<void>;
   teamId: number;
 };
 
@@ -81,6 +87,7 @@ export const AddTemplateFieldsFormPartial = ({
   recipients,
   fields,
   onSubmit,
+  onAutoSave,
   teamId,
 }: AddTemplateFieldsFormProps) => {
   const { _ } = useLingui();
@@ -102,14 +109,14 @@ export const AddTemplateFieldsFormPartial = ({
     defaultValues: {
       fields: fields.map((field) => ({
         nativeId: field.id,
-        formId: `${field.id}-${field.templateId}`,
+        formId: `${field.id}-${field.envelopeItemId}`,
         pageNumber: field.page,
         type: field.type,
         pageX: Number(field.positionX),
         pageY: Number(field.positionY),
         pageWidth: Number(field.width),
         pageHeight: Number(field.height),
-        signerId: field.recipientId ?? -1,
+        recipientId: field.recipientId ?? -1,
         signerEmail:
           recipients.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
         signerToken:
@@ -117,9 +124,24 @@ export const AddTemplateFieldsFormPartial = ({
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     },
+    resolver: zodResolver(ZAddTemplateFieldsFormSchema),
   });
 
   const onFormSubmit = form.handleSubmit(onSubmit);
+
+  const { scheduleSave } = useAutoSave(onAutoSave);
+
+  const handleAutoSave = async () => {
+    const isFormValid = await form.trigger();
+
+    if (!isFormValid) {
+      return;
+    }
+
+    const formData = form.getValues();
+
+    scheduleSave(formData);
+  };
 
   const {
     append,
@@ -153,13 +175,14 @@ export const AddTemplateFieldsFormPartial = ({
             nativeId: undefined,
             formId: nanoid(12),
             signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-            signerId: selectedSigner?.id ?? lastActiveField.signerId,
+            recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
             signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
             pageX: lastActiveField.pageX + 3,
             pageY: lastActiveField.pageY + 3,
           };
 
           append(newField);
+          void handleAutoSave();
 
           return;
         }
@@ -179,7 +202,7 @@ export const AddTemplateFieldsFormPartial = ({
               nativeId: undefined,
               formId: nanoid(12),
               signerEmail: selectedSigner?.email ?? lastActiveField.signerEmail,
-              signerId: selectedSigner?.id ?? lastActiveField.signerId,
+              recipientId: selectedSigner?.id ?? lastActiveField.recipientId,
               signerToken: selectedSigner?.token ?? lastActiveField.signerToken,
               pageNumber,
             };
@@ -187,6 +210,7 @@ export const AddTemplateFieldsFormPartial = ({
             append(newField);
           });
 
+          void handleAutoSave();
           return;
         }
 
@@ -198,7 +222,15 @@ export const AddTemplateFieldsFormPartial = ({
         });
       }
     },
-    [append, lastActiveField, selectedSigner?.email, selectedSigner?.id, toast],
+    [
+      append,
+      lastActiveField,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      toast,
+      handleAutoSave,
+    ],
   );
 
   const onFieldPaste = useCallback(
@@ -213,14 +245,23 @@ export const AddTemplateFieldsFormPartial = ({
           formId: nanoid(12),
           nativeId: undefined,
           signerEmail: selectedSigner?.email ?? copiedField.signerEmail,
-          signerId: selectedSigner?.id ?? copiedField.signerId,
+          recipientId: selectedSigner?.id ?? copiedField.recipientId,
           signerToken: selectedSigner?.token ?? copiedField.signerToken,
           pageX: copiedField.pageX + 3,
           pageY: copiedField.pageY + 3,
         });
+
+        void handleAutoSave();
       }
     },
-    [append, fieldClipboard, selectedSigner?.email, selectedSigner?.id, selectedSigner?.token],
+    [
+      append,
+      fieldClipboard,
+      selectedSigner?.email,
+      selectedSigner?.id,
+      selectedSigner?.token,
+      handleAutoSave,
+    ],
   );
 
   useHotkeys(['ctrl+c', 'meta+c'], (evt) => onFieldCopy(evt));
@@ -335,7 +376,7 @@ export const AddTemplateFieldsFormPartial = ({
         pageWidth: fieldPageWidth,
         pageHeight: fieldPageHeight,
         signerEmail: selectedSigner.email,
-        signerId: selectedSigner.id,
+        recipientId: selectedSigner.id,
         signerToken: selectedSigner.token ?? '',
         fieldMeta: undefined,
       };
@@ -378,8 +419,10 @@ export const AddTemplateFieldsFormPartial = ({
         pageWidth,
         pageHeight,
       });
+
+      void handleAutoSave();
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update, handleAutoSave],
   );
 
   const onFieldMove = useCallback(
@@ -401,8 +444,10 @@ export const AddTemplateFieldsFormPartial = ({
         pageX,
         pageY,
       });
+
+      void handleAutoSave();
     },
-    [getFieldPosition, localFields, update],
+    [getFieldPosition, localFields, update, handleAutoSave],
   );
 
   useEffect(() => {
@@ -504,6 +549,7 @@ export const AddTemplateFieldsFormPartial = ({
     });
 
     form.setValue('fields', updatedFields);
+    void handleAutoSave();
   };
 
   return (
@@ -519,6 +565,10 @@ export const AddTemplateFieldsFormPartial = ({
           fields={localFields}
           onAdvancedSettings={handleAdvancedSettings}
           onSave={handleSavedFieldSettings}
+          onAutoSave={async (fieldState) => {
+            handleSavedFieldSettings(fieldState);
+            await handleAutoSave();
+          }}
         />
       ) : (
         <>
@@ -552,26 +602,36 @@ export const AddTemplateFieldsFormPartial = ({
               )}
 
               {localFields.map((field, index) => {
-                const recipientIndex = recipients.findIndex((r) => r.email === field.signerEmail);
+                const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 
                 return (
                   <FieldItem
                     key={index}
                     recipientIndex={recipientIndex === -1 ? 0 : recipientIndex}
                     field={field}
-                    disabled={selectedSigner?.email !== field.signerEmail}
+                    disabled={selectedSigner?.id !== field.recipientId}
                     minHeight={MIN_HEIGHT_PX}
                     minWidth={MIN_WIDTH_PX}
                     defaultHeight={DEFAULT_HEIGHT_PX}
                     defaultWidth={DEFAULT_WIDTH_PX}
                     passive={isFieldWithinBounds && !!selectedField}
                     onFocus={() => setLastActiveField(field)}
-                    onBlur={() => setLastActiveField(null)}
+                    onBlur={() => {
+                      setLastActiveField(null);
+                      void handleAutoSave();
+                    }}
                     onResize={(options) => onFieldResize(options, index)}
                     onMove={(options) => onFieldMove(options, index)}
-                    onRemove={() => remove(index)}
-                    onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                    onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                    onRemove={() => {
+                      remove(index);
+                      void handleAutoSave();
+                    }}
+                    onDuplicate={() => {
+                      onFieldCopy(null, { duplicate: true });
+                    }}
+                    onDuplicateAllPages={() => {
+                      onFieldCopy(null, { duplicateAll: true });
+                    }}
                     onAdvancedSettings={() => {
                       setCurrentField(field);
                       handleAdvancedSettings();

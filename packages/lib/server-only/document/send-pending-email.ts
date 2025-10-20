@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
+import { EnvelopeType } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
@@ -9,18 +10,20 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
 export interface SendPendingEmailOptions {
-  documentId: number;
+  id: EnvelopeIdOptions;
   recipientId: number;
 }
 
-export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingEmailOptions) => {
-  const document = await prisma.document.findFirst({
+export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOptions) => {
+  const envelope = await prisma.envelope.findFirst({
     where: {
-      id: documentId,
+      ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
       recipients: {
         some: {
           id: recipientId,
@@ -37,11 +40,11 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.recipients.length === 0) {
+  if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
@@ -49,27 +52,27 @@ export const sendPendingEmail = async ({ documentId, recipientId }: SendPendingE
     emailType: 'RECIPIENT',
     source: {
       type: 'team',
-      teamId: document.teamId,
+      teamId: envelope.teamId,
     },
-    meta: document.documentMeta,
+    meta: envelope.documentMeta,
   });
 
   const isDocumentPendingEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).documentPending;
 
   if (!isDocumentPendingEmailEnabled) {
     return;
   }
 
-  const [recipient] = document.recipients;
+  const [recipient] = envelope.recipients;
 
   const { email, name } = recipient;
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
   const template = createElement(DocumentPendingEmailTemplate, {
-    documentName: document.title,
+    documentName: envelope.title,
     assetBaseUrl,
   });
 

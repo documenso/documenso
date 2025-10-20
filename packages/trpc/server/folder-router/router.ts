@@ -4,13 +4,10 @@ import { deleteFolder } from '@documenso/lib/server-only/folder/delete-folder';
 import { findFolders } from '@documenso/lib/server-only/folder/find-folders';
 import { getFolderBreadcrumbs } from '@documenso/lib/server-only/folder/get-folder-breadcrumbs';
 import { getFolderById } from '@documenso/lib/server-only/folder/get-folder-by-id';
-import { moveDocumentToFolder } from '@documenso/lib/server-only/folder/move-document-to-folder';
 import { moveFolder } from '@documenso/lib/server-only/folder/move-folder';
-import { moveTemplateToFolder } from '@documenso/lib/server-only/folder/move-template-to-folder';
 import { pinFolder } from '@documenso/lib/server-only/folder/pin-folder';
 import { unpinFolder } from '@documenso/lib/server-only/folder/unpin-folder';
 import { updateFolder } from '@documenso/lib/server-only/folder/update-folder';
-import { FolderType } from '@documenso/lib/types/folder-type';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {
@@ -21,9 +18,7 @@ import {
   ZGenericSuccessResponse,
   ZGetFoldersResponseSchema,
   ZGetFoldersSchema,
-  ZMoveDocumentToFolderSchema,
   ZMoveFolderSchema,
-  ZMoveTemplateToFolderSchema,
   ZPinFolderSchema,
   ZSuccessResponseSchema,
   ZUnpinFolderSchema,
@@ -265,95 +260,6 @@ export const folderRouter = router({
       type: currentFolder.type,
     };
   }),
-
-  /**
-   * @private
-   */
-  moveDocumentToFolder: authenticatedProcedure
-    .input(ZMoveDocumentToFolderSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId, user } = ctx;
-      const { documentId, folderId } = input;
-
-      ctx.logger.info({
-        input: {
-          documentId,
-          folderId,
-        },
-      });
-
-      if (folderId !== null) {
-        try {
-          await getFolderById({
-            userId: user.id,
-            teamId,
-            folderId,
-            type: FolderType.DOCUMENT,
-          });
-        } catch (error) {
-          throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Folder not found',
-          });
-        }
-      }
-
-      const result = await moveDocumentToFolder({
-        userId: user.id,
-        teamId,
-        documentId,
-        folderId,
-        requestMetadata: ctx.metadata,
-      });
-
-      return {
-        ...result,
-        type: FolderType.DOCUMENT,
-      };
-    }),
-
-  /**
-   * @private
-   */
-  moveTemplateToFolder: authenticatedProcedure
-    .input(ZMoveTemplateToFolderSchema)
-    .mutation(async ({ input, ctx }) => {
-      const { teamId, user } = ctx;
-      const { templateId, folderId } = input;
-
-      ctx.logger.info({
-        input: {
-          templateId,
-          folderId,
-        },
-      });
-
-      if (folderId !== null) {
-        try {
-          await getFolderById({
-            userId: user.id,
-            teamId,
-            folderId,
-            type: FolderType.TEMPLATE,
-          });
-        } catch (error) {
-          throw new AppError(AppErrorCode.NOT_FOUND, {
-            message: 'Folder not found',
-          });
-        }
-      }
-
-      const result = await moveTemplateToFolder({
-        userId: user.id,
-        teamId,
-        templateId,
-        folderId,
-      });
-
-      return {
-        ...result,
-        type: FolderType.TEMPLATE,
-      };
-    }),
 
   /**
    * @private

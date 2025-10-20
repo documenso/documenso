@@ -1,6 +1,7 @@
 import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
+import { EnvelopeType } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { DocumentRecipientSignedEmailTemplate } from '@documenso/email/templates/document-recipient-signed';
@@ -10,6 +11,7 @@ import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';
 import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
+import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSendRecipientSignedEmailJobDefinition } from './send-recipient-signed-email';
@@ -23,9 +25,15 @@ export const run = async ({
 }) => {
   const { documentId, recipientId } = payload;
 
-  const document = await prisma.document.findFirst({
+  const envelope = await prisma.envelope.findFirst({
     where: {
-      id: documentId,
+      ...unsafeBuildEnvelopeIdQuery(
+        {
+          type: 'documentId',
+          id: documentId,
+        },
+        EnvelopeType.DOCUMENT,
+      ),
       recipients: {
         some: {
           id: recipientId,
@@ -38,30 +46,36 @@ export const run = async ({
           id: recipientId,
         },
       },
-      user: true,
+      user: {
+        select: {
+          id: true,
+          email: true,
+          name: true,
+        },
+      },
       documentMeta: true,
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new Error('Document not found');
   }
 
-  if (document.recipients.length === 0) {
+  if (envelope.recipients.length === 0) {
     throw new Error('Document has no recipients');
   }
 
   const isRecipientSignedEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientSigned;
 
   if (!isRecipientSignedEmailEnabled) {
     return;
   }
 
-  const [recipient] = document.recipients;
+  const [recipient] = envelope.recipients;
   const { email: recipientEmail, name: recipientName } = recipient;
-  const { user: owner } = document;
+  const { user: owner } = envelope;
 
   const recipientReference = recipientName || recipientEmail;
 
@@ -74,9 +88,9 @@ export const run = async ({
     emailType: 'INTERNAL',
     source: {
       type: 'team',
-      teamId: document.teamId,
+      teamId: envelope.teamId,
     },
-    meta: document.documentMeta,
+    meta: envelope.documentMeta,
   });
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
@@ -84,7 +98,7 @@ export const run = async ({
   const i18n = await getI18nInstance(emailLanguage);
 
   const template = createElement(DocumentRecipientSignedEmailTemplate, {
-    documentName: document.title,
+    documentName: envelope.title,
     recipientName,
     recipientEmail,
     assetBaseUrl,
@@ -106,7 +120,7 @@ export const run = async ({
         address: owner.email,
       },
       from: senderEmail,
-      subject: i18n._(msg`${recipientReference} has signed "${document.title}"`),
+      subject: i18n._(msg`${recipientReference} has signed "${envelope.title}"`),
       html,
       text,
     });

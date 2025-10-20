@@ -1,6 +1,6 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
-import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
 import { env } from '@documenso/lib/utils/env';

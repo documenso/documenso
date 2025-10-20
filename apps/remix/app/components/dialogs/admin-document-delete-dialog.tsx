@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document } from '@prisma/client';
 import { useNavigate } from 'react-router';
 
 import { trpc } from '@documenso/trpc/react';
@@ -22,10 +21,10 @@ import { Input } from '@documenso/ui/primitives/input';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type AdminDocumentDeleteDialogProps = {
-  document: Document;
+  envelopeId: string;
 };
 
-export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialogProps) => {
+export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDialogProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -34,7 +33,7 @@ export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialo
   const [reason, setReason] = useState('');
 
   const { mutateAsync: deleteDocument, isPending: isDeletingDocument } =
-    trpc.admin.deleteDocument.useMutation();
+    trpc.admin.document.delete.useMutation();
 
   const handleDeleteDocument = async () => {
     try {
@@ -42,7 +41,7 @@ export const AdminDocumentDeleteDialog = ({ document }: AdminDocumentDeleteDialo
         return;
       }
 
-      await deleteDocument({ id: document.id, reason });
+      await deleteDocument({ id: envelopeId, reason });
 
       toast({
         title: _(msg`Document deleted`),

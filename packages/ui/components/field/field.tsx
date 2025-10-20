@@ -70,9 +70,16 @@ export type FieldRootContainerProps = {
   color?: RecipientColorStyles;
   children: React.ReactNode;
   className?: string;
+  readonly?: boolean;
 };
 
-export function FieldRootContainer({ field, children, color, className }: FieldRootContainerProps) {
+export function FieldRootContainer({
+  field,
+  children,
+  color,
+  className,
+  readonly,
+}: FieldRootContainerProps) {
   const [isValidating, setIsValidating] = useState(false);
   const ref = React.useRef<HTMLDivElement>(null);
 
@@ -103,6 +110,7 @@ export function FieldRootContainer({ field, children, color, className }: FieldR
         ref={ref}
         data-field-type={field.type}
         data-inserted={field.inserted ? 'true' : 'false'}
+        data-readonly={readonly ? 'true' : 'false'}
         className={cn(
           'field--FieldRootContainer field-card-container dark-mode-disabled group relative z-20 flex h-full w-full items-center rounded-[2px] bg-white/90 ring-2 ring-gray-200 transition-all',
           color?.base,

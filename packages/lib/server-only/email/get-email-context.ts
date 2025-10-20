@@ -1,3 +1,5 @@
+import { P, match } from 'ts-pattern';
+
 import type { BrandingSettings } from '@documenso/email/providers/branding';
 import { prisma } from '@documenso/prisma';
 import type {
@@ -104,7 +106,12 @@ export const getEmailContext = async (
   }
 
   const replyToEmail = meta?.emailReplyTo || emailContext.settings.emailReplyTo || undefined;
-  const senderEmailId = meta?.emailId === null ? null : emailContext.settings.emailId;
+
+  const senderEmailId = match(meta?.emailId)
+    .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
+    .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
+    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
 
