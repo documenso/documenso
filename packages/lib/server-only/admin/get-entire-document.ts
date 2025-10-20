@@ -1,14 +1,22 @@
+import type { EnvelopeType } from '@prisma/client';
+
 import { prisma } from '@documenso/prisma';
 
-export type GetEntireDocumentOptions = {
-  id: number;
+import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+
+export type unsafeGetEntireEnvelopeOptions = {
+  id: EnvelopeIdOptions;
+  type: EnvelopeType;
 };
 
-export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
-  const document = await prisma.document.findFirstOrThrow({
-    where: {
-      id,
-    },
+/**
+ * An unauthenticated function that returns the whole envelope
+ */
+export const unsafeGetEntireEnvelope = async ({ id, type }: unsafeGetEntireEnvelopeOptions) => {
+  const envelope = await prisma.envelope.findFirst({
+    where: unsafeBuildEnvelopeIdQuery(id, type),
     include: {
       documentMeta: true,
       user: {
@@ -30,5 +38,11 @@ export const getEntireDocument = async ({ id }: GetEntireDocumentOptions) => {
     },
   });
 
-  return document;
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Envelope not found',
+    });
+  }
+
+  return envelope;
 };

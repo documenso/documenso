@@ -60,7 +60,7 @@ export const Header = ({ className, ...props }: HeaderProps) => {
     >
       <div className="mx-auto flex w-full max-w-screen-xl items-center justify-between gap-x-4 px-4 md:justify-normal md:px-8">
         <Link
-          to={`${getRootHref(params, { returnEmptyRootString: true })}`}
+          to={getRootHref(params)}
           className="focus-visible:ring-ring ring-offset-background hidden rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 md:inline"
         >
           <BrandingLogo className="h-6 w-auto" />

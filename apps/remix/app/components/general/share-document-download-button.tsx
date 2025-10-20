@@ -15,6 +15,7 @@ export type ShareDocumentDownloadButtonProps = {
   documentData: DocumentData;
 };
 
+// Todo: Envelopes - Support multiple item downloads.
 export const ShareDocumentDownloadButton = ({
   title,
   documentData,

@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { kyselyPrisma, sql } from '@documenso/prisma';
@@ -34,11 +34,12 @@ export async function getSigningVolume({
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
     .leftJoin('Team as t', 'o.id', 't.organisationId')
-    .leftJoin('Document as d', (join) =>
+    .leftJoin('Envelope as e', (join) =>
       join
-        .onRef('t.id', '=', 'd.teamId')
-        .on('d.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('d.deletedAt', 'is', null),
+        .onRef('t.id', '=', 'e.teamId')
+        .on('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('e.deletedAt', 'is', null)
+        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
     )
     .where((eb) =>
       eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
@@ -48,7 +49,7 @@ export async function getSigningVolume({
       'o.createdAt as createdAt',
       'o.customerId as customerId',
       sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT d.id)`.as('signingVolume'),
+      sql<number>`COUNT(DISTINCT e.id)`.as('signingVolume'),
     ])
     .groupBy(['o.id', 'o.name', 'o.customerId']);
 
@@ -106,22 +107,22 @@ export async function getOrganisationInsights({
   let dateCondition = sql`1=1`;
 
   if (startDate && endDate) {
-    dateCondition = sql`d."createdAt" >= ${startDate} AND d."createdAt" <= ${endDate}`;
+    dateCondition = sql`e."createdAt" >= ${startDate} AND e."createdAt" <= ${endDate}`;
   } else {
     switch (dateRange) {
       case 'last30days': {
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        dateCondition = sql`d."createdAt" >= ${thirtyDaysAgo}`;
+        dateCondition = sql`e."createdAt" >= ${thirtyDaysAgo}`;
         break;
       }
       case 'last90days': {
         const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-        dateCondition = sql`d."createdAt" >= ${ninetyDaysAgo}`;
+        dateCondition = sql`e."createdAt" >= ${ninetyDaysAgo}`;
         break;
       }
       case 'lastYear': {
         const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        dateCondition = sql`d."createdAt" >= ${oneYearAgo}`;
+        dateCondition = sql`e."createdAt" >= ${oneYearAgo}`;
         break;
       }
       case 'allTime':
@@ -134,11 +135,12 @@ export async function getOrganisationInsights({
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
     .leftJoin('Team as t', 'o.id', 't.organisationId')
-    .leftJoin('Document as d', (join) =>
+    .leftJoin('Envelope as e', (join) =>
       join
-        .onRef('t.id', '=', 'd.teamId')
-        .on('d.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('d.deletedAt', 'is', null),
+        .onRef('t.id', '=', 'e.teamId')
+        .on('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .on('e.deletedAt', 'is', null)
+        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
     )
     .leftJoin('OrganisationMember as om', 'o.id', 'om.organisationId')
     .leftJoin('Subscription as s', 'o.id', 's.organisationId')
@@ -150,7 +152,7 @@ export async function getOrganisationInsights({
       'o.createdAt as createdAt',
       'o.customerId as customerId',
       sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND ${dateCondition} THEN d.id END)`.as(
+      sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND ${dateCondition} THEN e.id END)`.as(
         'signingVolume',
       ),
       sql<number>`GREATEST(COUNT(DISTINCT t.id), 1)`.as('teamCount'),

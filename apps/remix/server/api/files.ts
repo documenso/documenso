@@ -1,6 +1,6 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { sValidator } from '@hono/standard-validator';
 import { Hono } from 'hono';
-import { PDFDocument } from 'pdf-lib';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

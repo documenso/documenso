@@ -1,9 +1,10 @@
-import type { Document, Recipient } from '@prisma/client';
+import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 
+import { validateTwoFactorTokenFromEmail } from '../2fa/email/validate-2fa-token-from-email';
 import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';
 import { verifyPassword } from '../2fa/verify-password';
 import { AppError, AppErrorCode } from '../../errors/app-error';
@@ -14,9 +15,10 @@ import { getAuthenticatorOptions } from '../../utils/authenticator';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 
 type IsRecipientAuthorizedOptions = {
-  type: 'ACCESS' | 'ACTION';
-  documentAuthOptions: Document['authOptions'];
-  recipient: Pick<Recipient, 'authOptions' | 'email'>;
+  // !: Probably find a better name than 'ACCESS_2FA' if requirements change.
+  type: 'ACCESS' | 'ACCESS_2FA' | 'ACTION';
+  documentAuthOptions: Envelope['authOptions'];
+  recipient: Pick<Recipient, 'authOptions' | 'email' | 'envelopeId'>;
 
   /**
    * The ID of the user who initiated the request.
@@ -61,14 +63,22 @@ export const isRecipientAuthorized = async ({
     recipientAuth: recipient.authOptions,
   });
 
-  const authMethods: TDocumentAuth[] =
-    type === 'ACCESS' ? derivedRecipientAccessAuth : derivedRecipientActionAuth;
+  const authMethods: TDocumentAuth[] = match(type)
+    .with('ACCESS', () => derivedRecipientAccessAuth)
+    .with('ACCESS_2FA', () => derivedRecipientAccessAuth)
+    .with('ACTION', () => derivedRecipientActionAuth)
+    .exhaustive();
 
   // Early true return when auth is not required.
   if (
     authMethods.length === 0 ||
     authMethods.some((method) => method === DocumentAuth.EXPLICIT_NONE)
   ) {
+    return true;
+  }
+
+  // Early true return for ACCESS auth if all methods are 2FA since validation happens in ACCESS_2FA.
+  if (type === 'ACCESS' && authMethods.every((method) => method === DocumentAuth.TWO_FACTOR_AUTH)) {
     return true;
   }
 
@@ -80,12 +90,16 @@ export const isRecipientAuthorized = async ({
   }
 
   // Authentication required does not match provided method.
-  if (!authOptions || !authMethods.includes(authOptions.type) || !userId) {
+  if (!authOptions || !authMethods.includes(authOptions.type)) {
     return false;
   }
 
   return await match(authOptions)
     .with({ type: DocumentAuth.ACCOUNT }, async () => {
+      if (!userId) {
+        return false;
+      }
+
       const recipientUser = await getUserByEmail(recipient.email);
 
       if (!recipientUser) {
@@ -95,13 +109,34 @@ export const isRecipientAuthorized = async ({
       return recipientUser.id === userId;
     })
     .with({ type: DocumentAuth.PASSKEY }, async ({ authenticationResponse, tokenReference }) => {
+      if (!userId) {
+        return false;
+      }
+
       return await isPasskeyAuthValid({
         userId,
         authenticationResponse,
         tokenReference,
       });
     })
-    .with({ type: DocumentAuth.TWO_FACTOR_AUTH }, async ({ token }) => {
+    .with({ type: DocumentAuth.TWO_FACTOR_AUTH }, async ({ token, method }) => {
+      if (type === 'ACCESS') {
+        return true;
+      }
+
+      if (type === 'ACCESS_2FA' && method === 'email') {
+        return await validateTwoFactorTokenFromEmail({
+          envelopeId: recipient.envelopeId,
+          email: recipient.email,
+          code: token,
+          window: 10, // 5 minutes worth of tokens
+        });
+      }
+
+      if (!userId) {
+        return false;
+      }
+
       const user = await prisma.user.findFirst({
         where: {
           id: userId,
@@ -115,6 +150,7 @@ export const isRecipientAuthorized = async ({
         });
       }
 
+      // For ACTION auth or authenticator method, use TOTP
       return await verifyTwoFactorAuthenticationToken({
         user,
         totpCode: token,
@@ -122,6 +158,10 @@ export const isRecipientAuthorized = async ({
       });
     })
     .with({ type: DocumentAuth.PASSWORD }, async ({ password }) => {
+      if (!userId) {
+        return false;
+      }
+
       return await verifyPassword({
         userId,
         password,

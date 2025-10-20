@@ -57,7 +57,6 @@ export default function AdminDocumentsPage() {
         header: _(msg`Created`),
         accessorKey: 'createdAt',
         cell: ({ row }) => i18n.date(row.original.createdAt),
-        size: 160,
       },
       {
         header: _(msg`Title`),
@@ -65,20 +64,18 @@ export default function AdminDocumentsPage() {
         cell: ({ row }) => {
           return (
             <Link
-              to={`/admin/documents/${row.original.id}`}
-              className="block truncate font-medium hover:underline"
+              to={`/admin/documents/${row.original.envelopeId}`}
+              className="block max-w-[5rem] truncate font-medium hover:underline md:max-w-[10rem]"
             >
               {row.original.title}
             </Link>
           );
         },
-        size: 240,
       },
       {
         header: _(msg`Status`),
         accessorKey: 'status',
         cell: ({ row }) => <DocumentStatus status={row.original.status} />,
-        size: 140,
       },
       {
         header: _(msg`Owner`),
@@ -115,13 +112,11 @@ export default function AdminDocumentsPage() {
             </Tooltip>
           );
         },
-        size: 100,
       },
       {
         header: 'Last updated',
         accessorKey: 'updatedAt',
         cell: ({ row }) => i18n.date(row.original.updatedAt),
-        size: 160,
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
   }, []);

@@ -4,15 +4,15 @@ import { DOCUMENT_AUDIT_LOG_TYPE, DOCUMENT_EMAIL_TYPE } from '../../types/docume
 import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
 
 export type GetDocumentCertificateAuditLogsOptions = {
-  id: number;
+  envelopeId: string;
 };
 
 export const getDocumentCertificateAuditLogs = async ({
-  id,
+  envelopeId,
 }: GetDocumentCertificateAuditLogsOptions) => {
   const rawAuditLogs = await prisma.documentAuditLog.findMany({
     where: {
-      documentId: id,
+      envelopeId,
       type: {
         in: [
           DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,

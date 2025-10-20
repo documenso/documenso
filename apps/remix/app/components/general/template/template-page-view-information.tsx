@@ -3,14 +3,17 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Template, User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 
 export type TemplatePageViewInformationProps = {
   userId: number;
-  template: Template & {
+  template: {
+    userId: number;
+    createdAt: Date;
+    updatedAt: Date;
     user: Pick<User, 'id' | 'name' | 'email'>;
   };
 };

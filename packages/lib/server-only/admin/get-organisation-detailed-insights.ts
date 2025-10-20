@@ -1,4 +1,5 @@
 import type { DocumentStatus } from '@prisma/client';
+import { EnvelopeType } from '@prisma/client';
 
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { kyselyPrisma, sql } from '@documenso/prisma';
@@ -115,8 +116,11 @@ async function getTeamInsights(
 ): Promise<OrganisationDetailedInsights> {
   const teamsQuery = kyselyPrisma.$kysely
     .selectFrom('Team as t')
-    .leftJoin('Document as d', (join) =>
-      join.onRef('t.id', '=', 'd.teamId').on('d.deletedAt', 'is', null),
+    .leftJoin('Envelope as e', (join) =>
+      join
+        .onRef('t.id', '=', 'e.teamId')
+        .on('e.deletedAt', 'is', null)
+        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
     )
     .leftJoin('TeamGroup as tg', 'tg.teamId', 't.id')
     .leftJoin('OrganisationGroup as og', 'og.id', 'tg.organisationGroupId')
@@ -129,8 +133,8 @@ async function getTeamInsights(
       't.createdAt as createdAt',
       sql<number>`COUNT(DISTINCT om."userId")`.as('memberCount'),
       (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND d."createdAt" >= ${createdAtFrom} THEN d.id END)`
-        : sql<number>`COUNT(DISTINCT d.id)`
+        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
+        : sql<number>`COUNT(DISTINCT e.id)`
       ).as('documentCount'),
     ])
     .groupBy(['t.id', 't.name', 't.createdAt'])
@@ -164,20 +168,26 @@ async function getUserInsights(
     .selectFrom('OrganisationMember as om')
     .innerJoin('User as u', 'u.id', 'om.userId')
     .where('om.organisationId', '=', organisationId)
-    .leftJoin('Document as d', (join) =>
-      join.onRef('d.userId', '=', 'u.id').on('d.deletedAt', 'is', null),
+    .leftJoin('Envelope as e', (join) =>
+      join
+        .onRef('e.userId', '=', 'u.id')
+        .on('e.deletedAt', 'is', null)
+        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
     )
     .leftJoin('Team as td', (join) =>
-      join.onRef('td.id', '=', 'd.teamId').on('td.organisationId', '=', organisationId),
+      join.onRef('td.id', '=', 'e.teamId').on('td.organisationId', '=', organisationId),
     )
     .leftJoin('Recipient as r', (join) =>
       join.onRef('r.email', '=', 'u.email').on('r.signedAt', 'is not', null),
     )
-    .leftJoin('Document as sd', (join) =>
-      join.onRef('sd.id', '=', 'r.documentId').on('sd.deletedAt', 'is', null),
+    .leftJoin('Envelope as se', (join) =>
+      join
+        .onRef('se.id', '=', 'r.envelopeId')
+        .on('se.deletedAt', 'is', null)
+        .on('se.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
     )
     .leftJoin('Team as ts', (join) =>
-      join.onRef('ts.id', '=', 'sd.teamId').on('ts.organisationId', '=', organisationId),
+      join.onRef('ts.id', '=', 'se.teamId').on('ts.organisationId', '=', organisationId),
     );
 
   const usersQuery = usersBase
@@ -187,12 +197,12 @@ async function getUserInsights(
       'u.email as email',
       'u.createdAt as createdAt',
       (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND td.id IS NOT NULL AND d."createdAt" >= ${createdAtFrom} THEN d.id END)`
-        : sql<number>`COUNT(DISTINCT CASE WHEN td.id IS NOT NULL THEN d.id END)`
+        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
+        : sql<number>`COUNT(DISTINCT CASE WHEN td.id IS NOT NULL THEN e.id END)`
       ).as('documentCount'),
       (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND td.id IS NOT NULL AND d.status = 'COMPLETED' AND d."createdAt" >= ${createdAtFrom} THEN d.id END)`
-        : sql<number>`COUNT(DISTINCT CASE WHEN d.id IS NOT NULL AND td.id IS NOT NULL AND d.status = 'COMPLETED' THEN d.id END)`
+        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e.status = 'COMPLETED' AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
+        : sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e.status = 'COMPLETED' THEN e.id END)`
       ).as('signedDocumentCount'),
     ])
     .groupBy(['u.id', 'u.name', 'u.email', 'u.createdAt'])
@@ -224,36 +234,38 @@ async function getDocumentInsights(
   createdAtFrom: Date | null,
 ): Promise<OrganisationDetailedInsights> {
   let documentsQuery = kyselyPrisma.$kysely
-    .selectFrom('Document as d')
-    .innerJoin('Team as t', 'd.teamId', 't.id')
+    .selectFrom('Envelope as e')
+    .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
-    .where('d.deletedAt', 'is', null);
+    .where('e.deletedAt', 'is', null)
+    .where('e.type', '=', EnvelopeType.DOCUMENT);
 
   if (createdAtFrom) {
-    documentsQuery = documentsQuery.where('d.createdAt', '>=', createdAtFrom);
+    documentsQuery = documentsQuery.where('e.createdAt', '>=', createdAtFrom);
   }
 
   documentsQuery = documentsQuery
     .select([
-      'd.id as id',
-      'd.title as title',
-      'd.status as status',
-      'd.createdAt as createdAt',
-      'd.completedAt as completedAt',
+      'e.id as id',
+      'e.title as title',
+      'e.status as status',
+      'e.createdAt as createdAt',
+      'e.completedAt as completedAt',
       't.name as teamName',
     ])
-    .orderBy('d.createdAt', 'desc')
+    .orderBy('e.createdAt', 'desc')
     .limit(perPage)
     .offset(offset);
 
   let countQuery = kyselyPrisma.$kysely
-    .selectFrom('Document as d')
-    .innerJoin('Team as t', 'd.teamId', 't.id')
+    .selectFrom('Envelope as e')
+    .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
-    .where('d.deletedAt', 'is', null);
+    .where('e.deletedAt', 'is', null)
+    .where('e.type', '=', EnvelopeType.DOCUMENT);
 
   if (createdAtFrom) {
-    countQuery = countQuery.where('d.createdAt', '>=', createdAtFrom);
+    countQuery = countQuery.where('e.createdAt', '>=', createdAtFrom);
   }
 
   countQuery = countQuery.select(({ fn }) => [fn.countAll().as('count')]);
@@ -291,47 +303,49 @@ async function getOrganisationSummary(
         'totalMembers',
       ),
       sql<number>`(
-        SELECT COUNT(DISTINCT d2.id)
-        FROM "Document" AS d2
-        INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
-        WHERE t2."organisationId" = o.id AND d2."deletedAt" IS NULL
+        SELECT COUNT(DISTINCT e2.id)
+        FROM "Envelope" AS e2
+        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
+        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT'
       )`.as('totalDocuments'),
       sql<number>`(
-        SELECT COUNT(DISTINCT d2.id)
-        FROM "Document" AS d2
-        INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
-        WHERE t2."organisationId" = o.id AND d2."deletedAt" IS NULL AND d2.status IN ('DRAFT', 'PENDING')
+        SELECT COUNT(DISTINCT e2.id)
+        FROM "Envelope" AS e2
+        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
+        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status IN ('DRAFT', 'PENDING')
       )`.as('activeDocuments'),
       sql<number>`(
-        SELECT COUNT(DISTINCT d2.id)
-        FROM "Document" AS d2
-        INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
-        WHERE t2."organisationId" = o.id AND d2."deletedAt" IS NULL AND d2.status = 'COMPLETED'
+        SELECT COUNT(DISTINCT e2.id)
+        FROM "Envelope" AS e2
+        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
+        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status = 'COMPLETED'
       )`.as('completedDocuments'),
       (createdAtFrom
         ? sql<number>`(
-            SELECT COUNT(DISTINCT d2.id)
-            FROM "Document" AS d2
-            INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
+            SELECT COUNT(DISTINCT e2.id)
+            FROM "Envelope" AS e2
+            INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
             WHERE t2."organisationId" = o.id
-              AND d2."deletedAt" IS NULL
-              AND d2.status = 'COMPLETED'
-              AND d2."createdAt" >= ${createdAtFrom}
+              AND e2."deletedAt" IS NULL
+              AND e2.type = 'DOCUMENT'
+              AND e2.status = 'COMPLETED'
+              AND e2."createdAt" >= ${createdAtFrom}
           )`
         : sql<number>`(
-            SELECT COUNT(DISTINCT d2.id)
-            FROM "Document" AS d2
-            INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
+            SELECT COUNT(DISTINCT e2.id)
+            FROM "Envelope" AS e2
+            INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
             WHERE t2."organisationId" = o.id
-              AND d2."deletedAt" IS NULL
-              AND d2.status = 'COMPLETED'
+              AND e2."deletedAt" IS NULL
+              AND e2.type = 'DOCUMENT'
+              AND e2.status = 'COMPLETED'
           )`
       ).as('volumeThisPeriod'),
       sql<number>`(
-        SELECT COUNT(DISTINCT d2.id)
-        FROM "Document" AS d2
-        INNER JOIN "Team" AS t2 ON t2.id = d2."teamId"
-        WHERE t2."organisationId" = o.id AND d2."deletedAt" IS NULL AND d2.status = 'COMPLETED'
+        SELECT COUNT(DISTINCT e2.id)
+        FROM "Envelope" AS e2
+        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
+        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status = 'COMPLETED'
       )`.as('volumeAllTime'),
     ]);
 

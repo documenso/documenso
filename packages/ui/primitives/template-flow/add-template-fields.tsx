@@ -109,7 +109,7 @@ export const AddTemplateFieldsFormPartial = ({
     defaultValues: {
       fields: fields.map((field) => ({
         nativeId: field.id,
-        formId: `${field.id}-${field.templateId}`,
+        formId: `${field.id}-${field.envelopeItemId}`,
         pageNumber: field.page,
         type: field.type,
         pageX: Number(field.positionX),
