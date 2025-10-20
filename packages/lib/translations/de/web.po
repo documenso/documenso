@@ -267,6 +267,11 @@ msgstr "{prefix} hat das Dokument erstellt"
 msgid "{prefix} deleted the document"
 msgstr "{prefix} hat das Dokument gelöscht"
 
+#. placeholder {0}: data.data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} extended expiry for {0}"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} moved the document to team"
 msgstr "{prefix} hat das Dokument ins Team verschoben"
@@ -1703,6 +1708,10 @@ msgstr ""
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role progressive verb"
 msgid "Assisting"
+msgstr ""
+
+#: packages/ui/primitives/date-time-picker.tsx
+msgid "at"
 msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -4076,8 +4085,17 @@ msgid "Exceeded timeout"
 msgstr "Zeitüberschreitung überschritten"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
+#: apps/remix/app/components/tables/inbox-table.tsx
+#: apps/remix/app/components/tables/documents-table-action-button.tsx
+#: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Expired"
 msgstr "Abgelaufen"
+
+#. placeholder {0}: new Date(recipient.expired).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', })
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "Expired on: {0}"
+msgstr ""
 
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
@@ -4958,6 +4976,11 @@ msgstr "Link läuft in 1 Stunde ab."
 msgid "Link expires in 30 minutes."
 msgstr ""
 
+#: packages/ui/primitives/expiry-settings-picker.tsx
+#: packages/ui/primitives/document-flow/add-settings.tsx
+msgid "Link Expiry"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Link template"
 msgstr "Vorlage verlinken"
@@ -4978,6 +5001,11 @@ msgstr ""
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Links Generated"
 msgstr "Links generiert"
+
+#. placeholder {0}: formatExpiryDate(calculatedExpiryDate)
+#: packages/ui/primitives/expiry-settings-picker.tsx
+msgid "Links will expire on: {0}"
+msgstr ""
 
 #. placeholder {0}: webhook.eventTriggers .map((trigger) => toFriendlyWebhookEventName(trigger)) .join(', ')
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
@@ -5967,6 +5995,10 @@ msgstr "Persönliches Konto"
 msgid "Personal Inbox"
 msgstr "Persönlicher Posteingang"
 
+#: packages/ui/primitives/date-time-picker.tsx
+msgid "Pick a date"
+msgstr ""
+
 #: apps/remix/app/components/forms/editor/editor-field-checkbox-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Pick a number"
@@ -6380,6 +6412,10 @@ msgstr "Empfänger"
 #: packages/ui/components/recipient/recipient-action-auth-select.tsx
 msgid "Recipient action authentication"
 msgstr "Empfängeraktion Authentifizierung"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient expiry extended"
+msgstr ""
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient removed email"
@@ -7095,6 +7131,10 @@ msgstr "Sitzungen wurden widerrufen"
 msgid "Set a password"
 msgstr "Ein Passwort festlegen"
 
+#: packages/ui/primitives/expiry-settings-picker.tsx
+msgid "Set an expiry duration for signing links (leave empty to disable)"
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-view.tsx
 msgid "Set up your document properties and recipient information"
 msgstr "Richten Sie Ihre Dokumenteigenschaften und Empfängerinformationen ein"
@@ -7392,6 +7432,10 @@ msgstr "Unterzeichne für"
 #: apps/remix/app/components/forms/signin.tsx
 msgid "Signing in..."
 msgstr "Anmeldung..."
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "Signing Link Expired"
+msgstr ""
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -8267,6 +8311,10 @@ msgstr "Der Name des Unterzeichners"
 msgid "The signing link has been copied to your clipboard."
 msgstr "Der Signierlink wurde in die Zwischenablage kopiert."
 
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "The signing link has expired and can no longer be used to sign the document. Please contact the document sender if you need a new signing link."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "The site banner is a message that is shown at the top of the site. It can be used to display important information to your users."
 msgstr "Das Seitenbanner ist eine Nachricht, die oben auf der Seite angezeigt wird. Es kann verwendet werden, um Ihren Nutzern wichtige Informationen anzuzeigen."
@@ -8584,6 +8632,10 @@ msgstr "Diese Sitzung ist abgelaufen. Bitte versuchen Sie es erneut."
 #: packages/ui/primitives/document-flow/add-signers.tsx
 msgid "This signer has already signed the document."
 msgstr "Dieser Unterzeichner hat das Dokument bereits unterschrieben."
+
+#: apps/remix/app/routes/_recipient+/sign.$token+/expired.tsx
+msgid "This signing link is no longer valid"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "This team, and any associated data excluding billing invoices will be permanently deleted."

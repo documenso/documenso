@@ -20,33 +20,21 @@ export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | Documen
   return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
 };
 
-const getExpiryAmount = (
-  meta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
-): number | null => {
+const getExpiryAmount = (meta: Partial<DocumentMeta> | undefined | null): number | null => {
   if (!meta) return null;
 
   if ('expiryAmount' in meta && meta.expiryAmount !== undefined) {
     return meta.expiryAmount;
   }
 
-  if ('defaultExpiryAmount' in meta && meta.defaultExpiryAmount !== undefined) {
-    return meta.defaultExpiryAmount;
-  }
-
   return null;
 };
 
-const getExpiryUnit = (
-  meta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
-): string | null => {
+const getExpiryUnit = (meta: Partial<DocumentMeta> | undefined | null): string | null => {
   if (!meta) return null;
 
   if ('expiryUnit' in meta && meta.expiryUnit !== undefined) {
     return meta.expiryUnit;
-  }
-
-  if ('defaultExpiryUnit' in meta && meta.defaultExpiryUnit !== undefined) {
-    return meta.defaultExpiryUnit;
   }
 
   return null;

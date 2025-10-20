@@ -3,6 +3,10 @@ import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import {
+  ZDocumentExpiryAmountSchema,
+  ZDocumentExpiryUnitSchema,
+} from '@documenso/lib/types/document-meta';
 
 export const ZAddSignersFormSchema = z.object({
   signers: z.array(
@@ -21,6 +25,10 @@ export const ZAddSignersFormSchema = z.object({
   ),
   signingOrder: z.nativeEnum(DocumentSigningOrder),
   allowDictateNextSigner: z.boolean().default(false),
+  meta: z.object({
+    expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+    expiryUnit: ZDocumentExpiryUnitSchema.optional(),
+  }),
 });
 
 export type TAddSignersFormSchema = z.infer<typeof ZAddSignersFormSchema>;

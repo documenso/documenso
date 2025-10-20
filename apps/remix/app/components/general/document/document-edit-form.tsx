@@ -221,13 +221,6 @@ export const DocumentEditForm = ({
       updateDocument({
         documentId: document.id,
         meta: {
-          timezone,
-          dateFormat,
-          redirectUrl,
-          language: isValidLanguageCode(language) ? language : undefined,
-          typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
-          uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           allowDictateNextSigner: data.allowDictateNextSigner,
           signingOrder: data.signingOrder,
           expiryAmount: data.meta.expiryAmount,
@@ -256,6 +249,8 @@ export const DocumentEditForm = ({
           meta: {
             allowDictateNextSigner: data.allowDictateNextSigner,
             signingOrder: data.signingOrder,
+            expiryAmount: data.meta.expiryAmount,
+            expiryUnit: data.meta.expiryUnit,
           },
         }),
 

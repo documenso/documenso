@@ -1,6 +1,11 @@
 import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
+import {
+  ZDocumentExpiryAmountSchema,
+  ZDocumentExpiryUnitSchema,
+} from '@documenso/lib/types/document-meta';
+
 /**
  * Required for empty responses since we currently can't 201 requests for our openapi setup.
  *
@@ -30,3 +35,6 @@ export const ZDocumentExternalIdSchema = z
 export const ZDocumentVisibilitySchema = z
   .nativeEnum(DocumentVisibility)
   .describe('The visibility of the document.');
+
+// Re-export expiry schemas for convenience
+export { ZDocumentExpiryAmountSchema, ZDocumentExpiryUnitSchema };
