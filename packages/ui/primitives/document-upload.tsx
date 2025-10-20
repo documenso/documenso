@@ -20,9 +20,9 @@ export type DocumentDropzoneProps = {
   disabled?: boolean;
   loading?: boolean;
   disabledMessage?: MessageDescriptor;
-  onDrop?: (_file: File) => void | Promise<void>;
+  onDrop?: (_files: File[]) => void | Promise<void>;
   onDropRejected?: () => void | Promise<void>;
-  type?: 'document' | 'template';
+  type?: 'document' | 'template' | 'envelope';
   [key: string]: unknown;
 };
 
@@ -48,11 +48,12 @@ export const DocumentDropzone = ({
     accept: {
       'application/pdf': ['.pdf'],
     },
-    multiple: false,
+    multiple: type === 'envelope',
     disabled,
-    onDrop: ([acceptedFile]) => {
-      if (acceptedFile && onDrop) {
-        void onDrop(acceptedFile);
+    maxFiles: 10, // Todo: Envelopes - Use claims. And also update other places where this is used.
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0 && onDrop) {
+        void onDrop(acceptedFiles);
       }
     },
     onDropRejected: () => {
@@ -66,6 +67,7 @@ export const DocumentDropzone = ({
   const heading = {
     document: msg`Upload Document`,
     template: msg`Upload Template Document`,
+    envelope: msg`Envelope (beta)`,
   };
 
   if (disabled && IS_BILLING_ENABLED()) {

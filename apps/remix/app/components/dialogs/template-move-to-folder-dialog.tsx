@@ -83,7 +83,7 @@ export function TemplateMoveToFolderDialog({
     },
   );
 
-  const { mutateAsync: moveTemplateToFolder } = trpc.folder.moveTemplateToFolder.useMutation();
+  const { mutateAsync: updateTemplate } = trpc.template.updateTemplate.useMutation();
 
   useEffect(() => {
     if (!isOpen) {
@@ -96,9 +96,11 @@ export function TemplateMoveToFolderDialog({
 
   const onSubmit = async (data: TMoveTemplateFormSchema) => {
     try {
-      await moveTemplateToFolder({
+      await updateTemplate({
         templateId,
-        folderId: data.folderId ?? null,
+        data: {
+          folderId: data.folderId ?? null,
+        },
       });
 
       toast({

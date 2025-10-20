@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const ZResealDocumentRequestSchema = z.object({
-  id: z.number().min(1),
+  id: z.string(),
 });
 
 export const ZResealDocumentResponseSchema = z.void();

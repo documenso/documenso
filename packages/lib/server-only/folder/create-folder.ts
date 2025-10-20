@@ -2,8 +2,6 @@ import { prisma } from '@documenso/prisma';
 
 import type { TFolderType } from '../../types/folder-type';
 import { FolderType } from '../../types/folder-type';
-import { determineDocumentVisibility } from '../../utils/document-visibility';
-import { getTeamById } from '../team/get-team';
 import { getTeamSettings } from '../team/get-team-settings';
 
 export interface CreateFolderOptions {
@@ -21,8 +19,7 @@ export const createFolder = async ({
   parentId,
   type = FolderType.DOCUMENT,
 }: CreateFolderOptions) => {
-  const team = await getTeamById({ userId, teamId });
-
+  // This indirectly verifies whether the user has access to the team.
   const settings = await getTeamSettings({ userId, teamId });
 
   return await prisma.folder.create({
@@ -32,7 +29,7 @@ export const createFolder = async ({
       teamId,
       parentId,
       type,
-      visibility: determineDocumentVisibility(settings.documentVisibility, team.currentTeamRole),
+      visibility: settings.documentVisibility,
     },
   });
 };

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { TeamMemberRole } from '@prisma/client';
 
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedTeam, seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -118,8 +119,10 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
     redirectPath: `/t/${team.url}/templates/${template.id}/edit`,
   });
 
-  // Regular member should not be able to modify visibility when set to managers and above
-  await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();
+  // A regular member should not be able to see the template.
+  // They should be redirected to the templates page.
+  await expect(page.getByText('Not Found').first()).toBeVisible();
+  await page.goto(`/t/${team.url}/templates`);
 
   // Create a new template with 'everyone' visibility
   const everyoneTemplate = await seedBlankTemplate(owner, team.id, {
@@ -130,7 +133,9 @@ test('[TEMPLATE_FLOW] team member visibility permissions', async ({ page }) => {
   });
 
   // Navigate to the new template
-  await page.goto(`/t/${team.url}/templates/${everyoneTemplate.id}/edit`);
+  await page.goto(
+    `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(everyoneTemplate.secondaryId)}/edit`,
+  );
 
   // Regular member should be able to see but not modify visibility
   await expect(page.getByTestId('documentVisibilitySelectValue')).toBeDisabled();

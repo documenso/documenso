@@ -643,7 +643,7 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
-  documentId: z.number(),
+  envelopeId: z.string(),
   name: z.string().optional().nullable(),
   email: z.string().optional().nullable(),
   userId: z.number().optional().nullable(),

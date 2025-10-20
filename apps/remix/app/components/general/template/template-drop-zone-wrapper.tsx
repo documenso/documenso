@@ -42,7 +42,7 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
 
       const documentData = await putPdfFile(file);
 
-      const { id } = await createTemplate({
+      const { legacyTemplateId: id } = await createTemplate({
         title: file.name,
         templateDocumentDataId: documentData.id,
         folderId: folderId ?? undefined,

@@ -10,11 +10,11 @@ import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
-} from '@documenso/trpc/server/document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 
 export const ZAddSettingsFormSchema = z.object({
   title: z

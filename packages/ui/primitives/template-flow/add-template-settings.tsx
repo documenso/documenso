@@ -19,11 +19,11 @@ import {
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import type { TDocumentMetaDateFormat } from '@documenso/lib/types/document-meta';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
-import type { TDocumentMetaDateFormat } from '@documenso/trpc/server/document-router/schema';
 import {
   DocumentGlobalAuthAccessSelect,
   DocumentGlobalAuthAccessTooltip,
