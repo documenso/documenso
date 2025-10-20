@@ -27,10 +27,10 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
   const now = new Date();
   const intervalsString = intervals.join(',').toLowerCase();
 
-  const documentsToSendReminders = await io.runTask(
+  const envelopesToSendReminders = await io.runTask(
     `find-documents-for-${intervalsString}-reminder`,
     async () => {
-      const documents = await prisma.document.findMany({
+      const envelopes = await prisma.envelope.findMany({
         where: {
           status: DocumentStatus.PENDING,
           documentMeta: {
@@ -54,10 +54,10 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
         },
       });
 
-      const filteredDocuments = documents.filter((document) => {
-        const { documentMeta } = document;
+      const filteredEnvelopes = envelopes.filter((envelope) => {
+        const { documentMeta } = envelope;
         if (!documentMeta) {
-          io.logger.warn(`Filtering out document ${document.id} due to missing documentMeta.`);
+          io.logger.warn(`Filtering out envelope ${envelope.id} due to missing documentMeta.`);
           return false;
         }
 
@@ -72,46 +72,46 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
       });
 
       io.logger.info(
-        `Found ${filteredDocuments.length} documents after filtering for interval ${intervalsString}.`,
-        filteredDocuments.map((d) => ({ id: d.id })),
+        `Found ${filteredEnvelopes.length} envelopes after filtering for interval ${intervalsString}.`,
+        filteredEnvelopes.map((e) => ({ id: e.id })),
       );
 
-      return filteredDocuments;
+      return filteredEnvelopes;
     },
   );
 
-  if (documentsToSendReminders.length === 0) {
-    io.logger.info(`No documents found needing ${intervalsString} reminders.`);
+  if (envelopesToSendReminders.length === 0) {
+    io.logger.info(`No envelopes found needing ${intervalsString} reminders.`);
     return;
   }
 
   io.logger.info(
-    `Found ${documentsToSendReminders.length} documents needing ${intervalsString} reminders.`,
+    `Found ${envelopesToSendReminders.length} envelopes needing ${intervalsString} reminders.`,
   );
 
-  for (const document of documentsToSendReminders) {
-    if (!document.documentMeta) {
-      io.logger.warn(`Skipping document ${document.id} due to missing documentMeta.`);
+  for (const envelope of envelopesToSendReminders) {
+    if (!envelope.documentMeta) {
+      io.logger.warn(`Skipping envelope ${envelope.id} due to missing documentMeta.`);
       continue;
     }
 
-    if (!extractDerivedDocumentEmailSettings(document.documentMeta).recipientSigningRequest) {
-      io.logger.info(`Skipping document ${document.id} due to email settings.`);
+    if (!extractDerivedDocumentEmailSettings(envelope.documentMeta).recipientSigningRequest) {
+      io.logger.info(`Skipping envelope ${envelope.id} due to email settings.`);
       continue;
     }
 
-    for (const recipient of document.recipients) {
+    for (const recipient of envelope.recipients) {
       try {
-        const i18n = await getI18nInstance(document.documentMeta.language);
+        const i18n = await getI18nInstance(envelope.documentMeta.language);
         const recipientActionVerb = i18n
           ._(RECIPIENT_ROLES_DESCRIPTION[recipient.role].actionVerb)
           .toLowerCase();
 
         const emailSubject = i18n._(
-          msg`Reminder: Please ${recipientActionVerb} the document "${document.title}"`,
+          msg`Reminder: Please ${recipientActionVerb} the document "${envelope.title}"`,
         );
         const emailMessage = i18n._(
-          msg`This is a reminder to ${recipientActionVerb} the document "${document.title}". Please complete this at your earliest convenience.`,
+          msg`This is a reminder to ${recipientActionVerb} the document "${envelope.title}". Please complete this at your earliest convenience.`,
         );
 
         const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
@@ -119,7 +119,7 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
 
         const template = createElement(DocumentReminderEmailTemplate, {
           recipientName: recipient.name,
-          documentName: document.title,
+          documentName: envelope.title,
           assetBaseUrl,
           signDocumentLink,
           customBody: emailMessage,
@@ -128,9 +128,9 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
 
         await io.runTask(`send-reminder-${recipient.id}`, async () => {
           const [html, text] = await Promise.all([
-            renderEmailWithI18N(template, { lang: document.documentMeta?.language }),
+            renderEmailWithI18N(template, { lang: envelope.documentMeta?.language }),
             renderEmailWithI18N(template, {
-              lang: document.documentMeta?.language,
+              lang: envelope.documentMeta?.language,
               plainText: true,
             }),
           ]);
@@ -159,8 +159,8 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
           await prisma.documentAuditLog.create({
             data: {
               type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-              documentId: document.id,
-              userId: document.userId,
+              envelopeId: envelope.id,
+              userId: envelope.userId,
               data: {
                 type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
                 data: {
@@ -182,15 +182,15 @@ export async function run({ io, intervals }: SendReminderHandlerOptions) {
     }
 
     try {
-      await io.runTask(`update-meta-${document.id}`, async () => {
+      await io.runTask(`update-meta-${envelope.id}`, async () => {
         await prisma.documentMeta.update({
-          where: { documentId: document.id },
+          where: { id: envelope.documentMetaId },
           data: { lastReminderSentAt: now },
         });
       });
-      io.logger.info(`Updated lastReminderSentAt for document ${document.id}`);
+      io.logger.info(`Updated lastReminderSentAt for envelope ${envelope.id}`);
     } catch (error) {
-      io.logger.error(`Error updating lastReminderSentAt for document ${document.id}`, error);
+      io.logger.error(`Error updating lastReminderSentAt for envelope ${envelope.id}`, error);
     }
   }
 }
