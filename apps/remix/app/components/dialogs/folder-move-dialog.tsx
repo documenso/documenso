@@ -53,7 +53,7 @@ export const FolderMoveDialog = ({
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const { mutateAsync: moveFolder } = trpc.folder.moveFolder.useMutation();
+  const { mutateAsync: moveFolder } = trpc.folder.updateFolder.useMutation();
 
   const form = useForm<TMoveFolderFormSchema>({
     resolver: zodResolver(ZMoveFolderFormSchema),
@@ -68,6 +68,8 @@ export const FolderMoveDialog = ({
     try {
       await moveFolder({
         id: folder.id,
+        name: folder.name,
+        visibility: folder.visibility,
         parentId: targetFolderId || null,
       });
 

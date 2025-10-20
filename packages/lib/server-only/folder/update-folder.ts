@@ -9,6 +9,7 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 export interface UpdateFolderOptions {
   userId: number;
   teamId?: number;
+  parentId?: string;
   folderId: string;
   name: string;
   visibility: DocumentVisibility;
@@ -18,6 +19,7 @@ export interface UpdateFolderOptions {
 export const updateFolder = async ({
   userId,
   teamId,
+  parentId,
   folderId,
   name,
   visibility,
@@ -51,6 +53,7 @@ export const updateFolder = async ({
     data: {
       name,
       visibility: effectiveVisibility,
+      parentId,
     },
   });
 };

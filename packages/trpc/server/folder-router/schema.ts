@@ -62,6 +62,7 @@ export const ZCreateFolderResponseSchema = ZFolderSchema;
 export const ZUpdateFolderSchema = z.object({
   id: z.string(),
   name: z.string(),
+  parentId: z.string().optional().nullable(),
   visibility: z.nativeEnum(DocumentVisibility),
   type: ZFolderTypeSchema.optional(),
 });

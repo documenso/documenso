@@ -184,7 +184,7 @@ export const folderRouter = router({
     .output(ZUpdateFolderResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId, user } = ctx;
-      const { id, name, visibility } = input;
+      const { id, name, visibility, parentId } = input;
 
       ctx.logger.info({
         input: {
@@ -201,6 +201,7 @@ export const folderRouter = router({
       const result = await updateFolder({
         userId: user.id,
         teamId,
+        parentId,
         folderId: id,
         name,
         visibility,
