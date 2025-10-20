@@ -13,7 +13,7 @@ import type {
 export const getDocumentStats = async (filters: AnalyticsFilters): Promise<DocumentStats> => {
   const { dateFrom, dateTo, ...entityFilter } = filters;
 
-  const where: Prisma.DocumentWhereInput = {
+  const where: Prisma.EnvelopeWhereInput = {
     ...entityFilter,
     deletedAt: null,
     ...(dateFrom || dateTo
@@ -26,7 +26,7 @@ export const getDocumentStats = async (filters: AnalyticsFilters): Promise<Docum
       : {}),
   };
 
-  const counts = await prisma.document.groupBy({
+  const counts = await prisma.envelope.groupBy({
     by: ['status'],
     where,
     _count: {
@@ -42,7 +42,7 @@ export const getDocumentStats = async (filters: AnalyticsFilters): Promise<Docum
     [ExtendedDocumentStatus.ALL]: 0,
   };
 
-  counts.forEach((stat) => {
+  counts.forEach((stat: { status: DocumentStatus; _count: { _all: number } }) => {
     stats[stat.status as DocumentStatus] = stat._count._all;
     stats.ALL += stat._count._all;
   });

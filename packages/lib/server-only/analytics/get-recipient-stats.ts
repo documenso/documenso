@@ -13,7 +13,7 @@ export const getRecipientStats = async (filters: AnalyticsFilters): Promise<Reci
   const { dateFrom, dateTo, ...entityFilter } = filters;
 
   const where: Prisma.RecipientWhereInput = {
-    document: {
+    envelope: {
       ...entityFilter,
       deletedAt: null,
       ...(dateFrom || dateTo
