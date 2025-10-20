@@ -9,7 +9,7 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 export interface UpdateFolderOptions {
   userId: number;
   teamId?: number;
-  parentId?: string;
+  parentId?: string | null;
   folderId: string;
   name: string;
   visibility: DocumentVisibility;
