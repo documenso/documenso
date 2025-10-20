@@ -41,7 +41,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
   const isCurrentTeamDocument = team && row.team?.url === team.url;
 
   const documentsPath = formatDocumentsPath(team.url);
-  const formatPath = `${documentsPath}/${row.id}/edit`;
+  const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
 
   const onDownloadClick = async () => {
     try {

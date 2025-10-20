@@ -1,15 +1,20 @@
 import type {
-  Document,
   DocumentMeta,
+  Envelope,
   OrganisationGlobalSettings,
-  TemplateMeta,
+  Recipient,
+  Team,
+  User,
 } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder, DocumentStatus } from '@prisma/client';
 
 import { DEFAULT_DOCUMENT_TIME_ZONE } from '../constants/time-zones';
+import type { TDocumentLite, TDocumentMany } from '../types/document';
 import { DEFAULT_DOCUMENT_EMAIL_SETTINGS } from '../types/document-email';
+import { mapSecondaryIdToDocumentId } from './envelope';
+import { mapRecipientToLegacyRecipient } from './recipients';
 
-export const isDocumentCompleted = (document: Pick<Document, 'status'> | DocumentStatus) => {
+export const isDocumentCompleted = (document: Pick<Envelope, 'status'> | DocumentStatus) => {
   const status = typeof document === 'string' ? document : document.status;
 
   return status === DocumentStatus.COMPLETED || status === DocumentStatus.REJECTED;
@@ -61,7 +66,7 @@ const getExpiryUnit = (
  */
 export const extractDerivedDocumentMeta = (
   settings: Omit<OrganisationGlobalSettings, 'id'>,
-  overrideMeta: Partial<DocumentMeta | TemplateMeta> | undefined | null,
+  overrideMeta: Partial<DocumentMeta> | undefined | null,
 ) => {
   const meta = overrideMeta ?? {};
 
@@ -73,7 +78,6 @@ export const extractDerivedDocumentMeta = (
     dateFormat: meta.dateFormat || settings.documentDateFormat,
     message: meta.message || null,
     subject: meta.subject || null,
-    password: meta.password || null,
     redirectUrl: meta.redirectUrl || null,
 
     signingOrder: meta.signingOrder || DocumentSigningOrder.PARALLEL,
@@ -94,5 +98,87 @@ export const extractDerivedDocumentMeta = (
     // Expiry settings.
     expiryAmount: getExpiryAmount(meta),
     expiryUnit: getExpiryUnit(meta),
-  } satisfies Omit<DocumentMeta, 'id' | 'documentId'>;
+  } satisfies Omit<DocumentMeta, 'id'>;
+};
+
+/**
+ * Map an envelope to a legacy document lite response entity.
+ *
+ * Do not use spread operator here to avoid unexpected behavior.
+ */
+export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => {
+  const documentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+  return {
+    id: documentId, // Use legacy ID.
+    envelopeId: envelope.id,
+    visibility: envelope.visibility,
+    status: envelope.status,
+    source: envelope.source,
+    externalId: envelope.externalId,
+    userId: envelope.userId,
+    authOptions: envelope.authOptions,
+    formValues: envelope.formValues,
+    title: envelope.title,
+    createdAt: envelope.createdAt,
+    documentDataId: '', // Backwards compatibility.
+    updatedAt: envelope.updatedAt,
+    completedAt: envelope.completedAt,
+    deletedAt: envelope.deletedAt,
+    teamId: envelope.teamId,
+    folderId: envelope.folderId,
+    useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+    templateId: envelope.templateId,
+  };
+};
+
+type MapEnvelopeToDocumentManyOptions = Envelope & {
+  user: Pick<User, 'id' | 'name' | 'email'>;
+  team: Pick<Team, 'id' | 'url'>;
+  recipients: Recipient[];
+};
+
+/**
+ * Map an envelope to a legacy document many response entity.
+ *
+ * Do not use spread operator here to avoid unexpected behavior.
+ */
+export const mapEnvelopesToDocumentMany = (
+  envelope: MapEnvelopeToDocumentManyOptions,
+): TDocumentMany => {
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+  return {
+    id: legacyDocumentId, // Use legacy ID.
+    envelopeId: envelope.id,
+    visibility: envelope.visibility,
+    status: envelope.status,
+    source: envelope.source,
+    externalId: envelope.externalId,
+    userId: envelope.userId,
+    authOptions: envelope.authOptions,
+    formValues: envelope.formValues,
+    title: envelope.title,
+    createdAt: envelope.createdAt,
+    documentDataId: '', // Backwards compatibility.
+    updatedAt: envelope.updatedAt,
+    completedAt: envelope.completedAt,
+    deletedAt: envelope.deletedAt,
+    teamId: envelope.teamId,
+    folderId: envelope.folderId,
+    useLegacyFieldInsertion: envelope.useLegacyFieldInsertion,
+    templateId: envelope.templateId,
+    user: {
+      id: envelope.userId,
+      name: envelope.user.name,
+      email: envelope.user.email,
+    },
+    team: {
+      id: envelope.teamId,
+      url: envelope.team.url,
+    },
+    recipients: envelope.recipients.map((recipient) =>
+      mapRecipientToLegacyRecipient(recipient, envelope),
+    ),
+  };
 };

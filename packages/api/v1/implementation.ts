@@ -1,5 +1,4 @@
-import type { Prisma } from '@prisma/client';
-import { DocumentDataType, SigningStatus } from '@prisma/client';
+import { DocumentDataType, EnvelopeType, SigningStatus } from '@prisma/client';
 import { tsr } from '@ts-rest/serverless/fetch';
 import { match } from 'ts-pattern';
 
@@ -10,27 +9,24 @@ import '@documenso/lib/constants/time-zones';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import { createDocument } from '@documenso/lib/server-only/document/create-document';
+import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
 import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { updateDocument as updateDocumentSettings } from '@documenso/lib/server-only/document/update-document';
-import { deleteField } from '@documenso/lib/server-only/field/delete-field';
-import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
-import { getFieldsForDocument } from '@documenso/lib/server-only/field/get-fields-for-document';
-import { updateField } from '@documenso/lib/server-only/field/update-field';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import {
+  getEnvelopeById,
+  getEnvelopeWhereInput,
+} from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
+import { updateDocumentFields } from '@documenso/lib/server-only/field/update-document-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
-import { deleteRecipient } from '@documenso/lib/server-only/recipient/delete-recipient';
-import { getRecipientByIdV1Api } from '@documenso/lib/server-only/recipient/get-recipient-by-id-v1-api';
+import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
 import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
-import { createDocumentFromTemplateLegacy } from '@documenso/lib/server-only/template/create-document-from-template-legacy';
-import { createTemplate } from '@documenso/lib/server-only/template/create-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
@@ -52,7 +48,10 @@ import {
 } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
+import {
+  mapSecondaryIdToDocumentId,
+  mapSecondaryIdToTemplateId,
+} from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { ApiContractV1 } from './contract';
@@ -67,13 +66,23 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       page,
       perPage,
       userId: user.id,
-      teamId: team?.id,
+      teamId: team.id,
     });
 
     return {
       status: 200,
       body: {
-        documents,
+        documents: documents.map((document) => ({
+          id: mapSecondaryIdToDocumentId(document.secondaryId),
+          externalId: document.externalId,
+          userId: document.userId,
+          teamId: document.teamId,
+          title: document.title,
+          status: document.status,
+          createdAt: document.createdAt,
+          updatedAt: document.updatedAt,
+          completedAt: document.completedAt,
+        })),
         totalPages,
       },
     };
@@ -89,23 +98,43 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     });
 
     try {
-      const document = await getDocumentById({
-        documentId: Number(documentId),
+      const { envelopeWhereInput } = await getEnvelopeWhereInput({
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
-      const recipients = await getRecipientsForDocument({
-        documentId: Number(documentId),
-        userId: user.id,
-        teamId: team?.id,
+      const envelope = await prisma.envelope.findFirstOrThrow({
+        where: envelopeWhereInput,
+        include: {
+          recipients: {
+            orderBy: {
+              id: 'asc',
+            },
+          },
+          fields: {
+            include: {
+              signature: true,
+              recipient: {
+                select: {
+                  name: true,
+                  email: true,
+                  signingStatus: true,
+                },
+              },
+            },
+            orderBy: {
+              id: 'asc',
+            },
+          },
+        },
       });
 
-      const fields = await getFieldsForDocument({
-        documentId: Number(documentId),
-        userId: user.id,
-        teamId: team?.id,
-      });
+      const { fields, recipients } = envelope;
 
       const parsedMetaFields = fields.map((field) => {
         let parsedMetaOrNull = null;
@@ -126,12 +155,32 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       });
 
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
       return {
         status: 200,
         body: {
-          ...document,
+          id: legacyDocumentId,
+          externalId: envelope.externalId,
+          userId: envelope.userId,
+          teamId: envelope.teamId,
+          title: envelope.title,
+          status: envelope.status,
+          createdAt: envelope.createdAt,
+          updatedAt: envelope.updatedAt,
+          completedAt: envelope.completedAt,
           recipients: recipients.map((recipient) => ({
-            ...recipient,
+            id: recipient.id,
+            documentId: legacyDocumentId,
+            email: recipient.email,
+            name: recipient.name,
+            role: recipient.role,
+            signingOrder: recipient.signingOrder,
+            token: recipient.token,
+            signedAt: recipient.signedAt,
+            readStatus: recipient.readStatus,
+            signingStatus: recipient.signingStatus,
+            sendStatus: recipient.sendStatus,
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
           fields: parsedMetaFields,
@@ -158,22 +207,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     });
 
     try {
-      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
-        return {
-          status: 500,
-          body: {
-            message: 'Please make sure the storage transport is set to S3.',
-          },
-        };
-      }
-
-      const document = await getDocumentById({
-        documentId: Number(documentId),
+      const envelope = await getEnvelopeById({
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
-        teamId: team?.id,
-      });
+        teamId: team.id,
+      }).catch(() => null);
 
-      if (!document || !document.documentDataId) {
+      const firstDocumentData = envelope?.envelopeItems[0]?.documentData;
+
+      if (!envelope || !firstDocumentData) {
         return {
           status: 404,
           body: {
@@ -182,7 +228,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (DocumentDataType.S3_PATH !== document.documentData.type) {
+      // This error is done AFTER the get envelope so we can test access controls without S3.
+      if (process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT !== 's3') {
+        return {
+          status: 500,
+          body: {
+            message: 'Document downloads are only available when S3 storage is configured.',
+          },
+        };
+      }
+
+      if (DocumentDataType.S3_PATH !== firstDocumentData.type) {
         return {
           status: 400,
           body: {
@@ -191,7 +247,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (!downloadOriginalDocument && !isDocumentCompleted(document.status)) {
+      if (!downloadOriginalDocument && !isDocumentCompleted(envelope.status)) {
         return {
           status: 400,
           body: {
@@ -200,8 +256,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
+      if (envelope.envelopeItems.length !== 1) {
+        return {
+          status: 400,
+          body: {
+            message: 'API V1 does not support items',
+          },
+        };
+      }
+
       const { url } = await getPresignGetUrl(
-        downloadOriginalDocument ? document.documentData.initialData : document.documentData.data,
+        downloadOriginalDocument ? firstDocumentData.initialData : firstDocumentData.data,
       );
 
       return {
@@ -228,13 +293,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     });
 
     try {
-      const document = await getDocumentById({
-        documentId: Number(documentId),
+      const legacyDocumentId = Number(documentId);
+
+      const envelope = await getEnvelopeById({
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
-      if (!document) {
+      if (!envelope) {
         return {
           status: 404,
           body: {
@@ -244,15 +315,28 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       const deletedDocument = await deleteDocument({
-        id: document.id,
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
         requestMetadata: metadata,
       });
 
       return {
         status: 200,
-        body: deletedDocument,
+        body: {
+          id: legacyDocumentId,
+          externalId: deletedDocument.externalId,
+          userId: deletedDocument.userId,
+          teamId: deletedDocument.teamId,
+          title: deletedDocument.title,
+          status: deletedDocument.status,
+          createdAt: deletedDocument.createdAt,
+          updatedAt: deletedDocument.updatedAt,
+          completedAt: deletedDocument.completedAt,
+        },
       };
     } catch (err) {
       return {
@@ -325,53 +409,51 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         type: DocumentDataType.S3_PATH,
       });
 
-      const document = await createDocument({
-        title: body.title,
-        externalId: body.externalId || null,
+      const envelope = await createEnvelope({
         userId: user.id,
-        teamId: team?.id,
-        formValues: body.formValues,
-        folderId: body.folderId,
-        documentDataId: documentData.id,
+        teamId: team.id,
+        internalVersion: 1,
+        data: {
+          title: body.title,
+          type: EnvelopeType.DOCUMENT,
+          externalId: body.externalId || undefined,
+          formValues: body.formValues,
+          folderId: body.folderId,
+          envelopeItems: [
+            {
+              documentDataId: documentData.id,
+            },
+          ],
+          globalAccessAuth: body.authOptions?.globalAccessAuth,
+          globalActionAuth: body.authOptions?.globalActionAuth,
+        },
+        meta: {
+          subject: body.meta.subject,
+          message: body.meta.message,
+          timezone,
+          dateFormat: dateFormat?.value,
+          redirectUrl: body.meta.redirectUrl,
+          signingOrder: body.meta.signingOrder,
+          allowDictateNextSigner: body.meta.allowDictateNextSigner,
+          language: body.meta.language,
+          typedSignatureEnabled: body.meta.typedSignatureEnabled,
+          uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
+          drawSignatureEnabled: body.meta.drawSignatureEnabled,
+          distributionMethod: body.meta.distributionMethod,
+          emailSettings: body.meta.emailSettings,
+        },
         requestMetadata: metadata,
       });
 
-      await upsertDocumentMeta({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        subject: body.meta.subject,
-        message: body.meta.message,
-        timezone,
-        dateFormat: dateFormat?.value,
-        redirectUrl: body.meta.redirectUrl,
-        signingOrder: body.meta.signingOrder,
-        allowDictateNextSigner: body.meta.allowDictateNextSigner,
-        language: body.meta.language,
-        typedSignatureEnabled: body.meta.typedSignatureEnabled,
-        uploadSignatureEnabled: body.meta.uploadSignatureEnabled,
-        drawSignatureEnabled: body.meta.drawSignatureEnabled,
-        distributionMethod: body.meta.distributionMethod,
-        emailSettings: body.meta.emailSettings,
-        requestMetadata: metadata,
-      });
-
-      if (body.authOptions) {
-        await updateDocumentSettings({
-          documentId: document.id,
-          userId: user.id,
-          teamId: team?.id,
-          data: {
-            ...body.authOptions,
-          },
-          requestMetadata: metadata,
-        });
-      }
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
       const { recipients } = await setDocumentRecipients({
         userId: user.id,
-        teamId: team?.id,
-        documentId: document.id,
+        teamId: team.id,
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
         recipients: body.recipients,
         requestMetadata: metadata,
       });
@@ -380,7 +462,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         status: 200,
         body: {
           uploadUrl: url,
-          documentId: document.id,
+          documentId: legacyDocumentId,
           recipients: recipients.map((recipient) => ({
             recipientId: recipient.id,
             name: recipient.name,
@@ -388,7 +470,6 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             token: recipient.token,
             role: recipient.role,
             signingOrder: recipient.signingOrder,
-
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
           })),
         },
@@ -403,7 +484,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     }
   }),
 
-  createTemplate: authenticatedMiddleware(async (args, user, team) => {
+  createTemplate: authenticatedMiddleware(async (args, user, team, { metadata }) => {
     const { body } = args;
     const {
       title,
@@ -465,26 +546,36 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         type: DocumentDataType.S3_PATH,
       });
 
-      const createdTemplate = await createTemplate({
+      const createdTemplate = await createEnvelope({
         userId: user.id,
         teamId: team.id,
-        templateDocumentDataId: templateDocumentData.id,
+        internalVersion: 1,
         data: {
+          type: EnvelopeType.TEMPLATE,
+          envelopeItems: [
+            {
+              documentDataId: templateDocumentData.id,
+            },
+          ],
+          templateType: type,
           title,
           folderId,
-          externalId,
+          externalId: externalId ?? undefined,
           visibility,
           globalAccessAuth,
           globalActionAuth,
           publicTitle,
           publicDescription,
-          type,
         },
         meta,
+        requestMetadata: metadata,
       });
 
       const fullTemplate = await getTemplateById({
-        id: createdTemplate.id,
+        id: {
+          type: 'envelopeId',
+          id: createdTemplate.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -517,14 +608,28 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const deletedTemplate = await deleteTemplate({
-        id: Number(templateId),
+        id: {
+          type: 'templateId',
+          id: Number(templateId),
+        },
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
+
+      const legacyTemplateId = mapSecondaryIdToTemplateId(deletedTemplate.secondaryId);
 
       return {
         status: 200,
-        body: deletedTemplate,
+        body: {
+          id: legacyTemplateId,
+          externalId: deletedTemplate.externalId,
+          type: deletedTemplate.templateType,
+          title: deletedTemplate.title,
+          userId: deletedTemplate.userId,
+          teamId: deletedTemplate.teamId,
+          createdAt: deletedTemplate.createdAt,
+          updatedAt: deletedTemplate.updatedAt,
+        },
       };
     } catch (err) {
       return {
@@ -547,15 +652,24 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const template = await getTemplateById({
-        id: Number(templateId),
+        id: {
+          type: 'templateId',
+          id: Number(templateId),
+        },
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
       return {
         status: 200,
         body: {
           ...template,
+          templateMeta: template.templateMeta
+            ? {
+                ...template.templateMeta,
+                templateId: template.id,
+              }
+            : null,
           Field: template.fields.map((field) => ({
             ...field,
             fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
@@ -577,16 +691,25 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         page,
         perPage,
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
       return {
         status: 200,
         body: {
           templates: templates.map((template) => ({
-            ...template,
+            id: mapSecondaryIdToTemplateId(template.secondaryId),
+            externalId: template.externalId,
+            type: template.templateType,
+            title: template.title,
+            userId: template.userId,
+            teamId: template.teamId,
+            createdAt: template.createdAt,
+            updatedAt: template.updatedAt,
+            directLink: template.directLink,
             Field: template.fields.map((field) => ({
               ...field,
+              templateId: mapSecondaryIdToTemplateId(template.secondaryId),
               fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : null,
             })),
             Recipient: template.recipients,
@@ -609,7 +732,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       });
 
-      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -624,17 +747,71 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
       const fileName = body.title.endsWith('.pdf') ? body.title : `${body.title}.pdf`;
 
-      const document = await createDocumentFromTemplateLegacy({
-        templateId,
+      const template = await getEnvelopeById({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
+        type: EnvelopeType.TEMPLATE,
         userId: user.id,
-        teamId: team?.id,
-        recipients: body.recipients,
+        teamId: team.id,
       });
 
-      let documentDataId = document.documentDataId;
+      if (template.envelopeItems.length !== 1) {
+        throw new Error('API V1 does not support templates with multiple documents');
+      }
+
+      // V1 API request schema uses indices for recipients
+      // So we remap the recipients to attach the IDs
+      const mappedRecipients = body.recipients.map((recipient, index) => {
+        const existingRecipient = template.recipients.at(index);
+
+        if (!existingRecipient) {
+          throw new Error('Recipient not found.');
+        }
+
+        return {
+          id: existingRecipient.id,
+          name: recipient.name,
+          email: recipient.email,
+          signingOrder: recipient.signingOrder,
+          role: recipient.role, // You probably shouldn't be able to change the role.
+        };
+      });
+
+      const createdEnvelope = await createDocumentFromTemplate({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
+        externalId: body.externalId || null,
+        userId: user.id,
+        teamId: team.id,
+        recipients: mappedRecipients,
+        override: {
+          ...body.meta,
+          title: body.title,
+        },
+        requestMetadata: metadata,
+      });
+
+      const envelopeItems = await prisma.envelopeItem.findMany({
+        where: {
+          envelopeId: createdEnvelope.id,
+        },
+        include: {
+          documentData: true,
+        },
+      });
+
+      const firstEnvelopeItemData = envelopeItems[0].documentData;
+
+      if (!firstEnvelopeItemData) {
+        throw new Error('Document data not found.');
+      }
 
       if (body.formValues) {
-        const pdf = await getFileServerSide(document.documentData);
+        const pdf = await getFileServerSide(firstEnvelopeItemData);
 
         const prefilled = await insertFormValuesInPdf({
           pdf: Buffer.from(pdf),
@@ -647,50 +824,34 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           arrayBuffer: async () => Promise.resolve(prefilled),
         });
 
-        documentDataId = newDocumentData.id;
-      }
-
-      await updateDocument({
-        documentId: document.id,
-        userId: user.id,
-        teamId: team?.id,
-        data: {
-          title: fileName,
-          externalId: body.externalId || null,
-          formValues: body.formValues,
-          documentData: {
-            connect: {
-              id: documentDataId,
-            },
+        await prisma.envelopeItem.update({
+          where: {
+            id: firstEnvelopeItemData.id,
           },
-        },
-      });
-
-      if (body.meta) {
-        await upsertDocumentMeta({
-          documentId: document.id,
-          userId: user.id,
-          teamId: team?.id,
-          ...body.meta,
-          requestMetadata: metadata,
+          data: {
+            title: body.title || fileName,
+            documentDataId: newDocumentData.id,
+          },
         });
       }
 
-      if (body.authOptions) {
-        await updateDocumentSettings({
-          documentId: document.id,
-          userId: user.id,
-          teamId: team?.id,
-          data: body.authOptions,
-          requestMetadata: metadata,
+      if (body.authOptions || body.formValues) {
+        await prisma.envelope.update({
+          where: {
+            id: createdEnvelope.id,
+          },
+          data: {
+            formValues: body.formValues,
+            authOptions: body.authOptions,
+          },
         });
       }
 
       return {
         status: 200,
         body: {
-          documentId: document.id,
-          recipients: document.recipients.map((recipient) => ({
+          documentId: mapSecondaryIdToDocumentId(createdEnvelope.secondaryId),
+          recipients: createdEnvelope.recipients.map((recipient) => ({
             recipientId: recipient.id,
             name: recipient.name,
             email: recipient.email,
@@ -715,7 +876,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       });
 
-      const { remaining } = await getServerLimits({ userId: user.id, teamId: team?.id });
+      const { remaining } = await getServerLimits({ userId: user.id, teamId: team.id });
 
       if (remaining.documents <= 0) {
         return {
@@ -728,14 +889,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
       const templateId = Number(params.templateId);
 
-      let document: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
+      let envelope: Awaited<ReturnType<typeof createDocumentFromTemplate>> | null = null;
 
       try {
-        document = await createDocumentFromTemplate({
-          templateId,
+        envelope = await createDocumentFromTemplate({
+          id: {
+            type: 'templateId',
+            id: templateId,
+          },
           externalId: body.externalId || null,
           userId: user.id,
-          teamId: team?.id,
+          teamId: team.id,
           recipients: body.recipients,
           prefillFields: body.prefillFields,
           folderId: body.folderId,
@@ -749,10 +913,23 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         return AppError.toRestAPIError(err);
       }
 
-      if (body.formValues) {
-        const fileName = document.title.endsWith('.pdf') ? document.title : `${document.title}.pdf`;
+      if (envelope.envelopeItems.length !== 1) {
+        throw new Error('API V1 does not support envelopes');
+      }
 
-        const pdf = await getFileServerSide(document.documentData);
+      const firstEnvelopeDocumentData = await prisma.envelopeItem.findFirstOrThrow({
+        where: {
+          envelopeId: envelope.id,
+        },
+        include: {
+          documentData: true,
+        },
+      });
+
+      if (body.formValues) {
+        const fileName = envelope.title.endsWith('.pdf') ? envelope.title : `${envelope.title}.pdf`;
+
+        const pdf = await getFileServerSide(firstEnvelopeDocumentData.documentData);
 
         const prefilled = await insertFormValuesInPdf({
           pdf: Buffer.from(pdf),
@@ -765,15 +942,20 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           arrayBuffer: async () => Promise.resolve(prefilled),
         });
 
-        await updateDocument({
-          documentId: document.id,
-          userId: user.id,
-          teamId: team?.id,
+        await prisma.envelope.update({
+          where: {
+            id: envelope.id,
+          },
           data: {
             formValues: body.formValues,
-            documentData: {
-              connect: {
-                id: newDocumentData.id,
+            envelopeItems: {
+              update: {
+                where: {
+                  id: firstEnvelopeDocumentData.id,
+                },
+                data: {
+                  documentDataId: newDocumentData.id,
+                },
               },
             },
           },
@@ -781,20 +963,23 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       if (body.authOptions) {
-        await updateDocumentSettings({
-          documentId: document.id,
-          userId: user.id,
-          teamId: team?.id,
-          data: body.authOptions,
-          requestMetadata: metadata,
+        await prisma.envelope.update({
+          where: {
+            id: envelope.id,
+          },
+          data: {
+            authOptions: body.authOptions,
+          },
         });
       }
+
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
       return {
         status: 200,
         body: {
-          documentId: document.id,
-          recipients: document.recipients.map((recipient) => ({
+          documentId: legacyDocumentId,
+          recipients: envelope.recipients.map((recipient) => ({
             recipientId: recipient.id,
             name: recipient.name,
             email: recipient.email,
@@ -819,13 +1004,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     });
 
     try {
-      const document = await getDocumentById({
-        documentId: Number(documentId),
+      const legacyDocumentId = Number(documentId);
+
+      const envelope = await getEnvelopeById({
+        id: {
+          type: 'documentId',
+          id: legacyDocumentId,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
       });
 
-      if (!document) {
+      if (!envelope) {
         return {
           status: 404,
           body: {
@@ -834,7 +1025,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      if (isDocumentCompleted(document.status)) {
+      if (isDocumentCompleted(envelope.status)) {
         return {
           status: 400,
           body: {
@@ -843,14 +1034,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         };
       }
 
-      const emailSettings = extractDerivedDocumentEmailSettings(document.documentMeta);
+      const emailSettings = extractDerivedDocumentEmailSettings(envelope.documentMeta);
 
       // Update document email settings if sendCompletionEmails is provided
       if (typeof sendCompletionEmails === 'boolean') {
-        await upsertDocumentMeta({
-          documentId: document.id,
+        await updateDocumentMeta({
+          id: {
+            type: 'envelopeId',
+            id: envelope.id,
+          },
           userId: user.id,
-          teamId: team?.id,
+          teamId: team.id,
           emailSettings: {
             ...emailSettings,
             documentCompleted: sendCompletionEmails,
@@ -861,9 +1055,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       }
 
       const { recipients, ...sentDocument } = await sendDocument({
-        documentId: document.id,
+        id: {
+          type: 'envelopeId',
+          id: envelope.id,
+        },
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
         sendEmail,
         requestMetadata: metadata,
       });
@@ -872,7 +1069,15 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         status: 200,
         body: {
           message: 'Document sent for signing successfully',
-          ...sentDocument,
+          id: mapSecondaryIdToDocumentId(sentDocument.secondaryId),
+          externalId: sentDocument.externalId,
+          userId: sentDocument.userId,
+          teamId: sentDocument.teamId,
+          title: sentDocument.title,
+          status: sentDocument.status,
+          createdAt: sentDocument.createdAt,
+          updatedAt: sentDocument.updatedAt,
+          completedAt: sentDocument.completedAt,
           recipients: recipients.map((recipient) => ({
             ...recipient,
             signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
@@ -902,9 +1107,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     try {
       await resendDocument({
         userId: user.id,
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         recipients,
-        teamId: team?.id,
+        teamId: team.id,
         requestMetadata: metadata,
       });
 
@@ -934,13 +1142,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const document = await getDocumentById({
-      documentId: Number(documentId),
+    const legacyDocumentId = Number(documentId);
+
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: legacyDocumentId,
+      },
+      type: EnvelopeType.DOCUMENT,
       userId: user.id,
-      teamId: team?.id,
+      teamId: team.id,
     });
 
-    if (!document) {
+    if (!envelope) {
       return {
         status: 404,
         body: {
@@ -949,7 +1163,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (isDocumentCompleted(document.status)) {
+    if (isDocumentCompleted(envelope.status)) {
       return {
         status: 400,
         body: {
@@ -961,7 +1175,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     const recipients = await getRecipientsForDocument({
       documentId: Number(documentId),
       userId: user.id,
-      teamId: team?.id,
+      teamId: team.id,
     });
 
     const recipientAlreadyExists = recipients.some((recipient) => recipient.email === email);
@@ -977,9 +1191,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     try {
       const { recipients: newRecipients } = await setDocumentRecipients({
-        documentId: Number(documentId),
+        id: {
+          type: 'documentId',
+          id: Number(documentId),
+        },
         userId: user.id,
-        teamId: team?.id,
+        teamId: team.id,
         recipients: [
           ...recipients.map((recipient) => ({
             email: recipient.email,
@@ -1034,13 +1251,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const document = await getDocumentById({
-      documentId: Number(documentId),
+    const legacyDocumentId = Number(documentId);
+
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: legacyDocumentId,
+      },
+      type: EnvelopeType.DOCUMENT,
       userId: user.id,
-      teamId: team?.id,
+      teamId: team.id,
     });
 
-    if (!document) {
+    if (!envelope) {
       return {
         status: 404,
         body: {
@@ -1049,7 +1272,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (isDocumentCompleted(document.status)) {
+    if (isDocumentCompleted(envelope.status)) {
       return {
         status: 400,
         body: {
@@ -1061,7 +1284,10 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
     const updatedRecipient = await updateDocumentRecipients({
       userId: user.id,
       teamId: team.id,
-      documentId: Number(documentId),
+      id: {
+        type: 'envelopeId',
+        id: envelope.id,
+      },
       recipients: [
         {
           id: Number(recipientId),
@@ -1106,46 +1332,21 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const document = await getDocumentById({
-      documentId: Number(documentId),
+    const deletedRecipient = await deleteDocumentRecipient({
       userId: user.id,
-      teamId: team?.id,
-    });
-
-    if (!document) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-
-    if (isDocumentCompleted(document.status)) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
-      };
-    }
-
-    const deletedRecipient = await deleteRecipient({
-      documentId: Number(documentId),
+      teamId: team.id,
       recipientId: Number(recipientId),
-      userId: user.id,
-      teamId: team?.id,
-      requestMetadata: metadata.requestMetadata,
-    }).catch(() => null);
-
-    if (!deletedRecipient) {
-      return {
-        status: 400,
-        body: {
-          message: 'Unable to delete recipient',
+      requestMetadata: {
+        requestMetadata: metadata.requestMetadata,
+        source: 'apiV1',
+        auth: 'api',
+        auditUser: {
+          id: team.id,
+          email: team.name,
+          name: team.name,
         },
-      };
-    }
+      },
+    });
 
     return {
       status: 200,
@@ -1168,22 +1369,46 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     const fields = Array.isArray(args.body) ? args.body : [args.body];
 
-    const document = await prisma.document.findFirst({
-      select: { id: true, status: true },
-      where: {
+    const { envelopeWhereInput } = await getEnvelopeWhereInput({
+      id: {
+        type: 'documentId',
         id: Number(documentId),
-        team: buildTeamWhereQuery({ teamId: team.id, userId: user.id }),
+      },
+      type: EnvelopeType.DOCUMENT,
+      teamId: team.id,
+      userId: user.id,
+    });
+
+    const envelope = await prisma.envelope.findFirst({
+      where: envelopeWhereInput,
+      select: {
+        id: true,
+        secondaryId: true,
+        status: true,
+        envelopeItems: {
+          select: { id: true },
+        },
       },
     });
 
-    if (!document) {
+    if (!envelope) {
       return {
         status: 404,
         body: { message: 'Document not found' },
       };
     }
 
-    if (isDocumentCompleted(document.status)) {
+    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
+
+    if (!firstEnvelopeItemId) {
+      throw new Error('Missing envelope item ID');
+    }
+
+    if (envelope.envelopeItems.length !== 1) {
+      throw new Error('API V1 does not support multiple documents');
+    }
+
+    if (isDocumentCompleted(envelope.status)) {
       return {
         status: 400,
         body: { message: 'Document is already completed' },
@@ -1209,10 +1434,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
               throw new Error('Invalid page number');
             }
 
-            const recipient = await getRecipientByIdV1Api({
-              id: Number(recipientId),
-              documentId: Number(documentId),
-            }).catch(() => null);
+            const recipient = await prisma.recipient.findFirst({
+              where: {
+                id: Number(recipientId),
+                envelopeId: envelope.id,
+              },
+            });
 
             if (!recipient) {
               throw new Error('Recipient not found');
@@ -1259,7 +1486,8 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
             const field = await tx.field.create({
               data: {
-                documentId: Number(documentId),
+                envelopeId: envelope.id,
+                envelopeItemId: firstEnvelopeItemId,
                 recipientId: Number(recipientId),
                 type,
                 page: pageNumber,
@@ -1279,9 +1507,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             await tx.documentAuditLog.create({
               data: createDocumentAuditLogData({
                 type: 'FIELD_CREATED',
-                documentId: Number(documentId),
+                envelopeId: envelope.id,
                 user: {
-                  id: team?.id ?? user.id,
+                  id: team.id ?? user.id,
                   email: team?.name ?? user.email,
                   name: team ? '' : user.name,
                 },
@@ -1297,7 +1525,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
             return {
               id: field.id,
-              documentId: Number(field.documentId),
+              documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
               recipientId: field.recipientId ?? -1,
               type: field.type,
               pageNumber: field.page,
@@ -1337,13 +1565,17 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const document = await getDocumentById({
-      documentId: Number(documentId),
+    const envelope = await getEnvelopeById({
+      id: {
+        type: 'documentId',
+        id: Number(documentId),
+      },
+      type: EnvelopeType.DOCUMENT,
       userId: user.id,
-      teamId: team?.id,
+      teamId: team.id,
     });
 
-    if (!document) {
+    if (!envelope) {
       return {
         status: 404,
         body: {
@@ -1352,7 +1584,19 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    if (isDocumentCompleted(document.status)) {
+    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+    const firstEnvelopeItemId = envelope.envelopeItems[0].id;
+
+    if (!firstEnvelopeItemId) {
+      throw new Error('Missing document data');
+    }
+
+    if (envelope.envelopeItems.length > 1) {
+      throw new Error('API V1 does not support multiple documents');
+    }
+
+    if (isDocumentCompleted(envelope.status)) {
       return {
         status: 400,
         body: {
@@ -1361,10 +1605,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const recipient = await getRecipientByIdV1Api({
-      id: Number(recipientId),
-      documentId: Number(documentId),
-    }).catch(() => null);
+    const recipient = await prisma.recipient.findFirst({
+      where: {
+        id: Number(recipientId),
+        envelopeId: envelope.id,
+      },
+    });
 
     if (!recipient) {
       return {
@@ -1384,128 +1630,84 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedField = await updateField({
-      fieldId: Number(fieldId),
+    const { fields } = await updateDocumentFields({
       userId: user.id,
-      teamId: team?.id,
-      documentId: Number(documentId),
-      recipientId: recipientId ? Number(recipientId) : undefined,
-      type,
-      pageNumber,
-      pageX,
-      pageY,
-      pageWidth,
-      pageHeight,
-      requestMetadata: metadata.requestMetadata,
-      fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
+      teamId: team.id,
+      documentId: legacyDocumentId,
+      fields: [
+        {
+          id: Number(fieldId),
+          type,
+          pageNumber,
+          pageX,
+          pageY,
+          width: pageWidth,
+          height: pageHeight,
+          fieldMeta: fieldMeta ? ZFieldMetaSchema.parse(fieldMeta) : undefined,
+        },
+      ],
+      requestMetadata: {
+        requestMetadata: metadata.requestMetadata,
+        source: 'apiV1',
+        auth: 'api',
+        auditUser: {
+          id: team.id,
+          email: team.name,
+          name: team.name,
+        },
+      },
     });
 
-    const remappedField = {
-      id: updatedField.id,
-      documentId: updatedField.documentId,
-      recipientId: updatedField.recipientId ?? -1,
-      type: updatedField.type,
-      pageNumber: updatedField.page,
-      pageX: Number(updatedField.positionX),
-      pageY: Number(updatedField.positionY),
-      pageWidth: Number(updatedField.width),
-      pageHeight: Number(updatedField.height),
-      customText: updatedField.customText,
-      inserted: updatedField.inserted,
-    };
+    const updatedField = fields[0];
 
     return {
       status: 200,
       body: {
-        ...remappedField,
-        documentId: Number(documentId),
+        id: updatedField.id,
+        documentId: legacyDocumentId,
+        recipientId: updatedField.recipientId ?? -1,
+        type: updatedField.type,
+        pageNumber: updatedField.page,
+        pageX: Number(updatedField.positionX),
+        pageY: Number(updatedField.positionY),
+        pageWidth: Number(updatedField.width),
+        pageHeight: Number(updatedField.height),
+        customText: updatedField.customText,
+        inserted: updatedField.inserted,
       },
     };
   }),
 
   deleteField: authenticatedMiddleware(async (args, user, team, { logger, metadata }) => {
-    const { id: documentId, fieldId } = args.params;
+    // Note: documentId isn't actually used anywhere, so we just return it.
+    const { id: unverifiedDocumentId, fieldId } = args.params;
 
     logger.info({
       input: {
-        id: documentId,
+        id: unverifiedDocumentId,
         fieldId,
       },
     });
 
-    const document = await getDocumentById({
-      documentId: Number(documentId),
+    const deletedField = await deleteDocumentField({
+      fieldId: Number(fieldId),
       userId: user.id,
       teamId: team.id,
+      requestMetadata: {
+        requestMetadata: metadata.requestMetadata,
+        source: 'apiV1',
+        auth: 'api',
+        auditUser: {
+          id: team.id,
+          email: team.name,
+          name: team.name,
+        },
+      },
     });
-
-    if (!document) {
-      return {
-        status: 404,
-        body: {
-          message: 'Document not found',
-        },
-      };
-    }
-
-    if (isDocumentCompleted(document.status)) {
-      return {
-        status: 400,
-        body: {
-          message: 'Document is already completed',
-        },
-      };
-    }
-
-    const field = await getFieldById({
-      userId: user.id,
-      teamId: team?.id,
-      fieldId: Number(fieldId),
-    }).catch(() => null);
-
-    if (!field) {
-      return {
-        status: 404,
-        body: {
-          message: 'Field not found',
-        },
-      };
-    }
-
-    const recipient = await getRecipientByIdV1Api({
-      id: Number(field.recipientId),
-      documentId: Number(documentId),
-    }).catch(() => null);
-
-    if (recipient?.signingStatus === SigningStatus.SIGNED) {
-      return {
-        status: 400,
-        body: {
-          message: 'Recipient has already signed the document',
-        },
-      };
-    }
-
-    const deletedField = await deleteField({
-      documentId: Number(documentId),
-      fieldId: Number(fieldId),
-      userId: user.id,
-      teamId: team?.id,
-      requestMetadata: metadata.requestMetadata,
-    }).catch(() => null);
-
-    if (!deletedField) {
-      return {
-        status: 400,
-        body: {
-          message: 'Unable to delete field',
-        },
-      };
-    }
 
     const remappedField = {
       id: deletedField.id,
-      documentId: deletedField.documentId,
+      documentId: Number(unverifiedDocumentId),
       recipientId: deletedField.recipientId ?? -1,
       type: deletedField.type,
       pageNumber: deletedField.page,
@@ -1519,32 +1721,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
 
     return {
       status: 200,
-      body: {
-        ...remappedField,
-        documentId: Number(documentId),
-      },
+      body: remappedField,
     };
   }),
 });
-
-const updateDocument = async ({
-  documentId,
-  userId,
-  teamId,
-  data,
-}: {
-  documentId: number;
-  data: Prisma.DocumentUpdateInput;
-  userId: number;
-  teamId: number;
-}) => {
-  return await prisma.document.update({
-    where: {
-      id: documentId,
-      team: buildTeamWhereQuery({ teamId, userId }),
-    },
-    data: {
-      ...data,
-    },
-  });
-};

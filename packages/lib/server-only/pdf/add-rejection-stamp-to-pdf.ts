@@ -1,6 +1,6 @@
+import type { PDFDocument } from '@cantoo/pdf-lib';
+import { TextAlignment, rgb, setFontAndSize } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import type { PDFDocument } from 'pdf-lib';
-import { TextAlignment, rgb, setFontAndSize } from 'pdf-lib';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { getPageSize } from './get-page-size';

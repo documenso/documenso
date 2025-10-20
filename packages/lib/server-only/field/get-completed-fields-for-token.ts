@@ -1,4 +1,4 @@
-import { SigningStatus } from '@prisma/client';
+import { EnvelopeType, SigningStatus } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -6,10 +6,12 @@ export type GetCompletedFieldsForTokenOptions = {
   token: string;
 };
 
+// Note: You many need to filter this on a per envelope item ID basis.
 export const getCompletedFieldsForToken = async ({ token }: GetCompletedFieldsForTokenOptions) => {
   return await prisma.field.findMany({
     where: {
-      document: {
+      envelope: {
+        type: EnvelopeType.DOCUMENT,
         recipients: {
           some: {
             token,

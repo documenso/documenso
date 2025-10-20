@@ -7,7 +7,7 @@ import {
   PDFNumber,
   PDFString,
   rectangle,
-} from 'pdf-lib';
+} from '@cantoo/pdf-lib';
 
 import { BYTE_RANGE_PLACEHOLDER } from '../constants/byte-range';
 

@@ -1,4 +1,5 @@
-// import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+
 import type { TNumberFieldMeta as NumberFieldMeta } from '../types/field-meta';
 
 export const validateNumberField = (
@@ -10,16 +11,16 @@ export const validateNumberField = (
 
   const { minValue, maxValue, readOnly, required, numberFormat, fontSize } = fieldMeta || {};
 
-  const formatRegex: { [key: string]: RegExp } = {
-    '123,456,789.00': /^(?:\d{1,3}(?:,\d{3})*|\d+)(?:\.\d{1,2})?$/,
-    '123.456.789,00': /^(?:\d{1,3}(?:\.\d{3})*|\d+)(?:,\d{1,2})?$/,
-    '123456,789.00': /^(?:\d+)(?:,\d{1,3}(?:\.\d{1,2})?)?$/,
-  };
+  if (numberFormat) {
+    const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
 
-  const isValidFormat = numberFormat ? formatRegex[numberFormat].test(value) : true;
+    if (!foundRegex) {
+      errors.push(`Invalid number format - ${numberFormat}`);
+    }
 
-  if (!isValidFormat) {
-    errors.push(`Value ${value} does not match the number format - ${numberFormat}`);
+    if (foundRegex && !foundRegex.test(value)) {
+      errors.push(`Value ${value} does not match the number format - ${numberFormat}`);
+    }
   }
 
   const numberValue = parseFloat(value);
@@ -32,19 +33,19 @@ export const validateNumberField = (
     errors.push(`Value is not a valid number`);
   }
 
-  if (minValue !== undefined && minValue > 0 && numberValue < minValue) {
+  if (typeof minValue === 'number' && minValue > 0 && numberValue < minValue) {
     errors.push(`Value ${value} is less than the minimum value of ${minValue}`);
   }
 
-  if (maxValue !== undefined && maxValue > 0 && numberValue > maxValue) {
+  if (typeof maxValue === 'number' && maxValue > 0 && numberValue > maxValue) {
     errors.push(`Value ${value} is greater than the maximum value of ${maxValue}`);
   }
 
-  if (minValue !== undefined && maxValue !== undefined && minValue > maxValue) {
+  if (typeof minValue === 'number' && typeof maxValue === 'number' && minValue > maxValue) {
     errors.push('Minimum value cannot be greater than maximum value');
   }
 
-  if (maxValue !== undefined && minValue !== undefined && maxValue < minValue) {
+  if (typeof maxValue === 'number' && typeof minValue === 'number' && maxValue < minValue) {
     errors.push('Maximum value cannot be less than minimum value');
   }
 

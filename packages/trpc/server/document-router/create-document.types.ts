@@ -4,8 +4,9 @@ import {
   ZDocumentExpiryAmountSchema,
   ZDocumentExpiryUnitSchema,
   ZDocumentMetaTimezoneSchema,
-  ZDocumentTitleSchema,
-} from './schema';
+} from '@documenso/lib/types/document-meta';
+
+import { ZDocumentTitleSchema } from './schema';
 
 // Currently not in use until we allow passthrough documents on create.
 // export const createDocumentMeta: TrpcRouteMeta = {
@@ -27,7 +28,7 @@ export const ZCreateDocumentRequestSchema = z.object({
 });
 
 export const ZCreateDocumentResponseSchema = z.object({
-  id: z.number(),
+  legacyDocumentId: z.number(),
 });
 
 export type TCreateDocumentRequest = z.infer<typeof ZCreateDocumentRequestSchema>;
