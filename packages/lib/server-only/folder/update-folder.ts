@@ -46,8 +46,7 @@ export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFol
     const parentFolder = await prisma.folder.findFirst({
       where: {
         id: parentId,
-        userId,
-        teamId,
+        team: buildTeamWhereQuery({ teamId, userId }),
         type: folder.type,
       },
     });
