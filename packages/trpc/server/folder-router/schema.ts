@@ -12,7 +12,6 @@ import FolderSchema from '@documenso/prisma/generated/zod/modelSchema/FolderSche
  */
 export const ZSuccessResponseSchema = z.object({
   success: z.boolean(),
-  type: ZFolderTypeSchema.optional(),
 });
 
 export const ZGenericSuccessResponse = {
