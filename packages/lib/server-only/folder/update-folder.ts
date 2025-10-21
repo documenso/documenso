@@ -1,30 +1,28 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
-import { DocumentVisibility } from '@documenso/prisma/generated/types';
+import type { DocumentVisibility } from '@documenso/prisma/generated/types';
 
-import type { TFolderType } from '../../types/folder-type';
-import { FolderType } from '../../types/folder-type';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamById } from '../team/get-team';
 
 export interface UpdateFolderOptions {
   userId: number;
-  teamId?: number;
-  parentId?: string | null;
+  teamId: number;
   folderId: string;
-  name: string;
-  visibility: DocumentVisibility;
-  type?: TFolderType;
+  data: {
+    parentId?: string | null;
+    name?: string;
+    visibility?: DocumentVisibility;
+    pinned?: boolean;
+  };
 }
 
-export const updateFolder = async ({
-  userId,
-  teamId,
-  parentId,
-  folderId,
-  name,
-  visibility,
-  type,
-}: UpdateFolderOptions) => {
+export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFolderOptions) => {
+  const { parentId, name, visibility, pinned } = data;
+
+  const team = await getTeamById({ userId, teamId });
+
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
@@ -32,7 +30,9 @@ export const updateFolder = async ({
         teamId,
         userId,
       }),
-      type,
+      visibility: {
+        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+      },
     },
   });
 
@@ -42,18 +42,19 @@ export const updateFolder = async ({
     });
   }
 
-  const isTemplateFolder = folder.type === FolderType.TEMPLATE;
-  const effectiveVisibility =
-    isTemplateFolder && teamId !== null ? DocumentVisibility.EVERYONE : visibility;
-
   return await prisma.folder.update({
     where: {
       id: folderId,
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+      }),
     },
     data: {
       name,
-      visibility: effectiveVisibility,
+      visibility,
       parentId,
+      pinned,
     },
   });
 };

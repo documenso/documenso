@@ -63,14 +63,16 @@ export const FolderMoveDialog = ({
   });
 
   const onFormSubmit = async ({ targetFolderId }: TMoveFolderFormSchema) => {
-    if (!folder) return;
+    if (!folder) {
+      return;
+    }
 
     try {
       await moveFolder({
-        id: folder.id,
-        name: folder.name,
-        visibility: folder.visibility,
-        parentId: targetFolderId || null,
+        folderId: folder.id,
+        data: {
+          parentId: targetFolderId || null,
+        },
       });
 
       onOpenChange(false);

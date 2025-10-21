@@ -34,9 +34,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
 
-  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
-  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
-
   const { data: foldersData, isPending } = trpc.folder.getFolders.useQuery({
     type,
     parentId,
@@ -155,8 +152,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
                       setFolderToMove(folder);
                       setIsMovingFolder(true);
                     }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
                     onSettings={(folder) => {
                       setFolderToSettings(folder);
                       setIsSettingsFolderOpen(true);
@@ -180,8 +175,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
                       setFolderToMove(folder);
                       setIsMovingFolder(true);
                     }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
                     onSettings={(folder) => {
                       setFolderToSettings(folder);
                       setIsSettingsFolderOpen(true);
