@@ -137,7 +137,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: z.string().email().nullish(),
-  emailSettings: ZDocumentEmailSettingsSchema.optional(),
+  emailSettings: ZDocumentEmailSettingsSchema.nullish(),
   expiryAmount: ZDocumentExpiryAmountSchema.optional(),
   expiryUnit: ZDocumentExpiryUnitSchema.optional(),
 });

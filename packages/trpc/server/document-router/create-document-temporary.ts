@@ -98,6 +98,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       },
       meta: {
         ...meta,
+        emailSettings: meta?.emailSettings ?? undefined,
         expiryAmount,
         expiryUnit,
       },

@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { rateLimiter } from 'hono-rate-limiter';
 import { contextStorage } from 'hono/context-storage';
+import { cors } from 'hono/cors';
 import { requestId } from 'hono/request-id';
 import type { RequestIdVariables } from 'hono/request-id';
 import type { Logger } from 'pino';
@@ -83,12 +84,14 @@ app.route('/api/auth', auth);
 app.route('/api/files', filesRoute);
 
 // API servers.
+app.use(`/api/v1/*`, cors());
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
+app.use(`${API_V2_BETA_URL}/*`, cors());
 app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
 
 export default app;

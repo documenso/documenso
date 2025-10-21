@@ -35,7 +35,7 @@ export const distributeEnvelopeRoute = authenticatedProcedure
         timezone: meta.timezone,
         redirectUrl: meta.redirectUrl,
         distributionMethod: meta.distributionMethod,
-        emailSettings: meta.emailSettings,
+        emailSettings: meta.emailSettings ?? undefined,
         language: meta.language,
         emailId: meta.emailId,
         emailReplyTo: meta.emailReplyTo,
