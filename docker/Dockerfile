@@ -88,6 +88,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
       libxcomposite1 libxdamage1 libxfixes3 libxrandr2 libgbm1 \
       libasound2 libx11-6 libxext6 libxshmfence1 libxrender1 \
       fonts-liberation fonts-noto fonts-noto-cjk fonts-noto-color-emoji \
+      libpango-1.0-0 libcairo2 \
   && rm -rf /var/lib/apt/lists/*
 
 # Where Playwright will put browsers (make it now and chown later)
