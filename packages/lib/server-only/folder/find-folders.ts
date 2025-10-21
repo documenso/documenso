@@ -1,9 +1,11 @@
-import { EnvelopeType } from '@prisma/client';
+import type { Prisma } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';
+import type { FindResultResponse } from '../../types/search-params';
+import { buildTeamWhereQuery } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
 export interface FindFoldersOptions {
@@ -11,102 +13,48 @@ export interface FindFoldersOptions {
   teamId: number;
   parentId?: string | null;
   type?: TFolderType;
+  page?: number;
+  perPage?: number;
 }
 
-export const findFolders = async ({ userId, teamId, parentId, type }: FindFoldersOptions) => {
+export const findFolders = async ({
+  userId,
+  teamId,
+  parentId,
+  type,
+  page = 1,
+  perPage = 10,
+}: FindFoldersOptions) => {
   const team = await getTeamById({ userId, teamId });
 
-  const visibilityFilters = {
+  const whereClause: Prisma.FolderWhereInput = {
+    parentId,
+    team: buildTeamWhereQuery({ teamId, userId }),
+    type,
     visibility: {
       in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
     },
   };
 
-  const whereClause = {
-    AND: [
-      { parentId },
-      {
-        OR: [
-          { teamId, ...visibilityFilters },
-          { userId, teamId },
-        ],
+  const [data, count] = await Promise.all([
+    prisma.folder.findMany({
+      where: whereClause,
+      skip: Math.max(page - 1, 0) * perPage,
+      take: perPage,
+      orderBy: {
+        createdAt: 'desc',
       },
-    ],
-  };
+    }),
+    prisma.folder.count({
+      where: whereClause,
+    }),
+  ]);
 
-  try {
-    const folders = await prisma.folder.findMany({
-      where: {
-        ...whereClause,
-        ...(type ? { type } : {}),
-      },
-      orderBy: [{ pinned: 'desc' }, { createdAt: 'desc' }],
-    });
-
-    const foldersWithDetails = await Promise.all(
-      folders.map(async (folder) => {
-        try {
-          const [subfolders, documentCount, templateCount, subfolderCount] = await Promise.all([
-            prisma.folder.findMany({
-              where: {
-                parentId: folder.id,
-                teamId,
-                ...visibilityFilters,
-              },
-              orderBy: {
-                createdAt: 'desc',
-              },
-            }),
-            prisma.envelope.count({
-              where: {
-                type: EnvelopeType.DOCUMENT,
-                folderId: folder.id,
-              },
-            }),
-            prisma.envelope.count({
-              where: {
-                type: EnvelopeType.TEMPLATE,
-                folderId: folder.id,
-              },
-            }),
-            prisma.folder.count({
-              where: {
-                parentId: folder.id,
-                teamId,
-                ...visibilityFilters,
-              },
-            }),
-          ]);
-
-          const subfoldersWithEmptySubfolders = subfolders.map((subfolder) => ({
-            ...subfolder,
-            subfolders: [],
-            _count: {
-              documents: 0,
-              templates: 0,
-              subfolders: 0,
-            },
-          }));
-
-          return {
-            ...folder,
-            subfolders: subfoldersWithEmptySubfolders,
-            _count: {
-              documents: documentCount,
-              templates: templateCount,
-              subfolders: subfolderCount,
-            },
-          };
-        } catch (error) {
-          console.error('Error processing folder:', folder.id, error);
-          throw error;
-        }
-      }),
-    );
-
-    return foldersWithDetails;
-  } catch (error) {
-    console.error('Error in findFolders:', error);
-    throw error;
-  }
+  return {
+    data,
+    count,
+    currentPage: Math.max(page, 1),
+    perPage,
+    totalPages: Math.ceil(count / perPage),
+  } satisfies FindResultResponse<typeof data>;
 };

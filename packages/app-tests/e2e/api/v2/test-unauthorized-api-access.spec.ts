@@ -24,6 +24,7 @@ import {
   seedDraftDocument,
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
+import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -326,11 +327,6 @@ test.describe('Document API V2', () => {
         data: { documentId: mapSecondaryIdToDocumentId(doc.secondaryId) },
       });
 
-      const asdf = await res.json();
-      console.log({
-        asdf,
-      });
-
       expect(res.ok()).toBeTruthy();
       expect(res.status()).toBe(200);
     });
@@ -405,11 +401,6 @@ test.describe('Document API V2', () => {
 
       const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/document/field/${field.id}`, {
         headers: { Authorization: `Bearer ${tokenA}` },
-      });
-
-      const asdf = await res.json();
-      console.log({
-        asdf,
       });
 
       expect(res.ok()).toBeTruthy();
@@ -2709,6 +2700,156 @@ test.describe('Document API V2', () => {
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/direct/toggle`, {
         headers: { Authorization: `Bearer ${tokenA}` },
         data: { templateId: mapSecondaryIdToTemplateId(template.secondaryId), enabled: false },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+    });
+  });
+
+  test.describe('Folder list endpoint', () => {
+    test('should block unauthorized access to folder list endpoint', async ({ request }) => {
+      await seedBlankFolder(userA, teamA.id);
+      await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/folder`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const { data } = await res.json();
+      expect(data.every((folder: { userId: number }) => folder.userId !== userA.id)).toBe(true);
+      expect(data.length).toBe(0);
+    });
+
+    test('should allow authorized access to folder list endpoint', async ({ request }) => {
+      await seedBlankFolder(userA, teamA.id);
+      await seedBlankFolder(userA, teamA.id);
+
+      // Other team folders should not be visible.
+      await seedBlankFolder(userA, teamB.id);
+      await seedBlankFolder(userA, teamB.id);
+
+      // Other team and user folders should not be visible.
+      await seedBlankFolder(userB, teamB.id);
+      await seedBlankFolder(userB, teamB.id);
+
+      const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/folder`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const { data } = await res.json();
+
+      expect(data.length).toBe(2);
+      expect(data.every((folder: { userId: number }) => folder.userId === userA.id)).toBe(true);
+    });
+  });
+
+  test.describe('Folder create endpoint', () => {
+    test('should block unauthorized access to folder create endpoint', async ({ request }) => {
+      const unauthorizedFolder = await seedBlankFolder(userB, teamB.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          parentId: unauthorizedFolder.id,
+          name: 'Test Folder',
+          type: 'DOCUMENT',
+        },
+      });
+
+      expect(res.ok()).toBeFalsy();
+      expect(res.status()).toBe(404);
+    });
+
+    test('should allow authorized access to folder create endpoint', async ({ request }) => {
+      const authorizedFolder = await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          parentId: authorizedFolder.id,
+          name: 'Test Folder',
+          type: 'DOCUMENT',
+        },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const noParentRes = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          name: 'Test Folder',
+          type: 'DOCUMENT',
+        },
+      });
+
+      expect(noParentRes.ok()).toBeTruthy();
+      expect(noParentRes.status()).toBe(200);
+    });
+  });
+
+  test.describe('Folder update endpoint', () => {
+    test('should block unauthorized access to folder update endpoint', async ({ request }) => {
+      const folder = await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/update`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: {
+          folderId: folder.id,
+          data: {
+            name: 'Updated Folder Name',
+          },
+        },
+      });
+
+      expect(res.ok()).toBeFalsy();
+      expect(res.status()).toBe(404);
+    });
+
+    test('should allow authorized access to folder update endpoint', async ({ request }) => {
+      const folder = await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/update`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          folderId: folder.id,
+          data: {
+            name: 'Updated Folder Name',
+          },
+        },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+    });
+  });
+
+  test.describe('Folder delete endpoint', () => {
+    test('should block unauthorized access to folder delete endpoint', async ({ request }) => {
+      const folder = await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/delete`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        data: { folderId: folder.id },
+      });
+
+      expect(res.ok()).toBeFalsy();
+      expect(res.status()).toBe(404);
+    });
+
+    test('should allow authorized access to folder delete endpoint', async ({ request }) => {
+      const folder = await seedBlankFolder(userA, teamA.id);
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/folder/delete`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: { folderId: folder.id },
       });
 
       expect(res.ok()).toBeTruthy();
