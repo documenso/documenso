@@ -6,7 +6,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
-import { FaIdCardClip, FaMicrosoft } from 'react-icons/fa6';
+import { FaIdCardClip } from 'react-icons/fa6';
 import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
@@ -356,7 +356,13 @@ export const SignUpForm = ({
                     disabled={isSubmitting}
                     onClick={onSignUpWithMicrosoftClick}
                   >
-                    <FaMicrosoft className="mr-2 h-5 w-5" />
+                    <img
+                      className="mr-2 h-4 w-4"
+                      alt="Microsoft logo"
+                      src={'/static/microsoft.svg'}
+                      height={16}
+                      width={16}
+                    />
                     <Trans>Sign Up with Microsoft</Trans>
                   </Button>
                 </>
