@@ -42,6 +42,54 @@ export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFol
     });
   }
 
+  if (parentId) {
+    const parentFolder = await prisma.folder.findFirst({
+      where: {
+        id: parentId,
+        userId,
+        teamId,
+        type: folder.type,
+      },
+    });
+
+    if (!parentFolder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Parent folder not found',
+      });
+    }
+
+    if (parentId === folderId) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot move a folder into itself',
+      });
+    }
+
+    let currentParentId = parentFolder.parentId;
+
+    while (currentParentId) {
+      if (currentParentId === folderId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot move a folder into its descendant',
+        });
+      }
+
+      const currentParent = await prisma.folder.findUnique({
+        where: {
+          id: currentParentId,
+        },
+        select: {
+          parentId: true,
+        },
+      });
+
+      if (!currentParent) {
+        break;
+      }
+
+      currentParentId = currentParent.parentId;
+    }
+  }
+
   return await prisma.folder.update({
     where: {
       id: folderId,
