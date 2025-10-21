@@ -127,7 +127,7 @@ export const ZDocumentMetaCreateSchema = z.object({
   drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
   emailId: z.string().nullish(),
   emailReplyTo: z.string().email().nullish(),
-  emailSettings: ZDocumentEmailSettingsSchema.optional(),
+  emailSettings: ZDocumentEmailSettingsSchema.nullish(),
 });
 
 export type TDocumentMetaCreate = z.infer<typeof ZDocumentMetaCreateSchema>;
