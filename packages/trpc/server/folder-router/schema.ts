@@ -101,7 +101,7 @@ export const ZGetFoldersResponseSchema = z.object({
 export type TGetFoldersResponse = z.infer<typeof ZGetFoldersResponseSchema>;
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
-  parentId: ZFolderParentIdSchema.optional().describe('Filter folders by the parent folder ID'),
+  parentId: z.string().optional().describe('Filter folders by the parent folder ID'),
   type: ZFolderTypeSchema.optional().describe('Filter folders by the folder type'),
 });
 
