@@ -1,0 +1,230 @@
+import type { Prisma } from '@prisma/client';
+import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
+
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { generateDatabaseId } from '@documenso/lib/universal/id';
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
+import { prisma } from '@documenso/prisma';
+
+import { adminProcedure } from '../trpc';
+import {
+  ZUpdateOrganisationMemberRoleRequestSchema,
+  ZUpdateOrganisationMemberRoleResponseSchema,
+} from './update-organisation-member-role.types';
+
+/**
+ * Helper function to switch a member from one group to another atomically.
+ */
+const switchMemberGroup = async (
+  tx: Prisma.TransactionClient,
+  memberId: string,
+  fromGroupId: string,
+  toGroupId: string,
+) => {
+  await tx.organisationGroupMember.delete({
+    where: {
+      organisationMemberId_groupId: {
+        organisationMemberId: memberId,
+        groupId: fromGroupId,
+      },
+    },
+  });
+
+  await tx.organisationGroupMember.create({
+    data: {
+      id: generateDatabaseId('group_member'),
+      organisationMemberId: memberId,
+      groupId: toGroupId,
+    },
+  });
+};
+
+/**
+ * Admin mutation to update organisation member role or transfer ownership.
+ *
+ * This mutation handles two scenarios:
+ * 1. When role='OWNER': Transfers organisation ownership and promotes to ADMIN
+ * 2. When role=ADMIN/MANAGER/MEMBER: Updates group membership
+ *
+ * Admin privileges bypass normal hierarchy restrictions.
+ */
+export const updateOrganisationMemberRoleRoute = adminProcedure
+  .input(ZUpdateOrganisationMemberRoleRequestSchema)
+  .output(ZUpdateOrganisationMemberRoleResponseSchema)
+  .mutation(async ({ input, ctx }) => {
+    const { organisationId, userId, role } = input;
+
+    ctx.logger.info({
+      input: {
+        organisationId,
+        userId,
+        role,
+      },
+    });
+
+    // Fetch organisation with member details and internal groups
+    const organisation = await prisma.organisation.findUnique({
+      where: {
+        id: organisationId,
+      },
+      include: {
+        groups: {
+          where: {
+            type: OrganisationGroupType.INTERNAL_ORGANISATION,
+          },
+        },
+        members: {
+          where: {
+            userId,
+          },
+          include: {
+            organisationGroupMembers: {
+              include: {
+                group: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!organisation) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Organisation not found',
+      });
+    }
+
+    // Verify the user is a member of the organisation
+    const [member] = organisation.members;
+
+    if (!member) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'User is not a member of this organisation',
+      });
+    }
+
+    // Get current organisation role
+    const currentOrganisationRole = getHighestOrganisationRoleInGroup(
+      member.organisationGroupMembers.flatMap((member) => member.group),
+    );
+
+    // Handle ownership transfer
+    if (role === 'OWNER') {
+      // Verify the user is not already the owner
+      if (organisation.ownerUserId === userId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'User is already the owner of this organisation',
+        });
+      }
+
+      const currentMemberGroup = organisation.groups.find(
+        (group) => group.organisationRole === currentOrganisationRole,
+      );
+
+      const adminGroup = organisation.groups.find(
+        (group) => group.organisationRole === OrganisationMemberRole.ADMIN,
+      );
+
+      if (!currentMemberGroup) {
+        ctx.logger.error({
+          message: '[CRITICAL]: Missing internal group',
+          organisationId,
+          userId,
+          role: currentOrganisationRole,
+        });
+
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: 'Current member group not found',
+        });
+      }
+
+      if (!adminGroup) {
+        ctx.logger.error({
+          message: '[CRITICAL]: Missing internal group',
+          organisationId,
+          userId,
+          targetRole: 'ADMIN',
+        });
+
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: 'Admin group not found',
+        });
+      }
+
+      // Update the organisation owner and member role in a transaction
+      await prisma.$transaction(async (tx) => {
+        // Update the organisation to set the new owner
+        await tx.organisation.update({
+          where: {
+            id: organisationId,
+          },
+          data: {
+            ownerUserId: userId,
+          },
+        });
+
+        // Only update role if the user is not already an admin
+        if (currentOrganisationRole !== OrganisationMemberRole.ADMIN) {
+          await switchMemberGroup(tx, member.id, currentMemberGroup.id, adminGroup.id);
+        }
+      });
+
+      return;
+    }
+
+    // Handle regular role update (non-ownership transfer)
+    const targetRole = role as OrganisationMemberRole;
+
+    // Check if user already has this role
+    if (currentOrganisationRole === targetRole) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'User already has this role',
+      });
+    }
+
+    // If updating the current owner's role, ensure they remain admin
+    if (userId === organisation.ownerUserId && targetRole !== OrganisationMemberRole.ADMIN) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Organisation owner must be an admin. Transfer ownership first.',
+      });
+    }
+
+    const currentMemberGroup = organisation.groups.find(
+      (group) => group.organisationRole === currentOrganisationRole,
+    );
+
+    const newMemberGroup = organisation.groups.find(
+      (group) => group.organisationRole === targetRole,
+    );
+
+    if (!currentMemberGroup) {
+      ctx.logger.error({
+        message: '[CRITICAL]: Missing internal group',
+        organisationId,
+        userId,
+        role: currentOrganisationRole,
+      });
+
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Current member group not found',
+      });
+    }
+
+    if (!newMemberGroup) {
+      ctx.logger.error({
+        message: '[CRITICAL]: Missing internal group',
+        organisationId,
+        userId,
+        targetRole,
+      });
+
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'New member group not found',
+      });
+    }
+
+    // Switch member to new internal group role
+    await prisma.$transaction(async (tx) => {
+      await switchMemberGroup(tx, member.id, currentMemberGroup.id, newMemberGroup.id);
+    });
+  });

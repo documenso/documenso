@@ -13,6 +13,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
@@ -34,6 +35,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
@@ -71,23 +73,6 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       },
     });
 
-  const { mutateAsync: promoteToOwner, isPending: isPromotingToOwner } =
-    trpc.admin.organisationMember.promoteToOwner.useMutation({
-      onSuccess: () => {
-        toast({
-          title: t`Success`,
-          description: t`Member promoted to owner successfully`,
-        });
-      },
-      onError: () => {
-        toast({
-          title: t`Error`,
-          description: t`We couldn't promote the member to owner. Please try again.`,
-          variant: 'destructive',
-        });
-      },
-    });
-
   const teamsColumns = useMemo(() => {
     return [
       {
@@ -120,23 +105,30 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       },
       {
         header: t`Actions`,
-        cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              disabled={row.original.userId === organisation?.ownerUserId}
-              loading={isPromotingToOwner}
-              onClick={async () =>
-                promoteToOwner({
-                  organisationId,
-                  userId: row.original.userId,
-                })
-              }
-            >
-              <Trans>Promote to owner</Trans>
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const isOwner = row.original.userId === organisation?.ownerUserId;
+          const currentRole = getHighestOrganisationRoleInGroup(
+            row.original.organisationGroupMembers.flatMap((m) => m.group),
+          );
+
+          return (
+            <div className="flex justify-end space-x-2">
+              <AdminOrganisationMemberUpdateDialog
+                trigger={
+                  <Button variant="outline">
+                    <Trans>Update role</Trans>
+                  </Button>
+                }
+                organisationId={organisationId}
+                organisationMemberId={row.original.id}
+                organisationMemberUserId={row.original.userId}
+                organisationMemberName={row.original.user.name ?? row.original.user.email}
+                organisationMemberRole={currentRole}
+                isOwner={isOwner}
+              />
+            </div>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
   }, [organisation]);
