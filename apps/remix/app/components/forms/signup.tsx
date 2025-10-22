@@ -86,6 +86,8 @@ export const SignUpForm = ({
 
   const utmSrc = searchParams.get('utm_source') ?? null;
 
+  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+
   const form = useForm<TSignUpFormSchema>({
     values: {
       name: '',
@@ -243,7 +245,7 @@ export const SignUpForm = ({
             <fieldset
               className={cn(
                 'flex h-[550px] w-full flex-col gap-y-4',
-                (isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled) && 'h-[650px]',
+                hasSocialAuthEnabled && 'h-[650px]',
               )}
               disabled={isSubmitting}
             >
@@ -318,7 +320,7 @@ export const SignUpForm = ({
                 )}
               />
 
-              {(isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled) && (
+              {hasSocialAuthEnabled && (
                 <>
                   <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                     <div className="bg-border h-px flex-1" />
@@ -358,10 +360,8 @@ export const SignUpForm = ({
                   >
                     <img
                       className="mr-2 h-4 w-4"
-                      alt="Microsoft logo"
+                      alt="Microsoft Logo"
                       src={'/static/microsoft.svg'}
-                      height={16}
-                      width={16}
                     />
                     <Trans>Sign Up with Microsoft</Trans>
                   </Button>

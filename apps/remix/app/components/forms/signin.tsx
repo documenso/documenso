@@ -97,6 +97,8 @@ export const SignInForm = ({
     'totp' | 'backup'
   >('totp');
 
+  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
+
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
   const redirectPath = useMemo(() => {
@@ -381,7 +383,7 @@ export const SignInForm = ({
             {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
           </Button>
 
-          {(isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled) && (
+          {hasSocialAuthEnabled && (
             <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
               <div className="bg-border h-px flex-1" />
               <span className="text-muted-foreground bg-transparent">
@@ -414,13 +416,7 @@ export const SignInForm = ({
               disabled={isSubmitting}
               onClick={onSignInWithMicrosoftClick}
             >
-              <img
-                className="mr-2 h-4 w-4"
-                alt="Profile badge"
-                src={'/static/microsoft.svg'}
-                height={16}
-                width={16}
-              />
+              <img className="mr-2 h-4 w-4" alt="Microsoft Logo" src={'/static/microsoft.svg'} />
               Microsoft
             </Button>
           )}
