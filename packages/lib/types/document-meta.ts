@@ -107,6 +107,16 @@ export const ZDocumentMetaUploadSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using an uploaded signature.');
 
+export const ZDocumentExpiryAmountSchema = z
+  .number()
+  .int()
+  .min(1)
+  .describe('The amount for expiry duration (e.g., 3 for "3 days").');
+
+export const ZDocumentExpiryUnitSchema = z
+  .enum(['minutes', 'hours', 'days', 'weeks', 'months'])
+  .describe('The unit for expiry duration (e.g., "days" for "3 days").');
+
 /**
  * Note: Any updates to this will cause public API changes. You will need to update
  * all corresponding areas where this is used (some places that use this needs to pass
@@ -128,6 +138,8 @@ export const ZDocumentMetaCreateSchema = z.object({
   emailId: z.string().nullish(),
   emailReplyTo: z.string().email().nullish(),
   emailSettings: ZDocumentEmailSettingsSchema.nullish(),
+  expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+  expiryUnit: ZDocumentExpiryUnitSchema.optional(),
 });
 
 export type TDocumentMetaCreate = z.infer<typeof ZDocumentMetaCreateSchema>;

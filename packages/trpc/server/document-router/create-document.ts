@@ -4,6 +4,7 @@ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -16,7 +17,14 @@ export const createDocumentRoute = authenticatedProcedure
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
-    const { title, documentDataId, timezone, folderId } = input;
+    const { title, documentDataId, timezone, folderId, expiryAmount, expiryUnit } = input;
+
+    // Validate expiry settings
+    if ((expiryAmount || expiryUnit) && !isValidExpirySettings(expiryAmount, expiryUnit)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid expiry settings. Please check your expiry configuration.',
+      });
+    }
 
     ctx.logger.info({
       input: {
@@ -47,6 +55,10 @@ export const createDocumentRoute = authenticatedProcedure
             documentDataId,
           },
         ],
+      },
+      meta: {
+        expiryAmount,
+        expiryUnit,
       },
       normalizePdf: true,
       requestMetadata: ctx.metadata,

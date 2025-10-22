@@ -1,5 +1,7 @@
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -26,6 +28,15 @@ export const updateDocumentRoute = authenticatedProcedure
     });
 
     const userId = ctx.user.id;
+
+    if (
+      (meta.expiryAmount || meta.expiryUnit) &&
+      !isValidExpirySettings(meta.expiryAmount, meta.expiryUnit)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid expiry settings. Please check your expiry configuration.',
+      });
+    }
 
     const envelope = await updateEnvelope({
       userId,

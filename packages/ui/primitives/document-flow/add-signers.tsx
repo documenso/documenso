@@ -63,6 +63,8 @@ export type AddSignersFormProps = {
   fields: Field[];
   signingOrder?: DocumentSigningOrder | null;
   allowDictateNextSigner?: boolean;
+  expiryAmount?: number | null;
+  expiryUnit?: 'minutes' | 'hours' | 'days' | 'weeks' | 'months' | null;
   onSubmit: (_data: TAddSignersFormSchema) => void;
   onAutoSave: (_data: TAddSignersFormSchema) => Promise<AutoSaveResponse>;
   isDocumentPdfLoaded: boolean;
@@ -74,6 +76,8 @@ export const AddSignersFormPartial = ({
   fields,
   signingOrder,
   allowDictateNextSigner,
+  expiryAmount,
+  expiryUnit,
   onSubmit,
   onAutoSave,
   isDocumentPdfLoaded,
@@ -138,6 +142,10 @@ export const AddSignersFormPartial = ({
           : defaultRecipients,
       signingOrder: signingOrder || DocumentSigningOrder.PARALLEL,
       allowDictateNextSigner: allowDictateNextSigner ?? false,
+      meta: {
+        expiryAmount: expiryAmount ?? undefined,
+        expiryUnit: expiryUnit ?? undefined,
+      },
     },
   });
 

@@ -19,6 +19,8 @@ import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 import {
+  ZDocumentExpiryAmountSchema,
+  ZDocumentExpiryUnitSchema,
   ZDocumentExternalIdSchema,
   ZDocumentTitleSchema,
   ZDocumentVisibilitySchema,
@@ -51,6 +53,8 @@ export const ZCreateDocumentTemporaryRequestSchema = z.object({
       'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
+  expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+  expiryUnit: ZDocumentExpiryUnitSchema.optional(),
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({

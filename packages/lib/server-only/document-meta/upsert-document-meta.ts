@@ -10,6 +10,7 @@ import {
   createDocumentAuditLogData,
   diffDocumentMetaChanges,
 } from '@documenso/lib/utils/document-audit-logs';
+import { calculateRecipientExpiry } from '@documenso/lib/utils/expiry';
 import { prisma } from '@documenso/prisma';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
@@ -37,6 +38,8 @@ export type CreateDocumentMetaOptions = {
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
   language?: SupportedLanguageCodes;
+  expiryAmount?: number;
+  expiryUnit?: string;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -59,6 +62,8 @@ export const updateDocumentMeta = async ({
   uploadSignatureEnabled,
   drawSignatureEnabled,
   language,
+  expiryAmount,
+  expiryUnit,
   requestMetadata,
 }: CreateDocumentMetaOptions) => {
   const { envelopeWhereInput, team } = await getEnvelopeWhereInput({
@@ -120,8 +125,29 @@ export const updateDocumentMeta = async ({
         uploadSignatureEnabled,
         drawSignatureEnabled,
         language,
+        expiryAmount,
+        expiryUnit,
       },
     });
+
+    if (expiryAmount !== undefined || expiryUnit !== undefined) {
+      const newExpiryDate = calculateRecipientExpiry(
+        upsertedDocumentMeta.expiryAmount,
+        upsertedDocumentMeta.expiryUnit,
+        new Date(),
+      );
+
+      await tx.recipient.updateMany({
+        where: {
+          envelopeId: envelope.id,
+          signingStatus: { not: 'SIGNED' },
+          role: { not: 'CC' },
+        },
+        data: {
+          expired: newExpiryDate,
+        },
+      });
+    }
 
     const changes = diffDocumentMetaChanges(originalDocumentMeta ?? {}, upsertedDocumentMeta);
 

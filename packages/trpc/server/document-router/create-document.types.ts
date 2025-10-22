@@ -1,6 +1,10 @@
 import { z } from 'zod';
 
-import { ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
+import {
+  ZDocumentExpiryAmountSchema,
+  ZDocumentExpiryUnitSchema,
+  ZDocumentMetaTimezoneSchema,
+} from '@documenso/lib/types/document-meta';
 
 import { ZDocumentTitleSchema } from './schema';
 
@@ -19,6 +23,8 @@ export const ZCreateDocumentRequestSchema = z.object({
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   folderId: z.string().describe('The ID of the folder to create the document in').optional(),
+  expiryAmount: ZDocumentExpiryAmountSchema.optional(),
+  expiryUnit: ZDocumentExpiryUnitSchema.optional(),
 });
 
 export const ZCreateDocumentResponseSchema = z.object({

@@ -24,6 +24,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { calculateRecipientExpiry } from '../../utils/expiry';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -174,6 +175,24 @@ export const sendDocument = async ({
           metadata: requestMetadata,
           data: {},
         }),
+      });
+    }
+
+    if (envelope.documentMeta?.expiryAmount && envelope.documentMeta?.expiryUnit) {
+      const expiryDate = calculateRecipientExpiry(
+        envelope.documentMeta.expiryAmount,
+        envelope.documentMeta.expiryUnit,
+        new Date(), // Calculate from current time
+      );
+
+      await tx.recipient.updateMany({
+        where: {
+          envelopeId: envelope.id,
+          expired: null,
+        },
+        data: {
+          expired: expiryDate,
+        },
       });
     }
 

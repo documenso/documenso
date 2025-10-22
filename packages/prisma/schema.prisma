@@ -505,6 +505,9 @@ model DocumentMeta {
   emailReplyTo  String?
   emailId       String?
 
+  expiryAmount  Int?
+  expiryUnit    String?
+
   envelope Envelope?
 }
 
@@ -522,6 +525,7 @@ enum SigningStatus {
   NOT_SIGNED
   SIGNED
   REJECTED
+  EXPIRED
 }
 
 enum RecipientRole {

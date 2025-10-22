@@ -6,6 +6,7 @@ import { createDocumentData } from '@documenso/lib/server-only/document-data/cre
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { isValidExpirySettings } from '@documenso/lib/utils/expiry';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -37,7 +38,16 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       recipients,
       meta,
       folderId,
+      expiryAmount,
+      expiryUnit,
     } = input;
+
+    // Validate expiry settings
+    if ((expiryAmount || expiryUnit) && !isValidExpirySettings(expiryAmount, expiryUnit)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Invalid expiry settings. Please check your expiry configuration.',
+      });
+    }
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
 
@@ -89,6 +99,8 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       meta: {
         ...meta,
         emailSettings: meta?.emailSettings ?? undefined,
+        expiryAmount,
+        expiryUnit,
       },
       requestMetadata: ctx.metadata,
     });

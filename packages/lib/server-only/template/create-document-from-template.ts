@@ -52,6 +52,7 @@ import {
 } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { calculateRecipientExpiry } from '../../utils/expiry';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
@@ -110,6 +111,8 @@ export type CreateDocumentFromTemplateOptions = {
     typedSignatureEnabled?: boolean;
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
+    expiryAmount?: number;
+    expiryUnit?: string;
   };
   requestMetadata: ApiRequestMetadata;
 };
@@ -508,6 +511,16 @@ export const createDocumentFromTemplate = async ({
             data: finalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
+              // Calculate expiry date based on override
+              // Note: Templates no longer have default expiry settings (TemplateMeta removed)
+              const expiryAmount = override?.expiryAmount ?? null;
+              const expiryUnit = override?.expiryUnit ?? null;
+              const recipientExpiryDate = calculateRecipientExpiry(
+                expiryAmount,
+                expiryUnit,
+                new Date(), // Calculate from current time
+              );
+
               return {
                 email: recipient.email,
                 name: recipient.name,
@@ -523,6 +536,7 @@ export const createDocumentFromTemplate = async ({
                     ? SigningStatus.SIGNED
                     : SigningStatus.NOT_SIGNED,
                 signingOrder: recipient.signingOrder,
+                expired: recipientExpiryDate,
                 token: recipient.token,
               };
             }),

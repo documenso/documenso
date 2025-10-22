@@ -16,6 +16,7 @@ import { getEnvelopeForRecipientSigning } from '@documenso/lib/server-only/envel
 import { getEnvelopeRequiredAccessData } from '@documenso/lib/server-only/envelope/get-envelope-required-access-data';
 import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
 import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
+import { expireRecipient } from '@documenso/lib/server-only/recipient/expire-recipient';
 import { getIsRecipientsTurnToSign } from '@documenso/lib/server-only/recipient/get-is-recipient-turn';
 import { getNextPendingRecipient } from '@documenso/lib/server-only/recipient/get-next-pending-recipient';
 import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
@@ -25,6 +26,7 @@ import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settin
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
+import { isRecipientExpired } from '@documenso/lib/utils/expiry';
 import { prisma } from '@documenso/prisma';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 
@@ -136,6 +138,13 @@ const handleV1Loader = async ({ params, request }: Route.LoaderArgs) => {
 
   const { documentMeta } = document;
 
+  if (isRecipientExpired(recipient)) {
+    const expiredRecipient = await expireRecipient({ recipientId: recipient.id });
+    if (expiredRecipient) {
+      throw redirect(`/sign/${token}/expired`);
+    }
+  }
+
   if (recipient.signingStatus === SigningStatus.REJECTED) {
     throw redirect(`/sign/${token}/rejected`);
   }
@@ -238,6 +247,13 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     requestMetadata,
     recipientAccessAuth: derivedRecipientAccessAuth,
   }).catch(() => null);
+
+  if (isRecipientExpired(recipient)) {
+    const expiredRecipient = await expireRecipient({ recipientId: recipient.id });
+    if (expiredRecipient) {
+      throw redirect(`/sign/${token}/expired`);
+    }
+  }
 
   if (isRejected) {
     throw redirect(`/sign/${token}/rejected`);
