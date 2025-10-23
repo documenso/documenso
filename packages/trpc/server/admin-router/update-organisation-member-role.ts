@@ -62,7 +62,6 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       },
     });
 
-    // Fetch organisation with member details and internal groups
     const organisation = await prisma.organisation.findUnique({
       where: {
         id: organisationId,
@@ -94,7 +93,6 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       });
     }
 
-    // Verify the user is a member of the organisation
     const [member] = organisation.members;
 
     if (!member) {
@@ -103,14 +101,11 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       });
     }
 
-    // Get current organisation role
     const currentOrganisationRole = getHighestOrganisationRoleInGroup(
       member.organisationGroupMembers.flatMap((member) => member.group),
     );
 
-    // Handle ownership transfer
     if (role === 'OWNER') {
-      // Verify the user is not already the owner
       if (organisation.ownerUserId === userId) {
         throw new AppError(AppErrorCode.INVALID_REQUEST, {
           message: 'User is already the owner of this organisation',
@@ -151,9 +146,7 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
         });
       }
 
-      // Update the organisation owner and member role in a transaction
       await prisma.$transaction(async (tx) => {
-        // Update the organisation to set the new owner
         await tx.organisation.update({
           where: {
             id: organisationId,
@@ -163,7 +156,6 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
           },
         });
 
-        // Only update role if the user is not already an admin
         if (currentOrganisationRole !== OrganisationMemberRole.ADMIN) {
           await switchMemberGroup(tx, member.id, currentMemberGroup.id, adminGroup.id);
         }
@@ -172,17 +164,14 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       return;
     }
 
-    // Handle regular role update (non-ownership transfer)
     const targetRole = role as OrganisationMemberRole;
 
-    // Check if user already has this role
     if (currentOrganisationRole === targetRole) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'User already has this role',
       });
     }
 
-    // If updating the current owner's role, ensure they remain admin
     if (userId === organisation.ownerUserId && targetRole !== OrganisationMemberRole.ADMIN) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
         message: 'Organisation owner must be an admin. Transfer ownership first.',
@@ -223,7 +212,6 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
       });
     }
 
-    // Switch member to new internal group role
     await prisma.$transaction(async (tx) => {
       await switchMemberGroup(tx, member.id, currentMemberGroup.id, newMemberGroup.id);
     });
