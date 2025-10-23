@@ -14,12 +14,12 @@ export const DocumentSigningAttachmentsPopover = ({
   envelopeId,
   token,
 }: DocumentSigningAttachmentsPopoverProps) => {
-  const { data: attachments = [] } = trpc.envelope.attachment.find.useQuery({
+  const { data: attachments } = trpc.envelope.attachment.find.useQuery({
     envelopeId,
     token,
   });
 
-  if (attachments.length === 0) {
+  if (!attachments || attachments.data.length === 0) {
     return null;
   }
 
@@ -30,7 +30,9 @@ export const DocumentSigningAttachmentsPopover = ({
           <PaperclipIcon className="h-4 w-4" />
           <span>
             <Trans>Attachments</Trans>{' '}
-            {attachments.length > 0 && <span className="ml-1">({attachments.length})</span>}
+            {attachments && attachments.data.length > 0 && (
+              <span className="ml-1">({attachments.data.length})</span>
+            )}
           </span>
         </Button>
       </PopoverTrigger>
@@ -47,7 +49,7 @@ export const DocumentSigningAttachmentsPopover = ({
           </div>
 
           <div className="space-y-2">
-            {attachments.map((attachment) => (
+            {attachments?.data.map((attachment) => (
               <a
                 key={attachment.id}
                 href={attachment.data}

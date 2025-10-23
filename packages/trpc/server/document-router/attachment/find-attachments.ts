@@ -40,9 +40,13 @@ export const findAttachmentsRoute = authenticatedProcedure
       type: EnvelopeType.DOCUMENT,
     });
 
-    return await findAttachmentsByEnvelopeId({
+    const data = await findAttachmentsByEnvelopeId({
       envelopeId: envelope.id,
       teamId,
       userId,
     });
+
+    return {
+      data,
+    };
   });

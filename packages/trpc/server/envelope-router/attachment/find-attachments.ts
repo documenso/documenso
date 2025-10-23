@@ -28,7 +28,11 @@ export const findAttachmentsRoute = procedure
     });
 
     if (token) {
-      return await findAttachmentsByToken({ envelopeId, token });
+      const data = await findAttachmentsByToken({ envelopeId, token });
+
+      return {
+        data,
+      };
     }
 
     const { teamId } = ctx;
@@ -40,5 +44,9 @@ export const findAttachmentsRoute = procedure
       });
     }
 
-    return await findAttachmentsByEnvelopeId({ envelopeId, teamId, userId });
+    const data = await findAttachmentsByEnvelopeId({ envelopeId, teamId, userId });
+
+    return {
+      data,
+    };
   });

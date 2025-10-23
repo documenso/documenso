@@ -1,3 +1,5 @@
+import { DocumentStatus } from '@prisma/client';
+
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
@@ -7,15 +9,16 @@ export type CreateAttachmentOptions = {
   envelopeId: string;
   teamId: number;
   userId: number;
-  label: string;
-  data: string;
+  data: {
+    label: string;
+    data: string;
+  };
 };
 
 export const createAttachment = async ({
   envelopeId,
   teamId,
   userId,
-  label,
   data,
 }: CreateAttachmentOptions) => {
   const envelope = await prisma.envelope.findFirst({
@@ -31,12 +34,17 @@ export const createAttachment = async ({
     });
   }
 
+  if (envelope.status === DocumentStatus.COMPLETED || envelope.status === DocumentStatus.REJECTED) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Attachments can not be modified after the document has been completed or rejected',
+    });
+  }
+
   return await prisma.envelopeAttachment.create({
     data: {
       envelopeId,
       type: 'link',
-      label,
-      data,
+      ...data,
     },
   });
 };

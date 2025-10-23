@@ -22,7 +22,7 @@ export const updateAttachmentRoute = authenticatedProcedure
     const { teamId } = ctx;
     const userId = ctx.user.id;
 
-    const { id, label, data } = input;
+    const { id, data } = input;
 
     ctx.logger.info({
       input: { id },
@@ -32,7 +32,6 @@ export const updateAttachmentRoute = authenticatedProcedure
       id,
       userId,
       teamId,
-      label,
       data,
     });
   });

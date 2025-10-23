@@ -25,10 +25,10 @@ export const createAttachmentRoute = authenticatedProcedure
     const { teamId } = ctx;
     const userId = ctx.user.id;
 
-    const { documentId, label, data } = input;
+    const { documentId, data } = input;
 
     ctx.logger.info({
-      input: { documentId, label },
+      input: { documentId, label: data.label },
     });
 
     const envelope = await getEnvelopeById({
@@ -45,7 +45,6 @@ export const createAttachmentRoute = authenticatedProcedure
       envelopeId: envelope.id,
       teamId,
       userId,
-      label,
       data,
     });
   });

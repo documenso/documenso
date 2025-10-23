@@ -42,7 +42,7 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
 
   const utils = trpc.useUtils();
 
-  const { data: attachments = [] } = trpc.envelope.attachment.find.useQuery({
+  const { data: attachments } = trpc.envelope.attachment.find.useQuery({
     envelopeId,
   });
 
@@ -71,8 +71,10 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
     try {
       await createAttachment({
         envelopeId,
-        label: data.label,
-        data: data.url,
+        data: {
+          label: data.label,
+          data: data.url,
+        },
       });
 
       form.reset();
@@ -121,7 +123,9 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
 
           <span>
             <Trans>Attachments</Trans>
-            {attachments.length > 0 && <span className="ml-1">({attachments.length})</span>}
+            {attachments && attachments.data.length > 0 && (
+              <span className="ml-1">({attachments.data.length})</span>
+            )}
           </span>
         </Button>
       </PopoverTrigger>
@@ -137,9 +141,9 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
             </p>
           </div>
 
-          {attachments.length > 0 && (
+          {attachments && attachments.data.length > 0 && (
             <div className="space-y-2">
-              {attachments.map((attachment) => (
+              {attachments?.data.map((attachment) => (
                 <div
                   key={attachment.id}
                   className="border-border flex items-center justify-between rounded-md border p-2"

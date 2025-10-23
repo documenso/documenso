@@ -444,8 +444,6 @@ export const EmbedDirectTemplateClientPage = ({
                     />
                   </div>
                 )}
-
-                <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={token} />
               </div>
             </div>
 

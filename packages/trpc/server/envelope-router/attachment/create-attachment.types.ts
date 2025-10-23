@@ -2,8 +2,10 @@ import { z } from 'zod';
 
 export const ZCreateAttachmentRequestSchema = z.object({
   envelopeId: z.string(),
-  label: z.string().min(1, 'Label is required'),
-  data: z.string().url('Must be a valid URL'),
+  data: z.object({
+    label: z.string().min(1, 'Label is required'),
+    data: z.string().url('Must be a valid URL'),
+  }),
 });
 
 export const ZCreateAttachmentResponseSchema = z.void();
