@@ -623,6 +623,7 @@ const ZCreateDocumentResponseSchema = z.object({
 // ✅ Catch and transform errors appropriately
 try {
   const result = await createDocument({ userId, data });
+
   return result;
 } catch (err) {
   return AppError.toRestAPIError(err);
