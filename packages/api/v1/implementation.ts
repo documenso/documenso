@@ -498,6 +498,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       publicDescription,
       type,
       meta,
+      attachments,
     } = body;
 
     try {
@@ -569,6 +570,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           publicDescription,
         },
         meta,
+        attachments,
         requestMetadata: metadata,
       });
 
