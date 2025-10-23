@@ -19,6 +19,7 @@ import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-di
 import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 
+import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
 import { EnvelopeItemSelector } from '../envelope-editor/envelope-file-selector';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
 import { EnvelopeSignerHeader } from '../envelope-signing/envelope-signer-header';
@@ -31,8 +32,13 @@ const EnvelopeSignerPageRenderer = lazy(
 export const DocumentSigningPageViewV2 = () => {
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
-  const { envelope, recipientFields, recipientFieldsRemaining, showPendingFieldTooltip } =
-    useRequiredEnvelopeSigningContext();
+  const {
+    envelope,
+    recipient,
+    recipientFields,
+    recipientFieldsRemaining,
+    showPendingFieldTooltip,
+  } = useRequiredEnvelopeSigningContext();
 
   return (
     <div className="h-screen w-screen bg-gray-50">
@@ -82,6 +88,10 @@ export const DocumentSigningPageViewV2 = () => {
             <h4 className="text-sm font-semibold text-gray-900">
               <Trans>Actions</Trans>
             </h4>
+
+            <div className="w-full">
+              <DocumentSigningAttachmentsPopover envelopeId={envelope.id} token={recipient.token} />
+            </div>
 
             {/* Todo: Allow selecting which document to download and/or the original */}
             <Button variant="ghost" size="sm" className="w-full justify-start">

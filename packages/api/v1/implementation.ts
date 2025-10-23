@@ -427,6 +427,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           globalAccessAuth: body.authOptions?.globalAccessAuth,
           globalActionAuth: body.authOptions?.globalActionAuth,
         },
+        attachments: body.attachments,
         meta: {
           subject: body.meta.subject,
           message: body.meta.message,
@@ -792,6 +793,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           ...body.meta,
           title: body.title,
         },
+        attachments: body.attachments,
         requestMetadata: metadata,
       });
 

@@ -20,6 +20,7 @@ import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-rou
 
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
+import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -58,6 +59,11 @@ export type CreateEnvelopeOptions = {
     recipients?: TCreateEnvelopeRequest['recipients'];
     folderId?: string;
   };
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: TEnvelopeAttachmentType;
+  }>;
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
@@ -67,6 +73,7 @@ export const createEnvelope = async ({
   teamId,
   normalizePdf,
   data,
+  attachments,
   meta,
   requestMetadata,
   internalVersion,
@@ -246,6 +253,15 @@ export const createEnvelope = async ({
             })),
           },
         },
+        envelopeAttachments: {
+          createMany: {
+            data: (attachments || []).map((attachment) => ({
+              label: attachment.label,
+              data: attachment.data,
+              type: attachment.type ?? 'link',
+            })),
+          },
+        },
         userId,
         teamId,
         authOptions,
@@ -338,6 +354,7 @@ export const createEnvelope = async ({
         fields: true,
         folder: true,
         envelopeItems: true,
+        envelopeAttachments: true,
       },
     });
 

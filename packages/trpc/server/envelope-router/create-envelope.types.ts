@@ -76,6 +76,14 @@ export const ZCreateEnvelopeRequestSchema = z.object({
     )
     .optional(),
   meta: ZDocumentMetaCreateSchema.optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+      }),
+    )
+    .optional(),
 });
 
 export const ZCreateEnvelopeResponseSchema = z.object({

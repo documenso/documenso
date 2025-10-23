@@ -9,7 +9,7 @@ import {
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
-  .input(ZCreateEnvelopeRequestSchema) // Note: Before releasing this to public, update the response schema to be correct.
+  .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
@@ -24,6 +24,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       folderId,
       items,
       meta,
+      attachments,
     } = input;
 
     ctx.logger.info({
@@ -57,6 +58,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         folderId,
         envelopeItems: items,
       },
+      attachments,
       meta,
       normalizePdf: true,
       requestMetadata: ctx.metadata,

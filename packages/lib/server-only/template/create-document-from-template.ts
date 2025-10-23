@@ -91,6 +91,12 @@ export type CreateDocumentFromTemplateOptions = {
     envelopeItemId?: string;
   }[];
 
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: 'link';
+  }>;
+
   /**
    * Values that will override the predefined values in the template.
    */
@@ -295,6 +301,7 @@ export const createDocumentFromTemplate = async ({
   requestMetadata,
   folderId,
   prefillFields,
+  attachments,
 }: CreateDocumentFromTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -666,6 +673,33 @@ export const createDocumentFromTemplate = async ({
         },
       }),
     });
+
+    const templateAttachments = await tx.envelopeAttachment.findMany({
+      where: {
+        envelopeId: template.id,
+      },
+    });
+
+    const attachmentsToCreate = [
+      ...templateAttachments.map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type,
+        label: attachment.label,
+        data: attachment.data,
+      })),
+      ...(attachments || []).map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type || 'link',
+        label: attachment.label,
+        data: attachment.data,
+      })),
+    ];
+
+    if (attachmentsToCreate.length > 0) {
+      await tx.envelopeAttachment.createMany({
+        data: attachmentsToCreate,
+      });
+    }
 
     const createdEnvelope = await tx.envelope.findFirst({
       where: {

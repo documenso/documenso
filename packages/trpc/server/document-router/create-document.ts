@@ -16,7 +16,7 @@ export const createDocumentRoute = authenticatedProcedure
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
-    const { title, documentDataId, timezone, folderId } = input;
+    const { title, documentDataId, timezone, folderId, attachments } = input;
 
     ctx.logger.info({
       input: {
@@ -48,6 +48,7 @@ export const createDocumentRoute = authenticatedProcedure
           },
         ],
       },
+      attachments,
       normalizePdf: true,
       requestMetadata: ctx.metadata,
     });
