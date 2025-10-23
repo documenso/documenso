@@ -37,6 +37,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       recipients,
       meta,
       folderId,
+      attachments,
     } = input;
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -86,6 +87,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
           },
         ],
       },
+      attachments,
       meta: {
         ...meta,
         emailSettings: meta?.emailSettings ?? undefined,

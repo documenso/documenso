@@ -37,6 +37,7 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { injectCss } from '~/utils/css-vars';
 
 import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
+import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
 import { DocumentSigningRejectDialog } from '../general/document-signing/document-signing-reject-dialog';
@@ -48,6 +49,7 @@ import { EmbedDocumentRejected } from './embed-document-rejected';
 export type EmbedSignDocumentClientPageProps = {
   token: string;
   documentId: number;
+  envelopeId: string;
   documentData: DocumentData;
   recipient: RecipientWithFields;
   fields: Field[];
@@ -62,6 +64,7 @@ export type EmbedSignDocumentClientPageProps = {
 export const EmbedSignDocumentClientPage = ({
   token,
   documentId,
+  envelopeId,
   documentData,
   recipient,
   fields,
@@ -274,15 +277,17 @@ export const EmbedSignDocumentClientPage = ({
       <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
         {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-        {allowDocumentRejection && (
-          <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+        <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+          <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={token} />
+
+          {allowDocumentRejection && (
             <DocumentSigningRejectDialog
               documentId={documentId}
               token={token}
               onRejected={onDocumentRejected}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}

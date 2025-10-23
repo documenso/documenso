@@ -9,6 +9,7 @@ import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { logDocumentAccess } from '@documenso/lib/utils/logger';
 import { canAccessTeamDocument, formatDocumentsPath } from '@documenso/lib/utils/teams';
 
+import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
@@ -122,11 +123,13 @@ export default function DocumentEditPage() {
           </div>
         </div>
 
-        {document.useLegacyFieldInsertion && (
-          <div>
+        <div className="flex items-center gap-x-4">
+          <DocumentAttachmentsPopover envelopeId={document.envelopeId} />
+
+          {document.useLegacyFieldInsertion && (
             <LegacyFieldWarningPopover type="document" documentId={document.id} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       <DocumentEditForm

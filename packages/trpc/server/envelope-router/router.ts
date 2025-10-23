@@ -1,4 +1,8 @@
 import { router } from '../trpc';
+import { createAttachmentRoute } from './attachment/create-attachment';
+import { deleteAttachmentRoute } from './attachment/delete-attachment';
+import { findAttachmentsRoute } from './attachment/find-attachments';
+import { updateAttachmentRoute } from './attachment/update-attachment';
 import { createEnvelopeRoute } from './create-envelope';
 import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
@@ -34,5 +38,11 @@ export const envelopeRouter = router({
   field: {
     set: setEnvelopeFieldsRoute,
     sign: signEnvelopeFieldRoute,
+  },
+  attachment: {
+    find: findAttachmentsRoute,
+    create: createAttachmentRoute,
+    update: updateAttachmentRoute,
+    delete: deleteAttachmentRoute,
   },
 });

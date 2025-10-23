@@ -37,6 +37,7 @@ import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-sc
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
+import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
@@ -44,6 +45,7 @@ import { EmbedDocumentFields } from './embed-document-fields';
 
 export type EmbedDirectTemplateClientPageProps = {
   token: string;
+  envelopeId: string;
   updatedAt: Date;
   documentData: DocumentData;
   recipient: Recipient;
@@ -55,9 +57,10 @@ export type EmbedDirectTemplateClientPageProps = {
 
 export const EmbedDirectTemplateClientPage = ({
   token,
+  envelopeId,
   updatedAt,
   documentData,
-  recipient: _recipient,
+  recipient,
   fields,
   metadata,
   hidePoweredBy = false,
@@ -321,8 +324,12 @@ export const EmbedDirectTemplateClientPage = ({
   }
 
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+    <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
       {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
+
+      <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+        <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={recipient.token} />
+      </div>
 
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}

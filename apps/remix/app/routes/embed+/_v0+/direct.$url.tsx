@@ -122,6 +122,7 @@ export default function EmbedDirectTemplatePage() {
         <DocumentSigningRecipientProvider recipient={recipient}>
           <EmbedDirectTemplateClientPage
             token={token}
+            envelopeId={template.envelopeId}
             updatedAt={template.updatedAt}
             documentData={template.templateDocumentData}
             recipient={recipient}

@@ -22,6 +22,7 @@ import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribu
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -131,6 +132,8 @@ export default function EnvelopeEditorHeader() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <DocumentAttachmentsPopover envelopeId={envelope.id} />
+
           <EnvelopeEditorSettingsDialog
             trigger={
               <Button variant="outline" size="sm">

@@ -640,6 +640,23 @@ export const createDocumentFromDirectTemplate = async ({
       data: auditLogsToCreate,
     });
 
+    const templateAttachments = await tx.envelopeAttachment.findMany({
+      where: {
+        envelopeId: directTemplateEnvelope.id,
+      },
+    });
+
+    if (templateAttachments.length > 0) {
+      await tx.envelopeAttachment.createMany({
+        data: templateAttachments.map((attachment) => ({
+          envelopeId: createdEnvelope.id,
+          type: attachment.type,
+          label: attachment.label,
+          data: attachment.data,
+        })),
+      });
+    }
+
     // Send email to template owner.
     const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {
       recipientName: directRecipientEmail,
