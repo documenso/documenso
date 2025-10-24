@@ -456,10 +456,22 @@ const ZCreateFieldSchema = z.object({
   recipientId: z.number(),
   type: z.nativeEnum(FieldType),
   pageNumber: z.number(),
-  pageX: z.number(),
-  pageY: z.number(),
-  pageWidth: z.number(),
-  pageHeight: z.number(),
+  pageX: z
+    .number()
+    .min(0, 'Must be between 0-100 (percentage of page width)')
+    .max(100, 'Must be between 0-100 (percentage of page width)'),
+  pageY: z
+    .number()
+    .min(0, 'Must be between 0-100 (percentage of page height)')
+    .max(100, 'Must be between 0-100 (percentage of page height)'),
+  pageWidth: z
+    .number()
+    .min(0, 'Must be between 0-100 (percentage of page width)')
+    .max(100, 'Must be between 0-100 (percentage of page width)'),
+  pageHeight: z
+    .number()
+    .min(0, 'Must be between 0-100 (percentage of page height)')
+    .max(100, 'Must be between 0-100 (percentage of page height)'),
   fieldMeta: ZFieldMetaSchema.openapi({}),
 });
 

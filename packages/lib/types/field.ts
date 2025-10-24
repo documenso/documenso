@@ -57,17 +57,27 @@ export const ZFieldPageNumberSchema = z
 
 export const ZFieldPageXSchema = z
   .number()
-  .min(0)
+  .min(0, 'Must be between 0-100 (percentage of page width)')
+  .max(100, 'Must be between 0-100 (percentage of page width)')
   .describe('The X coordinate of where the field will be placed.');
 
 export const ZFieldPageYSchema = z
   .number()
-  .min(0)
+  .min(0, 'Must be between 0-100 (percentage of page height)')
+  .max(100, 'Must be between 0-100 (percentage of page height)')
   .describe('The Y coordinate of where the field will be placed.');
 
-export const ZFieldWidthSchema = z.number().min(1).describe('The width of the field.');
+export const ZFieldWidthSchema = z
+  .number()
+  .min(0, 'Must be between 0-100 (percentage of page width)')
+  .max(100, 'Must be between 0-100 (percentage of page width)')
+  .describe('The width of the field.');
 
-export const ZFieldHeightSchema = z.number().min(1).describe('The height of the field.');
+export const ZFieldHeightSchema = z
+  .number()
+  .min(0, 'Must be between 0-100 (percentage of page height)')
+  .max(100, 'Must be between 0-100 (percentage of page height)')
+  .describe('The height of the field.');
 
 // ---------------------------------------------
 
