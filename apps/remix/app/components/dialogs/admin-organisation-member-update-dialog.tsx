@@ -10,6 +10,7 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
+import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -66,7 +67,11 @@ export const AdminOrganisationMemberUpdateDialog = ({
   const navigate = useNavigate();
 
   // Determine the current role value for the form
-  const currentRoleValue = isOwner ? 'OWNER' : organisationMemberRole;
+  const currentRoleValue = isOwner
+    ? 'OWNER'
+    : getHighestOrganisationRoleInGroup(
+        organisationMember.organisationGroupMembers.map((ogm) => ogm.group),
+      );
   const organisationMemberName = organisationMember.user.name ?? organisationMember.user.email;
 
   const form = useForm<ZUpdateOrganisationMemberSchema>({
