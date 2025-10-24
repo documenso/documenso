@@ -63,7 +63,9 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
   );
 
   // Pass the prompt to the authorization endpoint.
-  url.searchParams.append('prompt', prompt);
+  if (process.env.NEXT_PRIVATE_OIDC_DISABLE_LOGIN_PARAMETER !== 'true') {
+    url.searchParams.append('prompt', prompt);
+  }
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,
