@@ -18,6 +18,8 @@ const BACKPORT_SUBSCRIPTION_CLAIM_JOB_DEFINITION_SCHEMA = z.object({
     embedSigning: z.literal(true).optional(),
     embedSigningWhiteLabel: z.literal(true).optional(),
     cfr21: z.literal(true).optional(),
+    // Todo: Envelopes - Do we need to check?
+    // authenticationPortal & emailDomains missing here.
   }),
 });
 

@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
+import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -51,7 +52,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     (timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
 
-  const { quota, remaining, refreshLimits } = useLimits();
+  const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -69,6 +70,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     if (!user.emailVerified) {
       return msg`Verify your email to upload documents.`;
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.documents, user.emailVerified, team]);
 
@@ -138,6 +140,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
+        .with(
+          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
+          () => t`You have reached the limit of the number of files per envelope`,
+        )
         .otherwise(() => t`An error occurred while uploading your document.`);
 
       toast({
@@ -151,12 +157,23 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     }
   };
 
-  const onFileDropRejected = () => {
+  const onFileDropRejected = (fileRejections: FileRejection[]) => {
+    const maxItemsReached = fileRejections.some((fileRejection) =>
+      fileRejection.errors.some((error) => error.code === DropzoneErrorCode.TooManyFiles),
+    );
+
+    if (maxItemsReached) {
+      toast({
+        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        duration: 5000,
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
     toast({
-      title:
-        type === EnvelopeType.DOCUMENT
-          ? t`Your document failed to upload.`
-          : t`Your template failed to upload.`,
+      title: t`Upload failed`,
       description: t`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
       duration: 5000,
       variant: 'destructive',
@@ -176,6 +193,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
                 onDrop={onFileDrop}
                 onDropRejected={onFileDropRejected}
                 type="envelope"
+                maxFiles={maximumEnvelopeItemCount}
               />
             </div>
           </TooltipTrigger>

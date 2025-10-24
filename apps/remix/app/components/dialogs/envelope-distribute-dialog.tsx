@@ -15,6 +15,7 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import * as z from 'zod';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
@@ -61,8 +62,9 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type EnvelopeDistributeDialogProps = {
   envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
     recipients: Recipient[];
-    fields: Field[];
+    fields: Pick<Field, 'type' | 'recipientId'>[];
   };
+  onDistribute?: () => Promise<void>;
   trigger?: React.ReactNode;
 };
 
@@ -84,7 +86,11 @@ export const ZEnvelopeDistributeFormSchema = z.object({
 
 export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFormSchema>;
 
-export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistributeDialogProps) => {
+export const EnvelopeDistributeDialog = ({
+  envelope,
+  trigger,
+  onDistribute,
+}: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
   const recipients = envelope.recipients;
@@ -127,21 +133,35 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
 
   const distributionMethod = watch('meta.distributionMethod');
 
-  const everySignerHasSignature = useMemo(
+  const recipientsMissingSignatureFields = useMemo(
     () =>
-      envelope.recipients
-        .filter((recipient) => recipient.role === RecipientRole.SIGNER)
-        .every((recipient) =>
-          envelope.fields.some(
+      envelope.recipients.filter(
+        (recipient) =>
+          recipient.role === RecipientRole.SIGNER &&
+          !envelope.fields.some(
             (field) => field.type === FieldType.SIGNATURE && field.recipientId === recipient.id,
           ),
-        ),
+      ),
     [envelope.recipients, envelope.fields],
   );
+
+  const invalidEnvelopeCode = useMemo(() => {
+    if (recipientsMissingSignatureFields.length > 0) {
+      return 'MISSING_SIGNATURES';
+    }
+
+    if (envelope.recipients.length === 0) {
+      return 'MISSING_RECIPIENTS';
+    }
+
+    return null;
+  }, [envelope.recipients, envelope.fields, recipientsMissingSignatureFields]);
 
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
     try {
       await distributeEnvelope({ envelopeId: envelope.id, meta });
+
+      await onDistribute?.();
 
       toast({
         title: t`Envelope distributed`,
@@ -178,7 +198,7 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
             <Trans>Recipients will be able to sign the document once sent</Trans>
           </DialogDescription>
         </DialogHeader>
-        {everySignerHasSignature ? (
+        {!invalidEnvelopeCode ? (
           <Form {...form}>
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <fieldset disabled={isSubmitting}>
@@ -350,6 +370,8 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
                           </div>
                         ) : (
                           <ul className="text-muted-foreground divide-y">
+                            {/* Todo: Envelopes - I don't think this section shows up */}
+
                             {recipients.length === 0 && (
                               <li className="flex flex-col items-center justify-center py-6 text-sm">
                                 <Trans>No recipients</Trans>
@@ -426,12 +448,24 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
         ) : (
           <>
             <Alert variant="warning">
-              <AlertDescription>
-                <Trans>
-                  Some signers have not been assigned a signature field. Please assign at least 1
-                  signature field to each signer before proceeding.
-                </Trans>
-              </AlertDescription>
+              {match(invalidEnvelopeCode)
+                .with('MISSING_RECIPIENTS', () => (
+                  <AlertDescription>
+                    <Trans>You need at least one recipient to send a document</Trans>
+                  </AlertDescription>
+                ))
+                .with('MISSING_SIGNATURES', () => (
+                  <AlertDescription>
+                    <Trans>The following signers are missing signature fields:</Trans>
+
+                    <ul className="ml-2 mt-1 list-inside list-disc">
+                      {recipientsMissingSignatureFields.map((recipient) => (
+                        <li key={recipient.id}>{recipient.email}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                ))
+                .exhaustive()}
             </Alert>
 
             <DialogFooter>

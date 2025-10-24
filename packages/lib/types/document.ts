@@ -33,6 +33,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
   folderId: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Which "Template" the document was created from.
   templateId: z
@@ -114,6 +115,7 @@ export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Backwards compatibility.
   documentDataId: z.string().default(''),
@@ -149,6 +151,7 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Backwards compatibility.
   documentDataId: z.string().default(''),

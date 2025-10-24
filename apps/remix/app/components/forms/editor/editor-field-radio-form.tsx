@@ -1,47 +1,62 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { PlusIcon, Trash } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
-import { z } from 'zod';
+import type { z } from 'zod';
 
-import { type TRadioFieldMeta as RadioFieldMeta } from '@documenso/lib/types/field-meta';
+import {
+  DEFAULT_FIELD_FONT_SIZE,
+  type TRadioFieldMeta as RadioFieldMeta,
+  ZRadioFieldMeta,
+} from '@documenso/lib/types/field-meta';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { Form, FormControl, FormField, FormItem } from '@documenso/ui/primitives/form/form';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@documenso/ui/primitives/select';
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import {
+  EditorGenericFontSizeField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
 } from './editor-field-generic-field-forms';
 
-const ZRadioFieldFormSchema = z
-  .object({
-    label: z.string().optional(),
-    values: z
-      .object({ id: z.number(), checked: z.boolean(), value: z.string() })
-      .array()
-      .min(1)
-      .optional(),
-    required: z.boolean().optional(),
-    readOnly: z.boolean().optional(),
-  })
-  .refine(
-    (data) => {
-      // There cannot be more than one checked option
-      if (data.values) {
-        const checkedValues = data.values.filter((option) => option.checked);
-        return checkedValues.length <= 1;
-      }
-      return true;
-    },
-    {
-      message: 'There cannot be more than one checked option',
-      path: ['values'],
-    },
-  );
+const ZRadioFieldFormSchema = ZRadioFieldMeta.pick({
+  label: true,
+  direction: true,
+  values: true,
+  required: true,
+  readOnly: true,
+  fontSize: true,
+}).refine(
+  (data) => {
+    // There cannot be more than one checked option
+    if (data.values) {
+      const checkedValues = data.values.filter((option) => option.checked);
+      return checkedValues.length <= 1;
+    }
+    return true;
+  },
+  {
+    message: 'There cannot be more than one checked option',
+    path: ['values'],
+  },
+);
 
 type TRadioFieldFormSchema = z.infer<typeof ZRadioFieldFormSchema>;
 
@@ -53,9 +68,12 @@ export type EditorFieldRadioFormProps = {
 export const EditorFieldRadioForm = ({
   value = {
     type: 'radio',
+    direction: 'vertical',
   },
   onValueChange,
 }: EditorFieldRadioFormProps) => {
+  const { t } = useLingui();
+
   const form = useForm<TRadioFieldFormSchema>({
     resolver: zodResolver(ZRadioFieldFormSchema),
     mode: 'onChange',
@@ -64,6 +82,8 @@ export const EditorFieldRadioForm = ({
       values: value.values || [{ id: 1, checked: false, value: 'Default value' }],
       required: value.required || false,
       readOnly: value.readOnly || false,
+      direction: value.direction || 'vertical',
+      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
     },
   });
 
@@ -107,7 +127,37 @@ export const EditorFieldRadioForm = ({
   return (
     <Form {...form}>
       <form>
-        <fieldset className="flex flex-col gap-2 pb-2">
+        <fieldset className="flex flex-col gap-2">
+          <EditorGenericFontSizeField formControl={form.control} />
+
+          <FormField
+            control={form.control}
+            name="direction"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>
+                  <Trans>Direction</Trans>
+                </FormLabel>
+                <FormControl>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger className="text-muted-foreground bg-background w-full">
+                      <SelectValue placeholder={t`Select direction`} />
+                    </SelectTrigger>
+                    <SelectContent position="popper">
+                      <SelectItem value="vertical">
+                        <Trans>Vertical</Trans>
+                      </SelectItem>
+                      <SelectItem value="horizontal">
+                        <Trans>Horizontal</Trans>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           <EditorGenericRequiredField formControl={form.control} />
 
           <EditorGenericReadOnlyField formControl={form.control} />

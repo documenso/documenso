@@ -209,6 +209,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'radio',
         label: field.label,
         values: newValues,
+        direction: radioMeta.direction ?? 'vertical',
       };
 
       return meta;
@@ -395,8 +396,6 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const firstEnvelopeItemId = template.envelopeItems[0].id;
-
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -407,10 +406,14 @@ export const createDocumentFromTemplate = async ({
     template.envelopeItems.map(async (item, i) => {
       let documentDataIdToDuplicate = item.documentDataId;
 
-      const foundCustomDocumentData = customDocumentData.find(
-        (customDocumentDataItem) =>
-          customDocumentDataItem.envelopeItemId || firstEnvelopeItemId === item.id,
-      );
+      const foundCustomDocumentData = customDocumentData.find((customDocumentDataItem) => {
+        // Handle empty envelopeItemId for backwards compatibility reasons.
+        if (customDocumentDataItem.documentDataId && !customDocumentDataItem.envelopeItemId) {
+          return true;
+        }
+
+        return customDocumentDataItem.envelopeItemId === item.id;
+      });
 
       if (foundCustomDocumentData) {
         documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;

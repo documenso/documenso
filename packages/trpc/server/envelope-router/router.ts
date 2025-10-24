@@ -10,6 +10,8 @@ import { deleteEnvelopeItemRoute } from './delete-envelope-item';
 import { distributeEnvelopeRoute } from './distribute-envelope';
 import { duplicateEnvelopeRoute } from './duplicate-envelope';
 import { getEnvelopeRoute } from './get-envelope';
+import { getEnvelopeItemsRoute } from './get-envelope-items';
+import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
 import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { setEnvelopeFieldsRoute } from './set-envelope-fields';
 import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
@@ -28,6 +30,8 @@ export const envelopeRouter = router({
   // share: shareEnvelopeRoute,
 
   item: {
+    getMany: getEnvelopeItemsRoute,
+    getManyByToken: getEnvelopeItemsByTokenRoute,
     createMany: createEnvelopeItemsRoute,
     updateMany: updateEnvelopeItemsRoute,
     delete: deleteEnvelopeItemRoute,

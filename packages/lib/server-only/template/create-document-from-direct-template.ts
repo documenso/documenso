@@ -162,12 +162,6 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
-  if (user && user.email !== directRecipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Email must match if you are logged in',
-    });
-  }
-
   const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
     extractDocumentAuthMethods({
       documentAuth: directTemplateEnvelope.authOptions,
@@ -340,7 +334,7 @@ export const createDocumentFromDirectTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
-        internalVersion: 1,
+        internalVersion: directTemplateEnvelope.internalVersion,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,

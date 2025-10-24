@@ -1,41 +1,32 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import Konva from 'konva';
-import type { Layer } from 'konva/lib/Layer';
-import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import { usePageContext } from 'react-pdf';
+import type Konva from 'konva';
 
+import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
+import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 
 export default function EnvelopeGenericPageRenderer() {
-  const pageContext = usePageContext();
+  const { i18n } = useLingui();
 
-  if (!pageContext) {
-    throw new Error('Unable to find Page context.');
-  }
-
-  const { _className, page, rotate, scale } = pageContext;
-
-  if (!page) {
-    throw new Error('Attempted to render page canvas, but no page was specified.');
-  }
-
-  const { t } = useLingui();
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
 
-  const canvasElement = useRef<HTMLCanvasElement>(null);
-  const konvaContainer = useRef<HTMLDivElement>(null);
+  const {
+    stage,
+    pageLayer,
+    canvasElement,
+    konvaContainer,
+    pageContext,
+    scaledViewport,
+    unscaledViewport,
+  } = usePageRenderer(({ stage, pageLayer }) => {
+    createPageCanvas(stage, pageLayer);
+  });
 
-  const stage = useRef<Konva.Stage | null>(null);
-  const pageLayer = useRef<Layer | null>(null);
-
-  const viewport = useMemo(
-    () => page.getViewport({ scale, rotation: rotate }),
-    [page, rotate, scale],
-  );
+  const { _className, scale } = pageContext;
 
   const localPageFields = useMemo(
     () =>
@@ -46,44 +37,6 @@ export default function EnvelopeGenericPageRenderer() {
     [fields, pageContext.pageNumber],
   );
 
-  // Custom renderer from Konva examples.
-  useEffect(
-    function drawPageOnCanvas() {
-      if (!page) {
-        return;
-      }
-
-      const { current: canvas } = canvasElement;
-      const { current: container } = konvaContainer;
-
-      if (!canvas || !container) {
-        return;
-      }
-
-      const renderContext: RenderParameters = {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        canvasContext: canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D,
-        viewport,
-      };
-
-      const cancellable = page.render(renderContext);
-      const runningTask = cancellable;
-
-      cancellable.promise.catch(() => {
-        // Intentionally empty
-      });
-
-      void cancellable.promise.then(() => {
-        createPageCanvas(container);
-      });
-
-      return () => {
-        runningTask.cancel();
-      };
-    },
-    [page, viewport],
-  );
-
   const renderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
@@ -91,6 +44,7 @@ export default function EnvelopeGenericPageRenderer() {
     }
 
     renderField({
+      scale,
       pageLayer: pageLayer.current,
       field: {
         renderId: field.id.toString(),
@@ -103,8 +57,9 @@ export default function EnvelopeGenericPageRenderer() {
         inserted: false,
         fieldMeta: field.fieldMeta,
       },
-      pageWidth: viewport.width,
-      pageHeight: viewport.height,
+      translations: getClientSideFieldTranslations(i18n),
+      pageWidth: unscaledViewport.width,
+      pageHeight: unscaledViewport.height,
       // color: getRecipientColorKey(field.recipientId),
       color: 'purple', // Todo
       editable: false,
@@ -113,25 +68,15 @@ export default function EnvelopeGenericPageRenderer() {
   };
 
   /**
-   * Create the initial Konva page canvas and initialize all fields and interactions.
+   * Initialize the Konva page canvas and all fields and interactions.
    */
-  const createPageCanvas = (container: HTMLDivElement) => {
-    stage.current = new Konva.Stage({
-      container,
-      width: viewport.width,
-      height: viewport.height,
-    });
-
-    // Create the main layer for interactive elements.
-    pageLayer.current = new Konva.Layer();
-    stage.current?.add(pageLayer.current);
-
+  const createPageCanvas = (_currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     // Render the fields.
     for (const field of localPageFields) {
       renderFieldOnLayer(field);
     }
 
-    pageLayer.current.batchDraw();
+    currentPageLayer.batchDraw();
   };
 
   /**
@@ -167,14 +112,19 @@ export default function EnvelopeGenericPageRenderer() {
   }
 
   return (
-    <div className="relative" key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}>
-      <div className="konva-container absolute inset-0 z-10" ref={konvaContainer}></div>
+    <div
+      className="relative w-full"
+      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
+    >
+      {/* The element Konva will inject it's canvas into. */}
+      <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 
+      {/* Canvas the PDF will be rendered on. */}
       <canvas
         className={`${_className}__canvas z-0`}
-        height={viewport.height}
         ref={canvasElement}
-        width={viewport.width}
+        height={scaledViewport.height}
+        width={scaledViewport.width}
       />
     </div>
   );

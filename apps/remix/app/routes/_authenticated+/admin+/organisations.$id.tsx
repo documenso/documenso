@@ -404,6 +404,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
       claims: {
         teamCount: organisation.organisationClaim.teamCount,
         memberCount: organisation.organisationClaim.memberCount,
+        envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
         flags: organisation.organisationClaim.flags,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
@@ -555,6 +556,30 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
               </FormControl>
               <FormDescription>
                 <Trans>Number of members allowed. 0 = Unlimited</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="claims.envelopeItemCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Trans>Envelope Item Count</Trans>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={1}
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                />
+              </FormControl>
+              <FormDescription>
+                <Trans>Maximum number of uploaded files per envelope allowed</Trans>
               </FormDescription>
               <FormMessage />
             </FormItem>

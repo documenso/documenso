@@ -23,7 +23,6 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       },
     });
 
-    // Todo: Envelopes - What to do about "normalizing"?
     const { envelopeWhereInput } = await getEnvelopeWhereInput({
       id: {
         type: 'envelopeId',
@@ -43,6 +42,15 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
             order: 'asc',
           },
         },
+        team: {
+          select: {
+            organisation: {
+              select: {
+                organisationClaim: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -58,7 +66,17 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    // Todo: Envelopes - Limit amount of items that can be created.
+    const organisationClaim = envelope.team.organisation.organisationClaim;
+
+    const remainingEnvelopeItems =
+      organisationClaim.envelopeItemCount - envelope.envelopeItems.length - items.length;
+
+    if (remainingEnvelopeItems < 0) {
+      throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
+        message: `You cannot upload more than ${organisationClaim.envelopeItemCount} envelope items`,
+        statusCode: 400,
+      });
+    }
 
     const foundDocumentData = await prisma.documentData.findMany({
       where: {
@@ -93,7 +111,7 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       envelope.envelopeItems[envelope.envelopeItems.length - 1]?.order ?? 1;
 
     const result = await prisma.envelopeItem.createManyAndReturn({
-      data: items.map((item, index) => ({
+      data: items.map((item) => ({
         id: prefixedId('envelope_item'),
         envelopeId,
         title: item.title,

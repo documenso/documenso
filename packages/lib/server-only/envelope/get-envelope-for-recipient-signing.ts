@@ -23,7 +23,7 @@ export type GetRecipientEnvelopeByTokenOptions = {
   accessAuth?: TDocumentAuthMethods;
 };
 
-const ZEnvelopeForSigningResponse = z.object({
+export const ZEnvelopeForSigningResponse = z.object({
   envelope: EnvelopeSchema.pick({
     type: true,
     status: true,
@@ -31,6 +31,7 @@ const ZEnvelopeForSigningResponse = z.object({
     secondaryId: true,
     internalVersion: true,
     completedAt: true,
+    updatedAt: true,
     deletedAt: true,
     title: true,
     authOptions: true,

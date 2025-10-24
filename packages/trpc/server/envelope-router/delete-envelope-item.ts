@@ -52,13 +52,29 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
       });
     }
 
-    await prisma.envelopeItem.delete({
+    const deletedEnvelopeItem = await prisma.envelopeItem.delete({
       where: {
         id: envelopeItemId,
         envelopeId: envelope.id,
       },
+      select: {
+        documentData: {
+          select: {
+            id: true,
+          },
+        },
+      },
     });
 
-    // Todo: Envelopes - Audit logs?
-    // Todo: Envelopes - Delete the document data as well?
+    // Todo: Envelopes [ASK] - Should we delete the document data?
+    await prisma.documentData.delete({
+      where: {
+        id: deletedEnvelopeItem.documentData.id,
+        envelopeItem: {
+          is: null,
+        },
+      },
+    });
+
+    // Todo: Envelope [AUDIT_LOGS]
   });

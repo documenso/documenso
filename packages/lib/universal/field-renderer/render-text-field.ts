@@ -7,12 +7,19 @@ import {
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TTextFieldMeta } from '../../types/field-meta';
-import { upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import {
+  konvaTextFill,
+  konvaTextFontFamily,
+  upsertFieldGroup,
+  upsertFieldRect,
+} from './field-generic-items';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text => {
-  const { pageWidth, pageHeight, mode = 'edit', pageLayer } = options;
+  const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
+
+  const fieldTypeName = translations?.[field.type] || field.type;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -30,24 +37,21 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   const textY = 0;
   let textAlign: 'left' | 'center' | 'right' = textMeta?.textAlign || 'left';
   let textVerticalAlign: 'top' | 'middle' | 'bottom' = 'top';
-  let textFontSize = textMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const textFontSize = textMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
   const textPadding = 10;
 
-  let textToRender: string = field.type;
+  let textToRender: string = fieldTypeName;
 
   // Handle edit mode.
   if (mode === 'edit') {
-    textToRender = field.type; // Todo: Envelope - Need translations
+    textToRender = fieldTypeName;
     textAlign = 'center';
-    textFontSize = DEFAULT_STANDARD_FONT_SIZE;
     textVerticalAlign = 'middle';
 
     if (textMeta?.label) {
       textToRender = textMeta.label;
-      textFontSize = textMeta.fontSize || DEFAULT_STANDARD_FONT_SIZE;
     } else if (textMeta?.text) {
       textToRender = textMeta.text;
-      textFontSize = textMeta.fontSize || DEFAULT_STANDARD_FONT_SIZE;
       textAlign = textMeta.textAlign || 'center'; // Todo: Envelopes - What is the default
 
       // Todo: Envelopes - Handle this on signatures
@@ -59,19 +63,16 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
 
   // Handle sign mode.
   if (mode === 'sign' || mode === 'export') {
-    textToRender = field.type; // Todo: Envelope - Need translations
+    textToRender = fieldTypeName;
     textAlign = 'center';
-    textFontSize = DEFAULT_STANDARD_FONT_SIZE;
     textVerticalAlign = 'middle';
 
     if (textMeta?.label) {
       textToRender = textMeta.label;
-      textFontSize = textMeta.fontSize || DEFAULT_STANDARD_FONT_SIZE;
     }
 
     if (textMeta?.text) {
       textToRender = textMeta.text;
-      textFontSize = textMeta.fontSize || DEFAULT_STANDARD_FONT_SIZE;
       textAlign = textMeta.textAlign || 'center'; // Todo: Envelopes - What is the default
 
       // Todo: Envelopes - Handle this on signatures
@@ -82,7 +83,6 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
 
     if (field.inserted) {
       textToRender = field.customText;
-      textFontSize = textMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
       textAlign = textMeta?.textAlign || 'center'; // Todo: Envelopes - What is the default
 
       // Todo: Envelopes - Handle this on signatures
@@ -98,11 +98,10 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     verticalAlign: textVerticalAlign,
     wrap: 'word',
     padding: textPadding,
-
     text: textToRender,
-
     fontSize: textFontSize,
-    fontFamily: 'Inter, system-ui, sans-serif',
+    fontFamily: konvaTextFontFamily,
+    fill: konvaTextFill,
     align: textAlign,
     width: fieldWidth,
     height: fieldHeight,
@@ -121,77 +120,62 @@ export const renderTextFieldElement = (
 
   const fieldGroup = upsertFieldGroup(field, options);
 
-  // ABOVE IS GENERIC, EXTRACT IT.
+  // Clear previous children and listeners to re-render fresh.
+  fieldGroup.removeChildren();
+  fieldGroup.off('transform');
+
+  // Assign elements to group and any listeners that should only be run on initialization.
+  if (isFirstRender) {
+    pageLayer.add(fieldGroup);
+  }
 
   // Render the field background and text.
   const fieldRect = upsertFieldRect(field, options);
   const fieldText = upsertFieldText(field, options);
 
-  // Assign elements to group and any listeners that should only be run on initialization.
-  if (isFirstRender) {
-    fieldGroup.add(fieldRect);
-    fieldGroup.add(fieldText);
-    pageLayer.add(fieldGroup);
+  fieldGroup.add(fieldRect);
+  fieldGroup.add(fieldText);
 
-    // This is to keep the text inside the field at the same size
-    // when the field is resized. Without this the text would be stretched.
-    fieldGroup.on('transform', () => {
-      const groupScaleX = fieldGroup.scaleX();
-      const groupScaleY = fieldGroup.scaleY();
+  // This is to keep the text inside the field at the same size
+  // when the field is resized. Without this the text would be stretched.
+  fieldGroup.on('transform', () => {
+    const groupScaleX = fieldGroup.scaleX();
+    const groupScaleY = fieldGroup.scaleY();
 
-      // Adjust text scale so it doesn't change while group is resized.
-      fieldText.scaleX(1 / groupScaleX);
-      fieldText.scaleY(1 / groupScaleY);
+    // Adjust text scale so it doesn't change while group is resized.
+    fieldText.scaleX(1 / groupScaleX);
+    fieldText.scaleY(1 / groupScaleY);
 
-      const rectWidth = fieldRect.width() * groupScaleX;
-      const rectHeight = fieldRect.height() * groupScaleY;
+    const rectWidth = fieldRect.width() * groupScaleX;
+    const rectHeight = fieldRect.height() * groupScaleY;
 
-      // // Update text group position and clipping
-      // fieldGroup.clipFunc(function (ctx) {
-      //   ctx.rect(0, 0, rectWidth, rectHeight);
-      // });
+    // Update text dimensions
+    fieldText.width(rectWidth);
+    fieldText.height(rectHeight);
 
-      // Update text dimensions
-      fieldText.width(rectWidth); // Account for padding
-      fieldText.height(rectHeight);
+    // Force Konva to recalculate text layout
+    fieldText.height();
 
-      console.log({
-        rectWidth,
-      });
+    fieldGroup.getLayer()?.batchDraw();
+  });
 
-      // Force Konva to recalculate text layout
-      // textInsideField.getTextHeight(); // This forces recalculation
-      fieldText.height(); // This forces recalculation
+  // Reset the text after transform has ended.
+  fieldGroup.on('transformend', () => {
+    fieldText.scaleX(1);
+    fieldText.scaleY(1);
 
-      // fieldGroup.draw();
-      fieldGroup.getLayer()?.batchDraw();
-    });
+    const rectWidth = fieldRect.width();
+    const rectHeight = fieldRect.height();
 
-    // Reset the text after transform has ended.
-    fieldGroup.on('transformend', () => {
-      fieldText.scaleX(1);
-      fieldText.scaleY(1);
+    // Update text dimensions
+    fieldText.width(rectWidth); // Account for padding
+    fieldText.height(rectHeight);
 
-      const rectWidth = fieldRect.width();
-      const rectHeight = fieldRect.height();
+    // Force Konva to recalculate text layout
+    fieldText.height();
 
-      // // Update text group position and clipping
-      // fieldGroup.clipFunc(function (ctx) {
-      //   ctx.rect(0, 0, rectWidth, rectHeight);
-      // });
-
-      // Update text dimensions
-      fieldText.width(rectWidth); // Account for padding
-      fieldText.height(rectHeight);
-
-      // Force Konva to recalculate text layout
-      // textInsideField.getTextHeight(); // This forces recalculation
-      fieldText.height(); // This forces recalculation
-
-      // fieldGroup.draw();
-      fieldGroup.getLayer()?.batchDraw();
-    });
-  }
+    fieldGroup.getLayer()?.batchDraw();
+  });
 
   // Handle export mode.
   if (mode === 'export') {

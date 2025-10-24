@@ -75,7 +75,6 @@ const ZEnvelopeRecipientsForm = z.object({
       actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
     }),
   ),
-  // Todo: Envelopes - These aren't synced to the server
   signingOrder: z.nativeEnum(DocumentSigningOrder),
   allowDictateNextSigner: z.boolean().default(false),
 });
@@ -83,7 +82,7 @@ const ZEnvelopeRecipientsForm = z.object({
 type TEnvelopeRecipientsForm = z.infer<typeof ZEnvelopeRecipientsForm>;
 
 export const EnvelopeEditorRecipientForm = () => {
-  const { envelope, setRecipientsDebounced } = useCurrentEnvelopeEditor();
+  const { envelope, setRecipientsDebounced, updateEnvelope } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
 
@@ -451,6 +450,8 @@ export const EnvelopeEditorRecipientForm = () => {
       shouldValidate: true,
       shouldDirty: true,
     });
+
+    void form.trigger();
   }, [form]);
 
   // Dupecode/Inefficient: Done because native isValid won't work for our usecase.
@@ -460,15 +461,39 @@ export const EnvelopeEditorRecipientForm = () => {
       return;
     }
 
-    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse(formValues);
+    const formValueSigners = formValues.signers || [];
+
+    // Remove the last signer if it's empty.
+    const recipients = formValueSigners.filter((signer, i) => {
+      if (i === formValueSigners.length - 1 && signer.email === '') {
+        return false;
+      }
+
+      return true;
+    });
+
+    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse({
+      ...formValues,
+      signers: recipients,
+    });
 
     if (validatedFormValues.success) {
       console.log('validatedFormValues', validatedFormValues);
 
       setRecipientsDebounced(validatedFormValues.data.signers);
 
-      // Todo: Envelopes - Need to save the other data as well
-      // setEnvelope
+      if (
+        validatedFormValues.data.signingOrder !== envelope.documentMeta.signingOrder ||
+        validatedFormValues.data.allowDictateNextSigner !==
+          envelope.documentMeta.allowDictateNextSigner
+      ) {
+        updateEnvelope({
+          meta: {
+            signingOrder: validatedFormValues.data.signingOrder,
+            allowDictateNextSigner: validatedFormValues.data.allowDictateNextSigner,
+          },
+        });
+      }
     }
   }, [formValues]);
 
@@ -508,7 +533,7 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-gray-50/80 p-4">
+            <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
               {!alwaysShowAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -876,6 +901,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                           onValueChange={(value) => {
                                             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
                                             handleRoleChange(index, value as RecipientRole);
+                                            field.onChange(value);
                                           }}
                                           disabled={
                                             snapshot.isDragging ||
