@@ -1,4 +1,3 @@
-import type { Prisma } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -11,33 +10,6 @@ import {
   ZUpdateOrganisationMemberRoleRequestSchema,
   ZUpdateOrganisationMemberRoleResponseSchema,
 } from './update-organisation-member-role.types';
-
-/**
- * Helper function to switch a member from one group to another atomically.
- */
-const switchMemberGroup = async (
-  tx: Prisma.TransactionClient,
-  memberId: string,
-  fromGroupId: string,
-  toGroupId: string,
-) => {
-  await tx.organisationGroupMember.delete({
-    where: {
-      organisationMemberId_groupId: {
-        organisationMemberId: memberId,
-        groupId: fromGroupId,
-      },
-    },
-  });
-
-  await tx.organisationGroupMember.create({
-    data: {
-      id: generateDatabaseId('group_member'),
-      organisationMemberId: memberId,
-      groupId: toGroupId,
-    },
-  });
-};
 
 /**
  * Admin mutation to update organisation member role or transfer ownership.
@@ -157,7 +129,22 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
         });
 
         if (currentOrganisationRole !== OrganisationMemberRole.ADMIN) {
-          await switchMemberGroup(tx, member.id, currentMemberGroup.id, adminGroup.id);
+          await tx.organisationGroupMember.delete({
+            where: {
+              organisationMemberId_groupId: {
+                organisationMemberId: member.id,
+                groupId: currentMemberGroup.id,
+              },
+            },
+          });
+
+          await tx.organisationGroupMember.create({
+            data: {
+              id: generateDatabaseId('group_member'),
+              organisationMemberId: member.id,
+              groupId: adminGroup.id,
+            },
+          });
         }
       });
 
@@ -213,6 +200,21 @@ export const updateOrganisationMemberRoleRoute = adminProcedure
     }
 
     await prisma.$transaction(async (tx) => {
-      await switchMemberGroup(tx, member.id, currentMemberGroup.id, newMemberGroup.id);
+      await tx.organisationGroupMember.delete({
+        where: {
+          organisationMemberId_groupId: {
+            organisationMemberId: member.id,
+            groupId: currentMemberGroup.id,
+          },
+        },
+      });
+
+      await tx.organisationGroupMember.create({
+        data: {
+          id: generateDatabaseId('group_member'),
+          organisationMemberId: member.id,
+          groupId: newMemberGroup.id,
+        },
+      });
     });
   });

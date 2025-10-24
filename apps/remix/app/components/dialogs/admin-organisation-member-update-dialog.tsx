@@ -7,9 +7,11 @@ import { OrganisationMemberRole } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
+import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -40,10 +42,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type AdminOrganisationMemberUpdateDialogProps = {
   trigger?: React.ReactNode;
   organisationId: string;
-  organisationMemberId: string;
-  organisationMemberName: string;
-  organisationMemberUserId: number;
-  organisationMemberRole: OrganisationMemberRole;
+  organisationMember: TGetAdminOrganisationResponse['members'][number];
   isOwner: boolean;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
@@ -56,10 +55,7 @@ type ZUpdateOrganisationMemberSchema = z.infer<typeof ZUpdateOrganisationMemberF
 export const AdminOrganisationMemberUpdateDialog = ({
   trigger,
   organisationId,
-  organisationMemberId,
-  organisationMemberName,
-  organisationMemberUserId,
-  organisationMemberRole,
+  organisationMember,
   isOwner,
   ...props
 }: AdminOrganisationMemberUpdateDialogProps) => {
@@ -71,6 +67,7 @@ export const AdminOrganisationMemberUpdateDialog = ({
 
   // Determine the current role value for the form
   const currentRoleValue = isOwner ? 'OWNER' : organisationMemberRole;
+  const organisationMemberName = organisationMember.user.name ?? organisationMember.user.email;
 
   const form = useForm<ZUpdateOrganisationMemberSchema>({
     resolver: zodResolver(ZUpdateOrganisationMemberFormSchema),
@@ -86,18 +83,16 @@ export const AdminOrganisationMemberUpdateDialog = ({
     try {
       await updateOrganisationMemberRole({
         organisationId,
-        userId: organisationMemberUserId,
+        userId: organisationMember.userId,
         role,
       });
 
-      const roleLabel =
-        role === 'OWNER'
-          ? t`Owner`
-          : role === OrganisationMemberRole.ADMIN
-            ? t`Admin`
-            : role === OrganisationMemberRole.MANAGER
-              ? t`Manager`
-              : t`Member`;
+      const roleLabel = match(role)
+        .with('OWNER', () => t`Owner`)
+        .with(OrganisationMemberRole.ADMIN, () => t`Admin`)
+        .with(OrganisationMemberRole.MANAGER, () => t`Manager`)
+        .with(OrganisationMemberRole.MEMBER, () => t`Member`)
+        .exhaustive();
 
       toast({
         title: t`Success`,

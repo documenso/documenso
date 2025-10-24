@@ -13,7 +13,6 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
-import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
 import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
@@ -107,9 +106,6 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         header: t`Actions`,
         cell: ({ row }) => {
           const isOwner = row.original.userId === organisation?.ownerUserId;
-          const currentRole = getHighestOrganisationRoleInGroup(
-            row.original.organisationGroupMembers.flatMap((m) => m.group),
-          );
 
           return (
             <div className="flex justify-end space-x-2">
@@ -120,10 +116,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
                   </Button>
                 }
                 organisationId={organisationId}
-                organisationMemberId={row.original.id}
-                organisationMemberUserId={row.original.userId}
-                organisationMemberName={row.original.user.name ?? row.original.user.email}
-                organisationMemberRole={currentRole}
+                organisationMember={row.original}
                 isOwner={isOwner}
               />
             </div>
