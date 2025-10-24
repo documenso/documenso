@@ -470,7 +470,7 @@ export function TemplateUseDialog({
                               <FormControl>
                                 <div
                                   key={item.id}
-                                  className="border-border bg-card hover:bg-accent/50 flex items-center gap-4 rounded-lg border p-4 transition-colors"
+                                  className="border-border bg-card hover:bg-accent/10 flex items-center gap-4 rounded-lg border p-4 transition-colors"
                                 >
                                   <div className="flex-shrink-0">
                                     <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">

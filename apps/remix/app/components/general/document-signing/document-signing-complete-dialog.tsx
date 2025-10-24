@@ -72,12 +72,12 @@ const ZNextSignerFormSchema = z.object({
 
 type TNextSignerFormSchema = z.infer<typeof ZNextSignerFormSchema>;
 
-const ZDirectReciipentFormSchema = z.object({
+const ZDirectRecipientFormSchema = z.object({
   name: z.string(),
   email: z.string().email('Invalid email address'),
 });
 
-type TDirectReciipentFormSchema = z.infer<typeof ZDirectReciipentFormSchema>;
+type TDirectRecipientFormSchema = z.infer<typeof ZDirectRecipientFormSchema>;
 
 export const DocumentSigningCompleteDialog = ({
   isSubmitting,
@@ -110,8 +110,8 @@ export const DocumentSigningCompleteDialog = ({
     },
   });
 
-  const directRecipientForm = useForm<TDirectReciipentFormSchema>({
-    resolver: zodResolver(ZDirectReciipentFormSchema),
+  const directRecipientForm = useForm<TDirectRecipientFormSchema>({
+    resolver: zodResolver(ZDirectRecipientFormSchema),
     defaultValues: {
       name: directTemplatePayload?.name ?? '',
       email: directTemplatePayload?.email ?? '',
@@ -146,10 +146,6 @@ export const DocumentSigningCompleteDialog = ({
 
       if (directTemplatePayload && !directTemplatePayload.email) {
         const isFormValid = await directRecipientForm.trigger();
-
-        console.log('isFormValid', isFormValid);
-        console.log('directRecipientForm.errors', directRecipientForm.formState.errors);
-        console.log('directRecipientForm.getValues()', directRecipientForm.getValues());
 
         if (!isFormValid) {
           return;

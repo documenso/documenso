@@ -1,7 +1,7 @@
 import { lazy, useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { FileTextIcon } from 'lucide-react';
+import { ConstructionIcon, FileTextIcon } from 'lucide-react';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
@@ -48,19 +48,35 @@ export const EnvelopeEditorPreviewPage = () => {
             </AlertDescription>
           </Alert>
 
-          {currentEnvelopeItem !== null ? (
-            <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
-          ) : (
-            <div className="flex flex-col items-center justify-center py-32">
-              <FileTextIcon className="text-muted-foreground h-10 w-10" />
-              <p className="text-foreground mt-1 text-sm">
-                <Trans>No documents found</Trans>
-              </p>
-              <p className="text-muted-foreground mt-1 text-sm">
-                <Trans>Please upload a document to continue</Trans>
+          {/* Coming soon section */}
+          <div className="border-border bg-card hover:bg-accent/10 flex w-full max-w-[800px] items-center gap-4 rounded-lg border p-4 transition-colors">
+            <div className="flex w-full flex-col items-center justify-center gap-2 py-32">
+              <ConstructionIcon className="text-muted-foreground h-10 w-10" />
+              <h3 className="text-foreground text-sm font-semibold">
+                <Trans>Coming soon</Trans>
+              </h3>
+              <p className="text-muted-foreground text-sm">
+                <Trans>This feature is coming soon</Trans>
               </p>
             </div>
-          )}
+          </div>
+
+          {/* Todo: Envelopes - Remove div after preview mode is implemented */}
+          <div className="hidden">
+            {currentEnvelopeItem !== null ? (
+              <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+            ) : (
+              <div className="flex flex-col items-center justify-center py-32">
+                <FileTextIcon className="text-muted-foreground h-10 w-10" />
+                <p className="text-foreground mt-1 text-sm">
+                  <Trans>No documents found</Trans>
+                </p>
+                <p className="text-muted-foreground mt-1 text-sm">
+                  <Trans>Please upload a document to continue</Trans>
+                </p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
