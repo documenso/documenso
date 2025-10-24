@@ -2,17 +2,17 @@
 ALTER TABLE "SubscriptionClaim" ADD COLUMN     "envelopeItemCount" INTEGER;
 ALTER TABLE "OrganisationClaim" ADD COLUMN     "envelopeItemCount" INTEGER;
 
-UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 5 WHERE "id" = 'free';
-UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 5 WHERE "id" = 'individual';
-UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 5 WHERE "id" = 'team';
-UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 5 WHERE "id" = 'earlyAdopter';
+-- Update ALL subscriptions to have 5 envelope items
+UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 10;
+
+-- Override platform and enterprise claims to have 10 envelope items
 UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 10 WHERE "id" = 'platform';
 UPDATE "SubscriptionClaim" SET "envelopeItemCount" = 10 WHERE "id" = 'enterprise';
 
-UPDATE "OrganisationClaim" SET "envelopeItemCount" = 5 WHERE "originalSubscriptionClaimId" = 'free';
-UPDATE "OrganisationClaim" SET "envelopeItemCount" = 5 WHERE "originalSubscriptionClaimId" = 'individual';
-UPDATE "OrganisationClaim" SET "envelopeItemCount" = 5 WHERE "originalSubscriptionClaimId" = 'team';
-UPDATE "OrganisationClaim" SET "envelopeItemCount" = 5 WHERE "originalSubscriptionClaimId" = 'earlyAdopter';
+-- Update ALL organisations to have 5 envelope items
+UPDATE "OrganisationClaim" SET "envelopeItemCount" = 5;
+
+-- Override platform and enterprise organisations to have 10 envelope items
 UPDATE "OrganisationClaim" SET "envelopeItemCount" = 10 WHERE "originalSubscriptionClaimId" = 'platform';
 UPDATE "OrganisationClaim" SET "envelopeItemCount" = 10 WHERE "originalSubscriptionClaimId" = 'enterprise';
 
