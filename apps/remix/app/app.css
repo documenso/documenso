@@ -66,6 +66,6 @@
   :root {
     --font-sans: 'Inter';
     --font-signature: 'Caveat';
-    --font-noto: 'Noto Sans';
+    --font-noto: 'Noto Sans', 'Noto Sans Korean', 'Noto Sans Japanese', 'Noto Sans Chinese';
   }
 }
