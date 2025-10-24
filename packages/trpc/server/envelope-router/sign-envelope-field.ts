@@ -1,7 +1,6 @@
 import { DocumentStatus, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { validateFieldAuth } from '@documenso/lib/server-only/document/validate-field-auth';
@@ -29,12 +28,6 @@ export const signEnvelopeFieldRoute = procedure
         fieldId,
       },
     });
-
-    if (!IS_ENVELOPES_ENABLED) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: `Envelopes are not enabled`,
-      });
-    }
 
     const recipient = await prisma.recipient.findFirst({
       where: {

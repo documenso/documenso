@@ -30,6 +30,8 @@ export const ZClaimFlagsSchema = z.object({
   cfr21: z.boolean().optional(),
 
   authenticationPortal: z.boolean().optional(),
+
+  allowEnvelopes: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -81,6 +83,10 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   authenticationPortal: {
     key: 'authenticationPortal',
     label: 'Authentication portal',
+  },
+  allowEnvelopes: {
+    key: 'allowEnvelopes',
+    label: 'Allow envelopes',
   },
 };
 
