@@ -81,6 +81,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
       }),
     )
     .optional(),
+  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
 });
 
 export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
@@ -278,6 +279,7 @@ export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
   values: [{ id: 1, checked: false, value: '' }],
   required: false,
   readOnly: false,
+  direction: 'vertical',
 };
 
 export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
