@@ -88,14 +88,14 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
     throw redirect('/');
   }
 
-  const envelopeForSigning = await getEnvelopeForDirectTemplateSigning({
+  return await getEnvelopeForDirectTemplateSigning({
     token,
     userId: session?.user?.id,
   })
     .then((envelopeForSigning) => {
       return {
         isDocumentAccessValid: true,
-        ...envelopeForSigning,
+        envelopeForSigning,
       } as const;
     })
     .catch(async (e) => {
@@ -112,15 +112,6 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
 
       throw new Response('Not Found', { status: 404 });
     });
-
-  if (!envelopeForSigning.isDocumentAccessValid) {
-    return envelopeForSigning;
-  }
-
-  return {
-    isDocumentAccessValid: true,
-    envelopeForSigning,
-  } as const;
 };
 
 export async function loader(loaderArgs: Route.LoaderArgs) {

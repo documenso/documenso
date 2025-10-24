@@ -191,9 +191,9 @@ export const sendDocument = async ({
       }
 
       if (field.type === FieldType.DROPDOWN) {
-        const { defaultValue } = ZDropdownFieldMeta.parse(field.fieldMeta);
+        const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
 
-        if (defaultValue) {
+        if (defaultValue && values.some((value) => value.value === defaultValue)) {
           fieldsToAutoInsert.push({
             fieldId: field.id,
             customText: defaultValue,
@@ -257,19 +257,21 @@ export const sendDocument = async ({
     }
 
     // Todo: Envelopes - [AUDIT_LOGS]
-    await Promise.all(
-      fieldsToAutoInsert.map(async (field) => {
-        await tx.field.update({
-          where: {
-            id: field.fieldId,
-          },
-          data: {
-            customText: field.customText,
-            inserted: true,
-          },
-        });
-      }),
-    );
+    if (envelope.internalVersion === 2) {
+      await Promise.all(
+        fieldsToAutoInsert.map(async (field) => {
+          await tx.field.update({
+            where: {
+              id: field.fieldId,
+            },
+            data: {
+              customText: field.customText,
+              inserted: true,
+            },
+          });
+        }),
+      );
+    }
 
     return await tx.envelope.update({
       where: {
