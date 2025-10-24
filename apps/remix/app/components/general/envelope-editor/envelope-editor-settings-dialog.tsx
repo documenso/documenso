@@ -151,13 +151,13 @@ const tabs = [
     id: 'email',
     title: msg`Email`,
     icon: MailIcon,
-    description: msg`Configure email settings for the document`,
+    description: msg`Configure email settings for the document.`,
   },
   {
     id: 'security',
     title: msg`Security`,
     icon: ShieldIcon,
-    description: msg`Configure security settings for the document`,
+    description: msg`Configure security settings for the document.`,
   },
 ] as const;
 
