@@ -148,9 +148,15 @@ export const NumberFieldAdvancedSettings = ({
           </SelectTrigger>
 
           <SelectContent>
-            <SelectItem value="left">Left</SelectItem>
-            <SelectItem value="center">Center</SelectItem>
-            <SelectItem value="right">Right</SelectItem>
+            <SelectItem value="left">
+              <Trans comment="Text Align">Left</Trans>
+            </SelectItem>
+            <SelectItem value="center">
+              <Trans comment="Text Align">Center</Trans>
+            </SelectItem>
+            <SelectItem value="right">
+              <Trans comment="Text Align">Right</Trans>
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
