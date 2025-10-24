@@ -10,6 +10,7 @@ import { z } from 'zod';
 
 import { AppError } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Form,
@@ -24,6 +25,8 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentAttachmentsPopoverProps = {
   envelopeId: string;
+  buttonClassName?: string;
+  buttonSize?: 'sm' | 'default';
 };
 
 const ZAttachmentFormSchema = z.object({
@@ -33,7 +36,11 @@ const ZAttachmentFormSchema = z.object({
 
 type TAttachmentFormSchema = z.infer<typeof ZAttachmentFormSchema>;
 
-export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPopoverProps) => {
+export const DocumentAttachmentsPopover = ({
+  envelopeId,
+  buttonClassName,
+  buttonSize,
+}: DocumentAttachmentsPopoverProps) => {
   const { toast } = useToast();
   const { _ } = useLingui();
 
@@ -118,7 +125,7 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
+        <Button variant="outline" className={cn('gap-2', buttonClassName)} size={buttonSize}>
           <Paperclip className="h-4 w-4" />
 
           <span>
@@ -215,9 +222,6 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
                 />
 
                 <div className="flex gap-2">
-                  <Button type="submit" size="sm" className="flex-1" loading={isCreating}>
-                    <Trans>Add</Trans>
-                  </Button>
                   <Button
                     type="button"
                     variant="outline"
@@ -229,6 +233,9 @@ export const DocumentAttachmentsPopover = ({ envelopeId }: DocumentAttachmentsPo
                     }}
                   >
                     <Trans>Cancel</Trans>
+                  </Button>
+                  <Button type="submit" size="sm" className="flex-1" loading={isCreating}>
+                    <Trans>Add</Trans>
                   </Button>
                 </div>
               </form>

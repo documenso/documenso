@@ -61,6 +61,7 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
     isPending,
     isComplete,
     isSigned,
+    internalVersion: envelope.internalVersion,
   })
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-full" asChild>
@@ -94,27 +95,25 @@ export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps
         </Link>
       </Button>
     ))
-    .with({ isComplete: true }, () =>
-      // Purposefully not using ts-pattern here to catch the alternative case.
-      envelope.internalVersion === 2 ? (
-        <EnvelopeDownloadDialog
-          envelopeId={envelope.id}
-          envelopeStatus={envelope.status}
-          envelopeItems={envelope.envelopeItems}
-          token={recipient?.token}
-          trigger={
-            <Button className="w-full">
-              <Download className="-ml-1 mr-2 inline h-4 w-4" />
-              <Trans>Download</Trans>
-            </Button>
-          }
-        />
-      ) : (
-        <Button className="w-full" onClick={onDownloadClick}>
-          <Download className="-ml-1 mr-2 inline h-4 w-4" />
-          <Trans>Download</Trans>
-        </Button>
-      ),
-    )
+    .with({ isComplete: true, internalVersion: 2 }, () => (
+      <EnvelopeDownloadDialog
+        envelopeId={envelope.id}
+        envelopeStatus={envelope.status}
+        envelopeItems={envelope.envelopeItems}
+        token={recipient?.token}
+        trigger={
+          <Button className="w-full">
+            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        }
+      />
+    ))
+    .with({ isComplete: true }, () => (
+      <Button className="w-full" onClick={onDownloadClick}>
+        <Download className="-ml-1 mr-2 inline h-4 w-4" />
+        <Trans>Download</Trans>
+      </Button>
+    ))
     .otherwise(() => null);
 };

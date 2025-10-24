@@ -82,6 +82,7 @@ export default function EnvelopeEditor() {
     flushAutosave,
     relativePath,
     syncEnvelope,
+    editorFields,
   } = useCurrentEnvelopeEditor();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -246,7 +247,10 @@ export default function EnvelopeEditor() {
 
             {isDocument && (
               <EnvelopeDistributeDialog
-                envelope={envelope}
+                envelope={{
+                  ...envelope,
+                  fields: editorFields.localFields,
+                }}
                 onDistribute={syncEnvelope}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">

@@ -90,6 +90,7 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
     isComplete,
     isSigned,
     isCurrentTeamDocument,
+    internalVersion: row.internalVersion,
   })
     .with(
       isOwner ? { isDraft: true, isOwner: true } : { isDraft: true, isCurrentTeamDocument: true },
@@ -133,26 +134,24 @@ export const DocumentsTableActionButton = ({ row }: DocumentsTableActionButtonPr
         <Trans>View</Trans>
       </Button>
     ))
-    .with({ isComplete: true }, () =>
-      // Purposefully not using ts-pattern here to catch the alternative case.
-      row.internalVersion === 2 ? (
-        <EnvelopeDownloadDialog
-          envelopeId={row.envelopeId}
-          envelopeStatus={row.status}
-          token={recipient?.token}
-          trigger={
-            <Button className="w-32">
-              <Download className="-ml-1 mr-2 inline h-4 w-4" />
-              <Trans>Download</Trans>
-            </Button>
-          }
-        />
-      ) : (
-        <Button className="w-32" onClick={onDownloadClick}>
-          <Download className="-ml-1 mr-2 inline h-4 w-4" />
-          <Trans>Download</Trans>
-        </Button>
-      ),
-    )
+    .with({ isComplete: true, internalVersion: 2 }, () => (
+      <EnvelopeDownloadDialog
+        envelopeId={row.envelopeId}
+        envelopeStatus={row.status}
+        token={recipient?.token}
+        trigger={
+          <Button className="w-32">
+            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        }
+      />
+    ))
+    .with({ isComplete: true }, () => (
+      <Button className="w-32" onClick={onDownloadClick}>
+        <Download className="-ml-1 mr-2 inline h-4 w-4" />
+        <Trans>Download</Trans>
+      </Button>
+    ))
     .otherwise(() => <div></div>);
 };

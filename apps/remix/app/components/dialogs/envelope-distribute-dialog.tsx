@@ -62,7 +62,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type EnvelopeDistributeDialogProps = {
   envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
     recipients: Recipient[];
-    fields: Field[];
+    fields: Pick<Field, 'type' | 'recipientId'>[];
   };
   onDistribute?: () => Promise<void>;
   trigger?: React.ReactNode;

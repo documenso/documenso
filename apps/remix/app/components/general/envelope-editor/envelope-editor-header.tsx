@@ -38,6 +38,7 @@ export default function EnvelopeEditorHeader() {
     autosaveError,
     relativePath,
     syncEnvelope,
+    editorFields,
   } = useCurrentEnvelopeEditor();
 
   return (
@@ -48,6 +49,7 @@ export default function EnvelopeEditorHeader() {
             <BrandingLogo className="h-6 w-auto" />
           </Link>
           <Separator orientation="vertical" className="h-6" />
+
           <div className="flex items-center space-x-2">
             <EnvelopeItemTitleInput
               disabled={envelope.status !== DocumentStatus.DRAFT}
@@ -133,7 +135,7 @@ export default function EnvelopeEditorHeader() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <DocumentAttachmentsPopover envelopeId={envelope.id} />
+          <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" />
 
           <EnvelopeEditorSettingsDialog
             trigger={
@@ -146,7 +148,10 @@ export default function EnvelopeEditorHeader() {
           {isDocument && (
             <>
               <EnvelopeDistributeDialog
-                envelope={envelope}
+                envelope={{
+                  ...envelope,
+                  fields: editorFields.localFields,
+                }}
                 onDistribute={syncEnvelope}
                 trigger={
                   <Button size="sm">
