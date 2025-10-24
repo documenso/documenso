@@ -44,6 +44,9 @@ export const getOrganisationSession = async ({
       },
       teams: {
         where: buildTeamWhereQuery({ teamId: undefined, userId }),
+        orderBy: {
+          name: 'asc',
+        },
         include: {
           teamGroups: {
             where: {
