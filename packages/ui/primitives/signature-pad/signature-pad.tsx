@@ -147,21 +147,21 @@ export const SignaturePad = ({
         {drawSignatureEnabled && (
           <TabsTrigger value="draw">
             <SignatureIcon className="mr-2 size-4" />
-            <Trans>Draw</Trans>
+            <Trans context="Draw signature">Draw</Trans>
           </TabsTrigger>
         )}
 
         {typedSignatureEnabled && (
           <TabsTrigger value="text">
             <KeyboardIcon className="mr-2 size-4" />
-            <Trans>Type</Trans>
+            <Trans context="Type signature">Type</Trans>
           </TabsTrigger>
         )}
 
         {uploadSignatureEnabled && (
           <TabsTrigger value="image">
             <UploadCloudIcon className="mr-2 size-4" />
-            <Trans>Upload</Trans>
+            <Trans context="Upload signature">Upload</Trans>
           </TabsTrigger>
         )}
       </TabsList>
