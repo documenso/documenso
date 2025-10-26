@@ -1,8 +1,8 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
-import { updateTemplate } from '@documenso/lib/server-only/template/update-template';
 import { nanoid } from '@documenso/lib/universal/id';
 
 import { procedure } from '../trpc';
@@ -38,15 +38,19 @@ export const updateEmbeddingTemplateRoute = procedure
 
       const { templateId, title, externalId, recipients, meta } = input;
 
-      await updateTemplate({
-        templateId,
+      await updateEnvelope({
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         userId: apiToken.userId,
-        teamId: apiToken.teamId ?? undefined,
+        teamId: apiToken.teamId,
         data: {
           title,
           externalId,
         },
         meta,
+        requestMetadata: ctx.metadata,
       });
 
       const recipientsWithClientId = recipients.map((recipient) => ({
@@ -57,7 +61,10 @@ export const updateEmbeddingTemplateRoute = procedure
       const { recipients: updatedRecipients } = await setTemplateRecipients({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         recipients: recipientsWithClientId.map((recipient) => ({
           id: recipient.id,
           email: recipient.email,
@@ -87,7 +94,10 @@ export const updateEmbeddingTemplateRoute = procedure
       await setFieldsForTemplate({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         fields: fields.map((field) => ({
           ...field,
           pageWidth: field.width,

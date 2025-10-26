@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Recipient, Template } from '@prisma/client';
+import type { Recipient } from '@prisma/client';
 import { PenIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -11,19 +11,17 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 
 export type TemplatePageViewRecipientsProps = {
-  template: Template & {
-    recipients: Recipient[];
-  };
+  recipients: Recipient[];
+  envelopeId: string;
   templateRootPath: string;
 };
 
 export const TemplatePageViewRecipients = ({
-  template,
+  recipients,
+  envelopeId,
   templateRootPath,
 }: TemplatePageViewRecipientsProps) => {
   const { _ } = useLingui();
-
-  const recipients = template.recipients;
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
@@ -33,7 +31,7 @@ export const TemplatePageViewRecipients = ({
         </h1>
 
         <Link
-          to={`${templateRootPath}/${template.id}/edit?step=signers`}
+          to={`${templateRootPath}/${envelopeId}/edit?step=signers`}
           title={_(msg`Modify recipients`)}
           className="flex flex-row items-center justify-between"
         >

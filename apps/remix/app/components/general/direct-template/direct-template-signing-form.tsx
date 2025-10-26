@@ -55,7 +55,7 @@ import { DocumentSigningRecipientProvider } from '../document-signing/document-s
 
 export type DirectTemplateSigningFormProps = {
   flowStep: DocumentFlowStep;
-  directRecipient: Recipient;
+  directRecipient: Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
   directRecipientFields: Field[];
   template: Omit<TTemplate, 'user'>;
   onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
@@ -417,11 +417,11 @@ export const DirectTemplateSigningForm = ({
 
           <DocumentSigningCompleteDialog
             isSubmitting={isSubmitting}
-            onSignatureComplete={handleSubmit}
+            onSignatureComplete={async () => handleSubmit()}
             documentTitle={template.title}
             fields={localFields}
             fieldsValidated={fieldsValidated}
-            role={directRecipient.role}
+            recipient={directRecipient}
           />
         </div>
       </DocumentFlowFormContainerFooter>

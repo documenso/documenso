@@ -1,6 +1,10 @@
 import { redirect } from 'react-router';
 
-import { IS_GOOGLE_SSO_ENABLED, IS_OIDC_SSO_ENABLED } from '@documenso/lib/constants/auth';
+import {
+  IS_GOOGLE_SSO_ENABLED,
+  IS_MICROSOFT_SSO_ENABLED,
+  IS_OIDC_SSO_ENABLED,
+} from '@documenso/lib/constants/auth';
 import { env } from '@documenso/lib/utils/env';
 
 import { SignUpForm } from '~/components/forms/signup';
@@ -17,6 +21,7 @@ export function loader() {
 
   // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
+  const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
 
   if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
@@ -25,17 +30,19 @@ export function loader() {
 
   return {
     isGoogleSSOEnabled,
+    isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
   };
 }
 
 export default function SignUp({ loaderData }: Route.ComponentProps) {
-  const { isGoogleSSOEnabled, isOIDCSSOEnabled } = loaderData;
+  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled } = loaderData;
 
   return (
     <SignUpForm
       className="w-screen max-w-screen-2xl px-4 md:px-16 lg:-my-16"
       isGoogleSSOEnabled={isGoogleSSOEnabled}
+      isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
       isOIDCSSOEnabled={isOIDCSSOEnabled}
     />
   );

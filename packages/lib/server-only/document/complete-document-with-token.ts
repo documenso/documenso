@@ -1,6 +1,7 @@
 import {
   DocumentSigningOrder,
   DocumentStatus,
+  EnvelopeType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -18,21 +19,26 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
-import type { TRecipientActionAuth } from '../../types/document-auth';
+import type { TRecipientAccessAuth, TRecipientActionAuth } from '../../types/document-auth';
+import { DocumentAuth } from '../../types/document-auth';
 import {
   ZWebhookDocumentSchema,
-  mapDocumentToWebhookDocumentPayload,
+  mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { mapSecondaryIdToDocumentId, unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 import { getIsRecipientsTurnToSign } from '../recipient/get-is-recipient-turn';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+import { isRecipientAuthorized } from './is-recipient-authorized';
 import { sendPendingEmail } from './send-pending-email';
 
 export type CompleteDocumentWithTokenOptions = {
   token: string;
-  documentId: number;
+  id: EnvelopeIdOptions;
   userId?: number;
   authOptions?: TRecipientActionAuth;
+  accessAuthOptions?: TRecipientAccessAuth;
   requestMetadata?: RequestMetadata;
   nextSigner?: {
     email: string;
@@ -40,10 +46,17 @@ export type CompleteDocumentWithTokenOptions = {
   };
 };
 
-const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptions) => {
-  return await prisma.document.findFirstOrThrow({
+export const completeDocumentWithToken = async ({
+  token,
+  id,
+  userId,
+  accessAuthOptions,
+  requestMetadata,
+  nextSigner,
+}: CompleteDocumentWithTokenOptions) => {
+  const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: documentId,
+      ...unsafeBuildEnvelopeIdQuery(id, EnvelopeType.DOCUMENT),
       recipients: {
         some: {
           token,
@@ -59,25 +72,18 @@ const getDocument = async ({ token, documentId }: CompleteDocumentWithTokenOptio
       },
     },
   });
-};
 
-export const completeDocumentWithToken = async ({
-  token,
-  documentId,
-  requestMetadata,
-  nextSigner,
-}: CompleteDocumentWithTokenOptions) => {
-  const document = await getDocument({ token, documentId });
+  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
 
-  if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending`);
+  if (envelope.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${envelope.id} must be pending`);
   }
 
-  if (document.recipients.length === 0) {
-    throw new Error(`Document ${document.id} has no recipient with token ${token}`);
+  if (envelope.recipients.length === 0) {
+    throw new Error(`Document ${envelope.id} has no recipient with token ${token}`);
   }
 
-  const [recipient] = document.recipients;
+  const [recipient] = envelope.recipients;
 
   if (recipient.signingStatus === SigningStatus.SIGNED) {
     throw new Error(`Recipient ${recipient.id} has already signed`);
@@ -90,7 +96,7 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+  if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
     const isRecipientsTurn = await getIsRecipientsTurnToSign({ token: recipient.token });
 
     if (!isRecipientsTurn) {
@@ -102,7 +108,7 @@ export const completeDocumentWithToken = async ({
 
   const fields = await prisma.field.findMany({
     where: {
-      documentId: document.id,
+      envelopeId: envelope.id,
       recipientId: recipient.id,
     },
   });
@@ -111,24 +117,57 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
-  // Document reauth for completing documents is currently not required.
+  // Check ACCESS AUTH 2FA validation during document completion
+  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+    documentAuth: envelope.authOptions,
+    recipientAuth: recipient.authOptions,
+  });
 
-  // const { derivedRecipientActionAuth } = extractDocumentAuthMethods({
-  //   documentAuth: document.authOptions,
-  //   recipientAuth: recipient.authOptions,
-  // });
+  if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
+    if (!accessAuthOptions) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Access authentication required',
+      });
+    }
 
-  // const isValid = await isRecipientAuthorized({
-  //   type: 'ACTION',
-  //   document: document,
-  //   recipient: recipient,
-  //   userId,
-  //   authOptions,
-  // });
+    const isValid = await isRecipientAuthorized({
+      type: 'ACCESS_2FA',
+      documentAuthOptions: envelope.authOptions,
+      recipient: recipient,
+      userId, // Can be undefined for non-account recipients
+      authOptions: accessAuthOptions,
+    });
 
-  // if (!isValid) {
-  //   throw new AppError(AppErrorCode.UNAUTHORIZED, 'Invalid authentication values');
-  // }
+    if (!isValid) {
+      await prisma.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED,
+          envelopeId: envelope.id,
+          data: {
+            recipientId: recipient.id,
+            recipientName: recipient.name,
+            recipientEmail: recipient.email,
+          },
+        }),
+      });
+
+      throw new AppError(AppErrorCode.TWO_FACTOR_AUTH_FAILED, {
+        message: 'Invalid 2FA authentication',
+      });
+    }
+
+    await prisma.documentAuditLog.create({
+      data: createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED,
+        envelopeId: envelope.id,
+        data: {
+          recipientId: recipient.id,
+          recipientName: recipient.name,
+          recipientEmail: recipient.email,
+        },
+      }),
+    });
+  }
 
   await prisma.$transaction(async (tx) => {
     await tx.recipient.update({
@@ -142,14 +181,14 @@ export const completeDocumentWithToken = async ({
     });
 
     const authOptions = extractDocumentAuthMethods({
-      documentAuth: document.authOptions,
+      documentAuth: envelope.authOptions,
       recipientAuth: recipient.authOptions,
     });
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
-        documentId: document.id,
+        envelopeId: envelope.id,
         user: {
           name: recipient.name,
           email: recipient.email,
@@ -169,7 +208,7 @@ export const completeDocumentWithToken = async ({
   await jobs.triggerJob({
     name: 'send.recipient.signed.email',
     payload: {
-      documentId: document.id,
+      documentId: legacyDocumentId,
       recipientId: recipient.id,
     },
   });
@@ -183,7 +222,7 @@ export const completeDocumentWithToken = async ({
       role: true,
     },
     where: {
-      documentId: document.id,
+      envelopeId: envelope.id,
       signingStatus: {
         not: SigningStatus.SIGNED,
       },
@@ -197,17 +236,17 @@ export const completeDocumentWithToken = async ({
   });
 
   if (pendingRecipients.length > 0) {
-    await sendPendingEmail({ documentId, recipientId: recipient.id });
+    await sendPendingEmail({ id, recipientId: recipient.id });
 
-    if (document.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
+    if (envelope.documentMeta?.signingOrder === DocumentSigningOrder.SEQUENTIAL) {
       const [nextRecipient] = pendingRecipients;
 
       await prisma.$transaction(async (tx) => {
-        if (nextSigner && document.documentMeta?.allowDictateNextSigner) {
+        if (nextSigner && envelope.documentMeta?.allowDictateNextSigner) {
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
-              documentId: document.id,
+              envelopeId: envelope.id,
               user: {
                 name: recipient.name,
                 email: recipient.email,
@@ -239,7 +278,7 @@ export const completeDocumentWithToken = async ({
           where: { id: nextRecipient.id },
           data: {
             sendStatus: SendStatus.SENT,
-            ...(nextSigner && document.documentMeta?.allowDictateNextSigner
+            ...(nextSigner && envelope.documentMeta?.allowDictateNextSigner
               ? {
                   name: nextSigner.name,
                   email: nextSigner.email,
@@ -251,8 +290,8 @@ export const completeDocumentWithToken = async ({
         await jobs.triggerJob({
           name: 'send.signing.requested.email',
           payload: {
-            userId: document.userId,
-            documentId: document.id,
+            userId: envelope.userId,
+            documentId: legacyDocumentId,
             recipientId: nextRecipient.id,
             requestMetadata,
           },
@@ -261,9 +300,9 @@ export const completeDocumentWithToken = async ({
     }
   }
 
-  const haveAllRecipientsSigned = await prisma.document.findFirst({
+  const haveAllRecipientsSigned = await prisma.envelope.findFirst({
     where: {
-      id: document.id,
+      id: envelope.id,
       recipients: {
         every: {
           OR: [{ signingStatus: SigningStatus.SIGNED }, { role: RecipientRole.CC }],
@@ -276,15 +315,16 @@ export const completeDocumentWithToken = async ({
     await jobs.triggerJob({
       name: 'internal.seal-document',
       payload: {
-        documentId: document.id,
+        documentId: legacyDocumentId,
         requestMetadata,
       },
     });
   }
 
-  const updatedDocument = await prisma.document.findFirstOrThrow({
+  const updatedDocument = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: document.id,
+      id: envelope.id,
+      type: EnvelopeType.DOCUMENT,
     },
     include: {
       documentMeta: true,
@@ -294,7 +334,7 @@ export const completeDocumentWithToken = async ({
 
   await triggerWebhook({
     event: WebhookTriggerEvents.DOCUMENT_SIGNED,
-    data: ZWebhookDocumentSchema.parse(mapDocumentToWebhookDocumentPayload(updatedDocument)),
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(updatedDocument)),
     userId: updatedDocument.userId,
     teamId: updatedDocument.teamId ?? undefined,
   });

@@ -1,8 +1,11 @@
+import { EnvelopeType } from '@prisma/client';
 import { P, match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { alphaid } from '../../universal/id';
+import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
 
 export type CreateSharingIdOptions =
   | {
@@ -15,12 +18,29 @@ export type CreateSharingIdOptions =
     };
 
 export const createOrGetShareLink = async ({ documentId, ...options }: CreateSharingIdOptions) => {
+  const envelope = await prisma.envelope.findUnique({
+    where: unsafeBuildEnvelopeIdQuery(
+      {
+        type: 'documentId',
+        id: documentId,
+      },
+      EnvelopeType.DOCUMENT,
+    ),
+    select: {
+      id: true,
+    },
+  });
+
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND);
+  }
+
   const email = await match(options)
     .with({ token: P.string }, async ({ token }) => {
       return await prisma.recipient
         .findFirst({
           where: {
-            documentId,
+            envelopeId: envelope.id,
             token,
           },
         })
@@ -31,6 +51,9 @@ export const createOrGetShareLink = async ({ documentId, ...options }: CreateSha
         .findFirst({
           where: {
             id: userId,
+          },
+          select: {
+            email: true,
           },
         })
         .then((user) => user?.email);
@@ -43,14 +66,14 @@ export const createOrGetShareLink = async ({ documentId, ...options }: CreateSha
 
   return await prisma.documentShareLink.upsert({
     where: {
-      documentId_email: {
+      envelopeId_email: {
+        envelopeId: envelope.id,
         email,
-        documentId,
       },
     },
     create: {
       email,
-      documentId,
+      envelopeId: envelope.id,
       slug: alphaid(14),
     },
     update: {},

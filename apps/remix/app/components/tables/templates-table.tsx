@@ -56,7 +56,7 @@ export const TemplatesTable = ({
   const formatTemplateLink = (row: TemplatesTableRow) => {
     const path = formatTemplatesPath(team.url);
 
-    return `${path}/${row.id}`;
+    return `${path}/${row.envelopeId}`;
   };
 
   const columns = useMemo(() => {
@@ -159,6 +159,7 @@ export const TemplatesTable = ({
           return (
             <div className="flex items-center gap-x-4">
               <TemplateUseDialog
+                envelopeId={row.original.envelopeId}
                 templateId={row.original.id}
                 templateSigningOrder={row.original.templateMeta?.signingOrder}
                 documentDistributionMethod={row.original.templateMeta?.distributionMethod}

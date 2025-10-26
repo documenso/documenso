@@ -1,5 +1,4 @@
-import type { Field } from '@prisma/client';
-import { FieldType } from '@prisma/client';
+import { EnvelopeType, type Field, FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
@@ -25,13 +24,15 @@ import {
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
-import { getDocumentWhereInput } from '../document/get-document-by-id';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface SetFieldsForDocumentOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
   fields: FieldData[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -39,43 +40,47 @@ export interface SetFieldsForDocumentOptions {
 export const setFieldsForDocument = async ({
   userId,
   teamId,
-  documentId,
+  id,
   fields,
   requestMetadata,
 }: SetFieldsForDocumentOptions) => {
-  const { documentWhereInput } = await getDocumentWhereInput({
-    documentId,
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id,
+    type: EnvelopeType.DOCUMENT,
     userId,
     teamId,
   });
 
-  const document = await prisma.document.findFirst({
-    where: documentWhereInput,
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
+      envelopeItems: {
+        select: {
+          id: true,
+        },
+      },
+      fields: {
+        include: {
+          recipient: true,
+        },
+      },
     },
   });
 
-  if (!document) {
+  if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Document not found',
     });
   }
 
-  if (document.completedAt) {
+  if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
       message: 'Document already complete',
     });
   }
 
-  const existingFields = await prisma.field.findMany({
-    where: {
-      documentId,
-    },
-    include: {
-      recipient: true,
-    },
-  });
+  const existingFields = envelope.fields;
 
   const removedFields = existingFields.filter(
     (existingField) => !fields.find((field) => field.id === existingField.id),
@@ -84,7 +89,18 @@ export const setFieldsForDocument = async ({
   const linkedFields = fields.map((field) => {
     const existing = existingFields.find((existingField) => existingField.id === field.id);
 
-    const recipient = document.recipients.find((recipient) => recipient.id === field.recipientId);
+    const recipient = envelope.recipients.find((recipient) => recipient.id === field.recipientId);
+
+    // Check whether the field is being attached to an allowed envelope item.
+    const foundEnvelopeItem = envelope.envelopeItems.find(
+      (envelopeItem) => envelopeItem.id === field.envelopeItemId,
+    );
+
+    if (!foundEnvelopeItem) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Envelope item ${field.envelopeItemId} not found`,
+      });
+    }
 
     // Each field MUST have a recipient associated with it.
     if (!recipient) {
@@ -105,6 +121,14 @@ export const setFieldsForDocument = async ({
       });
     }
 
+    // Prevent creating new fields when recipient has interacted with the document.
+    if (!existing && !canRecipientFieldsBeModified(recipient, existingFields)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message:
+          'Cannot modify a field where the recipient has already interacted with the document',
+      });
+    }
+
     return {
       ...field,
       _persisted: existing,
@@ -115,7 +139,7 @@ export const setFieldsForDocument = async ({
   const persistedFields = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       linkedFields.map(async (field) => {
-        const fieldSignerEmail = field.signerEmail.toLowerCase();
+        const fieldSignerEmail = field._recipient.email.toLowerCase();
 
         const parsedFieldMeta = field.fieldMeta
           ? ZFieldMetaSchema.parse(field.fieldMeta)
@@ -132,9 +156,11 @@ export const setFieldsForDocument = async ({
 
         if (field.type === FieldType.NUMBER && field.fieldMeta) {
           const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
+
           const errors = validateNumberField(
             String(numberFieldParsedMeta.value),
             numberFieldParsedMeta,
+            false,
           );
 
           if (errors.length > 0) {
@@ -197,7 +223,8 @@ export const setFieldsForDocument = async ({
         const upsertedField = await tx.field.upsert({
           where: {
             id: field._persisted?.id ?? -1,
-            documentId,
+            envelopeId: envelope.id,
+            envelopeItemId: field.envelopeItemId,
           },
           update: {
             page: field.pageNumber,
@@ -217,15 +244,21 @@ export const setFieldsForDocument = async ({
             customText: '',
             inserted: false,
             fieldMeta: parsedFieldMeta,
-            document: {
+            envelope: {
               connect: {
-                id: documentId,
+                id: envelope.id,
+              },
+            },
+            envelopeItem: {
+              connect: {
+                id: field.envelopeItemId,
+                envelopeId: envelope.id,
               },
             },
             recipient: {
               connect: {
-                id: field.recipientId,
-                documentId,
+                id: field._recipient.id,
+                envelopeId: envelope.id,
               },
             },
           },
@@ -249,7 +282,7 @@ export const setFieldsForDocument = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 changes,
@@ -264,7 +297,7 @@ export const setFieldsForDocument = async ({
           await tx.documentAuditLog.create({
             data: createDocumentAuditLogData({
               type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED,
-              documentId: documentId,
+              envelopeId: envelope.id,
               metadata: requestMetadata,
               data: {
                 ...baseAuditLog,
@@ -292,7 +325,7 @@ export const setFieldsForDocument = async ({
         data: removedFields.map((field) =>
           createDocumentAuditLogData({
             type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_DELETED,
-            documentId: documentId,
+            envelopeId: envelope.id,
             metadata: requestMetadata,
             data: {
               fieldId: field.secondaryId,
@@ -315,7 +348,9 @@ export const setFieldsForDocument = async ({
   });
 
   return {
-    fields: [...filteredFields, ...persistedFields],
+    fields: [...filteredFields, ...persistedFields].map((field) =>
+      mapFieldToLegacyField(field, envelope),
+    ),
   };
 };
 
@@ -324,8 +359,8 @@ export const setFieldsForDocument = async ({
  */
 type FieldData = {
   id?: number | null;
+  envelopeItemId: string;
   type: FieldType;
-  signerEmail: string;
   recipientId: number;
   pageNumber: number;
   pageX: number;
@@ -340,6 +375,7 @@ const hasFieldBeenChanged = (field: Field, newFieldData: FieldData) => {
   const newFieldMeta = newFieldData.fieldMeta || null;
 
   return (
+    field.envelopeItemId !== newFieldData.envelopeItemId ||
     field.type !== newFieldData.type ||
     field.page !== newFieldData.pageNumber ||
     field.positionX.toNumber() !== newFieldData.pageX ||

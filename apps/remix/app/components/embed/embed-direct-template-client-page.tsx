@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Recipient, Signature, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta, Recipient, Signature } from '@prisma/client';
 import { type DocumentData, type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
@@ -37,6 +37,7 @@ import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-sc
 import { injectCss } from '~/utils/css-vars';
 
 import type { DirectTemplateLocalField } from '../general/direct-template/direct-template-signing-form';
+import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { EmbedClientLoading } from './embed-client-loading';
 import { EmbedDocumentCompleted } from './embed-document-completed';
@@ -44,20 +45,22 @@ import { EmbedDocumentFields } from './embed-document-fields';
 
 export type EmbedDirectTemplateClientPageProps = {
   token: string;
+  envelopeId: string;
   updatedAt: Date;
   documentData: DocumentData;
   recipient: Recipient;
   fields: Field[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   hidePoweredBy?: boolean;
   allowWhiteLabelling?: boolean;
 };
 
 export const EmbedDirectTemplateClientPage = ({
   token,
+  envelopeId,
   updatedAt,
   documentData,
-  recipient: _recipient,
+  recipient,
   fields,
   metadata,
   hidePoweredBy = false,
@@ -321,8 +324,12 @@ export const EmbedDirectTemplateClientPage = ({
   }
 
   return (
-    <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
+    <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
       {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
+
+      <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+        <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={recipient.token} />
+      </div>
 
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}

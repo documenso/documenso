@@ -1,5 +1,5 @@
-import { DocumentStatus } from '@prisma/client';
-import type { Document, Recipient, User } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
+import type { Envelope, Recipient, User } from '@prisma/client';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
@@ -10,6 +10,8 @@ import {
 } from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
+
 export type SearchDocumentsWithKeywordOptions = {
   query: string;
   userId: number;
@@ -19,7 +21,7 @@ export type SearchDocumentsWithKeywordOptions = {
 export const searchDocumentsWithKeyword = async ({
   query,
   userId,
-  limit = 5,
+  limit = 20,
 }: SearchDocumentsWithKeywordOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -27,8 +29,9 @@ export const searchDocumentsWithKeyword = async ({
     },
   });
 
-  const documents = await prisma.document.findMany({
+  const envelopes = await prisma.envelope.findMany({
     where: {
+      type: EnvelopeType.DOCUMENT,
       OR: [
         {
           title: {
@@ -122,31 +125,33 @@ export const searchDocumentsWithKeyword = async ({
         },
       },
     },
+    distinct: ['id'],
     orderBy: {
       createdAt: 'desc',
     },
     take: limit,
   });
 
-  const isOwner = (document: Document, user: User) => document.userId === user.id;
+  const isOwner = (envelope: Envelope, user: User) => envelope.userId === user.id;
+
   const getSigningLink = (recipients: Recipient[], user: User) =>
     `/sign/${recipients.find((r) => r.email === user.email)?.token}`;
 
-  const maskedDocuments = documents
-    .filter((document) => {
-      if (!document.teamId || isOwner(document, user)) {
+  const maskedDocuments = envelopes
+    .filter((envelope) => {
+      if (!envelope.teamId || isOwner(envelope, user)) {
         return true;
       }
 
       const teamMemberRole = getHighestTeamRoleInGroup(
-        document.team.teamGroups.filter((tg) => tg.teamId === document.teamId),
+        envelope.team.teamGroups.filter((tg) => tg.teamId === envelope.teamId),
       );
 
       if (!teamMemberRole) {
         return false;
       }
 
-      const canAccessDocument = match([document.visibility, teamMemberRole])
+      const canAccessDocument = match([envelope.visibility, teamMemberRole])
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
         .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
@@ -157,23 +162,29 @@ export const searchDocumentsWithKeyword = async ({
 
       return canAccessDocument;
     })
-    .map((document) => {
-      const { recipients, ...documentWithoutRecipient } = document;
+    .map((envelope) => {
+      const { recipients, ...documentWithoutRecipient } = envelope;
 
       let documentPath;
 
-      if (isOwner(document, user)) {
-        documentPath = `${formatDocumentsPath(document.team?.url)}/${document.id}`;
-      } else if (document.teamId && document.team) {
-        documentPath = `${formatDocumentsPath(document.team.url)}/${document.id}`;
+      const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+      if (isOwner(envelope, user)) {
+        documentPath = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
+      } else if (envelope.teamId && envelope.team.teamGroups.length > 0) {
+        documentPath = `${formatDocumentsPath(envelope.team.url)}/${legacyDocumentId}`;
       } else {
         documentPath = getSigningLink(recipients, user);
       }
 
       return {
         ...documentWithoutRecipient,
+        team: {
+          id: envelope.teamId,
+          url: envelope.team.url,
+        },
         path: documentPath,
-        value: [document.id, document.title, ...document.recipients.map((r) => r.email)].join(' '),
+        value: [envelope.id, envelope.title, ...envelope.recipients.map((r) => r.email)].join(' '),
       };
     });
 

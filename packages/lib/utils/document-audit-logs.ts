@@ -22,7 +22,7 @@ import { ZRecipientAuthOptionsSchema } from '../types/document-auth';
 import type { ApiRequestMetadata, RequestMetadata } from '../universal/extract-request-metadata';
 
 type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
-  documentId: number;
+  envelopeId: string;
   type: T;
   data: Extract<TDocumentAuditLog, { type: T }>['data'];
   user?: { email?: string | null; id?: number | null; name?: string | null } | null;
@@ -32,13 +32,13 @@ type CreateDocumentAuditLogDataOptions<T = TDocumentAuditLog['type']> = {
 
 export type CreateDocumentAuditLogDataResponse = Pick<
   DocumentAuditLog,
-  'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'documentId'
+  'type' | 'ipAddress' | 'userAgent' | 'email' | 'userId' | 'name' | 'envelopeId'
 > & {
   data: TDocumentAuditLog['data'];
 };
 
 export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>({
-  documentId,
+  envelopeId,
   type,
   data,
   user,
@@ -62,7 +62,7 @@ export const createDocumentAuditLogData = <T extends TDocumentAuditLog['type']>(
   return {
     type,
     data,
-    documentId,
+    envelopeId,
     userId,
     email,
     name,
@@ -203,7 +203,6 @@ export const diffDocumentMetaChanges = (
   const oldMessage = oldData?.message ?? '';
   const oldSubject = oldData?.subject ?? '';
   const oldTimezone = oldData?.timezone ?? '';
-  const oldPassword = oldData?.password ?? null;
   const oldRedirectUrl = oldData?.redirectUrl ?? '';
   const oldEmailId = oldData?.emailId || null;
   const oldEmailReplyTo = oldData?.emailReplyTo || null;
@@ -255,12 +254,6 @@ export const diffDocumentMetaChanges = (
       type: DOCUMENT_META_DIFF_TYPE.REDIRECT_URL,
       from: oldRedirectUrl,
       to: newRedirectUrl,
-    });
-  }
-
-  if (oldPassword !== newData.password) {
-    diffs.push({
-      type: DOCUMENT_META_DIFF_TYPE.PASSWORD,
     });
   }
 
@@ -470,6 +463,36 @@ export const formatDocumentAuditLogAction = (
       const userName = prefix || _(msg`Recipient`);
 
       const result = msg`${userName} rejected the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} requested a 2FA token for the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} validated a 2FA token for the document`;
+
+      return {
+        anonymous: result,
+        identified: result,
+      };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, ({ data }) => {
+      const userName = prefix || _(msg`Recipient`);
+
+      const result = msg`${userName} failed to validate a 2FA token for the document`;
 
       return {
         anonymous: result,

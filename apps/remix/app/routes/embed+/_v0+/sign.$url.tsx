@@ -75,10 +75,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     documentAuth: document.authOptions,
   });
 
-  const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
-    .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
-    .with(undefined, () => true)
-    .exhaustive();
+  const isAccessAuthValid = derivedRecipientAccessAuth.every((accesssAuth) =>
+    match(accesssAuth)
+      .with(DocumentAccessAuth.ACCOUNT, () => user && user.email === recipient.email)
+      .with(DocumentAccessAuth.TWO_FACTOR_AUTH, () => true) // Allow without account requirement
+      .exhaustive(),
+  );
 
   if (!isAccessAuthValid) {
     throw data(
@@ -162,6 +164,7 @@ export default function EmbedSignDocumentPage() {
         <EmbedSignDocumentClientPage
           token={token}
           documentId={document.id}
+          envelopeId={document.envelopeId}
           documentData={document.documentData}
           recipient={recipient}
           fields={fields}

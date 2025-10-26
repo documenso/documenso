@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Upload } from 'lucide-react';
+import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
@@ -20,9 +21,10 @@ export type DocumentDropzoneProps = {
   disabled?: boolean;
   loading?: boolean;
   disabledMessage?: MessageDescriptor;
-  onDrop?: (_file: File) => void | Promise<void>;
-  onDropRejected?: () => void | Promise<void>;
-  type?: 'document' | 'template';
+  onDrop?: (_files: File[]) => void | Promise<void>;
+  onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
+  type?: 'document' | 'template' | 'envelope';
+  maxFiles?: number;
   [key: string]: unknown;
 };
 
@@ -34,6 +36,7 @@ export const DocumentDropzone = ({
   disabled,
   disabledMessage = msg`You cannot upload documents at this time.`,
   type = 'document',
+  maxFiles,
   ...props
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
@@ -48,24 +51,22 @@ export const DocumentDropzone = ({
     accept: {
       'application/pdf': ['.pdf'],
     },
-    multiple: false,
+    multiple: type === 'envelope',
     disabled,
-    onDrop: ([acceptedFile]) => {
-      if (acceptedFile && onDrop) {
-        void onDrop(acceptedFile);
+    maxFiles,
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0 && onDrop) {
+        void onDrop(acceptedFiles);
       }
     },
-    onDropRejected: () => {
-      if (onDropRejected) {
-        void onDropRejected();
-      }
-    },
+    onDropRejected,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
   const heading = {
     document: msg`Upload Document`,
     template: msg`Upload Template Document`,
+    envelope: msg`Envelope (beta)`,
   };
 
   if (disabled && IS_BILLING_ENABLED()) {
