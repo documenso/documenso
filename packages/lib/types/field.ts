@@ -71,7 +71,6 @@ export const ZFieldHeightSchema = z.number().min(1).describe('The height of the 
 
 // ---------------------------------------------
 
-// Todo: Envelopes - dunno man
 const PrismaDecimalSchema = z.preprocess(
   (val) => (typeof val === 'string' ? new Prisma.Decimal(val) : val),
   z.instanceof(Prisma.Decimal, { message: 'Must be a Decimal' }),

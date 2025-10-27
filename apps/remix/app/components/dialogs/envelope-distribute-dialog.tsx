@@ -15,18 +15,16 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import * as z from 'zod';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
+import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -65,6 +63,7 @@ export type EnvelopeDistributeDialogProps = {
     fields: Pick<Field, 'type' | 'recipientId'>[];
   };
   onDistribute?: () => Promise<void>;
+  documentRootPath: string;
   trigger?: React.ReactNode;
 };
 
@@ -89,6 +88,7 @@ export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFo
 export const EnvelopeDistributeDialog = ({
   envelope,
   trigger,
+  documentRootPath,
   onDistribute,
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
@@ -97,6 +97,7 @@ export const EnvelopeDistributeDialog = ({
 
   const { toast } = useToast();
   const { t } = useLingui();
+  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -163,6 +164,14 @@ export const EnvelopeDistributeDialog = ({
 
       await onDistribute?.();
 
+      let redirectPath = `${documentRootPath}/${envelope.id}`;
+
+      if (meta.distributionMethod === DocumentDistributionMethod.NONE) {
+        redirectPath += '?action=copy-links';
+      }
+
+      await navigate(redirectPath);
+
       toast({
         title: t`Envelope distributed`,
         description: t`Your envelope has been distributed successfully.`,
@@ -198,6 +207,7 @@ export const EnvelopeDistributeDialog = ({
             <Trans>Recipients will be able to sign the document once sent</Trans>
           </DialogDescription>
         </DialogHeader>
+
         {!invalidEnvelopeCode ? (
           <Form {...form}>
             <form onSubmit={handleSubmit(onFormSubmit)}>
@@ -220,7 +230,11 @@ export const EnvelopeDistributeDialog = ({
                   </TabsList>
                 </Tabs>
 
-                <div className="min-h-72">
+                <div
+                  className={cn('min-h-72', {
+                    'min-h-[23rem]': organisation.organisationClaim.flags.emailDomains,
+                  })}
+                >
                   <AnimatePresence initial={false} mode="wait">
                     {distributionMethod === DocumentDistributionMethod.EMAIL && (
                       <motion.div
@@ -355,73 +369,18 @@ export const EnvelopeDistributeDialog = ({
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                         className="min-h-60 rounded-lg border"
                       >
-                        {envelope.status === DocumentStatus.DRAFT ? (
-                          <div className="text-muted-foreground py-24 text-center text-sm">
-                            <p>
-                              <Trans>We won't send anything to notify recipients.</Trans>
-                            </p>
+                        <div className="text-muted-foreground py-24 text-center text-sm">
+                          <p>
+                            <Trans>We won't send anything to notify recipients.</Trans>
+                          </p>
 
-                            <p className="mt-2">
-                              <Trans>
-                                We will generate signing links for you, which you can send to the
-                                recipients through your method of choice.
-                              </Trans>
-                            </p>
-                          </div>
-                        ) : (
-                          <ul className="text-muted-foreground divide-y">
-                            {/* Todo: Envelopes - I don't think this section shows up */}
-
-                            {recipients.length === 0 && (
-                              <li className="flex flex-col items-center justify-center py-6 text-sm">
-                                <Trans>No recipients</Trans>
-                              </li>
-                            )}
-
-                            {recipients.map((recipient) => (
-                              <li
-                                key={recipient.id}
-                                className="flex items-center justify-between px-4 py-3 text-sm"
-                              >
-                                <AvatarWithText
-                                  avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                                  primaryText={
-                                    <p className="text-muted-foreground text-sm">
-                                      {recipient.email}
-                                    </p>
-                                  }
-                                  secondaryText={
-                                    <p className="text-muted-foreground/70 text-xs">
-                                      {t(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
-                                    </p>
-                                  }
-                                />
-
-                                {recipient.role !== RecipientRole.CC && (
-                                  <CopyTextButton
-                                    value={formatSigningLink(recipient.token)}
-                                    onCopySuccess={() => {
-                                      toast({
-                                        title: t`Copied to clipboard`,
-                                        description: t`The signing link has been copied to your clipboard.`,
-                                      });
-                                    }}
-                                    badgeContentUncopied={
-                                      <p className="ml-1 text-xs">
-                                        <Trans>Copy</Trans>
-                                      </p>
-                                    }
-                                    badgeContentCopied={
-                                      <p className="ml-1 text-xs">
-                                        <Trans>Copied</Trans>
-                                      </p>
-                                    }
-                                  />
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                          <p className="mt-2">
+                            <Trans>
+                              We will generate signing links for you, which you can send to the
+                              recipients through your method of choice.
+                            </Trans>
+                          </p>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>

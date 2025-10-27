@@ -262,9 +262,19 @@ msgstr "Użytkownik {prefix} dodał pole"
 msgid "{prefix} added a recipient"
 msgstr "Użytkownik {prefix} dodał odbiorcę"
 
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} created an envelope item with title {0}"
+msgstr ""
+
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} created the document"
 msgstr "Użytkownik {prefix} utworzył dokument"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{prefix} deleted an envelope item with title {0}"
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} deleted the document"
@@ -356,6 +366,7 @@ msgstr "{recipientActionVerb} dokument"
 msgid "{recipientActionVerb} the document to complete the process."
 msgstr "Sprawdź i {recipientActionVerb} dokument, aby zakończyć proces."
 
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "{recipientCount} recipients"
 msgstr "{recipientCount} odbiorców"
@@ -1742,8 +1753,9 @@ msgstr ""
 
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
 msgid "Attachment removed successfully."
-msgstr ""
+msgstr "<<<<<<< Updated upstream======="
 
+#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-attachments-popover.tsx
 #: apps/remix/app/components/general/document/document-attachments-popover.tsx
@@ -2158,6 +2170,10 @@ msgstr "Wyczyść filtry"
 msgid "Clear Signature"
 msgstr "Wyczyść podpis"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+msgid "Click here to add a recipient"
+msgstr ""
+
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "Click here to get started"
 msgstr "Kliknij, aby rozpocząć"
@@ -2280,6 +2296,7 @@ msgstr "Dokumenty zakończone"
 msgid "Completed Documents"
 msgstr "Zakończone dokumenty"
 
+#: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
 msgid "Completed on {formattedDate}"
 msgstr "Zakończono {formattedDate}"
@@ -2479,7 +2496,6 @@ msgid "Controls which signatures are allowed to be used when signing a document.
 msgstr "Kontroluje, które podpisy są dozwolone do użycia podczas podpisywania dokumentu."
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Copied"
 msgstr "Skopiowano"
@@ -2497,14 +2513,12 @@ msgstr "Skopiowano"
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-domain-records-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Copied to clipboard"
 msgstr "Skopiowano do schowka"
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "Copy"
 msgstr "Kopiuj"
@@ -2522,6 +2536,7 @@ msgid "Copy Shareable Link"
 msgstr "Kopiuj udostępniany link"
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
+#: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 msgid "Copy Signing Links"
 msgstr "Kopiuj linki do podpisania"
 
@@ -3646,7 +3661,6 @@ msgstr "Upuść swój dokument tutaj"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/document-flow/add-fields.tsx
-#: packages/lib/utils/fields.ts
 msgid "Dropdown"
 msgstr "Lista rozwijana"
 
@@ -4033,6 +4047,14 @@ msgstr ""
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Envelope Item Count"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Envelope item created"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Envelope item deleted"
 msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
@@ -5544,7 +5566,6 @@ msgstr "Nie znaleziono odbiorcy pasującego do tego opisu."
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "No recipients"
 msgstr "Brak odbiorców"
@@ -7066,6 +7087,10 @@ msgstr "Wybierz członków lub grupy członków, aby dodać do zespołu."
 msgid "Select members to add to this team"
 msgstr "Wybierz członków, aby dodać do tego zespołu"
 
+#: packages/lib/utils/fields.ts
+msgid "Select Option"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "Wybierz klucz uwierzytelniający"
@@ -7870,6 +7895,15 @@ msgstr "Synchronizuj domeny e-mail"
 msgid "Sync failed, changes not saved"
 msgstr ""
 
+#: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
+msgid "System auto inserted fields"
+msgstr ""
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "System auto inserted fields"
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "System Requirements"
 msgstr "Wymagania systemowe"
@@ -8412,7 +8446,6 @@ msgstr "Nazwa podpisującego"
 #: apps/remix/app/components/general/avatar-with-recipient.tsx
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
-#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "The signing link has been copied to your clipboard."
 msgstr "Link do podpisu został skopiowany do schowka."

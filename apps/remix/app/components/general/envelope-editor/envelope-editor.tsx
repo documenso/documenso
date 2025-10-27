@@ -81,7 +81,6 @@ export default function EnvelopeEditor() {
     isAutosaving,
     flushAutosave,
     relativePath,
-    syncEnvelope,
     editorFields,
   } = useCurrentEnvelopeEditor();
 
@@ -157,7 +156,7 @@ export default function EnvelopeEditor() {
       <EnvelopeEditorHeader />
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-73px)] w-screen">
+      <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
         <div className="bg-background border-border flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4">
           {/* Left section step selector. */}
@@ -251,7 +250,7 @@ export default function EnvelopeEditor() {
                   ...envelope,
                   fields: editorFields.localFields,
                 }}
-                onDistribute={syncEnvelope}
+                documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     <SendIcon className="mr-2 h-4 w-4" />
@@ -369,16 +368,14 @@ export default function EnvelopeEditor() {
         </div>
 
         {/* Main Content - Changes based on current step */}
-        <div className="flex-1 overflow-y-auto">
-          <AnimateGenericFadeInOut key={currentStep}>
-            {match({ currentStep, isStepLoading })
-              .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)
-              .with({ currentStep: 'upload' }, () => <EnvelopeEditorUploadPage />)
-              .with({ currentStep: 'addFields' }, () => <EnvelopeEditorFieldsPage />)
-              .with({ currentStep: 'preview' }, () => <EnvelopeEditorPreviewPage />)
-              .exhaustive()}
-          </AnimateGenericFadeInOut>
-        </div>
+        <AnimateGenericFadeInOut className="flex-1 overflow-y-auto" key={currentStep}>
+          {match({ currentStep, isStepLoading })
+            .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)
+            .with({ currentStep: 'upload' }, () => <EnvelopeEditorUploadPage />)
+            .with({ currentStep: 'addFields' }, () => <EnvelopeEditorFieldsPage />)
+            .with({ currentStep: 'preview' }, () => <EnvelopeEditorPreviewPage />)
+            .exhaustive()}
+        </AnimateGenericFadeInOut>
       </div>
     </div>
   );

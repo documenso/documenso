@@ -99,7 +99,11 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
 
   return (
     <EnvelopeEditorProvider initialEnvelope={envelope}>
-      <EnvelopeRenderProvider envelope={envelope}>
+      <EnvelopeRenderProvider
+        envelope={envelope}
+        fields={envelope.fields}
+        recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+      >
         <EnvelopeEditor />
       </EnvelopeRenderProvider>
     </EnvelopeEditorProvider>

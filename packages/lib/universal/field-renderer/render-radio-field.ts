@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TRadioFieldMeta } from '../../types/field-meta';
 import {
+  createFieldHoverInteraction,
   konvaTextFill,
   konvaTextFontFamily,
   upsertFieldGroup,
@@ -26,25 +27,24 @@ export const renderRadioFieldElement = (
 ) => {
   const { pageWidth, pageHeight, pageLayer, mode } = options;
 
-  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
-
-  const fieldGroup = upsertFieldGroup(field, options);
-
-  // Clear previous children to re-render fresh
-  fieldGroup.removeChildren();
-
-  fieldGroup.add(upsertFieldRect(field, options));
-
   const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
   const radioValues = radioMeta?.values || [];
 
-  const fontSize = radioMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
+
+  // Clear previous children and listeners to re-render fresh
+  const fieldGroup = upsertFieldGroup(field, options);
+  fieldGroup.removeChildren();
+  fieldGroup.off('transform');
 
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
   }
 
-  fieldGroup.off('transform');
+  const fieldRect = upsertFieldRect(field, options);
+  fieldGroup.add(fieldRect);
+
+  const fontSize = radioMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
 
   // Handle rescaling items during transforms.
   fieldGroup.on('transform', () => {
@@ -194,6 +194,8 @@ export const renderRadioFieldElement = (
     fieldGroup.add(dot);
     fieldGroup.add(text);
   });
+
+  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
 
   return {
     fieldGroup,

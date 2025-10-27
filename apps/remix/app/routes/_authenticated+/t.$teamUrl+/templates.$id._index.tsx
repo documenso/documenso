@@ -168,7 +168,11 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
         {envelope.internalVersion === 2 ? (
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
-            <EnvelopeRenderProvider envelope={envelope} fields={envelope.fields}>
+            <EnvelopeRenderProvider
+              envelope={envelope}
+              fields={envelope.fields}
+              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+            >
               {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
               )}

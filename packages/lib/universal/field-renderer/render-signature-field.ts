@@ -1,13 +1,12 @@
 import Konva from 'konva';
 
-import {
-  DEFAULT_RECT_BACKGROUND,
-  RECIPIENT_COLOR_STYLES,
-} from '@documenso/ui/lib/recipient-colors';
-
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../../constants/pdf';
 import { AppError } from '../../errors/app-error';
-import { upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import {
+  createFieldHoverInteraction,
+  upsertFieldGroup,
+  upsertFieldRect,
+} from './field-generic-items';
 import { calculateFieldPosition } from './field-renderer';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 
@@ -212,33 +211,7 @@ export const renderSignatureFieldElement = (
     fieldRect.opacity(0);
   }
 
-  // Todo: Doesn't work.
-  if (mode !== 'export') {
-    const hoverColor = options.color
-      ? RECIPIENT_COLOR_STYLES[options.color].baseRingHover
-      : '#e5e7eb';
-
-    // Todo: Envelopes - On hover add text color
-
-    // Add smooth transition-like behavior for hover effects
-    fieldGroup.on('mouseover', () => {
-      new Konva.Tween({
-        node: fieldRect,
-        duration: 0.3,
-        fill: hoverColor,
-      }).play();
-    });
-
-    fieldGroup.on('mouseout', () => {
-      new Konva.Tween({
-        node: fieldRect,
-        duration: 0.3,
-        fill: DEFAULT_RECT_BACKGROUND,
-      }).play();
-    });
-
-    fieldGroup.add(fieldRect);
-  }
+  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
 
   return {
     fieldGroup,

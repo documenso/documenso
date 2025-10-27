@@ -5,6 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
+import { Link } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -61,7 +62,7 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
 };
 
 export const EnvelopeEditorFieldsPage = () => {
-  const { envelope, editorFields } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -104,12 +105,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div className="flex w-full flex-col">
+      <div className="flex w-full flex-col overflow-y-auto">
         {/* Horizontal envelope item selector */}
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}
-        <div className="mt-4 flex justify-center p-4">
+        <div className="mt-4 flex h-full justify-center p-4">
           {currentEnvelopeItem !== null ? (
             <PDFViewerKonvaLazy customPageRenderer={EnvelopeEditorFieldsPageRenderer} />
           ) : (
@@ -128,7 +129,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && (
-        <div className="bg-background border-border sticky top-0 h-[calc(100vh-73px)] w-80 flex-shrink-0 overflow-y-auto border-l py-4">
+        <div className="bg-background border-border sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
             <h3 className="text-foreground mb-2 text-sm font-semibold">
@@ -137,8 +138,14 @@ export const EnvelopeEditorFieldsPage = () => {
 
             {envelope.recipients.length === 0 ? (
               <Alert variant="warning">
-                <AlertDescription>
+                <AlertDescription className="flex flex-col gap-2">
                   <Trans>You need at least one recipient to add fields</Trans>
+
+                  <Link to={`${relativePath.editorPath}`} className="text-sm">
+                    <p>
+                      <Trans>Click here to add a recipient</Trans>
+                    </p>
+                  </Link>
                 </AlertDescription>
               </Alert>
             ) : (

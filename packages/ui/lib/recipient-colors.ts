@@ -9,6 +9,7 @@ export type RecipientColorStyles = {
   base: string;
   baseRing: string;
   baseRingHover: string;
+  baseTextHover: string;
   fieldButton: string;
   fieldItem: string;
   fieldItemInitials: string;
@@ -24,6 +25,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-neutral-400',
     baseRing: 'rgba(176, 176, 176, 1)',
     baseRingHover: 'rgba(176, 176, 176, 1)',
+    baseTextHover: 'rgba(176, 176, 176, 1)',
     fieldButton: 'border-neutral-400 hover:border-neutral-400',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: '',
@@ -36,6 +38,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-green hover:bg-recipient-green/30',
     baseRing: 'rgba(122, 195, 85, 1)',
     baseRingHover: 'rgba(122, 195, 85, 0.3)',
+    baseTextHover: 'rgba(122, 195, 85, 1)',
     fieldButton: 'hover:border-recipient-green hover:bg-recipient-green/30 ',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-green',
@@ -48,6 +51,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-blue hover:bg-recipient-blue/30',
     baseRing: 'rgba(56, 123, 199, 1)',
     baseRingHover: 'rgba(56, 123, 199, 0.3)',
+    baseTextHover: 'rgba(56, 123, 199, 1)',
     fieldButton: 'hover:border-recipient-blue hover:bg-recipient-blue/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-blue',
@@ -60,6 +64,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-purple hover:bg-recipient-purple/30',
     baseRing: 'rgba(151, 71, 255, 1)',
     baseRingHover: 'rgba(151, 71, 255, 0.3)',
+    baseTextHover: 'rgba(151, 71, 255, 1)',
     fieldButton: 'hover:border-recipient-purple hover:bg-recipient-purple/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-purple',
@@ -72,6 +77,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-orange hover:bg-recipient-orange/30',
     baseRing: 'rgba(246, 159, 30, 1)',
     baseRingHover: 'rgba(246, 159, 30, 0.3)',
+    baseTextHover: 'rgba(246, 159, 30, 1)',
     fieldButton: 'hover:border-recipient-orange hover:bg-recipient-orange/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-orange',
@@ -84,6 +90,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-yellow hover:bg-recipient-yellow/30',
     baseRing: 'rgba(219, 186, 0, 1)',
     baseRingHover: 'rgba(219, 186, 0, 0.3)',
+    baseTextHover: 'rgba(219, 186, 0, 1)',
     fieldButton: 'hover:border-recipient-yellow hover:bg-recipient-yellow/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-yellow',
@@ -96,6 +103,7 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-pink hover:bg-recipient-pink/30',
     baseRing: 'rgba(217, 74, 186, 1)',
     baseRingHover: 'rgba(217, 74, 186, 0.3)',
+    baseTextHover: 'rgba(217, 74, 186, 1)',
     fieldButton: 'hover:border-recipient-pink hover:bg-recipient-pink/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-pink',

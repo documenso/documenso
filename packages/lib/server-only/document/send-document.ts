@@ -256,11 +256,10 @@ export const sendDocument = async ({
       });
     }
 
-    // Todo: Envelopes - [AUDIT_LOGS]
     if (envelope.internalVersion === 2) {
-      await Promise.all(
+      const autoInsertedFields = await Promise.all(
         fieldsToAutoInsert.map(async (field) => {
-          await tx.field.update({
+          return await tx.field.update({
             where: {
               id: field.fieldId,
             },
@@ -271,6 +270,21 @@ export const sendDocument = async ({
           });
         }),
       );
+
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED,
+          envelopeId: envelope.id,
+          data: {
+            fields: autoInsertedFields.map((field) => ({
+              fieldId: field.id,
+              fieldType: field.type,
+              recipientId: field.recipientId,
+            })),
+          },
+          // Don't put metadata or user here since it's a system event.
+        }),
+      });
     }
 
     return await tx.envelope.update({

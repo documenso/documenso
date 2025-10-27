@@ -213,8 +213,6 @@ export const EnvelopeDownloadDialog = ({
               </div>
             ))
           )}
-
-          {/* Todo: Envelopes - Download all button */}
         </div>
       </DialogContent>
     </Dialog>

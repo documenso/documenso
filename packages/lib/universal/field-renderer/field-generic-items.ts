@@ -129,3 +129,58 @@ export const createSpinner = ({
 
   return loadingGroup;
 };
+
+type CreateFieldHoverInteractionOptions = {
+  options: RenderFieldElementOptions;
+  fieldGroup: Konva.Group;
+  fieldRect: Konva.Rect;
+};
+
+/**
+ * Adds smooth transition-like behavior for hover effects to the field group and rectangle.
+ */
+export const createFieldHoverInteraction = ({
+  options,
+  fieldGroup,
+  fieldRect,
+}: CreateFieldHoverInteractionOptions) => {
+  const { mode } = options;
+
+  if (mode === 'export' || !options.color) {
+    return;
+  }
+
+  const hoverColor = RECIPIENT_COLOR_STYLES[options.color].baseRingHover;
+
+  fieldGroup.on('mouseover', () => {
+    new Konva.Tween({
+      node: fieldRect,
+      duration: 0.3,
+      fill: hoverColor,
+    }).play();
+  });
+
+  fieldGroup.on('mouseout', () => {
+    new Konva.Tween({
+      node: fieldRect,
+      duration: 0.3,
+      fill: DEFAULT_RECT_BACKGROUND,
+    }).play();
+  });
+
+  fieldGroup.on('transformstart', () => {
+    new Konva.Tween({
+      node: fieldRect,
+      duration: 0.3,
+      fill: hoverColor,
+    }).play();
+  });
+
+  fieldGroup.on('transformend', () => {
+    new Konva.Tween({
+      node: fieldRect,
+      duration: 0.3,
+      fill: DEFAULT_RECT_BACKGROUND,
+    }).play();
+  });
+};
