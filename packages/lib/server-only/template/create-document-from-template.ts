@@ -609,6 +609,7 @@ export const createDocumentFromTemplate = async ({
             height: field.height,
             customText: '',
             inserted: false,
+            autosign: field.autosign ?? false,
             fieldMeta: field.fieldMeta,
           };
 
@@ -651,6 +652,65 @@ export const createDocumentFromTemplate = async ({
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
       })),
     });
+
+    // Handle auto-signing for fields marked with autosign=true
+    const autoSignFields = fieldsToCreate.filter((field) => field.autosign);
+
+    if (autoSignFields.length > 0) {
+      // Get the created fields to get their IDs
+      const createdFields = await tx.field.findMany({
+        where: {
+          envelopeId: envelope.id,
+          autosign: true,
+        },
+        include: {
+          recipient: true,
+        },
+      });
+
+      // Auto-sign each field
+      for (const field of createdFields) {
+        // For signature fields, create a signature entry
+        if (field.type === 'SIGNATURE' || field.type === 'FREE_SIGNATURE') {
+          await tx.signature.create({
+            data: {
+              fieldId: field.id,
+              recipientId: field.recipientId,
+              typedSignature: `${field.recipient.name || field.recipient.email} (Auto-signed)`,
+            },
+          });
+        }
+
+        // Mark field as inserted
+        await tx.field.update({
+          where: { id: field.id },
+          data: { inserted: true },
+        });
+
+        // Create audit log for auto-signed field (without IP address)
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
+            envelopeId: envelope.id,
+            metadata: {
+              ...requestMetadata,
+              ipAddress: undefined, // No IP for auto-signed fields
+            },
+            data: {
+              recipientEmail: field.recipient.email,
+              recipientId: field.recipientId,
+              recipientName: field.recipient.name || '',
+              recipientRole: field.recipient.role,
+              fieldId: field.secondaryId,
+              field: {
+                type: field.type,
+                data: `${field.recipient.name || field.recipient.email} (Auto-signed)`,
+              },
+            },
+          }),
+        });
+      }
+    }
 
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({

@@ -77,6 +77,7 @@ export type FieldFormType = {
   signerEmail: string;
   recipientId: number;
   fieldMeta?: FieldMeta;
+  autosign?: boolean;
 };
 
 export type AddFieldsFormProps = {

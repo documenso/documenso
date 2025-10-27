@@ -31,6 +31,7 @@ export interface CreateEnvelopeFieldsOptions {
     pageY: number;
     width: number;
     height: number;
+    autosign?: boolean;
   })[];
   requestMetadata: ApiRequestMetadata;
 }
@@ -129,6 +130,7 @@ export const createEnvelopeFields = async ({
         height: field.height,
         customText: '',
         inserted: false,
+        autosign: field.autosign ?? false,
         fieldMeta: field.fieldMeta,
         envelopeId: envelope.id,
         envelopeItemId: field.envelopeItemId,

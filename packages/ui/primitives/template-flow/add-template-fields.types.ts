@@ -18,6 +18,7 @@ export const ZAddTemplateFieldsFormSchema = z.object({
       pageWidth: z.number().min(0),
       pageHeight: z.number().min(0),
       fieldMeta: ZFieldMetaSchema,
+      autosign: z.boolean().optional(),
     }),
   ),
 });

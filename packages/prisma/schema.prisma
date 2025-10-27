@@ -586,6 +586,7 @@ model Field {
   height         Decimal      @default(-1)
   customText     String
   inserted       Boolean
+  autosign       Boolean      @default(false) /// @zod.boolean.describe("Whether this field should be automatically signed when the document is sent.")
   envelopeItem   EnvelopeItem @relation(fields: [envelopeItemId], references: [id], onDelete: Cascade)
   envelope       Envelope     @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
   recipient      Recipient    @relation(fields: [recipientId], references: [id], onDelete: Cascade)

@@ -122,6 +122,7 @@ export const AddTemplateFieldsFormPartial = ({
         signerToken:
           recipients.find((recipient) => recipient.id === field.recipientId)?.token ?? '',
         fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+        autosign: field.autosign ?? false,
       })),
     },
     resolver: zodResolver(ZAddTemplateFieldsFormSchema),
@@ -552,6 +553,24 @@ export const AddTemplateFieldsFormPartial = ({
     void handleAutoSave();
   };
 
+  const handleAutosignSave = (autosign: boolean) => {
+    const initialValues = form.getValues();
+
+    const updatedFields = initialValues.fields.map((field) => {
+      if (field.formId === currentField?.formId) {
+        return {
+          ...field,
+          autosign,
+        };
+      }
+
+      return field;
+    });
+
+    form.setValue('fields', updatedFields);
+    void handleAutoSave();
+  };
+
   return (
     <>
       {showAdvancedSettings && currentField ? (
@@ -569,6 +588,7 @@ export const AddTemplateFieldsFormPartial = ({
             handleSavedFieldSettings(fieldState);
             await handleAutoSave();
           }}
+          onAutosignSave={handleAutosignSave}
         />
       ) : (
         <>

@@ -39,6 +39,7 @@ import { InitialsFieldAdvancedSettings } from './field-items-advanced-settings/i
 import { NameFieldAdvancedSettings } from './field-items-advanced-settings/name-field';
 import { NumberFieldAdvancedSettings } from './field-items-advanced-settings/number-field';
 import { RadioFieldAdvancedSettings } from './field-items-advanced-settings/radio-field';
+import { SignatureFieldAdvancedSettings } from './field-items-advanced-settings/signature-field';
 import { TextFieldAdvancedSettings } from './field-items-advanced-settings/text-field';
 
 export type FieldAdvancedSettingsProps = {
@@ -50,6 +51,7 @@ export type FieldAdvancedSettingsProps = {
   isDocumentPdfLoaded?: boolean;
   onSave?: (fieldState: FieldMeta) => void;
   onAutoSave?: (fieldState: FieldMeta) => Promise<void>;
+  onAutosignSave?: (autosign: boolean) => void;
 };
 
 export type FieldMetaKeys =
@@ -157,6 +159,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
       isDocumentPdfLoaded = true,
       onSave,
       onAutoSave,
+      onAutosignSave,
     },
     ref,
   ) => {
@@ -164,6 +167,7 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
     const { toast } = useToast();
 
     const [errors, setErrors] = useState<string[]>([]);
+    const [autosign, setAutosign] = useState(field.autosign ?? false);
 
     const fieldMeta = field?.fieldMeta;
 
@@ -241,7 +245,13 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
         } else {
           localStorage.setItem(localStorageKey, JSON.stringify(fieldState));
 
-          onSave?.(fieldState);
+          // For signature fields, save autosign setting
+          if (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) {
+            onAutosignSave?.(autosign);
+          } else {
+            onSave?.(fieldState);
+          }
+
           onAdvancedSettings?.();
         }
       } catch (error) {
@@ -337,6 +347,18 @@ export const FieldAdvancedSettings = forwardRef<HTMLDivElement, FieldAdvancedSet
                 fieldState={fieldState}
                 handleFieldChange={handleFieldChange}
                 handleErrors={setErrors}
+              />
+            ))
+            .with(FieldType.SIGNATURE, () => (
+              <SignatureFieldAdvancedSettings
+                autosign={autosign}
+                onAutosignChange={setAutosign}
+              />
+            ))
+            .with(FieldType.FREE_SIGNATURE, () => (
+              <SignatureFieldAdvancedSettings
+                autosign={autosign}
+                onAutosignChange={setAutosign}
               />
             ))
             .otherwise(() => null)}

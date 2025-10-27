@@ -93,6 +93,8 @@ export const FieldItem = ({
   const isDevMode = searchParams.get('devmode') === 'true';
 
   const advancedField = [
+    'SIGNATURE',
+    'FREE_SIGNATURE',
     'NUMBER',
     'RADIO',
     'CHECKBOX',
