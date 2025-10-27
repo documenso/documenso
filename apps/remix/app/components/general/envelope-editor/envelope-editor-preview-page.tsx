@@ -33,7 +33,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div className="flex w-full flex-col">
+      <div className="flex w-full flex-col overflow-y-auto">
         {/* Horizontal envelope item selector */}
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
@@ -82,7 +82,7 @@ export const EnvelopeEditorPreviewPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && false && (
-        <div className="sticky top-0 h-[calc(100vh-73px)] w-80 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white py-4">
+        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-gray-200 bg-white py-4">
           {/* Add fields section. */}
           <section className="px-4">
             {/* <h3 className="mb-2 text-sm font-semibold text-gray-900">

@@ -3,7 +3,7 @@ import { lazy, useMemo } from 'react';
 import { Plural, Trans } from '@lingui/react/macro';
 import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { ArrowLeftIcon, BanIcon, DownloadCloudIcon } from 'lucide-react';
+import { ArrowLeftIcon, BanIcon, DownloadCloudIcon, PaperclipIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -75,7 +75,7 @@ export const DocumentSigningPageViewV2 = () => {
       <EnvelopeSignerHeader />
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-73px)] w-screen">
+      <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
         <div className="bg-background border-border hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4 lg:flex">
           <div className="px-4">
@@ -121,12 +121,16 @@ export const DocumentSigningPageViewV2 = () => {
                 <Trans>Actions</Trans>
               </h4>
 
-              <div className="w-full">
-                <DocumentSigningAttachmentsPopover
-                  envelopeId={envelope.id}
-                  token={recipient.token}
-                />
-              </div>
+              <DocumentSigningAttachmentsPopover
+                envelopeId={envelope.id}
+                token={recipient.token}
+                trigger={
+                  <Button variant="ghost" size="sm" className="w-full justify-start">
+                    <PaperclipIcon className="mr-2 h-4 w-4" />
+                    <Trans>Attachments</Trans>
+                  </Button>
+                }
+              />
 
               <EnvelopeDownloadDialog
                 envelopeId={envelope.id}

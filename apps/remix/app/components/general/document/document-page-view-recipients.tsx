@@ -1,7 +1,10 @@
+import { useEffect, useState } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
+import { TooltipArrow } from '@radix-ui/react-tooltip';
 import {
   AlertTriangle,
   CheckIcon,
@@ -12,7 +15,7 @@ import {
   PlusIcon,
   UserIcon,
 } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -24,6 +27,12 @@ import { SignatureIcon } from '@documenso/ui/icons/signature';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { PopoverHover } from '@documenso/ui/primitives/popover';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentPageViewRecipientsProps = {
@@ -37,8 +46,24 @@ export const DocumentPageViewRecipients = ({
 }: DocumentPageViewRecipientsProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const recipients = envelope.recipients;
+  const [shouldHighlightCopyButtons, setShouldHighlightCopyButtons] = useState(false);
+
+  // Check for action=view-tokens query parameter and set highlighting state
+  useEffect(() => {
+    const hasViewTokensAction = searchParams.get('action') === 'copy-links';
+
+    if (hasViewTokensAction) {
+      setShouldHighlightCopyButtons(true);
+
+      // Remove the query parameter immediately
+      const params = new URLSearchParams(searchParams);
+      params.delete('action');
+      setSearchParams(params);
+    }
+  }, [searchParams, setSearchParams]);
 
   return (
     <section className="dark:bg-background border-border bg-widget flex flex-col rounded-xl border">
@@ -69,7 +94,7 @@ export const DocumentPageViewRecipients = ({
           </li>
         )}
 
-        {recipients.map((recipient) => (
+        {recipients.map((recipient, i) => (
           <li key={recipient.id} className="flex items-center justify-between px-4 py-2.5 text-sm">
             <AvatarWithText
               avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
@@ -159,15 +184,33 @@ export const DocumentPageViewRecipients = ({
               {envelope.status === DocumentStatus.PENDING &&
                 recipient.signingStatus === SigningStatus.NOT_SIGNED &&
                 recipient.role !== RecipientRole.CC && (
-                  <CopyTextButton
-                    value={formatSigningLink(recipient.token)}
-                    onCopySuccess={() => {
-                      toast({
-                        title: _(msg`Copied to clipboard`),
-                        description: _(msg`The signing link has been copied to your clipboard.`),
-                      });
-                    }}
-                  />
+                  <TooltipProvider>
+                    <Tooltip open={shouldHighlightCopyButtons && i === 0}>
+                      <TooltipTrigger asChild>
+                        <div
+                          className={shouldHighlightCopyButtons ? 'animate-pulse' : ''}
+                          onClick={() => setShouldHighlightCopyButtons(false)}
+                        >
+                          <CopyTextButton
+                            value={formatSigningLink(recipient.token)}
+                            onCopySuccess={() => {
+                              toast({
+                                title: _(msg`Copied to clipboard`),
+                                description: _(
+                                  msg`The signing link has been copied to your clipboard.`,
+                                ),
+                              });
+                              setShouldHighlightCopyButtons(false);
+                            }}
+                          />
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent sideOffset={2}>
+                        <Trans>Copy Signing Links</Trans>
+                        <TooltipArrow className="fill-background" />
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 )}
             </div>
           </li>

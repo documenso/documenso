@@ -189,7 +189,6 @@ export const run = async ({
     settings,
   });
 
-  // Todo: Envelopes - Is it okay to have dynamic IDs?
   const newDocumentData = await Promise.all(
     envelopeItems.map(async (envelopeItem) =>
       io.runTask(`decorate-and-sign-envelope-item-${envelopeItem.id}`, async () => {

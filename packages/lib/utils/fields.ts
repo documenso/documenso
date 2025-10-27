@@ -101,7 +101,7 @@ export const getClientSideFieldTranslations = ({ t }: I18n): Record<FieldType, s
     [FieldType.TEXT]: t(msg`Text`),
     [FieldType.CHECKBOX]: t(msg`Checkbox`),
     [FieldType.RADIO]: t(msg`Radio`),
-    [FieldType.DROPDOWN]: t(msg`Dropdown`),
+    [FieldType.DROPDOWN]: t(msg`Select Option`),
     [FieldType.SIGNATURE]: t(msg`Signature`),
     [FieldType.FREE_SIGNATURE]: t(msg`Free Signature`),
     [FieldType.INITIALS]: t(msg`Initials`),

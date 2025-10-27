@@ -8,6 +8,7 @@ import {
   RecipientRole,
   SigningStatus,
 } from '@prisma/client';
+import { prop, sortBy } from 'remeda';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
@@ -165,7 +166,29 @@ export const EnvelopeSigningProvider = ({
    * The fields that are still required to be signed by the actual recipient.
    */
   const recipientFieldsRemaining = useMemo(() => {
-    return envelopeData.recipient.fields.filter((field) => isFieldUnsignedAndRequired(field));
+    const requiredFields = envelopeData.recipient.fields
+      .filter((field) => isFieldUnsignedAndRequired(field))
+      .map((field) => {
+        const envelopeItem = envelope.envelopeItems.find(
+          (item) => item.id === field.envelopeItemId,
+        );
+
+        if (!envelopeItem) {
+          throw new Error('Missing envelope item');
+        }
+
+        return {
+          ...field,
+          envelopeItemOrder: envelopeItem.order,
+        };
+      });
+
+    return sortBy(
+      requiredFields,
+      [prop('envelopeItemOrder'), 'asc'],
+      [prop('page'), 'asc'],
+      [prop('positionY'), 'asc'],
+    );
   }, [envelopeData.recipient.fields]);
 
   /**

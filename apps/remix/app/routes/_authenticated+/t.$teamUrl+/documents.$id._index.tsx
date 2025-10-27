@@ -148,6 +148,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
             <EnvelopeRenderProvider
               envelope={envelope}
               fields={envelope.status == DocumentStatus.COMPLETED ? [] : envelope.fields}
+              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
             >
               {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />

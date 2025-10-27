@@ -14,7 +14,7 @@ import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { prop, sortBy } from 'remeda';
+import { isDeepEqual, prop, sortBy } from 'remeda';
 import { z } from 'zod';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -148,8 +148,7 @@ export const EnvelopeEditorRecipientForm = () => {
     },
   });
 
-  // Always show advanced settings if any recipient has auth options.
-  const alwaysShowAdvancedSettings = useMemo(() => {
+  const recipientHasAuthSettings = useMemo(() => {
     const recipientHasAuthOptions = recipients.find((recipient) => {
       const recipientAuthOptions = ZRecipientAuthOptionsSchema.parse(recipient.authOptions);
 
@@ -165,7 +164,7 @@ export const EnvelopeEditorRecipientForm = () => {
     return recipientHasAuthOptions !== undefined || formHasActionAuth !== undefined;
   }, [recipients, form]);
 
-  const [showAdvancedSettings, setShowAdvancedSettings] = useState(alwaysShowAdvancedSettings);
+  const [showAdvancedSettings, setShowAdvancedSettings] = useState(recipientHasAuthSettings);
   const [showSigningOrderConfirmation, setShowSigningOrderConfirmation] = useState(false);
 
   const {
@@ -464,7 +463,7 @@ export const EnvelopeEditorRecipientForm = () => {
     const formValueSigners = formValues.signers || [];
 
     // Remove the last signer if it's empty.
-    const recipients = formValueSigners.filter((signer, i) => {
+    const nonEmptyRecipients = formValueSigners.filter((signer, i) => {
       if (i === formValueSigners.length - 1 && signer.email === '') {
         return false;
       }
@@ -474,26 +473,48 @@ export const EnvelopeEditorRecipientForm = () => {
 
     const validatedFormValues = ZEnvelopeRecipientsForm.safeParse({
       ...formValues,
-      signers: recipients,
+      signers: nonEmptyRecipients,
     });
 
-    if (validatedFormValues.success) {
-      console.log('validatedFormValues', validatedFormValues);
+    if (!validatedFormValues.success) {
+      return;
+    }
 
+    const { data } = validatedFormValues;
+
+    const hasSigningOrderChanged = envelope.documentMeta.signingOrder !== data.signingOrder;
+    const hasAllowDictateNextSignerChanged =
+      envelope.documentMeta.allowDictateNextSigner !== data.allowDictateNextSigner;
+
+    const hasSignersChanged =
+      data.signers.length !== recipients.length ||
+      data.signers.some((signer) => {
+        const recipient = recipients.find((recipient) => recipient.id === signer.id);
+
+        if (!recipient) {
+          return true;
+        }
+
+        return (
+          signer.email !== recipient.email ||
+          signer.name !== recipient.name ||
+          signer.role !== recipient.role ||
+          signer.signingOrder !== recipient.signingOrder ||
+          !isDeepEqual(signer.actionAuth, recipient.authOptions?.actionAuth)
+        );
+      });
+
+    if (hasSignersChanged) {
       setRecipientsDebounced(validatedFormValues.data.signers);
+    }
 
-      if (
-        validatedFormValues.data.signingOrder !== envelope.documentMeta.signingOrder ||
-        validatedFormValues.data.allowDictateNextSigner !==
-          envelope.documentMeta.allowDictateNextSigner
-      ) {
-        updateEnvelope({
-          meta: {
-            signingOrder: validatedFormValues.data.signingOrder,
-            allowDictateNextSigner: validatedFormValues.data.allowDictateNextSigner,
-          },
-        });
-      }
+    if (hasSigningOrderChanged || hasAllowDictateNextSignerChanged) {
+      updateEnvelope({
+        meta: {
+          signingOrder: validatedFormValues.data.signingOrder,
+          allowDictateNextSigner: validatedFormValues.data.allowDictateNextSigner,
+        },
+      });
     }
   }, [formValues]);
 
@@ -534,17 +555,16 @@ export const EnvelopeEditorRecipientForm = () => {
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
             <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
-              {!alwaysShowAdvancedSettings && organisation.organisationClaim.flags.cfr21 && (
+              {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
                     id="showAdvancedRecipientSettings"
-                    className="h-5 w-5"
                     checked={showAdvancedSettings}
                     onCheckedChange={(value) => setShowAdvancedSettings(Boolean(value))}
                   />
 
                   <label
-                    className="text-muted-foreground ml-2 text-sm"
+                    className="ml-2 text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                     htmlFor="showAdvancedRecipientSettings"
                   >
                     <Trans>Show advanced settings</Trans>
@@ -703,171 +723,48 @@ export const EnvelopeEditorRecipientForm = () => {
                             <motion.fieldset
                               data-native-id={signer.id}
                               disabled={isSubmitting || !canRecipientBeModified(signer.id)}
-                              className={cn('grid grid-cols-10 items-end gap-2 pb-2', {
-                                'border-b pt-2': showAdvancedSettings,
-                                'grid-cols-12 pr-3': isSigningOrderSequential,
+                              className={cn('pb-2', {
+                                'border-b pb-4':
+                                  showAdvancedSettings && index !== signers.length - 1,
+                                'pt-2': showAdvancedSettings && index === 0,
+                                'pr-3': isSigningOrderSequential,
                               })}
                             >
-                              {isSigningOrderSequential && (
-                                <FormField
-                                  control={form.control}
-                                  name={`signers.${index}.signingOrder`}
-                                  render={({ field }) => (
-                                    <FormItem
-                                      className={cn(
-                                        'col-span-1 mt-auto flex items-center gap-x-1 space-y-0',
-                                        {
-                                          'mb-6':
-                                            form.formState.errors.signers?.[index] &&
-                                            !form.formState.errors.signers[index]?.signingOrder,
-                                        },
-                                      )}
-                                    >
-                                      <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
-                                      <FormControl>
-                                        <Input
-                                          type="number"
-                                          max={signers.length}
-                                          data-testid="signing-order-input"
-                                          className={cn(
-                                            'w-full text-center',
-                                            '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
-                                          )}
-                                          {...field}
-                                          onChange={(e) => {
-                                            field.onChange(e);
-                                            handleSigningOrderChange(index, e.target.value);
-                                          }}
-                                          onBlur={(e) => {
-                                            field.onBlur();
-                                            handleSigningOrderChange(index, e.target.value);
-                                          }}
-                                          disabled={
-                                            snapshot.isDragging ||
-                                            isSubmitting ||
-                                            !canRecipientBeModified(signer.id)
-                                          }
-                                        />
-                                      </FormControl>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              )}
-
-                              <FormField
-                                control={form.control}
-                                name={`signers.${index}.email`}
-                                render={({ field }) => (
-                                  <FormItem
-                                    className={cn('relative', {
-                                      'mb-6':
-                                        form.formState.errors.signers?.[index] &&
-                                        !form.formState.errors.signers[index]?.email,
-                                      'col-span-4': !showAdvancedSettings,
-                                      'col-span-5': showAdvancedSettings,
-                                    })}
-                                  >
-                                    {!showAdvancedSettings && index === 0 && (
-                                      <FormLabel required>
-                                        <Trans>Email</Trans>
-                                      </FormLabel>
-                                    )}
-
-                                    <FormControl>
-                                      <RecipientAutoCompleteInput
-                                        type="email"
-                                        placeholder={t`Email`}
-                                        value={field.value}
-                                        disabled={
-                                          snapshot.isDragging ||
-                                          isSubmitting ||
-                                          !canRecipientBeModified(signer.id)
-                                        }
-                                        options={recipientSuggestions}
-                                        onSelect={(suggestion) =>
-                                          handleRecipientAutoCompleteSelect(index, suggestion)
-                                        }
-                                        onSearchQueryChange={(query) => {
-                                          field.onChange(query);
-                                          setRecipientSearchQuery(query);
-                                        }}
-                                        loading={isLoading}
-                                        data-testid="signer-email-input"
-                                        maxLength={254}
-                                      />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              <FormField
-                                control={form.control}
-                                name={`signers.${index}.name`}
-                                render={({ field }) => (
-                                  <FormItem
-                                    className={cn({
-                                      'mb-6':
-                                        form.formState.errors.signers?.[index] &&
-                                        !form.formState.errors.signers[index]?.name,
-                                      'col-span-4': !showAdvancedSettings,
-                                      'col-span-5': showAdvancedSettings,
-                                    })}
-                                  >
-                                    {!showAdvancedSettings && index === 0 && (
-                                      <FormLabel>
-                                        <Trans>Name</Trans>
-                                      </FormLabel>
-                                    )}
-
-                                    <FormControl>
-                                      <RecipientAutoCompleteInput
-                                        type="text"
-                                        placeholder={t`Name`}
-                                        {...field}
-                                        disabled={
-                                          snapshot.isDragging ||
-                                          isSubmitting ||
-                                          !canRecipientBeModified(signer.id)
-                                        }
-                                        options={recipientSuggestions}
-                                        onSelect={(suggestion) =>
-                                          handleRecipientAutoCompleteSelect(index, suggestion)
-                                        }
-                                        onSearchQueryChange={(query) => {
-                                          field.onChange(query);
-                                          setRecipientSearchQuery(query);
-                                        }}
-                                        loading={isLoading}
-                                        maxLength={255}
-                                      />
-                                    </FormControl>
-
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-
-                              {showAdvancedSettings &&
-                                organisation.organisationClaim.flags.cfr21 && (
+                              <div className="flex flex-row items-center gap-x-2">
+                                {isSigningOrderSequential && (
                                   <FormField
                                     control={form.control}
-                                    name={`signers.${index}.actionAuth`}
+                                    name={`signers.${index}.signingOrder`}
                                     render={({ field }) => (
                                       <FormItem
-                                        className={cn('col-span-8', {
-                                          'mb-6':
-                                            form.formState.errors.signers?.[index] &&
-                                            !form.formState.errors.signers[index]?.actionAuth,
-                                          'col-span-10': isSigningOrderSequential,
-                                        })}
+                                        className={cn(
+                                          'mt-auto flex items-center gap-x-1 space-y-0',
+                                          {
+                                            'mb-6':
+                                              form.formState.errors.signers?.[index] &&
+                                              !form.formState.errors.signers[index]?.signingOrder,
+                                          },
+                                        )}
                                       >
+                                        <GripVerticalIcon className="h-5 w-5 flex-shrink-0 opacity-40" />
                                         <FormControl>
-                                          <RecipientActionAuthSelect
+                                          <Input
+                                            type="number"
+                                            max={signers.length}
+                                            data-testid="signing-order-input"
+                                            className={cn(
+                                              'w-10 text-center',
+                                              '[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none',
+                                            )}
                                             {...field}
-                                            onValueChange={field.onChange}
+                                            onChange={(e) => {
+                                              field.onChange(e);
+                                              handleSigningOrderChange(index, e.target.value);
+                                            }}
+                                            onBlur={(e) => {
+                                              field.onBlur();
+                                              handleSigningOrderChange(index, e.target.value);
+                                            }}
                                             disabled={
                                               snapshot.isDragging ||
                                               isSubmitting ||
@@ -875,20 +772,109 @@ export const EnvelopeEditorRecipientForm = () => {
                                             }
                                           />
                                         </FormControl>
-
                                         <FormMessage />
                                       </FormItem>
                                     )}
                                   />
                                 )}
 
-                              <div className="col-span-2 flex gap-x-2">
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.email`}
+                                  render={({ field }) => (
+                                    <FormItem
+                                      className={cn('relative w-full', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.email,
+                                      })}
+                                    >
+                                      {!showAdvancedSettings && index === 0 && (
+                                        <FormLabel required>
+                                          <Trans>Email</Trans>
+                                        </FormLabel>
+                                      )}
+
+                                      <FormControl>
+                                        <RecipientAutoCompleteInput
+                                          type="email"
+                                          placeholder={t`Email`}
+                                          value={field.value}
+                                          disabled={
+                                            snapshot.isDragging ||
+                                            isSubmitting ||
+                                            !canRecipientBeModified(signer.id)
+                                          }
+                                          options={recipientSuggestions}
+                                          onSelect={(suggestion) =>
+                                            handleRecipientAutoCompleteSelect(index, suggestion)
+                                          }
+                                          onSearchQueryChange={(query) => {
+                                            field.onChange(query);
+                                            setRecipientSearchQuery(query);
+                                          }}
+                                          loading={isLoading}
+                                          data-testid="signer-email-input"
+                                          maxLength={254}
+                                        />
+                                      </FormControl>
+
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+
+                                <FormField
+                                  control={form.control}
+                                  name={`signers.${index}.name`}
+                                  render={({ field }) => (
+                                    <FormItem
+                                      className={cn('w-full', {
+                                        'mb-6':
+                                          form.formState.errors.signers?.[index] &&
+                                          !form.formState.errors.signers[index]?.name,
+                                      })}
+                                    >
+                                      {!showAdvancedSettings && index === 0 && (
+                                        <FormLabel>
+                                          <Trans>Name</Trans>
+                                        </FormLabel>
+                                      )}
+
+                                      <FormControl>
+                                        <RecipientAutoCompleteInput
+                                          type="text"
+                                          placeholder={t`Name`}
+                                          {...field}
+                                          disabled={
+                                            snapshot.isDragging ||
+                                            isSubmitting ||
+                                            !canRecipientBeModified(signer.id)
+                                          }
+                                          options={recipientSuggestions}
+                                          onSelect={(suggestion) =>
+                                            handleRecipientAutoCompleteSelect(index, suggestion)
+                                          }
+                                          onSearchQueryChange={(query) => {
+                                            field.onChange(query);
+                                            setRecipientSearchQuery(query);
+                                          }}
+                                          loading={isLoading}
+                                          maxLength={255}
+                                        />
+                                      </FormControl>
+
+                                      <FormMessage />
+                                    </FormItem>
+                                  )}
+                                />
+
                                 <FormField
                                   control={form.control}
                                   name={`signers.${index}.role`}
                                   render={({ field }) => (
                                     <FormItem
-                                      className={cn('mt-auto', {
+                                      className={cn('mt-auto w-fit', {
                                         'mb-6':
                                           form.formState.errors.signers?.[index] &&
                                           !form.formState.errors.signers[index]?.role,
@@ -916,14 +902,11 @@ export const EnvelopeEditorRecipientForm = () => {
                                   )}
                                 />
 
-                                <button
-                                  type="button"
-                                  className={cn(
-                                    'mt-auto inline-flex h-10 w-10 items-center justify-center hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50',
-                                    {
-                                      'mb-6': form.formState.errors.signers?.[index],
-                                    },
-                                  )}
+                                <Button
+                                  variant="ghost"
+                                  className={cn('mt-auto px-2', {
+                                    'mb-6': form.formState.errors.signers?.[index],
+                                  })}
                                   data-testid="remove-signer-button"
                                   disabled={
                                     snapshot.isDragging ||
@@ -934,8 +917,40 @@ export const EnvelopeEditorRecipientForm = () => {
                                   onClick={() => onRemoveSigner(index)}
                                 >
                                   <TrashIcon className="h-4 w-4" />
-                                </button>
+                                </Button>
                               </div>
+
+                              {showAdvancedSettings &&
+                                organisation.organisationClaim.flags.cfr21 && (
+                                  <FormField
+                                    control={form.control}
+                                    name={`signers.${index}.actionAuth`}
+                                    render={({ field }) => (
+                                      <FormItem
+                                        className={cn('mt-2 w-full', {
+                                          'mb-6':
+                                            form.formState.errors.signers?.[index] &&
+                                            !form.formState.errors.signers[index]?.actionAuth,
+                                          'pl-6': isSigningOrderSequential,
+                                        })}
+                                      >
+                                        <FormControl>
+                                          <RecipientActionAuthSelect
+                                            {...field}
+                                            onValueChange={field.onChange}
+                                            disabled={
+                                              snapshot.isDragging ||
+                                              isSubmitting ||
+                                              !canRecipientBeModified(signer.id)
+                                            }
+                                          />
+                                        </FormControl>
+
+                                        <FormMessage />
+                                      </FormItem>
+                                    )}
+                                  />
+                                )}
                             </motion.fieldset>
                           </div>
                         )}

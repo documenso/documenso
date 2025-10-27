@@ -4,7 +4,10 @@ import { Trans } from '@lingui/react/macro';
 import type { DocumentData, EnvelopeItem } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import {
+  EnvelopeRenderProvider,
+  useCurrentEnvelopeRender,
+} from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
@@ -92,6 +95,60 @@ export const DocumentCertificateQRView = ({
         </Dialog>
       )}
 
+      {internalVersion === 2 ? (
+        <EnvelopeRenderProvider envelope={{ envelopeItems }}>
+          <DocumentCertificateQrV2
+            title={title}
+            recipientCount={recipientCount}
+            formattedDate={formattedDate}
+          />
+        </EnvelopeRenderProvider>
+      ) : (
+        <>
+          <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
+            <div className="space-y-1">
+              <h1 className="text-xl font-medium">{title}</h1>
+              <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
+                <p>
+                  <Trans>{recipientCount} recipients</Trans>
+                </p>
+
+                <p>
+                  <Trans>Completed on {formattedDate}</Trans>
+                </p>
+              </div>
+            </div>
+
+            <ShareDocumentDownloadButton
+              title={title}
+              documentData={envelopeItems[0].documentData}
+            />
+          </div>
+
+          <div className="mt-12 w-full">
+            <PDFViewer key={envelopeItems[0].id} documentData={envelopeItems[0].documentData} />
+          </div>
+        </>
+      )}
+    </div>
+  );
+};
+
+type DocumentCertificateQrV2Props = {
+  title: string;
+  recipientCount: number;
+  formattedDate: string;
+};
+
+const DocumentCertificateQrV2 = ({
+  title,
+  recipientCount,
+  formattedDate,
+}: DocumentCertificateQrV2Props) => {
+  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+
+  return (
+    <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
           <h1 className="text-xl font-medium">{title}</h1>
@@ -106,21 +163,18 @@ export const DocumentCertificateQRView = ({
           </div>
         </div>
 
-        <ShareDocumentDownloadButton title={title} documentData={envelopeItems[0].documentData} />
+        {currentEnvelopeItem && (
+          <ShareDocumentDownloadButton
+            title={title}
+            documentData={currentEnvelopeItem.documentData}
+          />
+        )}
       </div>
 
       <div className="mt-12 w-full">
-        {internalVersion === 2 ? (
-          <EnvelopeRenderProvider envelope={{ envelopeItems }}>
-            <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
+        <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
-            <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
-          </EnvelopeRenderProvider>
-        ) : (
-          <>
-            <PDFViewer key={envelopeItems[0].id} documentData={envelopeItems[0].documentData} />
-          </>
-        )}
+        <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
       </div>
     </div>
   );

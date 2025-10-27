@@ -1,13 +1,9 @@
 import Konva from 'konva';
 
-import {
-  DEFAULT_RECT_BACKGROUND,
-  RECIPIENT_COLOR_STYLES,
-} from '@documenso/ui/lib/recipient-colors';
-
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TTextFieldMeta } from '../../types/field-meta';
 import {
+  createFieldHoverInteraction,
   konvaTextFill,
   konvaTextFontFamily,
   upsertFieldGroup,
@@ -19,11 +15,11 @@ import { calculateFieldPosition } from './field-renderer';
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
 
-  const fieldTypeName = translations?.[field.type] || field.type;
-
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   const textMeta = field.fieldMeta as TTextFieldMeta | undefined;
+
+  const fieldTypeName = translations?.[field.type] || field.type;
 
   const fieldText: Konva.Text =
     pageLayer.findOne(`#${field.renderId}-text`) ||
@@ -118,9 +114,8 @@ export const renderTextFieldElement = (
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
 
-  const fieldGroup = upsertFieldGroup(field, options);
-
   // Clear previous children and listeners to re-render fresh.
+  const fieldGroup = upsertFieldGroup(field, options);
   fieldGroup.removeChildren();
   fieldGroup.off('transform');
 
@@ -183,33 +178,7 @@ export const renderTextFieldElement = (
     fieldRect.opacity(0);
   }
 
-  // Todo: Doesn't work.
-  if (mode !== 'export') {
-    const hoverColor = options.color
-      ? RECIPIENT_COLOR_STYLES[options.color].baseRingHover
-      : '#e5e7eb';
-
-    // Todo: Envelopes - On hover add text color
-
-    // Add smooth transition-like behavior for hover effects
-    fieldGroup.on('mouseover', () => {
-      new Konva.Tween({
-        node: fieldRect,
-        duration: 0.3,
-        fill: hoverColor,
-      }).play();
-    });
-
-    fieldGroup.on('mouseout', () => {
-      new Konva.Tween({
-        node: fieldRect,
-        duration: 0.3,
-        fill: DEFAULT_RECT_BACKGROUND,
-      }).play();
-    });
-
-    fieldGroup.add(fieldRect);
-  }
+  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
 
   return {
     fieldGroup,

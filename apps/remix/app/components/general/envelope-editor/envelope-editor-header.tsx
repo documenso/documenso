@@ -37,7 +37,6 @@ export default function EnvelopeEditorHeader() {
     updateEnvelope,
     autosaveError,
     relativePath,
-    syncEnvelope,
     editorFields,
   } = useCurrentEnvelopeEditor();
 
@@ -152,7 +151,7 @@ export default function EnvelopeEditorHeader() {
                   ...envelope,
                   fields: editorFields.localFields,
                 }}
-                onDistribute={syncEnvelope}
+                documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button size="sm">
                     <SendIcon className="mr-2 h-4 w-4" />

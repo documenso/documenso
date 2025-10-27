@@ -1,6 +1,8 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { prefixedId } from '@documenso/lib/universal/id';
+import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
@@ -14,7 +16,7 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
   .input(ZCreateEnvelopeItemsRequestSchema)
   .output(ZCreateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
-    const { user, teamId } = ctx;
+    const { user, teamId, metadata } = ctx;
     const { envelopeId, items } = input;
 
     ctx.logger.info({
@@ -110,17 +112,39 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
     const currentHighestOrderValue =
       envelope.envelopeItems[envelope.envelopeItems.length - 1]?.order ?? 1;
 
-    const result = await prisma.envelopeItem.createManyAndReturn({
-      data: items.map((item) => ({
-        id: prefixedId('envelope_item'),
-        envelopeId,
-        title: item.title,
-        documentDataId: item.documentDataId,
-        order: currentHighestOrderValue + 1,
-      })),
-      include: {
-        documentData: true,
-      },
+    const result = await prisma.$transaction(async (tx) => {
+      const createdItems = await tx.envelopeItem.createManyAndReturn({
+        data: items.map((item) => ({
+          id: prefixedId('envelope_item'),
+          envelopeId,
+          title: item.title,
+          documentDataId: item.documentDataId,
+          order: currentHighestOrderValue + 1,
+        })),
+        include: {
+          documentData: true,
+        },
+      });
+
+      await tx.documentAuditLog.createMany({
+        data: createdItems.map((item) =>
+          createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED,
+            envelopeId: envelope.id,
+            data: {
+              envelopeItemId: item.id,
+              envelopeItemTitle: item.title,
+            },
+            user: {
+              name: user.name,
+              email: user.email,
+            },
+            requestMetadata: metadata.requestMetadata,
+          }),
+        ),
+      });
+
+      return createdItems;
     });
 
     return {

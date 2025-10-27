@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TCheckboxFieldMeta } from '../../types/field-meta';
 import {
+  createFieldHoverInteraction,
   konvaTextFill,
   konvaTextFontFamily,
   upsertFieldGroup,
@@ -26,24 +27,26 @@ export const renderCheckboxFieldElement = (
 ) => {
   const { pageWidth, pageHeight, pageLayer, mode } = options;
 
-  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
-
-  const fieldGroup = upsertFieldGroup(field, options);
-
-  // Clear previous children and listeners to re-render fresh.
-  fieldGroup.removeChildren();
-  fieldGroup.off('transform');
-
-  fieldGroup.add(upsertFieldRect(field, options));
+  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
   const checkboxMeta: TCheckboxFieldMeta | null = (field.fieldMeta as TCheckboxFieldMeta) || null;
   const checkboxValues = checkboxMeta?.values || [];
 
-  const fontSize = checkboxMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+  const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
+
+  // Clear previous children and listeners to re-render fresh.
+  const fieldGroup = upsertFieldGroup(field, options);
+  fieldGroup.removeChildren();
+  fieldGroup.off('transform');
 
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
   }
+
+  const fieldRect = upsertFieldRect(field, options);
+  fieldGroup.add(fieldRect);
+
+  const fontSize = checkboxMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
 
   // Handle rescaling items during transforms.
   fieldGroup.on('transform', () => {
@@ -127,11 +130,9 @@ export const renderCheckboxFieldElement = (
     pageLayer.batchDraw();
   });
 
-  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
-
   const checkedValues: number[] = field.customText ? JSON.parse(field.customText) : [];
 
-  checkboxValues.forEach(({ id, value, checked }, index) => {
+  checkboxValues.forEach(({ value, checked }, index) => {
     const isCheckboxChecked = match(mode)
       .with('edit', () => checked)
       .with('sign', () => checkedValues.includes(index))
@@ -144,8 +145,6 @@ export const renderCheckboxFieldElement = (
         return checkedValues.includes(index);
       })
       .exhaustive();
-
-    console.log('wtf?');
 
     const itemSize = calculateCheckboxSize(fontSize);
 
@@ -210,6 +209,8 @@ export const renderCheckboxFieldElement = (
     fieldGroup.add(checkmark);
     fieldGroup.add(text);
   });
+
+  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
 
   return {
     fieldGroup,

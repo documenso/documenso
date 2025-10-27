@@ -12,7 +12,7 @@ import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
-  const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, fields, getRecipientColorKey } = useCurrentEnvelopeRender();
 
   const {
     stage,
@@ -60,8 +60,7 @@ export default function EnvelopeGenericPageRenderer() {
       translations: getClientSideFieldTranslations(i18n),
       pageWidth: unscaledViewport.width,
       pageHeight: unscaledViewport.height,
-      // color: getRecipientColorKey(field.recipientId),
-      color: 'purple', // Todo
+      color: getRecipientColorKey(field.recipientId),
       editable: false,
       mode: 'sign',
     });
@@ -80,7 +79,7 @@ export default function EnvelopeGenericPageRenderer() {
   };
 
   /**
-   * Render fields when they are added or removed from the localFields.
+   * Render fields when they are added or removed
    */
   useEffect(() => {
     if (!pageLayer.current || !stage.current) {
@@ -93,14 +92,12 @@ export default function EnvelopeGenericPageRenderer() {
         group.name() === 'field-group' &&
         !localPageFields.some((field) => field.id.toString() === group.id())
       ) {
-        console.log('Field removed, removing from canvas');
         group.destroy();
       }
     });
 
     // If it exists, rerender.
     localPageFields.forEach((field) => {
-      console.log('Field created/updated, rendering on canvas');
       renderFieldOnLayer(field);
     });
 
