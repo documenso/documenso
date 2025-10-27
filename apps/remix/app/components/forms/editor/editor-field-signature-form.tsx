@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Trans } from '@lingui/react/macro';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
@@ -60,7 +61,12 @@ export const EditorFieldSignatureForm = ({
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
-          <EditorGenericFontSizeField formControl={form.control} />
+          <div>
+            <EditorGenericFontSizeField formControl={form.control} />
+            <p className="text-muted-foreground mt-0.5 text-xs">
+              <Trans>The typed signature font size</Trans>
+            </p>
+          </div>
         </fieldset>
       </form>
     </Form>

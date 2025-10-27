@@ -306,7 +306,10 @@ export const setFieldsForDocument = async ({
           });
         }
 
-        return upsertedField;
+        return {
+          ...upsertedField,
+          formId: field.formId,
+        };
       }),
     );
   });
@@ -340,17 +343,25 @@ export const setFieldsForDocument = async ({
   }
 
   // Filter out fields that have been removed or have been updated.
-  const filteredFields = existingFields.filter((field) => {
-    const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
-    const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
+  const mappedFilteredFields = existingFields
+    .filter((field) => {
+      const isRemoved = removedFields.find((removedField) => removedField.id === field.id);
+      const isUpdated = persistedFields.find((persistedField) => persistedField.id === field.id);
 
-    return !isRemoved && !isUpdated;
-  });
+      return !isRemoved && !isUpdated;
+    })
+    .map((field) => ({
+      ...mapFieldToLegacyField(field, envelope),
+      formId: undefined,
+    }));
+
+  const mappedPersistentFields = persistedFields.map((field) => ({
+    ...mapFieldToLegacyField(field, envelope),
+    formId: field?.formId,
+  }));
 
   return {
-    fields: [...filteredFields, ...persistedFields].map((field) =>
-      mapFieldToLegacyField(field, envelope),
-    ),
+    fields: [...mappedFilteredFields, ...mappedPersistentFields],
   };
 };
 
@@ -359,6 +370,7 @@ export const setFieldsForDocument = async ({
  */
 type FieldData = {
   id?: number | null;
+  formId?: string;
   envelopeItemId: string;
   type: FieldType;
   recipientId: number;

@@ -12,6 +12,7 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
         .number()
         .optional()
         .describe('The id of the field. If not provided, a new field will be created.'),
+      formId: z.string().optional().describe('A temporary ID to keep track of new fields created'),
       envelopeItemId: z.string().describe('The id of the envelope item to put the field on'),
       recipientId: z.number(),
       type: z.nativeEnum(FieldType),
@@ -45,7 +46,14 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
   ),
 });
 
-export const ZSetEnvelopeFieldsResponseSchema = z.void();
+export const ZSetEnvelopeFieldsResponseSchema = z.object({
+  fields: z
+    .object({
+      id: z.number(),
+      formId: z.string().optional(),
+    })
+    .array(),
+});
 
 export type TSetEnvelopeFieldsRequest = z.infer<typeof ZSetEnvelopeFieldsRequestSchema>;
 export type TSetEnvelopeFieldsResponse = z.infer<typeof ZSetEnvelopeFieldsResponseSchema>;

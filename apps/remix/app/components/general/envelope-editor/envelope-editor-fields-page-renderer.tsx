@@ -57,8 +57,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   );
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
-    console.log('Field resized or moved');
-
     const { current: container } = canvasElement;
 
     if (!container) {
@@ -272,9 +270,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       if (!pointerPosition) {
         return;
       }
-
-      console.log(`pointerPosition.x: ${pointerPosition.x}`);
-      console.log(`pointerPosition.y: ${pointerPosition.y}`);
 
       x1 = pointerPosition.x / scale;
       y1 = pointerPosition.y / scale;

@@ -97,6 +97,11 @@ export const EnvelopeEditorProvider = ({
   const [envelope, setEnvelope] = useState(initialEnvelope);
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
 
+  const editorFields = useEditorFields({
+    envelope,
+    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+  });
+
   const envelopeUpdateMutationQuery = trpc.envelope.update.useMutation({
     onSuccess: (response, input) => {
       setEnvelope({
@@ -184,13 +189,24 @@ export const EnvelopeEditorProvider = ({
     triggerSave: setFieldsDebounced,
     flush: setFieldsAsync,
     isPending: isFieldsMutationPending,
-  } = useEnvelopeAutosave(async (fields: TLocalField[]) => {
-    await envelopeFieldSetMutationQuery.mutateAsync({
+  } = useEnvelopeAutosave(async (localFields: TLocalField[]) => {
+    const envelopeFields = await envelopeFieldSetMutationQuery.mutateAsync({
       envelopeId: envelope.id,
       envelopeType: envelope.type,
-      fields,
+      fields: localFields,
     });
-  }, 1000);
+
+    // Insert the IDs into the local fields.
+    envelopeFields.fields.forEach((field) => {
+      const localField = localFields.find((localField) => localField.formId === field.formId);
+
+      if (localField && !localField.id) {
+        localField.id = field.id;
+
+        editorFields.setFieldId(localField.formId, field.id);
+      }
+    });
+  }, 2000);
 
   const {
     triggerSave: setEnvelopeDebounced,
@@ -220,11 +236,6 @@ export const EnvelopeEditorProvider = ({
 
     setEnvelopeDebounced(envelopeUpdates);
   };
-
-  const editorFields = useEditorFields({
-    envelope,
-    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
-  });
 
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
