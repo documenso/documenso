@@ -21,6 +21,7 @@ import type {
   TNameFieldMeta,
   TNumberFieldMeta,
   TRadioFieldMeta,
+  TSignatureFieldMeta,
   TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
@@ -38,6 +39,7 @@ import { EditorFieldInitialsForm } from '~/components/forms/editor/editor-field-
 import { EditorFieldNameForm } from '~/components/forms/editor/editor-field-name-form';
 import { EditorFieldNumberForm } from '~/components/forms/editor/editor-field-number-form';
 import { EditorFieldRadioForm } from '~/components/forms/editor/editor-field-radio-form';
+import { EditorFieldSignatureForm } from '~/components/forms/editor/editor-field-signature-form';
 import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text-form';
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
@@ -189,7 +191,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
           {/* Field details section. */}
           <AnimateGenericFadeInOut key={editorFields.selectedField?.formId}>
-            {selectedField && selectedField.type !== FieldType.SIGNATURE && (
+            {selectedField && (
               <section>
                 <Separator className="my-4" />
 
@@ -199,6 +201,12 @@ export const EnvelopeEditorFieldsPage = () => {
                   </h3>
 
                   {match(selectedField.type)
+                    .with(FieldType.SIGNATURE, () => (
+                      <EditorFieldSignatureForm
+                        value={selectedField?.fieldMeta as TSignatureFieldMeta | undefined}
+                        onValueChange={(value) => updateSelectedFieldMeta(value)}
+                      />
+                    ))
                     .with(FieldType.CHECKBOX, () => (
                       <EditorFieldCheckboxForm
                         value={selectedField?.fieldMeta as TCheckboxFieldMeta | undefined}

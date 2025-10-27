@@ -50,6 +50,7 @@ type UseEditorFieldsResponse = {
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
+  setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
@@ -160,6 +161,17 @@ export const useEditorFields = ({
     [localFields, remove, triggerFieldsUpdate],
   );
 
+  const setFieldId = (formId: string, id: number) => {
+    const index = localFields.findIndex((field) => field.formId === formId);
+
+    if (index !== -1) {
+      update(index, {
+        ...localFields[index],
+        id,
+      });
+    }
+  };
+
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
       const index = localFields.findIndex((field) => field.formId === formId);
@@ -269,6 +281,7 @@ export const useEditorFields = ({
 
     // Field operations
     addField,
+    setFieldId,
     removeFieldsByFormId,
     updateFieldByFormId,
     duplicateField,
