@@ -256,7 +256,6 @@ export const sendDocument = async ({
       });
     }
 
-    // Todo: Envelopes - [AUDIT_LOGS]
     if (envelope.internalVersion === 2) {
       const autoInsertedFields = await Promise.all(
         fieldsToAutoInsert.map(async (field) => {

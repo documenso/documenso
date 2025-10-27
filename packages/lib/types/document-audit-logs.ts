@@ -351,6 +351,7 @@ export const ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema = z.object({
       z.object({
         fieldId: z.number(),
         fieldType: z.nativeEnum(FieldType),
+        recipientId: z.number(),
       }),
     ),
   }),
