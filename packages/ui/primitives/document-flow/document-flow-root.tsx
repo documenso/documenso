@@ -161,7 +161,7 @@ export const DocumentFlowFormContainerActions = ({
 
       <Button
         type="button"
-        className="bg-documenso flex-1"
+        className="bg-documenso hover:bg-documenso/90 flex-1 text-white"
         size="lg"
         disabled={disabled || disableNextStep || loading || !canGoNext}
         loading={loading}
