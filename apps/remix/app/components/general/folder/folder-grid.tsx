@@ -6,6 +6,7 @@ import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -98,7 +99,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {organisation.organisationClaim.flags.allowEnvelopes && (
+          {(IS_ENVELOPES_ENABLED || organisation.organisationClaim.flags.allowEnvelopes) && (
             <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
           )}
 
