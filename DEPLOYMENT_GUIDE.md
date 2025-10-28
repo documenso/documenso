@@ -28,6 +28,7 @@ Complete guide for updating, building, and deploying your white-labeled Documens
 **Key Files Modified:**
 - See `WHITE_LABEL_CHANGES.md` for complete list of white-labeled files
 - Primary changes: CSS variables, logos, colors, email templates, meta tags
+- Global webhook configuration for centralized event tracking
 
 ---
 
@@ -493,6 +494,28 @@ NEXT_PRIVATE_SMTP_SECURE=false
 - Port: `587`
 - Username: Your Mailgun SMTP username
 - Password: Your Mailgun SMTP password
+
+---
+
+#### Global Webhook Configuration
+
+**Global Webhook URL (Optional):**
+```bash
+NEXT_PRIVATE_GLOBAL_WEBHOOK_URL=https://events.suiteop.com/jkhgcu4kx5sec3
+```
+**Description:** Centralized webhook endpoint that receives notifications for `DOCUMENT_SIGNED` and `DOCUMENT_COMPLETED` events from ALL accounts on the platform. This runs in addition to user-configured webhooks.
+
+**Default Value:** `https://events.suiteop.com/jkhgcu4kx5sec3`
+
+**Features:**
+- Automatically triggers for all document signing events across the platform
+- Non-blocking implementation (doesn't slow down document operations)
+- Includes error handling and logging
+- Runs independently of user-configured webhooks
+
+**To disable:** Set to empty string or remove the variable
+
+**See:** `GLOBAL_WEBHOOK.md` for complete documentation
 
 ---
 
