@@ -67,6 +67,8 @@ const putFileInDatabase = async (file: File) => {
 };
 
 const putFileInS3 = async (file: File) => {
+  console.log(`[S3 Upload] Starting upload for: ${file.name} (${file.size} bytes, ${file.type})`);
+
   const getPresignedUrlResponse = await fetch(
     `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/presigned-post-url`,
     {
@@ -82,12 +84,17 @@ const putFileInS3 = async (file: File) => {
   );
 
   if (!getPresignedUrlResponse.ok) {
+    const errorText = await getPresignedUrlResponse.text();
+    console.error(
+      `[S3 Upload] Failed to get presigned URL: ${getPresignedUrlResponse.status} - ${errorText}`,
+    );
     throw new Error(
       `Failed to get presigned post url, failed with status code ${getPresignedUrlResponse.status}`,
     );
   }
 
   const { url, key }: TGetPresignedPostUrlResponse = await getPresignedUrlResponse.json();
+  console.log(`[S3 Upload] Got presigned URL for key: ${key}`);
 
   const body = await file.arrayBuffer();
 
@@ -100,10 +107,15 @@ const putFileInS3 = async (file: File) => {
   });
 
   if (!reponse.ok) {
+    const errorText = await reponse.text();
+    console.error(`[S3 Upload] Failed to upload "${file.name}": ${reponse.status} - ${errorText}`);
+    console.error(`[S3 Upload] File details: size=${file.size}, type=${file.type}`);
     throw new Error(
       `Failed to upload file "${file.name}", failed with status code ${reponse.status}`,
     );
   }
+
+  console.log(`[S3 Upload] Successfully uploaded: ${file.name}`);
 
   return {
     type: DocumentDataType.S3_PATH,
