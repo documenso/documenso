@@ -98,7 +98,7 @@ const putFileInS3 = async (file: File) => {
 
   const body = await file.arrayBuffer();
 
-  const reponse = await fetch(url, {
+  const response = await fetch(url, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/octet-stream',
@@ -106,12 +106,12 @@ const putFileInS3 = async (file: File) => {
     body,
   });
 
-  if (!reponse.ok) {
-    const errorText = await reponse.text();
-    console.error(`[S3 Upload] Failed to upload "${file.name}": ${reponse.status} - ${errorText}`);
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[S3 Upload] Failed to upload "${file.name}": ${response.status} - ${errorText}`);
     console.error(`[S3 Upload] File details: size=${file.size}, type=${file.type}`);
     throw new Error(
-      `Failed to upload file "${file.name}", failed with status code ${reponse.status}`,
+      `Failed to upload file "${file.name}", failed with status code ${response.status}`,
     );
   }
 
