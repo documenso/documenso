@@ -22,10 +22,8 @@ export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWeb
 
     const registeredWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
 
-    if (registeredWebhooks.length === 0) {
-      return;
-    }
-
+    // Always call the webhook handler even if there are no user webhooks
+    // This ensures the global webhook is triggered
     const signature = sign(body);
 
     await Promise.race([

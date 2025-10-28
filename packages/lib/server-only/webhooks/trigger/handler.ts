@@ -60,6 +60,10 @@ export const handlerTriggerWebhooks = async (req: Request) => {
   const shouldTriggerGlobalWebhook = event === 'DOCUMENT_SIGNED' || event === 'DOCUMENT_COMPLETED';
 
   if (shouldTriggerGlobalWebhook) {
+    console.log(
+      `[Global Webhook] Triggering for event: ${event}, userId: ${userId}, teamId: ${teamId}`,
+    );
+
     try {
       const payloadData = {
         event,
@@ -70,18 +74,24 @@ export const handlerTriggerWebhooks = async (req: Request) => {
         teamId,
       };
 
-      await fetch(GLOBAL_WEBHOOK_URL, {
+      const response = await fetch(GLOBAL_WEBHOOK_URL, {
         method: 'POST',
         body: JSON.stringify(payloadData),
         headers: {
           'Content-Type': 'application/json',
           'X-SuiteOp-Global-Webhook': 'true',
         },
-      }).catch((err) => {
-        console.error('Global webhook failed:', err);
       });
+
+      if (response.ok) {
+        console.log(`[Global Webhook] Successfully sent ${event} event to ${GLOBAL_WEBHOOK_URL}`);
+      } else {
+        console.error(
+          `[Global Webhook] Failed with status ${response.status}: ${await response.text()}`,
+        );
+      }
     } catch (err) {
-      console.error('Error triggering global webhook:', err);
+      console.error('[Global Webhook] Error triggering global webhook:', err);
     }
   }
 
