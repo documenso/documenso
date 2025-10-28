@@ -7,7 +7,7 @@ import { ZDocumentTitleSchema } from '../document-router/schema';
 
 export const ZCreateEnvelopeItemsRequestSchema = z.object({
   envelopeId: z.string(),
-  items: z
+  data: z
     .object({
       title: ZDocumentTitleSchema,
       documentDataId: z.string(),

@@ -13,11 +13,21 @@ import {
 } from './create-envelope-items.types';
 
 export const createEnvelopeItemsRoute = authenticatedProcedure
+  // Todo: Envelopes - Pending direct uploads
+  // .meta({
+  //   openapi: {
+  //     method: 'POST',
+  //     path: '/envelope/item/create-many',
+  //     summary: 'Create envelope items',
+  //     description: 'Create multiple envelope items for an envelope',
+  //     tags: ['Envelope Item'],
+  //   },
+  // })
   .input(ZCreateEnvelopeItemsRequestSchema)
   .output(ZCreateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId, metadata } = ctx;
-    const { envelopeId, items } = input;
+    const { envelopeId, data: items } = input;
 
     ctx.logger.info({
       input: {

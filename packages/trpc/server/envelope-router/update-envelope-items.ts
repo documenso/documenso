@@ -10,6 +10,15 @@ import {
 } from './update-envelope-items.types';
 
 export const updateEnvelopeItemsRoute = authenticatedProcedure
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/item/update-many',
+      summary: 'Update envelope items',
+      description: 'Update multiple envelope items for an envelope',
+      tags: ['Envelope Item'],
+    },
+  })
   .input(ZUpdateEnvelopeItemsRequestSchema)
   .output(ZUpdateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {

@@ -7,6 +7,15 @@ import {
 } from './duplicate-envelope.types';
 
 export const duplicateEnvelopeRoute = authenticatedProcedure
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/duplicate',
+      summary: 'Duplicate envelope',
+      description: 'Duplicate an envelope with all its settings',
+      tags: ['Envelope'],
+    },
+  })
   .input(ZDuplicateEnvelopeRequestSchema)
   .output(ZDuplicateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

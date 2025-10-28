@@ -9,6 +9,15 @@ import {
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
+  // Todo: Envelopes - Pending direct uploads
+  // .meta({
+  //   openapi: {
+  //     method: 'POST',
+  //     path: '/envelope/create',
+  //     summary: 'Create envelope',
+  //     tags: ['Envelope'],
+  //   },
+  // })
   .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

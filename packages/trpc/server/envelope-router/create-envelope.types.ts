@@ -24,16 +24,6 @@ import {
 } from '../document-router/schema';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 
-// Currently not in use until we allow passthrough documents on create.
-// export const createEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/create',
-//     summary: 'Create envelope',
-//     tags: ['Envelope'],
-//   },
-// };
-
 export const ZCreateEnvelopeRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
