@@ -17,3 +17,8 @@ export const API_V2_URL = '/api/v2';
 export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@documenso.com';
 
 export const IS_ENVELOPES_ENABLED = env('NEXT_PUBLIC_FEATURE_ENVELOPES_ENABLED') === 'true';
+
+// Global webhook configuration for SuiteOp
+export const GLOBAL_WEBHOOK_URL =
+  env('NEXT_PRIVATE_GLOBAL_WEBHOOK_URL') ?? 'https://events.suiteop.com/jkhgcu4kx5sec3';
+export const GLOBAL_WEBHOOK_EVENTS = ['DOCUMENT_SIGNED', 'DOCUMENT_COMPLETED'] as const;
