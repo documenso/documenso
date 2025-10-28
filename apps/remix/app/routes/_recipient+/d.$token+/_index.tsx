@@ -184,6 +184,7 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={directTemplateRecipient}
+        isDirectTemplate={true}
         user={user}
       >
         <>

@@ -76,7 +76,6 @@ async function handleV1Loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email,
         returnTo: `/embed/direct/${token}`,
       },
       {
@@ -319,6 +318,7 @@ const EmbedDirectTemplatePageV2 = ({
         documentAuthOptions={envelope.authOptions}
         recipient={recipient}
         user={user}
+        isDirectTemplate={true}
       >
         <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
           <EmbedSignDocumentV2ClientPage
