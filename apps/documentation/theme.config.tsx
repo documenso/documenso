@@ -2,12 +2,12 @@ import type { DocsThemeConfig } from 'nextra-theme-docs';
 import { useConfig } from 'nextra-theme-docs';
 
 const themeConfig: DocsThemeConfig = {
-  logo: <span>Documenso</span>,
+  logo: <span>SuiteOp</span>,
   head: function useHead() {
     const config = useConfig<{ title?: string; description?: string }>();
 
-    const title = `${config.frontMatter.title} | Documenso Docs` || 'Documenso Docs';
-    const description = config.frontMatter.description || 'The official Documenso documentation';
+    const title = `${config.frontMatter.title} | SuiteOp Docs` || 'SuiteOp Docs';
+    const description = config.frontMatter.description || 'The official SuiteOp documentation';
 
     return (
       <>
@@ -49,18 +49,18 @@ const themeConfig: DocsThemeConfig = {
     text: (
       <span>
         {new Date().getFullYear()} ©{' '}
-        <a href="https://documen.so" target="_blank">
-          Documenso
+        <a href="https://suiteop.com" target="_blank">
+          SuiteOp
         </a>
         .
       </span>
     ),
   },
-  primaryHue: 100,
-  primarySaturation: 48.47,
+  primaryHue: 248,
+  primarySaturation: 99,
   useNextSeoProps() {
     return {
-      titleTemplate: '%s | Documenso Docs',
+      titleTemplate: '%s | SuiteOp Docs',
     };
   },
 };

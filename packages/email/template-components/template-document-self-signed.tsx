@@ -29,7 +29,7 @@ export const TemplateDocumentSelfSigned = ({
       <Section className="flex-row items-center justify-center">
         <Section>
           <Column align="center">
-            <Text className="text-base font-semibold text-[#7AC455]">
+            <Text className="text-base font-semibold text-[#8585FF]">
               <Img
                 src={getAssetUrl('/static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
@@ -71,7 +71,7 @@ export const TemplateDocumentSelfSigned = ({
 
           <Button
             className="rounded-lg border border-solid border-slate-200 px-4 py-2 text-center text-sm font-medium text-black no-underline"
-            href="https://documenso.com/pricing"
+            href="https://suiteop.com/pricing"
           >
             <Img
               src={getAssetUrl('/static/review.png')}
