@@ -14,3 +14,8 @@ export const IS_BILLING_ENABLED = () => env('NEXT_PUBLIC_FEATURE_BILLING_ENABLED
 export const API_V2_BETA_URL = '/api/v2-beta';
 
 export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@documenso.com';
+
+// Global webhook configuration for SuiteOp
+export const GLOBAL_WEBHOOK_URL =
+  env('NEXT_PRIVATE_GLOBAL_WEBHOOK_URL') ?? 'https://events.suiteop.com/jkhgcu4kx5sec3';
+export const GLOBAL_WEBHOOK_EVENTS = ['DOCUMENT_SIGNED', 'DOCUMENT_COMPLETED'] as const;
