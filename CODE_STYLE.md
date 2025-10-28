@@ -107,7 +107,8 @@ import type { FindResultResponse } from './types';
 // ✅ Use type imports for types
 import type { Document } from '@prisma/client';
 
-import { Button, Input } from '@documenso/ui/primitives/button';
+import { Button } from '@documenso/ui/primitives/button';
+import { Input } from '@documenso/ui/primitives/input';
 ```
 
 ---
@@ -154,7 +155,7 @@ export const findDocuments = async ({
 const onFormSubmit = form.handleSubmit(onSubmit);
 
 // ✅ Deconstruct nested properties explicitly
-const { teamId } = ctx;
+const { user } = ctx;
 const { templateId } = input;
 ```
 
