@@ -10,6 +10,7 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 import { AccountDeleteDialog } from '~/components/dialogs/account-delete-dialog';
 import { AvatarImageForm } from '~/components/forms/avatar-image';
 import { ProfileForm } from '~/components/forms/profile';
+import { AccountBillingOrganisations } from '~/components/general/organisations/account-billing-organisations';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { TeamEmailUsage } from '~/components/general/teams/team-email-usage';
 import { appMetaTags } from '~/utils/meta';
@@ -46,6 +47,8 @@ export default function SettingsProfile() {
             </AnimateGenericFadeInOut>
           )}
         </AnimatePresence>
+
+        <AccountBillingOrganisations />
 
         <AccountDeleteDialog />
       </div>
