@@ -24,7 +24,10 @@ type PasskeyData = {
   isError: boolean;
 };
 
-type SigningAuthRecipient = Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
+type SigningAuthRecipient = Pick<
+  Recipient,
+  'authOptions' | 'email' | 'role' | 'name' | 'token' | 'id'
+>;
 
 export type DocumentSigningAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
