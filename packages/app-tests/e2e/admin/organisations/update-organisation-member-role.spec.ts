@@ -68,15 +68,29 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   // Test promoting a MEMBER to owner
   const memberRow = page.getByRole('row', { name: memberUser.email });
 
-  // Find and click the "Promote to owner" button for the member
-  const promoteButton = memberRow.getByRole('button', { name: 'Promote to owner' });
-  await expect(promoteButton).toBeVisible();
-  await expect(promoteButton).not.toBeDisabled();
+  // Find and click the "Update role" button for the member
+  const updateRoleButton = memberRow.getByRole('button', {
+    name: 'Update role',
+  });
+  await expect(updateRoleButton).toBeVisible();
+  await expect(updateRoleButton).not.toBeDisabled();
 
-  await promoteButton.click();
+  await updateRoleButton.click();
 
-  // Verify success toast appears
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible();
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   // Reload the page to see the changes
   await page.reload();
@@ -89,12 +103,18 @@ test('[ADMIN]: promote member to owner', async ({ page }) => {
   const previousOwnerRow = page.getByRole('row', { name: ownerUser.email });
   await expect(previousOwnerRow.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
-  // Verify that the promote button is now disabled for the new owner
-  const newOwnerPromoteButton = newOwnerRow.getByRole('button', { name: 'Promote to owner' });
-  await expect(newOwnerPromoteButton).toBeDisabled();
+  // Verify that the Update role button exists for the new owner and shows Owner as current role
+  const newOwnerUpdateButton = newOwnerRow.getByRole('button', {
+    name: 'Update role',
+  });
+  await expect(newOwnerUpdateButton).toBeVisible();
 
-  // Test that we can't promote the current owner (button should be disabled)
-  await expect(newOwnerPromoteButton).toHaveAttribute('disabled');
+  // Verify clicking it shows the dialog with Owner already selected
+  await newOwnerUpdateButton.click();
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Close the dialog without making changes
+  await page.getByRole('button', { name: 'Cancel' }).click();
 });
 
 test('[ADMIN]: promote manager to owner', async ({ page }) => {
@@ -130,10 +150,26 @@ test('[ADMIN]: promote manager to owner', async ({ page }) => {
 
   // Promote the manager to owner
   const managerRow = page.getByRole('row', { name: managerUser.email });
-  const promoteButton = managerRow.getByRole('button', { name: 'Promote to owner' });
+  const updateRoleButton = managerRow.getByRole('button', {
+    name: 'Update role',
+  });
 
-  await promoteButton.click();
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible();
+  await updateRoleButton.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   // Reload and verify the change
   await page.reload();
@@ -173,13 +209,26 @@ test('[ADMIN]: promote admin member to owner', async ({ page }) => {
 
   // Promote the admin member to owner
   const adminMemberRow = page.getByRole('row', { name: adminMemberUser.email });
-  const promoteButton = adminMemberRow.getByRole('button', { name: 'Promote to owner' });
-
-  await promoteButton.click();
-
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible({
-    timeout: 10_000,
+  const updateRoleButton = adminMemberRow.getByRole('button', {
+    name: 'Update role',
   });
+
+  await updateRoleButton.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   // Reload and verify the change
   await page.reload();
@@ -249,11 +298,25 @@ test('[ADMIN]: verify role hierarchy after promotion', async ({ page }) => {
   await expect(memberRow.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
   // Promote member to owner
-  const promoteButton = memberRow.getByRole('button', { name: 'Promote to owner' });
-  await promoteButton.click();
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible({
-    timeout: 10_000,
+  const updateRoleButton = memberRow.getByRole('button', {
+    name: 'Update role',
   });
+  await updateRoleButton.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   // Reload page to see updated state
   await page.reload();
@@ -262,9 +325,11 @@ test('[ADMIN]: verify role hierarchy after promotion', async ({ page }) => {
   memberRow = page.getByRole('row', { name: memberUser.email });
   await expect(memberRow.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
 
-  // Verify the promote button is now disabled for the new owner
-  const newOwnerPromoteButton = memberRow.getByRole('button', { name: 'Promote to owner' });
-  await expect(newOwnerPromoteButton).toBeDisabled();
+  // Verify the Update role button exists and shows Owner as current role
+  const newOwnerUpdateButton = memberRow.getByRole('button', {
+    name: 'Update role',
+  });
+  await expect(newOwnerUpdateButton).toBeVisible();
 
   // Sign in as the newly promoted user to verify they have owner permissions
   await apiSignin({
@@ -336,28 +401,56 @@ test('[ADMIN]: multiple promotions in sequence', async ({ page }) => {
 
   // First promotion: Member 1 becomes owner
   let member1Row = page.getByRole('row', { name: member1User.email });
-  let promoteButton1 = member1Row.getByRole('button', { name: 'Promote to owner' });
-  await promoteButton1.click();
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible({
-    timeout: 10_000,
+  let updateRoleButton1 = member1Row.getByRole('button', {
+    name: 'Update role',
   });
+  await updateRoleButton1.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   await page.reload();
 
-  // Verify Member 1 is now owner and button is disabled
+  // Verify Member 1 is now owner
   member1Row = page.getByRole('row', { name: member1User.email });
   await expect(member1Row.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
-  promoteButton1 = member1Row.getByRole('button', { name: 'Promote to owner' });
-  await expect(promoteButton1).toBeDisabled();
+  updateRoleButton1 = member1Row.getByRole('button', { name: 'Update role' });
+  await expect(updateRoleButton1).toBeVisible();
 
   // Second promotion: Member 2 becomes the new owner
   const member2Row = page.getByRole('row', { name: member2User.email });
-  const promoteButton2 = member2Row.getByRole('button', { name: 'Promote to owner' });
-  await expect(promoteButton2).not.toBeDisabled();
-  await promoteButton2.click();
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible({
-    timeout: 10_000,
+  const updateRoleButton2 = member2Row.getByRole('button', {
+    name: 'Update role',
   });
+  await expect(updateRoleButton2).toBeVisible();
+  await updateRoleButton2.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   await page.reload();
 
@@ -365,9 +458,11 @@ test('[ADMIN]: multiple promotions in sequence', async ({ page }) => {
   await expect(member2Row.getByRole('status').filter({ hasText: 'Owner' })).toBeVisible();
   await expect(member1Row.getByRole('status').filter({ hasText: 'Owner' })).not.toBeVisible();
 
-  // Verify Member 1's promote button is now enabled again
-  const newPromoteButton1 = member1Row.getByRole('button', { name: 'Promote to owner' });
-  await expect(newPromoteButton1).not.toBeDisabled();
+  // Verify Member 1's Update role button is still visible
+  const newUpdateButton1 = member1Row.getByRole('button', {
+    name: 'Update role',
+  });
+  await expect(newUpdateButton1).toBeVisible();
 });
 
 test('[ADMIN]: verify organisation access after ownership change', async ({ page }) => {
@@ -402,11 +497,25 @@ test('[ADMIN]: verify organisation access after ownership change', async ({ page
   });
 
   const memberRow = page.getByRole('row', { name: memberUser.email });
-  const promoteButton = memberRow.getByRole('button', { name: 'Promote to owner' });
-  await promoteButton.click();
-  await expect(page.getByText('Member promoted to owner successfully').first()).toBeVisible({
-    timeout: 10_000,
+  const updateRoleButton = memberRow.getByRole('button', {
+    name: 'Update role',
   });
+  await updateRoleButton.click();
+
+  // Wait for dialog to open and select Owner role
+  await expect(page.getByRole('dialog')).toBeVisible();
+
+  // Find and click the select trigger - it's a button with role="combobox"
+  await page.getByRole('dialog').locator('button[role="combobox"]').click();
+
+  // Select "Owner" from the dropdown options
+  await page.getByRole('option', { name: 'Owner' }).click();
+
+  // Click Update button
+  await page.getByRole('dialog').getByRole('button', { name: 'Update' }).click();
+
+  // Wait for dialog to close (indicates success)
+  await expect(page.getByRole('dialog')).not.toBeVisible({ timeout: 10_000 });
 
   // Test that the new owner can access organisation settings
   await apiSignin({
