@@ -95,6 +95,7 @@ export default function DirectTemplatePage() {
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={directTemplateRecipient}
+        isDirectTemplate={true}
         user={user}
       >
         <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">

@@ -69,7 +69,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     throw data(
       {
         type: 'embed-authentication-required',
-        email: user?.email,
         returnTo: `/embed/direct/${token}`,
       },
       {
@@ -117,6 +116,7 @@ export default function EmbedDirectTemplatePage() {
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={recipient}
+        isDirectTemplate={true}
         user={user}
       >
         <DocumentSigningRecipientProvider recipient={recipient}>

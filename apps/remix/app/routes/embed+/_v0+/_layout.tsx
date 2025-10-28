@@ -2,6 +2,7 @@ import { Outlet, isRouteErrorResponse, useRouteError } from 'react-router';
 
 import {
   IS_GOOGLE_SSO_ENABLED,
+  IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
   OIDC_PROVIDER_LABEL,
 } from '@documenso/lib/constants/auth';
@@ -29,11 +30,13 @@ export function headers({ loaderHeaders }: Route.HeadersArgs) {
 export function loader() {
   // SSR env variables.
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
+  const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
   const oidcProviderLabel = OIDC_PROVIDER_LABEL;
 
   return {
     isGoogleSSOEnabled,
+    isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
     oidcProviderLabel,
   };
@@ -44,7 +47,8 @@ export default function Layout() {
 }
 
 export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
-  const { isGoogleSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } = loaderData || {};
+  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, oidcProviderLabel } =
+    loaderData || {};
 
   const error = useRouteError();
 
@@ -53,6 +57,7 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
       return (
         <EmbedAuthenticationRequired
           isGoogleSSOEnabled={isGoogleSSOEnabled}
+          isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
           isOIDCSSOEnabled={isOIDCSSOEnabled}
           oidcProviderLabel={oidcProviderLabel}
           email={error.data.email}
