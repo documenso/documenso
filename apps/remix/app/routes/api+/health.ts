@@ -23,10 +23,12 @@ export const loader = async () => {
 
   try {
     const certStatus = getCertificateStatus();
+
     if (certStatus.isAvailable) {
       checks.certificate = { status: 'ok' };
     } else {
       checks.certificate = { status: 'warning' };
+
       if (overallStatus === 'ok') {
         overallStatus = 'warning';
       }

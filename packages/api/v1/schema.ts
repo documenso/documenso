@@ -8,8 +8,8 @@ import {
   RecipientRole,
   SendStatus,
   SigningStatus,
-  TemplateType,
 } from '@prisma/client';
+import { TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
 import { DATE_FORMATS, DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
@@ -22,6 +22,7 @@ import {
   ZRecipientActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
 extendZodWithOpenApi(z);
@@ -49,7 +50,6 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
   teamId: z.number().nullish(),
   title: z.string(),
   status: z.string(),
-  documentDataId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
   completedAt: z.date().nullable(),
@@ -198,6 +198,15 @@ export const ZCreateDocumentMutationSchema = z.object({
       description: 'The globalActionAuth property is only available for Enterprise accounts.',
     }),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 export type TCreateDocumentMutationSchema = z.infer<typeof ZCreateDocumentMutationSchema>;
@@ -263,6 +272,15 @@ export const ZCreateDocumentFromTemplateMutationSchema = z.object({
     })
     .optional(),
   formValues: z.record(z.string(), z.union([z.string(), z.boolean(), z.number()])).optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 export type TCreateDocumentFromTemplateMutationSchema = z.infer<
@@ -310,12 +328,11 @@ export const ZGenerateDocumentFromTemplateMutationSchema = z.object({
     )
     .refine(
       (schema) => {
-        const emails = schema.map((signer) => signer.email.toLowerCase());
         const ids = schema.map((signer) => signer.id);
 
-        return new Set(emails).size === emails.length && new Set(ids).size === ids.length;
+        return new Set(ids).size === ids.length;
       },
-      { message: 'Recipient IDs and emails must be unique' },
+      { message: 'Recipient IDs must be unique' },
     ),
   meta: z
     .object({
@@ -546,7 +563,6 @@ export const ZTemplateSchema = z.object({
   title: z.string(),
   userId: z.number(),
   teamId: z.number().nullish(),
-  templateDocumentDataId: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
 });

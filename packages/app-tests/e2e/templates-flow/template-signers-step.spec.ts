@@ -29,7 +29,7 @@ import { apiSignin } from '../fixtures/authentication';
 //     await apiSignin({
 //       page,
 //       email: user.email,
-//       redirectPath: `/templates/${template.id}/edit`,
+//       redirectPath: `/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
 //     });
 
 //     // Save the settings by going to the next step.

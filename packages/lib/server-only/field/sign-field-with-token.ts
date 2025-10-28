@@ -81,7 +81,7 @@ export const signFieldWithToken = async ({
       },
     },
     include: {
-      document: {
+      envelope: {
         include: {
           recipients: true,
         },
@@ -90,9 +90,9 @@ export const signFieldWithToken = async ({
     },
   });
 
-  const { document } = field;
+  const { envelope } = field;
 
-  if (!document) {
+  if (!envelope) {
     throw new Error(`Document not found for field ${field.id}`);
   }
 
@@ -100,12 +100,12 @@ export const signFieldWithToken = async ({
     throw new Error(`Recipient not found for field ${field.id}`);
   }
 
-  if (document.deletedAt) {
-    throw new Error(`Document ${document.id} has been deleted`);
+  if (envelope.deletedAt) {
+    throw new Error(`Document ${envelope.id} has been deleted`);
   }
 
-  if (document.status !== DocumentStatus.PENDING) {
-    throw new Error(`Document ${document.id} must be pending for signing`);
+  if (envelope.status !== DocumentStatus.PENDING) {
+    throw new Error(`Document ${envelope.id} must be pending for signing`);
   }
 
   if (
@@ -172,7 +172,7 @@ export const signFieldWithToken = async ({
   }
 
   const derivedRecipientActionAuth = await validateFieldAuth({
-    documentAuthOptions: document.authOptions,
+    documentAuthOptions: envelope.authOptions,
     recipient,
     field,
     userId,
@@ -181,7 +181,9 @@ export const signFieldWithToken = async ({
 
   const documentMeta = await prisma.documentMeta.findFirst({
     where: {
-      documentId: document.id,
+      envelope: {
+        id: envelope.id,
+      },
     },
   });
 
@@ -272,7 +274,7 @@ export const signFieldWithToken = async ({
           assistant && field.recipientId !== assistant.id
             ? DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_PREFILLED
             : DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED,
-        documentId: document.id,
+        envelopeId: envelope.id,
         user: {
           email: assistant?.email ?? recipient.email,
           name: assistant?.name ?? recipient.name,

@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -14,7 +15,7 @@ const setupTemplateAndNavigateToFieldsStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -33,7 +34,7 @@ const setupTemplateAndNavigateToFieldsStep = async (page: Page) => {
 };
 
 const triggerAutosave = async (page: Page) => {
-  await page.locator('#document-flow-form-container').click();
+  await page.locator('body').click({ position: { x: 0, y: 0 } });
   await page.locator('#document-flow-form-container').blur();
 
   await page.waitForTimeout(5000);
@@ -70,7 +71,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -85,7 +86,10 @@ test.describe('AutoSave Fields Step', () => {
 
     await expect(async () => {
       const retrievedFields = await getTemplateById({
-        id: template.id,
+        id: {
+          type: 'envelopeId',
+          id: template.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -129,7 +133,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -142,7 +146,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
 
     await page.getByText('Text').nth(1).click();
@@ -152,7 +156,10 @@ test.describe('AutoSave Fields Step', () => {
 
     await expect(async () => {
       const retrievedFields = await getTemplateById({
-        id: template.id,
+        id: {
+          type: 'envelopeId',
+          id: template.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
@@ -195,7 +202,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 2 (recipient2@documenso.com)' }).click();
 
     await page.getByRole('button', { name: 'Signature' }).click();
@@ -208,7 +215,7 @@ test.describe('AutoSave Fields Step', () => {
 
     await triggerAutosave(page);
 
-    await page.getByRole('combobox').click();
+    await page.getByRole('combobox').first().click();
     await page.getByRole('option', { name: 'Recipient 1 (recipient1@documenso.com)' }).click();
 
     await page.getByText('Signature').nth(1).click();
@@ -218,7 +225,11 @@ test.describe('AutoSave Fields Step', () => {
 
     await expect(async () => {
       const retrievedFields = await getTemplateById({
-        id: template.id,
+        id: {
+          type: 'envelopeId',
+          id: template.id,
+        },
+
         userId: user.id,
         teamId: team.id,
       });
@@ -270,7 +281,10 @@ test.describe('AutoSave Fields Step', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: {
+          type: 'envelopeId',
+          id: template.id,
+        },
         userId: user.id,
         teamId: team.id,
       });

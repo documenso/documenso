@@ -1,4 +1,4 @@
-import { RecipientRole } from '@prisma/client';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { SendStatus, SigningStatus } from '@prisma/client';
 
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
@@ -8,7 +8,8 @@ import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { buildTeamWhereQuery } from '../../utils/teams';
+import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateTemplateRecipientsOptions {
   userId: number;
@@ -30,11 +31,18 @@ export const createTemplateRecipients = async ({
   templateId,
   recipients: recipientsToCreate,
 }: CreateTemplateRecipientsOptions) => {
-  const template = await prisma.template.findFirst({
-    where: {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
       id: templateId,
-      team: buildTeamWhereQuery({ teamId, userId }),
     },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const template = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
     include: {
       recipients: true,
       team: {
@@ -71,20 +79,6 @@ export const createTemplateRecipients = async ({
     email: recipient.email.toLowerCase(),
   }));
 
-  const duplicateRecipients = normalizedRecipients.filter((newRecipient) => {
-    const existingRecipient = template.recipients.find(
-      (existingRecipient) => existingRecipient.email === newRecipient.email,
-    );
-
-    return existingRecipient !== undefined;
-  });
-
-  if (duplicateRecipients.length > 0) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: `Duplicate recipient(s) found for ${duplicateRecipients.map((recipient) => recipient.email).join(', ')}`,
-    });
-  }
-
   const createdRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
       normalizedRecipients.map(async (recipient) => {
@@ -95,7 +89,7 @@ export const createTemplateRecipients = async ({
 
         const createdRecipient = await tx.recipient.create({
           data: {
-            templateId,
+            envelopeId: template.id,
             name: recipient.name,
             email: recipient.email,
             role: recipient.role,
@@ -114,6 +108,8 @@ export const createTemplateRecipients = async ({
   });
 
   return {
-    recipients: createdRecipients,
+    recipients: createdRecipients.map((recipient) =>
+      mapRecipientToLegacyRecipient(recipient, template),
+    ),
   };
 };

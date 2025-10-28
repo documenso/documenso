@@ -42,7 +42,13 @@ export const getMultiSignDocumentRoute = procedure
       // Transform fields to match our schema
       const transformedFields = fields.map((field) => ({
         ...field,
-        recipient,
+        recipient: {
+          ...recipient,
+          documentId: document.id,
+          templateId: null,
+        },
+        documentId: document.id,
+        templateId: null,
       }));
 
       return {

@@ -1,7 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, Team, User } from '@prisma/client';
 import { DocumentStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { CheckCircle, Download, EyeIcon, Pencil } from 'lucide-react';
 import { Link } from 'react-router';
@@ -9,57 +8,45 @@ import { match } from 'ts-pattern';
 
 import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcClient } from '@documenso/trpc/client';
 import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+
 export type DocumentPageViewButtonProps = {
-  document: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-    team: Pick<Team, 'id' | 'url'>;
-  };
+  envelope: TEnvelope;
 };
 
-export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps) => {
+export const DocumentPageViewButton = ({ envelope }: DocumentPageViewButtonProps) => {
   const { user } = useSession();
 
   const { toast } = useToast();
   const { _ } = useLingui();
 
-  const recipient = document.recipients.find((recipient) => recipient.email === user.email);
+  const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
   const isRecipient = !!recipient;
-  const isPending = document.status === DocumentStatus.PENDING;
-  const isComplete = isDocumentCompleted(document);
+  const isPending = envelope.status === DocumentStatus.PENDING;
+  const isComplete = isDocumentCompleted(envelope);
   const isSigned = recipient?.signingStatus === SigningStatus.SIGNED;
   const role = recipient?.role;
 
-  const documentsPath = formatDocumentsPath(document.team.url);
-  const formatPath = `${documentsPath}/${document.id}/edit`;
+  const documentsPath = formatDocumentsPath(envelope.team.url);
+  const formatPath = `${documentsPath}/${envelope.id}/edit`;
 
   const onDownloadClick = async () => {
     try {
-      const documentWithData = await trpcClient.document.get.query(
-        {
-          documentId: document.id,
-        },
-        {
-          context: {
-            teamId: document.team?.id?.toString(),
-          },
-        },
-      );
+      // Todo; Envelopes - Support multiple items
+      const envelopeItem = envelope.envelopeItems[0];
 
-      const documentData = documentWithData?.documentData;
-
-      if (!documentData) {
+      if (!envelopeItem.documentData) {
         throw new Error('No document available');
       }
 
-      await downloadPDF({ documentData, fileName: documentWithData.title });
+      await downloadPDF({ documentData: envelopeItem.documentData, fileName: envelopeItem.title });
     } catch (err) {
       toast({
         title: _(msg`Something went wrong`),
@@ -74,6 +61,7 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
     isPending,
     isComplete,
     isSigned,
+    internalVersion: envelope.internalVersion,
   })
     .with({ isRecipient: true, isPending: true, isSigned: false }, () => (
       <Button className="w-full" asChild>
@@ -106,6 +94,20 @@ export const DocumentPageViewButton = ({ document }: DocumentPageViewButtonProps
           <Trans>Edit</Trans>
         </Link>
       </Button>
+    ))
+    .with({ isComplete: true, internalVersion: 2 }, () => (
+      <EnvelopeDownloadDialog
+        envelopeId={envelope.id}
+        envelopeStatus={envelope.status}
+        envelopeItems={envelope.envelopeItems}
+        token={recipient?.token}
+        trigger={
+          <Button className="w-full">
+            <Download className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        }
+      />
     ))
     .with({ isComplete: true }, () => (
       <Button className="w-full" onClick={onDownloadClick}>

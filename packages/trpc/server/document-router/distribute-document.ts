@@ -1,5 +1,6 @@
-import { upsertDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
+import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { mapEnvelopeToDocumentLite } from '@documenso/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -23,17 +24,20 @@ export const distributeDocumentRoute = authenticatedProcedure
     });
 
     if (Object.values(meta).length > 0) {
-      await upsertDocumentMeta({
+      await updateDocumentMeta({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         subject: meta.subject,
         message: meta.message,
         dateFormat: meta.dateFormat,
         timezone: meta.timezone,
         redirectUrl: meta.redirectUrl,
         distributionMethod: meta.distributionMethod,
-        emailSettings: meta.emailSettings,
+        emailSettings: meta.emailSettings ?? undefined,
         language: meta.language,
         emailId: meta.emailId,
         emailReplyTo: meta.emailReplyTo,
@@ -41,10 +45,15 @@ export const distributeDocumentRoute = authenticatedProcedure
       });
     }
 
-    return await sendDocument({
+    const envelope = await sendDocument({
       userId: ctx.user.id,
-      documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       teamId,
       requestMetadata: ctx.metadata,
     });
+
+    return mapEnvelopeToDocumentLite(envelope);
   });

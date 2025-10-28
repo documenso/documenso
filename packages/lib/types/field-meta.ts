@@ -1,11 +1,16 @@
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
+import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../constants/pdf';
+
+export const DEFAULT_FIELD_FONT_SIZE = 14;
+
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
   placeholder: z.string().optional(),
   required: z.boolean().optional(),
   readOnly: z.boolean().optional(),
+  fontSize: z.number().min(8).max(96).default(DEFAULT_FIELD_FONT_SIZE).optional(),
 });
 
 export type TBaseFieldMeta = z.infer<typeof ZBaseFieldMeta>;
@@ -16,7 +21,6 @@ export type TFieldTextAlignSchema = z.infer<typeof ZFieldTextAlignSchema>;
 
 export const ZInitialsFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('initials'),
-  fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -24,7 +28,6 @@ export type TInitialsFieldMeta = z.infer<typeof ZInitialsFieldMeta>;
 
 export const ZNameFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('name'),
-  fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -32,7 +35,6 @@ export type TNameFieldMeta = z.infer<typeof ZNameFieldMeta>;
 
 export const ZEmailFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('email'),
-  fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -40,7 +42,6 @@ export type TEmailFieldMeta = z.infer<typeof ZEmailFieldMeta>;
 
 export const ZDateFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('date'),
-  fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -50,7 +51,6 @@ export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text'),
   text: z.string().optional(),
   characterLimit: z.number().optional(),
-  fontSize: z.number().min(8).max(96).optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -58,11 +58,10 @@ export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
 
 export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('number'),
-  numberFormat: z.string().optional(),
+  numberFormat: z.string().nullish(),
   value: z.string().optional(),
-  minValue: z.number().optional(),
-  maxValue: z.number().optional(),
-  fontSize: z.number().min(8).max(96).optional(),
+  minValue: z.coerce.number().nullish(),
+  maxValue: z.coerce.number().nullish(),
   textAlign: ZFieldTextAlignSchema.optional(),
 });
 
@@ -79,6 +78,7 @@ export const ZRadioFieldMeta = ZBaseFieldMeta.extend({
       }),
     )
     .optional(),
+  direction: z.enum(['vertical', 'horizontal']).optional().default('vertical'),
 });
 
 export type TRadioFieldMeta = z.infer<typeof ZRadioFieldMeta>;
@@ -109,7 +109,14 @@ export const ZDropdownFieldMeta = ZBaseFieldMeta.extend({
 
 export type TDropdownFieldMeta = z.infer<typeof ZDropdownFieldMeta>;
 
+export const ZSignatureFieldMeta = ZBaseFieldMeta.extend({
+  type: z.literal('signature'),
+});
+
+export type TSignatureFieldMeta = z.infer<typeof ZSignatureFieldMeta>;
+
 export const ZFieldMetaNotOptionalSchema = z.discriminatedUnion('type', [
+  ZSignatureFieldMeta,
   ZInitialsFieldMeta,
   ZNameFieldMeta,
   ZEmailFieldMeta,
@@ -226,3 +233,96 @@ export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
 ]);
 
 export type TFieldAndMeta = z.infer<typeof ZFieldAndMetaSchema>;
+
+export const FIELD_DATE_META_DEFAULT_VALUES: TDateFieldMeta = {
+  type: 'date',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+};
+
+export const FIELD_TEXT_META_DEFAULT_VALUES: TTextFieldMeta = {
+  type: 'text',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+  label: '',
+  placeholder: '',
+  text: '',
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
+  type: 'number',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+  label: '',
+  placeholder: '',
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_INITIALS_META_DEFAULT_VALUES: TInitialsFieldMeta = {
+  type: 'initials',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+};
+
+export const FIELD_NAME_META_DEFAULT_VALUES: TNameFieldMeta = {
+  type: 'name',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+};
+
+export const FIELD_EMAIL_META_DEFAULT_VALUES: TEmailFieldMeta = {
+  type: 'email',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  textAlign: 'left',
+};
+
+export const FIELD_RADIO_META_DEFAULT_VALUES: TRadioFieldMeta = {
+  type: 'radio',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  values: [{ id: 1, checked: false, value: '' }],
+  required: false,
+  readOnly: false,
+  direction: 'vertical',
+};
+
+export const FIELD_CHECKBOX_META_DEFAULT_VALUES: TCheckboxFieldMeta = {
+  type: 'checkbox',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  values: [{ id: 1, checked: false, value: '' }],
+  validationRule: '',
+  validationLength: 0,
+  required: false,
+  readOnly: false,
+  direction: 'vertical',
+};
+
+export const FIELD_DROPDOWN_META_DEFAULT_VALUES: TDropdownFieldMeta = {
+  type: 'dropdown',
+  fontSize: DEFAULT_FIELD_FONT_SIZE,
+  values: [{ value: 'Option 1' }],
+  defaultValue: '',
+  required: false,
+  readOnly: false,
+};
+
+export const FIELD_SIGNATURE_META_DEFAULT_VALUES: TSignatureFieldMeta = {
+  type: 'signature',
+  fontSize: DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
+};
+
+export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
+  [FieldType.SIGNATURE]: FIELD_SIGNATURE_META_DEFAULT_VALUES,
+  [FieldType.FREE_SIGNATURE]: undefined,
+  [FieldType.INITIALS]: FIELD_INITIALS_META_DEFAULT_VALUES,
+  [FieldType.NAME]: FIELD_NAME_META_DEFAULT_VALUES,
+  [FieldType.EMAIL]: FIELD_EMAIL_META_DEFAULT_VALUES,
+  [FieldType.DATE]: FIELD_DATE_META_DEFAULT_VALUES,
+  [FieldType.TEXT]: FIELD_TEXT_META_DEFAULT_VALUES,
+  [FieldType.NUMBER]: FIELD_NUMBER_META_DEFAULT_VALUES,
+  [FieldType.RADIO]: FIELD_RADIO_META_DEFAULT_VALUES,
+  [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
+  [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
+} as const;

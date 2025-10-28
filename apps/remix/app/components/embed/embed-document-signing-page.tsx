@@ -3,7 +3,7 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, TemplateMeta } from '@prisma/client';
+import type { DocumentMeta } from '@prisma/client';
 import {
   type DocumentData,
   type Field,
@@ -15,12 +15,14 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import type { DocumentField } from '@documenso/lib/server-only/field/get-fields-for-document';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import {
+  type DocumentField,
+  DocumentReadOnlyFields,
+} from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
@@ -35,6 +37,7 @@ import { BrandingLogo } from '~/components/general/branding-logo';
 import { injectCss } from '~/utils/css-vars';
 
 import { ZSignDocumentEmbedDataSchema } from '../../types/embed-document-sign-schema';
+import { DocumentSigningAttachmentsPopover } from '../general/document-signing/document-signing-attachments-popover';
 import { useRequiredDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 import { DocumentSigningRecipientProvider } from '../general/document-signing/document-signing-recipient-provider';
 import { DocumentSigningRejectDialog } from '../general/document-signing/document-signing-reject-dialog';
@@ -46,11 +49,12 @@ import { EmbedDocumentRejected } from './embed-document-rejected';
 export type EmbedSignDocumentClientPageProps = {
   token: string;
   documentId: number;
+  envelopeId: string;
   documentData: DocumentData;
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
-  metadata?: DocumentMeta | TemplateMeta | null;
+  metadata?: DocumentMeta | null;
   isCompleted?: boolean;
   hidePoweredBy?: boolean;
   allowWhitelabelling?: boolean;
@@ -60,6 +64,7 @@ export type EmbedSignDocumentClientPageProps = {
 export const EmbedSignDocumentClientPage = ({
   token,
   documentId,
+  envelopeId,
   documentData,
   recipient,
   fields,
@@ -272,15 +277,17 @@ export const EmbedSignDocumentClientPage = ({
       <div className="embed--Root relative mx-auto flex min-h-[100dvh] max-w-screen-lg flex-col items-center justify-center p-6">
         {(!hasFinishedInit || !hasDocumentLoaded) && <EmbedClientLoading />}
 
-        {allowDocumentRejection && (
-          <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+        <div className="embed--Actions mb-4 flex w-full flex-row-reverse items-baseline justify-between">
+          <DocumentSigningAttachmentsPopover envelopeId={envelopeId} token={token} />
+
+          {allowDocumentRejection && (
             <DocumentSigningRejectDialog
-              document={{ id: documentId }}
+              documentId={documentId}
               token={token}
               onRejected={onDocumentRejected}
             />
-          </div>
-        )}
+          )}
+        </div>
 
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}

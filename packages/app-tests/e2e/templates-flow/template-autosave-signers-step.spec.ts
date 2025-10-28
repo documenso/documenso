@@ -1,8 +1,11 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
-import { getRecipientsForTemplate } from '@documenso/lib/server-only/recipient/get-recipients-for-template';
+import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { prisma } from '@documenso/prisma';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -17,7 +20,7 @@ const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/templates/${template.id}/edit`,
+    redirectPath: `/t/${team.url}/templates/${mapSecondaryIdToTemplateId(template.secondaryId)}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -26,7 +29,7 @@ const setupTemplateAndNavigateToSignersStep = async (page: Page) => {
 };
 
 const triggerAutosave = async (page: Page) => {
-  await page.locator('#document-flow-form-container').click();
+  await page.locator('body').click({ position: { x: 0, y: 0 } });
   await page.locator('#document-flow-form-container').blur();
 
   await page.waitForTimeout(5000);
@@ -47,7 +50,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -71,7 +74,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -99,7 +102,7 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -152,13 +155,16 @@ test.describe('AutoSave Signers Step - Templates', () => {
 
     await expect(async () => {
       const retrievedTemplate = await getTemplateById({
-        id: template.id,
+        id: {
+          type: 'envelopeId',
+          id: template.id,
+        },
         userId: user.id,
         teamId: team.id,
       });
 
       const retrievedRecipients = await getRecipientsForTemplate({
-        templateId: template.id,
+        templateId: mapSecondaryIdToTemplateId(template.secondaryId),
         userId: user.id,
         teamId: team.id,
       });
@@ -172,3 +178,36 @@ test.describe('AutoSave Signers Step - Templates', () => {
     }).toPass();
   });
 });
+
+export interface GetRecipientsForTemplateOptions {
+  templateId: number;
+  userId: number;
+  teamId: number;
+}
+
+const getRecipientsForTemplate = async ({
+  templateId,
+  userId,
+  teamId,
+}: GetRecipientsForTemplateOptions) => {
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'templateId',
+      id: templateId,
+    },
+    type: EnvelopeType.TEMPLATE,
+    userId,
+    teamId,
+  });
+
+  const recipients = await prisma.recipient.findMany({
+    where: {
+      envelope: envelopeWhereInput,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return recipients;
+};

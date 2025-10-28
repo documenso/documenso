@@ -5,7 +5,10 @@ import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
 import { Link, Outlet } from 'react-router';
 
-import { PAID_PLAN_LIMITS } from '@documenso/ee/server-only/limits/constants';
+import {
+  DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
+  PAID_PLAN_LIMITS,
+} from '@documenso/ee/server-only/limits/constants';
 import { LimitsProvider } from '@documenso/ee/server-only/limits/provider/client';
 import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -38,12 +41,14 @@ export default function Layout() {
           recipients: 0,
           directTemplates: 0,
         },
+        maximumEnvelopeItemCount: 0,
       };
     }
 
     return {
       quota: PAID_PLAN_LIMITS,
       remaining: PAID_PLAN_LIMITS,
+      maximumEnvelopeItemCount: DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT,
     };
   }, [organisation?.subscription]);
 

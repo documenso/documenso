@@ -12,11 +12,11 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
-} from '@documenso/trpc/server/document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),

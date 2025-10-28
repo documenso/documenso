@@ -6,6 +6,7 @@ export const ZCreateSubscriptionClaimRequestSchema = z.object({
   name: z.string().min(1),
   teamCount: z.number().int().min(0),
   memberCount: z.number().int().min(0),
+  envelopeItemCount: z.number().int().min(1),
   flags: ZClaimFlagsSchema,
 });
 

@@ -1,7 +1,8 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { EnvelopeType } from '@prisma/client';
 
-import { getDocumentById } from '@documenso/lib/server-only/document/get-document-by-id';
+import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -16,7 +17,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
   await apiSignin({
     page,
     email: user.email,
-    redirectPath: `/documents/${document.id}/edit`,
+    redirectPath: `/t/${team.url}/documents/${document.id}/edit`,
   });
 
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -42,7 +43,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
 };
 
 export const triggerAutosave = async (page: Page) => {
-  await page.locator('#document-flow-form-container').click();
+  await page.locator('body').click({ position: { x: 0, y: 0 } });
   await page.locator('#document-flow-form-container').blur();
 
   await page.waitForTimeout(5000);
@@ -59,8 +60,12 @@ test.describe('AutoSave Subject Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedDocumentData = await getDocumentById({
-        documentId: document.id,
+      const retrievedDocumentData = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -81,8 +86,12 @@ test.describe('AutoSave Subject Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedDocumentData = await getDocumentById({
-        documentId: document.id,
+      const retrievedDocumentData = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -105,8 +114,12 @@ test.describe('AutoSave Subject Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedDocumentData = await getDocumentById({
-        documentId: document.id,
+      const retrievedDocumentData = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });
@@ -156,8 +169,12 @@ test.describe('AutoSave Subject Step', () => {
     await triggerAutosave(page);
 
     await expect(async () => {
-      const retrievedDocumentData = await getDocumentById({
-        documentId: document.id,
+      const retrievedDocumentData = await getEnvelopeById({
+        id: {
+          type: 'envelopeId',
+          id: document.id,
+        },
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         teamId: team.id,
       });

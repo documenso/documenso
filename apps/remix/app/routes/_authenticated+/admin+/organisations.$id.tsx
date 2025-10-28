@@ -71,6 +71,23 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       },
     });
 
+  const { mutateAsync: promoteToOwner, isPending: isPromotingToOwner } =
+    trpc.admin.organisationMember.promoteToOwner.useMutation({
+      onSuccess: () => {
+        toast({
+          title: t`Success`,
+          description: t`Member promoted to owner successfully`,
+        });
+      },
+      onError: () => {
+        toast({
+          title: t`Error`,
+          description: t`We couldn't promote the member to owner. Please try again.`,
+          variant: 'destructive',
+        });
+      },
+    });
+
   const teamsColumns = useMemo(() => {
     return [
       {
@@ -99,6 +116,26 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         header: t`Email`,
         cell: ({ row }) => (
           <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.email}</Link>
+        ),
+      },
+      {
+        header: t`Actions`,
+        cell: ({ row }) => (
+          <div className="flex justify-end space-x-2">
+            <Button
+              variant="outline"
+              disabled={row.original.userId === organisation?.ownerUserId}
+              loading={isPromotingToOwner}
+              onClick={async () =>
+                promoteToOwner({
+                  organisationId,
+                  userId: row.original.userId,
+                })
+              }
+            >
+              <Trans>Promote to owner</Trans>
+            </Button>
+          </div>
         ),
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
@@ -367,6 +404,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
       claims: {
         teamCount: organisation.organisationClaim.teamCount,
         memberCount: organisation.organisationClaim.memberCount,
+        envelopeItemCount: organisation.organisationClaim.envelopeItemCount,
         flags: organisation.organisationClaim.flags,
       },
       originalSubscriptionClaimId: organisation.organisationClaim.originalSubscriptionClaimId || '',
@@ -518,6 +556,30 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
               </FormControl>
               <FormDescription>
                 <Trans>Number of members allowed. 0 = Unlimited</Trans>
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="claims.envelopeItemCount"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>
+                <Trans>Envelope Item Count</Trans>
+              </FormLabel>
+              <FormControl>
+                <Input
+                  type="number"
+                  min={1}
+                  {...field}
+                  onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                />
+              </FormControl>
+              <FormDescription>
+                <Trans>Maximum number of uploaded files per envelope allowed</Trans>
               </FormDescription>
               <FormMessage />
             </FormItem>

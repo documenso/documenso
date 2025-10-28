@@ -12,6 +12,7 @@ import {
 import { Link } from 'react-router';
 
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
+import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -28,21 +29,14 @@ import { useCurrentTeam } from '~/providers/team';
 export type FolderCardProps = {
   folder: TFolderWithSubfolders;
   onMove: (folder: TFolderWithSubfolders) => void;
-  onPin: (folderId: string) => void;
-  onUnpin: (folderId: string) => void;
   onSettings: (folder: TFolderWithSubfolders) => void;
   onDelete: (folder: TFolderWithSubfolders) => void;
 };
 
-export const FolderCard = ({
-  folder,
-  onMove,
-  onPin,
-  onUnpin,
-  onSettings,
-  onDelete,
-}: FolderCardProps) => {
+export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardProps) => {
   const team = useCurrentTeam();
+
+  const { mutateAsync: updateFolderMutation } = trpc.folder.updateFolder.useMutation();
 
   const formatPath = () => {
     const rootPath =
@@ -53,8 +47,17 @@ export const FolderCard = ({
     return `${rootPath}/f/${folder.id}`;
   };
 
+  const updateFolder = async ({ pinned }: { pinned: boolean }) => {
+    await updateFolderMutation({
+      folderId: folder.id,
+      data: {
+        pinned,
+      },
+    });
+  };
+
   return (
-    <Link to={formatPath()} key={folder.id}>
+    <Link to={formatPath()} data-folder-id={folder.id} data-folder-name={folder.name}>
       <Card className="hover:bg-muted/50 border-border h-full border transition-all">
         <CardContent className="p-4">
           <div className="flex min-w-0 items-center gap-3">
@@ -112,9 +115,7 @@ export const FolderCard = ({
                     <Trans>Move</Trans>
                   </DropdownMenuItem>
 
-                  <DropdownMenuItem
-                    onClick={() => (folder.pinned ? onUnpin(folder.id) : onPin(folder.id))}
-                  >
+                  <DropdownMenuItem onClick={async () => updateFolder({ pinned: !folder.pinned })}>
                     <PinIcon className="mr-2 h-4 w-4" />
                     {folder.pinned ? <Trans>Unpin</Trans> : <Trans>Pin</Trans>}
                   </DropdownMenuItem>

@@ -2,12 +2,11 @@ import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
-} from '../document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 
 export const ZUpdateOrganisationSettingsRequestSchema = z.object({
   organisationId: z.string(),

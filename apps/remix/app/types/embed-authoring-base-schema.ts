@@ -4,7 +4,6 @@ import { ZBaseEmbedDataSchema } from './embed-base-schemas';
 
 export const ZBaseEmbedAuthoringSchema = z
   .object({
-    token: z.string(),
     externalId: z.string().optional(),
     features: z
       .object({

@@ -1,5 +1,6 @@
-import { createDocumentFields } from '@documenso/lib/server-only/field/create-document-fields';
-import { createTemplateFields } from '@documenso/lib/server-only/field/create-template-fields';
+import { EnvelopeType } from '@prisma/client';
+
+import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
 import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
 import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
@@ -72,6 +73,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         fieldId,
+        envelopeType: EnvelopeType.DOCUMENT,
       });
     }),
 
@@ -100,10 +102,13 @@ export const fieldRouter = router({
         },
       });
 
-      const createdFields = await createDocumentFields({
+      const createdFields = await createEnvelopeFields({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         fields: [field],
         requestMetadata: ctx.metadata,
       });
@@ -136,10 +141,13 @@ export const fieldRouter = router({
         },
       });
 
-      return await createDocumentFields({
+      return await createEnvelopeFields({
         userId: ctx.user.id,
         teamId,
-        documentId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         fields,
         requestMetadata: ctx.metadata,
       });
@@ -251,10 +259,8 @@ export const fieldRouter = router({
 
   /**
    * @private
-   *
-   * Todo: Refactor to setFieldsForDocument function.
    */
-  addFields: authenticatedProcedure
+  setFieldsForDocument: authenticatedProcedure
     .input(ZSetDocumentFieldsRequestSchema)
     .output(ZSetDocumentFieldsResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -268,12 +274,16 @@ export const fieldRouter = router({
       });
 
       return await setFieldsForDocument({
-        documentId,
         userId: ctx.user.id,
         teamId,
+        id: {
+          type: 'documentId',
+          id: documentId,
+        },
         fields: fields.map((field) => ({
-          id: field.nativeId,
-          signerEmail: field.signerEmail,
+          id: field.id,
+          recipientId: field.recipientId,
+          envelopeItemId: field.envelopeItemId,
           type: field.type,
           pageNumber: field.pageNumber,
           pageX: field.pageX,
@@ -311,11 +321,15 @@ export const fieldRouter = router({
         },
       });
 
-      const createdFields = await createTemplateFields({
+      const createdFields = await createEnvelopeFields({
         userId: ctx.user.id,
         teamId,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         fields: [field],
+        requestMetadata: ctx.metadata,
       });
 
       return createdFields.fields[0];
@@ -351,6 +365,7 @@ export const fieldRouter = router({
         userId: ctx.user.id,
         teamId,
         fieldId,
+        envelopeType: EnvelopeType.TEMPLATE,
       });
     }),
 
@@ -379,11 +394,15 @@ export const fieldRouter = router({
         },
       });
 
-      return await createTemplateFields({
+      return await createEnvelopeFields({
         userId: ctx.user.id,
         teamId,
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         fields,
+        requestMetadata: ctx.metadata,
       });
     }),
 
@@ -490,10 +509,8 @@ export const fieldRouter = router({
 
   /**
    * @private
-   *
-   * Todo: Refactor to setFieldsForTemplate.
    */
-  addTemplateFields: authenticatedProcedure
+  setFieldsForTemplate: authenticatedProcedure
     .input(ZSetFieldsForTemplateRequestSchema)
     .output(ZSetFieldsForTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
@@ -507,12 +524,16 @@ export const fieldRouter = router({
       });
 
       return await setFieldsForTemplate({
-        templateId,
+        id: {
+          type: 'templateId',
+          id: templateId,
+        },
         userId: ctx.user.id,
         teamId,
         fields: fields.map((field) => ({
-          id: field.nativeId,
-          signerEmail: field.signerEmail,
+          id: field.id,
+          recipientId: field.recipientId,
+          envelopeItemId: field.envelopeItemId,
           type: field.type,
           pageNumber: field.pageNumber,
           pageX: field.pageX,

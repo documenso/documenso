@@ -1,10 +1,12 @@
-import { DocumentDataType } from '@prisma/client';
+import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { createDocumentV2 } from '@documenso/lib/server-only/document/create-document-v2';
+import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -35,6 +37,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       recipients,
       meta,
       folderId,
+      attachments,
     } = input;
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -55,27 +58,87 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       type: DocumentDataType.S3_PATH,
     });
 
-    const createdDocument = await createDocumentV2({
+    const createdEnvelope = await createEnvelope({
       userId: ctx.user.id,
       teamId,
-      documentDataId: documentData.id,
       normalizePdf: false, // Not normalizing because of presigned URL.
+      internalVersion: 1,
       data: {
+        type: EnvelopeType.DOCUMENT,
         title,
         externalId,
         visibility,
         globalAccessAuth,
         globalActionAuth,
-        recipients,
+        recipients: (recipients || []).map((recipient) => ({
+          ...recipient,
+          fields: (recipient.fields || []).map((field) => ({
+            ...field,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+            documentDataId: documentData.id,
+          })),
+        })),
         folderId,
+        envelopeItems: [
+          {
+            // If you ever allow more than 1 in this endpoint, make sure to use `maximumEnvelopeItemCount` to limit it.
+            documentDataId: documentData.id,
+          },
+        ],
       },
-      meta,
+      attachments,
+      meta: {
+        ...meta,
+        emailSettings: meta?.emailSettings ?? undefined,
+      },
       requestMetadata: ctx.metadata,
     });
 
+    const envelopeItems = await prisma.envelopeItem.findMany({
+      where: {
+        envelopeId: createdEnvelope.id,
+      },
+      include: {
+        documentData: true,
+      },
+    });
+
+    const legacyDocumentId = mapSecondaryIdToDocumentId(createdEnvelope.secondaryId);
+
+    const firstDocumentData = envelopeItems[0].documentData;
+
+    if (!firstDocumentData) {
+      throw new Error('Document data not found');
+    }
+
     return {
-      document: createdDocument,
-      folder: createdDocument.folder, // Todo: Remove this prior to api-v2 release.
+      document: {
+        ...createdEnvelope,
+        envelopeId: createdEnvelope.id,
+        documentDataId: firstDocumentData.id,
+        documentData: {
+          ...firstDocumentData,
+          envelopeItemId: envelopeItems[0].id,
+        },
+        documentMeta: {
+          ...createdEnvelope.documentMeta,
+          documentId: legacyDocumentId,
+        },
+        id: legacyDocumentId,
+        fields: createdEnvelope.fields.map((field) => ({
+          ...field,
+          documentId: legacyDocumentId,
+          templateId: null,
+        })),
+        recipients: createdEnvelope.recipients.map((recipient) => ({
+          ...recipient,
+          documentId: legacyDocumentId,
+          templateId: null,
+        })),
+      },
+      folder: createdEnvelope.folder, // Todo: Remove this prior to api-v2 release.
       uploadUrl: url,
     };
   });
