@@ -32,6 +32,8 @@ NEXT_PRIVATE_SMTP_USERNAME=your-email@gmail.com
 NEXT_PRIVATE_SMTP_PASSWORD=your-app-password
 NEXT_PRIVATE_SMTP_FROM_NAME=SuiteOp Sign
 NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@suiteop.com
+# Optional: Global webhook for centralized event tracking
+NEXT_PRIVATE_GLOBAL_WEBHOOK_URL=https://events.suiteop.com/jkhgcu4kx5sec3
 ```
 
 ---
@@ -118,6 +120,8 @@ Must preserve during updates:
 5. `apps/remix/app/utils/meta.ts`
 6. `apps/remix/public/site.webmanifest`
 7. All email templates (packages/email/templates/*.tsx)
+8. `packages/lib/constants/app.ts` (global webhook config)
+9. `packages/lib/server-only/webhooks/trigger/handler.ts` (webhook handler)
 
 ---
 
