@@ -6,6 +6,9 @@ This document outlines all the white-labeling changes made to transform Documens
 
 The white-labeling was implemented by modifying core source files rather than using runtime HTML/CSS overrides. This approach ensures maximum performance and prevents hydration issues while minimizing the number of changes needed.
 
+**Total Files Modified:** 48+  
+**Key Changes:** Colors (green → purple), Logos (SVG), Text ("Documenso" → "SuiteOp Sign"), User Profile, Email templates, Meta tags
+
 ## 1. CSS Variables & Theme Colors
 
 ### Core CSS Variables
@@ -219,10 +222,35 @@ To revert to Documenso branding:
 
 Or simply use git to revert the white-labeling commit.
 
+## 8. User Profile on Login/Signup Page
+
+### User Profile Component
+**File: `apps/remix/app/components/general/user-profile-timur.tsx`**
+
+Updated the demo user profile shown on signup/login pages:
+
+**Before:**
+- Name: "Timur Ercan"
+- URL: `/u/timur`
+- Greeting: "Hey I'm Timur"
+- Image: `packages/assets/images/timur.png`
+
+**After:**
+- Name: "Jean-Emmanuel Losi"
+- URL: `/u/jean`
+- Greeting: "Hey I'm Jean-Emmanuel"
+- Image: Still uses `timur.png` (needs manual replacement with your photo)
+
+**To Replace Photo:**
+Replace the file at `packages/assets/images/timur.png` with your own professional photo (recommended: 200x200px, PNG format, circular cropping looks best).
+
+---
+
 ## Additional Notes
 
 - The original Documenso green was HSL `95.08 71.08% 67.45%` / Hex `#7AC455`
 - The new SuiteOp purple is HSL `248 99% 70%` / Hex `#8585FF` (lighter) or `#3636A1` (darker)
 - All logo PNGs remain in place for backward compatibility but are not used in the main app
 - Email static logo at `packages/email/static/logo.png` should be replaced with SuiteOp logo for production use
+- User profile image at `packages/assets/images/timur.png` should be replaced with Jean-Emmanuel's photo
 
