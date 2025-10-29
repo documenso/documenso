@@ -30,7 +30,7 @@ export const RECIPIENT_COLOR_STYLES = {
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: '',
     comboxBoxTrigger:
-      'ring-2 ring-recipient-green shadow-[0_0_0_5px_hsl(var(--recipient-green)/10%),0_0_0_2px_hsl(var(--recipient-green)/60%),0_0_0_0.5px_hsl(var(--recipient-green))]',
+      'ring-2 ring-recipient-purple shadow-[0_0_0_5px_hsl(var(--recipient-purple)/10%),0_0_0_2px_hsl(var(--recipient-purple)/60%),0_0_0_0.5px_hsl(var(--recipient-purple))]',
     comboxBoxItem: '',
   },
 
