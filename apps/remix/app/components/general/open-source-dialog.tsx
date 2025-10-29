@@ -62,7 +62,18 @@ export const OpenSourceDialog = ({ open, setOpen }: OpenSourceDialogProps) => {
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2"
               >
-                <Trans>View on GitHub</Trans>
+                <Trans>Documenso on GitHub</Trans>
+                <ExternalLinkIcon className="h-4 w-4" />
+              </a>
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <a
+                href="https://github.com/jean-losi/documenso"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2"
+              >
+                <Trans>SuiteOp Sign on GitHub</Trans>
                 <ExternalLinkIcon className="h-4 w-4" />
               </a>
             </Button>
