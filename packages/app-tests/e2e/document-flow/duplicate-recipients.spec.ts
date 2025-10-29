@@ -69,7 +69,7 @@ const completeDocumentFlowWithDuplicateRecipients = async (options: {
   await page.getByRole('button', { name: 'Send' }).click();
 
   // Wait for send confirmation
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(`/t/${team.url}/documents`);
 
   await expect(page.getByRole('link', { name: document.title })).toBeVisible();
 };
@@ -157,7 +157,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.waitForTimeout(2500);
     await page.getByRole('button', { name: 'Send' }).click();
 
-    await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+    await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   });
@@ -188,7 +188,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
 
     const recipients = await prisma.recipient.findMany({
       where: {
-        documentId: document.id,
+        envelopeId: document.id,
       },
     });
 
@@ -286,7 +286,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
 
     await page.getByRole('button', { name: 'Send' }).click();
 
-    await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+    await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   });
@@ -348,7 +348,7 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     await page.waitForTimeout(2500);
     await page.getByRole('button', { name: 'Send' }).click();
 
-    await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+    await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
     await expect(page.getByRole('link', { name: document.title })).toBeVisible();
   });

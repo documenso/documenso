@@ -77,13 +77,13 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
   // Navigate to template settings and disable access.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
   await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Direct link' }).click();
+  await page.getByTestId('template-direct-link').click();
   await page.getByRole('switch').click();
   await page.getByRole('button', { name: 'Save' }).click();
   await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
 
   // Check that the direct template link is no longer accessible.
-  await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
+  await page.goto(formatDirectTemplatePath(template.directLink?.token || '123'));
   await expect(page.getByText('404 not found')).toBeVisible();
 });
 
@@ -111,7 +111,7 @@ test('[DIRECT_TEMPLATES]: delete direct template link', async ({ page }) => {
   // Navigate to template settings and delete the access.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}${formatTemplatesPath(template.team?.url)}`);
   await page.getByRole('cell', { name: 'Use Template' }).getByRole('button').nth(1).click();
-  await page.getByRole('menuitem', { name: 'Direct link' }).click();
+  await page.getByTestId('template-direct-link').click();
   await page.getByRole('button', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Confirm' }).click();
   await expect(page.getByText('Direct template link deleted').first()).toBeVisible();
@@ -171,6 +171,7 @@ test('[DIRECT_TEMPLATES]: use direct template link with 1 recipient', async ({ p
   await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
   await expect(page.getByRole('heading', { name: 'General' })).toBeVisible();
 
+  await page.waitForTimeout(100);
   await page.getByPlaceholder('recipient@documenso.com').fill(seedTestEmail());
 
   await page.getByRole('button', { name: 'Continue' }).click();

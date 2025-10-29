@@ -1,11 +1,11 @@
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
-import { DocumentSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { LegacyDocumentSchema } from '@documenso/prisma/types/document-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';
@@ -15,7 +15,7 @@ import { ZRecipientLiteSchema } from './recipient';
  *
  * Mainly used for returning a single document from the API.
  */
-export const ZDocumentSchema = DocumentSchema.pick({
+export const ZDocumentSchema = LegacyDocumentSchema.pick({
   visibility: true,
   status: true,
   source: true,
@@ -25,21 +25,33 @@ export const ZDocumentSchema = DocumentSchema.pick({
   authOptions: true,
   formValues: true,
   title: true,
-  documentDataId: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,
   deletedAt: true,
   teamId: true,
-  templateId: true,
   folderId: true,
 }).extend({
+  envelopeId: z.string(),
+  internalVersion: z.number(),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
+
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
+
   // Todo: Maybe we want to alter this a bit since this returns a lot of data.
   documentData: DocumentDataSchema.pick({
     type: true,
     id: true,
     data: true,
     initialData: true,
+  }).extend({
+    envelopeItemId: z.string(),
   }),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
@@ -48,9 +60,7 @@ export const ZDocumentSchema = DocumentSchema.pick({
     subject: true,
     message: true,
     timezone: true,
-    password: true,
     dateFormat: true,
-    documentId: true,
     redirectUrl: true,
     typedSignatureEnabled: true,
     uploadSignatureEnabled: true,
@@ -60,7 +70,11 @@ export const ZDocumentSchema = DocumentSchema.pick({
     emailSettings: true,
     emailId: true,
     emailReplyTo: true,
-  }).nullable(),
+  }).extend({
+    password: z.string().nullable().default(null),
+    documentId: z.number().default(-1).optional(),
+  }),
+
   folder: FolderSchema.pick({
     id: true,
     name: true,
@@ -82,7 +96,7 @@ export type TDocument = z.infer<typeof ZDocumentSchema>;
 /**
  * A lite version of the document response schema without relations.
  */
-export const ZDocumentLiteSchema = DocumentSchema.pick({
+export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
   visibility: true,
   status: true,
   source: true,
@@ -92,15 +106,25 @@ export const ZDocumentLiteSchema = DocumentSchema.pick({
   authOptions: true,
   formValues: true,
   title: true,
-  documentDataId: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,
   deletedAt: true,
   teamId: true,
-  templateId: true,
   folderId: true,
   useLegacyFieldInsertion: true,
+}).extend({
+  envelopeId: z.string(),
+  internalVersion: z.number(),
+
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
 });
 
 export type TDocumentLite = z.infer<typeof ZDocumentLiteSchema>;
@@ -108,7 +132,7 @@ export type TDocumentLite = z.infer<typeof ZDocumentLiteSchema>;
 /**
  * A version of the document response schema when returning multiple documents at once from a single API endpoint.
  */
-export const ZDocumentManySchema = DocumentSchema.pick({
+export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   visibility: true,
   status: true,
   source: true,
@@ -118,16 +142,26 @@ export const ZDocumentManySchema = DocumentSchema.pick({
   authOptions: true,
   formValues: true,
   title: true,
-  documentDataId: true,
   createdAt: true,
   updatedAt: true,
   completedAt: true,
   deletedAt: true,
   teamId: true,
-  templateId: true,
   folderId: true,
   useLegacyFieldInsertion: true,
 }).extend({
+  envelopeId: z.string(),
+  internalVersion: z.number(),
+
+  // Backwards compatibility.
+  documentDataId: z.string().default(''),
+
+  // Which "Template" the document was created from.
+  templateId: z
+    .number()
+    .nullish()
+    .describe('The ID of the template that the document was created from, if any.'),
+
   user: UserSchema.pick({
     id: true,
     name: true,

@@ -1,7 +1,5 @@
-import { TeamMemberRole } from '@prisma/client';
 import type { Prisma, User } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -25,7 +23,7 @@ export const getStats = async ({
   folderId,
   ...options
 }: GetStatsInput) => {
-  let createdAt: Prisma.DocumentWhereInput['createdAt'];
+  let createdAt: Prisma.EnvelopeWhereInput['createdAt'];
 
   if (period) {
     const daysAgo = parseInt(period.replace(/d$/, ''), 10);
@@ -90,13 +88,13 @@ export const getStats = async ({
 
 type GetCountsOption = {
   user: Pick<User, 'id' | 'email'>;
-  createdAt: Prisma.DocumentWhereInput['createdAt'];
+  createdAt: Prisma.EnvelopeWhereInput['createdAt'];
   search?: string;
   folderId?: string | null;
 };
 
 const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption) => {
-  const searchFilter: Prisma.DocumentWhereInput = {
+  const searchFilter: Prisma.EnvelopeWhereInput = {
     OR: [
       { title: { contains: search, mode: 'insensitive' } },
       { recipients: { some: { name: { contains: search, mode: 'insensitive' } } } },
@@ -108,12 +106,13 @@ const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption)
 
   return Promise.all([
     // Owner counts.
-    prisma.document.groupBy({
+    prisma.envelope.groupBy({
       by: ['status'],
       _count: {
         _all: true,
       },
       where: {
+        type: EnvelopeType.DOCUMENT,
         userId: user.id,
         createdAt,
         deletedAt: null,
@@ -121,12 +120,13 @@ const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption)
       },
     }),
     // Not signed counts.
-    prisma.document.groupBy({
+    prisma.envelope.groupBy({
       by: ['status'],
       _count: {
         _all: true,
       },
       where: {
+        type: EnvelopeType.DOCUMENT,
         status: ExtendedDocumentStatus.PENDING,
         recipients: {
           some: {
@@ -140,12 +140,13 @@ const getCounts = async ({ user, createdAt, search, folderId }: GetCountsOption)
       },
     }),
     // Has signed counts.
-    prisma.document.groupBy({
+    prisma.envelope.groupBy({
       by: ['status'],
       _count: {
         _all: true,
       },
       where: {
+        type: EnvelopeType.DOCUMENT,
         createdAt,
         user: {
           email: {
@@ -186,7 +187,7 @@ type GetTeamCountsOption = {
   senderIds?: number[];
   currentUserEmail: string;
   userId: number;
-  createdAt: Prisma.DocumentWhereInput['createdAt'];
+  createdAt: Prisma.EnvelopeWhereInput['createdAt'];
   currentTeamMemberRole?: TeamMemberRole;
   search?: string;
   folderId?: string | null;
@@ -197,14 +198,14 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
 
   const senderIds = options.senderIds ?? [];
 
-  const userIdWhereClause: Prisma.DocumentWhereInput['userId'] =
+  const userIdWhereClause: Prisma.EnvelopeWhereInput['userId'] =
     senderIds.length > 0
       ? {
           in: senderIds,
         }
       : undefined;
 
-  const searchFilter: Prisma.DocumentWhereInput = {
+  const searchFilter: Prisma.EnvelopeWhereInput = {
     OR: [
       { title: { contains: options.search, mode: 'insensitive' } },
       { recipients: { some: { name: { contains: options.search, mode: 'insensitive' } } } },
@@ -212,18 +213,20 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     ],
   };
 
-  let ownerCountsWhereInput: Prisma.DocumentWhereInput = {
+  const rootPageFilter = folderId === undefined ? { folderId: null } : {};
+
+  let ownerCountsWhereInput: Prisma.EnvelopeWhereInput = {
+    type: EnvelopeType.DOCUMENT,
     userId: userIdWhereClause,
     createdAt,
     teamId,
     deletedAt: null,
-    folderId,
   };
 
   let notSignedCountsGroupByArgs = null;
   let hasSignedCountsGroupByArgs = null;
 
-  const visibilityFiltersWhereInput: Prisma.DocumentWhereInput = {
+  const visibilityFiltersWhereInput: Prisma.EnvelopeWhereInput = {
     AND: [
       { deletedAt: null },
       {
@@ -261,12 +264,21 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
 
   ownerCountsWhereInput = {
     ...ownerCountsWhereInput,
-    ...visibilityFiltersWhereInput,
-    ...searchFilter,
+    AND: [
+      ...(Array.isArray(visibilityFiltersWhereInput.AND)
+        ? visibilityFiltersWhereInput.AND
+        : visibilityFiltersWhereInput.AND
+          ? [visibilityFiltersWhereInput.AND]
+          : []),
+      searchFilter,
+      rootPageFilter,
+      folderId ? { folderId } : {},
+    ],
   };
 
   if (teamEmail) {
     ownerCountsWhereInput = {
+      type: EnvelopeType.DOCUMENT,
       userId: userIdWhereClause,
       createdAt,
       OR: [
@@ -280,6 +292,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         },
       ],
       deletedAt: null,
+      AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
     };
 
     notSignedCountsGroupByArgs = {
@@ -288,9 +301,9 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         _all: true,
       },
       where: {
+        type: EnvelopeType.DOCUMENT,
         userId: userIdWhereClause,
         createdAt,
-        folderId,
         status: ExtendedDocumentStatus.PENDING,
         recipients: {
           some: {
@@ -300,8 +313,9 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           },
         },
         deletedAt: null,
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
-    } satisfies Prisma.DocumentGroupByArgs;
+    } satisfies Prisma.EnvelopeGroupByArgs;
 
     hasSignedCountsGroupByArgs = {
       by: ['status'],
@@ -309,9 +323,9 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         _all: true,
       },
       where: {
+        type: EnvelopeType.DOCUMENT,
         userId: userIdWhereClause,
         createdAt,
-        folderId,
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
@@ -335,19 +349,20 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
             },
           },
         ],
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
-    } satisfies Prisma.DocumentGroupByArgs;
+    } satisfies Prisma.EnvelopeGroupByArgs;
   }
 
   return Promise.all([
-    prisma.document.groupBy({
+    prisma.envelope.groupBy({
       by: ['status'],
       _count: {
         _all: true,
       },
       where: ownerCountsWhereInput,
     }),
-    notSignedCountsGroupByArgs ? prisma.document.groupBy(notSignedCountsGroupByArgs) : [],
-    hasSignedCountsGroupByArgs ? prisma.document.groupBy(hasSignedCountsGroupByArgs) : [],
+    notSignedCountsGroupByArgs ? prisma.envelope.groupBy(notSignedCountsGroupByArgs) : [],
+    hasSignedCountsGroupByArgs ? prisma.envelope.groupBy(hasSignedCountsGroupByArgs) : [],
   ]);
 };

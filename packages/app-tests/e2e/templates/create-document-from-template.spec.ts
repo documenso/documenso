@@ -75,11 +75,11 @@ test('[TEMPLATE]: should create a document from a template', async ({ page }) =>
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
     },
@@ -178,11 +178,11 @@ test('[TEMPLATE]: should create a team document from a team template', async ({ 
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct values.
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
     },
@@ -268,34 +268,42 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
+    page
+      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
   ]);
 
   await fileChooser.setFiles(EXAMPLE_PDF_PATH);
 
   // Wait for upload to complete
-  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
+  await expect(page.getByText('Remove')).toBeVisible();
 
   // Create document with custom document data
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
+
+  const firstDocumentData = document.envelopeItems[0].documentData;
 
   const expectedDocumentDataType =
     process.env.NEXT_PUBLIC_UPLOAD_TRANSPORT === 's3'
@@ -303,15 +311,15 @@ test('[TEMPLATE]: should create a document from a template with custom document'
       : DocumentDataType.BYTES_64;
 
   expect(document.title).toEqual('TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+  expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
-    expect(document.documentData.data).toEqual(pdfContent);
-    expect(document.documentData.initialData).toEqual(pdfContent);
+    expect(firstDocumentData.data).toEqual(pdfContent);
+    expect(firstDocumentData.initialData).toEqual(pdfContent);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
-    expect(document.documentData.data).toBeTruthy();
-    expect(document.documentData.initialData).toBeTruthy();
+    expect(firstDocumentData.data).toBeTruthy();
+    expect(firstDocumentData.initialData).toBeTruthy();
   }
 });
 
@@ -361,32 +369,38 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
+    page
+      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
   ]);
 
   await fileChooser.setFiles(EXAMPLE_PDF_PATH);
 
   // Wait for upload to complete
-  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
+  await expect(page.getByText('Remove')).toBeVisible();
 
   // Create document with custom document data
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the custom document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
@@ -395,17 +409,19 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
       ? DocumentDataType.S3_PATH
       : DocumentDataType.BYTES_64;
 
+  const firstDocumentData = document.envelopeItems[0].documentData;
+
   expect(document.teamId).toEqual(team.id);
   expect(document.title).toEqual('TEAM_TEMPLATE_WITH_CUSTOM_DOC');
-  expect(document.documentData.type).toEqual(expectedDocumentDataType);
+  expect(firstDocumentData.type).toEqual(expectedDocumentDataType);
 
   if (expectedDocumentDataType === DocumentDataType.BYTES_64) {
-    expect(document.documentData.data).toEqual(pdfContent);
-    expect(document.documentData.initialData).toEqual(pdfContent);
+    expect(firstDocumentData.data).toEqual(pdfContent);
+    expect(firstDocumentData.initialData).toEqual(pdfContent);
   } else {
     // For S3, we expect the data/initialData to be the S3 path (non-empty string)
-    expect(document.documentData.data).toBeTruthy();
-    expect(document.documentData.initialData).toBeTruthy();
+    expect(firstDocumentData.data).toBeTruthy();
+    expect(firstDocumentData.initialData).toBeTruthy();
   }
 });
 
@@ -451,34 +467,44 @@ test('[TEMPLATE]: should create a document from a template using template docume
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the template's document data
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
     },
     include: {
-      documentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
-  const templateWithData = await prisma.template.findFirstOrThrow({
+  const firstDocumentData = document.envelopeItems[0].documentData;
+
+  const templateWithData = await prisma.envelope.findFirstOrThrow({
     where: {
       id: template.id,
     },
     include: {
-      templateDocumentData: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 
   expect(document.title).toEqual('TEMPLATE_WITH_ORIGINAL_DOC');
-  expect(document.documentData.data).toEqual(templateWithData.templateDocumentData.data);
-  expect(document.documentData.initialData).toEqual(
-    templateWithData.templateDocumentData.initialData,
+  expect(firstDocumentData.data).toEqual(templateWithData.envelopeItems[0].documentData.data);
+  expect(firstDocumentData.initialData).toEqual(
+    templateWithData.envelopeItems[0].documentData.initialData,
   );
-  expect(document.documentData.type).toEqual(templateWithData.templateDocumentData.type);
+  expect(firstDocumentData.type).toEqual(templateWithData.envelopeItems[0].documentData.type);
 });
 
 test('[TEMPLATE]: should persist document visibility when creating from template', async ({
@@ -532,13 +558,20 @@ test('[TEMPLATE]: should persist document visibility when creating from template
   await page.getByRole('button', { name: 'Create as draft' }).click();
 
   // Review that the document was created with the correct visibility
-  await page.waitForURL(new RegExp(`/t/${team.url}/documents/\\d+`));
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
 
-  const documentId = Number(page.url().split('/').pop());
+  const documentId = page.url().split('/').pop();
 
-  const document = await prisma.document.findFirstOrThrow({
+  const document = await prisma.envelope.findFirstOrThrow({
     where: {
       id: documentId,
+    },
+    include: {
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
     },
   });
 

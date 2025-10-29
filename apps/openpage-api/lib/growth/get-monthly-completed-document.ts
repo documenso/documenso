@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { kyselyPrisma, sql } from '@documenso/prisma';
@@ -7,18 +7,19 @@ import { addZeroMonth } from '../add-zero-month';
 
 export const getCompletedDocumentsMonthly = async (type: 'count' | 'cumulative' = 'count') => {
   const qb = kyselyPrisma.$kysely
-    .selectFrom('Document')
+    .selectFrom('Envelope')
     .select(({ fn }) => [
-      fn<Date>('DATE_TRUNC', [sql.lit('MONTH'), 'Document.updatedAt']).as('month'),
+      fn<Date>('DATE_TRUNC', [sql.lit('MONTH'), 'Envelope.updatedAt']).as('month'),
       fn.count('id').as('count'),
       fn
         .sum(fn.count('id'))
         // Feels like a bug in the Kysely extension but I just can not do this orderBy in a type-safe manner
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions, @typescript-eslint/no-explicit-any
-        .over((ob) => ob.orderBy(fn('DATE_TRUNC', [sql.lit('MONTH'), 'Document.updatedAt']) as any))
+        .over((ob) => ob.orderBy(fn('DATE_TRUNC', [sql.lit('MONTH'), 'Envelope.updatedAt']) as any))
         .as('cume_count'),
     ])
-    .where(() => sql`"Document"."status" = ${DocumentStatus.COMPLETED}::"DocumentStatus"`)
+    .where(() => sql`"Envelope"."status" = ${DocumentStatus.COMPLETED}::"DocumentStatus"`)
+    .where(() => sql`"Envelope"."type" = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`)
     .groupBy('month')
     .orderBy('month', 'desc')
     .limit(12);

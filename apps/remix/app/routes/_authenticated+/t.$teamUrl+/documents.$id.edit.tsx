@@ -1,157 +1,111 @@
-import { Plural, Trans } from '@lingui/react/macro';
-import { TeamMemberRole } from '@prisma/client';
-import { ChevronLeft, Users2 } from 'lucide-react';
-import { Link, redirect } from 'react-router';
-import { match } from 'ts-pattern';
+import { useEffect } from 'react';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
-import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { logDocumentAccess } from '@documenso/lib/utils/logger';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { msg } from '@lingui/core/macro';
+import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
+import { Link, useNavigate } from 'react-router';
 
-import { DocumentEditForm } from '~/components/general/document/document-edit-form';
-import { DocumentStatus } from '~/components/general/document/document-status';
-import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
-import { StackAvatarsWithTooltip } from '~/components/general/stack-avatars-with-tooltip';
-import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
+import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
+import { trpc } from '@documenso/trpc/react';
+import { Button } from '@documenso/ui/primitives/button';
+import { Spinner } from '@documenso/ui/primitives/spinner';
+
+import EnvelopeEditor from '~/components/general/envelope-editor/envelope-editor';
+import { GenericErrorLayout } from '~/components/general/generic-error-layout';
+import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/documents.$id.edit';
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const { user } = await getSession(request);
+export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
+  const navigate = useNavigate();
+  const team = useCurrentTeam();
 
-  const teamUrl = params.teamUrl;
-
-  if (!teamUrl) {
-    throw new Response('Not Found', { status: 404 });
-  }
-
-  const team = await getTeamByUrl({ userId: user.id, teamUrl });
-
-  const { id } = params;
-
-  const documentId = Number(id);
-
-  const documentRootPath = formatDocumentsPath(team.url);
-
-  if (!documentId || Number.isNaN(documentId)) {
-    throw redirect(documentRootPath);
-  }
-
-  const document = await getDocumentWithDetailsById({
-    documentId,
-    userId: user.id,
-    teamId: team.id,
-  }).catch(() => null);
-
-  if (document?.teamId && !team?.url) {
-    throw redirect(documentRootPath);
-  }
-
-  const documentVisibility = document?.visibility;
-  const currentTeamMemberRole = team.currentTeamRole;
-  const isRecipient = document?.recipients.find((recipient) => recipient.email === user.email);
-  let canAccessDocument = true;
-
-  if (!isRecipient && document?.userId !== user.id) {
-    canAccessDocument = match([documentVisibility, currentTeamMemberRole])
-      .with([DocumentVisibility.EVERYONE, TeamMemberRole.ADMIN], () => true)
-      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MANAGER], () => true)
-      .with([DocumentVisibility.EVERYONE, TeamMemberRole.MEMBER], () => true)
-      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.ADMIN], () => true)
-      .with([DocumentVisibility.MANAGER_AND_ABOVE, TeamMemberRole.MANAGER], () => true)
-      .with([DocumentVisibility.ADMIN, TeamMemberRole.ADMIN], () => true)
-      .otherwise(() => false);
-  }
-
-  if (!document) {
-    throw redirect(documentRootPath);
-  }
-
-  if (team && !canAccessDocument) {
-    throw redirect(documentRootPath);
-  }
-
-  if (isDocumentCompleted(document.status)) {
-    throw redirect(`${documentRootPath}/${documentId}`);
-  }
-
-  logDocumentAccess({
-    request,
-    documentId,
-    userId: user.id,
-  });
-
-  return superLoaderJson({
-    document: {
-      ...document,
-      folder: null,
+  const {
+    data: envelope,
+    isLoading: isLoadingEnvelope,
+    isError: isErrorEnvelope,
+  } = trpc.envelope.get.useQuery(
+    {
+      envelopeId: params.id,
     },
-    documentRootPath,
-  });
-}
+    {
+      retry: false,
+    },
+  );
 
-export default function DocumentEditPage() {
-  const { document, documentRootPath } = useSuperLoaderData<typeof loader>();
+  /**
+   * Need to handle redirecting to legacy editor on the client side to reduce server
+   * requests for the majority use case.
+   */
+  useEffect(() => {
+    if (!envelope) {
+      return;
+    }
 
-  const { recipients } = document;
+    const pathPrefix =
+      envelope.type === EnvelopeType.DOCUMENT
+        ? formatDocumentsPath(team.url)
+        : formatTemplatesPath(team.url);
+
+    if (envelope.teamId !== team.id) {
+      void navigate(pathPrefix, { replace: true });
+    } else if (envelope.internalVersion !== 2) {
+      void navigate(`${pathPrefix}/${envelope.id}/legacy_editor`, { replace: true });
+    }
+  }, [envelope, team, navigate]);
+
+  if (envelope && (envelope.teamId !== team.id || envelope.internalVersion !== 2)) {
+    return (
+      <div className="text-foreground flex h-screen w-screen flex-col items-center justify-center gap-2">
+        <Spinner />
+        <Trans>Redirecting</Trans>
+      </div>
+    );
+  }
+
+  if (isLoadingEnvelope) {
+    return (
+      <div className="text-foreground flex h-screen w-screen flex-col items-center justify-center gap-2">
+        <Spinner />
+        <Trans>Loading</Trans>
+      </div>
+    );
+  }
+
+  if (isErrorEnvelope || !envelope) {
+    return (
+      <GenericErrorLayout
+        errorCode={404}
+        errorCodeMap={{
+          404: {
+            heading: msg`Not found`,
+            subHeading: msg`404 Not found`,
+            message: msg`The document you are looking for may have been removed, renamed or may have never
+                  existed.`,
+          },
+        }}
+        primaryButton={
+          <Button asChild>
+            <Link to={`/t/${team.url}/documents`}>
+              <Trans>Go home</Trans>
+            </Link>
+          </Button>
+        }
+      />
+    );
+  }
 
   return (
-    <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={documentRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
-        <ChevronLeft className="mr-2 inline-block h-5 w-5" />
-        <Trans>Documents</Trans>
-      </Link>
-
-      <div className="mt-4 flex w-full items-end justify-between">
-        <div className="flex-1">
-          <h1
-            className="block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-            title={document.title}
-          >
-            {document.title}
-          </h1>
-
-          <div className="mt-2.5 flex items-center gap-x-6">
-            <DocumentStatus
-              inheritColor
-              status={document.status}
-              className="text-muted-foreground"
-            />
-
-            {recipients.length > 0 && (
-              <div className="text-muted-foreground flex items-center">
-                <Users2 className="mr-2 h-5 w-5" />
-
-                <StackAvatarsWithTooltip
-                  recipients={recipients}
-                  documentStatus={document.status}
-                  position="bottom"
-                >
-                  <span>
-                    <Plural one="1 Recipient" other="# Recipients" value={recipients.length} />
-                  </span>
-                </StackAvatarsWithTooltip>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {document.useLegacyFieldInsertion && (
-          <div>
-            <LegacyFieldWarningPopover type="document" documentId={document.id} />
-          </div>
-        )}
-      </div>
-
-      <DocumentEditForm
-        className="mt-6"
-        initialDocument={document}
-        documentRootPath={documentRootPath}
-      />
-    </div>
+    <EnvelopeEditorProvider initialEnvelope={envelope}>
+      <EnvelopeRenderProvider
+        envelope={envelope}
+        fields={envelope.fields}
+        recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+      >
+        <EnvelopeEditor />
+      </EnvelopeRenderProvider>
+    </EnvelopeEditorProvider>
   );
 }

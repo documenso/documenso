@@ -1,4 +1,4 @@
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
 import { prisma } from '@documenso/prisma';
 
@@ -25,9 +25,10 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
   const serviceAccount = await deletedAccountServiceAccount();
 
   // TODO: Send out cancellations for all pending docs
-  await prisma.document.updateMany({
+  await prisma.envelope.updateMany({
     where: {
       userId: user.id,
+      type: EnvelopeType.DOCUMENT,
       status: {
         in: [DocumentStatus.PENDING, DocumentStatus.REJECTED, DocumentStatus.COMPLETED],
       },

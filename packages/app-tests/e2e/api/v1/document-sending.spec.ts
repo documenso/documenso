@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -25,7 +26,7 @@ test.describe('Document API', () => {
 
     // Test with sendCompletionEmails: false
     const response = await request.post(
-      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/send`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -41,7 +42,7 @@ test.describe('Document API', () => {
     expect(response.status()).toBe(200);
 
     // Verify email settings were updated
-    const updatedDocument = await prisma.document.findUnique({
+    const updatedDocument = await prisma.envelope.findUnique({
       where: { id: document.id },
       include: { documentMeta: true },
     });
@@ -53,7 +54,7 @@ test.describe('Document API', () => {
 
     // Test with sendCompletionEmails: true
     const response2 = await request.post(
-      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/send`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -69,7 +70,7 @@ test.describe('Document API', () => {
     expect(response2.status()).toBe(200);
 
     // Verify email settings were updated
-    const updatedDocument2 = await prisma.document.findUnique({
+    const updatedDocument2 = await prisma.envelope.findUnique({
       where: { id: document.id },
       include: { documentMeta: true },
     });
@@ -93,16 +94,16 @@ test.describe('Document API', () => {
 
     // Set initial email settings
     await prisma.documentMeta.upsert({
-      where: { documentId: document.id },
+      where: { id: document.documentMetaId },
       create: {
-        documentId: document.id,
+        id: document.documentMetaId,
         emailSettings: {
           documentCompleted: true,
           ownerDocumentCompleted: false,
         },
       },
       update: {
-        documentId: document.id,
+        id: document.documentMetaId,
         emailSettings: {
           documentCompleted: true,
           ownerDocumentCompleted: false,
@@ -118,7 +119,7 @@ test.describe('Document API', () => {
     });
 
     const response = await request.post(
-      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${document.id}/send`,
+      `${NEXT_PUBLIC_WEBAPP_URL()}/api/v1/documents/${mapSecondaryIdToDocumentId(document.secondaryId)}/send`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -134,7 +135,7 @@ test.describe('Document API', () => {
     expect(response.status()).toBe(200);
 
     // Verify email settings were not modified
-    const updatedDocument = await prisma.document.findUnique({
+    const updatedDocument = await prisma.envelope.findUnique({
       where: { id: document.id },
       include: { documentMeta: true },
     });

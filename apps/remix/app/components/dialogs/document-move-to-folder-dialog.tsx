@@ -71,7 +71,7 @@ export const DocumentMoveToFolderDialog = ({
     },
   });
 
-  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
+  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFoldersInternal.useQuery(
     {
       parentId: currentFolderId,
       type: FolderType.DOCUMENT,
@@ -81,7 +81,7 @@ export const DocumentMoveToFolderDialog = ({
     },
   );
 
-  const { mutateAsync: moveDocumentToFolder } = trpc.folder.moveDocumentToFolder.useMutation();
+  const { mutateAsync: updateDocument } = trpc.document.update.useMutation();
 
   useEffect(() => {
     if (!open) {
@@ -94,9 +94,11 @@ export const DocumentMoveToFolderDialog = ({
 
   const onSubmit = async (data: TMoveDocumentFormSchema) => {
     try {
-      await moveDocumentToFolder({
+      await updateDocument({
         documentId,
-        folderId: data.folderId ?? null,
+        data: {
+          folderId: data.folderId ?? null,
+        },
       });
 
       const documentsPath = formatDocumentsPath(team.url);

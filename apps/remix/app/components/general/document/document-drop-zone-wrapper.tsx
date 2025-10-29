@@ -64,7 +64,7 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
 
       const response = await putPdfFile(file);
 
-      const { id } = await createDocument({
+      const { legacyDocumentId: id } = await createDocument({
         title: file.name,
         documentDataId: response.id,
         timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
@@ -94,6 +94,10 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
         .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
+        )
+        .with(
+          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
+          () => msg`You have reached the limit of the number of files per envelope`,
         )
         .otherwise(() => msg`An error occurred while uploading your document.`);
 

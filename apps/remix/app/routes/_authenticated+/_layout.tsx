@@ -7,6 +7,7 @@ import { OrganisationProvider } from '@documenso/lib/client-only/providers/organ
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
 import { SITE_SETTINGS_BANNER_ID } from '@documenso/lib/server-only/site-settings/schemas/banner';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
 import { AppBanner } from '~/components/general/app-banner';
@@ -42,7 +43,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   };
 }
 
-export default function Layout({ loaderData, params }: Route.ComponentProps) {
+export default function Layout({ loaderData, params, matches }: Route.ComponentProps) {
   const { banner } = loaderData;
 
   const { user, organisations } = useSession();
@@ -70,6 +71,13 @@ export default function Layout({ loaderData, params }: Route.ComponentProps) {
 
   const orgNotFound = params.orgUrl && !currentOrganisation;
   const teamNotFound = params.teamUrl && !currentTeam;
+
+  // Hide the header for editor routes.
+  const hideHeader = matches.some(
+    (match) =>
+      match?.id === 'routes/_authenticated+/t.$teamUrl+/documents.$id.edit' ||
+      match?.id === 'routes/_authenticated+/t.$teamUrl+/templates.$id.edit',
+  );
 
   if (orgNotFound || teamNotFound) {
     return (
@@ -108,11 +116,15 @@ export default function Layout({ loaderData, params }: Route.ComponentProps) {
 
         {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
-        {banner && <AppBanner banner={banner} />}
+        {banner && !hideHeader && <AppBanner banner={banner} />}
 
-        <Header />
+        {!hideHeader && <Header />}
 
-        <main className="mt-8 pb-8 md:mt-12 md:pb-12">
+        <main
+          className={cn({
+            'mt-8 pb-8 md:mt-12 md:pb-12': !hideHeader,
+          })}
+        >
           <Outlet />
         </main>
       </TeamProvider>
