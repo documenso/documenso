@@ -8,7 +8,7 @@ export const ZUpdateEnvelopeItemsRequestSchema = z.object({
   envelopeId: z.string(),
   data: z
     .object({
-      envelopeItemId: z.string(),
+      envelopeItemId: z.string().describe('The ID of the envelope item to update.'),
       order: z.number().int().min(1).optional(),
       title: ZDocumentTitleSchema.optional(),
     })

@@ -32,6 +32,7 @@ export const getDocumentWithDetailsById = async ({
   return {
     ...envelope,
     envelopeId: envelope.id,
+    internalVersion: envelope.internalVersion,
     documentData: {
       ...firstDocumentData,
       envelopeItemId: envelope.envelopeItems[0].id,

@@ -1,131 +1,139 @@
-import { Plural, Trans, useLingui } from '@lingui/react/macro';
-import { Link, useNavigate } from 'react-router';
+import { Plural, Trans } from '@lingui/react/macro';
+import { EnvelopeType, RecipientRole } from '@prisma/client';
+import { BanIcon, DownloadCloudIcon } from 'lucide-react';
+import { Link } from 'react-router';
+import { match } from 'ts-pattern';
 
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { trpc } from '@documenso/trpc/react';
 import { Badge } from '@documenso/ui/primitives/badge';
+import { Button } from '@documenso/ui/primitives/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@documenso/ui/primitives/dropdown-menu';
 import { Separator } from '@documenso/ui/primitives/separator';
 
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { BrandingLogo } from '~/components/general/branding-logo';
 
-import { DocumentSigningCompleteDialog } from '../document-signing/document-signing-complete-dialog';
+import { BrandingLogoIcon } from '../branding-logo-icon';
+import { DocumentSigningRejectDialog } from '../document-signing/document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
+import { EnvelopeSignerCompleteDialog } from './envelope-signing-complete-dialog';
 
 export const EnvelopeSignerHeader = () => {
-  const { t } = useLingui();
-
-  const navigate = useNavigate();
-  const analytics = useAnalytics();
-
-  const { envelope, setShowPendingFieldTooltip, recipientFieldsRemaining, recipient } =
+  const { envelopeData, envelope, recipientFieldsRemaining, recipient } =
     useRequiredEnvelopeSigningContext();
 
-  const { currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
-
-  const {
-    mutateAsync: completeDocument,
-    isPending,
-    isSuccess,
-  } = trpc.recipient.completeDocumentWithToken.useMutation();
-
-  const handleOnNextFieldClick = () => {
-    const nextField = recipientFieldsRemaining[0];
-
-    if (!nextField) {
-      setShowPendingFieldTooltip(false);
-      return;
-    }
-
-    if (nextField.envelopeItemId !== currentEnvelopeItem?.id) {
-      setCurrentEnvelopeItem(nextField.envelopeItemId);
-    }
-
-    const fieldTooltip = document.querySelector(`#field-tooltip`);
-
-    if (fieldTooltip) {
-      fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
-    setShowPendingFieldTooltip(true);
-  };
-
-  const handleOnCompleteClick = async (
-    nextSigner?: { name: string; email: string },
-    accessAuthOptions?: TRecipientAccessAuth,
-  ) => {
-    const payload = {
-      token: recipient.token,
-      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-      authOptions: accessAuthOptions,
-      ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
-    };
-
-    await completeDocument(payload);
-
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: envelope.id,
-      timestamp: new Date().toISOString(),
-    });
-
-    if (envelope.documentMeta.redirectUrl) {
-      window.location.href = envelope.documentMeta.redirectUrl;
-    } else {
-      await navigate(`/sign/${recipient.token}/complete`);
-    }
-  };
-
   return (
-    <nav className="w-full border-b border-gray-200 bg-white px-6 py-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link to="/">
-            <BrandingLogo className="h-6 w-auto" />
-          </Link>
-          <Separator orientation="vertical" className="h-6" />
-
-          <div className="flex items-center space-x-2">
-            <h1 className="whitespace-nowrap text-sm font-medium text-gray-600">
-              {envelope.title}
-            </h1>
-
-            <Badge variant="secondary">
-              <Trans>Approver</Trans>
-            </Badge>
-          </div>
-        </div>
-
-        <div className="flex items-center space-x-2">
-          <p className="text-muted-foreground mr-2 flex-shrink-0 text-sm">
-            <Plural
-              one="1 Field Remaining"
-              other="# Fields Remaining"
-              value={recipientFieldsRemaining.length}
+    <nav className="bg-background border-border max-w-screen flex flex-row justify-between border-b px-4 py-3 md:px-6">
+      {/* Left side - Logo and title */}
+      <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
+        <Link to="/" className="flex-shrink-0">
+          {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
+            <img
+              src={`/api/branding/logo/team/${envelope.teamId}`}
+              alt={`${envelope.team.name}'s Logo`}
+              className="h-6 w-auto"
             />
-          </p>
+          ) : (
+            <>
+              <BrandingLogo className="hidden h-6 w-auto md:block" />
+              <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+            </>
+          )}
+        </Link>
 
-          <DocumentSigningCompleteDialog
-            isSubmitting={isPending}
-            onSignatureComplete={handleOnCompleteClick}
-            documentTitle={envelope.title}
-            fields={recipientFieldsRemaining}
-            fieldsValidated={handleOnNextFieldClick}
-            recipient={recipient}
-            // Todo: Envelopes
-            allowDictateNextSigner={envelope.documentMeta.allowDictateNextSigner}
-            // defaultNextSigner={
-            //   nextRecipient
-            //     ? { name: nextRecipient.name, email: nextRecipient.email }
-            //     : undefined
-            // }
-            // Todo: Envelopes - use
-            // buttonSize="sm"
-          />
+        <h1
+          title={envelope.title}
+          className="text-foreground min-w-0 truncate text-base font-semibold md:hidden"
+        >
+          {envelope.title}
+        </h1>
+
+        <Separator orientation="vertical" className="hidden h-6 md:block" />
+
+        <div className="hidden items-center space-x-2 md:flex">
+          <h1 className="text-foreground whitespace-nowrap text-sm font-medium">
+            {envelope.title}
+          </h1>
+
+          <Badge>
+            {match(recipient.role)
+              .with(RecipientRole.VIEWER, () => <Trans>Viewer</Trans>)
+              .with(RecipientRole.SIGNER, () => <Trans>Signer</Trans>)
+              .with(RecipientRole.APPROVER, () => <Trans>Approver</Trans>)
+              .with(RecipientRole.ASSISTANT, () => <Trans>Assistant</Trans>)
+              .otherwise(() => null)}
+          </Badge>
         </div>
       </div>
+
+      {/* Right side - Desktop content */}
+      <div className="hidden items-center space-x-2 md:flex">
+        <p className="text-muted-foreground mr-2 flex-shrink-0 text-sm">
+          <Plural
+            one="1 Field Remaining"
+            other="# Fields Remaining"
+            value={recipientFieldsRemaining.length}
+          />
+        </p>
+
+        <EnvelopeSignerCompleteDialog />
+      </div>
+
+      {/* Mobile Actions button */}
+      <div className="flex-shrink-0 md:hidden">
+        <MobileDropdownMenu />
+      </div>
     </nav>
+  );
+};
+
+const MobileDropdownMenu = () => {
+  const { envelope, recipient } = useRequiredEnvelopeSigningContext();
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="sm">
+          <Trans>Actions</Trans>
+        </Button>
+      </DropdownMenuTrigger>
+
+      <DropdownMenuContent align="end">
+        <EnvelopeDownloadDialog
+          envelopeId={envelope.id}
+          envelopeStatus={envelope.status}
+          envelopeItems={envelope.envelopeItems}
+          token={recipient.token}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                <Trans>Download PDF</Trans>
+              </div>
+            </DropdownMenuItem>
+          }
+        />
+
+        {envelope.type === EnvelopeType.DOCUMENT && (
+          <DocumentSigningRejectDialog
+            documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
+            token={recipient.token}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <BanIcon className="mr-2 h-4 w-4" />
+                  <Trans>Reject</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        )}
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };

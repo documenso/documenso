@@ -50,6 +50,7 @@ type UseEditorFieldsResponse = {
 
   // Field operations
   addField: (field: Omit<TLocalField, 'formId'>) => TLocalField;
+  setFieldId: (formId: string, id: number) => void;
   removeFieldsByFormId: (formIds: string[]) => void;
   updateFieldByFormId: (formId: string, updates: Partial<TLocalField>) => void;
   duplicateField: (field: TLocalField, recipientId?: number) => TLocalField;
@@ -123,7 +124,6 @@ export const useEditorFields = ({
     }
 
     if (bypassCheck) {
-      console.log(3);
       setSelectedFieldFormId(formId);
       return;
     }
@@ -136,6 +136,7 @@ export const useEditorFields = ({
       const field: TLocalField = {
         ...fieldData,
         formId: nanoid(12),
+        ...restrictFieldPosValues(fieldData),
       };
 
       append(field);
@@ -160,12 +161,31 @@ export const useEditorFields = ({
     [localFields, remove, triggerFieldsUpdate],
   );
 
+  const setFieldId = (formId: string, id: number) => {
+    const index = localFields.findIndex((field) => field.formId === formId);
+
+    if (index !== -1) {
+      update(index, {
+        ...localFields[index],
+        id,
+      });
+    }
+  };
+
   const updateFieldByFormId = useCallback(
     (formId: string, updates: Partial<TLocalField>) => {
       const index = localFields.findIndex((field) => field.formId === formId);
 
       if (index !== -1) {
-        update(index, { ...localFields[index], ...updates });
+        const updatedField = {
+          ...localFields[index],
+          ...updates,
+        };
+
+        update(index, {
+          ...updatedField,
+          ...restrictFieldPosValues(updatedField),
+        });
         triggerFieldsUpdate();
       }
     },
@@ -261,6 +281,7 @@ export const useEditorFields = ({
 
     // Field operations
     addField,
+    setFieldId,
     removeFieldsByFormId,
     updateFieldByFormId,
     duplicateField,
@@ -277,5 +298,16 @@ export const useEditorFields = ({
     // Selected recipient
     selectedRecipient,
     setSelectedRecipient,
+  };
+};
+
+const restrictFieldPosValues = (
+  field: Pick<TLocalField, 'positionX' | 'positionY' | 'width' | 'height'>,
+) => {
+  return {
+    positionX: Math.max(0, Math.min(100, field.positionX)),
+    positionY: Math.max(0, Math.min(100, field.positionY)),
+    width: Math.max(0, Math.min(100, field.width)),
+    height: Math.max(0, Math.min(100, field.height)),
   };
 };

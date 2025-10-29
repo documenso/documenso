@@ -1,21 +1,29 @@
 import { createContext, useContext, useMemo, useState } from 'react';
 
 import {
+  EnvelopeType,
   type Field,
   FieldType,
   type Recipient,
   RecipientRole,
   SigningStatus,
 } from '@prisma/client';
+import { prop, sortBy } from 'remeda';
 
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
+import {
+  isFieldUnsignedAndRequired,
+  isRequiredField,
+} from '@documenso/lib/utils/advanced-fields-helpers';
+import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { trpc } from '@documenso/trpc/react';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 
 export type EnvelopeSigningContextValue = {
+  isDirectTemplate: boolean;
+
   fullName: string;
   setFullName: (_value: string) => void;
   email: string;
@@ -32,7 +40,8 @@ export type EnvelopeSigningContextValue = {
   recipient: EnvelopeForSigningResponse['recipient'];
   recipientFieldsRemaining: Field[];
   recipientFields: Field[];
-  selectedRecipientFields: Field[];
+  requiredRecipientFields: Field[];
+  selectedAssistantRecipientFields: Field[];
   nextRecipient: EnvelopeForSigningResponse['envelope']['recipients'][number] | null;
   otherRecipientCompletedFields: (Field & {
     recipient: Pick<Recipient, 'name' | 'email' | 'signingStatus' | 'role'>;
@@ -85,26 +94,31 @@ export const EnvelopeSigningProvider = ({
 
   const [showPendingFieldTooltip, setShowPendingFieldTooltip] = useState(false);
 
-  const {
-    mutateAsync: completeDocument,
-    isPending,
-    isSuccess,
-  } = trpc.recipient.completeDocumentWithToken.useMutation();
+  const isDirectTemplate = envelope.type === EnvelopeType.TEMPLATE;
 
   const { mutateAsync: signEnvelopeField } = trpc.envelope.field.sign.useMutation({
     ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
     onSuccess: (data) => {
-      console.log('signEnvelopeField', data);
-
-      const newRecipientFields = envelopeData.recipient.fields.map((field) =>
-        field.id === data.signedField.id ? data.signedField : field,
-      );
-
       setEnvelopeData((prev) => ({
         ...prev,
+        envelope: {
+          ...prev.envelope,
+          recipients: prev.envelope.recipients.map((recipient) =>
+            recipient.id === data.signedField.recipientId
+              ? {
+                  ...recipient,
+                  fields: recipient.fields.map((field) =>
+                    field.id === data.signedField.id ? data.signedField : field,
+                  ),
+                }
+              : recipient,
+          ),
+        },
         recipient: {
           ...prev.recipient,
-          fields: newRecipientFields,
+          fields: prev.recipient.fields.map((field) =>
+            field.id === data.signedField.id ? data.signedField : field,
+          ),
         },
       }));
     },
@@ -149,6 +163,49 @@ export const EnvelopeSigningProvider = ({
   );
 
   /**
+   * The fields that are still required to be signed by the actual recipient.
+   */
+  const recipientFieldsRemaining = useMemo(() => {
+    const requiredFields = envelopeData.recipient.fields
+      .filter((field) => isFieldUnsignedAndRequired(field))
+      .map((field) => {
+        const envelopeItem = envelope.envelopeItems.find(
+          (item) => item.id === field.envelopeItemId,
+        );
+
+        if (!envelopeItem) {
+          throw new Error('Missing envelope item');
+        }
+
+        return {
+          ...field,
+          envelopeItemOrder: envelopeItem.order,
+        };
+      });
+
+    return sortBy(
+      requiredFields,
+      [prop('envelopeItemOrder'), 'asc'],
+      [prop('page'), 'asc'],
+      [prop('positionY'), 'asc'],
+    );
+  }, [envelopeData.recipient.fields]);
+
+  /**
+   * All the required fields for the actual recipient.
+   */
+  const requiredRecipientFields = useMemo(() => {
+    return envelopeData.recipient.fields.filter((field) => isRequiredField(field));
+  }, [envelopeData.recipient.fields]);
+
+  /**
+   * All the fields for the actual recipient.
+   */
+  const recipientFields = useMemo(() => {
+    return envelopeData.recipient.fields;
+  }, [envelopeData.recipient.fields]);
+
+  /**
    * Assistant recipients are those that have a signing order after the assistant.
    */
   const assistantRecipients =
@@ -181,22 +238,8 @@ export const EnvelopeSigningProvider = ({
     return envelope.recipients.find((r) => r.id === selectedAssistantRecipientId) || null;
   }, [envelope.recipients, selectedAssistantRecipientId]);
 
-  /**
-   * The fields that are still required to be signed by the current recipient.
-   */
-  const recipientFieldsRemaining = useMemo(() => {
-    return envelopeData.recipient.fields.filter((field) => isFieldUnsignedAndRequired(field));
-  }, [envelopeData.recipient.fields]);
-
-  /**
-   * All the fields for the current recipient.
-   */
-  const recipientFields = useMemo(() => {
-    return envelopeData.recipient.fields;
-  }, [envelopeData.recipient.fields]);
-
-  const selectedRecipientFields = useMemo(() => {
-    return recipientFields.filter((field) => field.recipientId === selectedAssistantRecipient?.id);
+  const selectedAssistantRecipientFields = useMemo(() => {
+    return assistantFields.filter((field) => field.recipientId === selectedAssistantRecipient?.id);
   }, [recipientFields, selectedAssistantRecipient]);
 
   /**
@@ -244,6 +287,12 @@ export const EnvelopeSigningProvider = ({
   const signField = async (fieldId: number, fieldValue: TSignEnvelopeFieldValue) => {
     console.log('insertField', fieldId, fieldValue);
 
+    // Set the field locally for direct templates.
+    if (isDirectTemplate) {
+      handleDirectTemplateFieldInsertion(fieldId, fieldValue);
+      return;
+    }
+
     await signEnvelopeField({
       token: envelopeData.recipient.token,
       fieldId,
@@ -252,9 +301,67 @@ export const EnvelopeSigningProvider = ({
     });
   };
 
+  const handleDirectTemplateFieldInsertion = (
+    fieldId: number,
+    fieldValue: TSignEnvelopeFieldValue,
+  ) => {
+    const foundField = recipient.fields.find((field) => field.id === fieldId);
+
+    if (!foundField) {
+      throw new Error('Not possible');
+    }
+
+    const insertionValues = extractFieldInsertionValues({
+      fieldValue,
+      field: foundField,
+      documentMeta: envelope.documentMeta,
+    });
+
+    const updatedField = {
+      ...foundField,
+      ...insertionValues,
+    };
+
+    if (fieldValue.type === FieldType.SIGNATURE) {
+      const isBase64 = isBase64Image(fieldValue.value || '');
+
+      updatedField.signature = fieldValue.value
+        ? {
+            signatureImageAsBase64: isBase64 ? fieldValue.value : null,
+            typedSignature: isBase64 ? null : fieldValue.value,
+            recipientId: recipient.id,
+            created: new Date(),
+            // Dummy IDs.
+            id: 0,
+            fieldId: 0,
+          }
+        : null;
+    }
+
+    setEnvelopeData((prev) => ({
+      ...prev,
+      envelope: {
+        ...prev.envelope,
+        recipients: prev.envelope.recipients.map((r) =>
+          r.id === recipient.id
+            ? {
+                ...r,
+                fields: r.fields.map((field) => (field.id === fieldId ? updatedField : field)),
+              }
+            : r,
+        ),
+      },
+      recipient: {
+        ...prev.recipient,
+        fields: prev.recipient.fields.map((field) => (field.id === fieldId ? updatedField : field)),
+      },
+    }));
+  };
+
   return (
     <EnvelopeSigningContext.Provider
       value={{
+        isDirectTemplate,
         fullName,
         setFullName,
         email,
@@ -270,6 +377,7 @@ export const EnvelopeSigningProvider = ({
         recipient,
         recipientFieldsRemaining,
         recipientFields,
+        requiredRecipientFields,
         nextRecipient,
 
         otherRecipientCompletedFields,
@@ -277,7 +385,7 @@ export const EnvelopeSigningProvider = ({
         assistantFields,
         setSelectedAssistantRecipientId,
         selectedAssistantRecipient,
-        selectedRecipientFields,
+        selectedAssistantRecipientFields,
 
         signField,
       }}

@@ -37,6 +37,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       recipients,
       meta,
       folderId,
+      attachments,
     } = input;
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -82,10 +83,12 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         folderId,
         envelopeItems: [
           {
+            // If you ever allow more than 1 in this endpoint, make sure to use `maximumEnvelopeItemCount` to limit it.
             documentDataId: documentData.id,
           },
         ],
       },
+      attachments,
       meta: {
         ...meta,
         emailSettings: meta?.emailSettings ?? undefined,

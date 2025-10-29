@@ -30,7 +30,7 @@ import { Input } from '@documenso/ui/primitives/input';
 
 const createNumberFieldSchema = (fieldMeta: TNumberFieldMeta) => {
   let schema = z.coerce.number({
-    invalid_type_error: msg`Please enter a valid number`.id, // Todo: Envelopes - Check that this works
+    invalid_type_error: msg`Please enter a valid number`.id,
   });
 
   const { numberFormat, minValue, maxValue } = fieldMeta;
@@ -55,9 +55,7 @@ const createNumberFieldSchema = (fieldMeta: TNumberFieldMeta) => {
         return foundRegex.test(value.toString());
       },
       {
-        message: `Number needs to be formatted as ${numberFormat}`,
-        // Todo: Envelopes
-        // message: msg`Number needs to be formatted as ${numberFormat}`.id,
+        message: msg`Number needs to be formatted as ${numberFormat}`.id,
       },
     );
   }
@@ -86,7 +84,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <Trans>Sign Number Field</Trans>

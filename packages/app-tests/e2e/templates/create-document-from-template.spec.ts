@@ -268,17 +268,19 @@ test('[TEMPLATE]: should create a document from a template with custom document'
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
+    page
+      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
   ]);
 
   await fileChooser.setFiles(EXAMPLE_PDF_PATH);
 
   // Wait for upload to complete
-  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
+  await expect(page.getByText('Remove')).toBeVisible();
 
   // Create document with custom document data
   await page.getByRole('button', { name: 'Create as draft' }).click();
@@ -367,17 +369,19 @@ test('[TEMPLATE]: should create a team document from a template with custom docu
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByTestId('template-use-dialog-file-input').evaluate((e) => {
-      if (e instanceof HTMLInputElement) {
-        e.click();
-      }
-    }),
+    page
+      .locator(`#template-use-dialog-file-input-${template.envelopeItems[0].id}`)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
   ]);
 
   await fileChooser.setFiles(EXAMPLE_PDF_PATH);
 
   // Wait for upload to complete
-  await expect(page.getByText(path.basename(EXAMPLE_PDF_PATH))).toBeVisible();
+  await expect(page.getByText('Remove')).toBeVisible();
 
   // Create document with custom document data
   await page.getByRole('button', { name: 'Create as draft' }).click();

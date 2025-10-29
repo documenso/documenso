@@ -42,6 +42,8 @@ import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialo
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
+import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
+
 export type DocumentsTableActionDropdownProps = {
   row: TDocumentRow;
   onMoveDocument?: () => void;
@@ -176,15 +178,33 @@ export const DocumentsTableActionDropdown = ({
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
-          <Download className="mr-2 h-4 w-4" />
-          <Trans>Download</Trans>
-        </DropdownMenuItem>
+        {row.internalVersion === 2 ? (
+          <EnvelopeDownloadDialog
+            envelopeId={row.envelopeId}
+            envelopeStatus={row.status}
+            token={recipient?.token}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <Download className="mr-2 h-4 w-4" />
+                  <Trans>Download</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        ) : (
+          <>
+            <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
+              <Download className="mr-2 h-4 w-4" />
+              <Trans>Download</Trans>
+            </DropdownMenuItem>
 
-        <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <FileDown className="mr-2 h-4 w-4" />
-          <Trans>Download Original</Trans>
-        </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDownloadOriginalClick}>
+              <FileDown className="mr-2 h-4 w-4" />
+              <Trans>Download Original</Trans>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />

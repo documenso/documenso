@@ -3,6 +3,9 @@ import React from 'react';
 
 import type { DocumentData } from '@prisma/client';
 
+import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
+import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
+
 import type { TEnvelope } from '../../types/envelope';
 import { getFile } from '../../universal/upload/get-file';
 
@@ -23,6 +26,7 @@ type EnvelopeRenderProviderValue = {
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
   fields: TEnvelope['fields'];
+  getRecipientColorKey: (recipientId: number) => TRecipientColor;
 };
 
 interface EnvelopeRenderProviderProps {
@@ -35,6 +39,13 @@ interface EnvelopeRenderProviderProps {
    * Only pass if the CustomRenderer you are passing in wants fields.
    */
   fields?: TEnvelope['fields'];
+
+  /**
+   * Optional recipient IDs used to determine the color of the fields.
+   *
+   * Only required for generic page renderers.
+   */
+  recipientIds?: number[];
 }
 
 const EnvelopeRenderContext = createContext<EnvelopeRenderProviderValue | null>(null);
@@ -56,6 +67,7 @@ export const EnvelopeRenderProvider = ({
   children,
   envelope,
   fields,
+  recipientIds = [],
 }: EnvelopeRenderProviderProps) => {
   // Indexed by documentDataId.
   const [files, setFiles] = useState<Record<string, FileData>>({});
@@ -132,6 +144,17 @@ export const EnvelopeRenderProvider = ({
     }
   }, [envelope.envelopeItems]);
 
+  const getRecipientColorKey = useCallback(
+    (recipientId: number) => {
+      const recipientIndex = recipientIds.findIndex((id) => id === recipientId);
+
+      return AVAILABLE_RECIPIENT_COLORS[
+        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
+      ];
+    },
+    [recipientIds],
+  );
+
   return (
     <EnvelopeRenderContext.Provider
       value={{
@@ -140,6 +163,7 @@ export const EnvelopeRenderProvider = ({
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],
+        getRecipientColorKey,
       }}
     >
       {children}

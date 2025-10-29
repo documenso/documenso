@@ -19,6 +19,7 @@ import {
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import {
@@ -197,6 +198,15 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   publicDescription: ZTemplatePublicDescriptionSchema.optional(),
   type: z.nativeEnum(TemplateType).optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 /**

@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSchema';
 
 import {
+  FIELD_SIGNATURE_META_DEFAULT_VALUES,
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
   ZDropdownFieldMeta,
@@ -12,6 +13,7 @@ import {
   ZNameFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
+  ZSignatureFieldMeta,
   ZTextFieldMeta,
 } from './field-meta';
 
@@ -69,7 +71,6 @@ export const ZFieldHeightSchema = z.number().min(1).describe('The height of the 
 
 // ---------------------------------------------
 
-// Todo: Envelopes - dunno man
 const PrismaDecimalSchema = z.preprocess(
   (val) => (typeof val === 'string' ? new Prisma.Decimal(val) : val),
   z.instanceof(Prisma.Decimal, { message: 'Must be a Decimal' }),
@@ -91,7 +92,7 @@ export type TFieldText = z.infer<typeof ZFieldTextSchema>;
 
 export const ZFieldSignatureSchema = BaseFieldSchemaUsingNumbers.extend({
   type: z.literal(FieldType.SIGNATURE),
-  fieldMeta: z.literal(null),
+  fieldMeta: ZSignatureFieldMeta.catch(FIELD_SIGNATURE_META_DEFAULT_VALUES),
 });
 
 export type TFieldSignature = z.infer<typeof ZFieldSignatureSchema>;

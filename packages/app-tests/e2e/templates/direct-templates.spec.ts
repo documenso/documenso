@@ -83,7 +83,7 @@ test('[DIRECT_TEMPLATES]: toggle direct template link', async ({ page }) => {
   await expect(page.getByText('Direct link signing has been').first()).toBeVisible();
 
   // Check that the direct template link is no longer accessible.
-  await page.goto(formatDirectTemplatePath(template.directLink?.token || ''));
+  await page.goto(formatDirectTemplatePath(template.directLink?.token || '123'));
   await expect(page.getByText('404 not found')).toBeVisible();
 });
 

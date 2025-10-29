@@ -15,6 +15,7 @@ import {
   mapFieldsWithRecipients,
 } from '@documenso/ui/components/document/document-read-only-fields';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -87,6 +88,8 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
   const documentRootPath = formatDocumentsPath(team.url);
 
+  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       {envelope.status === DocumentStatus.PENDING && (
@@ -140,40 +143,52 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
-        <Card
-          className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-          gradient
-        >
-          <CardContent className="p-2">
-            {envelope.internalVersion === 2 ? (
-              <EnvelopeRenderProvider envelope={envelope} fields={envelope.fields}>
+        {envelope.internalVersion === 2 ? (
+          <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
+            <EnvelopeRenderProvider
+              envelope={envelope}
+              fields={envelope.status == DocumentStatus.COMPLETED ? [] : envelope.fields}
+              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+            >
+              {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+              )}
 
-                <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
-              </EnvelopeRenderProvider>
-            ) : (
-              <>
-                {envelope.status !== DocumentStatus.COMPLETED && (
-                  <DocumentReadOnlyFields
-                    fields={mapFieldsWithRecipients(envelope.fields, envelope.recipients)}
-                    documentMeta={envelope.documentMeta || undefined}
-                    showRecipientTooltip={true}
-                    showRecipientColors={true}
-                    recipientIds={envelope.recipients.map((recipient) => recipient.id)}
-                  />
-                )}
-
-                <PDFViewer
-                  document={envelope}
-                  key={envelope.envelopeItems[0].id}
-                  documentData={envelope.envelopeItems[0].documentData}
+              <Card className="rounded-xl before:rounded-xl" gradient>
+                <CardContent className="p-2">
+                  <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+                </CardContent>
+              </Card>
+            </EnvelopeRenderProvider>
+          </div>
+        ) : (
+          <Card
+            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+            gradient
+          >
+            <CardContent className="p-2">
+              {envelope.status !== DocumentStatus.COMPLETED && (
+                <DocumentReadOnlyFields
+                  fields={mapFieldsWithRecipients(envelope.fields, envelope.recipients)}
+                  documentMeta={envelope.documentMeta || undefined}
+                  showRecipientTooltip={true}
+                  showRecipientColors={true}
+                  recipientIds={envelope.recipients.map((recipient) => recipient.id)}
                 />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              )}
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+              <PDFViewer
+                document={envelope}
+                key={envelope.envelopeItems[0].id}
+                documentData={envelope.envelopeItems[0].documentData}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        <div
+          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
+        >
           <div className="space-y-6">
             <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">

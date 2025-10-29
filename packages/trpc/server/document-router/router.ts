@@ -1,5 +1,9 @@
 import { router } from '../trpc';
 import { accessAuthRequest2FAEmailRoute } from './access-auth-request-2fa-email';
+import { createAttachmentRoute } from './attachment/create-attachment';
+import { deleteAttachmentRoute } from './attachment/delete-attachment';
+import { findAttachmentsRoute } from './attachment/find-attachments';
+import { updateAttachmentRoute } from './attachment/update-attachment';
 import { createDocumentRoute } from './create-document';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
@@ -53,4 +57,10 @@ export const documentRouter = router({
     find: findInboxRoute,
     getCount: getInboxCountRoute,
   }),
+  attachment: {
+    create: createAttachmentRoute,
+    update: updateAttachmentRoute,
+    delete: deleteAttachmentRoute,
+    find: findAttachmentsRoute,
+  },
 });

@@ -3,6 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Upload } from 'lucide-react';
+import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
@@ -21,8 +22,9 @@ export type DocumentDropzoneProps = {
   loading?: boolean;
   disabledMessage?: MessageDescriptor;
   onDrop?: (_files: File[]) => void | Promise<void>;
-  onDropRejected?: () => void | Promise<void>;
+  onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
   type?: 'document' | 'template' | 'envelope';
+  maxFiles?: number;
   [key: string]: unknown;
 };
 
@@ -34,6 +36,7 @@ export const DocumentDropzone = ({
   disabled,
   disabledMessage = msg`You cannot upload documents at this time.`,
   type = 'document',
+  maxFiles,
   ...props
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
@@ -50,17 +53,13 @@ export const DocumentDropzone = ({
     },
     multiple: type === 'envelope',
     disabled,
-    maxFiles: 10, // Todo: Envelopes - Use claims. And also update other places where this is used.
+    maxFiles,
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0 && onDrop) {
         void onDrop(acceptedFiles);
       }
     },
-    onDropRejected: () => {
-      if (onDropRejected) {
-        void onDropRejected();
-      }
-    },
+    onDropRejected,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 

@@ -162,12 +162,6 @@ export const createDocumentFromDirectTemplate = async ({
     throw new AppError(AppErrorCode.INVALID_REQUEST, { message: 'Template no longer matches' });
   }
 
-  if (user && user.email !== directRecipientEmail) {
-    throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Email must match if you are logged in',
-    });
-  }
-
   const { derivedRecipientAccessAuth, documentAuthOption: templateAuthOptions } =
     extractDocumentAuthMethods({
       documentAuth: directTemplateEnvelope.authOptions,
@@ -340,7 +334,7 @@ export const createDocumentFromDirectTemplate = async ({
         id: prefixedId('envelope'),
         secondaryId: incrementedDocumentId.formattedDocumentId,
         type: EnvelopeType.DOCUMENT,
-        internalVersion: 1,
+        internalVersion: directTemplateEnvelope.internalVersion,
         qrToken: prefixedId('qr'),
         source: DocumentSource.TEMPLATE_DIRECT_LINK,
         templateId: directTemplateEnvelopeLegacyId,
@@ -639,6 +633,23 @@ export const createDocumentFromDirectTemplate = async ({
     await tx.documentAuditLog.createMany({
       data: auditLogsToCreate,
     });
+
+    const templateAttachments = await tx.envelopeAttachment.findMany({
+      where: {
+        envelopeId: directTemplateEnvelope.id,
+      },
+    });
+
+    if (templateAttachments.length > 0) {
+      await tx.envelopeAttachment.createMany({
+        data: templateAttachments.map((attachment) => ({
+          envelopeId: createdEnvelope.id,
+          type: attachment.type,
+          label: attachment.label,
+          data: attachment.data,
+        })),
+      });
+    }
 
     // Send email to template owner.
     const emailTemplate = createElement(DocumentCreatedFromDirectTemplateEmailTemplate, {

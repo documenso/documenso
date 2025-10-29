@@ -22,7 +22,9 @@ export default function RecipientLayout({ matches }: Route.ComponentProps) {
 
   // Hide the header for signing routes.
   const hideHeader = matches.some(
-    (match) => match?.id === 'routes/_recipient+/sign.$token+/_index',
+    (match) =>
+      match?.id === 'routes/_recipient+/sign.$token+/_index' ||
+      match?.id === 'routes/_recipient+/d.$token+/_index',
   );
 
   return (
