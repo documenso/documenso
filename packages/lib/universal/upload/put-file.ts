@@ -14,6 +14,7 @@ import { AppError } from '../../errors/app-error';
 type File = {
   name: string;
   type: string;
+  size: number;
   arrayBuffer: () => Promise<ArrayBuffer>;
 };
 

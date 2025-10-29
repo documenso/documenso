@@ -37,6 +37,8 @@ import {
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
+import { OpenSourceDialog } from './open-source-dialog';
+
 export const OrgMenuSwitcher = () => {
   const { _ } = useLingui();
 
@@ -46,6 +48,7 @@ export const OrgMenuSwitcher = () => {
 
   const [isOpen, setIsOpen] = useState(false);
   const [languageSwitcherOpen, setLanguageSwitcherOpen] = useState(false);
+  const [openSourceDialogOpen, setOpenSourceDialogOpen] = useState(false);
   const [hoveredOrgId, setHoveredOrgId] = useState<string | null>(null);
 
   const isUserAdmin = isAdmin(user);
@@ -323,16 +326,18 @@ export const OrgMenuSwitcher = () => {
 
               {currentOrganisation && (
                 <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                  <Link
-                    to={{
-                      pathname: `/o/${currentOrganisation.url}/support`,
-                      search: currentTeam ? `?team=${currentTeam.id}` : '',
-                    }}
-                  >
+                  <a href="https://suiteop.com/help" target="_blank" rel="noopener noreferrer">
                     <Trans>Support</Trans>
-                  </Link>
+                  </a>
                 </DropdownMenuItem>
               )}
+
+              <DropdownMenuItem
+                className="text-muted-foreground px-4 py-2"
+                onClick={() => setOpenSourceDialogOpen(true)}
+              >
+                <Trans>Open Source</Trans>
+              </DropdownMenuItem>
 
               <DropdownMenuItem
                 className="text-muted-foreground hover:!text-muted-foreground px-4 py-2"
@@ -346,6 +351,7 @@ export const OrgMenuSwitcher = () => {
       </DropdownMenuContent>
 
       <LanguageSwitcherDialog open={languageSwitcherOpen} setOpen={setLanguageSwitcherOpen} />
+      <OpenSourceDialog open={openSourceDialogOpen} setOpen={setOpenSourceDialogOpen} />
     </DropdownMenu>
   );
 };
