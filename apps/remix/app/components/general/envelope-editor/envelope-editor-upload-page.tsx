@@ -1,12 +1,11 @@
 import { useMemo, useState } from 'react';
 
-import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
-import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
-import { X } from 'lucide-react';
+import { FileWarningIcon, GripVerticalIcon, Loader2, X } from 'lucide-react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { Link } from 'react-router';
 

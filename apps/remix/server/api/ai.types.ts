@@ -44,13 +44,7 @@ export type TDetectObjectsRequest = z.infer<typeof ZDetectObjectsRequestSchema>;
 export type TDetectObjectsResponse = z.infer<typeof ZDetectObjectsResponseSchema>;
 
 export const ZDetectObjectsAndDrawRequestSchema = z.object({
-  imagePath: z.string().min(1, 'Image path is required'),
-});
-
-export const ZDetectObjectsAndDrawResponseSchema = z.object({
-  outputPath: z.string().describe('Path to the generated image with bounding boxes'),
-  detectedObjects: z.array(ZDetectedObjectSchema).describe('Array of detected objects'),
+  image: z.instanceof(Blob, { message: 'Image file is required' }),
 });
 
 export type TDetectObjectsAndDrawRequest = z.infer<typeof ZDetectObjectsAndDrawRequestSchema>;
-export type TDetectObjectsAndDrawResponse = z.infer<typeof ZDetectObjectsAndDrawResponseSchema>;
