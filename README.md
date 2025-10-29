@@ -171,7 +171,7 @@ git clone https://github.com/<your-username>/documenso
 
 5. Create the database schema by running `npm run prisma:migrate-dev`
 
-6. Run `npm run translate:compile` in the root dierctory to compile lingui
+6. Run `npm run translate:compile` in the root directory to compile lingui
 
 7. Run `npm run dev` in the root directory to start
 
