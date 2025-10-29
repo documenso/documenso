@@ -14,6 +14,7 @@ import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
+import { aiRoute } from './api/ai';
 import { filesRoute } from './api/files';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
@@ -82,6 +83,9 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.route('/api/files', filesRoute);
+
+// AI route.
+app.route('/api/ai', aiRoute);
 
 // API servers.
 app.use(`/api/v1/*`, cors());
