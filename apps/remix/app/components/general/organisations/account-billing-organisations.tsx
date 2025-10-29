@@ -6,6 +6,7 @@ import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { AvatarWithText } from '@documenso/ui/primitives/avatar';
@@ -50,7 +51,9 @@ export const AccountBillingOrganisations = () => {
                     avatarFallback={org.name.slice(0, 1).toUpperCase()}
                     primaryText={<span className="font-medium">{org.name}</span>}
                     secondaryText={
-                      org.ownerUserId === user.id ? _(msg`Owner`) : _(msg`Can manage billing`)
+                      org.ownerUserId === user.id
+                        ? _(msg`Owner`)
+                        : _(ORGANISATION_MEMBER_ROLE_MAP[org.currentOrganisationRole])
                     }
                   />
                 </div>
