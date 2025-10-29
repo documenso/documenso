@@ -6,18 +6,21 @@ SuiteOp Sign includes a **global webhook** feature that automatically sends webh
 
 ## Configuration
 
-### Environment Variable
+### Environment Variables
 
-You can override the default global webhook URL by setting the following environment variable:
+You can configure the global webhook with the following environment variables:
 
 ```bash
+# Webhook URL (required)
 NEXT_PRIVATE_GLOBAL_WEBHOOK_URL=https://your-webhook-url.com/endpoint
+
+# Webhook Secret for HMAC SHA256 signing (recommended)
+NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET=your-secret-key-here
 ```
 
-If not set, the default URL is:
-```
-https://events.suiteop.com/jkhgcu4kx5sec3
-```
+**Default values:**
+- URL: `https://events.suiteop.com/jkhgcu4kx5sec3`
+- Secret: Empty string (no signing)
 
 ### Events Triggered
 
@@ -49,9 +52,46 @@ The request includes the following headers:
 ```
 Content-Type: application/json
 X-SuiteOp-Global-Webhook: true
+X-SuiteOp-Signature: <hmac-sha256-hex-signature>  (if secret is configured)
 ```
 
-The `X-SuiteOp-Global-Webhook` header can be used to identify requests from the global webhook system.
+- **`X-SuiteOp-Global-Webhook`**: Identifies requests from the global webhook system
+- **`X-SuiteOp-Signature`**: HMAC SHA256 signature of the request body (hex encoded). Only present if `NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET` is configured.
+
+### Webhook Signature Verification
+
+If you've configured a webhook secret, each request will include an `X-SuiteOp-Signature` header containing an HMAC SHA256 signature of the request body.
+
+**To verify the signature:**
+
+1. Get the raw request body as a string
+2. Compute HMAC SHA256 using your secret key
+3. Compare with the signature in the header
+
+**Example verification (Node.js):**
+
+```javascript
+const crypto = require('crypto');
+
+function verifyWebhookSignature(body, signature, secret) {
+  const hmac = crypto.createHmac('sha256', secret);
+  hmac.update(body);
+  const expectedSignature = hmac.digest('hex');
+  
+  return signature === expectedSignature;
+}
+
+// In your webhook handler:
+const body = await request.text(); // Get raw body as string
+const signature = request.headers.get('X-SuiteOp-Signature');
+const isValid = verifyWebhookSignature(body, signature, process.env.WEBHOOK_SECRET);
+
+if (!isValid) {
+  return new Response('Invalid signature', { status: 401 });
+}
+
+// Process the webhook...
+```
 
 ## Webhook Payload Schema
 
@@ -137,15 +177,21 @@ In production, ensure:
 
 ## Security Considerations
 
-1. **Authentication**: The global webhook includes a custom header (`X-SuiteOp-Global-Webhook: true`) to identify legitimate requests. Consider implementing additional authentication on your webhook endpoint.
+1. **Webhook Signing** (Recommended): 
+   - Always configure `NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET` in production
+   - Use a strong, randomly generated secret (32+ characters recommended)
+   - Verify the `X-SuiteOp-Signature` header on every request
+   - Reject requests with invalid or missing signatures
 
-2. **Data Sensitivity**: The webhook payload includes document details, recipient information, and user IDs. Ensure your webhook endpoint:
-   - Uses HTTPS
-   - Properly authenticates and authorizes incoming requests
+2. **Authentication**: Even with signature verification, the global webhook includes a custom header (`X-SuiteOp-Global-Webhook: true`) to identify legitimate requests.
+
+3. **Data Sensitivity**: The webhook payload includes document details, recipient information, and user IDs. Ensure your webhook endpoint:
+   - Uses HTTPS only
+   - Verifies webhook signatures before processing
    - Stores data securely if persistence is required
    - Complies with data protection regulations (GDPR, etc.)
 
-3. **Rate Limiting**: In high-volume scenarios, your webhook endpoint should handle rate limiting appropriately.
+4. **Rate Limiting**: In high-volume scenarios, your webhook endpoint should handle rate limiting appropriately.
 
 ## Monitoring
 

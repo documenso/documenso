@@ -1,4 +1,6 @@
-import { GLOBAL_WEBHOOK_URL } from '../../../constants/app';
+import { createHmac } from 'crypto';
+
+import { GLOBAL_WEBHOOK_SECRET, GLOBAL_WEBHOOK_URL } from '../../../constants/app';
 import { jobs } from '../../../jobs/client';
 import { verify } from '../../crypto/verify';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
@@ -74,12 +76,23 @@ export const handlerTriggerWebhooks = async (req: Request) => {
         teamId,
       };
 
+      const payloadString = JSON.stringify(payloadData);
+
+      // Sign the webhook payload using HMAC SHA256 if secret is configured
+      let signature = '';
+      if (GLOBAL_WEBHOOK_SECRET) {
+        const hmac = createHmac('sha256', GLOBAL_WEBHOOK_SECRET);
+        hmac.update(payloadString);
+        signature = hmac.digest('hex');
+      }
+
       const response = await fetch(GLOBAL_WEBHOOK_URL, {
         method: 'POST',
-        body: JSON.stringify(payloadData),
+        body: payloadString,
         headers: {
           'Content-Type': 'application/json',
           'X-SuiteOp-Global-Webhook': 'true',
+          ...(signature && { 'X-SuiteOp-Signature': signature }),
         },
       });
 
