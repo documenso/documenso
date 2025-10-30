@@ -1,5 +1,20 @@
 import { PDFDocument, rgb } from '@cantoo/pdf-lib';
+import type { Recipient } from '@prisma/client';
+import { EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 import PDFParser from 'pdf2json';
+import { match } from 'ts-pattern';
+
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
+import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
+import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/create-template-recipients';
+import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
+import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
+import { prisma } from '@documenso/prisma';
 
 import { getPageSize } from './get-page-size';
 
@@ -30,11 +45,23 @@ type PlaceholderInfo = {
   pageHeight: number;
 };
 
+type FieldToCreate = TFieldAndMeta & {
+  recipientId: number;
+  pageNumber: number;
+  pageX: number;
+  pageY: number;
+  width: number;
+  height: number;
+};
+
 /*
   Questions for later:
-    - Does it handle multi-page PDFs?
+    - Does it handle multi-page PDFs? ✅ YES! ✅
+    - Does it handle multiple recipients on the same page? ✅ YES! ✅
+    - Does it handle multiple recipients on multiple pages? ✅ YES! ✅
     - What happens with incorrect placeholders? E.g. those containing non-accepted properties.
     - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing.
+    - Need to handle envelopes with multiple items.
 */
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
@@ -199,4 +226,199 @@ export const replacePlaceholdersInPDF = async (pdf: Buffer): Promise<Buffer> => 
   const modifiedPdfBytes = await pdfDoc.save();
 
   return Buffer.from(modifiedPdfBytes);
+};
+
+const extractRecipientPlaceholder = (
+  placeholder: string,
+): { email: string; recipientIndex: number } => {
+  const indexMatch = placeholder.match(/^r(\d+)$/i);
+
+  if (!indexMatch) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Invalid recipient placeholder format: ${placeholder}. Expected format: r1, r2, r3, etc.`,
+    });
+  }
+
+  return {
+    email: `recipient.${indexMatch[1]}@documenso.com`,
+    recipientIndex: Number(indexMatch[1]),
+  };
+};
+
+/*
+  Parse field type string to FieldType enum.
+  Normalizes the input (uppercase, trim) and validates it's a valid field type.
+  This ensures we handle case variations and whitespace, and provides clear error messages.
+*/
+const parseFieldType = (fieldTypeString: string): FieldType => {
+  const normalizedType = fieldTypeString.toUpperCase().trim();
+
+  return match(normalizedType)
+    .with('SIGNATURE', () => FieldType.SIGNATURE)
+    .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
+    .with('INITIALS', () => FieldType.INITIALS)
+    .with('NAME', () => FieldType.NAME)
+    .with('EMAIL', () => FieldType.EMAIL)
+    .with('DATE', () => FieldType.DATE)
+    .with('TEXT', () => FieldType.TEXT)
+    .with('NUMBER', () => FieldType.NUMBER)
+    .with('RADIO', () => FieldType.RADIO)
+    .with('CHECKBOX', () => FieldType.CHECKBOX)
+    .with('DROPDOWN', () => FieldType.DROPDOWN)
+    .otherwise(() => {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Invalid field type: ${fieldTypeString}`,
+      });
+    });
+};
+
+export const insertFieldsFromPlaceholdersInPDF = async (
+  pdf: Buffer,
+  userId: number,
+  teamId: number,
+  envelopeId: EnvelopeIdOptions,
+  requestMetadata: ApiRequestMetadata,
+): Promise<Buffer> => {
+  const placeholders = await extractPlaceholdersFromPDF(pdf);
+
+  if (placeholders.length === 0) {
+    return pdf;
+  }
+
+  /*
+    A structure that maps the recipient email to the recipient index.
+    Example: 'recipient.1@documenso.com' => 1
+  */
+  const recipientEmailToIndex = new Map<string, number>();
+
+  for (const placeholder of placeholders) {
+    const { email, recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
+
+    recipientEmailToIndex.set(email, recipientIndex);
+  }
+
+  /*
+    Create a list of recipients to create.
+    Example: [{ email: 'recipient.1@documenso.com', name: 'Recipient 1', role: 'SIGNER', signingOrder: 1 }]
+  */
+  const recipientsToCreate = Array.from(
+    recipientEmailToIndex.entries(),
+    ([email, recipientIndex]) => {
+      const placeholderInfo = generateRecipientPlaceholder(recipientIndex);
+
+      return {
+        email,
+        name: placeholderInfo.name,
+        role: RecipientRole.SIGNER,
+        signingOrder: recipientIndex,
+      };
+    },
+  );
+
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: envelopeId,
+    userId,
+    teamId,
+    type: null,
+  });
+
+  const envelope = await prisma.envelope.findFirst({
+    where: envelopeWhereInput,
+    select: {
+      id: true,
+      type: true,
+      secondaryId: true,
+    },
+  });
+
+  if (!envelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Envelope not found',
+    });
+  }
+
+  let createdRecipients: Pick<Recipient, 'id' | 'email'>[];
+
+  if (envelope.type === EnvelopeType.DOCUMENT) {
+    const { recipients } = await createDocumentRecipients({
+      userId,
+      teamId,
+      id: envelopeId,
+      recipients: recipientsToCreate,
+      requestMetadata,
+    });
+
+    createdRecipients = recipients;
+  } else {
+    const templateId =
+      envelopeId.type === 'templateId'
+        ? envelopeId.id
+        : mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+    const { recipients } = await createTemplateRecipients({
+      userId,
+      teamId,
+      templateId,
+      recipients: recipientsToCreate,
+    });
+
+    createdRecipients = recipients;
+  }
+
+  const fieldsToCreate: FieldToCreate[] = [];
+
+  for (const placeholder of placeholders) {
+    /*
+      Convert PDF2JSON coordinates to percentage-based coordinates (0-100)
+      The UI expects positionX and positionY as percentages, not absolute points
+      PDF2JSON uses relative coordinates: x/pageWidth and y/pageHeight give us the percentage
+    */
+    const xPercent = (placeholder.x / placeholder.pageWidth) * 100;
+    const yPercent = (placeholder.y / placeholder.pageHeight) * 100;
+
+    const widthPercent = (placeholder.width / placeholder.pageWidth) * 100;
+    const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
+
+    const fieldType = parseFieldType(placeholder.fieldType);
+
+    const { email } = extractRecipientPlaceholder(placeholder.recipient);
+    const normalizedEmail = email.toLowerCase();
+    const recipient = createdRecipients.find((r) => r.email.toLowerCase() === normalizedEmail);
+
+    if (!recipient) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Could not find recipient ID for placeholder: ${placeholder.placeholder}`,
+      });
+    }
+
+    const recipientId = recipient.id;
+
+    // Default height percentage if too small (use 2% as a reasonable default)
+    const finalHeightPercent = heightPercent > 0.01 ? heightPercent : 2;
+
+    const baseField = {
+      recipientId,
+      pageNumber: placeholder.page,
+      pageX: xPercent,
+      pageY: yPercent,
+      width: widthPercent,
+      height: finalHeightPercent,
+    };
+
+    fieldsToCreate.push({
+      type: fieldType,
+      fieldMeta: undefined,
+      ...baseField,
+    });
+  }
+
+  await createEnvelopeFields({
+    userId,
+    teamId,
+    id: envelopeId,
+    fields: fieldsToCreate,
+    requestMetadata,
+  });
+
+  return pdf;
 };
