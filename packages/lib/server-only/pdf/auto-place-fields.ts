@@ -9,7 +9,7 @@ import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-e
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
 import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/create-template-recipients';
-import type { TFieldAndMeta } from '@documenso/lib/types/field-meta';
+import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
@@ -33,14 +33,12 @@ type PlaceholderInfo = {
   placeholder: string;
   fieldType: string;
   recipient: string;
-  isRequired: string;
+  fieldMeta: Record<string, string>;
   page: number;
-  // PDF2JSON coordinates (in page units - these are relative to page dimensions)
   x: number;
   y: number;
   width: number;
   height: number;
-  // Page dimensions from PDF2JSON (in page units)
   pageWidth: number;
   pageHeight: number;
 };
@@ -121,7 +119,9 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           const placeholder = match[0];
           const placeholderData = match[1].split(',').map((part) => part.trim());
 
-          const [fieldType, recipient, isRequired] = placeholderData;
+          const [fieldType, recipient, ...fieldMetaData] = placeholderData;
+
+          const fieldMeta = Object.fromEntries(fieldMetaData.map((meta) => meta.split('=')));
 
           /*
             Find the position of where the placeholder starts in the text
@@ -157,7 +157,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
             placeholder,
             fieldType,
             recipient,
-            isRequired,
+            fieldMeta,
             page: pageIndex + 1,
             x,
             y,
@@ -272,6 +272,51 @@ const parseFieldType = (fieldTypeString: string): FieldType => {
     });
 };
 
+/*
+  Transform raw field metadata from placeholder format to schema format.
+  Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
+  Converts string values to proper types (booleans, numbers).
+*/
+const transformFieldMeta = (
+  rawMeta: Record<string, string>,
+  fieldType: FieldType,
+): Record<string, unknown> | undefined => {
+  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
+    return undefined;
+  }
+
+  if (Object.keys(rawMeta).length === 0) {
+    return undefined;
+  }
+
+  const fieldTypeString = String(fieldType).toLowerCase();
+
+  const transformed: Record<string, unknown> = {
+    type: fieldTypeString,
+  };
+
+  for (const [key, value] of Object.entries(rawMeta)) {
+    if (key === 'readOnly' || key === 'required') {
+      transformed[key] = value === 'true';
+    } else if (
+      key === 'fontSize' ||
+      key === 'maxValue' ||
+      key === 'minValue' ||
+      key === 'characterLimit'
+    ) {
+      const numValue = Number(value);
+
+      if (!Number.isNaN(numValue)) {
+        transformed[key] = numValue;
+      }
+    } else {
+      transformed[key] = value;
+    }
+  }
+
+  return transformed;
+};
+
 export const insertFieldsFromPlaceholdersInPDF = async (
   pdf: Buffer,
   userId: number,
@@ -349,7 +394,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     });
 
     createdRecipients = recipients;
-  } else {
+  } else if (envelope.type === EnvelopeType.TEMPLATE) {
     const templateId =
       envelopeId.type === 'templateId'
         ? envelopeId.id
@@ -363,6 +408,10 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     });
 
     createdRecipients = recipients;
+  } else {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Invalid envelope type: ${envelope.type}`,
+    });
   }
 
   const fieldsToCreate: FieldToCreate[] = [];
@@ -396,19 +445,21 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     // Default height percentage if too small (use 2% as a reasonable default)
     const finalHeightPercent = heightPercent > 0.01 ? heightPercent : 2;
 
-    const baseField = {
+    const transformedFieldMeta = transformFieldMeta(placeholder.fieldMeta, fieldType);
+
+    const baseFieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
+      type: fieldType,
+      fieldMeta: transformedFieldMeta,
+    });
+
+    fieldsToCreate.push({
+      ...baseFieldAndMeta,
       recipientId,
       pageNumber: placeholder.page,
       pageX: xPercent,
       pageY: yPercent,
       width: widthPercent,
       height: finalHeightPercent,
-    };
-
-    fieldsToCreate.push({
-      type: fieldType,
-      fieldMeta: undefined,
-      ...baseField,
     });
   }
 
