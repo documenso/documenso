@@ -80,12 +80,6 @@ const EnvelopeEditorFieldsPageRenderer = lazy(
  * });
  * // Result: height expanded to ~2.7% (30px), centered on original position
  */
-/**
- * Enforces minimum field dimensions with centered expansion.
- *
- * If a field is smaller than the minimum width or height, it will be expanded
- * to meet the minimum requirements while staying centered on its original position.
- */
 const enforceMinimumFieldDimensions = (params: {
   positionX: number;
   positionY: number;

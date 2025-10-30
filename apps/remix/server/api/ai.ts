@@ -1,9 +1,7 @@
-import { google } from '@ai-sdk/google';
 import { sValidator } from '@hono/standard-validator';
-import { generateObject, generateText } from 'ai';
+import { generateObject } from 'ai';
 import { readFile, writeFile } from 'fs/promises';
 import { Hono } from 'hono';
-import { cors } from 'hono/cors';
 import { join } from 'path';
 import sharp from 'sharp';
 import { Canvas, Image } from 'skia-canvas';
@@ -14,11 +12,9 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { HonoEnv } from '../router';
 import {
   type TDetectObjectsResponse,
-  type TGenerateTextResponse,
   ZDetectObjectsAndDrawRequestSchema,
   ZDetectObjectsRequestSchema,
-  ZDetectObjectsResponseSchema,
-  ZGenerateTextRequestSchema,
+  ZDetectedObjectSchema,
 } from './ai.types';
 
 /**
@@ -100,8 +96,10 @@ const runObjectDetection = async (imageBuffer: Buffer): Promise<TDetectObjectsRe
   const base64Image = compressedImageBuffer.toString('base64');
 
   const result = await generateObject({
-    model: google('gemini-2.5-pro'),
-    schema: ZDetectObjectsResponseSchema,
+    // model: google('gemini-2.5-pro'),
+    model: 'google/gemini-2.5-pro',
+    output: 'array',
+    schema: ZDetectedObjectSchema,
     messages: [
       {
         role: 'user',
@@ -123,42 +121,6 @@ const runObjectDetection = async (imageBuffer: Buffer): Promise<TDetectObjectsRe
 };
 
 export const aiRoute = new Hono<HonoEnv>()
-  .use(
-    '*',
-    cors({
-      origin: 'http://localhost:3000',
-      allowMethods: ['POST', 'OPTIONS'],
-      allowHeaders: ['Content-Type', 'Authorization'],
-      credentials: true,
-    }),
-  )
-
-  .post('/generate', sValidator('json', ZGenerateTextRequestSchema), async (c) => {
-    try {
-      await getSession(c.req.raw);
-
-      const { prompt } = c.req.valid('json');
-
-      const result = await generateText({
-        model: google('gemini-2.0-flash-exp'),
-        prompt,
-      });
-
-      return c.json<TGenerateTextResponse>({ text: result.text });
-    } catch (error) {
-      console.error('AI generation failed:', error);
-
-      if (error instanceof AppError) {
-        throw error;
-      }
-
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to generate text',
-        userMessage: 'An error occurred while generating the text. Please try again.',
-      });
-    }
-  })
-
   .post('/detect-objects', sValidator('json', ZDetectObjectsRequestSchema), async (c) => {
     try {
       await getSession(c.req.raw);
