@@ -1,6 +1,5 @@
-import { sValidator } from '@hono/standard-validator';
 import { generateObject } from 'ai';
-import { readFile, writeFile } from 'fs/promises';
+import { mkdir, writeFile } from 'fs/promises';
 import { Hono } from 'hono';
 import { join } from 'path';
 import sharp from 'sharp';
@@ -8,13 +7,13 @@ import { Canvas, Image } from 'skia-canvas';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { env } from '@documenso/lib/utils/env';
 
 import type { HonoEnv } from '../router';
 import {
-  type TDetectObjectsResponse,
-  ZDetectObjectsAndDrawRequestSchema,
-  ZDetectObjectsRequestSchema,
-  ZDetectedObjectSchema,
+  type TDetectFormFieldsResponse,
+  ZDetectFormFieldsRequestSchema,
+  ZDetectedFormFieldSchema,
 } from './ai.types';
 
 /**
@@ -91,15 +90,14 @@ When detecting thin horizontal lines for SIGNATURE, INITIALS, NAME, EMAIL, DATE,
    - Expanded field: [ymin=420, xmin=200, ymax=500, xmax=600] (creates 80-unit tall field)
    - This gives comfortable signing space while respecting the form layout`;
 
-const runObjectDetection = async (imageBuffer: Buffer): Promise<TDetectObjectsResponse> => {
+const runFormFieldDetection = async (imageBuffer: Buffer): Promise<TDetectFormFieldsResponse> => {
   const compressedImageBuffer = await resizeAndCompressImage(imageBuffer);
   const base64Image = compressedImageBuffer.toString('base64');
 
   const result = await generateObject({
-    // model: google('gemini-2.5-pro'),
     model: 'google/gemini-2.5-pro',
     output: 'array',
-    schema: ZDetectedObjectSchema,
+    schema: ZDetectedFormFieldSchema,
     messages: [
       {
         role: 'user',
@@ -120,74 +118,37 @@ const runObjectDetection = async (imageBuffer: Buffer): Promise<TDetectObjectsRe
   return result.object;
 };
 
-export const aiRoute = new Hono<HonoEnv>()
-  .post('/detect-objects', sValidator('json', ZDetectObjectsRequestSchema), async (c) => {
-    try {
-      await getSession(c.req.raw);
+export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c) => {
+  try {
+    await getSession(c.req.raw);
 
-      const { imagePath } = c.req.valid('json');
+    const parsedBody = await c.req.parseBody();
+    const rawImage = parsedBody.image;
+    const imageCandidate = Array.isArray(rawImage) ? rawImage[0] : rawImage;
+    const parsed = ZDetectFormFieldsRequestSchema.safeParse({ image: imageCandidate });
 
-      const imageBuffer = await readFile(imagePath);
-      const detectedObjects = await runObjectDetection(imageBuffer);
-
-      return c.json<TDetectObjectsResponse>(detectedObjects);
-    } catch (error) {
-      console.error('Object detection failed:', error);
-
-      if (error instanceof AppError) {
-        throw error;
-      }
-
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to detect objects',
-        userMessage: 'An error occurred while detecting objects. Please try again.',
+    if (!parsed.success) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Image file is required',
+        userMessage: 'Please upload a valid image file.',
       });
     }
-  })
 
-  .post('/detect-object-and-draw', async (c) => {
-    try {
-      await getSession(c.req.raw);
+    const imageBuffer = Buffer.from(await parsed.data.image.arrayBuffer());
+    const metadata = await sharp(imageBuffer).metadata();
+    const imageWidth = metadata.width;
+    const imageHeight = metadata.height;
 
-      const parsedBody = await c.req.parseBody();
-      const rawImage = parsedBody.image;
-      const imageCandidate = Array.isArray(rawImage) ? rawImage[0] : rawImage;
-      const parsed = ZDetectObjectsAndDrawRequestSchema.safeParse({ image: imageCandidate });
+    if (!imageWidth || !imageHeight) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Unable to extract image dimensions',
+        userMessage: 'The image file appears to be invalid or corrupted.',
+      });
+    }
 
-      if (!parsed.success) {
-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'Image file is required',
-          userMessage: 'Please upload a valid image file.',
-        });
-      }
+    const detectedFields = await runFormFieldDetection(imageBuffer);
 
-      const imageBlob = parsed.data.image;
-      const arrayBuffer = await imageBlob.arrayBuffer();
-      const imageBuffer = Buffer.from(arrayBuffer);
-      const metadata = await sharp(imageBuffer).metadata();
-      const imageWidth = metadata.width;
-      const imageHeight = metadata.height;
-
-      console.log(
-        `[detect-object-and-draw] Original image dimensions: ${imageWidth}x${imageHeight}`,
-      );
-
-      if (!imageWidth || !imageHeight) {
-        throw new AppError(AppErrorCode.INVALID_REQUEST, {
-          message: 'Unable to extract image dimensions',
-          userMessage: 'The image file appears to be invalid or corrupted.',
-        });
-      }
-
-      console.log('[detect-object-and-draw] Compressing image for Gemini API...');
-      console.log('[detect-object-and-draw] Calling Gemini API for form field detection...');
-      const detectedObjects = await runObjectDetection(imageBuffer);
-      console.log('[detect-object-and-draw] Gemini API call completed');
-
-      console.log(
-        `[detect-object-and-draw] Detected ${detectedObjects.length} objects, starting to draw...`,
-      );
-
+    if (env('NEXT_PUBLIC_AI_DEBUG_PREVIEW') === 'true') {
       const padding = { left: 80, top: 20, right: 20, bottom: 40 };
       const canvas = new Canvas(
         imageWidth + padding.left + padding.right,
@@ -210,7 +171,6 @@ export const aiRoute = new Hono<HonoEnv>()
         ctx.stroke();
       }
 
-      // Horizontal grid lines (every 100 units on 0-1000 scale)
       for (let i = 0; i <= 1000; i += 100) {
         const y = padding.top + (i / 1000) * imageHeight;
         ctx.beginPath();
@@ -221,8 +181,8 @@ export const aiRoute = new Hono<HonoEnv>()
 
       const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
-      detectedObjects.forEach((obj, index) => {
-        const [ymin, xmin, ymax, xmax] = obj.box_2d.map((coord) => coord / 1000);
+      detectedFields.forEach((field, index) => {
+        const [ymin, xmin, ymax, xmax] = field.box_2d.map((coord) => coord / 1000);
 
         const x = xmin * imageWidth + padding.left;
         const y = ymin * imageHeight + padding.top;
@@ -235,7 +195,7 @@ export const aiRoute = new Hono<HonoEnv>()
 
         ctx.fillStyle = colors[index % colors.length];
         ctx.font = '20px Arial';
-        ctx.fillText(obj.label, x, y - 5);
+        ctx.fillText(field.label, x, y - 5);
       });
 
       ctx.strokeStyle = '#000000';
@@ -284,26 +244,25 @@ export const aiRoute = new Hono<HonoEnv>()
         .replace(/[-:]/g, '')
         .replace(/\..+/, '')
         .replace('T', '_');
-      const outputFilename = `detected_objects_${timestamp}.png`;
-      const outputPath = join(process.cwd(), outputFilename);
+      const outputFilename = `detected_form_fields_${timestamp}.png`;
+      const debugDir = join(process.cwd(), 'packages', 'assets', 'ai-previews');
+      const outputPath = join(debugDir, outputFilename);
 
-      console.log('[detect-object-and-draw] Converting canvas to PNG buffer...');
+      await mkdir(debugDir, { recursive: true });
+
       const pngBuffer = await canvas.toBuffer('png');
-      console.log(`[detect-object-and-draw] Saving to: ${outputPath}`);
       await writeFile(outputPath, pngBuffer);
-
-      console.log('[detect-object-and-draw] Image saved successfully!');
-      return c.json<TDetectObjectsResponse>(detectedObjects);
-    } catch (error) {
-      console.error('Object detection and drawing failed:', error);
-
-      if (error instanceof AppError) {
-        throw error;
-      }
-
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-        message: 'Failed to detect objects and draw',
-        userMessage: 'An error occurred while detecting and drawing objects. Please try again.',
-      });
     }
-  });
+
+    return c.json<TDetectFormFieldsResponse>(detectedFields);
+  } catch (error) {
+    if (error instanceof AppError) {
+      throw error;
+    }
+
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: 'Failed to detect form fields and generate preview',
+      userMessage: 'An error occurred while detecting form fields. Please try again.',
+    });
+  }
+});

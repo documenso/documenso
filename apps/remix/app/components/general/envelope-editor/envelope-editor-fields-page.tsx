@@ -299,17 +299,10 @@ export const EnvelopeEditorFieldsPage = () => {
                     return;
                   }
 
-                  console.log('Successfully captured page 1 as PNG Blob:', {
-                    size: `${(blob.size / 1024).toFixed(2)} KB`,
-                    type: blob.type,
-                  });
-                  console.log('Blob object:', blob);
-
-                  console.log('[Auto Add Fields] Sending image to AI endpoint...');
                   const formData = new FormData();
                   formData.append('image', blob, 'page-1.png');
 
-                  const response = await fetch('/api/ai/detect-object-and-draw', {
+                  const response = await fetch('/api/ai/detect-form-fields', {
                     method: 'POST',
                     body: formData,
                     credentials: 'include',
@@ -320,10 +313,6 @@ export const EnvelopeEditorFieldsPage = () => {
                   }
 
                   const detectedFields = await response.json();
-                  console.log(
-                    `[Auto Add Fields] Detected ${detectedFields.length} fields:`,
-                    detectedFields,
-                  );
 
                   if (!editorFields.selectedRecipient || !currentEnvelopeItem) {
                     toast({
@@ -336,9 +325,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
                   const pageCanvasRefs = getPageCanvasRefs(1);
                   if (!pageCanvasRefs) {
-                    console.warn(
-                      '[Auto Add Fields] Could not get page dimensions for minimum field enforcement',
-                    );
+                    toast({
+                      title: t`Error`,
+                      description: t`Failed to capture page. Please ensure the document is fully loaded.`,
+                      variant: 'destructive',
+                    });
+                    return;
                   }
 
                   let addedCount = 0;
@@ -381,20 +373,19 @@ export const EnvelopeEditorFieldsPage = () => {
                       });
                       addedCount++;
                     } catch (error) {
-                      console.error(`Failed to add ${fieldType} field:`, error);
+                      toast({
+                        title: t`Error`,
+                        description: t`Failed to add field. Please try again.`,
+                        variant: 'destructive',
+                      });
                     }
                   }
-
-                  console.log(
-                    `[Auto Add Fields] Successfully added ${addedCount} fields to the document`,
-                  );
 
                   toast({
                     title: t`Success`,
                     description: t`Added ${addedCount} fields to the document`,
                   });
                 } catch (error) {
-                  console.error('Auto add fields error:', error);
                   toast({
                     title: t`Error`,
                     description: t`An unexpected error occurred while capturing the page.`,

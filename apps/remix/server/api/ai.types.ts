@@ -11,7 +11,7 @@ export const ZGenerateTextResponseSchema = z.object({
 export type TGenerateTextRequest = z.infer<typeof ZGenerateTextRequestSchema>;
 export type TGenerateTextResponse = z.infer<typeof ZGenerateTextResponseSchema>;
 
-export const ZDetectedObjectSchema = z.object({
+export const ZDetectedFormFieldSchema = z.object({
   box_2d: z
     .array(z.number())
     .length(4)
@@ -32,19 +32,12 @@ export const ZDetectedObjectSchema = z.object({
     .describe('Documenso field type inferred from nearby label text or visual characteristics'),
 });
 
-export const ZDetectObjectsRequestSchema = z.object({
-  imagePath: z.string().min(1, 'Image path is required'),
-  // TODO: Replace with file upload - reference files.ts pattern
-});
-
-export const ZDetectObjectsResponseSchema = z.array(ZDetectedObjectSchema);
-
-export type TDetectedObject = z.infer<typeof ZDetectedObjectSchema>;
-export type TDetectObjectsRequest = z.infer<typeof ZDetectObjectsRequestSchema>;
-export type TDetectObjectsResponse = z.infer<typeof ZDetectObjectsResponseSchema>;
-
-export const ZDetectObjectsAndDrawRequestSchema = z.object({
+export const ZDetectFormFieldsRequestSchema = z.object({
   image: z.instanceof(Blob, { message: 'Image file is required' }),
 });
 
-export type TDetectObjectsAndDrawRequest = z.infer<typeof ZDetectObjectsAndDrawRequestSchema>;
+export const ZDetectFormFieldsResponseSchema = z.array(ZDetectedFormFieldSchema);
+
+export type TDetectedFormField = z.infer<typeof ZDetectedFormFieldSchema>;
+export type TDetectFormFieldsRequest = z.infer<typeof ZDetectFormFieldsRequestSchema>;
+export type TDetectFormFieldsResponse = z.infer<typeof ZDetectFormFieldsResponseSchema>;
