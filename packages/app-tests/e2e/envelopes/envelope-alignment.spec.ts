@@ -193,7 +193,7 @@ async function renderPdfToImage(pdfBytes: Uint8Array) {
   const pdf = await loadingTask.promise;
 
   // Increase for higher resolution
-  const scale = 2;
+  const scale = 4;
 
   return await Promise.all(
     Array.from({ length: pdf.numPages }, async (_, index) => {
@@ -203,6 +203,7 @@ async function renderPdfToImage(pdfBytes: Uint8Array) {
 
       const virtualCanvas = new Canvas(viewport.width, viewport.height);
       const context = virtualCanvas.getContext('2d');
+      context.imageSmoothingEnabled = false;
 
       // @ts-expect-error skia-canvas context satisfies runtime requirements for pdfjs
       await page.render({ canvasContext: context, viewport }).promise;
