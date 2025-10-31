@@ -23,6 +23,7 @@ import type { TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus } from '@prisma/client';
 import fs from 'node:fs';
+import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
 
 import { getFile } from '@documenso/lib/universal/upload/get-file';
@@ -90,7 +91,7 @@ test('field placement visual regression', async ({ page }, testInfo) => {
     },
   });
 
-  const storedImages = fs.readdirSync(`packages/app-tests/visual-regression`);
+  const storedImages = fs.readdirSync(path.join(__dirname, '../../visual-regression'));
 
   await Promise.all(
     completedDocument.envelopeItems.map(async (item) => {
@@ -98,7 +99,7 @@ test('field placement visual regression', async ({ page }, testInfo) => {
 
       const loadedImages = storedImages
         .filter((image) => image.includes(item.title))
-        .map((image) => fs.readFileSync(`packages/app-tests/visual-regression/${image}`));
+        .map((image) => fs.readFileSync(path.join(__dirname, '../../visual-regression', image)));
 
       await compareSignedPdfWithImages({
         id: item.title.replaceAll(' ', '-').toLowerCase(),
@@ -179,7 +180,7 @@ test.skip('download envelope images', async ({ page }) => {
 
       for (const [index, { image }] of pdfImages.entries()) {
         fs.writeFileSync(
-          `packages/app-tests/visual-regression/${item.title}-${index}.png`,
+          path.join(__dirname, '../../visual-regression', `${item.title}-${index}.png`),
           new Uint8Array(image),
         );
       }
@@ -231,18 +232,25 @@ const compareSignedPdfWithImages = async ({
 }: CompareSignedPdfWithImagesOptions) => {
   const renderedImages = await renderPdfToImage(pdfData);
 
+  const blankCertificateFile = fs.readFileSync(
+    path.join(__dirname, '../../visual-regression/blank-certificate.png'),
+  );
+  const blankCertificateImage = PNG.sync.read(blankCertificateFile).data;
+
   for (const [index, { image, width, height }] of renderedImages.entries()) {
     const isCertificate = index === renderedImages.length - 1;
 
     const diff = new PNG({ width, height });
 
-    const storedImage = new Uint8Array(PNG.sync.read(images[index]).data);
+    const storedImage = PNG.sync.read(images[index]).data;
 
-    const newImage = new Uint8Array(PNG.sync.read(image).data);
+    const newImage = PNG.sync.read(image).data;
+
+    const oldImage = isCertificate ? blankCertificateImage : storedImage;
 
     const comparison = pixelMatch(
-      storedImage,
-      newImage,
+      new Uint8Array(oldImage),
+      new Uint8Array(newImage),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       diff.data as unknown as Uint8Array,
       width,
@@ -254,12 +262,13 @@ const compareSignedPdfWithImages = async ({
     );
     console.log(`${id}-${index}: ${comparison}`);
 
-    const filePath = testInfo.outputPath(`diff-${id}-${index}.png`);
+    const filePath = path.join(testInfo.outputPath(), `diff-${id}-${index}.png`);
 
     fs.writeFileSync(filePath, new Uint8Array(PNG.sync.write(diff)));
 
     if (isCertificate) {
-      expect(comparison).toBeLessThan(20000);
+      // Expect the certificate to NOT be blank. Since the storedImage is blank.
+      expect(comparison).toBeGreaterThan(20000);
     } else {
       expect(comparison).toEqual(0);
     }
