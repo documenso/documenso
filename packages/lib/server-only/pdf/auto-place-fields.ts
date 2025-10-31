@@ -31,9 +31,8 @@ type CharIndexMapping = {
 
 type PlaceholderInfo = {
   placeholder: string;
-  fieldType: string;
   recipient: string;
-  fieldMeta: Record<string, string>;
+  fieldAndMeta: TFieldAndMeta;
   page: number;
   x: number;
   y: number;
@@ -61,6 +60,88 @@ type FieldToCreate = TFieldAndMeta & {
     - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing.
     - Need to handle envelopes with multiple items.
 */
+
+/*
+  Parse field type string to FieldType enum.
+  Normalizes the input (uppercase, trim) and validates it's a valid field type.
+  This ensures we handle case variations and whitespace, and provides clear error messages.
+*/
+const parseFieldType = (fieldTypeString: string): FieldType => {
+  const normalizedType = fieldTypeString.toUpperCase().trim();
+
+  return match(normalizedType)
+    .with('SIGNATURE', () => FieldType.SIGNATURE)
+    .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
+    .with('INITIALS', () => FieldType.INITIALS)
+    .with('NAME', () => FieldType.NAME)
+    .with('EMAIL', () => FieldType.EMAIL)
+    .with('DATE', () => FieldType.DATE)
+    .with('TEXT', () => FieldType.TEXT)
+    .with('NUMBER', () => FieldType.NUMBER)
+    .with('RADIO', () => FieldType.RADIO)
+    .with('CHECKBOX', () => FieldType.CHECKBOX)
+    .with('DROPDOWN', () => FieldType.DROPDOWN)
+    .otherwise(() => {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Invalid field type: ${fieldTypeString}`,
+      });
+    });
+};
+
+/*
+  Transform raw field metadata from placeholder format to schema format.
+  Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
+  Converts string values to proper types (booleans, numbers).
+*/
+const parseFieldMeta = (
+  rawFieldMeta: Record<string, string>,
+  fieldType: FieldType,
+): Record<string, unknown> | undefined => {
+  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
+    return;
+  }
+
+  if (Object.keys(rawFieldMeta).length === 0) {
+    return;
+  }
+
+  const fieldTypeString = String(fieldType).toLowerCase();
+
+  const parsedFieldMeta: Record<string, boolean | number | string> = {
+    type: fieldTypeString,
+  };
+
+  /*
+    rawFieldMeta is an object with string keys and string values.
+    It contains string values because the PDF parser returns the values as strings.
+
+    E.g. { required: 'true', fontSize: '12', maxValue: '100', minValue: '0', characterLimit: '100' }
+  */
+  const rawFieldMetaEntries = Object.entries(rawFieldMeta);
+
+  for (const entry of rawFieldMetaEntries) {
+    const [key, value] = entry;
+
+    if (key === 'readOnly' || key === 'required') {
+      parsedFieldMeta[key] = value === 'true';
+    } else if (
+      key === 'fontSize' ||
+      key === 'maxValue' ||
+      key === 'minValue' ||
+      key === 'characterLimit'
+    ) {
+      const numValue = Number(value);
+
+      if (!Number.isNaN(numValue)) {
+        parsedFieldMeta[key] = numValue;
+      }
+    } else {
+      parsedFieldMeta[key] = value;
+    }
+  }
+
+  return parsedFieldMeta;
+};
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
   return new Promise((resolve, reject) => {
@@ -119,9 +200,17 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           const placeholder = match[0];
           const placeholderData = match[1].split(',').map((part) => part.trim());
 
-          const [fieldType, recipient, ...fieldMetaData] = placeholderData;
+          const [fieldTypeString, recipient, ...fieldMetaData] = placeholderData;
 
-          const fieldMeta = Object.fromEntries(fieldMetaData.map((meta) => meta.split('=')));
+          const rawFieldMeta = Object.fromEntries(fieldMetaData.map((meta) => meta.split('=')));
+
+          const fieldType = parseFieldType(fieldTypeString);
+          const parsedFieldMeta = parseFieldMeta(rawFieldMeta, fieldType);
+
+          const fieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
+            type: fieldType,
+            fieldMeta: parsedFieldMeta,
+          });
 
           /*
             Find the position of where the placeholder starts in the text
@@ -155,9 +244,8 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
           placeholders.push({
             placeholder,
-            fieldType,
             recipient,
-            fieldMeta,
+            fieldAndMeta,
             page: pageIndex + 1,
             x,
             y,
@@ -243,78 +331,6 @@ const extractRecipientPlaceholder = (
     email: `recipient.${indexMatch[1]}@documenso.com`,
     recipientIndex: Number(indexMatch[1]),
   };
-};
-
-/*
-  Parse field type string to FieldType enum.
-  Normalizes the input (uppercase, trim) and validates it's a valid field type.
-  This ensures we handle case variations and whitespace, and provides clear error messages.
-*/
-const parseFieldType = (fieldTypeString: string): FieldType => {
-  const normalizedType = fieldTypeString.toUpperCase().trim();
-
-  return match(normalizedType)
-    .with('SIGNATURE', () => FieldType.SIGNATURE)
-    .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
-    .with('INITIALS', () => FieldType.INITIALS)
-    .with('NAME', () => FieldType.NAME)
-    .with('EMAIL', () => FieldType.EMAIL)
-    .with('DATE', () => FieldType.DATE)
-    .with('TEXT', () => FieldType.TEXT)
-    .with('NUMBER', () => FieldType.NUMBER)
-    .with('RADIO', () => FieldType.RADIO)
-    .with('CHECKBOX', () => FieldType.CHECKBOX)
-    .with('DROPDOWN', () => FieldType.DROPDOWN)
-    .otherwise(() => {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Invalid field type: ${fieldTypeString}`,
-      });
-    });
-};
-
-/*
-  Transform raw field metadata from placeholder format to schema format.
-  Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
-  Converts string values to proper types (booleans, numbers).
-*/
-const transformFieldMeta = (
-  rawMeta: Record<string, string>,
-  fieldType: FieldType,
-): Record<string, unknown> | undefined => {
-  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
-    return undefined;
-  }
-
-  if (Object.keys(rawMeta).length === 0) {
-    return undefined;
-  }
-
-  const fieldTypeString = String(fieldType).toLowerCase();
-
-  const transformed: Record<string, unknown> = {
-    type: fieldTypeString,
-  };
-
-  for (const [key, value] of Object.entries(rawMeta)) {
-    if (key === 'readOnly' || key === 'required') {
-      transformed[key] = value === 'true';
-    } else if (
-      key === 'fontSize' ||
-      key === 'maxValue' ||
-      key === 'minValue' ||
-      key === 'characterLimit'
-    ) {
-      const numValue = Number(value);
-
-      if (!Number.isNaN(numValue)) {
-        transformed[key] = numValue;
-      }
-    } else {
-      transformed[key] = value;
-    }
-  }
-
-  return transformed;
 };
 
 export const insertFieldsFromPlaceholdersInPDF = async (
@@ -428,8 +444,6 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     const widthPercent = (placeholder.width / placeholder.pageWidth) * 100;
     const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
 
-    const fieldType = parseFieldType(placeholder.fieldType);
-
     const { email } = extractRecipientPlaceholder(placeholder.recipient);
     const normalizedEmail = email.toLowerCase();
     const recipient = createdRecipients.find((r) => r.email.toLowerCase() === normalizedEmail);
@@ -445,15 +459,8 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     // Default height percentage if too small (use 2% as a reasonable default)
     const finalHeightPercent = heightPercent > 0.01 ? heightPercent : 2;
 
-    const transformedFieldMeta = transformFieldMeta(placeholder.fieldMeta, fieldType);
-
-    const baseFieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
-      type: fieldType,
-      fieldMeta: transformedFieldMeta,
-    });
-
     fieldsToCreate.push({
-      ...baseFieldAndMeta,
+      ...placeholder.fieldAndMeta,
       recipientId,
       pageNumber: placeholder.page,
       pageX: xPercent,
