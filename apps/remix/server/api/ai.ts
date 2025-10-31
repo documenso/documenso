@@ -41,7 +41,7 @@ IMPORTANT RULES:
 1. Only detect EMPTY/UNFILLED fields (ignore boxes that already contain text or data)
 2. Analyze nearby text labels to determine the field type
 3. Return bounding boxes for the fillable area only, NOT the label text
-4. Each bounding box must be in the format [ymin, xmin, ymax, xmax] where all coordinates are NORMALIZED to a 0-1000 scale
+4. Each boundingBox must be in the format [ymin, xmin, ymax, xmax] where all coordinates are NORMALIZED to a 0-1000 scale
 
 FIELD TYPES TO DETECT:
 • SIGNATURE - Signature lines, boxes labeled 'Signature', 'Sign here', 'Authorized signature', 'X____'
@@ -182,7 +182,7 @@ export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c)
       const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
 
       detectedFields.forEach((field, index) => {
-        const [ymin, xmin, ymax, xmax] = field.box_2d.map((coord) => coord / 1000);
+        const [ymin, xmin, ymax, xmax] = field.boundingBox.map((coord) => coord / 1000);
 
         const x = xmin * imageWidth + padding.left;
         const y = ymin * imageHeight + padding.top;

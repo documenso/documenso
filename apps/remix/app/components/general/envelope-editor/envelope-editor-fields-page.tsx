@@ -14,7 +14,9 @@ import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/e
 import {
   compositePageToBlob,
   getPageCanvasRefs,
+  getRegisteredPageNumbers,
 } from '@documenso/lib/client-only/utils/page-canvas-registry';
+import type { TDetectedFormField } from '@documenso/lib/types/ai';
 import type {
   TCheckboxFieldMeta,
   TDateFieldMeta,
@@ -138,6 +140,66 @@ const enforceMinimumFieldDimensions = (params: {
   };
 };
 
+const processAllPagesWithAI = async (params: {
+  pageNumbers: number[];
+  onProgress: (current: number, total: number) => void;
+}): Promise<{
+  fieldsPerPage: Map<number, TDetectedFormField[]>;
+  errors: Map<number, Error>;
+}> => {
+  const { pageNumbers, onProgress } = params;
+  const fieldsPerPage = new Map<number, TDetectedFormField[]>();
+  const errors = new Map<number, Error>();
+
+  const results = await Promise.allSettled(
+    pageNumbers.map(async (pageNumber) => {
+      try {
+        const blob = await compositePageToBlob(pageNumber);
+
+        if (!blob) {
+          throw new Error(`Failed to capture page ${pageNumber}`);
+        }
+
+        const formData = new FormData();
+        formData.append('image', blob, `page-${pageNumber}.png`);
+
+        const response = await fetch('/api/ai/detect-form-fields', {
+          method: 'POST',
+          body: formData,
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          throw new Error(`AI detection failed for page ${pageNumber}: ${response.statusText}`);
+        }
+
+        const detectedFields: TDetectedFormField[] = await response.json();
+
+        return { pageNumber, detectedFields };
+      } catch (error) {
+        throw { pageNumber, error };
+      }
+    }),
+  );
+
+  let completedCount = 0;
+
+  results.forEach((result) => {
+    completedCount++;
+    onProgress(completedCount, pageNumbers.length);
+
+    if (result.status === 'fulfilled') {
+      const { pageNumber, detectedFields } = result.value;
+      fieldsPerPage.set(pageNumber, detectedFields);
+    } else {
+      const { pageNumber, error } = result.reason;
+      errors.set(pageNumber, error instanceof Error ? error : new Error(String(error)));
+    }
+  });
+
+  return { fieldsPerPage, errors };
+};
+
 const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.SIGNATURE]: msg`Signature Settings`,
   [FieldType.FREE_SIGNATURE]: msg`Free Signature Settings`,
@@ -161,6 +223,10 @@ export const EnvelopeEditorFieldsPage = () => {
   const { toast } = useToast();
 
   const [isAutoAddingFields, setIsAutoAddingFields] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
 
   const selectedField = useMemo(
     () => structuredClone(editorFields.selectedField),
@@ -286,34 +352,9 @@ export const EnvelopeEditorFieldsPage = () => {
               disabled={isAutoAddingFields}
               onClick={async () => {
                 setIsAutoAddingFields(true);
+                setProcessingProgress(null);
 
                 try {
-                  const blob = await compositePageToBlob(1);
-
-                  if (!blob) {
-                    toast({
-                      title: t`Error`,
-                      description: t`Failed to capture page. Please ensure the document is fully loaded.`,
-                      variant: 'destructive',
-                    });
-                    return;
-                  }
-
-                  const formData = new FormData();
-                  formData.append('image', blob, 'page-1.png');
-
-                  const response = await fetch('/api/ai/detect-form-fields', {
-                    method: 'POST',
-                    body: formData,
-                    credentials: 'include',
-                  });
-
-                  if (!response.ok) {
-                    throw new Error(`AI detection failed: ${response.statusText}`);
-                  }
-
-                  const detectedFields = await response.json();
-
                   if (!editorFields.selectedRecipient || !currentEnvelopeItem) {
                     toast({
                       title: t`Warning`,
@@ -323,80 +364,123 @@ export const EnvelopeEditorFieldsPage = () => {
                     return;
                   }
 
-                  const pageCanvasRefs = getPageCanvasRefs(1);
-                  if (!pageCanvasRefs) {
+                  const pageNumbers = getRegisteredPageNumbers();
+
+                  if (pageNumbers.length === 0) {
                     toast({
                       title: t`Error`,
-                      description: t`Failed to capture page. Please ensure the document is fully loaded.`,
+                      description: t`No pages found. Please ensure the document is fully loaded.`,
                       variant: 'destructive',
                     });
                     return;
                   }
 
-                  let addedCount = 0;
-                  for (const detected of detectedFields) {
-                    const [ymin, xmin, ymax, xmax] = detected.box_2d;
-                    let positionX = (xmin / 1000) * 100;
-                    let positionY = (ymin / 1000) * 100;
-                    let width = ((xmax - xmin) / 1000) * 100;
-                    let height = ((ymax - ymin) / 1000) * 100;
+                  const { fieldsPerPage, errors } = await processAllPagesWithAI({
+                    pageNumbers,
+                    onProgress: (current, total) => {
+                      setProcessingProgress({ current, total });
+                    },
+                  });
 
-                    if (pageCanvasRefs) {
-                      const adjusted = enforceMinimumFieldDimensions({
-                        positionX,
-                        positionY,
-                        width,
-                        height,
-                        pageWidth: pageCanvasRefs.pdfCanvas.width,
-                        pageHeight: pageCanvasRefs.pdfCanvas.height,
-                      });
+                  let totalAdded = 0;
+                  for (const [pageNumber, detectedFields] of fieldsPerPage.entries()) {
+                    const pageCanvasRefs = getPageCanvasRefs(pageNumber);
 
-                      positionX = adjusted.positionX;
-                      positionY = adjusted.positionY;
-                      width = adjusted.width;
-                      height = adjusted.height;
-                    }
+                    for (const detected of detectedFields) {
+                      const [ymin, xmin, ymax, xmax] = detected.boundingBox;
+                      let positionX = (xmin / 1000) * 100;
+                      let positionY = (ymin / 1000) * 100;
+                      let width = ((xmax - xmin) / 1000) * 100;
+                      let height = ((ymax - ymin) / 1000) * 100;
 
-                    const fieldType = detected.label as FieldType;
+                      if (pageCanvasRefs) {
+                        const adjusted = enforceMinimumFieldDimensions({
+                          positionX,
+                          positionY,
+                          width,
+                          height,
+                          pageWidth: pageCanvasRefs.pdfCanvas.width,
+                          pageHeight: pageCanvasRefs.pdfCanvas.height,
+                        });
 
-                    try {
-                      editorFields.addField({
-                        envelopeItemId: currentEnvelopeItem.id,
-                        page: 1,
-                        type: fieldType,
-                        positionX,
-                        positionY,
-                        width,
-                        height,
-                        recipientId: editorFields.selectedRecipient.id,
-                        fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[fieldType]),
-                      });
-                      addedCount++;
-                    } catch (error) {
-                      toast({
-                        title: t`Error`,
-                        description: t`Failed to add field. Please try again.`,
-                        variant: 'destructive',
-                      });
+                        positionX = adjusted.positionX;
+                        positionY = adjusted.positionY;
+                        width = adjusted.width;
+                        height = adjusted.height;
+                      }
+
+                      const fieldType = detected.label as FieldType;
+
+                      try {
+                        editorFields.addField({
+                          envelopeItemId: currentEnvelopeItem.id,
+                          page: pageNumber,
+                          type: fieldType,
+                          positionX,
+                          positionY,
+                          width,
+                          height,
+                          recipientId: editorFields.selectedRecipient.id,
+                          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[fieldType]),
+                        });
+                        totalAdded++;
+                      } catch (error) {
+                        console.error(`Failed to add field on page ${pageNumber}:`, error);
+                      }
                     }
                   }
 
-                  toast({
-                    title: t`Success`,
-                    description: t`Added ${addedCount} fields to the document`,
-                  });
+                  const successfulPages = fieldsPerPage.size;
+                  const failedPages = errors.size;
+
+                  if (totalAdded > 0) {
+                    let description = t`Added ${totalAdded} fields`;
+                    if (pageNumbers.length > 1) {
+                      description = t`Added ${totalAdded} fields across ${successfulPages} pages`;
+                    }
+                    if (failedPages > 0) {
+                      description = t`Added ${totalAdded} fields across ${successfulPages} pages. ${failedPages} pages failed.`;
+                    }
+
+                    toast({
+                      title: t`Success`,
+                      description,
+                    });
+                  } else if (failedPages > 0) {
+                    toast({
+                      title: t`Error`,
+                      description: t`Failed to detect fields on ${failedPages} pages. Please try again.`,
+                      variant: 'destructive',
+                    });
+                  } else {
+                    toast({
+                      title: t`Info`,
+                      description: t`No fields were detected in the document`,
+                    });
+                  }
                 } catch (error) {
                   toast({
                     title: t`Error`,
-                    description: t`An unexpected error occurred while capturing the page.`,
+                    description: t`An unexpected error occurred while processing pages.`,
                     variant: 'destructive',
                   });
                 } finally {
                   setIsAutoAddingFields(false);
+                  setProcessingProgress(null);
                 }
               }}
             >
-              {isAutoAddingFields ? <Trans>Processing...</Trans> : <Trans>Auto add fields</Trans>}
+              {isAutoAddingFields ? (
+                processingProgress ? (
+                  <Trans>
+                    Processing page {processingProgress.current} of {processingProgress.total}...
+                  </Trans>
+                ) : (
+                  <Trans>Processing...</Trans>
+                )
+              ) : (
+                <Trans>Auto add fields</Trans>
+              )}
             </Button>
           </section>
 
