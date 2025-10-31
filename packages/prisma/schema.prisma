@@ -258,8 +258,9 @@ model SubscriptionClaim {
   name   String
   locked Boolean @default(false)
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
@@ -273,8 +274,9 @@ model OrganisationClaim {
   originalSubscriptionClaimId String?
   organisation                Organisation?
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
@@ -422,6 +424,8 @@ model Envelope {
 
   documentMetaId String       @unique
   documentMeta   DocumentMeta @relation(fields: [documentMetaId], references: [id])
+
+  envelopeAttachments EnvelopeAttachment[]
 }
 
 model EnvelopeItem {
@@ -506,6 +510,22 @@ model DocumentMeta {
   emailId       String?
 
   envelope Envelope?
+}
+
+/// @zod.import(["import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';"])
+model EnvelopeAttachment {
+  id String @id @default(cuid())
+
+  type  String /// [EnvelopeAttachmentType] @zod.custom.use(ZEnvelopeAttachmentTypeSchema)
+  label String
+
+  data String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  envelopeId String
+  envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 }
 
 enum ReadStatus {

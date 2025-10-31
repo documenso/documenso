@@ -16,7 +16,7 @@ export const createDocumentRoute = authenticatedProcedure
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
-    const { title, documentDataId, timezone, folderId } = input;
+    const { title, documentDataId, timezone, folderId, attachments } = input;
 
     ctx.logger.info({
       input: {
@@ -44,10 +44,12 @@ export const createDocumentRoute = authenticatedProcedure
         folderId,
         envelopeItems: [
           {
+            // If you ever allow more than 1 in this endpoint, make sure to use `maximumEnvelopeItemCount` to limit it.
             documentDataId,
           },
         ],
       },
+      attachments,
       normalizePdf: true,
       requestMetadata: ctx.metadata,
     });

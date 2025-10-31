@@ -11,6 +11,7 @@ import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/t
 import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
@@ -108,6 +109,8 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       }
     : undefined;
 
+  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
       <Link to={templateRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
@@ -163,39 +166,51 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
-        <Card
-          className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-          gradient
-        >
-          <CardContent className="p-2">
-            {envelope.internalVersion === 2 ? (
-              <EnvelopeRenderProvider envelope={envelope} fields={envelope.fields}>
+        {envelope.internalVersion === 2 ? (
+          <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
+            <EnvelopeRenderProvider
+              envelope={envelope}
+              fields={envelope.fields}
+              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+            >
+              {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+              )}
 
-                <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
-              </EnvelopeRenderProvider>
-            ) : (
-              <>
-                <DocumentReadOnlyFields
-                  fields={readOnlyFields}
-                  showFieldStatus={false}
-                  showRecipientTooltip={true}
-                  showRecipientColors={true}
-                  recipientIds={envelope.recipients.map((recipient) => recipient.id)}
-                  documentMeta={mockedDocumentMeta}
-                />
+              <Card className="rounded-xl before:rounded-xl" gradient>
+                <CardContent className="p-2">
+                  <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+                </CardContent>
+              </Card>
+            </EnvelopeRenderProvider>
+          </div>
+        ) : (
+          <Card
+            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+            gradient
+          >
+            <CardContent className="p-2">
+              <DocumentReadOnlyFields
+                fields={readOnlyFields}
+                showFieldStatus={false}
+                showRecipientTooltip={true}
+                showRecipientColors={true}
+                recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+                documentMeta={mockedDocumentMeta}
+              />
 
-                <PDFViewer
-                  document={envelope}
-                  key={envelope.envelopeItems[0].id}
-                  documentData={envelope.envelopeItems[0].documentData}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              <PDFViewer
+                document={envelope}
+                key={envelope.envelopeItems[0].id}
+                documentData={envelope.envelopeItems[0].documentData}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+        <div
+          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
+        >
           <div className="space-y-6">
             <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
@@ -223,6 +238,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
               <div className="mt-4 border-t px-4 pt-4">
                 <TemplateUseDialog
+                  envelopeId={envelope.id}
                   templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                   templateSigningOrder={envelope.documentMeta?.signingOrder}
                   recipients={envelope.recipients}

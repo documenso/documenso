@@ -36,6 +36,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
 import { DocumentResendDialog } from '~/components/dialogs/document-resend-dialog';
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { DocumentRecipientLinkCopyDialog } from '~/components/general/document/document-recipient-link-copy-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -146,17 +147,36 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
           </DropdownMenuItem>
         )}
 
-        {isComplete && (
-          <DropdownMenuItem onClick={onDownloadClick}>
-            <Download className="mr-2 h-4 w-4" />
-            <Trans>Download</Trans>
-          </DropdownMenuItem>
-        )}
+        {envelope.internalVersion === 2 ? (
+          <EnvelopeDownloadDialog
+            envelopeId={envelope.id}
+            envelopeStatus={envelope.status}
+            token={recipient?.token}
+            envelopeItems={envelope.envelopeItems}
+            trigger={
+              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+                <div>
+                  <Download className="mr-2 h-4 w-4" />
+                  <Trans>Download</Trans>
+                </div>
+              </DropdownMenuItem>
+            }
+          />
+        ) : (
+          <>
+            {isComplete && (
+              <DropdownMenuItem onClick={onDownloadClick}>
+                <Download className="mr-2 h-4 w-4" />
+                <Trans>Download</Trans>
+              </DropdownMenuItem>
+            )}
 
-        <DropdownMenuItem onClick={onDownloadOriginalClick}>
-          <Download className="mr-2 h-4 w-4" />
-          <Trans>Download Original</Trans>
-        </DropdownMenuItem>
+            <DropdownMenuItem onClick={onDownloadOriginalClick}>
+              <Download className="mr-2 h-4 w-4" />
+              <Trans>Download Original</Trans>
+            </DropdownMenuItem>
+          </>
+        )}
 
         <DropdownMenuItem asChild>
           <Link to={`${documentsPath}/${envelope.id}/logs`}>

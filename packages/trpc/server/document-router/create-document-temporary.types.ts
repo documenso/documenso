@@ -7,6 +7,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import {
   ZFieldHeightSchema,
   ZFieldPageNumberSchema,
@@ -68,6 +69,15 @@ export const ZCreateDocumentTemporaryRequestSchema = z.object({
       }),
     )
 
+    .optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
     .optional(),
   meta: ZDocumentMetaCreateSchema.optional(),
 });

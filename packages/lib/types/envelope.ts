@@ -79,7 +79,7 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
         type: true,
         id: true,
         data: true,
-        initialData: true, // Todo: Envelopes - Maybe this hide this.
+        initialData: true,
       }),
     })
     .array(),

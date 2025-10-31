@@ -73,7 +73,7 @@ export function TemplateMoveToFolderDialog({
     },
   });
 
-  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
+  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFoldersInternal.useQuery(
     {
       parentId: currentFolderId ?? null,
       type: FolderType.TEMPLATE,

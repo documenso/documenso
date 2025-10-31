@@ -90,8 +90,7 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       ),
     );
 
-    // Todo: Envelope - Audit logs?
-    // Todo: Envelopes - Delete the document data as well?
+    // Todo: Envelope [AUDIT_LOGS]
 
     return {
       updatedEnvelopeItems,

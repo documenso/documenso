@@ -91,11 +91,11 @@ export const PdfViewerKonva = ({
   }, []);
 
   return (
-    <div ref={$el} className={cn('w-[800px] overflow-hidden', className)} {...props}>
+    <div ref={$el} className={cn('w-full max-w-[800px]', className)} {...props}>
       {envelopeItemFile && Konva ? (
         <PDFDocument
           file={envelopeItemFile}
-          className={cn('w-full overflow-hidden rounded', {
+          className={cn('w-full rounded', {
             'h-[80vh] max-h-[60rem]': numPages === 0,
           })}
           onLoadSuccess={(d) => onDocumentLoaded(d)}
@@ -138,7 +138,7 @@ export const PdfViewerKonva = ({
             .fill(null)
             .map((_, i) => (
               <div key={i} className="last:-mb-2">
-                <div className="border-border overflow-hidden rounded border will-change-transform">
+                <div className="border-border rounded border will-change-transform">
                   <PDFPage
                     pageNumber={i + 1}
                     width={width}

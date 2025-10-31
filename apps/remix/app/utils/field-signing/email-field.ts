@@ -9,12 +9,13 @@ import { SignFieldEmailDialog } from '~/components/dialogs/sign-field-email-dial
 type HandleEmailFieldClickOptions = {
   field: TFieldEmail;
   email: string | null;
+  placeholderEmail: string | null;
 };
 
 export const handleEmailFieldClick = async (
   options: HandleEmailFieldClickOptions,
 ): Promise<Extract<TSignEnvelopeFieldValue, { type: typeof FieldType.EMAIL }> | null> => {
-  const { field, email } = options;
+  const { field, email, placeholderEmail } = options;
 
   if (field.type !== FieldType.EMAIL) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
@@ -32,7 +33,9 @@ export const handleEmailFieldClick = async (
   let emailToInsert = email;
 
   if (!emailToInsert) {
-    emailToInsert = await SignFieldEmailDialog.call({});
+    emailToInsert = await SignFieldEmailDialog.call({
+      placeholderEmail,
+    });
   }
 
   if (!emailToInsert) {

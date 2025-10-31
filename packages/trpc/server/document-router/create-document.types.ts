@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { ZDocumentMetaTimezoneSchema } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 
 import { ZDocumentTitleSchema } from './schema';
 
@@ -19,6 +20,15 @@ export const ZCreateDocumentRequestSchema = z.object({
   documentDataId: z.string().min(1),
   timezone: ZDocumentMetaTimezoneSchema.optional(),
   folderId: z.string().describe('The ID of the folder to create the document in').optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 export const ZCreateDocumentResponseSchema = z.object({

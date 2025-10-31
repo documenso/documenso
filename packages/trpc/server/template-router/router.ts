@@ -235,6 +235,7 @@ export const templateRouter = router({
         publicDescription,
         type,
         meta,
+        attachments,
       } = input;
 
       const fileName = title.endsWith('.pdf') ? title : `${title}.pdf`;
@@ -268,6 +269,7 @@ export const templateRouter = router({
           publicDescription,
         },
         meta,
+        attachments,
         requestMetadata: ctx.metadata,
       });
 

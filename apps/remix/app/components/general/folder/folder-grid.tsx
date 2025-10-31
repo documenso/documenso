@@ -5,6 +5,8 @@ import { FolderType } from '@prisma/client';
 import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -19,6 +21,8 @@ import { DocumentUploadButton } from '~/components/general/document/document-upl
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
+import { EnvelopeUploadButton } from '../document/envelope-upload-button';
+
 export type FolderGridProps = {
   type: FolderType;
   parentId: string | null;
@@ -26,6 +30,7 @@ export type FolderGridProps = {
 
 export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const team = useCurrentTeam();
+  const organisation = useCurrentOrganisation();
 
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
@@ -33,9 +38,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
   const [folderToDelete, setFolderToDelete] = useState<TFolderWithSubfolders | null>(null);
   const [isSettingsFolderOpen, setIsSettingsFolderOpen] = useState(false);
   const [folderToSettings, setFolderToSettings] = useState<TFolderWithSubfolders | null>(null);
-
-  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
-  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
 
   const { data: foldersData, isPending } = trpc.folder.getFolders.useQuery({
     type,
@@ -97,8 +99,9 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {/* Todo: Envelopes - Feature flag */}
-          {/* <EnvelopeUploadButton type={type} folderId={parentId || undefined} /> */}
+          {(IS_ENVELOPES_ENABLED || organisation.organisationClaim.flags.allowEnvelopes) && (
+            <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
+          )}
 
           {type === FolderType.DOCUMENT ? (
             <DocumentUploadButton />
@@ -155,8 +158,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
                       setFolderToMove(folder);
                       setIsMovingFolder(true);
                     }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
                     onSettings={(folder) => {
                       setFolderToSettings(folder);
                       setIsSettingsFolderOpen(true);
@@ -180,8 +181,6 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
                       setFolderToMove(folder);
                       setIsMovingFolder(true);
                     }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
                     onSettings={(folder) => {
                       setFolderToSettings(folder);
                       setIsSettingsFolderOpen(true);

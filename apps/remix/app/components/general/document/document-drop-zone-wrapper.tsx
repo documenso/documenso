@@ -95,6 +95,10 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
           AppErrorCode.LIMIT_EXCEEDED,
           () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
         )
+        .with(
+          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
+          () => msg`You have reached the limit of the number of files per envelope`,
+        )
         .otherwise(() => msg`An error occurred while uploading your document.`);
 
       toast({

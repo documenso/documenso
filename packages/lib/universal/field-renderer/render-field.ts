@@ -36,6 +36,8 @@ type RenderFieldOptions = {
 
   color?: TRecipientColor;
 
+  translations: Record<FieldType, string> | null;
+
   /**
    * The render type.
    *
@@ -47,15 +49,18 @@ type RenderFieldOptions = {
    */
   mode: 'edit' | 'sign' | 'export';
 
+  scale: number;
   editable?: boolean;
 };
 
 export const renderField = ({
   field,
+  translations,
   pageLayer,
   pageWidth,
   pageHeight,
   mode,
+  scale,
   editable,
   color,
 }: RenderFieldOptions) => {
@@ -63,9 +68,11 @@ export const renderField = ({
     pageLayer,
     pageWidth,
     pageHeight,
+    translations,
     mode,
     color,
     editable,
+    scale,
   };
 
   return match(field.type)
@@ -74,5 +81,5 @@ export const renderField = ({
     .with(FieldType.RADIO, () => renderRadioFieldElement(field, options))
     .with(FieldType.DROPDOWN, () => renderDropdownFieldElement(field, options))
     .with(FieldType.SIGNATURE, () => renderSignatureFieldElement(field, options))
-    .otherwise(() => renderTextFieldElement(field, options)); // Todo
+    .otherwise(() => renderTextFieldElement(field, options)); // Todo: Envelopes
 };

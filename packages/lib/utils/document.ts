@@ -76,6 +76,7 @@ export const mapEnvelopeToDocumentLite = (envelope: Envelope): TDocumentLite => 
   return {
     id: documentId, // Use legacy ID.
     envelopeId: envelope.id,
+    internalVersion: envelope.internalVersion,
     visibility: envelope.visibility,
     status: envelope.status,
     source: envelope.source,
@@ -115,6 +116,7 @@ export const mapEnvelopesToDocumentMany = (
   return {
     id: legacyDocumentId, // Use legacy ID.
     envelopeId: envelope.id,
+    internalVersion: envelope.internalVersion,
     visibility: envelope.visibility,
     status: envelope.status,
     source: envelope.source,

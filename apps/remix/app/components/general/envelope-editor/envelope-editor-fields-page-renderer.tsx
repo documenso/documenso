@@ -3,15 +3,12 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLingui } from '@lingui/react/macro';
 import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
-import type { Layer } from 'konva/lib/Layer';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Transformer } from 'konva/lib/shapes/Transformer';
 import { CopyPlusIcon, SquareStackIcon, TrashIcon } from 'lucide-react';
-import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
-import { usePageContext } from 'react-pdf';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
+import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
@@ -21,32 +18,16 @@ import {
   convertPixelToPercentage,
 } from '@documenso/lib/universal/field-renderer/field-renderer';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
+import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 
 export default function EnvelopeEditorFieldsPageRenderer() {
-  const pageContext = usePageContext();
-
-  if (!pageContext) {
-    throw new Error('Unable to find Page context.');
-  }
-
-  const { _className, page, rotate, scale } = pageContext;
-
-  if (!page) {
-    throw new Error('Attempted to render page canvas, but no page was specified.');
-  }
-
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
-  const canvasElement = useRef<HTMLCanvasElement>(null);
-  const konvaContainer = useRef<HTMLDivElement>(null);
-
-  const stage = useRef<Konva.Stage | null>(null);
-  const pageLayer = useRef<Layer | null>(null);
   const interactiveTransformer = useRef<Transformer | null>(null);
 
   const [selectedKonvaFieldGroups, setSelectedKonvaFieldGroups] = useState<Konva.Group[]>([]);
@@ -54,10 +35,17 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   const [isFieldChanging, setIsFieldChanging] = useState(false);
   const [pendingFieldCreation, setPendingFieldCreation] = useState<Konva.Rect | null>(null);
 
-  const viewport = useMemo(
-    () => page.getViewport({ scale, rotation: rotate }),
-    [page, rotate, scale],
-  );
+  const {
+    stage,
+    pageLayer,
+    canvasElement,
+    konvaContainer,
+    pageContext,
+    scaledViewport,
+    unscaledViewport,
+  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer));
+
+  const { _className, scale } = pageContext;
 
   const localPageFields = useMemo(
     () =>
@@ -68,47 +56,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     [editorFields.localFields, pageContext.pageNumber],
   );
 
-  // Custom renderer from Konva examples.
-  useEffect(
-    function drawPageOnCanvas() {
-      if (!page) {
-        return;
-      }
-
-      const { current: canvas } = canvasElement;
-      const { current: container } = konvaContainer;
-
-      if (!canvas || !container) {
-        return;
-      }
-
-      const renderContext: RenderParameters = {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        canvasContext: canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D,
-        viewport,
-      };
-
-      const cancellable = page.render(renderContext);
-      const runningTask = cancellable;
-
-      cancellable.promise.catch(() => {
-        // Intentionally empty
-      });
-
-      void cancellable.promise.then(() => {
-        createPageCanvas(container);
-      });
-
-      return () => {
-        runningTask.cancel();
-      };
-    },
-    [page, viewport],
-  );
-
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
-    console.log('Field resized or moved');
-
     const { current: container } = canvasElement;
 
     if (!container) {
@@ -120,6 +68,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     const fieldGroup = event.target as Konva.Group;
     const fieldFormId = fieldGroup.id();
 
+    // Note: This values are scaled.
     const {
       width: fieldPixelWidth,
       height: fieldPixelHeight,
@@ -130,7 +79,8 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       skipShadow: true,
     });
 
-    const { height: pageHeight, width: pageWidth } = getBoundingClientRect(container);
+    const pageHeight = scaledViewport.height;
+    const pageWidth = scaledViewport.width;
 
     // Calculate x and y as a percentage of the page width and height
     const positionPercentX = (fieldX / pageWidth) * 100;
@@ -165,8 +115,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   };
 
   const renderFieldOnLayer = (field: TLocalField) => {
-    if (!pageLayer.current || !interactiveTransformer.current) {
-      console.error('Layer not loaded yet');
+    if (!pageLayer.current) {
       return;
     }
 
@@ -174,7 +123,8 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     const isFieldEditable =
       recipient !== undefined && canRecipientFieldsBeModified(recipient, envelope.fields);
 
-    const { fieldGroup, isFirstRender } = renderField({
+    const { fieldGroup } = renderField({
+      scale,
       pageLayer: pageLayer.current,
       field: {
         renderId: field.formId,
@@ -183,8 +133,9 @@ export default function EnvelopeEditorFieldsPageRenderer() {
         inserted: false,
         fieldMeta: field.fieldMeta,
       },
-      pageWidth: viewport.width,
-      pageHeight: viewport.height,
+      translations: getClientSideFieldTranslations(i18n),
+      pageWidth: unscaledViewport.width,
+      pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
       editable: isFieldEditable,
       mode: 'edit',
@@ -210,24 +161,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   };
 
   /**
-   * Create the initial Konva page canvas and initialize all fields and interactions.
+   * Initialize the Konva page canvas and all fields and interactions.
    */
-  const createPageCanvas = (container: HTMLDivElement) => {
-    stage.current = new Konva.Stage({
-      container,
-      width: viewport.width,
-      height: viewport.height,
-    });
-
-    // Create the main layer for interactive elements.
-    pageLayer.current = new Konva.Layer();
-    stage.current?.add(pageLayer.current);
-
+  const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     // Initialize snap guides layer
     // snapGuideLayer.current = initializeSnapGuides(stage.current);
 
     // Add transformer for resizing and rotating.
-    interactiveTransformer.current = createInteractiveTransformer(stage.current, pageLayer.current);
+    interactiveTransformer.current = createInteractiveTransformer(currentStage, currentPageLayer);
 
     // Render the fields.
     for (const field of localPageFields) {
@@ -235,12 +176,12 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     }
 
     // Handle stage click to deselect.
-    stage.current?.on('click', (e) => {
+    currentStage.on('mousedown', (e) => {
       removePendingField();
 
       if (e.target === stage.current) {
         setSelectedFields([]);
-        pageLayer.current?.batchDraw();
+        currentPageLayer.batchDraw();
       }
     });
 
@@ -267,12 +208,12 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       setSelectedFields([e.target]);
     };
 
-    stage.current?.on('dragstart', onDragStartOrEnd);
-    stage.current?.on('dragend', onDragStartOrEnd);
-    stage.current?.on('transformstart', () => setIsFieldChanging(true));
-    stage.current?.on('transformend', () => setIsFieldChanging(false));
+    currentStage.on('dragstart', onDragStartOrEnd);
+    currentStage.on('dragend', onDragStartOrEnd);
+    currentStage.on('transformstart', () => setIsFieldChanging(true));
+    currentStage.on('transformend', () => setIsFieldChanging(false));
 
-    pageLayer.current.batchDraw();
+    currentPageLayer.batchDraw();
   };
 
   /**
@@ -284,7 +225,10 @@ export default function EnvelopeEditorFieldsPageRenderer() {
    * - Selecting multiple fields
    * - Selecting empty area to create fields
    */
-  const createInteractiveTransformer = (stage: Konva.Stage, layer: Konva.Layer) => {
+  const createInteractiveTransformer = (
+    currentStage: Konva.Stage,
+    currentPageLayer: Konva.Layer,
+  ) => {
     const transformer = new Konva.Transformer({
       rotateEnabled: false,
       keepRatio: false,
@@ -301,36 +245,36 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       },
     });
 
-    layer.add(transformer);
+    currentPageLayer.add(transformer);
 
     // Add selection rectangle.
     const selectionRectangle = new Konva.Rect({
       fill: 'rgba(24, 160, 251, 0.3)',
       visible: false,
     });
-    layer.add(selectionRectangle);
+    currentPageLayer.add(selectionRectangle);
 
     let x1: number;
     let y1: number;
     let x2: number;
     let y2: number;
 
-    stage.on('mousedown touchstart', (e) => {
+    currentStage.on('mousedown touchstart', (e) => {
       // do nothing if we mousedown on any shape
-      if (e.target !== stage) {
+      if (e.target !== currentStage) {
         return;
       }
 
-      const pointerPosition = stage.getPointerPosition();
+      const pointerPosition = currentStage.getPointerPosition();
 
       if (!pointerPosition) {
         return;
       }
 
-      x1 = pointerPosition.x;
-      y1 = pointerPosition.y;
-      x2 = pointerPosition.x;
-      y2 = pointerPosition.y;
+      x1 = pointerPosition.x / scale;
+      y1 = pointerPosition.y / scale;
+      x2 = pointerPosition.x / scale;
+      y2 = pointerPosition.y / scale;
 
       selectionRectangle.setAttrs({
         x: x1,
@@ -341,7 +285,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       });
     });
 
-    stage.on('mousemove touchmove', () => {
+    currentStage.on('mousemove touchmove', () => {
       // do nothing if we didn't start selection
       if (!selectionRectangle.visible()) {
         return;
@@ -349,14 +293,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
       selectionRectangle.moveToTop();
 
-      const pointerPosition = stage.getPointerPosition();
+      const pointerPosition = currentStage.getPointerPosition();
 
       if (!pointerPosition) {
         return;
       }
 
-      x2 = pointerPosition.x;
-      y2 = pointerPosition.y;
+      x2 = pointerPosition.x / scale;
+      y2 = pointerPosition.y / scale;
 
       selectionRectangle.setAttrs({
         x: Math.min(x1, x2),
@@ -366,7 +310,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       });
     });
 
-    stage.on('mouseup touchend', () => {
+    currentStage.on('mouseup touchend', () => {
       // do nothing if we didn't start selection
       if (!selectionRectangle.visible()) {
         return;
@@ -377,38 +321,41 @@ export default function EnvelopeEditorFieldsPageRenderer() {
         selectionRectangle.visible(false);
       });
 
-      const stageFieldGroups = stage.find('.field-group') || [];
+      const stageFieldGroups = currentStage.find('.field-group') || [];
       const box = selectionRectangle.getClientRect();
       const selectedFieldGroups = stageFieldGroups.filter(
         (shape) => Konva.Util.haveIntersection(box, shape.getClientRect()) && shape.draggable(),
       );
       setSelectedFields(selectedFieldGroups);
 
+      const unscaledBoxWidth = box.width / scale;
+      const unscaledBoxHeight = box.height / scale;
+
       // Create a field if no items are selected or the size is too small.
       if (
         selectedFieldGroups.length === 0 &&
         canvasElement.current &&
-        box.width > MIN_FIELD_WIDTH_PX &&
-        box.height > MIN_FIELD_HEIGHT_PX &&
+        unscaledBoxWidth > MIN_FIELD_WIDTH_PX &&
+        unscaledBoxHeight > MIN_FIELD_HEIGHT_PX &&
         editorFields.selectedRecipient &&
         canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields)
       ) {
         const pendingFieldCreation = new Konva.Rect({
           name: 'pending-field-creation',
-          x: box.x,
-          y: box.y,
-          width: box.width,
-          height: box.height,
+          x: box.x / scale,
+          y: box.y / scale,
+          width: unscaledBoxWidth,
+          height: unscaledBoxHeight,
           fill: 'rgba(24, 160, 251, 0.3)',
         });
 
-        layer.add(pendingFieldCreation);
+        currentPageLayer.add(pendingFieldCreation);
         setPendingFieldCreation(pendingFieldCreation);
       }
     });
 
     // Clicks should select/deselect shapes
-    stage.on('click tap', function (e) {
+    currentStage.on('click tap', function (e) {
       // if we are selecting with rect, do nothing
       if (
         selectionRectangle.visible() &&
@@ -419,7 +366,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       }
 
       // If empty area clicked, remove all selections
-      if (e.target === stage) {
+      if (e.target === stage.current) {
         setSelectedFields([]);
         return;
       }
@@ -468,19 +415,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
         group.name() === 'field-group' &&
         !localPageFields.some((field) => field.formId === group.id())
       ) {
-        console.log('Field removed, removing from canvas');
         group.destroy();
       }
     });
 
     // If it exists, rerender.
     localPageFields.forEach((field) => {
-      console.log('Field created/updated, rendering on canvas');
       renderFieldOnLayer(field);
     });
-
-    // If it doesn't exist, render it.
-    //
 
     // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
@@ -555,15 +497,13 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       return;
     }
 
-    const { height: pageHeight, width: pageWidth } = getBoundingClientRect(canvasElement.current);
-
     const { fieldX, fieldY, fieldWidth, fieldHeight } = convertPixelToPercentage({
       width: pixelWidth,
       height: pixelHeight,
       positionX: pixelX,
       positionY: pixelY,
-      pageWidth,
-      pageHeight,
+      pageWidth: unscaledViewport.width,
+      pageHeight: unscaledViewport.height,
     });
 
     editorFields.addField({
@@ -597,7 +537,10 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   }
 
   return (
-    <div className="relative" key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}>
+    <div
+      className="relative w-full"
+      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
+    >
       {selectedKonvaFieldGroups.length > 0 &&
         interactiveTransformer.current &&
         !isFieldChanging && (
@@ -649,17 +592,23 @@ export default function EnvelopeEditorFieldsPageRenderer() {
           </div>
         )}
 
-      {/* Todo: Envelopes - This will not overflow the page when close to edges */}
       {pendingFieldCreation && (
         <div
           style={{
             position: 'absolute',
-            top: pendingFieldCreation.y() + pendingFieldCreation.getClientRect().height + 5 + 'px',
-            left: pendingFieldCreation.x() + pendingFieldCreation.getClientRect().width / 2 + 'px',
+            top:
+              pendingFieldCreation.y() * scale +
+              pendingFieldCreation.getClientRect().height +
+              5 +
+              'px',
+            left:
+              pendingFieldCreation.x() * scale +
+              pendingFieldCreation.getClientRect().width / 2 +
+              'px',
             transform: 'translateX(-50%)',
             zIndex: 50,
           }}
-          className="text-muted-foreground grid w-fit grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border bg-white p-1 shadow-sm"
+          className="text-muted-foreground grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border bg-white p-1 shadow-sm"
         >
           {fieldButtonList.map((field) => (
             <button
@@ -673,13 +622,15 @@ export default function EnvelopeEditorFieldsPageRenderer() {
         </div>
       )}
 
-      <div className="konva-container absolute inset-0 z-10" ref={konvaContainer}></div>
+      {/* The element Konva will inject it's canvas into. */}
+      <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 
+      {/* Canvas the PDF will be rendered on. */}
       <canvas
         className={`${_className}__canvas z-0`}
-        height={viewport.height}
         ref={canvasElement}
-        width={viewport.width}
+        height={scaledViewport.height}
+        width={scaledViewport.width}
       />
     </div>
   );
