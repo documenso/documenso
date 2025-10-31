@@ -200,6 +200,7 @@ async function renderPdfToImage(pdfBytes: Uint8Array) {
       const page = await pdf.getPage(index + 1);
 
       const viewport = page.getViewport({ scale });
+
       const virtualCanvas = new Canvas(viewport.width, viewport.height);
       const context = virtualCanvas.getContext('2d');
 
@@ -262,15 +263,19 @@ const compareSignedPdfWithImages = async ({
     );
     console.log(`${id}-${index}: ${comparison}`);
 
-    const filePath = path.join(testInfo.outputPath(), `diff-${id}-${index}.png`);
+    const diffFilePath = path.join(testInfo.outputPath(), `${id}-${index}-diff.png`);
+    const oldFilePath = path.join(testInfo.outputPath(), `${id}-${index}-old.png`);
+    const newFilePath = path.join(testInfo.outputPath(), `${id}-${index}-new.png`);
 
-    fs.writeFileSync(filePath, new Uint8Array(PNG.sync.write(diff)));
+    fs.writeFileSync(diffFilePath, new Uint8Array(PNG.sync.write(diff)));
+    fs.writeFileSync(oldFilePath, new Uint8Array(images[index]));
+    fs.writeFileSync(newFilePath, new Uint8Array(image));
 
     if (isCertificate) {
       // Expect the certificate to NOT be blank. Since the storedImage is blank.
-      expect(comparison).toBeGreaterThan(20000);
+      expect.soft(comparison).toBeGreaterThan(20000);
     } else {
-      expect(comparison).toEqual(0);
+      expect.soft(comparison).toEqual(0);
     }
   }
 };
