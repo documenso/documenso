@@ -242,7 +242,6 @@ export const EnvelopeEditorSettingsDialog = ({
     try {
       await updateEnvelope({
         envelopeId: envelope.id,
-        envelopeType: envelope.type,
         data: {
           externalId: data.externalId || null,
           visibility: data.visibility,

@@ -1,5 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-// import type { OpenApiMeta } from 'trpc-to-openapi';
 import { z } from 'zod';
 
 import {
@@ -17,7 +15,6 @@ import {
 
 export const ZUpdateEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),
-  envelopeType: z.nativeEnum(EnvelopeType),
   data: z
     .object({
       title: ZDocumentTitleSchema.optional(),
