@@ -265,8 +265,17 @@ export const EnvelopeEditorFieldsPage = () => {
 
   return (
     <div className="relative flex h-full">
-      <div className="flex w-full flex-col overflow-y-auto">
+      <div className="relative flex w-full flex-col overflow-y-auto">
         {/* Horizontal envelope item selector */}
+        {isAutoAddingFields && (
+          <>
+            <div className="edge-glow edge-glow-top pointer-events-none fixed left-0 right-0 top-0 z-20 h-16" />
+            <div className="edge-glow edge-glow-right pointer-events-none fixed bottom-0 right-0 top-0 z-20 w-16" />
+            <div className="edge-glow edge-glow-bottom pointer-events-none fixed bottom-0 left-0 right-0 z-20 h-16" />
+            <div className="edge-glow edge-glow-left pointer-events-none fixed bottom-0 left-0 top-0 z-20 w-16" />
+          </>
+        )}
+
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}

@@ -257,6 +257,7 @@ export const FIELD_NUMBER_META_DEFAULT_VALUES: TNumberFieldMeta = {
   textAlign: 'left',
   label: '',
   placeholder: '',
+  value: '',
   required: false,
   readOnly: false,
 };

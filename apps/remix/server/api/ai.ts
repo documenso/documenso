@@ -43,6 +43,21 @@ IMPORTANT RULES:
 3. Return bounding boxes for the fillable area only, NOT the label text
 4. Each boundingBox must be in the format [ymin, xmin, ymax, xmax] where all coordinates are NORMALIZED to a 0-1000 scale
 
+CRITICAL: UNDERSTANDING FILLABLE AREAS
+The "fillable area" is ONLY the empty space where a user will write, type, sign, or check.
+- ✓ CORRECT: The blank underscore where someone writes their name: "Name: _________" → box ONLY the underscores
+- ✓ CORRECT: The empty white rectangle inside a box outline → box ONLY the empty space, not any printed text
+- ✓ CORRECT: The blank space to the right of a label: "Email: [ empty box ]" → box ONLY the empty box, exclude "Email:"
+- ✗ INCORRECT: Including the word "Signature:" that appears to the left of a signature line
+- ✗ INCORRECT: Including printed labels, instructions, or descriptive text near the field
+- ✗ INCORRECT: Extending the box to include text just because it's close to the fillable area
+
+VISUALIZING THE DISTINCTION:
+- If there's text (printed words/labels) near an empty box or line, they are SEPARATE elements
+- The text is a LABEL telling the user what to fill
+- The empty space is the FILLABLE AREA where they actually write/sign
+- Your bounding box should capture ONLY the empty space, even if the label is immediately adjacent
+
 FIELD TYPES TO DETECT:
 • SIGNATURE - Signature lines, boxes labeled 'Signature', 'Sign here', 'Authorized signature', 'X____'
 • INITIALS - Small boxes labeled 'Initials', 'Initial here', typically smaller than signature fields
@@ -57,12 +72,22 @@ FIELD TYPES TO DETECT:
 
 DETECTION GUIDELINES:
 - Read text located near the box (above, to the left, or inside the box boundary) to infer the field type
+- IMPORTANT: Use the nearby text to CLASSIFY the field type, but DO NOT include that text in the bounding box
 - If you're uncertain which type fits best, default to TEXT
 - For checkboxes and radio buttons: Detect each individual box/circle separately, not the label
 - Signature fields are often longer horizontal lines or larger boxes
 - Date fields often show format hints or date separators (slashes, dashes)
 - Look for visual patterns: underscores (____), horizontal lines, box outlines
-- Return coordinates for the fillable area, not the descriptive label text
+
+BOUNDING BOX PLACEMENT (CRITICAL):
+- Your coordinates must capture ONLY the empty fillable space (the blank area where input goes)
+- EXCLUDE all printed text labels, even if they are:
+  · Directly to the left of the field (e.g., "Name: _____")
+  · Directly above the field (e.g., "Signature" printed above a line)
+  · Very close to the field with minimal spacing
+  · Inside the same outlined box as the fillable area
+- The label text helps you IDENTIFY the field type, but must be EXCLUDED from the bounding box
+- If you detect a label "Email:" followed by a blank box, draw the box around ONLY the blank box, not the word "Email:"
 
 COORDINATE SYSTEM:
 - [ymin, xmin, ymax, xmax] normalized to 0-1000 scale
@@ -245,7 +270,7 @@ export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c)
         .replace(/\..+/, '')
         .replace('T', '_');
       const outputFilename = `detected_form_fields_${timestamp}.png`;
-      const debugDir = join(process.cwd(), 'packages', 'assets', 'ai-previews');
+      const debugDir = join(process.cwd(), '..', '..', 'packages', 'assets', 'ai-previews');
       const outputPath = join(debugDir, outputFilename);
 
       await mkdir(debugDir, { recursive: true });
