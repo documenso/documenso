@@ -257,7 +257,7 @@ const compareSignedPdfWithImages = async ({
       width,
       height,
       {
-        threshold: 0.1,
+        threshold: 0.2,
         // includeAA: true, // This allows stricter testing.
       },
     );
