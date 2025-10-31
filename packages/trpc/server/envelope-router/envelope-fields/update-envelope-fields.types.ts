@@ -2,8 +2,8 @@ import { z } from 'zod';
 
 import {
   ZClampedFieldHeightSchema,
-  ZClampedFieldPageXSchema,
-  ZClampedFieldPageYSchema,
+  ZClampedFieldPositionXSchema,
+  ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
   ZFieldPageNumberSchema,
   ZFieldSchema,
@@ -19,9 +19,9 @@ const ZUpdateFieldSchema = ZFieldAndMetaSchema.and(
       .describe(
         'The ID of the envelope item to put the field on. If not provided, field will be placed on the first item.',
       ),
-    pageNumber: ZFieldPageNumberSchema.optional(),
-    pageX: ZClampedFieldPageXSchema.optional(),
-    pageY: ZClampedFieldPageYSchema.optional(),
+    page: ZFieldPageNumberSchema.optional(),
+    positionX: ZClampedFieldPositionXSchema.optional(),
+    positionY: ZClampedFieldPositionYSchema.optional(),
     width: ZClampedFieldWidthSchema.optional(),
     height: ZClampedFieldHeightSchema.optional(),
   }),

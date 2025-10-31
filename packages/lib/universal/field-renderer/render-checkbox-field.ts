@@ -3,6 +3,7 @@ import { match } from 'ts-pattern';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TCheckboxFieldMeta } from '../../types/field-meta';
+import { parseCheckboxCustomText } from '../../utils/fields';
 import {
   createFieldHoverInteraction,
   konvaTextFill,
@@ -130,7 +131,7 @@ export const renderCheckboxFieldElement = (
     pageLayer.batchDraw();
   });
 
-  const checkedValues: number[] = field.customText ? JSON.parse(field.customText) : [];
+  const checkedValues: number[] = field.customText ? parseCheckboxCustomText(field.customText) : [];
 
   checkboxValues.forEach(({ value, checked }, index) => {
     const isCheckboxChecked = match(mode)
@@ -170,7 +171,7 @@ export const renderCheckboxFieldElement = (
       width: itemSize,
       height: itemSize,
       stroke: '#374151',
-      strokeWidth: 2,
+      strokeWidth: 1.5,
       cornerRadius: 2,
       fill: 'white',
     });

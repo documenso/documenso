@@ -108,7 +108,14 @@ export const fieldRouter = router({
           type: 'documentId',
           id: documentId,
         },
-        fields: [field],
+        fields: [
+          {
+            ...field,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+          },
+        ],
         requestMetadata: ctx.metadata,
       });
 
@@ -147,7 +154,12 @@ export const fieldRouter = router({
           type: 'documentId',
           id: documentId,
         },
-        fields,
+        fields: fields.map((field) => ({
+          ...field,
+          page: field.pageNumber,
+          positionX: field.pageX,
+          positionY: field.pageY,
+        })),
         requestMetadata: ctx.metadata,
       });
     }),
@@ -335,7 +347,14 @@ export const fieldRouter = router({
           type: 'templateId',
           id: templateId,
         },
-        fields: [field],
+        fields: [
+          {
+            ...field,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+          },
+        ],
         requestMetadata: ctx.metadata,
       });
 
@@ -408,7 +427,12 @@ export const fieldRouter = router({
           type: 'templateId',
           id: templateId,
         },
-        fields,
+        fields: fields.map((field) => ({
+          ...field,
+          page: field.pageNumber,
+          positionX: field.pageX,
+          positionY: field.pageY,
+        })),
         requestMetadata: ctx.metadata,
       });
     }),

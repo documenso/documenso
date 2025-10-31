@@ -27,14 +27,18 @@ import { signEnvelopeFieldRoute } from './sign-envelope-field';
 import { updateEnvelopeRoute } from './update-envelope';
 import { updateEnvelopeItemsRoute } from './update-envelope-items';
 
+/**
+ * Note: The order of the routes is important for public API routes.
+ *
+ * Example: GET /envelope/attachment must appear before GET /envelope/:id
+ */
 export const envelopeRouter = router({
-  get: getEnvelopeRoute,
-  create: createEnvelopeRoute,
-  update: updateEnvelopeRoute,
-  delete: deleteEnvelopeRoute,
-  duplicate: duplicateEnvelopeRoute,
-  distribute: distributeEnvelopeRoute,
-  redistribute: redistributeEnvelopeRoute,
+  attachment: {
+    find: findAttachmentsRoute,
+    create: createAttachmentRoute,
+    update: updateAttachmentRoute,
+    delete: deleteAttachmentRoute,
+  },
   item: {
     getMany: getEnvelopeItemsRoute,
     getManyByToken: getEnvelopeItemsByTokenRoute,
@@ -57,10 +61,11 @@ export const envelopeRouter = router({
     set: setEnvelopeFieldsRoute,
     sign: signEnvelopeFieldRoute,
   },
-  attachment: {
-    find: findAttachmentsRoute,
-    create: createAttachmentRoute,
-    update: updateAttachmentRoute,
-    delete: deleteAttachmentRoute,
-  },
+  get: getEnvelopeRoute,
+  create: createEnvelopeRoute,
+  update: updateEnvelopeRoute,
+  delete: deleteEnvelopeRoute,
+  duplicate: duplicateEnvelopeRoute,
+  distribute: distributeEnvelopeRoute,
+  redistribute: redistributeEnvelopeRoute,
 });

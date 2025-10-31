@@ -74,13 +74,13 @@ export const ZFieldWidthSchema = z.number().min(1).describe('The width of the fi
 
 export const ZFieldHeightSchema = z.number().min(1).describe('The height of the field.');
 
-export const ZClampedFieldPageXSchema = z
+export const ZClampedFieldPositionXSchema = z
   .number()
   .min(0)
   .max(100)
   .describe('The percentage based X coordinate where the field will be placed.');
 
-export const ZClampedFieldPageYSchema = z
+export const ZClampedFieldPositionYSchema = z
   .number()
   .min(0)
   .max(100)

@@ -3,8 +3,8 @@ import { z } from 'zod';
 
 import {
   ZClampedFieldHeightSchema,
-  ZClampedFieldPageXSchema,
-  ZClampedFieldPageYSchema,
+  ZClampedFieldPositionXSchema,
+  ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
 } from '@documenso/lib/types/field';
 import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
@@ -26,8 +26,8 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
         .number()
         .min(1)
         .describe('The page number of the field on the envelope. Starts from 1.'),
-      positionX: ZClampedFieldPageXSchema,
-      positionY: ZClampedFieldPageYSchema,
+      positionX: ZClampedFieldPositionXSchema,
+      positionY: ZClampedFieldPositionYSchema,
       width: ZClampedFieldWidthSchema,
       height: ZClampedFieldHeightSchema,
       fieldMeta: ZFieldMetaSchema,

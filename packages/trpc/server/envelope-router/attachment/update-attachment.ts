@@ -13,7 +13,7 @@ export const updateAttachmentRoute = authenticatedProcedure
       path: '/envelope/attachment/update',
       summary: 'Update attachment',
       description: 'Update an existing attachment',
-      tags: ['Envelope'],
+      tags: ['Envelope Attachment'],
     },
   })
   .input(ZUpdateAttachmentRequestSchema)

@@ -14,15 +14,15 @@ import {
 
 export const createEnvelopeItemsRoute = authenticatedProcedure
   // Todo: Envelopes - Pending direct uploads
-  // .meta({
-  //   openapi: {
-  //     method: 'POST',
-  //     path: '/envelope/item/create-many',
-  //     summary: 'Create envelope items',
-  //     description: 'Create multiple envelope items for an envelope',
-  //     tags: ['Envelope Item'],
-  //   },
-  // })
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/item/create-many',
+      summary: 'Create envelope items',
+      description: 'Create multiple envelope items for an envelope',
+      tags: ['Envelope Item'],
+    },
+  })
   .input(ZCreateEnvelopeItemsRequestSchema)
   .output(ZCreateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
