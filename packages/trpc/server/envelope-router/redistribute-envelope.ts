@@ -7,7 +7,16 @@ import {
 } from './redistribute-envelope.types';
 
 export const redistributeEnvelopeRoute = authenticatedProcedure
-  // .meta(redistributeEnvelopeMeta)
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/redistribute',
+      summary: 'Redistribute envelope',
+      description:
+        'Redistribute the envelope to the provided recipients who have not actioned the envelope. Will use the distribution method set in the envelope',
+      tags: ['Envelope'],
+    },
+  })
   .input(ZRedistributeEnvelopeRequestSchema)
   .output(ZRedistributeEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

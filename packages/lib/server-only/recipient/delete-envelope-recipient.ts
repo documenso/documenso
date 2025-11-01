@@ -14,26 +14,27 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { canRecipientBeModified } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
+import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface DeleteDocumentRecipientOptions {
+export interface DeleteEnvelopeRecipientOptions {
   userId: number;
   teamId: number;
   recipientId: number;
   requestMetadata: ApiRequestMetadata;
 }
 
-export const deleteDocumentRecipient = async ({
+export const deleteEnvelopeRecipient = async ({
   userId,
   teamId,
   recipientId,
   requestMetadata,
-}: DeleteDocumentRecipientOptions) => {
+}: DeleteEnvelopeRecipientOptions) => {
   const envelope = await prisma.envelope.findFirst({
     where: {
-      type: EnvelopeType.DOCUMENT,
       recipients: {
         some: {
           id: recipientId,
@@ -47,6 +48,9 @@ export const deleteDocumentRecipient = async ({
       recipients: {
         where: {
           id: recipientId,
+        },
+        include: {
+          fields: true,
         },
       },
     },
@@ -89,24 +93,43 @@ export const deleteDocumentRecipient = async ({
     });
   }
 
-  const deletedRecipient = await prisma.$transaction(async (tx) => {
-    await tx.documentAuditLog.create({
-      data: createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
-        envelopeId: envelope.id,
-        metadata: requestMetadata,
-        data: {
-          recipientEmail: recipientToDelete.email,
-          recipientName: recipientToDelete.name,
-          recipientId: recipientToDelete.id,
-          recipientRole: recipientToDelete.role,
-        },
-      }),
+  if (!canRecipientBeModified(recipientToDelete, recipientToDelete.fields)) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Recipient has already interacted with the document.',
     });
+  }
+
+  const { envelopeWhereInput } = await getEnvelopeWhereInput({
+    id: {
+      type: 'envelopeId',
+      id: envelope.id,
+    },
+    type: null,
+    userId,
+    teamId,
+  });
+
+  const deletedRecipient = await prisma.$transaction(async (tx) => {
+    if (envelope.type === EnvelopeType.DOCUMENT) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_DELETED,
+          envelopeId: envelope.id,
+          metadata: requestMetadata,
+          data: {
+            recipientEmail: recipientToDelete.email,
+            recipientName: recipientToDelete.name,
+            recipientId: recipientToDelete.id,
+            recipientRole: recipientToDelete.role,
+          },
+        }),
+      });
+    }
 
     return await tx.recipient.delete({
       where: {
         id: recipientId,
+        envelope: envelopeWhereInput,
       },
     });
   });
@@ -116,7 +139,11 @@ export const deleteDocumentRecipient = async ({
   ).recipientRemoved;
 
   // Send email to deleted recipient.
-  if (recipientToDelete.sendStatus === SendStatus.SENT && isRecipientRemovedEmailEnabled) {
+  if (
+    recipientToDelete.sendStatus === SendStatus.SENT &&
+    isRecipientRemovedEmailEnabled &&
+    envelope.type === EnvelopeType.DOCUMENT
+  ) {
     const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 
     const template = createElement(RecipientRemovedFromDocumentTemplate, {

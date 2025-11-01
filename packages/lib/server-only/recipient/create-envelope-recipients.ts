@@ -15,7 +15,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface CreateDocumentRecipientsOptions {
+export interface CreateEnvelopeRecipientsOptions {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
@@ -30,16 +30,16 @@ export interface CreateDocumentRecipientsOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const createDocumentRecipients = async ({
+export const createEnvelopeRecipients = async ({
   userId,
   teamId,
   id,
   recipients: recipientsToCreate,
   requestMetadata,
-}: CreateDocumentRecipientsOptions) => {
+}: CreateEnvelopeRecipientsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
-    type: EnvelopeType.DOCUMENT,
+    type: null,
     userId,
     teamId,
   });
@@ -62,13 +62,13 @@ export const createDocumentRecipients = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: 'Envelope not found',
     });
   }
 
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Document already complete',
+      message: 'Envelope already complete',
     });
   }
 
@@ -112,21 +112,23 @@ export const createDocumentRecipients = async ({
         });
 
         // Handle recipient created audit log.
-        await tx.documentAuditLog.create({
-          data: createDocumentAuditLogData({
-            type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
-            envelopeId: envelope.id,
-            metadata: requestMetadata,
-            data: {
-              recipientEmail: createdRecipient.email,
-              recipientName: createdRecipient.name,
-              recipientId: createdRecipient.id,
-              recipientRole: createdRecipient.role,
-              accessAuth: recipient.accessAuth ?? [],
-              actionAuth: recipient.actionAuth ?? [],
-            },
-          }),
-        });
+        if (envelope.type === EnvelopeType.DOCUMENT) {
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_CREATED,
+              envelopeId: envelope.id,
+              metadata: requestMetadata,
+              data: {
+                recipientEmail: createdRecipient.email,
+                recipientName: createdRecipient.name,
+                recipientId: createdRecipient.id,
+                recipientRole: createdRecipient.role,
+                accessAuth: recipient.accessAuth ?? [],
+                actionAuth: recipient.actionAuth ?? [],
+              },
+            }),
+          });
+        }
 
         return createdRecipient;
       }),

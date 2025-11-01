@@ -159,7 +159,7 @@ export const renderRadioFieldElement = (
       y: itemInputY,
       radius: calculateRadioSize(fontSize) / 2,
       stroke: '#374151',
-      strokeWidth: 2,
+      strokeWidth: 1.5,
       fill: 'white',
     });
 

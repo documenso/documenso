@@ -164,14 +164,62 @@ export const maybeAuthenticatedMiddleware = t.middleware(async ({ ctx, next, pat
     nonBatchedRequestId: alphaid(),
   });
 
-  ctx.logger.info({
+  const infoToLog: TrpcApiLog = {
     path,
     auth: ctx.metadata.auth,
     source: ctx.metadata.source,
-    userId: ctx.user?.id,
-    apiTokenId: null,
     trpcMiddleware: 'maybeAuthenticated',
     unverifiedTeamId: ctx.teamId,
+  };
+
+  const authorizationHeader = ctx.req.headers.get('authorization');
+
+  // Taken from `authenticatedMiddleware` in `@documenso/api/v1/middleware/authenticated.ts`.
+  if (authorizationHeader) {
+    // Support for both "Authorization: Bearer api_xxx" and "Authorization: api_xxx"
+    const [token] = (authorizationHeader || '').split('Bearer ').filter((s) => s.length > 0);
+
+    if (!token) {
+      throw new Error('Token was not provided for authenticated middleware');
+    }
+
+    const apiToken = await getApiTokenByToken({ token });
+
+    ctx.logger.info({
+      ...infoToLog,
+      userId: apiToken.user.id,
+      apiTokenId: apiToken.id,
+    } satisfies TrpcApiLog);
+
+    return await next({
+      ctx: {
+        ...ctx,
+        user: apiToken.user,
+        teamId: apiToken.teamId,
+        session: null,
+        metadata: {
+          ...ctx.metadata,
+          auditUser: apiToken.team
+            ? {
+                id: null,
+                email: null,
+                name: apiToken.team.name,
+              }
+            : {
+                id: apiToken.user.id,
+                email: apiToken.user.email,
+                name: apiToken.user.name,
+              },
+          auth: 'api',
+        } satisfies ApiRequestMetadata,
+      },
+    });
+  }
+
+  trpcSessionLogger.info({
+    ...infoToLog,
+    userId: ctx.user?.id,
+    apiTokenId: null,
   } satisfies TrpcApiLog);
 
   return await next({

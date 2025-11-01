@@ -1,23 +1,30 @@
-import { EnvelopeType, RecipientRole } from '@prisma/client';
-import { SendStatus, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
 import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
+import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import {
+  createDocumentAuditLogData,
+  diffRecipientChanges,
+} from '@documenso/lib/utils/document-audit-logs';
 import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { extractLegacyIds } from '../../universal/id';
+import { type EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
+import { canRecipientBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface UpdateTemplateRecipientsOptions {
+export interface UpdateEnvelopeRecipientsOptions {
   userId: number;
   teamId: number;
-  templateId: number;
+  id: EnvelopeIdOptions;
   recipients: {
     id: number;
     email?: string;
@@ -27,20 +34,19 @@ export interface UpdateTemplateRecipientsOptions {
     accessAuth?: TRecipientAccessAuthTypes[];
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
+  requestMetadata: ApiRequestMetadata;
 }
 
-export const updateTemplateRecipients = async ({
+export const updateEnvelopeRecipients = async ({
   userId,
   teamId,
-  templateId,
+  id,
   recipients,
-}: UpdateTemplateRecipientsOptions) => {
+  requestMetadata,
+}: UpdateEnvelopeRecipientsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'templateId',
-      id: templateId,
-    },
-    type: EnvelopeType.TEMPLATE,
+    id,
+    type: null,
     userId,
     teamId,
   });
@@ -48,6 +54,7 @@ export const updateTemplateRecipients = async ({
   const envelope = await prisma.envelope.findFirst({
     where: envelopeWhereInput,
     include: {
+      fields: true,
       recipients: true,
       team: {
         select: {
@@ -63,7 +70,13 @@ export const updateTemplateRecipients = async ({
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Template not found',
+      message: 'Envelope not found',
+    });
+  }
+
+  if (envelope.completedAt) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Envelope already complete',
     });
   }
 
@@ -89,30 +102,33 @@ export const updateTemplateRecipients = async ({
       });
     }
 
+    if (!canRecipientBeModified(originalRecipient, envelope.fields)) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot modify a recipient who has already interacted with the document',
+      });
+    }
+
     return {
       originalRecipient,
-      recipientUpdateData: recipient,
+      updateData: recipient,
     };
   });
 
   const updatedRecipients = await prisma.$transaction(async (tx) => {
     return await Promise.all(
-      recipientsToUpdate.map(async ({ originalRecipient, recipientUpdateData }) => {
+      recipientsToUpdate.map(async ({ originalRecipient, updateData }) => {
         let authOptions = ZRecipientAuthOptionsSchema.parse(originalRecipient.authOptions);
 
-        if (
-          recipientUpdateData.actionAuth !== undefined ||
-          recipientUpdateData.accessAuth !== undefined
-        ) {
+        if (updateData.actionAuth !== undefined || updateData.accessAuth !== undefined) {
           authOptions = createRecipientAuthOptions({
-            accessAuth: recipientUpdateData.accessAuth || authOptions.accessAuth,
-            actionAuth: recipientUpdateData.actionAuth || authOptions.actionAuth,
+            accessAuth: updateData.accessAuth || authOptions.accessAuth,
+            actionAuth: updateData.actionAuth || authOptions.actionAuth,
           });
         }
 
         const mergedRecipient = {
           ...originalRecipient,
-          ...recipientUpdateData,
+          ...updateData,
         };
 
         const updatedRecipient = await tx.recipient.update({
@@ -152,6 +168,28 @@ export const updateTemplateRecipients = async ({
           });
         }
 
+        // Handle recipient updated audit log.
+        if (envelope.type === EnvelopeType.DOCUMENT) {
+          const changes = diffRecipientChanges(originalRecipient, updatedRecipient);
+
+          if (changes.length > 0) {
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+                envelopeId: envelope.id,
+                metadata: requestMetadata,
+                data: {
+                  recipientEmail: updatedRecipient.email,
+                  recipientName: updatedRecipient.name,
+                  recipientId: updatedRecipient.id,
+                  recipientRole: updatedRecipient.role,
+                  changes,
+                },
+              }),
+            });
+          }
+        }
+
         return updatedRecipient;
       }),
     );
@@ -160,8 +198,7 @@ export const updateTemplateRecipients = async ({
   return {
     recipients: updatedRecipients.map((recipient) => ({
       ...recipient,
-      documentId: null,
-      templateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+      ...extractLegacyIds(envelope),
       fields: recipient.fields.map((field) => mapFieldToLegacyField(field, envelope)),
     })),
   };

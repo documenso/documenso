@@ -215,7 +215,6 @@ export const EnvelopeEditorProvider = ({
   } = useEnvelopeAutosave(async (envelopeUpdates: UpdateEnvelopePayload) => {
     await envelopeUpdateMutationQuery.mutateAsync({
       envelopeId: envelope.id,
-      envelopeType: envelope.type,
       data: envelopeUpdates.data,
       meta: envelopeUpdates.meta,
     });

@@ -142,7 +142,7 @@ export const EnvelopeEditorUploadPage = () => {
 
     const { createdEnvelopeItems } = await createEnvelopeItems({
       envelopeId: envelope.id,
-      items: envelopeItemsToCreate,
+      data: envelopeItemsToCreate,
     }).catch((error) => {
       console.error(error);
 

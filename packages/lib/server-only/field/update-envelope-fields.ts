@@ -10,18 +10,21 @@ import {
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { type EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientFieldsBeModified } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface UpdateDocumentFieldsOptions {
+export interface UpdateEnvelopeFieldsOptions {
   userId: number;
   teamId: number;
-  documentId: number;
+  id: EnvelopeIdOptions;
+  type?: EnvelopeType | null; // Only used to enforce the type.
   fields: {
     id: number;
     type?: FieldType;
     pageNumber?: number;
+    envelopeItemId?: string;
     pageX?: number;
     pageY?: number;
     width?: number;
@@ -31,19 +34,17 @@ export interface UpdateDocumentFieldsOptions {
   requestMetadata: ApiRequestMetadata;
 }
 
-export const updateDocumentFields = async ({
+export const updateEnvelopeFields = async ({
   userId,
   teamId,
-  documentId,
+  id,
+  type = null,
   fields,
   requestMetadata,
-}: UpdateDocumentFieldsOptions) => {
+}: UpdateEnvelopeFieldsOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: {
-      type: 'documentId',
-      id: documentId,
-    },
-    type: EnvelopeType.DOCUMENT,
+    id,
+    type,
     userId,
     teamId,
   });
@@ -53,18 +54,19 @@ export const updateDocumentFields = async ({
     include: {
       recipients: true,
       fields: true,
+      envelopeItems: true,
     },
   });
 
   if (!envelope) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Document not found',
+      message: 'Envelope not found',
     });
   }
 
   if (envelope.completedAt) {
     throw new AppError(AppErrorCode.INVALID_REQUEST, {
-      message: 'Document already complete',
+      message: 'Envelope already complete',
     });
   }
 
@@ -96,6 +98,29 @@ export const updateDocumentFields = async ({
       });
     }
 
+    const fieldType = field.type || originalField.type;
+    const fieldMetaType = field.fieldMeta?.type || originalField.fieldMeta?.type;
+
+    // Not going to mess with V1 envelopes.
+    if (
+      envelope.internalVersion === 2 &&
+      fieldMetaType &&
+      fieldMetaType.toLowerCase() !== fieldType.toLowerCase()
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Field meta type does not match the field type',
+      });
+    }
+
+    if (
+      field.envelopeItemId &&
+      !envelope.envelopeItems.some((item) => item.id === field.envelopeItemId)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Envelope item not found',
+      });
+    }
+
     return {
       originalField,
       updateData: field,
@@ -118,27 +143,30 @@ export const updateDocumentFields = async ({
             width: updateData.width,
             height: updateData.height,
             fieldMeta: updateData.fieldMeta,
+            envelopeItemId: updateData.envelopeItemId,
           },
         });
 
-        const changes = diffFieldChanges(originalField, updatedField);
-
         // Handle field updated audit log.
-        if (changes.length > 0) {
-          await tx.documentAuditLog.create({
-            data: createDocumentAuditLogData({
-              type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
-              envelopeId: envelope.id,
-              metadata: requestMetadata,
-              data: {
-                fieldId: updatedField.secondaryId,
-                fieldRecipientEmail: recipientEmail,
-                fieldRecipientId: updatedField.recipientId,
-                fieldType: updatedField.type,
-                changes,
-              },
-            }),
-          });
+        if (envelope.type === EnvelopeType.DOCUMENT) {
+          const changes = diffFieldChanges(originalField, updatedField);
+
+          if (changes.length > 0) {
+            await tx.documentAuditLog.create({
+              data: createDocumentAuditLogData({
+                type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_UPDATED,
+                envelopeId: envelope.id,
+                metadata: requestMetadata,
+                data: {
+                  fieldId: updatedField.secondaryId,
+                  fieldRecipientEmail: recipientEmail,
+                  fieldRecipientId: updatedField.recipientId,
+                  fieldType: updatedField.type,
+                  changes,
+                },
+              }),
+            });
+          }
         }
 
         return updatedField;

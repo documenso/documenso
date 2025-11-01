@@ -37,11 +37,8 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  templateId: true,
 }).extend({
-  templateId: z
-    .number()
-    .nullish()
-    .describe('The ID of the template that the document was created from, if any.'),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,

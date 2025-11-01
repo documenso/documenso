@@ -12,6 +12,15 @@ import {
 } from './delete-envelope-item.types';
 
 export const deleteEnvelopeItemRoute = authenticatedProcedure
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/item/delete',
+      summary: 'Delete envelope item',
+      description: 'Delete an envelope item from an envelope',
+      tags: ['Envelope Item'],
+    },
+  })
   .input(ZDeleteEnvelopeItemRequestSchema)
   .output(ZDeleteEnvelopeItemResponseSchema)
   .mutation(async ({ input, ctx }) => {
