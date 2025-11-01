@@ -1,6 +1,5 @@
 import type { DocumentMeta, DocumentVisibility, Prisma, TemplateType } from '@prisma/client';
-import { EnvelopeType, FolderType } from '@prisma/client';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, FolderType, WebhookTriggerEvents } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
@@ -12,9 +11,14 @@ import { prisma } from '@documenso/prisma';
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { createDocumentAuthOptions, extractDocumentAuthMethods } from '../../utils/document-auth';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 import { getEnvelopeWhereInput } from './get-envelope-by-id';
 
 export type UpdateEnvelopeOptions = {
@@ -336,6 +340,22 @@ export const updateEnvelope = async ({
     if (envelope.type === EnvelopeType.DOCUMENT) {
       await tx.documentAuditLog.createMany({
         data: auditLogs,
+      });
+    }
+
+    if (envelope.type === EnvelopeType.TEMPLATE) {
+      const envelopeWithRelations = await tx.envelope.findUniqueOrThrow({
+        where: { id: updatedEnvelope.id },
+        include: { documentMeta: true, recipients: true },
+      });
+
+      void triggerWebhook({
+        event: WebhookTriggerEvents.TEMPLATE_UPDATED,
+        data: ZWebhookDocumentSchema.parse(
+          mapEnvelopeToWebhookDocumentPayload(envelopeWithRelations),
+        ),
+        userId,
+        teamId,
       });
     }
 
