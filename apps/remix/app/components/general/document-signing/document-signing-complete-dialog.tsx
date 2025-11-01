@@ -304,7 +304,6 @@ export const DocumentSigningCompleteDialog = ({
                 <form onSubmit={form.handleSubmit(onFormSubmit)}>
                   {allowDictateNextSigner && defaultNextSigner && (
                     <div className="mb-4 flex flex-col gap-4">
-                      {/* Todo: Envelopes - Should we say "The next recipient to sign this document will be"? */}
                       <div className="flex flex-col gap-4 md:flex-row">
                         <FormField
                           control={form.control}

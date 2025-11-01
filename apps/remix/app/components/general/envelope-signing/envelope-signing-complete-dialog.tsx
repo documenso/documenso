@@ -127,6 +127,7 @@ export const EnvelopeSignerCompleteDialog = () => {
             isBase64,
           };
         }),
+        nextSigner,
       });
 
       const redirectUrl = envelope.documentMeta.redirectUrl;
