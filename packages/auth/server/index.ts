@@ -81,6 +81,7 @@ auth.onError((err, c) => {
   }
 
   // Handle other errors
+  console.error('Unknown Error:', err);
   return c.json(
     {
       code: AppErrorCode.UNKNOWN_ERROR,
