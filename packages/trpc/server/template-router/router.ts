@@ -519,6 +519,7 @@ export const templateRouter = router({
         directTemplateExternalId,
         signedFieldValues,
         templateUpdatedAt,
+        nextSigner,
       } = input;
 
       ctx.logger.info({
@@ -541,6 +542,7 @@ export const templateRouter = router({
               email: ctx.user.email,
             }
           : undefined,
+        nextSigner,
         requestMetadata: ctx.metadata,
       });
     }),

@@ -285,8 +285,6 @@ export const EnvelopeSigningProvider = ({
   }, [envelope.documentMeta?.signingOrder, envelope.recipients, recipient.id]);
 
   const signField = async (fieldId: number, fieldValue: TSignEnvelopeFieldValue) => {
-    console.log('insertField', fieldId, fieldValue);
-
     // Set the field locally for direct templates.
     if (isDirectTemplate) {
       handleDirectTemplateFieldInsertion(fieldId, fieldValue);

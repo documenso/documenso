@@ -90,6 +90,12 @@ export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
+  nextSigner: z
+    .object({
+      email: z.string().email().max(254),
+      name: z.string().min(1).max(255),
+    })
+    .optional(),
 });
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
