@@ -725,6 +725,13 @@ export const createDocumentFromTemplate = async ({
       teamId,
     });
 
+    await triggerWebhook({
+      event: WebhookTriggerEvents.TEMPLATE_USED,
+      data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+      userId,
+      teamId,
+    });
+
     return envelope;
   });
 };

@@ -7,6 +7,7 @@ import {
   OrganisationType,
   RecipientRole,
   SigningStatus,
+  WebhookTriggerEvents,
 } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
@@ -24,11 +25,16 @@ import { prisma } from '@documenso/prisma';
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
+import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
 export type ResendDocumentOptions = {
   id: EnvelopeIdOptions;
@@ -230,4 +236,11 @@ export const resendDocument = async ({
       );
     }),
   );
+
+  await triggerWebhook({
+    event: WebhookTriggerEvents.DOCUMENT_REMINDER_SENT,
+    data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+    userId: envelope.userId,
+    teamId: envelope.teamId,
+  });
 };
