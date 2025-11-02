@@ -1,5 +1,4 @@
 import { TRPCError, initTRPC } from '@trpc/server';
-import SuperJSON from 'superjson';
 import type { AnyZodObject } from 'zod';
 
 import { AppError, genericErrorCodeToTrpcErrorCodeMap } from '@documenso/lib/errors/app-error';
@@ -9,6 +8,7 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { alphaid } from '@documenso/lib/universal/id';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 
+import { dataTransformer } from '../utils/data-transformer';
 import type { TrpcContext } from './context';
 
 // Can't import type from trpc-to-openapi because it breaks build, not sure why.
@@ -35,7 +35,7 @@ const t = initTRPC
   .meta<TrpcRouteMeta>()
   .context<TrpcContext>()
   .create({
-    transformer: SuperJSON,
+    transformer: dataTransformer,
     errorFormatter(opts) {
       const { shape, error } = opts;
 
