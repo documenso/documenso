@@ -13,7 +13,6 @@ import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/fi
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import { prisma } from '@documenso/prisma';
 
 import { getPageSize } from './get-page-size';
@@ -43,12 +42,19 @@ type PlaceholderInfo = {
 };
 
 type FieldToCreate = TFieldAndMeta & {
+  envelopeItemId?: string;
   recipientId: number;
   pageNumber: number;
   pageX: number;
   pageY: number;
   width: number;
   height: number;
+};
+
+type RecipientPlaceholderInfo = {
+  email: string;
+  name: string;
+  recipientIndex: number;
 };
 
 /*
@@ -316,9 +322,7 @@ export const replacePlaceholdersInPDF = async (pdf: Buffer): Promise<Buffer> => 
   return Buffer.from(modifiedPdfBytes);
 };
 
-const extractRecipientPlaceholder = (
-  placeholder: string,
-): { email: string; recipientIndex: number } => {
+const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderInfo => {
   const indexMatch = placeholder.match(/^r(\d+)$/i);
 
   if (!indexMatch) {
@@ -327,9 +331,12 @@ const extractRecipientPlaceholder = (
     });
   }
 
+  const recipientIndex = Number(indexMatch[1]);
+
   return {
-    email: `recipient.${indexMatch[1]}@documenso.com`,
-    recipientIndex: Number(indexMatch[1]),
+    email: `recipient.${recipientIndex}@documenso.com`,
+    name: `Recipient ${recipientIndex}`,
+    recipientIndex,
   };
 };
 
@@ -339,6 +346,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
   teamId: number,
   envelopeId: EnvelopeIdOptions,
   requestMetadata: ApiRequestMetadata,
+  envelopeItemId?: string,
 ): Promise<Buffer> => {
   const placeholders = await extractPlaceholdersFromPDF(pdf);
 
@@ -347,15 +355,15 @@ export const insertFieldsFromPlaceholdersInPDF = async (
   }
 
   /*
-    A structure that maps the recipient email to the recipient index.
-    Example: 'recipient.1@documenso.com' => 1
+    A structure that maps the recipient index to the recipient name.
+    Example: 1 => 'Recipient 1'
   */
-  const recipientEmailToIndex = new Map<string, number>();
+  const recipientPlaceholders = new Map<number, string>();
 
   for (const placeholder of placeholders) {
-    const { email, recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
+    const { name, recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
 
-    recipientEmailToIndex.set(email, recipientIndex);
+    recipientPlaceholders.set(recipientIndex, name);
   }
 
   /*
@@ -363,13 +371,11 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     Example: [{ email: 'recipient.1@documenso.com', name: 'Recipient 1', role: 'SIGNER', signingOrder: 1 }]
   */
   const recipientsToCreate = Array.from(
-    recipientEmailToIndex.entries(),
-    ([email, recipientIndex]) => {
-      const placeholderInfo = generateRecipientPlaceholder(recipientIndex);
-
+    recipientPlaceholders.entries(),
+    ([recipientIndex, name]) => {
       return {
-        email,
-        name: placeholderInfo.name,
+        email: `recipient.${recipientIndex}@documenso.com`,
+        name,
         role: RecipientRole.SIGNER,
         signingOrder: recipientIndex,
       };
@@ -398,36 +404,53 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     });
   }
 
-  let createdRecipients: Pick<Recipient, 'id' | 'email'>[];
+  const existingRecipients = await prisma.recipient.findMany({
+    where: {
+      envelopeId: envelope.id,
+    },
+    select: {
+      id: true,
+      email: true,
+    },
+  });
 
-  if (envelope.type === EnvelopeType.DOCUMENT) {
-    const { recipients } = await createDocumentRecipients({
-      userId,
-      teamId,
-      id: envelopeId,
-      recipients: recipientsToCreate,
-      requestMetadata,
-    });
+  const existingEmails = new Set(existingRecipients.map((r) => r.email.toLowerCase()));
+  const recipientsToCreateFiltered = recipientsToCreate.filter(
+    (r) => !existingEmails.has(r.email.toLowerCase()),
+  );
 
-    createdRecipients = recipients;
-  } else if (envelope.type === EnvelopeType.TEMPLATE) {
-    const templateId =
-      envelopeId.type === 'templateId'
-        ? envelopeId.id
-        : mapSecondaryIdToTemplateId(envelope.secondaryId);
+  let createdRecipients: Pick<Recipient, 'id' | 'email'>[] = existingRecipients;
 
-    const { recipients } = await createTemplateRecipients({
-      userId,
-      teamId,
-      templateId,
-      recipients: recipientsToCreate,
-    });
+  if (recipientsToCreateFiltered.length > 0) {
+    if (envelope.type === EnvelopeType.DOCUMENT) {
+      const { recipients } = await createDocumentRecipients({
+        userId,
+        teamId,
+        id: envelopeId,
+        recipients: recipientsToCreateFiltered,
+        requestMetadata,
+      });
 
-    createdRecipients = recipients;
-  } else {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: `Invalid envelope type: ${envelope.type}`,
-    });
+      createdRecipients = [...existingRecipients, ...recipients];
+    } else if (envelope.type === EnvelopeType.TEMPLATE) {
+      const templateId =
+        envelopeId.type === 'templateId'
+          ? envelopeId.id
+          : mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+      const { recipients } = await createTemplateRecipients({
+        userId,
+        teamId,
+        templateId,
+        recipients: recipientsToCreateFiltered,
+      });
+
+      createdRecipients = [...existingRecipients, ...recipients];
+    } else {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Invalid envelope type: ${envelope.type}`,
+      });
+    }
   }
 
   const fieldsToCreate: FieldToCreate[] = [];
@@ -461,6 +484,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
 
     fieldsToCreate.push({
       ...placeholder.fieldAndMeta,
+      envelopeItemId,
       recipientId,
       pageNumber: placeholder.page,
       pageX: xPercent,
