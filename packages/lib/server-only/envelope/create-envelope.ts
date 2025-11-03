@@ -16,11 +16,16 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 
-import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import type {
+  TDocumentAccessAuthTypes,
+  TDocumentActionAuthTypes,
+  TRecipientAccessAuthTypes,
+  TRecipientActionAuthTypes,
+} from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
 import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
+import type { TFieldAndMeta } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -33,6 +38,25 @@ import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
+
+type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
+  documentDataId: string;
+  page: number;
+  positionX: number;
+  positionY: number;
+  width: number;
+  height: number;
+};
+
+type CreateEnvelopeRecipientOptions = {
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
+  fields?: CreateEnvelopeRecipientFieldOptions[];
+};
 
 export type CreateEnvelopeOptions = {
   userId: number;
@@ -56,7 +80,7 @@ export type CreateEnvelopeOptions = {
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    recipients?: TCreateEnvelopeRequest['recipients'];
+    recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
   };
   attachments?: Array<{

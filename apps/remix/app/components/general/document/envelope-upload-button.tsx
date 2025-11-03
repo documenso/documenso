@@ -14,9 +14,9 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
 import {
@@ -78,35 +78,24 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     try {
       setIsLoading(true);
 
-      const result = await Promise.all(
-        files.map(async (file) => {
-          try {
-            const response = await putPdfFile(file);
-
-            return {
-              title: file.name,
-              documentDataId: response.id,
-            };
-          } catch (err) {
-            console.error(err);
-            throw new Error('Failed to upload document');
-          }
-        }),
-      );
-
-      const envelopeItemsToCreate = result.filter(
-        (item): item is { title: string; documentDataId: string } => item !== undefined,
-      );
-
-      const { id } = await createEnvelope({
+      const payload = {
         folderId,
         type,
         title: files[0].name,
-        items: envelopeItemsToCreate,
         meta: {
           timezone: userTimezone,
         },
-      }).catch((error) => {
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+
+      for (const file of files) {
+        formData.append('files', file);
+      }
+
+      const { id } = await createEnvelope(formData).catch((error) => {
         console.error(error);
 
         throw error;

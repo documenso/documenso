@@ -3,6 +3,7 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
@@ -16,7 +17,12 @@ export const createDocumentRoute = authenticatedProcedure
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
-    const { title, documentDataId, timezone, folderId, attachments } = input;
+
+    const { payload, file } = input;
+
+    const { title, timezone, folderId, attachments } = payload;
+
+    const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
 
     ctx.logger.info({
       input: {
@@ -55,6 +61,7 @@ export const createDocumentRoute = authenticatedProcedure
     });
 
     return {
+      envelopeId: document.id,
       legacyDocumentId: mapSecondaryIdToDocumentId(document.secondaryId),
     };
   });
