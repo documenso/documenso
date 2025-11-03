@@ -13,9 +13,9 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
 import {
@@ -73,14 +73,18 @@ export const DocumentUploadButton = ({ className }: DocumentUploadButtonProps) =
     try {
       setIsLoading(true);
 
-      const response = await putPdfFile(file);
-
-      const { legacyDocumentId: id } = await createDocument({
+      const payload = {
         title: file.name,
-        documentDataId: response.id,
         timezone: userTimezone,
         folderId: folderId ?? undefined,
-      });
+      } satisfies TCreateDocumentPayloadSchema;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+      formData.append('file', file);
+
+      const { envelopeId: id } = await createDocument(formData);
 
       void refreshLimits();
 
