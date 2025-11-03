@@ -10,6 +10,7 @@ import {
 } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { insertFieldsFromPlaceholdersInPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -233,7 +234,7 @@ export const createEnvelope = async ({
       ? await incrementDocumentId().then((v) => v.formattedDocumentId)
       : await incrementTemplateId().then((v) => v.formattedTemplateId);
 
-  return await prisma.$transaction(async (tx) => {
+  const createdEnvelope = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),
@@ -353,8 +354,12 @@ export const createEnvelope = async ({
         recipients: true,
         fields: true,
         folder: true,
-        envelopeItems: true,
         envelopeAttachments: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
       },
     });
 
@@ -390,4 +395,51 @@ export const createEnvelope = async ({
 
     return createdEnvelope;
   });
+
+  for (const envelopeItem of createdEnvelope.envelopeItems) {
+    const buffer = await getFileServerSide(envelopeItem.documentData);
+
+    // Use normalized PDF if normalizePdf was true, otherwise use original
+    const pdfToProcess = normalizePdf
+      ? await makeNormalizedPdf(Buffer.from(buffer))
+      : Buffer.from(buffer);
+
+    await insertFieldsFromPlaceholdersInPDF(
+      pdfToProcess,
+      userId,
+      teamId,
+      {
+        type: 'envelopeId',
+        id: createdEnvelope.id,
+      },
+      requestMetadata,
+      envelopeItem.id,
+    );
+  }
+
+  const finalEnvelope = await prisma.envelope.findFirst({
+    where: {
+      id: createdEnvelope.id,
+    },
+    include: {
+      documentMeta: true,
+      recipients: true,
+      fields: true,
+      folder: true,
+      envelopeAttachments: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
+    },
+  });
+
+  if (!finalEnvelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Envelope not found',
+    });
+  }
+
+  return finalEnvelope;
 };

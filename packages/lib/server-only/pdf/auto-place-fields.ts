@@ -63,8 +63,8 @@ type RecipientPlaceholderInfo = {
     - Does it handle multiple recipients on the same page? ✅ YES! ✅
     - Does it handle multiple recipients on multiple pages? ✅ YES! ✅
     - What happens with incorrect placeholders? E.g. those containing non-accepted properties.
-    - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing.
-    - Need to handle envelopes with multiple items.
+    - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing. ✅
+    - Need to handle envelopes with multiple items. ✅
 */
 
 /*
@@ -202,9 +202,9 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
         const placeholderMatches = pageText.matchAll(/{{([^}]+)}}/g);
 
-        for (const match of placeholderMatches) {
-          const placeholder = match[0];
-          const placeholderData = match[1].split(',').map((part) => part.trim());
+        for (const placeholderMatch of placeholderMatches) {
+          const placeholder = placeholderMatch[0];
+          const placeholderData = placeholderMatch[1].split(',').map((part) => part.trim());
 
           const [fieldTypeString, recipient, ...fieldMetaData] = placeholderData;
 
@@ -223,7 +223,12 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
             Then find the position of where the placeholder ends in the text by adding the length of the placeholder to the index of the placeholder.
           */
-          const matchIndex = match.index;
+          const matchIndex = placeholderMatch.index;
+
+          if (matchIndex === undefined) {
+            continue;
+          }
+
           const placeholderLength = placeholder.length;
           const placeholderEndIndex = matchIndex + placeholderLength;
 
