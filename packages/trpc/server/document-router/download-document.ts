@@ -1,8 +1,13 @@
 import type { DocumentData } from '@prisma/client';
-import { DocumentDataType, EnvelopeType } from '@prisma/client';
+import { DocumentDataType, EnvelopeType, WebhookTriggerEvents } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { triggerWebhook } from '@documenso/lib/server-only/webhooks/trigger/trigger-webhook';
+import {
+  ZWebhookDocumentSchema,
+  mapEnvelopeToWebhookDocumentPayload,
+} from '@documenso/lib/types/webhook-payload';
 import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 
@@ -75,6 +80,13 @@ export const downloadDocumentRoute = authenticatedProcedure
       const baseTitle = envelope.title.replace(/\.pdf$/, '');
       const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
       const filename = `${baseTitle}${suffix}`;
+
+      void triggerWebhook({
+        event: WebhookTriggerEvents.DOCUMENT_DOWNLOADED,
+        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(envelope)),
+        userId: envelope.userId,
+        teamId: envelope.teamId,
+      });
 
       return {
         downloadUrl: url,
