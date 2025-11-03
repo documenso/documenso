@@ -144,7 +144,7 @@ services:
       - key: NEXT_PUBLIC_DISABLE_SIGNUP
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
-        sycn: false
+        sync: false
 
 databases:
   - name: documenso-db
