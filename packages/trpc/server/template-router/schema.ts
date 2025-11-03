@@ -231,7 +231,7 @@ export const ZCreateTemplateV2ResponseSchema = z.object({
 
 export const ZCreateTemplateResponseSchema = z.object({
   envelopeId: z.string(),
-  legacyTemplateId: z.number(),
+  id: z.number(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({

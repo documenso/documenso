@@ -70,7 +70,6 @@ export type CreateEnvelopeOptions = {
     envelopeItems: { title?: string; documentDataId: string; order?: number }[];
     formValues?: TDocumentFormValues;
 
-    timezone?: string;
     userTimezone?: string;
 
     templateType?: TemplateType;
@@ -107,7 +106,6 @@ export const createEnvelope = async ({
     title,
     externalId,
     formValues,
-    timezone,
     userTimezone,
     folderId,
     templateType,
@@ -166,6 +164,7 @@ export const createEnvelope = async ({
   let envelopeItems: { title?: string; documentDataId: string; order?: number }[] =
     data.envelopeItems;
 
+  // Todo: Envelopes - Remove
   if (normalizePdf) {
     envelopeItems = await Promise.all(
       data.envelopeItems.map(async (item) => {
@@ -243,7 +242,7 @@ export const createEnvelope = async ({
 
   // userTimezone is last because it's always passed in regardless of the organisation/team settings
   // for uploads from the frontend
-  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+  const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(settings, {

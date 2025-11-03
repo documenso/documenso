@@ -10,10 +10,12 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentResponseSchema,
+  createDocumentMeta,
 } from './create-document.types';
 
 export const createDocumentRoute = authenticatedProcedure
-  .input(ZCreateDocumentRequestSchema) // Note: Before releasing this to public, update the response schema to be correct.
+  .meta(createDocumentMeta)
+  .input(ZCreateDocumentRequestSchema)
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
@@ -62,6 +64,6 @@ export const createDocumentRoute = authenticatedProcedure
 
     return {
       envelopeId: document.id,
-      legacyDocumentId: mapSecondaryIdToDocumentId(document.secondaryId),
+      id: mapSecondaryIdToDocumentId(document.secondaryId),
     };
   });

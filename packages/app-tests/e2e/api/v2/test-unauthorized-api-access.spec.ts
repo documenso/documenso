@@ -1,5 +1,7 @@
 import { expect, test } from '@playwright/test';
 import type { Team, User } from '@prisma/client';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
@@ -2855,6 +2857,86 @@ test.describe('Document API V2', () => {
 
       expect(res.ok()).toBeTruthy();
       expect(res.status()).toBe(200);
+    });
+  });
+
+  test.describe('Document create endpoint', () => {
+    test('should allow authorized access to document create endpoint', async ({ request }) => {
+      const payload = {
+        title: 'Test Document',
+      };
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const pdfPath = path.join(__dirname, '../../../../../assets/example.pdf');
+      const pdfData = fs.existsSync(pdfPath) ? fs.readFileSync(pdfPath) : Buffer.from('%PDF-1.4\n');
+
+      formData.append('file', new File([pdfData], 'test.pdf', { type: 'application/pdf' }));
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const data = await res.json();
+      expect(data.envelopeId).toBeDefined();
+      expect(data.id).toBeDefined();
+
+      const envelope = await prisma.envelope.findFirstOrThrow({
+        where: {
+          id: data.envelopeId,
+        },
+        include: {
+          envelopeItems: true,
+        },
+      });
+
+      expect(envelope?.title).toBe(payload.title);
+      expect(envelope.envelopeItems.length).toBe(1);
+    });
+  });
+
+  test.describe('Template create endpoint', () => {
+    test('should allow authorized access to template create endpoint', async ({ request }) => {
+      const payload = {
+        title: 'Test Template',
+      };
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const pdfPath = path.join(__dirname, '../../../../../assets/example.pdf');
+      const pdfData = fs.existsSync(pdfPath) ? fs.readFileSync(pdfPath) : Buffer.from('%PDF-1.4\n');
+
+      formData.append('file', new File([pdfData], 'test.pdf', { type: 'application/pdf' }));
+
+      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/template/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const data = await res.json();
+      expect(data.envelopeId).toBeDefined();
+      expect(data.id).toBeDefined();
+
+      const envelope = await prisma.envelope.findFirstOrThrow({
+        where: {
+          id: data.envelopeId,
+        },
+        include: {
+          envelopeItems: true,
+        },
+      });
+
+      expect(envelope.title).toBe(payload.title);
+      expect(envelope.envelopeItems.length).toBe(1);
     });
   });
 

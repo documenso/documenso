@@ -10,15 +10,14 @@ import {
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
-  // Todo: Envelopes - Pending direct uploads
-  // .meta({
-  //   openapi: {
-  //     method: 'POST',
-  //     path: '/envelope/create',
-  //     summary: 'Create envelope',
-  //     tags: ['Envelope'],
-  //   },
-  // })
+  .meta({
+    openapi: {
+      method: 'POST',
+      path: '/envelope/create',
+      summary: 'Create envelope',
+      tags: ['Envelope'],
+    },
+  })
   .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -33,6 +32,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       visibility,
       globalAccessAuth,
       globalActionAuth,
+      formValues,
       recipients,
       folderId,
       meta,
@@ -121,6 +121,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         type,
         title,
         externalId,
+        formValues,
         visibility,
         globalAccessAuth,
         globalActionAuth,
@@ -130,7 +131,6 @@ export const createEnvelopeRoute = authenticatedProcedure
       },
       attachments,
       meta,
-      normalizePdf: true,
       requestMetadata: ctx.metadata,
     });
 

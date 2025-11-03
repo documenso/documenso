@@ -161,7 +161,6 @@ export const templateRouter = router({
    */
   createTemplate: authenticatedProcedure
     .meta({
-      // Note before releasing this to public, update the response schema to be correct.
       openapi: {
         method: 'POST',
         path: '/template/create',
@@ -207,7 +206,7 @@ export const templateRouter = router({
 
       return {
         envelopeId: envelope.id,
-        legacyTemplateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
       };
     }),
 

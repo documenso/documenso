@@ -8,7 +8,6 @@ import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
 import { ZDocumentTitleSchema } from './schema';
 
-// Currently not in use until we allow passthrough documents on create.
 export const createDocumentMeta: TrpcRouteMeta = {
   openapi: {
     method: 'POST',
@@ -42,7 +41,7 @@ export const ZCreateDocumentRequestSchema = zodFormData({
 
 export const ZCreateDocumentResponseSchema = z.object({
   envelopeId: z.string(),
-  legacyDocumentId: z.number(),
+  id: z.number(),
 });
 
 export type TCreateDocumentPayloadSchema = z.infer<typeof ZCreateDocumentPayloadSchema>;
