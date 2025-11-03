@@ -124,7 +124,7 @@ test.describe('API V2 Envelopes', () => {
       expect(envelope?.type).toBe(EnvelopeType.TEMPLATE);
       expect(envelope?.status).toBe(DocumentStatus.DRAFT);
       expect(envelope?.envelopeItems.length).toBe(1);
-      expect(envelope?.envelopeItems[0].title).toBe('field-font-alignment');
+      expect(envelope?.envelopeItems[0].title).toBe('field-font-alignment.pdf');
       expect(envelope?.envelopeItems[0].documentDataId).toBeDefined();
     });
 
