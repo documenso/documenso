@@ -103,7 +103,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       fieldUpdates.height = fieldPageHeight;
     }
 
-    // Todo: envelopes Use id
     editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
 
     // Select the field if it is not already selected.
