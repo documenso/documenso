@@ -25,7 +25,7 @@ type TextPosition = {
 };
 
 type CharIndexMapping = {
-  textPosIndex: number;
+  textPositionIndex: number;
 };
 
 type PlaceholderInfo = {
@@ -121,28 +121,26 @@ const parseFieldMeta = (
     rawFieldMeta is an object with string keys and string values.
     It contains string values because the PDF parser returns the values as strings.
 
-    E.g. { required: 'true', fontSize: '12', maxValue: '100', minValue: '0', characterLimit: '100' }
+    E.g. { 'required': 'true', 'fontSize': '12', 'maxValue': '100', 'minValue': '0', 'characterLimit': '100' }
   */
   const rawFieldMetaEntries = Object.entries(rawFieldMeta);
 
-  for (const entry of rawFieldMetaEntries) {
-    const [key, value] = entry;
-
-    if (key === 'readOnly' || key === 'required') {
-      parsedFieldMeta[key] = value === 'true';
+  for (const [property, value] of rawFieldMetaEntries) {
+    if (property === 'readOnly' || property === 'required') {
+      parsedFieldMeta[property] = value === 'true';
     } else if (
-      key === 'fontSize' ||
-      key === 'maxValue' ||
-      key === 'minValue' ||
-      key === 'characterLimit'
+      property === 'fontSize' ||
+      property === 'maxValue' ||
+      property === 'minValue' ||
+      property === 'characterLimit'
     ) {
       const numValue = Number(value);
 
       if (!Number.isNaN(numValue)) {
-        parsedFieldMeta[key] = numValue;
+        parsedFieldMeta[property] = numValue;
       }
     } else {
-      parsedFieldMeta[key] = value;
+      parsedFieldMeta[property] = value;
     }
   }
 
@@ -177,16 +175,20 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
         page.Texts.forEach((text) => {
           /*
-            R is an array that contains objects with each character.
-            The decodedText contains only the character, without any other information.
+            R is an array of objects containing each character, its position and styling information.
+            The decodedText stores the characters, without any other information.
 
             textPositions stores each character and its position on the page.
           */
           const decodedText = text.R.map((run) => decodeURIComponent(run.T)).join('');
 
+          /*
+            For each character in the decodedText, we store its position in the textPositions array.
+            This allows us to quickly find the position of a character in the textPositions array by its index.
+          */
           for (let i = 0; i < decodedText.length; i++) {
             charIndexToTextPos.push({
-              textPosIndex: textPositions.length,
+              textPositionIndex: textPositions.length,
             });
           }
 
@@ -202,6 +204,16 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
 
         const placeholderMatches = pageText.matchAll(/{{([^}]+)}}/g);
 
+        /*
+          A placeholder match has the following format:
+
+          [
+            '{{fieldType,recipient,fieldMeta}}',
+            'fieldType,recipient,fieldMeta',
+            'index: <number>',
+            'input: <pdf-text>'
+          ]
+        */
         for (const placeholderMatch of placeholderMatches) {
           const placeholder = placeholderMatch[0];
           const placeholderData = placeholderMatch[1].split(',').map((part) => part.trim());
@@ -221,28 +233,29 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           /*
             Find the position of where the placeholder starts in the text
 
-            Then find the position of where the placeholder ends in the text by adding the length of the placeholder to the index of the placeholder.
+            Then find the position of where the placeholder ends in the text
+            by adding the length of the placeholder to the index of the placeholder.
           */
-          const matchIndex = placeholderMatch.index;
+          if (placeholderMatch.index === undefined) {
+            console.error('Placeholder match index is undefined for placeholder', placeholder);
 
-          if (matchIndex === undefined) {
             continue;
           }
 
           const placeholderLength = placeholder.length;
-          const placeholderEndIndex = matchIndex + placeholderLength;
+          const placeholderEndIndex = placeholderMatch.index + placeholderLength;
 
-          const startCharInfo = charIndexToTextPos[matchIndex];
-          const endCharInfo = charIndexToTextPos[placeholderEndIndex - 1];
+          const startCharacterIndex = charIndexToTextPos[placeholderMatch.index];
+          const endCharacterIndex = charIndexToTextPos[placeholderEndIndex - 1];
 
-          if (!startCharInfo || !endCharInfo) {
+          if (!startCharacterIndex || !endCharacterIndex) {
             console.error('Could not find text position for placeholder', placeholder);
 
             return;
           }
 
-          const startTextPos = textPositions[startCharInfo.textPosIndex];
-          const endTextPos = textPositions[endCharInfo.textPosIndex];
+          const startTextPos = textPositions[startCharacterIndex.textPositionIndex];
+          const endTextPos = textPositions[endCharacterIndex.textPositionIndex];
 
           /* 
             PDF2JSON coordinates - these are in "page units" (relative coordinates)
@@ -419,9 +432,9 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     },
   });
 
-  const existingEmails = new Set(existingRecipients.map((r) => r.email.toLowerCase()));
+  const existingEmails = existingRecipients.map((r) => r.email);
   const recipientsToCreateFiltered = recipientsToCreate.filter(
-    (r) => !existingEmails.has(r.email.toLowerCase()),
+    (recipient) => !existingEmails.includes(recipient.email),
   );
 
   let createdRecipients: Pick<Recipient, 'id' | 'email'>[] = existingRecipients;
@@ -473,8 +486,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
 
     const { email } = extractRecipientPlaceholder(placeholder.recipient);
-    const normalizedEmail = email.toLowerCase();
-    const recipient = createdRecipients.find((r) => r.email.toLowerCase() === normalizedEmail);
+    const recipient = createdRecipients.find((r) => r.email === email);
 
     if (!recipient) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
