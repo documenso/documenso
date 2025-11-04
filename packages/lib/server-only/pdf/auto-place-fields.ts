@@ -166,12 +166,9 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           
           Page dimensions from PDF2JSON are in "page units" (relative coordinates)
         */
-        const pageWidth = page.Width;
-        const pageHeight = page.Height;
-
         let pageText = '';
         const textPositions: TextPosition[] = [];
-        const charIndexToTextPos: CharIndexMapping[] = [];
+        const charIndexMappings: CharIndexMapping[] = [];
 
         page.Texts.forEach((text) => {
           /*
@@ -187,7 +184,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
             This allows us to quickly find the position of a character in the textPositions array by its index.
           */
           for (let i = 0; i < decodedText.length; i++) {
-            charIndexToTextPos.push({
+            charIndexMappings.push({
               textPositionIndex: textPositions.length,
             });
           }
@@ -216,11 +213,13 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
         */
         for (const placeholderMatch of placeholderMatches) {
           const placeholder = placeholderMatch[0];
-          const placeholderData = placeholderMatch[1].split(',').map((part) => part.trim());
+          const placeholderData = placeholderMatch[1].split(',').map((property) => property.trim());
 
           const [fieldTypeString, recipient, ...fieldMetaData] = placeholderData;
 
-          const rawFieldMeta = Object.fromEntries(fieldMetaData.map((meta) => meta.split('=')));
+          const rawFieldMeta = Object.fromEntries(
+            fieldMetaData.map((property) => property.split('=')),
+          );
 
           const fieldType = parseFieldType(fieldTypeString);
           const parsedFieldMeta = parseFieldMeta(rawFieldMeta, fieldType);
@@ -231,10 +230,10 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           });
 
           /*
-            Find the position of where the placeholder starts in the text
+            Find the position of where the placeholder starts and ends in the text.
 
-            Then find the position of where the placeholder ends in the text
-            by adding the length of the placeholder to the index of the placeholder.
+            Then find the position of the characters in the textPositions array.
+            This allows us to quickly find the position of a character in the textPositions array by its index.
           */
           if (placeholderMatch.index === undefined) {
             console.error('Placeholder match index is undefined for placeholder', placeholder);
@@ -242,41 +241,42 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
             continue;
           }
 
-          const placeholderLength = placeholder.length;
-          const placeholderEndIndex = placeholderMatch.index + placeholderLength;
+          const placeholderEndCharIndex = placeholderMatch.index + placeholder.length;
 
-          const startCharacterIndex = charIndexToTextPos[placeholderMatch.index];
-          const endCharacterIndex = charIndexToTextPos[placeholderEndIndex - 1];
+          /*
+            Get the index of the placeholder's first and last character in the textPositions array.
+            Used to retrieve the character information from the textPositions array.
 
-          if (!startCharacterIndex || !endCharacterIndex) {
-            console.error('Could not find text position for placeholder', placeholder);
-
-            return;
-          }
-
-          const startTextPos = textPositions[startCharacterIndex.textPositionIndex];
-          const endTextPos = textPositions[endCharacterIndex.textPositionIndex];
-
-          /* 
-            PDF2JSON coordinates - these are in "page units" (relative coordinates)
-            Calculate width as the distance from start to end, plus a portion of the last character's width
-            Use 10% of the last character width to avoid extending too far beyond the placeholder
+            Example:
+              startTextPosIndex - 1
+              endTextPosIndex - 40
           */
-          const x = startTextPos.x;
-          const y = startTextPos.y;
-          const width = endTextPos.x + endTextPos.w * 0.1 - startTextPos.x;
+          const startTextPosIndex = charIndexMappings[placeholderMatch.index].textPositionIndex;
+          const endTextPosIndex = charIndexMappings[placeholderEndCharIndex - 1].textPositionIndex;
+
+          /*
+            Get the placeholder's first and last character information from the textPositions array.
+
+            Example:
+              placeholderStart = { text: '{', x: 100, y: 100, w: 100 }
+              placeholderEnd = { text: '}', x: 200, y: 100, w: 100 }
+          */
+          const placeholderStart = textPositions[startTextPosIndex];
+          const placeholderEnd = textPositions[endTextPosIndex];
+
+          const width = placeholderEnd.x + placeholderEnd.w * 0.1 - placeholderStart.x;
 
           placeholders.push({
             placeholder,
             recipient,
             fieldAndMeta,
             page: pageIndex + 1,
-            x,
-            y,
+            x: placeholderStart.x,
+            y: placeholderStart.y,
             width,
             height: 1,
-            pageWidth,
-            pageHeight,
+            pageWidth: page.Width,
+            pageHeight: page.Height,
           });
         }
       });
@@ -311,12 +311,6 @@ export const replacePlaceholdersInPDF = async (pdf: Buffer): Promise<Buffer> => 
       - Need to convert from page units to points
       - Y-axis in pdf-lib is bottom-up (origin at bottom-left)
       - Y-axis in PDF2JSON is top-down (origin at top-left)
-      
-      Conversion formulas:
-      - x_points = (x / pageWidth) * pdfLibPageWidth
-      - y_points = pdfLibPageHeight - ((y / pageHeight) * pdfLibPageHeight)
-      - width_points = (width / pageWidth) * pdfLibPageWidth
-      - height_points = (height / pageHeight) * pdfLibPageHeight
     */
 
     const xPoints = (placeholder.x / placeholder.pageWidth) * pdfLibPageWidth;
@@ -432,9 +426,9 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     },
   });
 
-  const existingEmails = existingRecipients.map((r) => r.email);
+  const existingEmails = new Set(existingRecipients.map((r) => r.email));
   const recipientsToCreateFiltered = recipientsToCreate.filter(
-    (recipient) => !existingEmails.includes(recipient.email),
+    (recipient) => !existingEmails.has(recipient.email),
   );
 
   let createdRecipients: Pick<Recipient, 'id' | 'email'>[] = existingRecipients;
