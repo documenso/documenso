@@ -156,7 +156,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+                  <PDFViewerKonvaLazy
+                    renderer="preview"
+                    customPageRenderer={EnvelopeGenericPageRenderer}
+                  />
                 </CardContent>
               </Card>
             </EnvelopeRenderProvider>

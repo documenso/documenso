@@ -13,6 +13,7 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),
   envelopeType: z.nativeEnum(EnvelopeType),
   fields: z.array(
+    // Todo: Envelopes - Use strict schema for types + field meta.
     z.object({
       id: z
         .number()

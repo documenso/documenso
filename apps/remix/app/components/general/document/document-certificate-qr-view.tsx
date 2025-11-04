@@ -174,7 +174,7 @@ const DocumentCertificateQrV2 = ({
       <div className="mt-12 w-full">
         <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
-        <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+        <PDFViewerKonvaLazy renderer="preview" customPageRenderer={EnvelopeGenericPageRenderer} />
       </div>
     </div>
   );

@@ -27,6 +27,9 @@ type EnvelopeRenderProviderValue = {
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
   fields: TEnvelope['fields'];
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
+
+  renderError: boolean;
+  setRenderError: (renderError: boolean) => void;
 };
 
 interface EnvelopeRenderProviderProps {
@@ -73,6 +76,8 @@ export const EnvelopeRenderProvider = ({
   const [files, setFiles] = useState<Record<string, FileData>>({});
 
   const [currentItem, setItem] = useState<EnvelopeRenderItem | null>(null);
+
+  const [renderError, setRenderError] = useState<boolean>(false);
 
   const envelopeItems = useMemo(
     () => envelope.envelopeItems.sort((a, b) => a.order - b.order),
@@ -164,6 +169,8 @@ export const EnvelopeRenderProvider = ({
         setCurrentEnvelopeItem,
         fields: fields ?? [],
         getRecipientColorKey,
+        renderError,
+        setRenderError,
       }}
     >
       {children}

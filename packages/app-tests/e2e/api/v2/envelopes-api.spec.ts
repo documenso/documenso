@@ -68,7 +68,7 @@ test.describe('API V2 Envelopes', () => {
       const formData = new FormData();
       formData.append('payload', JSON.stringify(payload));
 
-      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/create`, {
+      const res = await request.post(`${baseUrl}/envelope/create`, {
         headers: { Authorization: `Bearer ${tokenB}` },
         multipart: formData,
       });
@@ -100,7 +100,7 @@ test.describe('API V2 Envelopes', () => {
         formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
       }
 
-      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/create`, {
+      const res = await request.post(`${baseUrl}/envelope/create`, {
         headers: { Authorization: `Bearer ${tokenB}` },
         multipart: formData,
       });
@@ -232,14 +232,14 @@ test.describe('API V2 Envelopes', () => {
       }
 
       // Should error since folder is not owned by the user.
-      const invalidRes = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/create`, {
+      const invalidRes = await request.post(`${baseUrl}/envelope/create`, {
         headers: { Authorization: `Bearer ${tokenB}` },
         multipart: formData,
       });
 
       expect(invalidRes.ok()).toBeFalsy();
 
-      const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/create`, {
+      const res = await request.post(`${baseUrl}/envelope/create`, {
         headers: { Authorization: `Bearer ${tokenA}` },
         multipart: formData,
       });
@@ -378,21 +378,24 @@ test.describe('API V2 Envelopes', () => {
       new File([alignmentPdf], 'field-font-alignment.pdf', { type: 'application/pdf' }),
     );
 
-    const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/create`, {
+    const createEnvelopeRequest = await request.post(`${baseUrl}/envelope/create`, {
       headers: { Authorization: `Bearer ${tokenA}` },
       multipart: formData,
     });
 
-    const response: TCreateEnvelopeResponse = await res.json();
+    expect(createEnvelopeRequest.ok()).toBeTruthy();
+    expect(createEnvelopeRequest.status()).toBe(200);
 
-    const createdEnvelope: TGetEnvelopeResponse = await request
-      .get(`${baseUrl}/envelope/${response.id}`, {
-        headers: { Authorization: `Bearer ${tokenA}` },
-      })
-      .then(async (res) => await res.json());
+    const { id: createdEnvelopeId }: TCreateEnvelopeResponse = await createEnvelopeRequest.json();
+
+    const getEnvelopeRequest = await request.get(`${baseUrl}/envelope/${createdEnvelopeId}`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+    });
+
+    const createdEnvelope: TGetEnvelopeResponse = await getEnvelopeRequest.json();
 
     // Might as well testing access control here as well.
-    const unauthRequest = await request.get(`${baseUrl}/envelope/${response.id}`, {
+    const unauthRequest = await request.get(`${baseUrl}/envelope/${createdEnvelopeId}`, {
       headers: { Authorization: `Bearer ${tokenB}` },
     });
 

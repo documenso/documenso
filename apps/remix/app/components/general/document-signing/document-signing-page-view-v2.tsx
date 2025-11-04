@@ -205,6 +205,7 @@ export const DocumentSigningPageViewV2 = () => {
             <div className="flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
                 <PDFViewerKonvaLazy
+                  renderer="signing"
                   key={currentEnvelopeItem.id}
                   documentDataId={currentEnvelopeItem.documentDataId}
                   customPageRenderer={EnvelopeSignerPageRenderer}

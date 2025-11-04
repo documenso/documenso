@@ -92,12 +92,19 @@ app.use('/api/trpc/*', reactRouterTrpcServer);
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_URL}/openapi.json`, (c) => c.json(openApiDocument));
 app.use(`${API_V2_URL}/*`, cors());
-app.use(`${API_V2_URL}/*`, async (c) => openApiTrpcServerHandler(c));
+app.use(`${API_V2_URL}/*`, async (c) =>
+  openApiTrpcServerHandler(c, {
+    isBeta: false,
+  }),
+);
 
-// Redirect /api/v2-beta to /api/v2.
-app.all('/api/v2-beta/*', (c) => {
-  const newPath = c.req.path.replace(API_V2_BETA_URL, API_V2_URL);
-  return c.redirect(newPath, 301);
-});
+// Unstable API server routes. Order matters for these two.
+app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
+app.use(`${API_V2_BETA_URL}/*`, cors());
+app.use(`${API_V2_BETA_URL}/*`, async (c) =>
+  openApiTrpcServerHandler(c, {
+    isBeta: true,
+  }),
+);
 
 export default app;

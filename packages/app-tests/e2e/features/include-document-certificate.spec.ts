@@ -78,7 +78,6 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    // Todo: Envelopes
     const firstDocumentData = completedDocument.envelopeItems[0].documentData;
 
     const completedDocumentData = await getFile(firstDocumentData);
@@ -169,7 +168,6 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    // Todo: Envelopes
     const firstDocumentData = completedDocument.envelopeItems[0].documentData;
 
     const completedDocumentData = await getFile(firstDocumentData);

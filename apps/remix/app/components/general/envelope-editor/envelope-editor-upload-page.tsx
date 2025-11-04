@@ -203,7 +203,6 @@ export const EnvelopeEditorUploadPage = () => {
     debouncedUpdateEnvelopeItems(items);
   };
 
-  // Todo: Envelopes - Sync into envelopes data
   const debouncedUpdateEnvelopeItems = useDebounceFunction((files: LocalFile[]) => {
     void updateEnvelopeItems({
       envelopeId: envelope.id,

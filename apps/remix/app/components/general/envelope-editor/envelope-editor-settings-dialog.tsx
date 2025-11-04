@@ -229,7 +229,6 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const emails = emailData?.data || [];
 
-  // Todo: Envelopes this doesn't make sense (look at previous)
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
@@ -322,7 +321,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
       <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
         {/* Sidebar. */}
-        <div className="flex w-80 flex-col border-r bg-gray-50">
+        <div className="bg-accent/20 flex w-80 flex-col border-r">
           <DialogHeader className="p-6 pb-4">
             <DialogTitle>Document Settings</DialogTitle>
           </DialogHeader>

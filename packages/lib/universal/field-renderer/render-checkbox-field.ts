@@ -63,16 +63,15 @@ export const renderCheckboxFieldElement = (
     const rectWidth = fieldRect.width() * groupScaleX;
     const rectHeight = fieldRect.height() * groupScaleY;
 
-    // Todo: Envelopes - check sorting more than 10
-    // arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-
     const squares = fieldGroup
       .find('.checkbox-square')
-      .sort((a, b) => a.id().localeCompare(b.id()));
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
     const checkmarks = fieldGroup
       .find('.checkbox-checkmark')
-      .sort((a, b) => a.id().localeCompare(b.id()));
-    const text = fieldGroup.find('.checkbox-text').sort((a, b) => a.id().localeCompare(b.id()));
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
+    const text = fieldGroup
+      .find('.checkbox-text')
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
 
     const groupedItems = squares.map((square, i) => ({
       squareElement: square,

@@ -27,7 +27,8 @@ import type {
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Button } from '@documenso/ui/primitives/button';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
 
@@ -112,9 +113,34 @@ export const EnvelopeEditorFieldsPage = () => {
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}
-        <div className="mt-4 flex h-full justify-center p-4">
+        <div className="mt-4 flex flex-col items-center justify-center">
+          {envelope.recipients.length === 0 && (
+            <Alert
+              variant="neutral"
+              className="border-border bg-background mb-4 flex max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm border"
+            >
+              <div className="flex flex-col gap-1">
+                <AlertTitle>
+                  <Trans>Missing Recipients</Trans>
+                </AlertTitle>
+                <AlertDescription>
+                  <Trans>You need at least one recipient to add fields</Trans>
+                </AlertDescription>
+              </div>
+
+              <Button asChild variant="outline">
+                <Link to={`${relativePath.editorPath}`}>
+                  <Trans>Add Recipients</Trans>
+                </Link>
+              </Button>
+            </Alert>
+          )}
+
           {currentEnvelopeItem !== null ? (
-            <PDFViewerKonvaLazy customPageRenderer={EnvelopeEditorFieldsPageRenderer} />
+            <PDFViewerKonvaLazy
+              renderer="editor"
+              customPageRenderer={EnvelopeEditorFieldsPageRenderer}
+            />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
               <FileTextIcon className="text-muted-foreground h-10 w-10" />
@@ -130,7 +156,7 @@ export const EnvelopeEditorFieldsPage = () => {
       </div>
 
       {/* Right Section - Form Fields Panel */}
-      {currentEnvelopeItem && (
+      {currentEnvelopeItem && envelope.recipients.length > 0 && (
         <div className="bg-background border-border sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
@@ -138,29 +164,15 @@ export const EnvelopeEditorFieldsPage = () => {
               <Trans>Selected Recipient</Trans>
             </h3>
 
-            {envelope.recipients.length === 0 ? (
-              <Alert variant="warning">
-                <AlertDescription className="flex flex-col gap-2">
-                  <Trans>You need at least one recipient to add fields</Trans>
-
-                  <Link to={`${relativePath.editorPath}`} className="text-sm">
-                    <p>
-                      <Trans>Click here to add a recipient</Trans>
-                    </p>
-                  </Link>
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <RecipientSelector
-                selectedRecipient={editorFields.selectedRecipient}
-                onSelectedRecipientChange={(recipient) =>
-                  editorFields.setSelectedRecipient(recipient.id)
-                }
-                recipients={envelope.recipients}
-                className="w-full"
-                align="end"
-              />
-            )}
+            <RecipientSelector
+              selectedRecipient={editorFields.selectedRecipient}
+              onSelectedRecipientChange={(recipient) =>
+                editorFields.setSelectedRecipient(recipient.id)
+              }
+              recipients={envelope.recipients}
+              className="w-full"
+              align="end"
+            />
 
             {editorFields.selectedRecipient &&
               !canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields) && (

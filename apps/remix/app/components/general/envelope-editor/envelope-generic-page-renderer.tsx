@@ -12,7 +12,8 @@ import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
-  const { currentEnvelopeItem, fields, getRecipientColorKey } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, fields, getRecipientColorKey, setRenderError } =
+    useCurrentEnvelopeRender();
 
   const {
     stage,
@@ -37,7 +38,7 @@ export default function EnvelopeGenericPageRenderer() {
     [fields, pageContext.pageNumber],
   );
 
-  const renderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
+  const unsafeRenderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
@@ -64,6 +65,15 @@ export default function EnvelopeGenericPageRenderer() {
       editable: false,
       mode: 'sign',
     });
+  };
+
+  const renderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
+    try {
+      unsafeRenderFieldOnLayer(field);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**

@@ -13,6 +13,7 @@ import { prop, sortBy } from 'remeda';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
@@ -51,7 +52,11 @@ export type EnvelopeSigningContextValue = {
   setSelectedAssistantRecipientId: (_value: number | null) => void;
   selectedAssistantRecipient: EnvelopeForSigningResponse['envelope']['recipients'][number] | null;
 
-  signField: (_fieldId: number, _value: TSignEnvelopeFieldValue) => Promise<void>;
+  signField: (
+    _fieldId: number,
+    _value: TSignEnvelopeFieldValue,
+    authOptions?: TRecipientActionAuth,
+  ) => Promise<void>;
 };
 
 const EnvelopeSigningContext = createContext<EnvelopeSigningContextValue | null>(null);
@@ -284,7 +289,11 @@ export const EnvelopeSigningProvider = ({
       : null;
   }, [envelope.documentMeta?.signingOrder, envelope.recipients, recipient.id]);
 
-  const signField = async (fieldId: number, fieldValue: TSignEnvelopeFieldValue) => {
+  const signField = async (
+    fieldId: number,
+    fieldValue: TSignEnvelopeFieldValue,
+    authOptions?: TRecipientActionAuth,
+  ) => {
     // Set the field locally for direct templates.
     if (isDirectTemplate) {
       handleDirectTemplateFieldInsertion(fieldId, fieldValue);
@@ -295,7 +304,7 @@ export const EnvelopeSigningProvider = ({
       token: envelopeData.recipient.token,
       fieldId,
       fieldValue,
-      authOptions: undefined,
+      authOptions,
     });
   };
 

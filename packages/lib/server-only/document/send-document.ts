@@ -250,7 +250,7 @@ export const sendDocument = async ({
           );
         }
 
-        if (isValid) {
+        if (isValid && checkedIndices.length > 0) {
           fieldsToAutoInsert.push({
             fieldId,
             customText: toCheckboxCustomText(checkedIndices),
