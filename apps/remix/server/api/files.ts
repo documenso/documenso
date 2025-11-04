@@ -1,21 +1,22 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
 import { sValidator } from '@hono/standard-validator';
 import { Hono } from 'hono';
 
+import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { putFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import {
-  getPresignGetUrl,
-  getPresignPostUrl,
-} from '@documenso/lib/universal/upload/server-actions';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
+import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../router';
+import { handleEnvelopeItemFileRequest } from './files.helpers';
 import {
-  type TGetPresignedGetUrlResponse,
   type TGetPresignedPostUrlResponse,
-  ZGetPresignedGetUrlRequestSchema,
+  ZGetEnvelopeItemFileDownloadRequestParamsSchema,
+  ZGetEnvelopeItemFileRequestParamsSchema,
+  ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
+  ZGetEnvelopeItemFileTokenRequestParamsSchema,
   ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
@@ -42,47 +43,12 @@ export const filesRoute = new Hono<HonoEnv>()
         return c.json({ error: 'File too large' }, 400);
       }
 
-      const arrayBuffer = await file.arrayBuffer();
-
-      const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
-        console.error(`PDF upload parse error: ${e.message}`);
-
-        throw new AppError('INVALID_DOCUMENT_FILE');
-      });
-
-      if (pdf.isEncrypted) {
-        throw new AppError('INVALID_DOCUMENT_FILE');
-      }
-
-      // Todo: (RR7) Test this.
-      if (!file.name.endsWith('.pdf')) {
-        Object.defineProperty(file, 'name', {
-          writable: true,
-          value: `${file.name}.pdf`,
-        });
-      }
-
-      const { type, data } = await putFileServerSide(file);
-
-      const result = await createDocumentData({ type, data });
+      const result = await putNormalizedPdfFileServerSide(file);
 
       return c.json(result);
     } catch (error) {
       console.error('Upload failed:', error);
       return c.json({ error: 'Upload failed' }, 500);
-    }
-  })
-  .post('/presigned-get-url', sValidator('json', ZGetPresignedGetUrlRequestSchema), async (c) => {
-    const { key } = await c.req.json();
-
-    try {
-      const { url } = await getPresignGetUrl(key || '');
-
-      return c.json({ url } satisfies TGetPresignedGetUrlResponse);
-    } catch (err) {
-      console.error(err);
-
-      throw new AppError(AppErrorCode.UNKNOWN_ERROR);
     }
   })
   .post('/presigned-post-url', sValidator('json', ZGetPresignedPostUrlRequestSchema), async (c) => {
@@ -97,4 +63,222 @@ export const filesRoute = new Hono<HonoEnv>()
 
       throw new AppError(AppErrorCode.UNKNOWN_ERROR);
     }
-  });
+  })
+  .get(
+    '/envelope/:envelopeId/envelopeItem/:envelopeItemId',
+    sValidator('param', ZGetEnvelopeItemFileRequestParamsSchema),
+    async (c) => {
+      const { envelopeId, envelopeItemId } = c.req.valid('param');
+
+      const session = await getOptionalSession(c);
+
+      if (!session.user) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const envelope = await prisma.envelope.findFirst({
+        where: {
+          id: envelopeId,
+        },
+        include: {
+          envelopeItems: {
+            where: {
+              id: envelopeItemId,
+            },
+            include: {
+              documentData: true,
+            },
+          },
+        },
+      });
+
+      if (!envelope) {
+        return c.json({ error: 'Envelope not found' }, 404);
+      }
+
+      const [envelopeItem] = envelope.envelopeItems;
+
+      if (!envelopeItem) {
+        return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      const team = await getTeamById({
+        userId: session.user.id,
+        teamId: envelope.teamId,
+      }).catch((error) => {
+        console.error(error);
+
+        return null;
+      });
+
+      if (!team) {
+        return c.json(
+          { error: 'User does not have access to the team that this envelope is associated with' },
+          403,
+        );
+      }
+
+      if (!envelopeItem.documentData) {
+        return c.json({ error: 'Document data not found' }, 404);
+      }
+
+      return await handleEnvelopeItemFileRequest({
+        title: envelopeItem.title,
+        status: envelope.status,
+        documentData: envelopeItem.documentData,
+        version: 'signed',
+        isDownload: false,
+        context: c,
+      });
+    },
+  )
+  .get(
+    '/envelope/:envelopeId/envelopeItem/:envelopeItemId/download/:version?',
+    sValidator('param', ZGetEnvelopeItemFileDownloadRequestParamsSchema),
+    async (c) => {
+      const { envelopeId, envelopeItemId, version } = c.req.valid('param');
+
+      const session = await getOptionalSession(c);
+
+      if (!session.user) {
+        return c.json({ error: 'Unauthorized' }, 401);
+      }
+
+      const envelope = await prisma.envelope.findFirst({
+        where: {
+          id: envelopeId,
+        },
+        include: {
+          envelopeItems: {
+            where: {
+              id: envelopeItemId,
+            },
+            include: {
+              documentData: true,
+            },
+          },
+        },
+      });
+
+      if (!envelope) {
+        return c.json({ error: 'Envelope not found' }, 404);
+      }
+
+      const [envelopeItem] = envelope.envelopeItems;
+
+      if (!envelopeItem) {
+        return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      const team = await getTeamById({
+        userId: session.user.id,
+        teamId: envelope.teamId,
+      }).catch((error) => {
+        console.error(error);
+
+        return null;
+      });
+
+      if (!team) {
+        return c.json(
+          { error: 'User does not have access to the team that this envelope is associated with' },
+          403,
+        );
+      }
+
+      if (!envelopeItem.documentData) {
+        return c.json({ error: 'Document data not found' }, 404);
+      }
+
+      return await handleEnvelopeItemFileRequest({
+        title: envelopeItem.title,
+        status: envelope.status,
+        documentData: envelopeItem.documentData,
+        version,
+        isDownload: true,
+        context: c,
+      });
+    },
+  )
+  .get(
+    '/token/:token/envelopeItem/:envelopeItemId',
+    sValidator('param', ZGetEnvelopeItemFileTokenRequestParamsSchema),
+    async (c) => {
+      const { token, envelopeItemId } = c.req.valid('param');
+
+      const envelopeItem = await prisma.envelopeItem.findFirst({
+        where: {
+          id: envelopeItemId,
+          envelope: {
+            recipients: {
+              some: {
+                token,
+              },
+            },
+          },
+        },
+        include: {
+          envelope: true,
+          documentData: true,
+        },
+      });
+
+      if (!envelopeItem) {
+        return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      if (!envelopeItem.documentData) {
+        return c.json({ error: 'Document data not found' }, 404);
+      }
+
+      return await handleEnvelopeItemFileRequest({
+        title: envelopeItem.title,
+        status: envelopeItem.envelope.status,
+        documentData: envelopeItem.documentData,
+        version: 'signed',
+        isDownload: false,
+        context: c,
+      });
+    },
+  )
+  .get(
+    '/token/:token/envelopeItem/:envelopeItemId/download/:version?',
+    sValidator('param', ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema),
+    async (c) => {
+      const { token, envelopeItemId, version } = c.req.valid('param');
+
+      const envelopeItem = await prisma.envelopeItem.findFirst({
+        where: {
+          id: envelopeItemId,
+          envelope: {
+            recipients: {
+              some: {
+                token,
+              },
+            },
+          },
+        },
+        include: {
+          envelope: true,
+          documentData: true,
+        },
+      });
+
+      if (!envelopeItem) {
+        return c.json({ error: 'Envelope item not found' }, 404);
+      }
+
+      if (!envelopeItem.documentData) {
+        return c.json({ error: 'Document data not found' }, 404);
+      }
+
+      return await handleEnvelopeItemFileRequest({
+        title: envelopeItem.title,
+        status: envelopeItem.envelope.status,
+        documentData: envelopeItem.documentData,
+        version,
+        isDownload: true,
+        context: c,
+      });
+    },
+  );

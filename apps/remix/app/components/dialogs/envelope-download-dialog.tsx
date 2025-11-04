@@ -6,7 +6,7 @@ import { type DocumentData, DocumentStatus, type EnvelopeItem } from '@prisma/cl
 import { DownloadIcon, FileTextIcon } from 'lucide-react';
 
 import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -87,17 +87,11 @@ export const EnvelopeDownloadDialog = ({
     }));
 
     try {
-      const data = await getFile({
-        type: envelopeItem.documentData.type,
-        data:
-          version === 'signed'
-            ? envelopeItem.documentData.data
-            : envelopeItem.documentData.initialData,
-      });
+      const downloadUrl = token
+        ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/token/${token}/envelopeItem/${envelopeItemId}/download/${version}`
+        : `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/envelope/${envelopeId}/envelopeItem/${envelopeItemId}/download/${version}`;
 
-      const blob = new Blob([data], {
-        type: 'application/pdf',
-      });
+      const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
 
       const baseTitle = envelopeItem.title.replace(/\.pdf$/, '');
       const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';

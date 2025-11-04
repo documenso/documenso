@@ -24,15 +24,43 @@ export const ZGetPresignedPostUrlResponseSchema = z.object({
   url: z.string().min(1),
 });
 
-export const ZGetPresignedGetUrlRequestSchema = z.object({
-  key: z.string().min(1),
-});
-
-export const ZGetPresignedGetUrlResponseSchema = z.object({
-  url: z.string().min(1),
-});
-
 export type TGetPresignedPostUrlRequest = z.infer<typeof ZGetPresignedPostUrlRequestSchema>;
 export type TGetPresignedPostUrlResponse = z.infer<typeof ZGetPresignedPostUrlResponseSchema>;
-export type TGetPresignedGetUrlRequest = z.infer<typeof ZGetPresignedGetUrlRequestSchema>;
-export type TGetPresignedGetUrlResponse = z.infer<typeof ZGetPresignedGetUrlResponseSchema>;
+
+export const ZGetEnvelopeItemFileRequestParamsSchema = z.object({
+  envelopeId: z.string().min(1),
+  envelopeItemId: z.string().min(1),
+});
+
+export type TGetEnvelopeItemFileRequestParams = z.infer<
+  typeof ZGetEnvelopeItemFileRequestParamsSchema
+>;
+
+export const ZGetEnvelopeItemFileTokenRequestParamsSchema = z.object({
+  token: z.string().min(1),
+  envelopeItemId: z.string().min(1),
+});
+
+export type TGetEnvelopeItemFileTokenRequestParams = z.infer<
+  typeof ZGetEnvelopeItemFileTokenRequestParamsSchema
+>;
+
+export const ZGetEnvelopeItemFileDownloadRequestParamsSchema = z.object({
+  envelopeId: z.string().min(1),
+  envelopeItemId: z.string().min(1),
+  version: z.enum(['signed', 'original']).default('signed'),
+});
+
+export type TGetEnvelopeItemFileDownloadRequestParams = z.infer<
+  typeof ZGetEnvelopeItemFileDownloadRequestParamsSchema
+>;
+
+export const ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema = z.object({
+  token: z.string().min(1),
+  envelopeItemId: z.string().min(1),
+  version: z.enum(['signed', 'original']).default('signed'),
+});
+
+export type TGetEnvelopeItemFileTokenDownloadRequestParams = z.infer<
+  typeof ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema
+>;
