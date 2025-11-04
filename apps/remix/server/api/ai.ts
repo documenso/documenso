@@ -1,13 +1,41 @@
+// sort-imports-ignore
+
+// ---- PATCH pdfjs-dist's canvas require BEFORE importing it ----
+import { createRequire } from 'module';
+import { fileURLToPath } from 'url';
+import { Canvas, Image } from 'skia-canvas';
+
+const require = createRequire(import.meta.url || fileURLToPath(new URL('.', import.meta.url)));
+const Module = require('module');
+
+const originalRequire = Module.prototype.require;
+Module.prototype.require = function (path: string) {
+  if (path === 'canvas') {
+    return {
+      createCanvas: (width: number, height: number) => new Canvas(width, height),
+      Image, // needed by pdfjs-dist
+    };
+  }
+  // eslint-disable-next-line prefer-rest-params, @typescript-eslint/consistent-type-assertions
+  return originalRequire.apply(this, arguments as unknown as [string]);
+};
+
+// Use dynamic require to bypass Vite SSR transformation
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
+
 import { generateObject } from 'ai';
 import { mkdir, writeFile } from 'fs/promises';
 import { Hono } from 'hono';
 import { join } from 'path';
 import sharp from 'sharp';
-import { Canvas, Image } from 'skia-canvas';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { env } from '@documenso/lib/utils/env';
+import { prisma } from '@documenso/prisma';
 
 import type { HonoEnv } from '../router';
 import {
@@ -16,12 +44,46 @@ import {
   ZDetectedFormFieldSchema,
 } from './ai.types';
 
-/**
- * Resize and compress image for better Gemini API accuracy.
- * Resizes to max width of 1000px (maintaining aspect ratio) and compresses to JPEG at 70% quality.
- * This preprocessing improves bounding box detection accuracy.
- */
-async function resizeAndCompressImage(imageBuffer: Buffer): Promise<Buffer> {
+const renderPdfToImage = async (pdfBytes: Uint8Array) => {
+  const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
+  const pdf = await loadingTask.promise;
+
+  try {
+    const scale = 4;
+
+    const pages = await Promise.all(
+      Array.from({ length: pdf.numPages }, async (_, index) => {
+        const pageNumber = index + 1;
+        const page = await pdf.getPage(pageNumber);
+
+        try {
+          const viewport = page.getViewport({ scale });
+
+          const virtualCanvas = new Canvas(viewport.width, viewport.height);
+          const context = virtualCanvas.getContext('2d');
+          context.imageSmoothingEnabled = false;
+
+          await page.render({ canvasContext: context, viewport }).promise;
+
+          return {
+            image: await virtualCanvas.toBuffer('png'),
+            pageNumber,
+            width: Math.floor(viewport.width),
+            height: Math.floor(viewport.height),
+          };
+        } finally {
+          page.cleanup();
+        }
+      }),
+    );
+
+    return pages;
+  } finally {
+    await pdf.destroy();
+  }
+};
+
+const resizeAndCompressImage = async (imageBuffer: Buffer): Promise<Buffer> => {
   const metadata = await sharp(imageBuffer).metadata();
   const originalWidth = metadata.width || 0;
 
@@ -33,7 +95,7 @@ async function resizeAndCompressImage(imageBuffer: Buffer): Promise<Buffer> {
   }
 
   return await sharp(imageBuffer).jpeg({ quality: 70 }).toBuffer();
-}
+};
 
 const detectObjectsPrompt = `You are analyzing a form document image to detect fillable fields for the Documenso document signing platform.
 
@@ -115,7 +177,10 @@ When detecting thin horizontal lines for SIGNATURE, INITIALS, NAME, EMAIL, DATE,
    - Expanded field: [ymin=420, xmin=200, ymax=500, xmax=600] (creates 80-unit tall field)
    - This gives comfortable signing space while respecting the form layout`;
 
-const runFormFieldDetection = async (imageBuffer: Buffer): Promise<TDetectFormFieldsResponse> => {
+const runFormFieldDetection = async (
+  imageBuffer: Buffer,
+  pageNumber: number,
+): Promise<TDetectFormFieldsResponse> => {
   const compressedImageBuffer = await resizeAndCompressImage(imageBuffer);
   const base64Image = compressedImageBuffer.toString('base64');
 
@@ -140,128 +205,98 @@ const runFormFieldDetection = async (imageBuffer: Buffer): Promise<TDetectFormFi
     ],
   });
 
-  return result.object;
+  return result.object.map((field) => ({
+    ...field,
+    pageNumber,
+  }));
 };
 
 export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c) => {
   try {
-    await getSession(c.req.raw);
+    const { user } = await getSession(c.req.raw);
 
-    const parsedBody = await c.req.parseBody();
-    const rawImage = parsedBody.image;
-    const imageCandidate = Array.isArray(rawImage) ? rawImage[0] : rawImage;
-    const parsed = ZDetectFormFieldsRequestSchema.safeParse({ image: imageCandidate });
+    const body = await c.req.json();
+    const parsed = ZDetectFormFieldsRequestSchema.safeParse(body);
 
     if (!parsed.success) {
       throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Image file is required',
-        userMessage: 'Please upload a valid image file.',
+        message: 'Document ID is required',
+        userMessage: 'Please provide a valid document ID.',
       });
     }
 
-    const imageBuffer = Buffer.from(await parsed.data.image.arrayBuffer());
-    const metadata = await sharp(imageBuffer).metadata();
-    const imageWidth = metadata.width;
-    const imageHeight = metadata.height;
+    const { documentId } = parsed.data;
 
-    if (!imageWidth || !imageHeight) {
-      throw new AppError(AppErrorCode.INVALID_REQUEST, {
-        message: 'Unable to extract image dimensions',
-        userMessage: 'The image file appears to be invalid or corrupted.',
+    const documentData = await prisma.documentData.findUnique({
+      where: { id: documentId },
+      include: {
+        envelopeItem: {
+          include: {
+            envelope: {
+              select: {
+                userId: true,
+                teamId: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!documentData || !documentData.envelopeItem) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: `Document data not found: ${documentId}`,
+        userMessage: 'The requested document does not exist.',
       });
     }
 
-    const detectedFields = await runFormFieldDetection(imageBuffer);
+    const envelope = documentData.envelopeItem.envelope;
+
+    const isDirectOwner = envelope.userId === user.id;
+
+    let hasTeamAccess = false;
+    if (envelope.teamId) {
+      try {
+        await getTeamById({ teamId: envelope.teamId, userId: user.id });
+        hasTeamAccess = true;
+      } catch (error) {
+        hasTeamAccess = false;
+      }
+    }
+
+    if (!isDirectOwner && !hasTeamAccess) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: `User ${user.id} does not have access to document ${documentId}`,
+        userMessage: 'You do not have permission to access this document.',
+      });
+    }
+
+    const pdfBytes = await getFileServerSide({
+      type: documentData.type,
+      data: documentData.initialData || documentData.data,
+    });
+
+    const renderedPages = await renderPdfToImage(pdfBytes);
+
+    const results = await Promise.allSettled(
+      renderedPages.map(async (page) => {
+        return await runFormFieldDetection(page.image, page.pageNumber);
+      }),
+    );
+
+    const detectedFields: TDetectFormFieldsResponse = [];
+    for (const [index, result] of results.entries()) {
+      if (result.status === 'fulfilled') {
+        detectedFields.push(...result.value);
+      } else {
+        const pageNumber = renderedPages[index]?.pageNumber ?? index + 1;
+        console.error(`Failed to detect fields on page ${pageNumber}:`, result.reason);
+      }
+    }
 
     if (env('NEXT_PUBLIC_AI_DEBUG_PREVIEW') === 'true') {
-      const padding = { left: 80, top: 20, right: 20, bottom: 40 };
-      const canvas = new Canvas(
-        imageWidth + padding.left + padding.right,
-        imageHeight + padding.top + padding.bottom,
-      );
-      const ctx = canvas.getContext('2d');
-
-      const img = new Image();
-      img.src = imageBuffer;
-      ctx.drawImage(img, padding.left, padding.top);
-
-      ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
-      ctx.lineWidth = 1;
-
-      for (let i = 0; i <= 1000; i += 100) {
-        const x = padding.left + (i / 1000) * imageWidth;
-        ctx.beginPath();
-        ctx.moveTo(x, padding.top);
-        ctx.lineTo(x, imageHeight + padding.top);
-        ctx.stroke();
-      }
-
-      for (let i = 0; i <= 1000; i += 100) {
-        const y = padding.top + (i / 1000) * imageHeight;
-        ctx.beginPath();
-        ctx.moveTo(padding.left, y);
-        ctx.lineTo(imageWidth + padding.left, y);
-        ctx.stroke();
-      }
-
-      const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
-
-      detectedFields.forEach((field, index) => {
-        const [ymin, xmin, ymax, xmax] = field.boundingBox.map((coord) => coord / 1000);
-
-        const x = xmin * imageWidth + padding.left;
-        const y = ymin * imageHeight + padding.top;
-        const width = (xmax - xmin) * imageWidth;
-        const height = (ymax - ymin) * imageHeight;
-
-        ctx.strokeStyle = colors[index % colors.length];
-        ctx.lineWidth = 5;
-        ctx.strokeRect(x, y, width, height);
-
-        ctx.fillStyle = colors[index % colors.length];
-        ctx.font = '20px Arial';
-        ctx.fillText(field.label, x, y - 5);
-      });
-
-      ctx.strokeStyle = '#000000';
-      ctx.lineWidth = 1;
-      ctx.font = '26px Arial';
-
-      ctx.beginPath();
-      ctx.moveTo(padding.left, padding.top);
-      ctx.lineTo(padding.left, imageHeight + padding.top);
-      ctx.stroke();
-
-      ctx.textAlign = 'right';
-      ctx.textBaseline = 'middle';
-      for (let i = 0; i <= 1000; i += 100) {
-        const y = padding.top + (i / 1000) * imageHeight;
-        ctx.fillStyle = '#000000';
-        ctx.fillText(i.toString(), padding.left - 5, y);
-
-        ctx.beginPath();
-        ctx.moveTo(padding.left - 5, y);
-        ctx.lineTo(padding.left, y);
-        ctx.stroke();
-      }
-
-      ctx.beginPath();
-      ctx.moveTo(padding.left, imageHeight + padding.top);
-      ctx.lineTo(imageWidth + padding.left, imageHeight + padding.top);
-      ctx.stroke();
-
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'top';
-      for (let i = 0; i <= 1000; i += 100) {
-        const x = padding.left + (i / 1000) * imageWidth;
-        ctx.fillStyle = '#000000';
-        ctx.fillText(i.toString(), x, imageHeight + padding.top + 5);
-
-        ctx.beginPath();
-        ctx.moveTo(x, imageHeight + padding.top);
-        ctx.lineTo(x, imageHeight + padding.top + 5);
-        ctx.stroke();
-      }
+      const debugDir = join(process.cwd(), '..', '..', 'packages', 'assets', 'ai-previews');
+      await mkdir(debugDir, { recursive: true });
 
       const now = new Date();
       const timestamp = now
@@ -269,14 +304,104 @@ export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c)
         .replace(/[-:]/g, '')
         .replace(/\..+/, '')
         .replace('T', '_');
-      const outputFilename = `detected_form_fields_${timestamp}.png`;
-      const debugDir = join(process.cwd(), '..', '..', 'packages', 'assets', 'ai-previews');
-      const outputPath = join(debugDir, outputFilename);
 
-      await mkdir(debugDir, { recursive: true });
+      for (const page of renderedPages) {
+        const padding = { left: 80, top: 20, right: 20, bottom: 40 };
+        const canvas = new Canvas(
+          page.width + padding.left + padding.right,
+          page.height + padding.top + padding.bottom,
+        );
+        const ctx = canvas.getContext('2d');
 
-      const pngBuffer = await canvas.toBuffer('png');
-      await writeFile(outputPath, pngBuffer);
+        const img = new Image();
+        img.src = page.image;
+        ctx.drawImage(img, padding.left, padding.top);
+
+        ctx.strokeStyle = 'rgba(255, 0, 0, 0.5)';
+        ctx.lineWidth = 1;
+
+        for (let i = 0; i <= 1000; i += 100) {
+          const x = padding.left + (i / 1000) * page.width;
+          ctx.beginPath();
+          ctx.moveTo(x, padding.top);
+          ctx.lineTo(x, page.height + padding.top);
+          ctx.stroke();
+        }
+
+        for (let i = 0; i <= 1000; i += 100) {
+          const y = padding.top + (i / 1000) * page.height;
+          ctx.beginPath();
+          ctx.moveTo(padding.left, y);
+          ctx.lineTo(page.width + padding.left, y);
+          ctx.stroke();
+        }
+
+        const colors = ['#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+
+        const pageFields = detectedFields.filter((f) => f.pageNumber === page.pageNumber);
+        pageFields.forEach((field, index) => {
+          const [ymin, xmin, ymax, xmax] = field.boundingBox.map((coord) => coord / 1000);
+
+          const x = xmin * page.width + padding.left;
+          const y = ymin * page.height + padding.top;
+          const width = (xmax - xmin) * page.width;
+          const height = (ymax - ymin) * page.height;
+
+          ctx.strokeStyle = colors[index % colors.length];
+          ctx.lineWidth = 5;
+          ctx.strokeRect(x, y, width, height);
+
+          ctx.fillStyle = colors[index % colors.length];
+          ctx.font = '20px Arial';
+          ctx.fillText(field.label, x, y - 5);
+        });
+
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 1;
+        ctx.font = '26px Arial';
+
+        ctx.beginPath();
+        ctx.moveTo(padding.left, padding.top);
+        ctx.lineTo(padding.left, page.height + padding.top);
+        ctx.stroke();
+
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        for (let i = 0; i <= 1000; i += 100) {
+          const y = padding.top + (i / 1000) * page.height;
+          ctx.fillStyle = '#000000';
+          ctx.fillText(i.toString(), padding.left - 5, y);
+
+          ctx.beginPath();
+          ctx.moveTo(padding.left - 5, y);
+          ctx.lineTo(padding.left, y);
+          ctx.stroke();
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(padding.left, page.height + padding.top);
+        ctx.lineTo(page.width + padding.left, page.height + padding.top);
+        ctx.stroke();
+
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        for (let i = 0; i <= 1000; i += 100) {
+          const x = padding.left + (i / 1000) * page.width;
+          ctx.fillStyle = '#000000';
+          ctx.fillText(i.toString(), x, page.height + padding.top + 5);
+
+          ctx.beginPath();
+          ctx.moveTo(x, page.height + padding.top);
+          ctx.lineTo(x, page.height + padding.top + 5);
+          ctx.stroke();
+        }
+
+        const outputFilename = `detected_form_fields_${timestamp}_page_${page.pageNumber}.png`;
+        const outputPath = join(debugDir, outputFilename);
+
+        const pngBuffer = await canvas.toBuffer('png');
+        await writeFile(outputPath, new Uint8Array(pngBuffer));
+      }
     }
 
     return c.json<TDetectFormFieldsResponse>(detectedFields);
@@ -285,8 +410,10 @@ export const aiRoute = new Hono<HonoEnv>().post('/detect-form-fields', async (c)
       throw error;
     }
 
+    console.error('Failed to detect form fields from PDF:', error);
+
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: 'Failed to detect form fields and generate preview',
+      message: `Failed to detect form fields from PDF: ${error instanceof Error ? error.message : String(error)}`,
       userMessage: 'An error occurred while detecting form fields. Please try again.',
     });
   }

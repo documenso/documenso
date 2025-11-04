@@ -32,10 +32,15 @@ export const ZDetectedFormFieldSchema = z.object({
       'DROPDOWN',
     ])
     .describe('Documenso field type inferred from nearby label text or visual characteristics'),
+  pageNumber: z
+    .number()
+    .int()
+    .positive()
+    .describe('1-indexed page number where field was detected'),
 });
 
 export const ZDetectFormFieldsRequestSchema = z.object({
-  image: z.instanceof(Blob, { message: 'Image file is required' }),
+  documentId: z.string().min(1, { message: 'Document ID is required' }),
 });
 
 export const ZDetectFormFieldsResponseSchema = z.array(ZDetectedFormFieldSchema);

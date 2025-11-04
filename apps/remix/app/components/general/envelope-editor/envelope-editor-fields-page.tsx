@@ -11,11 +11,7 @@ import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import {
-  compositePageToBlob,
-  getPageCanvasRefs,
-  getRegisteredPageNumbers,
-} from '@documenso/lib/client-only/utils/page-canvas-registry';
+import { getPageCanvasRefs } from '@documenso/lib/client-only/utils/page-canvas-registry';
 import type { TDetectedFormField } from '@documenso/lib/types/ai';
 import type {
   TCheckboxFieldMeta,
@@ -141,61 +137,49 @@ const enforceMinimumFieldDimensions = (params: {
 };
 
 const processAllPagesWithAI = async (params: {
-  pageNumbers: number[];
+  documentDataId: string;
   onProgress: (current: number, total: number) => void;
 }): Promise<{
   fieldsPerPage: Map<number, TDetectedFormField[]>;
   errors: Map<number, Error>;
 }> => {
-  const { pageNumbers, onProgress } = params;
+  const { documentDataId, onProgress } = params;
   const fieldsPerPage = new Map<number, TDetectedFormField[]>();
   const errors = new Map<number, Error>();
 
-  const results = await Promise.allSettled(
-    pageNumbers.map(async (pageNumber) => {
-      try {
-        const blob = await compositePageToBlob(pageNumber);
+  try {
+    // Make single API call to process all pages server-side
+    onProgress(0, 1);
 
-        if (!blob) {
-          throw new Error(`Failed to capture page ${pageNumber}`);
-        }
+    const response = await fetch('/api/ai/detect-form-fields', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ documentId: documentDataId }),
+      credentials: 'include',
+    });
 
-        const formData = new FormData();
-        formData.append('image', blob, `page-${pageNumber}.png`);
-
-        const response = await fetch('/api/ai/detect-form-fields', {
-          method: 'POST',
-          body: formData,
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          throw new Error(`AI detection failed for page ${pageNumber}: ${response.statusText}`);
-        }
-
-        const detectedFields: TDetectedFormField[] = await response.json();
-
-        return { pageNumber, detectedFields };
-      } catch (error) {
-        throw { pageNumber, error };
-      }
-    }),
-  );
-
-  let completedCount = 0;
-
-  results.forEach((result) => {
-    completedCount++;
-    onProgress(completedCount, pageNumbers.length);
-
-    if (result.status === 'fulfilled') {
-      const { pageNumber, detectedFields } = result.value;
-      fieldsPerPage.set(pageNumber, detectedFields);
-    } else {
-      const { pageNumber, error } = result.reason;
-      errors.set(pageNumber, error instanceof Error ? error : new Error(String(error)));
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`AI detection failed: ${response.statusText} - ${errorText}`);
     }
-  });
+
+    const detectedFields: TDetectedFormField[] = await response.json();
+
+    // Group fields by page number
+    for (const field of detectedFields) {
+      if (!fieldsPerPage.has(field.pageNumber)) {
+        fieldsPerPage.set(field.pageNumber, []);
+      }
+      fieldsPerPage.get(field.pageNumber)!.push(field);
+    }
+
+    onProgress(1, 1);
+  } catch (error) {
+    // If request fails, treat it as error for all pages
+    errors.set(0, error instanceof Error ? error : new Error(String(error)));
+  }
 
   return { fieldsPerPage, errors };
 };
@@ -373,19 +357,17 @@ export const EnvelopeEditorFieldsPage = () => {
                     return;
                   }
 
-                  const pageNumbers = getRegisteredPageNumbers();
-
-                  if (pageNumbers.length === 0) {
+                  if (!currentEnvelopeItem.documentDataId) {
                     toast({
                       title: t`Error`,
-                      description: t`No pages found. Please ensure the document is fully loaded.`,
+                      description: t`Document data not found. Please try reloading the page.`,
                       variant: 'destructive',
                     });
                     return;
                   }
 
                   const { fieldsPerPage, errors } = await processAllPagesWithAI({
-                    pageNumbers,
+                    documentDataId: currentEnvelopeItem.documentDataId,
                     onProgress: (current, total) => {
                       setProcessingProgress({ current, total });
                     },
@@ -444,7 +426,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
                   if (totalAdded > 0) {
                     let description = t`Added ${totalAdded} fields`;
-                    if (pageNumbers.length > 1) {
+                    if (fieldsPerPage.size > 1) {
                       description = t`Added ${totalAdded} fields across ${successfulPages} pages`;
                     }
                     if (failedPages > 0) {

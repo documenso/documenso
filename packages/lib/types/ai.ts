@@ -11,4 +11,5 @@ export type TDetectedFormField = {
     | 'RADIO'
     | 'CHECKBOX'
     | 'DROPDOWN';
+  pageNumber: number;
 };
