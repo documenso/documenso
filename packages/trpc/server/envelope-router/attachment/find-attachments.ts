@@ -15,7 +15,7 @@ export const findAttachmentsRoute = maybeAuthenticatedProcedure
       path: '/envelope/attachment',
       summary: 'Find attachments',
       description: 'Find all attachments for an envelope',
-      tags: ['Envelope Attachment'],
+      tags: ['Envelope Attachments'],
     },
   })
   .input(ZFindAttachmentsRequestSchema)

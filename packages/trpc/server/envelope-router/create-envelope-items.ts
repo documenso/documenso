@@ -20,7 +20,7 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       path: '/envelope/item/create-many',
       summary: 'Create envelope items',
       description: 'Create multiple envelope items for an envelope',
-      tags: ['Envelope Item'],
+      tags: ['Envelope Items'],
     },
   })
   .input(ZCreateEnvelopeItemsRequestSchema)

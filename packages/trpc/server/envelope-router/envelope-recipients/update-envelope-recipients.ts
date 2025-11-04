@@ -13,7 +13,7 @@ export const updateEnvelopeRecipientsRoute = authenticatedProcedure
       path: '/envelope/recipient/update-many',
       summary: 'Update envelope recipients',
       description: 'Update multiple recipients for an envelope',
-      tags: ['Envelope Recipient'],
+      tags: ['Envelope Recipients'],
     },
   })
   .input(ZUpdateEnvelopeRecipientsRequestSchema)

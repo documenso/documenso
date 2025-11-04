@@ -13,7 +13,7 @@ export const updateEnvelopeFieldsRoute = authenticatedProcedure
       path: '/envelope/field/update-many',
       summary: 'Update envelope fields',
       description: 'Update multiple envelope fields for an envelope',
-      tags: ['Envelope Field'],
+      tags: ['Envelope Fields'],
     },
   })
   .input(ZUpdateEnvelopeFieldsRequestSchema)

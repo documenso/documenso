@@ -20,7 +20,7 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
       path: '/envelope/field/delete',
       summary: 'Delete envelope field',
       description: 'Delete an envelope field',
-      tags: ['Envelope Field'],
+      tags: ['Envelope Fields'],
     },
   })
   .input(ZDeleteEnvelopeFieldRequestSchema)

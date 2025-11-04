@@ -18,7 +18,7 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
       path: '/envelope/item/delete',
       summary: 'Delete envelope item',
       description: 'Delete an envelope item from an envelope',
-      tags: ['Envelope Item'],
+      tags: ['Envelope Items'],
     },
   })
   .input(ZDeleteEnvelopeItemRequestSchema)

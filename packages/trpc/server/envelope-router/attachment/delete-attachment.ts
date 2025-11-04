@@ -13,7 +13,7 @@ export const deleteAttachmentRoute = authenticatedProcedure
       path: '/envelope/attachment/delete',
       summary: 'Delete attachment',
       description: 'Delete an attachment from an envelope',
-      tags: ['Envelope Attachment'],
+      tags: ['Envelope Attachments'],
     },
   })
   .input(ZDeleteAttachmentRequestSchema)

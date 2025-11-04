@@ -15,7 +15,7 @@ export const getEnvelopeRecipientRoute = authenticatedProcedure
       path: '/envelope/recipient/{recipientId}',
       summary: 'Get envelope recipient',
       description: 'Returns an envelope recipient given an ID',
-      tags: ['Envelope Recipient'],
+      tags: ['Envelope Recipients'],
     },
   })
   .input(ZGetEnvelopeRecipientRequestSchema)

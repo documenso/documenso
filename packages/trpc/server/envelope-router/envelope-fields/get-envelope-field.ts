@@ -13,7 +13,7 @@ export const getEnvelopeFieldRoute = authenticatedProcedure
       path: '/envelope/field/{fieldId}',
       summary: 'Get envelope field',
       description: 'Returns an envelope field given an ID',
-      tags: ['Envelope Field'],
+      tags: ['Envelope Fields'],
     },
   })
   .input(ZGetEnvelopeFieldRequestSchema)

@@ -13,7 +13,7 @@ export const createAttachmentRoute = authenticatedProcedure
       path: '/envelope/attachment/create',
       summary: 'Create attachment',
       description: 'Create a new attachment for an envelope',
-      tags: ['Envelope Attachment'],
+      tags: ['Envelope Attachments'],
     },
   })
   .input(ZCreateAttachmentRequestSchema)
