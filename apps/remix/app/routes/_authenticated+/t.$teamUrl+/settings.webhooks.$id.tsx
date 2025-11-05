@@ -109,8 +109,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Webhook not found`,
             subHeading: msg`404 Webhook not found`,
-            message: msg`The webhook you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The webhook you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={

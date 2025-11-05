@@ -117,8 +117,7 @@ export default function OrganisationEmailDomainSettingsPage({ params }: Route.Co
           404: {
             heading: msg`Email domain not found`,
             subHeading: msg`404 Email domain not found`,
-            message: msg`The email domain you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The email domain you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={

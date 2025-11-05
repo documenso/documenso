@@ -71,8 +71,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Not found`,
             subHeading: msg`404 Not found`,
-            message: msg`The document you are looking for may have been removed, renamed or may have never
-                  existed.`,
+            message: msg`The document you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
