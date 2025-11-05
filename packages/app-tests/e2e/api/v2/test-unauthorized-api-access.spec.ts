@@ -30,6 +30,7 @@ import {
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
 import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -3855,25 +3856,24 @@ test.describe('Document API V2', () => {
       }) => {
         const doc = await seedBlankDocument(userA, teamA.id);
 
-        const documentData = await prisma.documentData.create({
-          data: {
-            type: 'BYTES_64',
-            data: Buffer.from('test pdf content').toString('base64'),
-            initialData: Buffer.from('test pdf content').toString('base64'),
-          },
-        });
+        const fieldMetaPdf = fs.readFileSync(
+          path.join(__dirname, '../../../../../assets/field-meta.pdf'),
+        );
+
+        const createEnvelopeItemsPayload: TCreateEnvelopeItemsPayload = {
+          envelopeId: doc.id,
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(createEnvelopeItemsPayload));
+        formData.append(
+          'files',
+          new File([fieldMetaPdf], 'field-meta.pdf', { type: 'application/pdf' }),
+        );
 
         const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/item/create-many`, {
           headers: { Authorization: `Bearer ${tokenB}` },
-          data: {
-            envelopeId: doc.id,
-            data: [
-              {
-                title: 'New Item',
-                documentDataId: documentData.id,
-              },
-            ],
-          },
+          multipart: formData,
         });
 
         expect(res.ok()).toBeFalsy();
@@ -3885,29 +3885,48 @@ test.describe('Document API V2', () => {
       }) => {
         const doc = await seedBlankDocument(userA, teamA.id);
 
-        const documentData = await prisma.documentData.create({
-          data: {
-            type: 'BYTES_64',
-            data: Buffer.from('test pdf content').toString('base64'),
-            initialData: Buffer.from('test pdf content').toString('base64'),
-          },
-        });
+        const fieldMetaPdf = fs.readFileSync(
+          path.join(__dirname, '../../../../../assets/field-meta.pdf'),
+        );
+
+        const createEnvelopeItemsPayload: TCreateEnvelopeItemsPayload = {
+          envelopeId: doc.id,
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(createEnvelopeItemsPayload));
+        formData.append(
+          'files',
+          new File([fieldMetaPdf], 'field-meta-1.pdf', { type: 'application/pdf' }),
+        );
+        formData.append(
+          'files',
+          new File([fieldMetaPdf], 'field-meta-2.pdf', { type: 'application/pdf' }),
+        );
 
         const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/item/create-many`, {
           headers: { Authorization: `Bearer ${tokenA}` },
-          data: {
-            envelopeId: doc.id,
-            data: [
-              {
-                title: 'New Item',
-                documentDataId: documentData.id,
-              },
-            ],
+          multipart: formData,
+        });
+
+        const envelope = await prisma.envelope.findFirstOrThrow({
+          where: {
+            id: doc.id,
+          },
+          include: {
+            envelopeItems: true,
           },
         });
 
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
+
+        const envelopeItems = envelope.envelopeItems;
+
+        // 3 Files because seed creates one automatically.
+        expect(envelopeItems.length).toBe(3);
+        expect(envelopeItems[1].title).toBe('field-meta-1.pdf');
+        expect(envelopeItems[2].title).toBe('field-meta-2.pdf');
       });
     });
 
