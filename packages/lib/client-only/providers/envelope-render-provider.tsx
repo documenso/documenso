@@ -16,6 +16,10 @@ type FileData =
       status: 'loaded';
     };
 
+type EnvelopeRenderOverrideSettings = {
+  mode: 'edit' | 'sign' | 'export';
+};
+
 type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
 
 type EnvelopeRenderProviderValue = {
@@ -28,10 +32,12 @@ type EnvelopeRenderProviderValue = {
 
   renderError: boolean;
   setRenderError: (renderError: boolean) => void;
+  overrideSettings?: EnvelopeRenderOverrideSettings;
 };
 
 interface EnvelopeRenderProviderProps {
   children: React.ReactNode;
+
   envelope: Pick<TEnvelope, 'envelopeItems'>;
 
   /**
@@ -54,6 +60,11 @@ interface EnvelopeRenderProviderProps {
    * If not provided, it will be assumed that the current user can access the document.
    */
   token: string | undefined;
+
+  /**
+   * Custom override settings for generic page renderers.
+   */
+  overrideSettings?: EnvelopeRenderOverrideSettings;
 }
 
 const EnvelopeRenderContext = createContext<EnvelopeRenderProviderValue | null>(null);
@@ -77,6 +88,7 @@ export const EnvelopeRenderProvider = ({
   fields,
   token,
   recipientIds = [],
+  overrideSettings,
 }: EnvelopeRenderProviderProps) => {
   // Indexed by documentDataId.
   const [files, setFiles] = useState<Record<string, FileData>>({});
@@ -185,6 +197,7 @@ export const EnvelopeRenderProvider = ({
         getRecipientColorKey,
         renderError,
         setRenderError,
+        overrideSettings,
       }}
     >
       {children}

@@ -12,7 +12,7 @@ import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
-  const { currentEnvelopeItem, fields, getRecipientColorKey, setRenderError } =
+  const { currentEnvelopeItem, fields, getRecipientColorKey, setRenderError, overrideSettings } =
     useCurrentEnvelopeRender();
 
   const {
@@ -50,12 +50,11 @@ export default function EnvelopeGenericPageRenderer() {
       field: {
         renderId: field.id.toString(),
         ...field,
-        customText: '',
         width: Number(field.width),
         height: Number(field.height),
         positionX: Number(field.positionX),
         positionY: Number(field.positionY),
-        inserted: false,
+        customText: field.inserted ? field.customText : '',
         fieldMeta: field.fieldMeta,
       },
       translations: getClientSideFieldTranslations(i18n),
@@ -63,7 +62,7 @@ export default function EnvelopeGenericPageRenderer() {
       pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
       editable: false,
-      mode: 'sign',
+      mode: overrideSettings?.mode ?? 'sign',
     });
   };
 

@@ -25,6 +25,7 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@epic-web/remember": "^1.1.0",
+    "@faker-js/faker": "^10.1.0",
     "@hono/node-server": "^1.13.7",
     "@hono/trpc-server": "^0.3.4",
     "@hookform/resolvers": "^3.1.0",

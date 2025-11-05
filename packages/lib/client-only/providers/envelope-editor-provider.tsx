@@ -46,6 +46,7 @@ type EnvelopeEditorProviderValue = {
   setLocalEnvelope: (localEnvelope: Partial<TEnvelope>) => void;
 
   updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
+  updateEnvelopeAsync: (envelopeUpdates: UpdateEnvelopePayload) => Promise<void>;
   setRecipientsDebounced: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => void;
   setRecipientsAsync: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => Promise<void>;
 
@@ -66,8 +67,6 @@ type EnvelopeEditorProviderValue = {
   };
 
   syncEnvelope: () => Promise<void>;
-  // refetchEnvelope: () => Promise<void>;
-  // updateEnvelope: (envelope: TEnvelope) => Promise<void>;
 };
 
 interface EnvelopeEditorProviderProps {
@@ -236,6 +235,13 @@ export const EnvelopeEditorProvider = ({
     setEnvelopeDebounced(envelopeUpdates);
   };
 
+  const updateEnvelopeAsync = async (envelopeUpdates: UpdateEnvelopePayload) => {
+    await envelopeUpdateMutationQuery.mutateAsync({
+      envelopeId: envelope.id,
+      ...envelopeUpdates,
+    });
+  };
+
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
       const recipientIndex = envelope.recipients.findIndex(
@@ -323,6 +329,7 @@ export const EnvelopeEditorProvider = ({
         setLocalEnvelope,
         getRecipientColorKey,
         updateEnvelope,
+        updateEnvelopeAsync,
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,

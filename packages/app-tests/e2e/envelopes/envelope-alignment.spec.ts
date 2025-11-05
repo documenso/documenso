@@ -25,8 +25,7 @@ import { DocumentStatus } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { getEnvelopeDownloadUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -95,7 +94,13 @@ test('field placement visual regression', async ({ page }, testInfo) => {
 
   await Promise.all(
     completedDocument.envelopeItems.map(async (item) => {
-      const pdfData = await getFile(item.documentData);
+      const documentUrl = getEnvelopeDownloadUrl({
+        envelopeItem: item,
+        token,
+        version: 'signed',
+      });
+
+      const pdfData = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
 
       const loadedImages = storedImages
         .filter((image) => image.includes(item.title))
@@ -103,7 +108,7 @@ test('field placement visual regression', async ({ page }, testInfo) => {
 
       await compareSignedPdfWithImages({
         id: item.title.replaceAll(' ', '-').toLowerCase(),
-        pdfData,
+        pdfData: new Uint8Array(pdfData),
         images: loadedImages,
         testInfo,
       });
@@ -174,9 +179,15 @@ test.skip('download envelope images', async ({ page }) => {
 
   await Promise.all(
     completedDocument.envelopeItems.map(async (item) => {
-      const pdfData = await getFile(item.documentData);
+      const documentUrl = getEnvelopeDownloadUrl({
+        envelopeItem: item,
+        token,
+        version: 'signed',
+      });
 
-      const pdfImages = await renderPdfToImage(pdfData);
+      const pdfData = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+
+      const pdfImages = await renderPdfToImage(new Uint8Array(pdfData));
 
       for (const [index, { image }] of pdfImages.entries()) {
         fs.writeFileSync(
