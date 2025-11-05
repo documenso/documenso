@@ -192,7 +192,7 @@ export const EnvelopeDownloadDialog = ({
                     {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
                       <DownloadIcon className="mr-2 h-4 w-4" />
                     )}
-                    <Trans>Original</Trans>
+                    <Trans context="Original document (adjective)">Original</Trans>
                   </Button>
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
@@ -206,7 +206,7 @@ export const EnvelopeDownloadDialog = ({
                       {!isDownloadingState[generateDownloadKey(item.id, 'signed')] && (
                         <DownloadIcon className="mr-2 h-4 w-4" />
                       )}
-                      <Trans>Signed</Trans>
+                      <Trans context="Signed document (adjective)">Signed</Trans>
                     </Button>
                   )}
                 </div>
