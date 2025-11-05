@@ -245,7 +245,7 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
         recipient={recipient}
         user={user}
       >
-        <EnvelopeRenderProvider envelope={envelope}>
+        <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
           <DocumentSigningPageViewV2 />
         </EnvelopeRenderProvider>
       </DocumentSigningAuthProvider>

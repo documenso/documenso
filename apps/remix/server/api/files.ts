@@ -1,4 +1,5 @@
 import { sValidator } from '@hono/standard-validator';
+import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
@@ -206,17 +207,28 @@ export const filesRoute = new Hono<HonoEnv>()
     async (c) => {
       const { token, envelopeItemId } = c.req.valid('param');
 
-      const envelopeItem = await prisma.envelopeItem.findFirst({
-        where: {
-          id: envelopeItemId,
-          envelope: {
-            recipients: {
-              some: {
-                token,
-              },
+      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
+        id: envelopeItemId,
+        envelope: {
+          recipients: {
+            some: {
+              token,
             },
           },
         },
+      };
+
+      if (token.startsWith('qr_')) {
+        envelopeWhereQuery = {
+          id: envelopeItemId,
+          envelope: {
+            qrToken: token,
+          },
+        };
+      }
+
+      const envelopeItem = await prisma.envelopeItem.findUnique({
+        where: envelopeWhereQuery,
         include: {
           envelope: true,
           documentData: true,
@@ -247,17 +259,28 @@ export const filesRoute = new Hono<HonoEnv>()
     async (c) => {
       const { token, envelopeItemId, version } = c.req.valid('param');
 
-      const envelopeItem = await prisma.envelopeItem.findFirst({
-        where: {
-          id: envelopeItemId,
-          envelope: {
-            recipients: {
-              some: {
-                token,
-              },
+      let envelopeWhereQuery: Prisma.EnvelopeItemWhereUniqueInput = {
+        id: envelopeItemId,
+        envelope: {
+          recipients: {
+            some: {
+              token,
             },
           },
         },
+      };
+
+      if (token.startsWith('qr_')) {
+        envelopeWhereQuery = {
+          id: envelopeItemId,
+          envelope: {
+            qrToken: token,
+          },
+        };
+      }
+
+      const envelopeItem = await prisma.envelopeItem.findUnique({
+        where: envelopeWhereQuery,
         include: {
           envelope: true,
           documentData: true,

@@ -559,5 +559,10 @@ test.describe('API V2 Envelopes', () => {
     );
     expect(finalEnvelope.title).toBe('Envelope Full Field Test');
     expect(finalEnvelope.type).toBe(EnvelopeType.DOCUMENT);
+
+    console.log({
+      createdEnvelopeId: finalEnvelope.id,
+      userEmail: userA.email,
+    });
   });
 });

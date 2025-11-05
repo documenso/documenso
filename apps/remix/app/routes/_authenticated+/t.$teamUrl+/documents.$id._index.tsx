@@ -147,6 +147,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
               envelope={envelope}
+              token={undefined}
               fields={envelope.status == DocumentStatus.COMPLETED ? [] : envelope.fields}
               recipientIds={envelope.recipients.map((recipient) => recipient.id)}
             >
@@ -181,9 +182,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               )}
 
               <PDFViewer
-                document={envelope}
+                envelopeItem={envelope.envelopeItems[0]}
+                token={undefined}
                 key={envelope.envelopeItems[0].id}
-                documentData={envelope.envelopeItems[0].documentData}
+                version="signed"
               />
             </CardContent>
           </Card>

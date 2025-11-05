@@ -165,7 +165,7 @@ export default function EmbedSignDocumentPage() {
           token={token}
           documentId={document.id}
           envelopeId={document.envelopeId}
-          documentData={document.documentData}
+          envelopeItems={document.envelopeItems}
           recipient={recipient}
           fields={fields}
           completedFields={completedFields}

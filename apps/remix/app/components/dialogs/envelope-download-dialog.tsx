@@ -2,11 +2,10 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { type DocumentData, DocumentStatus, type EnvelopeItem } from '@prisma/client';
+import { DocumentStatus, type EnvelopeItem } from '@prisma/client';
 import { DownloadIcon, FileTextIcon } from 'lucide-react';
 
-import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -20,9 +19,7 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'title' | 'order'> & {
-  documentData: DocumentData;
-};
+type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' | 'order'>;
 
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
@@ -87,19 +84,11 @@ export const EnvelopeDownloadDialog = ({
     }));
 
     try {
-      const downloadUrl = token
-        ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/token/${token}/envelopeItem/${envelopeItemId}/download/${version}`
-        : `${NEXT_PUBLIC_WEBAPP_URL()}/api/files/envelope/${envelopeId}/envelopeItem/${envelopeItemId}/download/${version}`;
-
-      const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
-
-      const baseTitle = envelopeItem.title.replace(/\.pdf$/, '');
-      const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
-      const filename = `${baseTitle}${suffix}`;
-
-      downloadFile({
-        filename,
-        data: blob,
+      await downloadPDF({
+        envelopeItem,
+        token,
+        fileName: envelopeItem.title,
+        version,
       });
 
       setIsDownloadingState((prev) => ({
@@ -140,7 +129,7 @@ export const EnvelopeDownloadDialog = ({
         <div className="flex flex-col gap-4">
           {isLoadingEnvelopeItems ? (
             <>
-              {Array.from({ length: 2 }).map((_, index) => (
+              {Array.from({ length: 1 }).map((_, index) => (
                 <div
                   key={index}
                   className="border-border bg-card flex items-center gap-2 rounded-lg border p-4"
@@ -169,6 +158,7 @@ export const EnvelopeDownloadDialog = ({
                 </div>
 
                 <div className="min-w-0 flex-1">
+                  {/* Todo: Envelopes - Fix overflow */}
                   <h4 className="text-foreground truncate text-sm font-medium">{item.title}</h4>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     <Trans>PDF Document</Trans>

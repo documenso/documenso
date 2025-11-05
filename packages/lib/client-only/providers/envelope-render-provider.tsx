@@ -1,13 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 
-import type { DocumentData } from '@prisma/client';
-
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
-import { getFile } from '../../universal/upload/get-file';
+import { getEnvelopeDownloadUrl } from '../../utils/envelope-download';
 
 type FileData =
   | {
@@ -49,6 +47,13 @@ interface EnvelopeRenderProviderProps {
    * Only required for generic page renderers.
    */
   recipientIds?: number[];
+
+  /**
+   * The token to access the envelope.
+   *
+   * If not provided, it will be assumed that the current user can access the document.
+   */
+  token: string | undefined;
 }
 
 const EnvelopeRenderContext = createContext<EnvelopeRenderProviderValue | null>(null);
@@ -70,6 +75,7 @@ export const EnvelopeRenderProvider = ({
   children,
   envelope,
   fields,
+  token,
   recipientIds = [],
 }: EnvelopeRenderProviderProps) => {
   // Indexed by documentDataId.
@@ -84,27 +90,35 @@ export const EnvelopeRenderProvider = ({
     [envelope.envelopeItems],
   );
 
-  const loadEnvelopeItemPdfFile = async (documentData: DocumentData) => {
-    if (files[documentData.id]?.status === 'loading') {
+  const loadEnvelopeItemPdfFile = async (envelopeItem: EnvelopeRenderItem) => {
+    if (files[envelopeItem.documentDataId]?.status === 'loading') {
       return;
     }
 
-    if (!files[documentData.id]) {
+    if (!files[envelopeItem.documentDataId]) {
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
+        [envelopeItem.documentDataId]: {
           status: 'loading',
         },
       }));
     }
 
     try {
-      const file = await getFile(documentData);
+      const downloadUrl = getEnvelopeDownloadUrl({
+        envelopeItem: envelopeItem,
+        token,
+        version: 'signed',
+      });
+
+      const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
+
+      const file = await blob.arrayBuffer();
 
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
-          file,
+        [envelopeItem.documentDataId]: {
+          file: new Uint8Array(file),
           status: 'loaded',
         },
       }));
@@ -113,7 +127,7 @@ export const EnvelopeRenderProvider = ({
 
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
+        [envelopeItem.documentDataId]: {
           status: 'error',
         },
       }));
@@ -145,7 +159,7 @@ export const EnvelopeRenderProvider = ({
     const missingFiles = envelope.envelopeItems.filter((item) => !files[item.documentDataId]);
 
     for (const item of missingFiles) {
-      void loadEnvelopeItemPdfFile(item.documentData);
+      void loadEnvelopeItemPdfFile(item);
     }
   }, [envelope.envelopeItems]);
 

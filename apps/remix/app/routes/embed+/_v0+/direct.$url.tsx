@@ -124,7 +124,7 @@ export default function EmbedDirectTemplatePage() {
             token={token}
             envelopeId={template.envelopeId}
             updatedAt={template.updatedAt}
-            documentData={template.templateDocumentData}
+            envelopeItems={template.envelopeItems}
             recipient={recipient}
             fields={fields}
             metadata={template.templateMeta}
