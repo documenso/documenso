@@ -44,11 +44,9 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   if (mode === 'edit') {
     if (textMeta?.text) {
       textToRender = textMeta.text;
-    } else if (textMeta?.label) {
-      textToRender = textMeta.label;
     } else {
       // Show field name which is centered for the edit mode if no label/text is avaliable.
-      textToRender = fieldTypeName;
+      textToRender = textMeta?.label || fieldTypeName;
       textAlign = 'center';
     }
   }
@@ -58,11 +56,9 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     if (!field.inserted) {
       if (textMeta?.text) {
         textToRender = textMeta.text;
-      } else if (textMeta?.label) {
-        textToRender = textMeta.label;
       } else if (mode === 'sign') {
         // Only show the field name in sign mode if no text/label is avaliable.
-        textToRender = fieldTypeName;
+        textToRender = textMeta?.label || fieldTypeName;
         textAlign = 'center';
       }
     }
