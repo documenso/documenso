@@ -74,7 +74,6 @@ export const ZEnvelopeForSigningResponse = z.object({
       envelopeId: true,
       id: true,
       title: true,
-      documentDataId: true,
       order: true,
     }).array(),
 

@@ -18,7 +18,7 @@ import {
   RecipientRole,
 } from '@documenso/prisma/client';
 import { seedUser } from '@documenso/prisma/seed/users';
-import type { TCreateEnvelopeItemsRequest } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import type {
   TCreateEnvelopePayload,
   TCreateEnvelopeResponse,
@@ -403,28 +403,20 @@ test.describe('API V2 Envelopes', () => {
     expect(unauthRequest.status()).toBe(404);
 
     // Step 2: Create second envelope item via API
-    // Todo: Envelopes - Use API Route
-    const fieldMetaDocumentData = await prisma.documentData.create({
-      data: {
-        type: 'BYTES_64',
-        data: fieldMetaPdf.toString('base64'),
-        initialData: fieldMetaPdf.toString('base64'),
-      },
-    });
-
-    const createEnvelopeItemsRequest: TCreateEnvelopeItemsRequest = {
+    const createEnvelopeItemsPayload: TCreateEnvelopeItemsPayload = {
       envelopeId: createdEnvelope.id,
-      data: [
-        {
-          title: 'Field Meta Test',
-          documentDataId: fieldMetaDocumentData.id,
-        },
-      ],
     };
+
+    const createEnvelopeItemFormData = new FormData();
+    createEnvelopeItemFormData.append('payload', JSON.stringify(createEnvelopeItemsPayload));
+    createEnvelopeItemFormData.append(
+      'files',
+      new File([fieldMetaPdf], 'field-meta.pdf', { type: 'application/pdf' }),
+    );
 
     const createItemsRes = await request.post(`${baseUrl}/envelope/item/create-many`, {
       headers: { Authorization: `Bearer ${tokenA}` },
-      data: createEnvelopeItemsRequest,
+      multipart: createEnvelopeItemFormData,
     });
 
     expect(createItemsRes.ok()).toBeTruthy();

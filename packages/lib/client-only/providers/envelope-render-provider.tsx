@@ -23,7 +23,7 @@ type EnvelopeRenderOverrideSettings = {
 type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
 
 type EnvelopeRenderProviderValue = {
-  getPdfBuffer: (documentDataId: string) => FileData | null;
+  getPdfBuffer: (envelopeItemId: string) => FileData | null;
   envelopeItems: EnvelopeRenderItem[];
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
@@ -103,14 +103,14 @@ export const EnvelopeRenderProvider = ({
   );
 
   const loadEnvelopeItemPdfFile = async (envelopeItem: EnvelopeRenderItem) => {
-    if (files[envelopeItem.documentDataId]?.status === 'loading') {
+    if (files[envelopeItem.id]?.status === 'loading') {
       return;
     }
 
-    if (!files[envelopeItem.documentDataId]) {
+    if (!files[envelopeItem.id]) {
       setFiles((prev) => ({
         ...prev,
-        [envelopeItem.documentDataId]: {
+        [envelopeItem.id]: {
           status: 'loading',
         },
       }));
@@ -129,7 +129,7 @@ export const EnvelopeRenderProvider = ({
 
       setFiles((prev) => ({
         ...prev,
-        [envelopeItem.documentDataId]: {
+        [envelopeItem.id]: {
           file: new Uint8Array(file),
           status: 'loaded',
         },
@@ -139,7 +139,7 @@ export const EnvelopeRenderProvider = ({
 
       setFiles((prev) => ({
         ...prev,
-        [envelopeItem.documentDataId]: {
+        [envelopeItem.id]: {
           status: 'error',
         },
       }));
@@ -147,8 +147,8 @@ export const EnvelopeRenderProvider = ({
   };
 
   const getPdfBuffer = useCallback(
-    (documentDataId: string) => {
-      return files[documentDataId] || null;
+    (envelopeItemId: string) => {
+      return files[envelopeItemId] || null;
     },
     [files],
   );
@@ -168,7 +168,7 @@ export const EnvelopeRenderProvider = ({
 
   // Look for any missing pdf files and load them.
   useEffect(() => {
-    const missingFiles = envelope.envelopeItems.filter((item) => !files[item.documentDataId]);
+    const missingFiles = envelope.envelopeItems.filter((item) => !files[item.id]);
 
     for (const item of missingFiles) {
       void loadEnvelopeItemPdfFile(item);

@@ -18,9 +18,9 @@ import {
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { nanoid } from '@documenso/lib/universal/id';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Card,
@@ -114,36 +114,19 @@ export const EnvelopeEditorUploadPage = () => {
 
     setLocalFiles((prev) => [...prev, ...newUploadingFiles]);
 
-    const result = await Promise.all(
-      files.map(async (file, index) => {
-        try {
-          const response = await putPdfFile(file);
-
-          // Mark as uploaded (remove from uploading state)
-          return {
-            title: file.name,
-            documentDataId: response.id,
-          };
-        } catch (_error) {
-          setLocalFiles((prev) =>
-            prev.map((uploadingFile) =>
-              uploadingFile.id === newUploadingFiles[index].id
-                ? { ...uploadingFile, isError: true, isUploading: false }
-                : uploadingFile,
-            ),
-          );
-        }
-      }),
-    );
-
-    const envelopeItemsToCreate = result.filter(
-      (item): item is { title: string; documentDataId: string } => item !== undefined,
-    );
-
-    const { createdEnvelopeItems } = await createEnvelopeItems({
+    const payload = {
       envelopeId: envelope.id,
-      data: envelopeItemsToCreate,
-    }).catch((error) => {
+    } satisfies TCreateEnvelopeItemsPayload;
+
+    const formData = new FormData();
+
+    formData.append('payload', JSON.stringify(payload));
+
+    for (const file of files) {
+      formData.append('files', file);
+    }
+
+    const { createdEnvelopeItems } = await createEnvelopeItems(formData).catch((error) => {
       console.error(error);
 
       // Set error state on files in batch upload.

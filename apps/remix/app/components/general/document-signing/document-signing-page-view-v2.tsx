@@ -207,7 +207,6 @@ export const DocumentSigningPageViewV2 = () => {
                 <PDFViewerKonvaLazy
                   renderer="signing"
                   key={currentEnvelopeItem.id}
-                  documentDataId={currentEnvelopeItem.documentDataId}
                   customPageRenderer={EnvelopeSignerPageRenderer}
                 />
               ) : (

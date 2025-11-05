@@ -78,7 +78,7 @@ export const PdfViewerKonva = ({
   const [pdfError, setPdfError] = useState(false);
 
   const envelopeItemFile = useMemo(() => {
-    const data = getPdfBuffer(currentEnvelopeItem?.documentDataId || '');
+    const data = getPdfBuffer(currentEnvelopeItem?.id || '');
 
     if (!data || data.status !== 'loaded') {
       return null;
@@ -87,7 +87,7 @@ export const PdfViewerKonva = ({
     return {
       data: new Uint8Array(data.file),
     };
-  }, [currentEnvelopeItem?.documentDataId, getPdfBuffer]);
+  }, [currentEnvelopeItem?.id, getPdfBuffer]);
 
   const onDocumentLoaded = useCallback(
     (doc: PDFDocumentProxy) => {

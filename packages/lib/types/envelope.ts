@@ -6,8 +6,8 @@ import { EnvelopeSchema } from '@documenso/prisma/generated/zod/modelSchema/Enve
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import TemplateDirectLinkSchema from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
-import { ZFieldSchema } from './field';
-import { ZRecipientLiteSchema } from './recipient';
+import { ZEnvelopeFieldSchema } from './field';
+import { ZEnvelopeRecipientLiteSchema } from './recipient';
 
 /**
  * The full envelope response schema.
@@ -56,19 +56,12 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     emailId: true,
     emailReplyTo: true,
   }),
-  recipients: ZRecipientLiteSchema.omit({
-    documentId: true,
-    templateId: true,
-  }).array(),
-  fields: ZFieldSchema.omit({
-    documentId: true,
-    templateId: true,
-  }).array(),
+  recipients: ZEnvelopeRecipientLiteSchema.array(),
+  fields: ZEnvelopeFieldSchema.array(),
   envelopeItems: EnvelopeItemSchema.pick({
     envelopeId: true,
     id: true,
     title: true,
-    documentDataId: true,
     order: true,
   }).array(),
   directLink: TemplateDirectLinkSchema.pick({
