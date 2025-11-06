@@ -16,7 +16,7 @@ export const ZGetEnvelopeItemsByTokenRequestSchema = z.object({
 });
 
 export const ZGetEnvelopeItemsByTokenResponseSchema = z.object({
-  envelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
     envelopeId: true,
     title: true,

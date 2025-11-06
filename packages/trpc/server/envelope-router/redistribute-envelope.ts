@@ -4,19 +4,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
   ZRedistributeEnvelopeResponseSchema,
+  redistributeEnvelopeMeta,
 } from './redistribute-envelope.types';
 
 export const redistributeEnvelopeRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/redistribute',
-      summary: 'Redistribute envelope',
-      description:
-        'Redistribute the envelope to the provided recipients who have not actioned the envelope. Will use the distribution method set in the envelope',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(redistributeEnvelopeMeta)
   .input(ZRedistributeEnvelopeRequestSchema)
   .output(ZRedistributeEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

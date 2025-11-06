@@ -4,17 +4,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateEnvelopeRequestSchema,
   ZUpdateEnvelopeResponseSchema,
+  updateEnvelopeMeta,
 } from './update-envelope.types';
 
 export const updateEnvelopeRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/update',
-      summary: 'Update envelope',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(updateEnvelopeMeta)
   .input(ZUpdateEnvelopeRequestSchema)
   .output(ZUpdateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

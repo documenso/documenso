@@ -4,18 +4,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZUpdateEnvelopeFieldsRequestSchema,
   ZUpdateEnvelopeFieldsResponseSchema,
+  updateEnvelopeFieldsMeta,
 } from './update-envelope-fields.types';
 
 export const updateEnvelopeFieldsRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/field/update-many',
-      summary: 'Update envelope fields',
-      description: 'Update multiple envelope fields for an envelope',
-      tags: ['Envelope Fields'],
-    },
-  })
+  .meta(updateEnvelopeFieldsMeta)
   .input(ZUpdateEnvelopeFieldsRequestSchema)
   .output(ZUpdateEnvelopeFieldsResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -28,7 +21,7 @@ export const updateEnvelopeFieldsRoute = authenticatedProcedure
       },
     });
 
-    return await updateEnvelopeFields({
+    const { fields: data } = await updateEnvelopeFields({
       userId: user.id,
       teamId,
       id: {
@@ -39,4 +32,8 @@ export const updateEnvelopeFieldsRoute = authenticatedProcedure
       fields,
       requestMetadata: ctx.metadata,
     });
+
+    return {
+      data,
+    };
   });

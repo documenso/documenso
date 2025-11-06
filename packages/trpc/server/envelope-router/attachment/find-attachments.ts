@@ -6,18 +6,11 @@ import { maybeAuthenticatedProcedure } from '../../trpc';
 import {
   ZFindAttachmentsRequestSchema,
   ZFindAttachmentsResponseSchema,
+  findAttachmentsMeta,
 } from './find-attachments.types';
 
 export const findAttachmentsRoute = maybeAuthenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'GET',
-      path: '/envelope/attachment',
-      summary: 'Find attachments',
-      description: 'Find all attachments for an envelope',
-      tags: ['Envelope Attachments'],
-    },
-  })
+  .meta(findAttachmentsMeta)
   .input(ZFindAttachmentsRequestSchema)
   .output(ZFindAttachmentsResponseSchema)
   .query(async ({ input, ctx }) => {

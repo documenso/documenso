@@ -4,6 +4,17 @@ import { zfd } from 'zod-form-data';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { zodFormData } from '../../utils/zod-form-data';
+import type { TrpcRouteMeta } from '../trpc';
+
+export const createEnvelopeItemsMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/item/create-many',
+    summary: 'Create envelope items',
+    description: 'Create multiple envelope items for an envelope',
+    tags: ['Envelope Items'],
+  },
+};
 
 export const ZCreateEnvelopeItemsPayloadSchema = z.object({
   envelopeId: z.string(),
@@ -16,7 +27,7 @@ export const ZCreateEnvelopeItemsRequestSchema = zodFormData({
 });
 
 export const ZCreateEnvelopeItemsResponseSchema = z.object({
-  createdEnvelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
     title: true,
     envelopeId: true,

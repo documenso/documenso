@@ -37,7 +37,7 @@ export const ZSetEnvelopeFieldsRequestSchema = z.object({
 });
 
 export const ZSetEnvelopeFieldsResponseSchema = z.object({
-  fields: z
+  data: z
     .object({
       id: z.number(),
       formId: z.string().optional(),

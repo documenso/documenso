@@ -150,7 +150,7 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeRecipientSetMutationQuery = trpc.envelope.recipient.set.useMutation({
-    onSuccess: ({ recipients }) => {
+    onSuccess: ({ data: recipients }) => {
       setEnvelope((prev) => ({
         ...prev,
         recipients,
@@ -196,7 +196,7 @@ export const EnvelopeEditorProvider = ({
     });
 
     // Insert the IDs into the local fields.
-    envelopeFields.fields.forEach((field) => {
+    envelopeFields.data.forEach((field) => {
       const localField = localFields.find((localField) => localField.formId === field.formId);
 
       if (localField && !localField.id) {

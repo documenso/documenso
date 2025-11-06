@@ -4,18 +4,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZCreateEnvelopeFieldsRequestSchema,
   ZCreateEnvelopeFieldsResponseSchema,
+  createEnvelopeFieldsMeta,
 } from './create-envelope-fields.types';
 
 export const createEnvelopeFieldsRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/field/create-many',
-      summary: 'Create envelope fields',
-      description: 'Create multiple fields for an envelope',
-      tags: ['Envelope Fields'],
-    },
-  })
+  .meta(createEnvelopeFieldsMeta)
   .input(ZCreateEnvelopeFieldsRequestSchema)
   .output(ZCreateEnvelopeFieldsResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -28,7 +21,7 @@ export const createEnvelopeFieldsRoute = authenticatedProcedure
       },
     });
 
-    return await createEnvelopeFields({
+    const { fields: data } = await createEnvelopeFields({
       userId: user.id,
       teamId,
       id: {
@@ -38,4 +31,8 @@ export const createEnvelopeFieldsRoute = authenticatedProcedure
       fields,
       requestMetadata: metadata,
     });
+
+    return {
+      data,
+    };
   });

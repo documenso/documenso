@@ -7,18 +7,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateEnvelopeItemsRequestSchema,
   ZUpdateEnvelopeItemsResponseSchema,
+  updateEnvelopeItemsMeta,
 } from './update-envelope-items.types';
 
 export const updateEnvelopeItemsRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/item/update-many',
-      summary: 'Update envelope items',
-      description: 'Update multiple envelope items for an envelope',
-      tags: ['Envelope Items'],
-    },
-  })
+  .meta(updateEnvelopeItemsMeta)
   .input(ZUpdateEnvelopeItemsRequestSchema)
   .output(ZUpdateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -102,6 +95,6 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
     // Todo: Envelope [AUDIT_LOGS]
 
     return {
-      updatedEnvelopeItems,
+      data: updatedEnvelopeItems,
     };
   });

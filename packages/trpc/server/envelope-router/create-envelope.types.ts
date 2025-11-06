@@ -27,14 +27,13 @@ import {
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
 
-// Currently not in use until we allow passthrough documents on create.
 export const createEnvelopeMeta: TrpcRouteMeta = {
   openapi: {
     method: 'POST',
     path: '/envelope/create',
     contentTypes: ['multipart/form-data'],
     summary: 'Create envelope',
-    description: 'Create a envelope using form data.',
+    description: 'Create an envelope using form data.',
     tags: ['Envelope'],
   },
 };

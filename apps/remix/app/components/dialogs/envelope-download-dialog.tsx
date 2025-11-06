@@ -61,12 +61,12 @@ export const EnvelopeDownloadDialog = ({
         access: token ? { type: 'recipient', token } : { type: 'user' },
       },
       {
-        initialData: initialEnvelopeItems ? { envelopeItems: initialEnvelopeItems } : undefined,
+        initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
         enabled: open,
       },
     );
 
-  const envelopeItems = envelopeItemsPayload?.envelopeItems || [];
+  const envelopeItems = envelopeItemsPayload?.data || [];
 
   const onDownload = async (
     envelopeItem: EnvelopeItemToDownload,

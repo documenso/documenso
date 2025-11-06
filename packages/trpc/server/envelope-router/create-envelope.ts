@@ -7,17 +7,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateEnvelopeRequestSchema,
   ZCreateEnvelopeResponseSchema,
+  createEnvelopeMeta,
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/create',
-      summary: 'Create envelope',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(createEnvelopeMeta)
   .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

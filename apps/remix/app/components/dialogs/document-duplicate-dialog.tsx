@@ -49,20 +49,20 @@ export const DocumentDuplicateDialog = ({
       },
     );
 
-  const envelopeItems = envelopeItemsPayload?.envelopeItems || [];
+  const envelopeItems = envelopeItemsPayload?.data || [];
 
   const documentsPath = formatDocumentsPath(team.url);
 
   const { mutateAsync: duplicateEnvelope, isPending: isDuplicating } =
     trpcReact.envelope.duplicate.useMutation({
-      onSuccess: async ({ duplicatedEnvelopeId }) => {
+      onSuccess: async ({ id }) => {
         toast({
           title: _(msg`Document Duplicated`),
           description: _(msg`Your document has been successfully duplicated.`),
           duration: 5000,
         });
 
-        await navigate(`${documentsPath}/${duplicatedEnvelopeId}/edit`);
+        await navigate(`${documentsPath}/${id}/edit`);
         onOpenChange(false);
       },
     });

@@ -10,6 +10,18 @@ import {
 } from '@documenso/lib/types/field';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
+import type { TrpcRouteMeta } from '../../trpc';
+
+export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/field/update-many',
+    summary: 'Update envelope fields',
+    description: 'Update multiple envelope fields for an envelope',
+    tags: ['Envelope Fields'],
+  },
+};
+
 const ZUpdateFieldSchema = ZFieldAndMetaSchema.and(
   z.object({
     id: z.number().describe('The ID of the field to update.'),
@@ -33,7 +45,7 @@ export const ZUpdateEnvelopeFieldsRequestSchema = z.object({
 });
 
 export const ZUpdateEnvelopeFieldsResponseSchema = z.object({
-  fields: z.array(ZFieldSchema),
+  data: z.array(ZFieldSchema),
 });
 
 export type TUpdateEnvelopeFieldsRequest = z.infer<typeof ZUpdateEnvelopeFieldsRequestSchema>;

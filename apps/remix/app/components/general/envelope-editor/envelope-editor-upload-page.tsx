@@ -67,8 +67,8 @@ export const EnvelopeEditorUploadPage = () => {
 
   const { mutateAsync: createEnvelopeItems, isPending: isCreatingEnvelopeItems } =
     trpc.envelope.item.createMany.useMutation({
-      onSuccess: (data) => {
-        const createdEnvelopes = data.createdEnvelopeItems.filter(
+      onSuccess: ({ data }) => {
+        const createdEnvelopes = data.filter(
           (item) => !envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === item.id),
         );
 
@@ -79,10 +79,10 @@ export const EnvelopeEditorUploadPage = () => {
     });
 
   const { mutateAsync: updateEnvelopeItems } = trpc.envelope.item.updateMany.useMutation({
-    onSuccess: (data) => {
+    onSuccess: ({ data }) => {
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((originalItem) => {
-          const updatedItem = data.updatedEnvelopeItems.find((item) => item.id === originalItem.id);
+          const updatedItem = data.find((item) => item.id === originalItem.id);
 
           if (updatedItem) {
             return {
@@ -126,7 +126,7 @@ export const EnvelopeEditorUploadPage = () => {
       formData.append('files', file);
     }
 
-    const { createdEnvelopeItems } = await createEnvelopeItems(formData).catch((error) => {
+    const { data } = await createEnvelopeItems(formData).catch((error) => {
       console.error(error);
 
       // Set error state on files in batch upload.
@@ -148,7 +148,7 @@ export const EnvelopeEditorUploadPage = () => {
       );
 
       return filteredFiles.concat(
-        createdEnvelopeItems.map((item) => ({
+        data.map((item) => ({
           id: item.id,
           envelopeItemId: item.id,
           title: item.title,

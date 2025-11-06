@@ -11,18 +11,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateEnvelopeItemsRequestSchema,
   ZCreateEnvelopeItemsResponseSchema,
+  createEnvelopeItemsMeta,
 } from './create-envelope-items.types';
 
 export const createEnvelopeItemsRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/item/create-many',
-      summary: 'Create envelope items',
-      description: 'Create multiple envelope items for an envelope',
-      tags: ['Envelope Items'],
-    },
-  })
+  .meta(createEnvelopeItemsMeta)
   .input(ZCreateEnvelopeItemsRequestSchema)
   .output(ZCreateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -142,6 +135,6 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
     });
 
     return {
-      createdEnvelopeItems: result,
+      data: result,
     };
   });

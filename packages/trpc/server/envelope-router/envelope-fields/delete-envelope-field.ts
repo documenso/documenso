@@ -11,18 +11,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZDeleteEnvelopeFieldRequestSchema,
   ZDeleteEnvelopeFieldResponseSchema,
+  deleteEnvelopeFieldMeta,
 } from './delete-envelope-field.types';
 
 export const deleteEnvelopeFieldRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/field/delete',
-      summary: 'Delete envelope field',
-      description: 'Delete an envelope field',
-      tags: ['Envelope Fields'],
-    },
-  })
+  .meta(deleteEnvelopeFieldMeta)
   .input(ZDeleteEnvelopeFieldRequestSchema)
   .output(ZDeleteEnvelopeFieldResponseSchema)
   .mutation(async ({ input, ctx }) => {

@@ -4,18 +4,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZGetEnvelopeFieldRequestSchema,
   ZGetEnvelopeFieldResponseSchema,
+  getEnvelopeFieldMeta,
 } from './get-envelope-field.types';
 
 export const getEnvelopeFieldRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'GET',
-      path: '/envelope/field/{fieldId}',
-      summary: 'Get envelope field',
-      description: 'Returns an envelope field given an ID',
-      tags: ['Envelope Fields'],
-    },
-  })
+  .meta(getEnvelopeFieldMeta)
   .input(ZGetEnvelopeFieldRequestSchema)
   .output(ZGetEnvelopeFieldResponseSchema)
   .query(async ({ input, ctx }) => {

@@ -6,18 +6,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZGetEnvelopeRecipientRequestSchema,
   ZGetEnvelopeRecipientResponseSchema,
+  getEnvelopeRecipientMeta,
 } from './get-envelope-recipient.types';
 
 export const getEnvelopeRecipientRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'GET',
-      path: '/envelope/recipient/{recipientId}',
-      summary: 'Get envelope recipient',
-      description: 'Returns an envelope recipient given an ID',
-      tags: ['Envelope Recipients'],
-    },
-  })
+  .meta(getEnvelopeRecipientMeta)
   .input(ZGetEnvelopeRecipientRequestSchema)
   .output(ZGetEnvelopeRecipientResponseSchema)
   .query(async ({ input, ctx }) => {
