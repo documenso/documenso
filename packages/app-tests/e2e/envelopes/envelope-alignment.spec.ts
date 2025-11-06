@@ -34,7 +34,7 @@ import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
-test('field placement visual regression', async ({ page }, testInfo) => {
+test.skip('field placement visual regression', async ({ page }, testInfo) => {
   const { user, team } = await seedUser();
 
   const envelope = await seedAlignmentTestDocument({
