@@ -60,7 +60,7 @@ export const UserOrganisationsTable = () => {
                     ? _(
                         msg({
                           message: `Personal`,
-                          context: `Personal organization (adjective)`,
+                          context: `Personal organisation (adjective)`,
                         }),
                       )
                     : row.original.name}
