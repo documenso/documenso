@@ -15,6 +15,17 @@ import { renderSignatureFieldElement } from './render-signature-field';
 export const MIN_FIELD_HEIGHT_PX = 12;
 export const MIN_FIELD_WIDTH_PX = 36;
 
+/**
+ * The render type.
+ *
+ * @default 'edit'
+ *
+ * - `edit` - The field is rendered in editor page.
+ * - `sign` - The field is rendered for the signing page.
+ * - `export` - The field is rendered for exporting and sealing into the PDF. No backgrounds, interactive elements, etc.
+ */
+export type FieldRenderMode = 'edit' | 'sign' | 'export';
+
 export type FieldToRender = Pick<
   Field,
   'envelopeItemId' | 'recipientId' | 'type' | 'page' | 'customText' | 'inserted' | 'recipientId'
@@ -25,7 +36,7 @@ export type FieldToRender = Pick<
   positionX: number;
   positionY: number;
   fieldMeta?: TFieldMetaSchema | null;
-  signature?: Signature | null;
+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
 };
 
 type RenderFieldOptions = {
@@ -38,16 +49,7 @@ type RenderFieldOptions = {
 
   translations: Record<FieldType, string> | null;
 
-  /**
-   * The render type.
-   *
-   * @default 'edit'
-   *
-   * - `edit` - The field is rendered in editor page.
-   * - `sign` - The field is rendered for the signing page.
-   * - `export` - The field is rendered for exporting and sealing into the PDF. No backgrounds, interactive elements, etc.
-   */
-  mode: 'edit' | 'sign' | 'export';
+  mode: FieldRenderMode;
 
   scale: number;
   editable?: boolean;

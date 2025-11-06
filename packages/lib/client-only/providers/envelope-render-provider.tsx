@@ -1,10 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 
+import type { Field, Recipient } from '@prisma/client';
+
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
+import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
 import { getEnvelopeDownloadUrl } from '../../utils/envelope-download';
 
 type FileData =
@@ -17,7 +20,9 @@ type FileData =
     };
 
 type EnvelopeRenderOverrideSettings = {
-  mode: 'edit' | 'sign' | 'export';
+  mode?: FieldRenderMode;
+  showRecipientTooltip?: boolean;
+  showRecipientSigningStatus?: boolean;
 };
 
 type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
@@ -27,7 +32,8 @@ type EnvelopeRenderProviderValue = {
   envelopeItems: EnvelopeRenderItem[];
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
-  fields: TEnvelope['fields'];
+  fields: Field[];
+  recipients: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   renderError: boolean;
@@ -45,14 +51,15 @@ interface EnvelopeRenderProviderProps {
    *
    * Only pass if the CustomRenderer you are passing in wants fields.
    */
-  fields?: TEnvelope['fields'];
+  fields?: Field[];
 
   /**
-   * Optional recipient IDs used to determine the color of the fields.
+   * Optional recipient used to determine the color of the fields and hover
+   * previews.
    *
    * Only required for generic page renderers.
    */
-  recipientIds?: number[];
+  recipients?: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
 
   /**
    * The token to access the envelope.
@@ -87,7 +94,7 @@ export const EnvelopeRenderProvider = ({
   envelope,
   fields,
   token,
-  recipientIds = [],
+  recipients = [],
   overrideSettings,
 }: EnvelopeRenderProviderProps) => {
   // Indexed by documentDataId.
@@ -175,6 +182,11 @@ export const EnvelopeRenderProvider = ({
     }
   }, [envelope.envelopeItems]);
 
+  const recipientIds = useMemo(
+    () => recipients.map((recipient) => recipient.id).sort(),
+    [recipients],
+  );
+
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
       const recipientIndex = recipientIds.findIndex((id) => id === recipientId);
@@ -194,6 +206,7 @@ export const EnvelopeRenderProvider = ({
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],
+        recipients,
         getRecipientColorKey,
         renderError,
         setRenderError,

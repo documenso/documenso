@@ -413,7 +413,6 @@ export default function EnvelopeSignerPageRenderer() {
     }
 
     localPageFields.forEach((field) => {
-      console.log('Field changed/inserted, rendering on canvas');
       renderFieldOnLayer(field);
     });
 

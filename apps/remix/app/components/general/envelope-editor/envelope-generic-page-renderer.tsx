@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
+import { type Recipient, SigningStatus } from '@prisma/client';
 import type Konva from 'konva';
 
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -8,12 +9,23 @@ import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/e
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
+import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
+
+type GenericLocalField = TEnvelope['fields'][number] & {
+  recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
+};
 
 export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
-  const { currentEnvelopeItem, fields, getRecipientColorKey, setRenderError, overrideSettings } =
-    useCurrentEnvelopeRender();
+  const {
+    currentEnvelopeItem,
+    fields,
+    recipients,
+    getRecipientColorKey,
+    setRenderError,
+    overrideSettings,
+  } = useCurrentEnvelopeRender();
 
   const {
     stage,
@@ -29,20 +41,37 @@ export default function EnvelopeGenericPageRenderer() {
 
   const { _className, scale } = pageContext;
 
-  const localPageFields = useMemo(
-    () =>
-      fields.filter(
+  const localPageFields = useMemo((): GenericLocalField[] => {
+    return fields
+      .filter(
         (field) =>
           field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
-      ),
-    [fields, pageContext.pageNumber],
-  );
+      )
+      .map((field) => {
+        const recipient = recipients.find((recipient) => recipient.id === field.recipientId);
 
-  const unsafeRenderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
+        if (!recipient) {
+          throw new Error(`Recipient not found for field ${field.id}`);
+        }
+
+        return {
+          ...field,
+          recipient,
+        };
+      });
+  }, [fields, pageContext.pageNumber, currentEnvelopeItem?.id, recipients]);
+
+  const unsafeRenderFieldOnLayer = (field: GenericLocalField) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
     }
+
+    const { recipient } = field;
+
+    const fieldTranslations = getClientSideFieldTranslations(i18n);
+
+    const isInserted = recipient.signingStatus === SigningStatus.SIGNED && field.inserted;
 
     renderField({
       scale,
@@ -54,10 +83,14 @@ export default function EnvelopeGenericPageRenderer() {
         height: Number(field.height),
         positionX: Number(field.positionX),
         positionY: Number(field.positionY),
-        customText: field.inserted ? field.customText : '',
+        customText: isInserted ? field.customText : '',
         fieldMeta: field.fieldMeta,
+        signature: {
+          signatureImageAsBase64: '',
+          typedSignature: fieldTranslations.SIGNATURE,
+        },
       },
-      translations: getClientSideFieldTranslations(i18n),
+      translations: fieldTranslations,
       pageWidth: unscaledViewport.width,
       pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
@@ -66,7 +99,7 @@ export default function EnvelopeGenericPageRenderer() {
     });
   };
 
-  const renderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
+  const renderFieldOnLayer = (field: GenericLocalField) => {
     try {
       unsafeRenderFieldOnLayer(field);
     } catch (err) {
@@ -122,6 +155,16 @@ export default function EnvelopeGenericPageRenderer() {
       className="relative w-full"
       key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
     >
+      {overrideSettings?.showRecipientTooltip &&
+        localPageFields.map((field) => (
+          <EnvelopeRecipientFieldTooltip
+            key={field.id}
+            field={field}
+            showFieldStatus={overrideSettings?.showRecipientSigningStatus}
+            showRecipientTooltip={overrideSettings?.showRecipientTooltip}
+          />
+        ))}
+
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 

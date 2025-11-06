@@ -201,7 +201,7 @@ export const EnvelopeEditorPreviewPage = () => {
       envelope={envelope}
       token={undefined}
       fields={fieldsWithPlaceholders}
-      recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+      recipients={envelope.recipients}
       overrideSettings={{
         mode: 'export',
       }}

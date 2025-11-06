@@ -172,7 +172,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               envelope={envelope}
               token={undefined}
               fields={envelope.fields}
-              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+              recipients={envelope.recipients}
+              overrideSettings={{
+                showRecipientTooltip: true,
+              }}
             >
               {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
