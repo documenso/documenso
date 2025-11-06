@@ -1,6 +1,6 @@
 import { PDFDocument, rgb } from '@cantoo/pdf-lib';
 import type { Recipient } from '@prisma/client';
-import { EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
+import { type Envelope, EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 import PDFParser from 'pdf2json';
 import { match } from 'ts-pattern';
 
@@ -288,7 +288,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
   });
 };
 
-export const replacePlaceholdersInPDF = async (pdf: Buffer): Promise<Buffer> => {
+export const removePlaceholdersFromPDF = async (pdf: Buffer): Promise<Buffer> => {
   const placeholders = await extractPlaceholdersFromPDF(pdf);
 
   const pdfDoc = await PDFDocument.load(new Uint8Array(pdf));
@@ -352,6 +352,81 @@ const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderI
   };
 };
 
+const createRecipients = async (
+  recipientPlaceholders: Map<number, string>,
+  envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
+  envelopeId: EnvelopeIdOptions,
+  userId: number,
+  teamId: number,
+  requestMetadata: ApiRequestMetadata,
+): Promise<Pick<Recipient, 'id' | 'email'>[]> => {
+  const recipientsToCreate = Array.from(
+    recipientPlaceholders.entries(),
+    ([recipientIndex, name]) => {
+      return {
+        email: `recipient.${recipientIndex}@documenso.com`,
+        name,
+        role: RecipientRole.SIGNER,
+        signingOrder: recipientIndex,
+      };
+    },
+  );
+
+  const existingRecipients = await prisma.recipient.findMany({
+    where: {
+      envelopeId: envelope.id,
+    },
+    select: {
+      id: true,
+      email: true,
+    },
+  });
+
+  const existingEmails = new Set(existingRecipients.map((r) => r.email));
+  const recipientsToCreateFiltered = recipientsToCreate.filter(
+    (recipient) => !existingEmails.has(recipient.email),
+  );
+
+  if (recipientsToCreateFiltered.length === 0) {
+    return existingRecipients;
+  }
+
+  const newRecipients = await match(envelope.type)
+    .with(EnvelopeType.DOCUMENT, async () => {
+      const { recipients } = await createDocumentRecipients({
+        userId,
+        teamId,
+        id: envelopeId,
+        recipients: recipientsToCreateFiltered,
+        requestMetadata,
+      });
+
+      return recipients;
+    })
+    .with(EnvelopeType.TEMPLATE, async () => {
+      const templateId =
+        envelopeId.type === 'templateId'
+          ? envelopeId.id
+          : mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
+
+      const { recipients } = await createTemplateRecipients({
+        userId,
+        teamId,
+        templateId,
+        recipients: recipientsToCreateFiltered,
+      });
+
+      return recipients;
+    })
+    .otherwise(() => {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Invalid envelope type: ${envelope.type}`,
+      });
+    });
+
+  return [...existingRecipients, ...newRecipients];
+};
+
 export const insertFieldsFromPlaceholdersInPDF = async (
   pdf: Buffer,
   userId: number,
@@ -359,6 +434,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
   envelopeId: EnvelopeIdOptions,
   requestMetadata: ApiRequestMetadata,
   envelopeItemId?: string,
+  recipients?: Pick<Recipient, 'id' | 'email'>[],
 ): Promise<Buffer> => {
   const placeholders = await extractPlaceholdersFromPDF(pdf);
 
@@ -377,22 +453,6 @@ export const insertFieldsFromPlaceholdersInPDF = async (
 
     recipientPlaceholders.set(recipientIndex, name);
   }
-
-  /*
-    Create a list of recipients to create.
-    Example: [{ email: 'recipient.1@documenso.com', name: 'Recipient 1', role: 'SIGNER', signingOrder: 1 }]
-  */
-  const recipientsToCreate = Array.from(
-    recipientPlaceholders.entries(),
-    ([recipientIndex, name]) => {
-      return {
-        email: `recipient.${recipientIndex}@documenso.com`,
-        name,
-        role: RecipientRole.SIGNER,
-        signingOrder: recipientIndex,
-      };
-    },
-  );
 
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id: envelopeId,
@@ -416,53 +476,19 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     });
   }
 
-  const existingRecipients = await prisma.recipient.findMany({
-    where: {
-      envelopeId: envelope.id,
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  });
+  let createdRecipients: Pick<Recipient, 'id' | 'email'>[];
 
-  const existingEmails = new Set(existingRecipients.map((r) => r.email));
-  const recipientsToCreateFiltered = recipientsToCreate.filter(
-    (recipient) => !existingEmails.has(recipient.email),
-  );
-
-  let createdRecipients: Pick<Recipient, 'id' | 'email'>[] = existingRecipients;
-
-  if (recipientsToCreateFiltered.length > 0) {
-    if (envelope.type === EnvelopeType.DOCUMENT) {
-      const { recipients } = await createDocumentRecipients({
-        userId,
-        teamId,
-        id: envelopeId,
-        recipients: recipientsToCreateFiltered,
-        requestMetadata,
-      });
-
-      createdRecipients = [...existingRecipients, ...recipients];
-    } else if (envelope.type === EnvelopeType.TEMPLATE) {
-      const templateId =
-        envelopeId.type === 'templateId'
-          ? envelopeId.id
-          : mapSecondaryIdToTemplateId(envelope.secondaryId);
-
-      const { recipients } = await createTemplateRecipients({
-        userId,
-        teamId,
-        templateId,
-        recipients: recipientsToCreateFiltered,
-      });
-
-      createdRecipients = [...existingRecipients, ...recipients];
-    } else {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Invalid envelope type: ${envelope.type}`,
-      });
-    }
+  if (recipients && recipients.length > 0) {
+    createdRecipients = recipients;
+  } else {
+    createdRecipients = await createRecipients(
+      recipientPlaceholders,
+      envelope,
+      envelopeId,
+      userId,
+      teamId,
+      requestMetadata,
+    );
   }
 
   const fieldsToCreate: FieldToCreate[] = [];
@@ -479,8 +505,30 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     const widthPercent = (placeholder.width / placeholder.pageWidth) * 100;
     const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
 
-    const { email } = extractRecipientPlaceholder(placeholder.recipient);
-    const recipient = createdRecipients.find((r) => r.email === email);
+    let recipient: Pick<Recipient, 'id' | 'email'> | undefined;
+
+    if (recipients && recipients.length > 0) {
+      /*
+        Map placeholder by index: r1 -> recipients[0], r2 -> recipients[1], etc.
+        recipientIndex is 1-based, so we subtract 1 to get the array index.
+      */
+      const { recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
+      const recipientArrayIndex = recipientIndex - 1;
+
+      if (recipientArrayIndex < 0 || recipientArrayIndex >= recipients.length) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: `Recipient placeholder ${placeholder.recipient} (index ${recipientIndex}) is out of range. Provided ${recipients.length} recipient(s).`,
+        });
+      }
+
+      recipient = recipients[recipientArrayIndex];
+    } else {
+      /*
+        Use email-based matching for placeholder recipients.
+      */
+      const { email } = extractRecipientPlaceholder(placeholder.recipient);
+      recipient = createdRecipients.find((r) => r.email === email);
+    }
 
     if (!recipient) {
       throw new AppError(AppErrorCode.INVALID_BODY, {
