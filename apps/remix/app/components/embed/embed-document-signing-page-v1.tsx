@@ -40,7 +40,7 @@ import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
 
-export type EmbedSignDocumentClientPageProps = {
+export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
   documentId: number;
   envelopeId: string;
@@ -55,7 +55,7 @@ export type EmbedSignDocumentClientPageProps = {
   allRecipients?: RecipientWithFields[];
 };
 
-export const EmbedSignDocumentClientPage = ({
+export const EmbedSignDocumentV1ClientPage = ({
   token,
   documentId,
   envelopeId,
@@ -68,7 +68,7 @@ export const EmbedSignDocumentClientPage = ({
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
-}: EmbedSignDocumentClientPageProps) => {
+}: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 

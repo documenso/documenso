@@ -10,6 +10,7 @@ import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-rende
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
+import { isBase64Image } from '@documenso/lib/constants/signatures';
 import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
@@ -22,6 +23,7 @@ import { EnvelopeFieldToolTip } from '@documenso/ui/components/field/envelope-fi
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
 import { handleDropdownFieldClick } from '~/utils/field-signing/dropdown-field';
 import { handleEmailFieldClick } from '~/utils/field-signing/email-field';
@@ -59,6 +61,8 @@ export default function EnvelopeSignerPageRenderer() {
     selectedAssistantRecipient,
     isDirectTemplate,
   } = useRequiredEnvelopeSigningContext();
+
+  const { onFieldSigned, onFieldUnsigned } = useEmbedSigningContext() || {};
 
   const {
     stage,
@@ -378,7 +382,19 @@ export default function EnvelopeSignerPageRenderer() {
     authOptions?: TRecipientActionAuth,
   ) => {
     try {
-      await signFieldInternal(fieldId, payload, authOptions);
+      const { inserted } = await signFieldInternal(fieldId, payload, authOptions);
+
+      // ?: The two callbacks below are used within the embedding context
+      if (inserted && onFieldSigned) {
+        const value = payload.value ? JSON.stringify(payload.value) : undefined;
+        const isBase64 = value ? isBase64Image(value) : undefined;
+
+        onFieldSigned({ fieldId, value, isBase64 });
+      }
+
+      if (!inserted && onFieldUnsigned) {
+        onFieldUnsigned({ fieldId });
+      }
     } catch (err) {
       console.error(err);
 

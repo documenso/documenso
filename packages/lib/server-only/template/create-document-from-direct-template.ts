@@ -82,6 +82,7 @@ type CreatedDirectRecipientField = {
 
 export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
   token: z.string(),
+  envelopeId: z.string(),
   documentId: z.number(),
   recipientId: z.number(),
 });
@@ -815,6 +816,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   return {
     token,
+    envelopeId: createdEnvelope.id,
     documentId: incrementedDocumentId.documentId,
     recipientId,
   };

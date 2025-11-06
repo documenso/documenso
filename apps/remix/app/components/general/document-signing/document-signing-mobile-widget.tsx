@@ -8,12 +8,17 @@ import { match } from 'ts-pattern';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+
+import { BrandingLogo } from '../branding-logo';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
 import { EnvelopeSignerCompleteDialog } from '../envelope-signing/envelope-signing-complete-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 export const DocumentSigningMobileWidget = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const { hidePoweredBy = true } = useEmbedSigningContext() || {};
 
   const { recipientFieldsRemaining, recipient, requiredRecipientFields } =
     useRequiredEnvelopeSigningContext();
@@ -29,7 +34,7 @@ export const DocumentSigningMobileWidget = () => {
 
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-50 flex justify-center px-2 pb-2 sm:px-4 sm:pb-6">
-      <div className="pointer-events-auto w-full max-w-2xl">
+      <div className="pointer-events-auto w-full max-w-[760px]">
         <div className="bg-card border-border overflow-hidden rounded-xl border shadow-2xl">
           {/* Main Header Bar */}
           <div className="flex items-center justify-between gap-4 p-4">
@@ -114,6 +119,13 @@ export const DocumentSigningMobileWidget = () => {
           {isExpanded && (
             <div className="border-border animate-in slide-in-from-bottom-2 border-t p-4 duration-200">
               <EnvelopeSignerForm />
+
+              {!hidePoweredBy && (
+                <div className="bg-primary text-primary-foreground mt-2 inline-block rounded px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100 lg:hidden">
+                  <span>Powered by</span>
+                  <BrandingLogo className="ml-2 inline-block h-[14px]" />
+                </div>
+              )}
             </div>
           )}
         </div>

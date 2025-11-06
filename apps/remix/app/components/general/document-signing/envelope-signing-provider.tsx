@@ -56,7 +56,7 @@ export type EnvelopeSigningContextValue = {
     _fieldId: number,
     _value: TSignEnvelopeFieldValue,
     authOptions?: TRecipientActionAuth,
-  ) => Promise<void>;
+  ) => Promise<Pick<Field, 'id' | 'inserted'>>;
 };
 
 const EnvelopeSigningContext = createContext<EnvelopeSigningContextValue | null>(null);
@@ -296,16 +296,19 @@ export const EnvelopeSigningProvider = ({
   ) => {
     // Set the field locally for direct templates.
     if (isDirectTemplate) {
-      handleDirectTemplateFieldInsertion(fieldId, fieldValue);
-      return;
+      const signedField = handleDirectTemplateFieldInsertion(fieldId, fieldValue);
+
+      return signedField;
     }
 
-    await signEnvelopeField({
+    const { signedField } = await signEnvelopeField({
       token: envelopeData.recipient.token,
       fieldId,
       fieldValue,
       authOptions,
     });
+
+    return signedField;
   };
 
   const handleDirectTemplateFieldInsertion = (
@@ -363,6 +366,8 @@ export const EnvelopeSigningProvider = ({
         fields: prev.recipient.fields.map((field) => (field.id === fieldId ? updatedField : field)),
       },
     }));
+
+    return updatedField;
   };
 
   return (
