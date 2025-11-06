@@ -52,7 +52,7 @@ export const handleEnvelopeItemFileRequest = async ({
   }
 
   c.header('Content-Type', 'application/pdf');
-  c.header('Content-Length', file.length.toString());
+  // c.header('Content-Length', file.length.toString());
   c.header('ETag', etag);
 
   if (!isDownload) {
