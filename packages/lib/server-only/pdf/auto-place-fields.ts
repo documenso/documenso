@@ -1,21 +1,22 @@
 import { PDFDocument, rgb } from '@cantoo/pdf-lib';
 import type { Recipient } from '@prisma/client';
-import { type Envelope, EnvelopeType, FieldType, RecipientRole } from '@prisma/client';
 import PDFParser from 'pdf2json';
-import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
-import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
-import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/create-template-recipients';
 import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { getPageSize } from './get-page-size';
+import {
+  createRecipientsFromPlaceholders,
+  extractRecipientPlaceholder,
+  parseFieldMetaFromPlaceholder,
+  parseFieldTypeFromPlaceholder,
+} from './helpers';
 
 type TextPosition = {
   text: string;
@@ -51,12 +52,6 @@ type FieldToCreate = TFieldAndMeta & {
   height: number;
 };
 
-type RecipientPlaceholderInfo = {
-  email: string;
-  name: string;
-  recipientIndex: number;
-};
-
 /*
   Questions for later:
     - Does it handle multi-page PDFs? ✅ YES! ✅
@@ -66,86 +61,6 @@ type RecipientPlaceholderInfo = {
     - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing. ✅
     - Need to handle envelopes with multiple items. ✅
 */
-
-/*
-  Parse field type string to FieldType enum.
-  Normalizes the input (uppercase, trim) and validates it's a valid field type.
-  This ensures we handle case variations and whitespace, and provides clear error messages.
-*/
-const parseFieldType = (fieldTypeString: string): FieldType => {
-  const normalizedType = fieldTypeString.toUpperCase().trim();
-
-  return match(normalizedType)
-    .with('SIGNATURE', () => FieldType.SIGNATURE)
-    .with('FREE_SIGNATURE', () => FieldType.FREE_SIGNATURE)
-    .with('INITIALS', () => FieldType.INITIALS)
-    .with('NAME', () => FieldType.NAME)
-    .with('EMAIL', () => FieldType.EMAIL)
-    .with('DATE', () => FieldType.DATE)
-    .with('TEXT', () => FieldType.TEXT)
-    .with('NUMBER', () => FieldType.NUMBER)
-    .with('RADIO', () => FieldType.RADIO)
-    .with('CHECKBOX', () => FieldType.CHECKBOX)
-    .with('DROPDOWN', () => FieldType.DROPDOWN)
-    .otherwise(() => {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Invalid field type: ${fieldTypeString}`,
-      });
-    });
-};
-
-/*
-  Transform raw field metadata from placeholder format to schema format.
-  Users should provide properly capitalized property names (e.g., readOnly, fontSize, textAlign).
-  Converts string values to proper types (booleans, numbers).
-*/
-const parseFieldMeta = (
-  rawFieldMeta: Record<string, string>,
-  fieldType: FieldType,
-): Record<string, unknown> | undefined => {
-  if (fieldType === FieldType.SIGNATURE || fieldType === FieldType.FREE_SIGNATURE) {
-    return;
-  }
-
-  if (Object.keys(rawFieldMeta).length === 0) {
-    return;
-  }
-
-  const fieldTypeString = String(fieldType).toLowerCase();
-
-  const parsedFieldMeta: Record<string, boolean | number | string> = {
-    type: fieldTypeString,
-  };
-
-  /*
-    rawFieldMeta is an object with string keys and string values.
-    It contains string values because the PDF parser returns the values as strings.
-
-    E.g. { 'required': 'true', 'fontSize': '12', 'maxValue': '100', 'minValue': '0', 'characterLimit': '100' }
-  */
-  const rawFieldMetaEntries = Object.entries(rawFieldMeta);
-
-  for (const [property, value] of rawFieldMetaEntries) {
-    if (property === 'readOnly' || property === 'required') {
-      parsedFieldMeta[property] = value === 'true';
-    } else if (
-      property === 'fontSize' ||
-      property === 'maxValue' ||
-      property === 'minValue' ||
-      property === 'characterLimit'
-    ) {
-      const numValue = Number(value);
-
-      if (!Number.isNaN(numValue)) {
-        parsedFieldMeta[property] = numValue;
-      }
-    } else {
-      parsedFieldMeta[property] = value;
-    }
-  }
-
-  return parsedFieldMeta;
-};
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
   return new Promise((resolve, reject) => {
@@ -221,8 +136,8 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
             fieldMetaData.map((property) => property.split('=')),
           );
 
-          const fieldType = parseFieldType(fieldTypeString);
-          const parsedFieldMeta = parseFieldMeta(rawFieldMeta, fieldType);
+          const fieldType = parseFieldTypeFromPlaceholder(fieldTypeString);
+          const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
           const fieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
             type: fieldType,
@@ -334,99 +249,6 @@ export const removePlaceholdersFromPDF = async (pdf: Buffer): Promise<Buffer> =>
   return Buffer.from(modifiedPdfBytes);
 };
 
-const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderInfo => {
-  const indexMatch = placeholder.match(/^r(\d+)$/i);
-
-  if (!indexMatch) {
-    throw new AppError(AppErrorCode.INVALID_BODY, {
-      message: `Invalid recipient placeholder format: ${placeholder}. Expected format: r1, r2, r3, etc.`,
-    });
-  }
-
-  const recipientIndex = Number(indexMatch[1]);
-
-  return {
-    email: `recipient.${recipientIndex}@documenso.com`,
-    name: `Recipient ${recipientIndex}`,
-    recipientIndex,
-  };
-};
-
-const createRecipients = async (
-  recipientPlaceholders: Map<number, string>,
-  envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
-  envelopeId: EnvelopeIdOptions,
-  userId: number,
-  teamId: number,
-  requestMetadata: ApiRequestMetadata,
-): Promise<Pick<Recipient, 'id' | 'email'>[]> => {
-  const recipientsToCreate = Array.from(
-    recipientPlaceholders.entries(),
-    ([recipientIndex, name]) => {
-      return {
-        email: `recipient.${recipientIndex}@documenso.com`,
-        name,
-        role: RecipientRole.SIGNER,
-        signingOrder: recipientIndex,
-      };
-    },
-  );
-
-  const existingRecipients = await prisma.recipient.findMany({
-    where: {
-      envelopeId: envelope.id,
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  });
-
-  const existingEmails = new Set(existingRecipients.map((r) => r.email));
-  const recipientsToCreateFiltered = recipientsToCreate.filter(
-    (recipient) => !existingEmails.has(recipient.email),
-  );
-
-  if (recipientsToCreateFiltered.length === 0) {
-    return existingRecipients;
-  }
-
-  const newRecipients = await match(envelope.type)
-    .with(EnvelopeType.DOCUMENT, async () => {
-      const { recipients } = await createDocumentRecipients({
-        userId,
-        teamId,
-        id: envelopeId,
-        recipients: recipientsToCreateFiltered,
-        requestMetadata,
-      });
-
-      return recipients;
-    })
-    .with(EnvelopeType.TEMPLATE, async () => {
-      const templateId =
-        envelopeId.type === 'templateId'
-          ? envelopeId.id
-          : mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
-
-      const { recipients } = await createTemplateRecipients({
-        userId,
-        teamId,
-        templateId,
-        recipients: recipientsToCreateFiltered,
-      });
-
-      return recipients;
-    })
-    .otherwise(() => {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Invalid envelope type: ${envelope.type}`,
-      });
-    });
-
-  return [...existingRecipients, ...newRecipients];
-};
-
 export const insertFieldsFromPlaceholdersInPDF = async (
   pdf: Buffer,
   userId: number,
@@ -481,7 +303,7 @@ export const insertFieldsFromPlaceholdersInPDF = async (
   if (recipients && recipients.length > 0) {
     createdRecipients = recipients;
   } else {
-    createdRecipients = await createRecipients(
+    createdRecipients = await createRecipientsFromPlaceholders(
       recipientPlaceholders,
       envelope,
       envelopeId,
