@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentData } from '@prisma/client';
+import type { EnvelopeItem } from '@prisma/client';
+import { base64 } from '@scure/base';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
@@ -11,7 +12,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 
 import { cn } from '../lib/utils';
 import { useToast } from './use-toast';
@@ -48,17 +49,23 @@ const PDFLoader = () => (
 
 export type PDFViewerProps = {
   className?: string;
-  documentData: Pick<DocumentData, 'type' | 'data'>;
+  envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
+  token: string | undefined;
+  version: 'original' | 'signed';
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
+  overrideData?: string;
   [key: string]: unknown;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
 export const PDFViewer = ({
   className,
-  documentData,
+  envelopeItem,
+  token,
+  version,
   onDocumentLoad,
   onPageClick,
+  overrideData,
   ...props
 }: PDFViewerProps) => {
   const { _ } = useLingui();
@@ -67,16 +74,13 @@ export const PDFViewer = ({
   const $el = useRef<HTMLDivElement>(null);
 
   const [isDocumentBytesLoading, setIsDocumentBytesLoading] = useState(false);
-  const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(null);
+  const [documentBytes, setDocumentBytes] = useState<Uint8Array | null>(
+    overrideData ? base64.decode(overrideData) : null,
+  );
 
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
-
-  const memoizedData = useMemo(
-    () => ({ type: documentData.type, data: documentData.data }),
-    [documentData.data, documentData.type],
-  );
 
   const isLoading = isDocumentBytesLoading || !documentBytes;
 
@@ -142,13 +146,26 @@ export const PDFViewer = ({
   }, []);
 
   useEffect(() => {
+    if (overrideData) {
+      const bytes = base64.decode(overrideData);
+
+      setDocumentBytes(bytes);
+      return;
+    }
+
     const fetchDocumentBytes = async () => {
       try {
         setIsDocumentBytesLoading(true);
 
-        const bytes = await getFile(memoizedData);
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'view',
+          envelopeItem: envelopeItem,
+          token,
+        });
 
-        setDocumentBytes(bytes);
+        const bytes = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+
+        setDocumentBytes(new Uint8Array(bytes));
 
         setIsDocumentBytesLoading(false);
       } catch (err) {
@@ -163,7 +180,7 @@ export const PDFViewer = ({
     };
 
     void fetchDocumentBytes();
-  }, [memoizedData, toast]);
+  }, [envelopeItem.envelopeId, envelopeItem.id, token, version, toast, overrideData]);
 
   return (
     <div ref={$el} className={cn('overflow-hidden', className)} {...props}>

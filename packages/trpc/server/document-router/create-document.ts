@@ -3,20 +3,28 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateDocumentRequestSchema,
   ZCreateDocumentResponseSchema,
+  createDocumentMeta,
 } from './create-document.types';
 
 export const createDocumentRoute = authenticatedProcedure
-  .input(ZCreateDocumentRequestSchema) // Note: Before releasing this to public, update the response schema to be correct.
+  .meta(createDocumentMeta)
+  .input(ZCreateDocumentRequestSchema)
   .output(ZCreateDocumentResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
-    const { title, documentDataId, timezone, folderId, attachments } = input;
+
+    const { payload, file } = input;
+
+    const { title, timezone, folderId, attachments } = payload;
+
+    const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
 
     ctx.logger.info({
       input: {
@@ -55,6 +63,7 @@ export const createDocumentRoute = authenticatedProcedure
     });
 
     return {
-      legacyDocumentId: mapSecondaryIdToDocumentId(document.secondaryId),
+      envelopeId: document.id,
+      id: mapSecondaryIdToDocumentId(document.secondaryId),
     };
   });

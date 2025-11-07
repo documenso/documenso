@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+import type { TrpcRouteMeta } from '../../trpc';
+
+export const deleteAttachmentMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/attachment/delete',
+    summary: 'Delete attachment',
+    description: 'Delete an attachment from an envelope',
+    tags: ['Envelope Attachments'],
+  },
+};
+
 export const ZDeleteAttachmentRequestSchema = z.object({
   id: z.string(),
 });

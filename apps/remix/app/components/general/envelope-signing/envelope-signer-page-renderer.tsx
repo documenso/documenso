@@ -10,15 +10,20 @@ import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-rende
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
+import { isBase64Image } from '@documenso/lib/constants/signatures';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { ZFullFieldSchema } from '@documenso/lib/types/field';
 import { createSpinner } from '@documenso/lib/universal/field-renderer/field-generic-items';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
+import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeFieldToolTip } from '@documenso/ui/components/field/envelope-field-tooltip';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { handleCheckboxFieldClick } from '~/utils/field-signing/checkbox-field';
 import { handleDropdownFieldClick } from '~/utils/field-signing/dropdown-field';
 import { handleEmailFieldClick } from '~/utils/field-signing/email-field';
@@ -28,12 +33,16 @@ import { handleNumberFieldClick } from '~/utils/field-signing/number-field';
 import { handleSignatureFieldClick } from '~/utils/field-signing/signature-field';
 import { handleTextFieldClick } from '~/utils/field-signing/text-field';
 
+import { useRequiredDocumentSigningAuthContext } from '../document-signing/document-signing-auth-provider';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
 
 export default function EnvelopeSignerPageRenderer() {
-  const { i18n } = useLingui();
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { t, i18n } = useLingui();
+  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
   const { sessionData } = useOptionalSession();
+
+  const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
+  const { toast } = useToast();
 
   const {
     envelopeData,
@@ -41,7 +50,7 @@ export default function EnvelopeSignerPageRenderer() {
     recipientFields,
     recipientFieldsRemaining,
     showPendingFieldTooltip,
-    signField,
+    signField: signFieldInternal,
     email,
     setEmail,
     fullName,
@@ -52,6 +61,8 @@ export default function EnvelopeSignerPageRenderer() {
     selectedAssistantRecipient,
     isDirectTemplate,
   } = useRequiredEnvelopeSigningContext();
+
+  const { onFieldSigned, onFieldUnsigned } = useEmbedSigningContext() || {};
 
   const {
     stage,
@@ -80,7 +91,7 @@ export default function EnvelopeSignerPageRenderer() {
     );
   }, [recipientFields, selectedAssistantRecipientFields, pageContext.pageNumber]);
 
-  const renderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
+  const unsafeRenderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
@@ -237,7 +248,7 @@ export default function EnvelopeSignerPageRenderer() {
             .then(async (payload) => {
               if (payload) {
                 fieldGroup.add(loadingSpinnerGroup);
-                await signField(field.id, payload); // Todo: Envelopes - Handle errors
+                await signField(field.id, payload);
               }
 
               if (payload?.value) {
@@ -318,7 +329,6 @@ export default function EnvelopeSignerPageRenderer() {
          * SIGNATURE FIELD.
          */
         .with({ type: FieldType.SIGNATURE }, (field) => {
-          // Todo: Envelopes - Reauth
           handleSignatureFieldClick({
             field,
             signature,
@@ -329,11 +339,21 @@ export default function EnvelopeSignerPageRenderer() {
             .then(async (payload) => {
               if (payload) {
                 fieldGroup.add(loadingSpinnerGroup);
-                await signField(field.id, payload);
-              }
 
-              if (payload?.value) {
-                setSignature(payload.value);
+                if (payload.value) {
+                  void executeActionAuthProcedure({
+                    onReauthFormSubmit: async (authOptions) => {
+                      await signField(field.id, payload, authOptions);
+
+                      loadingSpinnerGroup.destroy();
+                    },
+                    actionTarget: field.type,
+                  });
+
+                  setSignature(payload.value);
+                } else {
+                  await signField(field.id, payload);
+                }
               }
             })
             .finally(() => {
@@ -347,13 +367,54 @@ export default function EnvelopeSignerPageRenderer() {
     fieldGroup.on('pointerdown', handleFieldGroupClick);
   };
 
+  const renderFieldOnLayer = (unparsedField: Field & { signature?: Signature | null }) => {
+    try {
+      unsafeRenderFieldOnLayer(unparsedField);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
+  };
+
+  const signField = async (
+    fieldId: number,
+    payload: TSignEnvelopeFieldValue,
+    authOptions?: TRecipientActionAuth,
+  ) => {
+    try {
+      const { inserted } = await signFieldInternal(fieldId, payload, authOptions);
+
+      // ?: The two callbacks below are used within the embedding context
+      if (inserted && onFieldSigned) {
+        const value = payload.value ? JSON.stringify(payload.value) : undefined;
+        const isBase64 = value ? isBase64Image(value) : undefined;
+
+        onFieldSigned({ fieldId, value, isBase64 });
+      }
+
+      if (!inserted && onFieldUnsigned) {
+        onFieldUnsigned({ fieldId });
+      }
+    } catch (err) {
+      console.error(err);
+
+      toast({
+        title: t`Error`,
+        description: t`An error occurred while signing the field.`,
+        variant: 'destructive',
+      });
+
+      throw err;
+    }
+  };
+
   /**
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
     // Render the fields.
     for (const field of localPageFields) {
-      renderFieldOnLayer(field); // Todo: Envelopes - [CRITICAL] Handle errors which prevent rendering
+      renderFieldOnLayer(field);
     }
 
     currentPageLayer.batchDraw();
@@ -368,8 +429,7 @@ export default function EnvelopeSignerPageRenderer() {
     }
 
     localPageFields.forEach((field) => {
-      console.log('Field changed/inserted, rendering on canvas');
-      renderFieldOnLayer(field); // Todo: Envelopes - [CRITICAL] Handle errors which prevent rendering
+      renderFieldOnLayer(field);
     });
 
     pageLayer.current.batchDraw();
@@ -387,7 +447,7 @@ export default function EnvelopeSignerPageRenderer() {
     pageLayer.current.destroyChildren();
 
     localPageFields.forEach((field) => {
-      renderFieldOnLayer(field); // Todo: Envelopes - [CRITICAL] Handle errors which prevent rendering
+      renderFieldOnLayer(field);
     });
 
     pageLayer.current.batchDraw();

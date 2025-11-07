@@ -1,6 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
-import { Trans } from '@lingui/react/macro';
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import Konva from 'konva';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
@@ -8,6 +10,7 @@ import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { cn } from '@documenso/ui/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
@@ -29,10 +32,31 @@ const PDFLoader = () => (
   </>
 );
 
+export type PdfViewerRendererMode = 'editor' | 'preview' | 'signing';
+
+const RendererErrorMessages: Record<
+  PdfViewerRendererMode,
+  { title: MessageDescriptor; description: MessageDescriptor }
+> = {
+  editor: {
+    title: msg`Configuration Error`,
+    description: msg`There was an issue rendering some fields, please review the fields and try again.`,
+  },
+  preview: {
+    title: msg`Configuration Error`,
+    description: msg`Something went wrong while rendering the document, some fields may be missing or corrupted.`,
+  },
+  signing: {
+    title: msg`Configuration Error`,
+    description: msg`Something went wrong while rendering the document, some fields may be missing or corrupted.`,
+  },
+};
+
 export type PdfViewerKonvaProps = {
   className?: string;
   onDocumentLoad?: () => void;
   customPageRenderer?: React.FunctionComponent;
+  renderer: PdfViewerRendererMode;
   [key: string]: unknown;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
@@ -40,18 +64,21 @@ export const PdfViewerKonva = ({
   className,
   onDocumentLoad,
   customPageRenderer,
+  renderer,
   ...props
 }: PdfViewerKonvaProps) => {
+  const { t } = useLingui();
+
   const $el = useRef<HTMLDivElement>(null);
 
-  const { getPdfBuffer, currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { getPdfBuffer, currentEnvelopeItem, renderError } = useCurrentEnvelopeRender();
 
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
 
   const envelopeItemFile = useMemo(() => {
-    const data = getPdfBuffer(currentEnvelopeItem?.documentDataId || '');
+    const data = getPdfBuffer(currentEnvelopeItem?.id || '');
 
     if (!data || data.status !== 'loaded') {
       return null;
@@ -60,7 +87,7 @@ export const PdfViewerKonva = ({
     return {
       data: new Uint8Array(data.file),
     };
-  }, [currentEnvelopeItem?.documentDataId, getPdfBuffer]);
+  }, [currentEnvelopeItem?.id, getPdfBuffer]);
 
   const onDocumentLoaded = useCallback(
     (doc: PDFDocumentProxy) => {
@@ -92,6 +119,13 @@ export const PdfViewerKonva = ({
 
   return (
     <div ref={$el} className={cn('w-full max-w-[800px]', className)} {...props}>
+      {renderError && (
+        <Alert variant="destructive" className="mb-4 max-w-[800px]">
+          <AlertTitle>{t(RendererErrorMessages[renderer].title)}</AlertTitle>
+          <AlertDescription>{t(RendererErrorMessages[renderer].description)}</AlertDescription>
+        </Alert>
+      )}
+
       {envelopeItemFile && Konva ? (
         <PDFDocument
           file={envelopeItemFile}

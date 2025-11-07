@@ -16,9 +16,9 @@ import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/l
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -62,14 +62,18 @@ export const DocumentDropZoneWrapper = ({ children, className }: DocumentDropZon
     try {
       setIsLoading(true);
 
-      const response = await putPdfFile(file);
-
-      const { legacyDocumentId: id } = await createDocument({
+      const payload = {
         title: file.name,
-        documentDataId: response.id,
-        timezone: userTimezone, // Note: When migrating to v2 document upload remember to pass this through as a 'userTimezone' field.
+        timezone: userTimezone,
         folderId: folderId ?? undefined,
-      });
+      } satisfies TCreateDocumentPayloadSchema;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+      formData.append('file', file);
+
+      const { envelopeId: id } = await createDocument(formData);
 
       void refreshLimits();
 

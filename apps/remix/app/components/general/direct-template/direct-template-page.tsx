@@ -153,7 +153,9 @@ export const DirectTemplatePageView = ({
         <CardContent className="p-2">
           <PDFViewer
             key={template.id}
-            documentData={template.templateDocumentData}
+            envelopeItem={template.envelopeItems[0]}
+            token={directTemplateRecipient.token}
+            version="signed"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

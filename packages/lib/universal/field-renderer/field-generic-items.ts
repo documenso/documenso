@@ -153,6 +153,11 @@ export const createFieldHoverInteraction = ({
   const hoverColor = RECIPIENT_COLOR_STYLES[options.color].baseRingHover;
 
   fieldGroup.on('mouseover', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -161,6 +166,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('mouseout', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -169,6 +179,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('transformstart', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -177,6 +192,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('transformend', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,

@@ -1,14 +1,13 @@
 import { z } from 'zod';
 
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import { EnvelopeItemSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 import { EnvelopeSchema } from '@documenso/prisma/generated/zod/modelSchema/EnvelopeSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import TemplateDirectLinkSchema from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
 
-import { ZFieldSchema } from './field';
-import { ZRecipientLiteSchema } from './recipient';
+import { ZEnvelopeFieldSchema } from './field';
+import { ZEnvelopeRecipientLiteSchema } from './recipient';
 
 /**
  * The full envelope response schema.
@@ -37,11 +36,8 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
   userId: true,
   teamId: true,
   folderId: true,
+  templateId: true,
 }).extend({
-  templateId: z
-    .number()
-    .nullish()
-    .describe('The ID of the template that the document was created from, if any.'),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,
     distributionMethod: true,
@@ -60,29 +56,14 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     emailId: true,
     emailReplyTo: true,
   }),
-  recipients: ZRecipientLiteSchema.omit({
-    documentId: true,
-    templateId: true,
-  }).array(),
-  fields: ZFieldSchema.omit({
-    documentId: true,
-    templateId: true,
-  }).array(),
+  recipients: ZEnvelopeRecipientLiteSchema.array(),
+  fields: ZEnvelopeFieldSchema.array(),
   envelopeItems: EnvelopeItemSchema.pick({
+    envelopeId: true,
     id: true,
     title: true,
-    documentDataId: true,
     order: true,
-  })
-    .extend({
-      documentData: DocumentDataSchema.pick({
-        type: true,
-        id: true,
-        data: true,
-        initialData: true,
-      }),
-    })
-    .array(),
+  }).array(),
   directLink: TemplateDirectLinkSchema.pick({
     directTemplateRecipientId: true,
     enabled: true,

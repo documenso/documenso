@@ -20,7 +20,12 @@ import { validateCheckboxLength } from '../../advanced-fields-validation/validat
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldAndMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -174,9 +179,20 @@ export const sendDocument = async ({
 
   const fieldsToAutoInsert: { fieldId: number; customText: string }[] = [];
 
-  // Auto insert radio and checkboxes that have default values.
+  // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
-    for (const field of envelope.fields) {
+    for (const unknownField of envelope.fields) {
+      const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
+
+      if (parsedField.error) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'One or more fields have invalid metadata. Error: ' + parsedField.error.message,
+        });
+      }
+
+      const field = parsedField.data;
+      const fieldId = unknownField.id;
+
       if (field.type === FieldType.RADIO) {
         const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
 
@@ -184,7 +200,7 @@ export const sendDocument = async ({
 
         if (checkedItemIndex !== -1) {
           fieldsToAutoInsert.push({
-            fieldId: field.id,
+            fieldId,
             customText: toRadioCustomText(checkedItemIndex),
           });
         }
@@ -195,7 +211,7 @@ export const sendDocument = async ({
 
         if (defaultValue && values.some((value) => value.value === defaultValue)) {
           fieldsToAutoInsert.push({
-            fieldId: field.id,
+            fieldId,
             customText: defaultValue,
           });
         }
@@ -234,9 +250,9 @@ export const sendDocument = async ({
           );
         }
 
-        if (isValid) {
+        if (isValid && checkedIndices.length > 0) {
           fieldsToAutoInsert.push({
-            fieldId: field.id,
+            fieldId,
             customText: toCheckboxCustomText(checkedIndices),
           });
         }

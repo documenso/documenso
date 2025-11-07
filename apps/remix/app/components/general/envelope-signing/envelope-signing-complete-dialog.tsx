@@ -2,15 +2,18 @@ import { useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { FieldType } from '@prisma/client';
-import { useNavigate, useSearchParams } from 'react-router';
+import { useNavigate, useRevalidator, useSearchParams } from 'react-router';
 
 import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
+
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
 import { DocumentSigningCompleteDialog } from '../document-signing/document-signing-complete-dialog';
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
@@ -19,8 +22,9 @@ export const EnvelopeSignerCompleteDialog = () => {
   const navigate = useNavigate();
   const analytics = useAnalytics();
 
-  const { toast } = useToast();
   const { t } = useLingui();
+  const { toast } = useToast();
+  const { revalidate } = useRevalidator();
 
   const [searchParams] = useSearchParams();
 
@@ -36,6 +40,8 @@ export const EnvelopeSignerCompleteDialog = () => {
   } = useRequiredEnvelopeSigningContext();
 
   const { currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
+
+  const { onDocumentCompleted, onDocumentError } = useEmbedSigningContext() || {};
 
   const { mutateAsync: completeDocument, isPending } =
     trpc.recipient.completeDocumentWithToken.useMutation();
@@ -68,25 +74,54 @@ export const EnvelopeSignerCompleteDialog = () => {
     nextSigner?: { name: string; email: string },
     accessAuthOptions?: TRecipientAccessAuth,
   ) => {
-    const payload = {
-      token: recipient.token,
-      documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-      authOptions: accessAuthOptions,
-      ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
-    };
+    try {
+      const payload = {
+        token: recipient.token,
+        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+        authOptions: accessAuthOptions,
+        ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
+      };
 
-    await completeDocument(payload);
+      await completeDocument(payload);
 
-    analytics.capture('App: Recipient has completed signing', {
-      signerId: recipient.id,
-      documentId: envelope.id,
-      timestamp: new Date().toISOString(),
-    });
+      analytics.capture('App: Recipient has completed signing', {
+        signerId: recipient.id,
+        documentId: envelope.id,
+        timestamp: new Date().toISOString(),
+      });
 
-    if (envelope.documentMeta.redirectUrl) {
-      window.location.href = envelope.documentMeta.redirectUrl;
-    } else {
-      await navigate(`/sign/${recipient.token}/complete`);
+      if (onDocumentCompleted) {
+        onDocumentCompleted({
+          token: recipient.token,
+          documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+          recipientId: recipient.id,
+          envelopeId: envelope.id,
+        });
+
+        await revalidate();
+
+        return;
+      }
+
+      if (envelope.documentMeta.redirectUrl) {
+        window.location.href = envelope.documentMeta.redirectUrl;
+      } else {
+        await navigate(`/sign/${recipient.token}/complete`);
+      }
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      if (error.code !== AppErrorCode.TWO_FACTOR_AUTH_FAILED) {
+        toast({
+          title: t`Something went wrong`,
+          description: t`We were unable to submit this document at this time. Please try again later.`,
+          variant: 'destructive',
+        });
+
+        onDocumentError?.();
+      }
+
+      throw err;
     }
   };
 
@@ -105,8 +140,12 @@ export const EnvelopeSignerCompleteDialog = () => {
         directTemplateExternalId = decodeURIComponent(directTemplateExternalId);
       }
 
+      if (!recipient.directToken) {
+        throw new Error('Recipient direct token is required');
+      }
+
       const { token } = await createDocumentFromDirectTemplate({
-        directTemplateToken: recipient.token, // The direct template token is inserted into the recipient token for ease of use.
+        directTemplateToken: recipient.directToken, // The direct template token is inserted into the recipient token for ease of use.
         directTemplateExternalId,
         directRecipientName: recipientDetails?.name || fullName,
         directRecipientEmail: recipientDetails?.email || email,
@@ -132,17 +171,30 @@ export const EnvelopeSignerCompleteDialog = () => {
 
       const redirectUrl = envelope.documentMeta.redirectUrl;
 
+      if (onDocumentCompleted) {
+        await navigate({
+          pathname: `/embed/sign/${token}`,
+          search: window.location.search,
+          hash: window.location.hash,
+        });
+
+        return;
+      }
+
       if (redirectUrl) {
         window.location.href = redirectUrl;
       } else {
         await navigate(`/sign/${token}/complete`);
       }
     } catch (err) {
+      console.log('err', err);
       toast({
         title: t`Something went wrong`,
         description: t`We were unable to submit this document at this time. Please try again later.`,
         variant: 'destructive',
       });
+
+      onDocumentError?.();
 
       throw err;
     }
