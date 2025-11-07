@@ -191,7 +191,7 @@ export const run = async ({
 
   const newDocumentData = await Promise.all(
     envelopeItems.map(async (envelopeItem) =>
-      io.runTask(`decorate-and-sign-envelope-item-${envelopeItem.id}`, async () => {
+      io.runTask(`decorate-${envelopeItem.id}`, async () => {
         const envelopeItemFields = envelope.envelopeItems.find(
           (item) => item.id === envelopeItem.id,
         )?.field;
