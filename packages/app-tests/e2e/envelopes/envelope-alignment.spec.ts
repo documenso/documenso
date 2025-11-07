@@ -25,7 +25,7 @@ import { DocumentStatus } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-import { getEnvelopeDownloadUrl } from '@documenso/lib/utils/envelope-download';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -94,7 +94,8 @@ test.skip('field placement visual regression', async ({ page }, testInfo) => {
 
   await Promise.all(
     completedDocument.envelopeItems.map(async (item) => {
-      const documentUrl = getEnvelopeDownloadUrl({
+      const documentUrl = getEnvelopeItemPdfUrl({
+        type: 'download',
         envelopeItem: item,
         token,
         version: 'signed',
@@ -179,7 +180,8 @@ test.skip('download envelope images', async ({ page }) => {
 
   await Promise.all(
     completedDocument.envelopeItems.map(async (item) => {
-      const documentUrl = getEnvelopeDownloadUrl({
+      const documentUrl = getEnvelopeItemPdfUrl({
+        type: 'download',
         envelopeItem: item,
         token,
         version: 'signed',

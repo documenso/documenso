@@ -1,6 +1,6 @@
 import type { EnvelopeItem } from '@prisma/client';
 
-import { getEnvelopeDownloadUrl } from '../utils/envelope-download';
+import { getEnvelopeItemPdfUrl } from '../utils/envelope-download';
 import { downloadFile } from './download-file';
 
 type DocumentVersion = 'original' | 'signed';
@@ -24,7 +24,8 @@ export const downloadPDF = async ({
   fileName,
   version = 'signed',
 }: DownloadPDFProps) => {
-  const downloadUrl = getEnvelopeDownloadUrl({
+  const downloadUrl = getEnvelopeItemPdfUrl({
+    type: 'download',
     envelopeItem: envelopeItem,
     token,
     version,
