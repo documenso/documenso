@@ -1,4 +1,5 @@
 import { type DocumentDataType, DocumentStatus } from '@prisma/client';
+import contentDisposition from 'content-disposition';
 import { type Context } from 'hono';
 
 import { sha256 } from '@documenso/lib/universal/crypto';
@@ -34,7 +35,7 @@ export const handleEnvelopeItemFileRequest = async ({
 
   const etag = Buffer.from(sha256(documentDataToUse)).toString('hex');
 
-  if (c.req.header('If-None-Match') === etag) {
+  if (c.req.header('If-None-Match') === etag && !isDownload) {
     return c.body(null, 304);
   }
 
@@ -58,7 +59,6 @@ export const handleEnvelopeItemFileRequest = async ({
     if (status === DocumentStatus.COMPLETED) {
       c.header('Cache-Control', 'public, max-age=31536000, immutable');
     } else {
-      // Set a tiny 1 minute cache, with must-revalidate to ensure the client always checks for updates.
       c.header('Cache-Control', 'public, max-age=0, must-revalidate');
     }
   }
@@ -69,7 +69,7 @@ export const handleEnvelopeItemFileRequest = async ({
     const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
     const filename = `${baseTitle}${suffix}`;
 
-    c.header('Content-Disposition', `attachment; filename="${filename}"`);
+    c.header('Content-Disposition', contentDisposition(filename));
 
     // For downloads, prevent caching to ensure fresh data
     c.header('Cache-Control', 'no-cache, no-store, must-revalidate');
