@@ -115,10 +115,78 @@ export const extractRecipientPlaceholder = (placeholder: string): RecipientPlace
   };
 };
 
+/*
+  Finds a recipient based on a placeholder reference.
+  If recipients array is provided, uses index-based matching (r1 -> recipients[0], etc.).
+  Otherwise, uses email-based matching from createdRecipients.
+*/
+export const findRecipientByPlaceholder = (
+  recipientPlaceholder: string,
+  placeholder: string,
+  recipients: Pick<Recipient, 'id' | 'email'>[] | undefined,
+  createdRecipients: Pick<Recipient, 'id' | 'email'>[],
+): Pick<Recipient, 'id' | 'email'> => {
+  if (recipients && recipients.length > 0) {
+    /*
+      Map placeholder by index: r1 -> recipients[0], r2 -> recipients[1], etc.
+      recipientIndex is 1-based, so we subtract 1 to get the array index.
+    */
+    const { recipientIndex } = extractRecipientPlaceholder(recipientPlaceholder);
+    const recipientArrayIndex = recipientIndex - 1;
+
+    if (recipientArrayIndex < 0 || recipientArrayIndex >= recipients.length) {
+      throw new AppError(AppErrorCode.INVALID_BODY, {
+        message: `Recipient placeholder ${recipientPlaceholder} (index ${recipientIndex}) is out of range. Provided ${recipients.length} recipient(s).`,
+      });
+    }
+
+    return recipients[recipientArrayIndex];
+  }
+
+  /*
+    Use email-based matching for placeholder recipients.
+  */
+  const { email } = extractRecipientPlaceholder(recipientPlaceholder);
+  const recipient = createdRecipients.find((r) => r.email === email);
+
+  if (!recipient) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Could not find recipient ID for placeholder: ${placeholder}`,
+    });
+  }
+
+  return recipient;
+};
+
+/*
+  Determines the recipients to use for field creation.
+  If recipients are provided, uses them directly.
+  Otherwise, creates recipients from placeholders.
+*/
+export const determineRecipientsForPlaceholders = async (
+  recipients: Pick<Recipient, 'id' | 'email'>[] | undefined,
+  recipientPlaceholders: Map<number, string>,
+  envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
+  userId: number,
+  teamId: number,
+  requestMetadata: ApiRequestMetadata,
+): Promise<Pick<Recipient, 'id' | 'email'>[]> => {
+  if (recipients && recipients.length > 0) {
+    return recipients;
+  }
+
+  return createRecipientsFromPlaceholders(
+    recipientPlaceholders,
+    envelope,
+    userId,
+    teamId,
+    requestMetadata,
+  );
+};
+
 export const createRecipientsFromPlaceholders = async (
   recipientPlaceholders: Map<number, string>,
   envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
-  envelopeId: EnvelopeIdOptions,
   userId: number,
   teamId: number,
   requestMetadata: ApiRequestMetadata,
@@ -156,6 +224,11 @@ export const createRecipientsFromPlaceholders = async (
 
   const newRecipients = await match(envelope.type)
     .with(EnvelopeType.DOCUMENT, async () => {
+      const envelopeId: EnvelopeIdOptions = {
+        type: 'envelopeId',
+        id: envelope.id,
+      };
+
       const { recipients } = await createDocumentRecipients({
         userId,
         teamId,
@@ -167,10 +240,7 @@ export const createRecipientsFromPlaceholders = async (
       return recipients;
     })
     .with(EnvelopeType.TEMPLATE, async () => {
-      const templateId =
-        envelopeId.type === 'templateId'
-          ? envelopeId.id
-          : mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
+      const templateId = mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
 
       const { recipients } = await createTemplateRecipients({
         userId,

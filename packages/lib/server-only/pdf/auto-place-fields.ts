@@ -12,11 +12,17 @@ import { prisma } from '@documenso/prisma';
 
 import { getPageSize } from './get-page-size';
 import {
-  createRecipientsFromPlaceholders,
+  determineRecipientsForPlaceholders,
   extractRecipientPlaceholder,
+  findRecipientByPlaceholder,
   parseFieldMetaFromPlaceholder,
   parseFieldTypeFromPlaceholder,
 } from './helpers';
+
+const PLACEHOLDER_REGEX = /{{([^}]+)}}/g;
+const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
+const WIDTH_ADJUSTMENT_FACTOR = 0.1;
+const MIN_HEIGHT_THRESHOLD = 0.01;
 
 type TextPosition = {
   text: string;
@@ -51,16 +57,6 @@ type FieldToCreate = TFieldAndMeta & {
   width: number;
   height: number;
 };
-
-/*
-  Questions for later:
-    - Does it handle multi-page PDFs? ✅ YES! ✅
-    - Does it handle multiple recipients on the same page? ✅ YES! ✅
-    - Does it handle multiple recipients on multiple pages? ✅ YES! ✅
-    - What happens with incorrect placeholders? E.g. those containing non-accepted properties.
-    - The placeholder data is dynamic. How to handle this parsing? Perhaps we need to do it similar to the fieldMeta parsing. ✅
-    - Need to handle envelopes with multiple items. ✅
-*/
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
   return new Promise((resolve, reject) => {
@@ -114,7 +110,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           });
         });
 
-        const placeholderMatches = pageText.matchAll(/{{([^}]+)}}/g);
+        const placeholderMatches = pageText.matchAll(PLACEHOLDER_REGEX);
 
         /*
           A placeholder match has the following format:
@@ -150,12 +146,6 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
             Then find the position of the characters in the textPositions array.
             This allows us to quickly find the position of a character in the textPositions array by its index.
           */
-          if (placeholderMatch.index === undefined) {
-            console.error('Placeholder match index is undefined for placeholder', placeholder);
-
-            continue;
-          }
-
           const placeholderEndCharIndex = placeholderMatch.index + placeholder.length;
 
           /*
@@ -179,7 +169,8 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
           const placeholderStart = textPositions[startTextPosIndex];
           const placeholderEnd = textPositions[endTextPosIndex];
 
-          const width = placeholderEnd.x + placeholderEnd.w * 0.1 - placeholderStart.x;
+          const width =
+            placeholderEnd.x + placeholderEnd.w * WIDTH_ADJUSTMENT_FACTOR - placeholderStart.x;
 
           placeholders.push({
             placeholder,
@@ -298,20 +289,14 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     });
   }
 
-  let createdRecipients: Pick<Recipient, 'id' | 'email'>[];
-
-  if (recipients && recipients.length > 0) {
-    createdRecipients = recipients;
-  } else {
-    createdRecipients = await createRecipientsFromPlaceholders(
-      recipientPlaceholders,
-      envelope,
-      envelopeId,
-      userId,
-      teamId,
-      requestMetadata,
-    );
-  }
+  const createdRecipients = await determineRecipientsForPlaceholders(
+    recipients,
+    recipientPlaceholders,
+    envelope,
+    userId,
+    teamId,
+    requestMetadata,
+  );
 
   const fieldsToCreate: FieldToCreate[] = [];
 
@@ -327,46 +312,21 @@ export const insertFieldsFromPlaceholdersInPDF = async (
     const widthPercent = (placeholder.width / placeholder.pageWidth) * 100;
     const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
 
-    let recipient: Pick<Recipient, 'id' | 'email'> | undefined;
-
-    if (recipients && recipients.length > 0) {
-      /*
-        Map placeholder by index: r1 -> recipients[0], r2 -> recipients[1], etc.
-        recipientIndex is 1-based, so we subtract 1 to get the array index.
-      */
-      const { recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
-      const recipientArrayIndex = recipientIndex - 1;
-
-      if (recipientArrayIndex < 0 || recipientArrayIndex >= recipients.length) {
-        throw new AppError(AppErrorCode.INVALID_BODY, {
-          message: `Recipient placeholder ${placeholder.recipient} (index ${recipientIndex}) is out of range. Provided ${recipients.length} recipient(s).`,
-        });
-      }
-
-      recipient = recipients[recipientArrayIndex];
-    } else {
-      /*
-        Use email-based matching for placeholder recipients.
-      */
-      const { email } = extractRecipientPlaceholder(placeholder.recipient);
-      recipient = createdRecipients.find((r) => r.email === email);
-    }
-
-    if (!recipient) {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Could not find recipient ID for placeholder: ${placeholder.placeholder}`,
-      });
-    }
-
-    const recipientId = recipient.id;
+    const recipient = findRecipientByPlaceholder(
+      placeholder.recipient,
+      placeholder.placeholder,
+      recipients,
+      createdRecipients,
+    );
 
     // Default height percentage if too small (use 2% as a reasonable default)
-    const finalHeightPercent = heightPercent > 0.01 ? heightPercent : 2;
+    const finalHeightPercent =
+      heightPercent > MIN_HEIGHT_THRESHOLD ? heightPercent : DEFAULT_FIELD_HEIGHT_PERCENT;
 
     fieldsToCreate.push({
       ...placeholder.fieldAndMeta,
       envelopeItemId,
-      recipientId,
+      recipientId: recipient.id,
       pageNumber: placeholder.page,
       pageX: xPercent,
       pageY: yPercent,
