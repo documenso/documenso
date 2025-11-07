@@ -189,29 +189,34 @@ export const run = async ({
     settings,
   });
 
-  const newDocumentData = await Promise.all(
-    envelopeItems.map(async (envelopeItem) =>
-      io.runTask(`decorate-${envelopeItem.id}`, async () => {
-        const envelopeItemFields = envelope.envelopeItems.find(
-          (item) => item.id === envelopeItem.id,
-        )?.field;
+  const decoratePromises: Array<Promise<{ oldDocumentDataId: string; newDocumentDataId: string }>> =
+    [];
 
-        if (!envelopeItemFields) {
-          throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
-        }
+  for (const envelopeItem of envelopeItems) {
+    const task = io.runTask(`decorate-${envelopeItem.id}`, async () => {
+      const envelopeItemFields = envelope.envelopeItems.find(
+        (item) => item.id === envelopeItem.id,
+      )?.field;
 
-        return decorateAndSignPdf({
-          envelope,
-          envelopeItem,
-          envelopeItemFields,
-          isRejected,
-          rejectionReason,
-          certificateData,
-          auditLogData,
-        });
-      }),
-    ),
-  );
+      if (!envelopeItemFields) {
+        throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+      }
+
+      return decorateAndSignPdf({
+        envelope,
+        envelopeItem,
+        envelopeItemFields,
+        isRejected,
+        rejectionReason,
+        certificateData,
+        auditLogData,
+      });
+    });
+
+    decoratePromises.push(task);
+  }
+
+  const newDocumentData = await Promise.all(decoratePromises);
 
   const postHog = PostHogServerClient();
 
