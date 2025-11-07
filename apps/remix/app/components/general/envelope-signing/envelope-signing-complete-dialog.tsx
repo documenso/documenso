@@ -190,7 +190,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       console.log('err', err);
       toast({
         title: t`Something went wrong`,
-        description: t`Weeeeeeee were unable to submit this document at this time. Please try again later.`,
+        description: t`We were unable to submit this document at this time. Please try again later.`,
         variant: 'destructive',
       });
 
