@@ -9,6 +9,7 @@ import { useHotkeys } from 'react-hotkeys-hook';
 import { useNavigate } from 'react-router';
 import { Theme, useTheme } from 'remix-themes';
 
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
@@ -63,10 +64,12 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const [search, setSearch] = useState('');
   const [pages, setPages] = useState<string[]>([]);
 
+  const debouncedSearch = useDebouncedValue(search, 200);
+
   const { data: searchDocumentsData, isPending: isSearchingDocuments } =
     trpcReact.document.search.useQuery(
       {
-        query: search,
+        query: debouncedSearch,
       },
       {
         placeholderData: (previousData) => previousData,
@@ -232,6 +235,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
             <Trans>No results found.</Trans>
           </CommandEmpty>
         )}
+
         {!currentPage && (
           <>
             {documentPageLinks.length > 0 && (
@@ -239,14 +243,17 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
                 <Commands push={push} pages={documentPageLinks} />
               </CommandGroup>
             )}
+
             {templatePageLinks.length > 0 && (
               <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Templates`)}>
                 <Commands push={push} pages={templatePageLinks} />
               </CommandGroup>
             )}
+
             <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Settings`)}>
               <Commands push={push} pages={SETTINGS_PAGES} />
             </CommandGroup>
+
             <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Preferences`)}>
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('language')}>
                 Change language
@@ -255,6 +262,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
                 Change theme
               </CommandItem>
             </CommandGroup>
+
             {searchResults.length > 0 && (
               <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Your documents`)}>
                 <Commands push={push} pages={searchResults} />
