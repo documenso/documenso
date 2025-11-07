@@ -26,7 +26,7 @@ import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 export default function EnvelopeEditorFieldsPageRenderer() {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
   const interactiveTransformer = useRef<Transformer | null>(null);
 
@@ -103,7 +103,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       fieldUpdates.height = fieldPageHeight;
     }
 
-    // Todo: envelopes Use id
     editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
 
     // Select the field if it is not already selected.
@@ -114,7 +113,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     pageLayer.current?.batchDraw();
   };
 
-  const renderFieldOnLayer = (field: TLocalField) => {
+  const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
     }
@@ -158,6 +157,15 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
     fieldGroup.on('transformend', handleResizeOrMove);
     fieldGroup.on('dragend', handleResizeOrMove);
+  };
+
+  const renderFieldOnLayer = (field: TLocalField) => {
+    try {
+      unsafeRenderFieldOnLayer(field);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**

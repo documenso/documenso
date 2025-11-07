@@ -7,6 +7,8 @@ import {
 } from '@documenso/lib/constants/auth';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
+import { EmbedDocumentCompleted } from '~/components/embed/embed-document-completed';
+import { EmbedDocumentRejected } from '~/components/embed/embed-document-rejected';
 import { EmbedDocumentWaitingForTurn } from '~/components/embed/embed-document-waiting-for-turn';
 import { EmbedPaywall } from '~/components/embed/embed-paywall';
 
@@ -48,6 +50,8 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
 
   const error = useRouteError();
 
+  console.log({ routeError: error });
+
   if (isRouteErrorResponse(error)) {
     if (error.status === 401 && error.data.type === 'embed-authentication-required') {
       return (
@@ -67,6 +71,16 @@ export function ErrorBoundary({ loaderData }: Route.ErrorBoundaryProps) {
 
     if (error.status === 403 && error.data.type === 'embed-waiting-for-turn') {
       return <EmbedDocumentWaitingForTurn />;
+    }
+
+    // !: Not used at the moment, may be removed in the future.
+    if (error.status === 403 && error.data.type === 'embed-document-rejected') {
+      return <EmbedDocumentRejected />;
+    }
+
+    // !: Not used at the moment, may be removed in the future.
+    if (error.status === 403 && error.data.type === 'embed-document-completed') {
+      return <EmbedDocumentCompleted name={error.data.name} signature={error.data.signature} />;
     }
   }
 

@@ -95,3 +95,18 @@ export const ZRecipientManySchema = RecipientSchema.pick({
   documentId: z.number().nullish(),
   templateId: z.number().nullish(),
 });
+
+export const ZEnvelopeRecipientSchema = ZRecipientSchema.omit({
+  documentId: true,
+  templateId: true,
+});
+
+export const ZEnvelopeRecipientLiteSchema = ZRecipientLiteSchema.omit({
+  documentId: true,
+  templateId: true,
+});
+
+export const ZEnvelopeRecipientManySchema = ZRecipientManySchema.omit({
+  documentId: true,
+  templateId: true,
+});

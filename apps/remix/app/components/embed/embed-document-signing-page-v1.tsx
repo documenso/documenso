@@ -3,14 +3,8 @@ import { useEffect, useId, useLayoutEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta } from '@prisma/client';
-import {
-  type DocumentData,
-  type Field,
-  FieldType,
-  RecipientRole,
-  SigningStatus,
-} from '@prisma/client';
+import type { DocumentMeta, EnvelopeItem } from '@prisma/client';
+import { type Field, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
@@ -46,11 +40,11 @@ import { EmbedDocumentCompleted } from './embed-document-completed';
 import { EmbedDocumentFields } from './embed-document-fields';
 import { EmbedDocumentRejected } from './embed-document-rejected';
 
-export type EmbedSignDocumentClientPageProps = {
+export type EmbedSignDocumentV1ClientPageProps = {
   token: string;
   documentId: number;
   envelopeId: string;
-  documentData: DocumentData;
+  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
   recipient: RecipientWithFields;
   fields: Field[];
   completedFields: DocumentField[];
@@ -61,11 +55,11 @@ export type EmbedSignDocumentClientPageProps = {
   allRecipients?: RecipientWithFields[];
 };
 
-export const EmbedSignDocumentClientPage = ({
+export const EmbedSignDocumentV1ClientPage = ({
   token,
   documentId,
   envelopeId,
-  documentData,
+  envelopeItems,
   recipient,
   fields,
   completedFields,
@@ -74,7 +68,7 @@ export const EmbedSignDocumentClientPage = ({
   hidePoweredBy = false,
   allowWhitelabelling = false,
   allRecipients = [],
-}: EmbedSignDocumentClientPageProps) => {
+}: EmbedSignDocumentV1ClientPageProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
 
@@ -293,7 +287,9 @@ export const EmbedSignDocumentClientPage = ({
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
             <PDFViewer
-              documentData={documentData}
+              envelopeItem={envelopeItems[0]}
+              token={token}
+              version="signed"
               onDocumentLoad={() => setHasDocumentLoaded(true)}
             />
           </div>

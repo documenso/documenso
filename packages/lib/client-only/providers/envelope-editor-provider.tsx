@@ -46,6 +46,7 @@ type EnvelopeEditorProviderValue = {
   setLocalEnvelope: (localEnvelope: Partial<TEnvelope>) => void;
 
   updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
+  updateEnvelopeAsync: (envelopeUpdates: UpdateEnvelopePayload) => Promise<void>;
   setRecipientsDebounced: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => void;
   setRecipientsAsync: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => Promise<void>;
 
@@ -66,8 +67,6 @@ type EnvelopeEditorProviderValue = {
   };
 
   syncEnvelope: () => Promise<void>;
-  // refetchEnvelope: () => Promise<void>;
-  // updateEnvelope: (envelope: TEnvelope) => Promise<void>;
 };
 
 interface EnvelopeEditorProviderProps {
@@ -151,7 +150,7 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeRecipientSetMutationQuery = trpc.envelope.recipient.set.useMutation({
-    onSuccess: ({ recipients }) => {
+    onSuccess: ({ data: recipients }) => {
       setEnvelope((prev) => ({
         ...prev,
         recipients,
@@ -197,7 +196,7 @@ export const EnvelopeEditorProvider = ({
     });
 
     // Insert the IDs into the local fields.
-    envelopeFields.fields.forEach((field) => {
+    envelopeFields.data.forEach((field) => {
       const localField = localFields.find((localField) => localField.formId === field.formId);
 
       if (localField && !localField.id) {
@@ -215,7 +214,6 @@ export const EnvelopeEditorProvider = ({
   } = useEnvelopeAutosave(async (envelopeUpdates: UpdateEnvelopePayload) => {
     await envelopeUpdateMutationQuery.mutateAsync({
       envelopeId: envelope.id,
-      envelopeType: envelope.type,
       data: envelopeUpdates.data,
       meta: envelopeUpdates.meta,
     });
@@ -235,6 +233,13 @@ export const EnvelopeEditorProvider = ({
     }));
 
     setEnvelopeDebounced(envelopeUpdates);
+  };
+
+  const updateEnvelopeAsync = async (envelopeUpdates: UpdateEnvelopePayload) => {
+    await envelopeUpdateMutationQuery.mutateAsync({
+      envelopeId: envelope.id,
+      ...envelopeUpdates,
+    });
   };
 
   const getRecipientColorKey = useCallback(
@@ -324,6 +329,7 @@ export const EnvelopeEditorProvider = ({
         setLocalEnvelope,
         getRecipientColorKey,
         updateEnvelope,
+        updateEnvelopeAsync,
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,

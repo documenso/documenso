@@ -245,7 +245,12 @@ export const DocumentSigningPageViewV1 = ({
           <div className="flex-1">
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
-                <PDFViewer key={documentData.id} documentData={documentData} document={document} />
+                <PDFViewer
+                  key={document.envelopeItems[0].id}
+                  envelopeItem={document.envelopeItems[0]}
+                  token={recipient.token}
+                  version="signed"
+                />
               </CardContent>
             </Card>
           </div>

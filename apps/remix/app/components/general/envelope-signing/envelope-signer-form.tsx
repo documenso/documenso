@@ -8,6 +8,8 @@ import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+
 import { useRequiredEnvelopeSigningContext } from '../document-signing/envelope-signing-provider';
 
 export default function EnvelopeSignerForm() {
@@ -25,6 +27,8 @@ export default function EnvelopeSignerForm() {
     setSelectedAssistantRecipientId,
   } = useRequiredEnvelopeSigningContext();
 
+  const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
+
   const hasSignatureField = useMemo(() => {
     return recipientFields.some((field) => field.type === FieldType.SIGNATURE);
   }, [recipientFields]);
@@ -37,7 +41,7 @@ export default function EnvelopeSignerForm() {
 
   if (recipient.role === RecipientRole.ASSISTANT) {
     return (
-      <fieldset className="dark:bg-background border-border rounded-2xl sm:border sm:p-3">
+      <fieldset className="embed--DocumentWidgetForm dark:bg-background border-border rounded-2xl sm:border sm:p-3">
         <RadioGroup
           className="gap-0 space-y-2 shadow-none sm:space-y-3"
           value={selectedAssistantRecipient?.id?.toString()}
@@ -101,7 +105,8 @@ export default function EnvelopeSignerForm() {
             id="full-name"
             className="bg-background mt-2"
             value={fullName}
-            onChange={(e) => setFullName(e.target.value.trimStart())}
+            disabled={isNameLocked}
+            onChange={(e) => !isNameLocked && setFullName(e.target.value.trimStart())}
           />
         </div>
 
