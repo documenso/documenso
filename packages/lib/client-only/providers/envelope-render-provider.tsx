@@ -8,7 +8,7 @@ import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
-import { getEnvelopeDownloadUrl } from '../../utils/envelope-download';
+import { getEnvelopeItemPdfUrl } from '../../utils/envelope-download';
 
 type FileData =
   | {
@@ -124,10 +124,10 @@ export const EnvelopeRenderProvider = ({
     }
 
     try {
-      const downloadUrl = getEnvelopeDownloadUrl({
+      const downloadUrl = getEnvelopeItemPdfUrl({
+        type: 'view',
         envelopeItem: envelopeItem,
         token,
-        version: 'signed',
       });
 
       const blob = await fetch(downloadUrl).then(async (res) => await res.blob());

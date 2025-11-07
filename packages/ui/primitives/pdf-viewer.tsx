@@ -12,7 +12,7 @@ import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { getEnvelopeDownloadUrl } from '@documenso/lib/utils/envelope-download';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 
 import { cn } from '../lib/utils';
 import { useToast } from './use-toast';
@@ -157,10 +157,10 @@ export const PDFViewer = ({
       try {
         setIsDocumentBytesLoading(true);
 
-        const documentUrl = getEnvelopeDownloadUrl({
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'view',
           envelopeItem: envelopeItem,
           token,
-          version,
         });
 
         const bytes = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());

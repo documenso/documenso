@@ -59,7 +59,7 @@ export const handleEnvelopeItemFileRequest = async ({
       c.header('Cache-Control', 'public, max-age=31536000, immutable');
     } else {
       // Set a tiny 1 minute cache, with must-revalidate to ensure the client always checks for updates.
-      c.header('Cache-Control', 'public, max-age=60, must-revalidate');
+      c.header('Cache-Control', 'public, max-age=0, must-revalidate');
     }
   }
 

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getEnvelopeDownloadUrl } from '@documenso/lib/utils/envelope-download';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedTeam } from '@documenso/prisma/seed/teams';
@@ -34,7 +34,8 @@ test.describe('Signing Certificate Tests', () => {
         },
       })
       .then(async (data) => {
-        const documentUrl = getEnvelopeDownloadUrl({
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
           envelopeItem: data,
           token: recipient.token,
           version: 'signed',
@@ -85,7 +86,8 @@ test.describe('Signing Certificate Tests', () => {
 
     const firstDocumentData = completedDocument.envelopeItems[0];
 
-    const documentUrl = getEnvelopeDownloadUrl({
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
       envelopeItem: firstDocumentData,
       token: recipient.token,
       version: 'signed',
@@ -139,7 +141,8 @@ test.describe('Signing Certificate Tests', () => {
         },
       })
       .then(async (data) => {
-        const documentUrl = getEnvelopeDownloadUrl({
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
           envelopeItem: data,
           token: recipient.token,
           version: 'signed',
@@ -188,7 +191,8 @@ test.describe('Signing Certificate Tests', () => {
 
     const firstDocumentData = completedDocument.envelopeItems[0];
 
-    const documentUrl = getEnvelopeDownloadUrl({
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
       envelopeItem: firstDocumentData,
       token: recipient.token,
       version: 'signed',
@@ -242,7 +246,8 @@ test.describe('Signing Certificate Tests', () => {
         },
       })
       .then(async (data) => {
-        const documentUrl = getEnvelopeDownloadUrl({
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
           envelopeItem: data,
           token: recipient.token,
           version: 'signed',
@@ -289,7 +294,8 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    const documentUrl = getEnvelopeDownloadUrl({
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
       envelopeItem: completedDocument.envelopeItems[0],
       token: recipient.token,
       version: 'signed',
