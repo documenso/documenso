@@ -11,6 +11,7 @@ import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
 import { downloadDocumentRoute } from './download-document';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
+import { downloadDocumentBetaRoute } from './download-document-beta';
 import { downloadDocumentCertificateRoute } from './download-document-certificate';
 import { duplicateDocumentRoute } from './duplicate-document';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -39,6 +40,7 @@ export const documentRouter = router({
   share: shareDocumentRoute,
 
   // Temporary v2 beta routes to be removed once V2 is fully released.
+  downloadBeta: downloadDocumentBetaRoute,
   download: downloadDocumentRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
   createDocumentFormData: createDocumentFormDataRoute,

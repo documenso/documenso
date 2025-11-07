@@ -91,7 +91,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         }
 
         if (field.identifier === undefined) {
-          documentDataId = envelopeItems[0]?.documentDataId;
+          documentDataId = envelopeItems.at(0)?.documentDataId;
         }
 
         if (!documentDataId) {

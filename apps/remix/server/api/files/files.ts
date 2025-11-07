@@ -10,7 +10,7 @@ import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { prisma } from '@documenso/prisma';
 
-import type { HonoEnv } from '../router';
+import type { HonoEnv } from '../../router';
 import { handleEnvelopeItemFileRequest } from './files.helpers';
 import {
   type TGetPresignedPostUrlResponse,

@@ -14,7 +14,8 @@ import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
-import { filesRoute } from './api/files';
+import { downloadRoute } from './api/download/download';
+import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
@@ -92,6 +93,8 @@ app.use('/api/trpc/*', reactRouterTrpcServer);
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_URL}/openapi.json`, (c) => c.json(openApiDocument));
 app.use(`${API_V2_URL}/*`, cors());
+// Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`${API_V2_URL}`, downloadRoute);
 app.use(`${API_V2_URL}/*`, async (c) =>
   openApiTrpcServerHandler(c, {
     isBeta: false,
@@ -101,6 +104,8 @@ app.use(`${API_V2_URL}/*`, async (c) =>
 // Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
 app.use(`${API_V2_BETA_URL}/*`, cors());
+// Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`${API_V2_BETA_URL}`, downloadRoute);
 app.use(`${API_V2_BETA_URL}/*`, async (c) =>
   openApiTrpcServerHandler(c, {
     isBeta: true,

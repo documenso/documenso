@@ -4,7 +4,7 @@ import { type Context } from 'hono';
 import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 
-import type { HonoEnv } from '../router';
+import type { HonoEnv } from '../../router';
 
 type HandleEnvelopeItemFileRequestOptions = {
   title: string;

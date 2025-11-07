@@ -26,6 +26,7 @@ import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
 import { signEnvelopeFieldRoute } from './sign-envelope-field';
 import { updateEnvelopeRoute } from './update-envelope';
 import { updateEnvelopeItemsRoute } from './update-envelope-items';
+import { useEnvelopeRoute } from './use-envelope';
 
 /**
  * Note: The order of the routes is important for public API routes.
@@ -63,6 +64,7 @@ export const envelopeRouter = router({
   },
   get: getEnvelopeRoute,
   create: createEnvelopeRoute,
+  use: useEnvelopeRoute,
   update: updateEnvelopeRoute,
   delete: deleteEnvelopeRoute,
   duplicate: duplicateEnvelopeRoute,
