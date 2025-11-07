@@ -1,13 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import React from 'react';
 
-import type { DocumentData } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
 
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
-import { getFile } from '../../universal/upload/get-file';
+import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
+import { getEnvelopeItemPdfUrl } from '../../utils/envelope-download';
 
 type FileData =
   | {
@@ -18,19 +19,31 @@ type FileData =
       status: 'loaded';
     };
 
+type EnvelopeRenderOverrideSettings = {
+  mode?: FieldRenderMode;
+  showRecipientTooltip?: boolean;
+  showRecipientSigningStatus?: boolean;
+};
+
 type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
 
 type EnvelopeRenderProviderValue = {
-  getPdfBuffer: (documentDataId: string) => FileData | null;
+  getPdfBuffer: (envelopeItemId: string) => FileData | null;
   envelopeItems: EnvelopeRenderItem[];
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
-  fields: TEnvelope['fields'];
+  fields: Field[];
+  recipients: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
+
+  renderError: boolean;
+  setRenderError: (renderError: boolean) => void;
+  overrideSettings?: EnvelopeRenderOverrideSettings;
 };
 
 interface EnvelopeRenderProviderProps {
   children: React.ReactNode;
+
   envelope: Pick<TEnvelope, 'envelopeItems'>;
 
   /**
@@ -38,14 +51,27 @@ interface EnvelopeRenderProviderProps {
    *
    * Only pass if the CustomRenderer you are passing in wants fields.
    */
-  fields?: TEnvelope['fields'];
+  fields?: Field[];
 
   /**
-   * Optional recipient IDs used to determine the color of the fields.
+   * Optional recipient used to determine the color of the fields and hover
+   * previews.
    *
    * Only required for generic page renderers.
    */
-  recipientIds?: number[];
+  recipients?: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>[];
+
+  /**
+   * The token to access the envelope.
+   *
+   * If not provided, it will be assumed that the current user can access the document.
+   */
+  token: string | undefined;
+
+  /**
+   * Custom override settings for generic page renderers.
+   */
+  overrideSettings?: EnvelopeRenderOverrideSettings;
 }
 
 const EnvelopeRenderContext = createContext<EnvelopeRenderProviderValue | null>(null);
@@ -67,39 +93,51 @@ export const EnvelopeRenderProvider = ({
   children,
   envelope,
   fields,
-  recipientIds = [],
+  token,
+  recipients = [],
+  overrideSettings,
 }: EnvelopeRenderProviderProps) => {
   // Indexed by documentDataId.
   const [files, setFiles] = useState<Record<string, FileData>>({});
 
   const [currentItem, setItem] = useState<EnvelopeRenderItem | null>(null);
 
+  const [renderError, setRenderError] = useState<boolean>(false);
+
   const envelopeItems = useMemo(
     () => envelope.envelopeItems.sort((a, b) => a.order - b.order),
     [envelope.envelopeItems],
   );
 
-  const loadEnvelopeItemPdfFile = async (documentData: DocumentData) => {
-    if (files[documentData.id]?.status === 'loading') {
+  const loadEnvelopeItemPdfFile = async (envelopeItem: EnvelopeRenderItem) => {
+    if (files[envelopeItem.id]?.status === 'loading') {
       return;
     }
 
-    if (!files[documentData.id]) {
+    if (!files[envelopeItem.id]) {
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
+        [envelopeItem.id]: {
           status: 'loading',
         },
       }));
     }
 
     try {
-      const file = await getFile(documentData);
+      const downloadUrl = getEnvelopeItemPdfUrl({
+        type: 'view',
+        envelopeItem: envelopeItem,
+        token,
+      });
+
+      const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
+
+      const file = await blob.arrayBuffer();
 
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
-          file,
+        [envelopeItem.id]: {
+          file: new Uint8Array(file),
           status: 'loaded',
         },
       }));
@@ -108,7 +146,7 @@ export const EnvelopeRenderProvider = ({
 
       setFiles((prev) => ({
         ...prev,
-        [documentData.id]: {
+        [envelopeItem.id]: {
           status: 'error',
         },
       }));
@@ -116,8 +154,8 @@ export const EnvelopeRenderProvider = ({
   };
 
   const getPdfBuffer = useCallback(
-    (documentDataId: string) => {
-      return files[documentDataId] || null;
+    (envelopeItemId: string) => {
+      return files[envelopeItemId] || null;
     },
     [files],
   );
@@ -137,12 +175,17 @@ export const EnvelopeRenderProvider = ({
 
   // Look for any missing pdf files and load them.
   useEffect(() => {
-    const missingFiles = envelope.envelopeItems.filter((item) => !files[item.documentDataId]);
+    const missingFiles = envelope.envelopeItems.filter((item) => !files[item.id]);
 
     for (const item of missingFiles) {
-      void loadEnvelopeItemPdfFile(item.documentData);
+      void loadEnvelopeItemPdfFile(item);
     }
   }, [envelope.envelopeItems]);
+
+  const recipientIds = useMemo(
+    () => recipients.map((recipient) => recipient.id).sort(),
+    [recipients],
+  );
 
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
@@ -163,7 +206,11 @@ export const EnvelopeRenderProvider = ({
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],
+        recipients,
         getRecipientColorKey,
+        renderError,
+        setRenderError,
+        overrideSettings,
       }}
     >
       {children}

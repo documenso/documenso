@@ -17,11 +17,16 @@ import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-reques
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 
-import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import type {
+  TDocumentAccessAuthTypes,
+  TDocumentActionAuthTypes,
+  TRecipientAccessAuthTypes,
+  TRecipientActionAuthTypes,
+} from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
 import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
+import type { TFieldAndMeta } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -35,6 +40,25 @@ import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
+type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
+  documentDataId: string;
+  page: number;
+  positionX: number;
+  positionY: number;
+  width: number;
+  height: number;
+};
+
+type CreateEnvelopeRecipientOptions = {
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
+  fields?: CreateEnvelopeRecipientFieldOptions[];
+};
+
 export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
@@ -47,7 +71,6 @@ export type CreateEnvelopeOptions = {
     envelopeItems: { title?: string; documentDataId: string; order?: number }[];
     formValues?: TDocumentFormValues;
 
-    timezone?: string;
     userTimezone?: string;
 
     templateType?: TemplateType;
@@ -57,7 +80,7 @@ export type CreateEnvelopeOptions = {
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    recipients?: TCreateEnvelopeRequest['recipients'];
+    recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
   };
   attachments?: Array<{
@@ -84,7 +107,6 @@ export const createEnvelope = async ({
     title,
     externalId,
     formValues,
-    timezone,
     userTimezone,
     folderId,
     templateType,
@@ -143,6 +165,7 @@ export const createEnvelope = async ({
   let envelopeItems: { title?: string; documentDataId: string; order?: number }[] =
     data.envelopeItems;
 
+  // Todo: Envelopes - Remove
   if (normalizePdf) {
     envelopeItems = await Promise.all(
       data.envelopeItems.map(async (item) => {
@@ -220,7 +243,7 @@ export const createEnvelope = async ({
 
   // userTimezone is last because it's always passed in regardless of the organisation/team settings
   // for uploads from the frontend
-  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+  const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(settings, {

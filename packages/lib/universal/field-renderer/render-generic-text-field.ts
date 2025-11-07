@@ -12,6 +12,8 @@ import {
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
+const DEFAULT_TEXT_ALIGN = 'left';
+
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
 
@@ -31,8 +33,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   // Calculate text positioning based on alignment
   const textX = 0;
   const textY = 0;
-  let textAlign: 'left' | 'center' | 'right' = textMeta?.textAlign || 'left';
-  let textVerticalAlign: 'top' | 'middle' | 'bottom' = 'top';
+  let textAlign: 'left' | 'center' | 'right' = textMeta?.textAlign || DEFAULT_TEXT_ALIGN;
+  const textVerticalAlign: 'top' | 'middle' | 'bottom' = 'middle';
   const textFontSize = textMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
   const textPadding = 10;
 
@@ -40,51 +42,29 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
 
   // Handle edit mode.
   if (mode === 'edit') {
-    textToRender = fieldTypeName;
-    textAlign = 'center';
-    textVerticalAlign = 'middle';
-
-    if (textMeta?.label) {
-      textToRender = textMeta.label;
-    } else if (textMeta?.text) {
+    if (textMeta?.text) {
       textToRender = textMeta.text;
-      textAlign = textMeta.textAlign || 'center'; // Todo: Envelopes - What is the default
-
-      // Todo: Envelopes - Handle this on signatures
-      if (textMeta.characterLimit) {
-        textToRender = textToRender.slice(0, textMeta.characterLimit);
-      }
+    } else {
+      // Show field name which is centered for the edit mode if no label/text is avaliable.
+      textToRender = textMeta?.label || fieldTypeName;
+      textAlign = 'center';
     }
   }
 
   // Handle sign mode.
   if (mode === 'sign' || mode === 'export') {
-    textToRender = fieldTypeName;
-    textAlign = 'center';
-    textVerticalAlign = 'middle';
-
-    if (textMeta?.label) {
-      textToRender = textMeta.label;
-    }
-
-    if (textMeta?.text) {
-      textToRender = textMeta.text;
-      textAlign = textMeta.textAlign || 'center'; // Todo: Envelopes - What is the default
-
-      // Todo: Envelopes - Handle this on signatures
-      if (textMeta.characterLimit) {
-        textToRender = textToRender.slice(0, textMeta.characterLimit);
+    if (!field.inserted) {
+      if (textMeta?.text) {
+        textToRender = textMeta.text;
+      } else if (mode === 'sign') {
+        // Only show the field name in sign mode if no text/label is avaliable.
+        textToRender = textMeta?.label || fieldTypeName;
+        textAlign = 'center';
       }
     }
 
     if (field.inserted) {
       textToRender = field.customText;
-      textAlign = textMeta?.textAlign || 'center'; // Todo: Envelopes - What is the default
-
-      // Todo: Envelopes - Handle this on signatures
-      if (textMeta?.characterLimit) {
-        textToRender = textToRender.slice(0, textMeta.characterLimit);
-      }
     }
   }
 
@@ -106,7 +86,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   return fieldText;
 };
 
-export const renderTextFieldElement = (
+export const renderGenericTextFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {

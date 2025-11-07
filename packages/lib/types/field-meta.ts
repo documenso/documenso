@@ -188,7 +188,7 @@ export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.SIGNATURE),
-    fieldMeta: z.undefined(),
+    fieldMeta: ZSignatureFieldMeta.optional(),
   }),
   z.object({
     type: z.literal(FieldType.FREE_SIGNATURE),

@@ -22,7 +22,9 @@ import { SignFieldNameDialog } from '~/components/dialogs/sign-field-name-dialog
 import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-dialog';
 import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
+import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
 import { EnvelopeItemSelector } from '../envelope-editor/envelope-file-selector';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
@@ -47,6 +49,13 @@ export const DocumentSigningPageViewV2 = () => {
     requiredRecipientFields,
     selectedAssistantRecipientFields,
   } = useRequiredEnvelopeSigningContext();
+
+  const {
+    isEmbed = false,
+    allowDocumentRejection = true,
+    hidePoweredBy = true,
+    onDocumentRejected,
+  } = useEmbedSigningContext() || {};
 
   /**
    * The total remaining fields remaining for the current recipient or selected assistant recipient.
@@ -77,7 +86,7 @@ export const DocumentSigningPageViewV2 = () => {
       {/* Main Content Area */}
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
-        <div className="bg-background border-border hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4 lg:flex">
+        <div className="embed--DocumentWidgetContainer bg-background border-border hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4 lg:flex">
           <div className="px-4">
             <h3 className="text-foreground flex items-end justify-between text-sm font-semibold">
               {match(recipient.role)
@@ -107,7 +116,7 @@ export const DocumentSigningPageViewV2 = () => {
               />
             </div>
 
-            <div className="mt-6 space-y-3">
+            <div className="embed--DocumentWidgetContent mt-6 space-y-3">
               <EnvelopeSignerForm />
             </div>
           </div>
@@ -116,7 +125,7 @@ export const DocumentSigningPageViewV2 = () => {
 
           {/* Quick Actions. */}
           {!isDirectTemplate && (
-            <div className="space-y-3 px-4">
+            <div className="embed--Actions space-y-3 px-4">
               <h4 className="text-foreground text-sm font-semibold">
                 <Trans>Actions</Trans>
               </h4>
@@ -145,10 +154,21 @@ export const DocumentSigningPageViewV2 = () => {
                 }
               />
 
-              {envelope.type === EnvelopeType.DOCUMENT && (
+              {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
                 <DocumentSigningRejectDialog
                   documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
                   token={recipient.token}
+                  onRejected={
+                    onDocumentRejected &&
+                    ((reason) =>
+                      onDocumentRejected({
+                        token: recipient.token,
+                        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+                        envelopeId: envelope.id,
+                        recipientId: recipient.id,
+                        reason,
+                      }))
+                  }
                   trigger={
                     <Button
                       variant="ghost"
@@ -164,18 +184,22 @@ export const DocumentSigningPageViewV2 = () => {
             </div>
           )}
 
-          {/* Footer of left sidebar. */}
-          <div className="mt-auto px-4">
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link to="/">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                <Trans>Return</Trans>
-              </Link>
-            </Button>
+          <div className="embed--DocumentWidgetFooter">
+            {/* Footer of left sidebar. */}
+            {!isEmbed && (
+              <div className="mt-auto px-4">
+                <Button asChild variant="ghost" className="w-full justify-start">
+                  <Link to="/">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    <Trans>Return</Trans>
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="embed--DocumentContainer flex-1 overflow-y-auto">
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
@@ -202,11 +226,11 @@ export const DocumentSigningPageViewV2 = () => {
             )}
 
             {/* Document View */}
-            <div className="flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
+            <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
                 <PDFViewerKonvaLazy
+                  renderer="signing"
                   key={currentEnvelopeItem.id}
-                  documentDataId={currentEnvelopeItem.documentDataId}
                   customPageRenderer={EnvelopeSignerPageRenderer}
                 />
               ) : (
@@ -218,9 +242,20 @@ export const DocumentSigningPageViewV2 = () => {
               )}
 
               {/* Mobile widget - Additional padding to allow users to scroll */}
-              <div className="block pb-16 md:hidden">
+              <div className="block pb-28 lg:hidden">
                 <DocumentSigningMobileWidget />
               </div>
+
+              {!hidePoweredBy && (
+                <a
+                  href="https://documenso.com"
+                  target="_blank"
+                  className="bg-primary text-primary-foreground fixed bottom-0 right-0 z-40 hidden cursor-pointer rounded-tl px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100 lg:block"
+                >
+                  <span>Powered by</span>
+                  <BrandingLogo className="ml-2 inline-block h-[14px]" />
+                </a>
+              )}
             </div>
           </div>
         </div>

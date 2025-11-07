@@ -87,5 +87,9 @@ export const getTemplateByDirectLinkToken = async ({
     },
     recipients: recipientsWithMappedFields,
     fields: recipientsWithMappedFields.flatMap((recipient) => recipient.fields),
+    envelopeItems: envelope.envelopeItems.map((item) => ({
+      id: item.id,
+      envelopeId: item.envelopeId,
+    })),
   };
 };

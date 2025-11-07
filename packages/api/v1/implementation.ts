@@ -20,12 +20,12 @@ import {
   getEnvelopeWhereInput,
 } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
-import { updateDocumentFields } from '@documenso/lib/server-only/field/update-document-fields';
+import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
-import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
+import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
-import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
+import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
@@ -1285,7 +1285,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedRecipient = await updateDocumentRecipients({
+    const updatedRecipient = await updateEnvelopeRecipients({
       userId: user.id,
       teamId: team.id,
       id: {
@@ -1336,7 +1336,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const deletedRecipient = await deleteDocumentRecipient({
+    const deletedRecipient = await deleteEnvelopeRecipient({
       userId: user.id,
       teamId: team.id,
       recipientId: Number(recipientId),
@@ -1634,10 +1634,13 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const { fields } = await updateDocumentFields({
+    const { fields } = await updateEnvelopeFields({
       userId: user.id,
       teamId: team.id,
-      documentId: legacyDocumentId,
+      id: {
+        type: 'documentId',
+        id: legacyDocumentId,
+      },
       fields: [
         {
           id: Number(fieldId),

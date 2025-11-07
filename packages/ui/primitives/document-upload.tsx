@@ -66,7 +66,7 @@ export const DocumentDropzone = ({
   const heading = {
     document: msg`Upload Document`,
     template: msg`Upload Template Document`,
-    envelope: msg`Envelope (beta)`,
+    envelope: msg`Upload Envelope`,
   };
 
   if (disabled && IS_BILLING_ENABLED()) {

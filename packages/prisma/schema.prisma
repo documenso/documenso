@@ -134,8 +134,8 @@ model Passkey {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @default(now())
   lastUsedAt           DateTime?
-  credentialId         Bytes
-  credentialPublicKey  Bytes
+  credentialId         Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
+  credentialPublicKey  Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
   counter              BigInt
   credentialDeviceType String
   credentialBackedUp   Boolean

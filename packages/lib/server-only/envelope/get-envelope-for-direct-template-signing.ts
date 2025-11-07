@@ -143,7 +143,7 @@ export const getEnvelopeForDirectTemplateSigning = async ({
     envelope,
     recipient: {
       ...recipient,
-      token: envelope.directLink?.token || '',
+      directToken: envelope.directLink?.token || '',
     },
     recipientSignature: null,
     isRecipientsTurn: true,

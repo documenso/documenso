@@ -152,6 +152,18 @@ export const EditorFieldTextForm = ({
                     className="h-auto"
                     placeholder={t`Add text to the field`}
                     {...field}
+                    onChange={(e) => {
+                      const values = form.getValues();
+                      const characterLimit = values.characterLimit || 0;
+                      let textValue = e.target.value;
+
+                      if (characterLimit > 0 && textValue.length > characterLimit) {
+                        textValue = textValue.slice(0, characterLimit);
+                      }
+
+                      e.target.value = textValue;
+                      field.onChange(e);
+                    }}
                     rows={1}
                   />
                 </FormControl>
@@ -175,6 +187,18 @@ export const EditorFieldTextForm = ({
                     className="bg-background"
                     placeholder={t`Field character limit`}
                     {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+
+                      const values = form.getValues();
+                      const characterLimit = parseInt(e.target.value, 10) || 0;
+
+                      const textValue = values.text || '';
+
+                      if (characterLimit > 0 && textValue.length > characterLimit) {
+                        form.setValue('text', textValue.slice(0, characterLimit));
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
