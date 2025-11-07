@@ -4,8 +4,7 @@ import type { Recipient } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createDocumentRecipients } from '@documenso/lib/server-only/recipient/create-document-recipients';
-import { createTemplateRecipients } from '@documenso/lib/server-only/recipient/create-template-recipients';
+import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
@@ -229,7 +228,7 @@ export const createRecipientsFromPlaceholders = async (
         id: envelope.id,
       };
 
-      const { recipients } = await createDocumentRecipients({
+      const { recipients } = await createEnvelopeRecipients({
         userId,
         teamId,
         id: envelopeId,
@@ -242,11 +241,17 @@ export const createRecipientsFromPlaceholders = async (
     .with(EnvelopeType.TEMPLATE, async () => {
       const templateId = mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
 
-      const { recipients } = await createTemplateRecipients({
+      const envelopeId: EnvelopeIdOptions = {
+        type: 'templateId',
+        id: templateId,
+      };
+
+      const { recipients } = await createEnvelopeRecipients({
         userId,
         teamId,
-        templateId,
+        id: envelopeId,
         recipients: recipientsToCreateFiltered,
+        requestMetadata,
       });
 
       return recipients;

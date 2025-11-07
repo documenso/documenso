@@ -51,9 +51,9 @@ type PlaceholderInfo = {
 type FieldToCreate = TFieldAndMeta & {
   envelopeItemId?: string;
   recipientId: number;
-  pageNumber: number;
-  pageX: number;
-  pageY: number;
+  page: number;
+  positionX: number;
+  positionY: number;
   width: number;
   height: number;
 };
@@ -327,9 +327,9 @@ export const insertFieldsFromPlaceholdersInPDF = async (
       ...placeholder.fieldAndMeta,
       envelopeItemId,
       recipientId: recipient.id,
-      pageNumber: placeholder.page,
-      pageX: xPercent,
-      pageY: yPercent,
+      page: placeholder.page,
+      positionX: xPercent,
+      positionY: yPercent,
       width: widthPercent,
       height: finalHeightPercent,
     });

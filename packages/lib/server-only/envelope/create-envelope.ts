@@ -35,6 +35,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -427,16 +428,19 @@ export const createEnvelope = async ({
       ? await makeNormalizedPdf(Buffer.from(buffer))
       : Buffer.from(buffer);
 
+    const envelopeOptions: EnvelopeIdOptions = {
+      type: 'envelopeId',
+      id: createdEnvelope.id,
+    };
+
     await insertFieldsFromPlaceholdersInPDF(
       pdfToProcess,
       userId,
       teamId,
-      {
-        type: 'envelopeId',
-        id: createdEnvelope.id,
-      },
+      envelopeOptions,
       requestMetadata,
       envelopeItem.id,
+      createdEnvelope.recipients,
     );
   }
 
