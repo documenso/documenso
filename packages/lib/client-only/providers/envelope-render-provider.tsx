@@ -30,6 +30,8 @@ type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
 type EnvelopeRenderProviderValue = {
   getPdfBuffer: (envelopeItemId: string) => FileData | null;
   envelopeItems: EnvelopeRenderItem[];
+  envelopeStatus: TEnvelope['status'];
+  envelopeType: TEnvelope['type'];
   currentEnvelopeItem: EnvelopeRenderItem | null;
   setCurrentEnvelopeItem: (envelopeItemId: string) => void;
   fields: Field[];
@@ -44,7 +46,7 @@ type EnvelopeRenderProviderValue = {
 interface EnvelopeRenderProviderProps {
   children: React.ReactNode;
 
-  envelope: Pick<TEnvelope, 'envelopeItems'>;
+  envelope: Pick<TEnvelope, 'envelopeItems' | 'status' | 'type'>;
 
   /**
    * Optional fields which are passed down to renderers for custom rendering needs.
@@ -100,7 +102,7 @@ export const EnvelopeRenderProvider = ({
   // Indexed by documentDataId.
   const [files, setFiles] = useState<Record<string, FileData>>({});
 
-  const [currentItem, setItem] = useState<EnvelopeRenderItem | null>(null);
+  const [currentItem, setCurrentItem] = useState<EnvelopeRenderItem | null>(null);
 
   const [renderError, setRenderError] = useState<boolean>(false);
 
@@ -163,11 +165,15 @@ export const EnvelopeRenderProvider = ({
   const setCurrentEnvelopeItem = (envelopeItemId: string) => {
     const foundItem = envelope.envelopeItems.find((item) => item.id === envelopeItemId);
 
-    setItem(foundItem ?? null);
+    setCurrentItem(foundItem ?? null);
   };
 
   // Set the selected item to the first item if none is set.
   useEffect(() => {
+    if (currentItem && !envelopeItems.some((item) => item.id === currentItem.id)) {
+      setCurrentItem(null);
+    }
+
     if (!currentItem && envelopeItems.length > 0) {
       setCurrentEnvelopeItem(envelopeItems[0].id);
     }
@@ -203,6 +209,8 @@ export const EnvelopeRenderProvider = ({
       value={{
         getPdfBuffer,
         envelopeItems,
+        envelopeStatus: envelope.status,
+        envelopeType: envelope.type,
         currentEnvelopeItem: currentItem,
         setCurrentEnvelopeItem,
         fields: fields ?? [],

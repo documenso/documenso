@@ -49,7 +49,7 @@ export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
-  const { envelope, setLocalEnvelope, relativePath } = useCurrentEnvelopeEditor();
+  const { envelope, setLocalEnvelope, relativePath, editorFields } = useCurrentEnvelopeEditor();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
 
@@ -165,9 +165,17 @@ export const EnvelopeEditorUploadPage = () => {
   const onFileDelete = (envelopeItemId: string) => {
     setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.id !== envelopeItemId));
 
+    const fieldsWithoutDeletedItem = envelope.fields.filter(
+      (field) => field.envelopeItemId !== envelopeItemId,
+    );
+
     setLocalEnvelope({
       envelopeItems: envelope.envelopeItems.filter((item) => item.id !== envelopeItemId),
+      fields: envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
     });
+
+    // Reset editor fields.
+    editorFields.resetForm(fieldsWithoutDeletedItem);
   };
 
   /**
