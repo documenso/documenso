@@ -189,11 +189,44 @@ export const run = async ({
     settings,
   });
 
-  const decoratePromises: Array<Promise<{ oldDocumentDataId: string; newDocumentDataId: string }>> =
-    [];
+  // !: The commented out code is our desired implementation but we're seemingly
+  // !: running into issues with inngest parallelism in production.
+  // !: Until this is resolved we will do this sequentially which is slower but
+  // !: will actually work.
+  // const decoratePromises: Array<Promise<{ oldDocumentDataId: string; newDocumentDataId: string }>> =
+  //   [];
+
+  // for (const envelopeItem of envelopeItems) {
+  //   const task = io.runTask(`decorate-${envelopeItem.id}`, async () => {
+  //     const envelopeItemFields = envelope.envelopeItems.find(
+  //       (item) => item.id === envelopeItem.id,
+  //     )?.field;
+
+  //     if (!envelopeItemFields) {
+  //       throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+  //     }
+
+  //     return decorateAndSignPdf({
+  //       envelope,
+  //       envelopeItem,
+  //       envelopeItemFields,
+  //       isRejected,
+  //       rejectionReason,
+  //       certificateData,
+  //       auditLogData,
+  //     });
+  //   });
+
+  //   decoratePromises.push(task);
+  // }
+
+  // const newDocumentData = await Promise.all(decoratePromises);
+
+  // TODO: Remove once parallelization is working
+  const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
   for (const envelopeItem of envelopeItems) {
-    const task = io.runTask(`decorate-${envelopeItem.id}`, async () => {
+    const result = await io.runTask(`decorate-${envelopeItem.id}`, async () => {
       const envelopeItemFields = envelope.envelopeItems.find(
         (item) => item.id === envelopeItem.id,
       )?.field;
@@ -213,10 +246,8 @@ export const run = async ({
       });
     });
 
-    decoratePromises.push(task);
+    newDocumentData.push(result);
   }
-
-  const newDocumentData = await Promise.all(decoratePromises);
 
   const postHog = PostHogServerClient();
 
