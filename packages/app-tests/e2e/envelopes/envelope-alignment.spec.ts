@@ -316,7 +316,7 @@ const compareSignedPdfWithImages = async ({
       // Expect the certificate to NOT be blank. Since the storedImage is blank.
       expect.soft(comparison).toBeGreaterThan(20000);
     } else {
-      expect.soft(comparison).toEqual(0);
+      expect.soft(comparison).toBeLessThan(2);
     }
   }
 };

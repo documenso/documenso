@@ -101,6 +101,10 @@ export const EditorFieldTextForm = ({
   useEffect(() => {
     const validatedFormValues = ZTextFieldFormSchema.safeParse(formValues);
 
+    if (formValues.readOnly && !formValues.text) {
+      void form.trigger('text');
+    }
+
     if (validatedFormValues.success) {
       onValueChange({
         type: 'text',

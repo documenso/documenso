@@ -132,6 +132,10 @@ export const EditorFieldNumberForm = ({
   useEffect(() => {
     const validatedFormValues = ZNumberFieldFormSchema.safeParse(formValues);
 
+    if (formValues.readOnly && !formValues.value) {
+      void form.trigger('value');
+    }
+
     if (validatedFormValues.success) {
       onValueChange({
         type: 'number',
