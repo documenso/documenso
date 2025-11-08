@@ -251,7 +251,7 @@ const createPresignToken = async (
 const verifyPresignToken = async (
   request: APIRequestContext,
   apiToken: string,
-  data: Partial<VerifyEmbeddingPresignTokenOptions>,
+  data: VerifyEmbeddingPresignTokenOptions,
 ) => {
   return await request.post(
     `${NEXT_PUBLIC_WEBAPP_URL()}/api/v2-beta/embedding/verify-presign-token`,
