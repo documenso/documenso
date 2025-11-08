@@ -27,7 +27,7 @@ import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/en
 import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 
-import { formatAlignmentTestFields } from '../../../constants/field-alignment-pdf';
+import { ALIGNMENT_TEST_FIELDS } from '../../../constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '../../../constants/field-meta-pdf';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
@@ -490,7 +490,7 @@ test.describe('API V2 Envelopes', () => {
     // Step 6: Create fields for first PDF (alignment fields)
     const alignmentFieldsRequest = {
       envelopeId: createdEnvelope.id,
-      data: formatAlignmentTestFields.map((field) => ({
+      data: ALIGNMENT_TEST_FIELDS.map((field) => ({
         recipientId,
         envelopeItemId: alignmentItem.id,
         type: field.type,
@@ -547,7 +547,7 @@ test.describe('API V2 Envelopes', () => {
     expect(finalEnvelope.envelopeItems.length).toBe(2);
     expect(finalEnvelope.recipients.length).toBe(1);
     expect(finalEnvelope.fields.length).toBe(
-      formatAlignmentTestFields.length + FIELD_META_TEST_FIELDS.length,
+      ALIGNMENT_TEST_FIELDS.length + FIELD_META_TEST_FIELDS.length,
     );
     expect(finalEnvelope.title).toBe('Envelope Full Field Test');
     expect(finalEnvelope.type).toBe(EnvelopeType.DOCUMENT);

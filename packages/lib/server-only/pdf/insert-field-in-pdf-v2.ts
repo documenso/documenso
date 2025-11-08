@@ -32,10 +32,8 @@ export const insertFieldInPDFV2 = async ({
   const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });
   const layer = new Konva.Layer();
 
-  const insertedFields = fields.filter((field) => field.inserted);
-
   // Render the fields onto the layer.
-  for (const field of insertedFields) {
+  for (const field of fields) {
     renderField({
       scale: 1,
       field: {

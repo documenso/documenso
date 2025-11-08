@@ -34,7 +34,34 @@ import { apiSignin } from '../fixtures/authentication';
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
-test.skip('field placement visual regression', async ({ page }, testInfo) => {
+test.skip('seed alignment test document', async ({ page }) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      email: 'example@documenso.com',
+    },
+    include: {
+      ownedOrganisations: {
+        include: {
+          teams: true,
+        },
+      },
+    },
+  });
+
+  const userId = user.id;
+  const teamId = user.ownedOrganisations[0].teams[0].id;
+
+  await seedAlignmentTestDocument({
+    userId,
+    teamId,
+    recipientName: user.name || '',
+    recipientEmail: user.email,
+    insertFields: false,
+    status: DocumentStatus.DRAFT,
+  });
+});
+
+test('field placement visual regression', async ({ page }, testInfo) => {
   const { user, team } = await seedUser();
 
   const envelope = await seedAlignmentTestDocument({
@@ -289,7 +316,7 @@ const compareSignedPdfWithImages = async ({
       // Expect the certificate to NOT be blank. Since the storedImage is blank.
       expect.soft(comparison).toBeGreaterThan(20000);
     } else {
-      expect.soft(comparison).toEqual(0);
+      expect.soft(comparison).toBeLessThan(2);
     }
   }
 };

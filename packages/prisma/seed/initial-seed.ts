@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { formatAlignmentTestFields } from '@documenso/app-tests/constants/field-alignment-pdf';
+import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { incrementDocumentId } from '@documenso/lib/server-only/envelope/increment-id';
@@ -301,7 +301,7 @@ export const seedAlignmentTestDocument = async ({
   }
 
   await Promise.all(
-    formatAlignmentTestFields.map(async (field) => {
+    ALIGNMENT_TEST_FIELDS.map(async (field) => {
       await prisma.field.create({
         data: {
           ...field,
@@ -309,7 +309,10 @@ export const seedAlignmentTestDocument = async ({
           envelopeItemId: envelopeItemAlignmentItem,
           envelopeId: id,
           customText: insertFields ? field.customText : '',
-          inserted: insertFields,
+          inserted:
+            insertFields &&
+            ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) ||
+              field.type === 'SIGNATURE'),
           signature: field.signature
             ? {
                 create: {
@@ -333,7 +336,10 @@ export const seedAlignmentTestDocument = async ({
           envelopeItemId: envelopeItemFieldMetaItem,
           envelopeId: id,
           customText: insertFields ? field.customText : '',
-          inserted: insertFields,
+          inserted:
+            insertFields &&
+            ((!field?.fieldMeta?.readOnly && Boolean(field.customText)) ||
+              field.type === 'SIGNATURE'),
           signature: field.signature
             ? {
                 create: {

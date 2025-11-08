@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { SigningStatus } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
-import { ClockIcon, EyeOffIcon } from 'lucide-react';
+import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
 
 import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
@@ -20,7 +20,15 @@ import { PopoverHover } from '../../primitives/popover';
 interface EnvelopeRecipientFieldTooltipProps {
   field: Pick<
     Field,
-    'id' | 'inserted' | 'positionX' | 'positionY' | 'width' | 'height' | 'page' | 'type'
+    | 'id'
+    | 'inserted'
+    | 'positionX'
+    | 'positionY'
+    | 'width'
+    | 'height'
+    | 'page'
+    | 'type'
+    | 'fieldMeta'
   > & {
     recipient: Pick<Recipient, 'name' | 'email' | 'signingStatus'>;
   };
@@ -151,10 +159,19 @@ export function EnvelopeRecipientFieldTooltip({
           <Badge
             className="mx-auto mb-1 py-0.5"
             variant={
-              field.recipient.signingStatus === SigningStatus.SIGNED ? 'default' : 'secondary'
+              field?.fieldMeta?.readOnly
+                ? 'neutral'
+                : field.recipient.signingStatus === SigningStatus.SIGNED
+                  ? 'default'
+                  : 'secondary'
             }
           >
-            {field.recipient.signingStatus === SigningStatus.SIGNED ? (
+            {field?.fieldMeta?.readOnly ? (
+              <>
+                <LockIcon className="mr-1 h-3 w-3" />
+                <Trans>Read Only</Trans>
+              </>
+            ) : field.recipient.signingStatus === SigningStatus.SIGNED ? (
               <>
                 <SignatureIcon className="mr-1 h-3 w-3" />
                 <Trans>Signed</Trans>

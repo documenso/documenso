@@ -1,7 +1,13 @@
 import Konva from 'konva';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
-import type { TTextFieldMeta } from '../../types/field-meta';
+import type { GenericTextFieldTypeMetas } from '../../types/field-meta';
+import {
+  FIELD_DEFAULT_GENERIC_ALIGN,
+  FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN,
+  FIELD_DEFAULT_LETTER_SPACING,
+  FIELD_DEFAULT_LINE_HEIGHT,
+} from '../../types/field-meta';
 import {
   createFieldHoverInteraction,
   konvaTextFill,
@@ -12,14 +18,14 @@ import {
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 import { calculateFieldPosition } from './field-renderer';
 
-const DEFAULT_TEXT_ALIGN = 'left';
+const DEFAULT_TEXT_X_PADDING = 6;
 
 const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOptions): Konva.Text => {
   const { pageWidth, pageHeight, mode = 'edit', pageLayer, translations } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
-  const textMeta = field.fieldMeta as TTextFieldMeta | undefined;
+  const fieldMeta = field.fieldMeta as GenericTextFieldTypeMetas | undefined;
 
   const fieldTypeName = translations?.[field.type] || field.type;
 
@@ -33,53 +39,62 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   // Calculate text positioning based on alignment
   const textX = 0;
   const textY = 0;
-  let textAlign: 'left' | 'center' | 'right' = textMeta?.textAlign || DEFAULT_TEXT_ALIGN;
-  const textVerticalAlign: 'top' | 'middle' | 'bottom' = 'middle';
-  const textFontSize = textMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
-  const textPadding = 10;
+  const textFontSize = fieldMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
 
-  let textToRender: string = fieldTypeName;
+  // By default, render the field name or label centered
+  let textToRender: string = fieldMeta?.label || fieldTypeName;
+  let textAlign: 'left' | 'center' | 'right' = 'center';
+  let textVerticalAlign: 'top' | 'middle' | 'bottom' = FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+  let textLineHeight = FIELD_DEFAULT_LINE_HEIGHT;
+  let textLetterSpacing = FIELD_DEFAULT_LETTER_SPACING;
 
-  // Handle edit mode.
-  if (mode === 'edit') {
-    if (textMeta?.text) {
-      textToRender = textMeta.text;
-    } else {
-      // Show field name which is centered for the edit mode if no label/text is avaliable.
-      textToRender = textMeta?.label || fieldTypeName;
-      textAlign = 'center';
+  // Default to blank for export mode since this we want to ensure we don't show
+  // any placeholder text or labels unless actually it's inserted.
+  if (mode === 'export') {
+    textToRender = '';
+  }
+
+  // Use default values for text/number if provided.
+  if (fieldMeta?.type === 'text' || fieldMeta?.type === 'number') {
+    const value = fieldMeta?.type === 'text' ? fieldMeta.text : fieldMeta.value;
+
+    if (value) {
+      textToRender = value;
+
+      textVerticalAlign = fieldMeta.verticalAlign || FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+      textAlign = fieldMeta.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
+      textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
+      textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
     }
   }
 
-  // Handle sign mode.
-  if (mode === 'sign' || mode === 'export') {
-    if (!field.inserted) {
-      if (textMeta?.text) {
-        textToRender = textMeta.text;
-      } else if (mode === 'sign') {
-        // Only show the field name in sign mode if no text/label is avaliable.
-        textToRender = textMeta?.label || fieldTypeName;
-        textAlign = 'center';
-      }
-    }
+  if (field.inserted) {
+    textToRender = field.customText;
 
-    if (field.inserted) {
-      textToRender = field.customText;
+    textAlign = fieldMeta?.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
+
+    if (fieldMeta?.type === 'text' || fieldMeta?.type === 'number') {
+      textVerticalAlign = fieldMeta.verticalAlign || FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+      textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
+      textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
     }
   }
 
+  // Note: Do not use native text padding since it's uniform.
+  // We only want to have padding on the left and right hand sides.
   fieldText.setAttrs({
-    x: textX,
+    x: textX + DEFAULT_TEXT_X_PADDING,
     y: textY,
     verticalAlign: textVerticalAlign,
     wrap: 'word',
-    padding: textPadding,
     text: textToRender,
     fontSize: textFontSize,
+    align: textAlign,
+    lineHeight: textLineHeight,
+    letterSpacing: textLetterSpacing,
     fontFamily: konvaTextFontFamily,
     fill: konvaTextFill,
-    align: textAlign,
-    width: fieldWidth,
+    width: fieldWidth - DEFAULT_TEXT_X_PADDING * 2,
     height: fieldHeight,
   } satisfies Partial<Konva.TextConfig>);
 
@@ -90,7 +105,7 @@ export const renderGenericTextFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { mode = 'edit', pageLayer } = options;
+  const { mode = 'edit', pageLayer, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
 
@@ -125,7 +140,7 @@ export const renderGenericTextFieldElement = (
     const rectHeight = fieldRect.height() * groupScaleY;
 
     // Update text dimensions
-    fieldText.width(rectWidth);
+    fieldText.width(rectWidth - DEFAULT_TEXT_X_PADDING * 2);
     fieldText.height(rectHeight);
 
     // Force Konva to recalculate text layout
@@ -143,7 +158,7 @@ export const renderGenericTextFieldElement = (
     const rectHeight = fieldRect.height();
 
     // Update text dimensions
-    fieldText.width(rectWidth); // Account for padding
+    fieldText.width(rectWidth - DEFAULT_TEXT_X_PADDING * 2);
     fieldText.height(rectHeight);
 
     // Force Konva to recalculate text layout
@@ -158,7 +173,9 @@ export const renderGenericTextFieldElement = (
     fieldRect.opacity(0);
   }
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,
