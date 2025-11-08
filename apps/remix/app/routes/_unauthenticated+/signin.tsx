@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
 
@@ -19,7 +20,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/signin';
 
 export function meta() {
-  return appMetaTags('Sign In');
+  return appMetaTags(msg`Sign In`);
 }
 
 export async function loader({ request }: Route.LoaderArgs) {

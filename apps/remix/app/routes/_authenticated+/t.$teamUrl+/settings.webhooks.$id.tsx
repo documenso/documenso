@@ -40,7 +40,7 @@ const ZEditWebhookFormSchema = ZEditWebhookRequestSchema.omit({ id: true, teamId
 type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage({ params }: Route.ComponentProps) {

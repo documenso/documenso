@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
 
@@ -9,7 +10,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/reset-password.$token';
 
 export function meta() {
-  return appMetaTags('Reset Password');
+  return appMetaTags(msg`Reset Password`);
 }
 
 export async function loader({ params }: Route.LoaderArgs) {

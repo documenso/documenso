@@ -7,7 +7,7 @@ import { SettingsSecurityPasskeyTable } from '~/components/tables/settings-secur
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Manage passkeys');
+  return appMetaTags(msg`Manage passkeys`);
 }
 
 export default function SettingsPasskeys() {

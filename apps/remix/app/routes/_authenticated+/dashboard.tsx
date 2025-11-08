@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
@@ -25,7 +26,7 @@ export function loader() {
 }
 
 export function meta() {
-  return appMetaTags('Dashboard');
+  return appMetaTags(msg`Dashboard`);
 }
 
 export default function DashboardPage() {

@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
@@ -15,7 +16,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Templates');
+  return appMetaTags(msg`Templates`);
 }
 
 export default function TemplatesPage() {
