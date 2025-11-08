@@ -490,7 +490,7 @@ test.describe('API V2 Envelopes', () => {
     // Step 6: Create fields for first PDF (alignment fields)
     const alignmentFieldsRequest = {
       envelopeId: createdEnvelope.id,
-      data: formatAlignmentTestFields.map((field) => ({
+      data: ALIGNMENT_TEST_FIELDS.map((field) => ({
         recipientId,
         envelopeItemId: alignmentItem.id,
         type: field.type,
