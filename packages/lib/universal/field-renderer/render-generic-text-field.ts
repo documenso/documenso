@@ -62,7 +62,7 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
-  // Default to blank for export mode since this we want to ensure we don't show
+  // Default to blank for export mode since we want to ensure we don't show
   // any placeholder text or labels unless actually it's inserted.
   if (mode === 'export') {
     textToRender = '';
