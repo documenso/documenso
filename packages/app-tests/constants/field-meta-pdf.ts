@@ -220,7 +220,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     type: FieldType.NUMBER,
     fieldMeta: {
       type: 'number',
-      value: '123',
+      value: '123456789',
     },
     page: 4,
     ...calculatePosition(3, 2),
@@ -273,8 +273,8 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
       type: 'radio',
       values: [
         { id: 1, checked: false, value: 'Option 1' },
-        { id: 2, checked: true, value: 'Option 2' },
-        { id: 3, checked: false, value: 'Option 3' },
+        { id: 2, checked: false, value: 'Option 2' },
+        { id: 3, checked: true, value: 'Option 3' },
       ],
     },
     page: 5,
@@ -341,7 +341,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
       values: [
         { id: 1, checked: false, value: 'Option 1' },
         { id: 2, checked: true, value: 'Option 2' },
-        { id: 2, checked: true, value: 'Option 3' },
+        { id: 3, checked: false, value: 'Option 3' },
       ],
     },
     page: 6,

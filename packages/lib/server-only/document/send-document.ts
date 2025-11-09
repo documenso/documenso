@@ -24,7 +24,9 @@ import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZFieldAndMetaSchema,
+  ZNumberFieldMeta,
   ZRadioFieldMeta,
+  ZTextFieldMeta,
 } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -337,6 +339,31 @@ export const extractFieldAutoInsertValues = (
   const field = parsedField.data;
   const fieldId = unknownField.id;
 
+  // Auto insert text fields with prefilled values.
+  if (field.type === FieldType.TEXT) {
+    const { text } = ZTextFieldMeta.parse(field.fieldMeta);
+
+    if (text) {
+      return {
+        fieldId,
+        customText: text,
+      };
+    }
+  }
+
+  // Auto insert number fields with prefilled values.
+  if (field.type === FieldType.NUMBER) {
+    const { value } = ZNumberFieldMeta.parse(field.fieldMeta);
+
+    if (value) {
+      return {
+        fieldId,
+        customText: value,
+      };
+    }
+  }
+
+  // Auto insert radio fields with the pre-checked value.
   if (field.type === FieldType.RADIO) {
     const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
 
@@ -350,6 +377,7 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
+  // Auto insert dropdown fields with the default value.
   if (field.type === FieldType.DROPDOWN) {
     const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
 
@@ -361,6 +389,7 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
+  // Auto insert checkbox fields with the pre-checked values.
   if (field.type === FieldType.CHECKBOX) {
     const {
       values = [],
