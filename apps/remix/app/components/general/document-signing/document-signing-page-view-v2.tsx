@@ -184,10 +184,10 @@ export const DocumentSigningPageViewV2 = () => {
             </div>
           )}
 
-          <div className="embed--DocumentWidgetFooter">
+          <div className="embed--DocumentWidgetFooter mt-auto">
             {/* Footer of left sidebar. */}
             {!isEmbed && (
-              <div className="mt-auto px-4">
+              <div className="px-4">
                 <Button asChild variant="ghost" className="w-full justify-start">
                   <Link to="/">
                     <ArrowLeftIcon className="mr-2 h-4 w-4" />
