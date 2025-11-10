@@ -104,7 +104,7 @@ export default function EnvelopeGenericPageRenderer() {
       pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
       editable: false,
-      mode: overrideSettings?.mode ?? 'sign',
+      mode: overrideSettings?.mode ?? 'edit',
     });
   };
 

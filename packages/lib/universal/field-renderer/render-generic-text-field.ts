@@ -48,14 +48,8 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
   let textLineHeight = FIELD_DEFAULT_LINE_HEIGHT;
   let textLetterSpacing = FIELD_DEFAULT_LETTER_SPACING;
 
-  // Default to blank for export mode since this we want to ensure we don't show
-  // any placeholder text or labels unless actually it's inserted.
-  if (mode === 'export') {
-    textToRender = '';
-  }
-
-  // Use default values for text/number if provided.
-  if (fieldMeta?.type === 'text' || fieldMeta?.type === 'number') {
+  // Render default values for text/number if provided for editing mode.
+  if (mode === 'edit' && (fieldMeta?.type === 'text' || fieldMeta?.type === 'number')) {
     const value = fieldMeta?.type === 'text' ? fieldMeta.text : fieldMeta.value;
 
     if (value) {
@@ -68,6 +62,27 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     }
   }
 
+  // Default to blank for export mode since we want to ensure we don't show
+  // any placeholder text or labels unless actually it's inserted.
+  if (mode === 'export') {
+    textToRender = '';
+  }
+
+  // Fallback render readonly fields if prefilled value exists.
+  if (field?.fieldMeta?.readOnly && (fieldMeta?.type === 'text' || fieldMeta?.type === 'number')) {
+    const value = fieldMeta?.type === 'text' ? fieldMeta.text : fieldMeta.value;
+
+    if (value) {
+      textToRender = value;
+
+      textVerticalAlign = fieldMeta.verticalAlign || FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+      textAlign = fieldMeta.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
+      textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
+      textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
+    }
+  }
+
+  // Override everything with value if it's inserted.
   if (field.inserted) {
     textToRender = field.customText;
 
