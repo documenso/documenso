@@ -1,28 +1,28 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
-import { DocumentVisibility } from '@documenso/prisma/generated/types';
+import type { DocumentVisibility } from '@documenso/prisma/generated/types';
 
-import type { TFolderType } from '../../types/folder-type';
-import { FolderType } from '../../types/folder-type';
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { buildTeamWhereQuery } from '../../utils/teams';
+import { getTeamById } from '../team/get-team';
 
 export interface UpdateFolderOptions {
   userId: number;
-  teamId?: number;
+  teamId: number;
   folderId: string;
-  name: string;
-  visibility: DocumentVisibility;
-  type?: TFolderType;
+  data: {
+    parentId?: string | null;
+    name?: string;
+    visibility?: DocumentVisibility;
+    pinned?: boolean;
+  };
 }
 
-export const updateFolder = async ({
-  userId,
-  teamId,
-  folderId,
-  name,
-  visibility,
-  type,
-}: UpdateFolderOptions) => {
+export const updateFolder = async ({ userId, teamId, folderId, data }: UpdateFolderOptions) => {
+  const { parentId, name, visibility, pinned } = data;
+
+  const team = await getTeamById({ userId, teamId });
+
   const folder = await prisma.folder.findFirst({
     where: {
       id: folderId,
@@ -30,7 +30,9 @@ export const updateFolder = async ({
         teamId,
         userId,
       }),
-      type,
+      visibility: {
+        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+      },
     },
   });
 
@@ -40,17 +42,66 @@ export const updateFolder = async ({
     });
   }
 
-  const isTemplateFolder = folder.type === FolderType.TEMPLATE;
-  const effectiveVisibility =
-    isTemplateFolder && teamId !== null ? DocumentVisibility.EVERYONE : visibility;
+  if (parentId) {
+    const parentFolder = await prisma.folder.findFirst({
+      where: {
+        id: parentId,
+        team: buildTeamWhereQuery({ teamId, userId }),
+        type: folder.type,
+      },
+    });
+
+    if (!parentFolder) {
+      throw new AppError(AppErrorCode.NOT_FOUND, {
+        message: 'Parent folder not found',
+      });
+    }
+
+    if (parentId === folderId) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: 'Cannot move a folder into itself',
+      });
+    }
+
+    let currentParentId = parentFolder.parentId;
+
+    while (currentParentId) {
+      if (currentParentId === folderId) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Cannot move a folder into its descendant',
+        });
+      }
+
+      const currentParent = await prisma.folder.findUnique({
+        where: {
+          id: currentParentId,
+        },
+        select: {
+          parentId: true,
+        },
+      });
+
+      if (!currentParent) {
+        break;
+      }
+
+      currentParentId = currentParent.parentId;
+    }
+  }
 
   return await prisma.folder.update({
     where: {
       id: folderId,
+      team: buildTeamWhereQuery({
+        teamId,
+        userId,
+      }),
     },
     data: {
       name,
-      visibility: effectiveVisibility,
+      visibility,
+      parentId,
+      pinned,
     },
   });
 };

@@ -15,17 +15,16 @@ import {
 import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router';
+import { match } from 'ts-pattern';
 import * as z from 'zod';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
+import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -61,8 +60,10 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 export type EnvelopeDistributeDialogProps = {
   envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
     recipients: Recipient[];
-    fields: Field[];
+    fields: Pick<Field, 'type' | 'recipientId'>[];
   };
+  onDistribute?: () => Promise<void>;
+  documentRootPath: string;
   trigger?: React.ReactNode;
 };
 
@@ -84,13 +85,19 @@ export const ZEnvelopeDistributeFormSchema = z.object({
 
 export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFormSchema>;
 
-export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistributeDialogProps) => {
+export const EnvelopeDistributeDialog = ({
+  envelope,
+  trigger,
+  documentRootPath,
+  onDistribute,
+}: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
   const recipients = envelope.recipients;
 
   const { toast } = useToast();
   const { t } = useLingui();
+  const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -127,21 +134,43 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
 
   const distributionMethod = watch('meta.distributionMethod');
 
-  const everySignerHasSignature = useMemo(
+  const recipientsMissingSignatureFields = useMemo(
     () =>
-      envelope.recipients
-        .filter((recipient) => recipient.role === RecipientRole.SIGNER)
-        .every((recipient) =>
-          envelope.fields.some(
+      envelope.recipients.filter(
+        (recipient) =>
+          recipient.role === RecipientRole.SIGNER &&
+          !envelope.fields.some(
             (field) => field.type === FieldType.SIGNATURE && field.recipientId === recipient.id,
           ),
-        ),
+      ),
     [envelope.recipients, envelope.fields],
   );
+
+  const invalidEnvelopeCode = useMemo(() => {
+    if (recipientsMissingSignatureFields.length > 0) {
+      return 'MISSING_SIGNATURES';
+    }
+
+    if (envelope.recipients.length === 0) {
+      return 'MISSING_RECIPIENTS';
+    }
+
+    return null;
+  }, [envelope.recipients, envelope.fields, recipientsMissingSignatureFields]);
 
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
     try {
       await distributeEnvelope({ envelopeId: envelope.id, meta });
+
+      await onDistribute?.();
+
+      let redirectPath = `${documentRootPath}/${envelope.id}`;
+
+      if (meta.distributionMethod === DocumentDistributionMethod.NONE) {
+        redirectPath += '?action=copy-links';
+      }
+
+      await navigate(redirectPath);
 
       toast({
         title: t`Envelope distributed`,
@@ -178,7 +207,8 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
             <Trans>Recipients will be able to sign the document once sent</Trans>
           </DialogDescription>
         </DialogHeader>
-        {everySignerHasSignature ? (
+
+        {!invalidEnvelopeCode ? (
           <Form {...form}>
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <fieldset disabled={isSubmitting}>
@@ -200,7 +230,11 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
                   </TabsList>
                 </Tabs>
 
-                <div className="min-h-72">
+                <div
+                  className={cn('min-h-72', {
+                    'min-h-[23rem]': organisation.organisationClaim.flags.emailDomains,
+                  })}
+                >
                   <AnimatePresence initial={false} mode="wait">
                     {distributionMethod === DocumentDistributionMethod.EMAIL && (
                       <motion.div
@@ -302,7 +336,7 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
                                     <Trans>Message</Trans>{' '}
                                     <span className="text-muted-foreground">(Optional)</span>
                                     <Tooltip>
-                                      <TooltipTrigger>
+                                      <TooltipTrigger type="button">
                                         <InfoIcon className="mx-2 h-4 w-4" />
                                       </TooltipTrigger>
                                       <TooltipContent className="text-muted-foreground p-4">
@@ -335,71 +369,18 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                         className="min-h-60 rounded-lg border"
                       >
-                        {envelope.status === DocumentStatus.DRAFT ? (
-                          <div className="text-muted-foreground py-24 text-center text-sm">
-                            <p>
-                              <Trans>We won't send anything to notify recipients.</Trans>
-                            </p>
+                        <div className="text-muted-foreground py-24 text-center text-sm">
+                          <p>
+                            <Trans>We won't send anything to notify recipients.</Trans>
+                          </p>
 
-                            <p className="mt-2">
-                              <Trans>
-                                We will generate signing links for you, which you can send to the
-                                recipients through your method of choice.
-                              </Trans>
-                            </p>
-                          </div>
-                        ) : (
-                          <ul className="text-muted-foreground divide-y">
-                            {recipients.length === 0 && (
-                              <li className="flex flex-col items-center justify-center py-6 text-sm">
-                                <Trans>No recipients</Trans>
-                              </li>
-                            )}
-
-                            {recipients.map((recipient) => (
-                              <li
-                                key={recipient.id}
-                                className="flex items-center justify-between px-4 py-3 text-sm"
-                              >
-                                <AvatarWithText
-                                  avatarFallback={recipient.email.slice(0, 1).toUpperCase()}
-                                  primaryText={
-                                    <p className="text-muted-foreground text-sm">
-                                      {recipient.email}
-                                    </p>
-                                  }
-                                  secondaryText={
-                                    <p className="text-muted-foreground/70 text-xs">
-                                      {t(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
-                                    </p>
-                                  }
-                                />
-
-                                {recipient.role !== RecipientRole.CC && (
-                                  <CopyTextButton
-                                    value={formatSigningLink(recipient.token)}
-                                    onCopySuccess={() => {
-                                      toast({
-                                        title: t`Copied to clipboard`,
-                                        description: t`The signing link has been copied to your clipboard.`,
-                                      });
-                                    }}
-                                    badgeContentUncopied={
-                                      <p className="ml-1 text-xs">
-                                        <Trans>Copy</Trans>
-                                      </p>
-                                    }
-                                    badgeContentCopied={
-                                      <p className="ml-1 text-xs">
-                                        <Trans>Copied</Trans>
-                                      </p>
-                                    }
-                                  />
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+                          <p className="mt-2">
+                            <Trans>
+                              We will generate signing links for you, which you can send to the
+                              recipients through your method of choice.
+                            </Trans>
+                          </p>
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -426,12 +407,24 @@ export const EnvelopeDistributeDialog = ({ envelope, trigger }: EnvelopeDistribu
         ) : (
           <>
             <Alert variant="warning">
-              <AlertDescription>
-                <Trans>
-                  Some signers have not been assigned a signature field. Please assign at least 1
-                  signature field to each signer before proceeding.
-                </Trans>
-              </AlertDescription>
+              {match(invalidEnvelopeCode)
+                .with('MISSING_RECIPIENTS', () => (
+                  <AlertDescription>
+                    <Trans>You need at least one recipient to send a document</Trans>
+                  </AlertDescription>
+                ))
+                .with('MISSING_SIGNATURES', () => (
+                  <AlertDescription>
+                    <Trans>The following signers are missing signature fields:</Trans>
+
+                    <ul className="ml-2 mt-1 list-inside list-disc">
+                      {recipientsMissingSignatureFields.map((recipient) => (
+                        <li key={recipient.id}>{recipient.email}</li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                ))
+                .exhaustive()}
             </Alert>
 
             <DialogFooter>

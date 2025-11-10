@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
+import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -13,11 +14,11 @@ import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { cn } from '@documenso/ui/lib/utils';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
+import { DocumentUploadButton } from '@documenso/ui/primitives/document-upload-button';
 import {
   Tooltip,
   TooltipContent,
@@ -51,7 +52,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     (timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone,
   );
 
-  const { quota, remaining, refreshLimits } = useLimits();
+  const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -69,6 +70,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     if (!user.emailVerified) {
       return msg`Verify your email to upload documents.`;
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [remaining.documents, user.emailVerified, team]);
 
@@ -76,35 +78,24 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     try {
       setIsLoading(true);
 
-      const result = await Promise.all(
-        files.map(async (file) => {
-          try {
-            const response = await putPdfFile(file);
-
-            return {
-              title: file.name,
-              documentDataId: response.id,
-            };
-          } catch (err) {
-            console.error(err);
-            throw new Error('Failed to upload document');
-          }
-        }),
-      );
-
-      const envelopeItemsToCreate = result.filter(
-        (item): item is { title: string; documentDataId: string } => item !== undefined,
-      );
-
-      const { id } = await createEnvelope({
+      const payload = {
         folderId,
         type,
         title: files[0].name,
-        items: envelopeItemsToCreate,
         meta: {
           timezone: userTimezone,
         },
-      }).catch((error) => {
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+
+      for (const file of files) {
+        formData.append('files', file);
+      }
+
+      const { id } = await createEnvelope(formData).catch((error) => {
         console.error(error);
 
         throw error;
@@ -138,6 +129,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
+        .with(
+          'ENVELOPE_ITEM_LIMIT_EXCEEDED',
+          () => t`You have reached the limit of the number of files per envelope`,
+        )
         .otherwise(() => t`An error occurred while uploading your document.`);
 
       toast({
@@ -151,12 +146,23 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     }
   };
 
-  const onFileDropRejected = () => {
+  const onFileDropRejected = (fileRejections: FileRejection[]) => {
+    const maxItemsReached = fileRejections.some((fileRejection) =>
+      fileRejection.errors.some((error) => error.code === DropzoneErrorCode.TooManyFiles),
+    );
+
+    if (maxItemsReached) {
+      toast({
+        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        duration: 5000,
+        variant: 'destructive',
+      });
+
+      return;
+    }
+
     toast({
-      title:
-        type === EnvelopeType.DOCUMENT
-          ? t`Your document failed to upload.`
-          : t`Your template failed to upload.`,
+      title: t`Upload failed`,
       description: t`File cannot be larger than ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB`,
       duration: 5000,
       variant: 'destructive',
@@ -169,13 +175,15 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         <Tooltip>
           <TooltipTrigger asChild>
             <div>
-              <DocumentDropzone
+              <DocumentUploadButton
                 loading={isLoading}
                 disabled={remaining.documents === 0 || !user.emailVerified}
                 disabledMessage={disabledMessage}
                 onDrop={onFileDrop}
                 onDropRejected={onFileDropRejected}
-                type="envelope"
+                type={type}
+                internalVersion="2"
+                maxFiles={maximumEnvelopeItemCount}
               />
             </div>
           </TooltipTrigger>

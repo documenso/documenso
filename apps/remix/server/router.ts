@@ -1,19 +1,21 @@
 import { Hono } from 'hono';
 import { rateLimiter } from 'hono-rate-limiter';
 import { contextStorage } from 'hono/context-storage';
+import { cors } from 'hono/cors';
 import { requestId } from 'hono/request-id';
 import type { RequestIdVariables } from 'hono/request-id';
 import type { Logger } from 'pino';
 
 import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
-import { API_V2_BETA_URL } from '@documenso/lib/constants/app';
+import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
-import { filesRoute } from './api/files';
+import { downloadRoute } from './api/download/download';
+import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
 import { appMiddleware } from './middleware';
 import { openApiTrpcServerHandler } from './trpc/hono-trpc-open-api';
@@ -83,12 +85,31 @@ app.route('/api/auth', auth);
 app.route('/api/files', filesRoute);
 
 // API servers.
+app.use(`/api/v1/*`, cors());
 app.route('/api/v1', tsRestHonoApp);
 app.use('/api/jobs/*', jobsClient.getApiHandler());
 app.use('/api/trpc/*', reactRouterTrpcServer);
 
 // Unstable API server routes. Order matters for these two.
+app.get(`${API_V2_URL}/openapi.json`, (c) => c.json(openApiDocument));
+app.use(`${API_V2_URL}/*`, cors());
+// Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`${API_V2_URL}`, downloadRoute);
+app.use(`${API_V2_URL}/*`, async (c) =>
+  openApiTrpcServerHandler(c, {
+    isBeta: false,
+  }),
+);
+
+// Unstable API server routes. Order matters for these two.
 app.get(`${API_V2_BETA_URL}/openapi.json`, (c) => c.json(openApiDocument));
-app.use(`${API_V2_BETA_URL}/*`, async (c) => openApiTrpcServerHandler(c));
+app.use(`${API_V2_BETA_URL}/*`, cors());
+// Shadows the download routes that tRPC defines since tRPC-to-openapi doesn't support their return types.
+app.route(`${API_V2_BETA_URL}`, downloadRoute);
+app.use(`${API_V2_BETA_URL}/*`, async (c) =>
+  openApiTrpcServerHandler(c, {
+    isBeta: true,
+  }),
+);
 
 export default app;

@@ -23,3 +23,8 @@ export const SELFHOSTED_PLAN_LIMITS: TLimitsSchema = {
   recipients: Infinity,
   directTemplates: Infinity,
 };
+
+/**
+ * Used as an initial value for the frontend before values are loaded from the server.
+ */
+export const DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT = 5;

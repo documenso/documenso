@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, FileSearch } from 'lucide-react';
+import { CheckCircle2, Clock8, DownloadIcon } from 'lucide-react';
 import { Link, useRevalidator } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -20,14 +19,13 @@ import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-emai
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
 import type { Document } from '@documenso/prisma/types/document-legacy-schema';
-import DocumentDialog from '@documenso/ui/components/document/document-dialog';
-import { DocumentDownloadButton } from '@documenso/ui/components/document/document-download-button';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { ClaimAccount } from '~/components/general/claim-account';
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 
@@ -207,24 +205,16 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
           <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
             <DocumentShareButton documentId={document.id} token={recipient.token} />
 
-            {isDocumentCompleted(document.status) ? (
-              <DocumentDownloadButton
-                className="flex-1"
-                fileName={document.title}
-                documentData={document.documentData}
-                disabled={!isDocumentCompleted(document.status)}
-              />
-            ) : (
-              <DocumentDialog
-                documentData={document.documentData}
+            {isDocumentCompleted(document.status) && (
+              <EnvelopeDownloadDialog
+                envelopeId={document.envelopeId}
+                envelopeStatus={document.status}
+                envelopeItems={document.envelopeItems}
+                token={recipient?.token}
                 trigger={
-                  <Button
-                    className="text-[11px]"
-                    title={_(msg`Signatures will appear once the document has been completed`)}
-                    variant="outline"
-                  >
-                    <FileSearch className="mr-2 h-5 w-5" strokeWidth={1.7} />
-                    <Trans>View Original Document</Trans>
+                  <Button type="button" variant="outline" className="flex-1">
+                    <DownloadIcon className="mr-2 h-5 w-5" />
+                    <Trans>Download</Trans>
                   </Button>
                 }
               />

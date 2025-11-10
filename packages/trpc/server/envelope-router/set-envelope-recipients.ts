@@ -23,7 +23,7 @@ export const setEnvelopeRecipientsRoute = authenticatedProcedure
       },
     });
 
-    return await match(envelopeType)
+    const { recipients: data } = await match(envelopeType)
       .with(EnvelopeType.DOCUMENT, async () =>
         setDocumentRecipients({
           userId: ctx.user.id,
@@ -48,4 +48,8 @@ export const setEnvelopeRecipientsRoute = authenticatedProcedure
         }),
       )
       .exhaustive();
+
+    return {
+      data,
+    };
   });

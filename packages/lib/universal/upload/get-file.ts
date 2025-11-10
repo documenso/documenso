@@ -7,7 +7,13 @@ export type GetFileOptions = {
   data: string;
 };
 
-export const getFile = async ({ type, data }: GetFileOptions) => {
+/**
+ * KEPT FOR POSTERITY, SHOULD BE REMOVED IN THE FUTURE
+ * DO NOT USE OR I WILL FIRE YOU
+ *
+ * - Lucas, 2025-11-04
+ */
+const getFile = async ({ type, data }: GetFileOptions) => {
   return await match(type)
     .with(DocumentDataType.BYTES, () => getFileFromBytes(data))
     .with(DocumentDataType.BYTES_64, () => getFileFromBytes64(data))

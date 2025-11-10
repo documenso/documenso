@@ -265,7 +265,7 @@ export const TemplateDirectLinkDialog = ({
                   {remaining.directTemplates !== 0 && (
                     <DialogFooter className="mx-auto mt-4">
                       <Button type="button" onClick={() => setCurrentStep('SELECT_RECIPIENT')}>
-                        <Trans> Enable direct link signing</Trans>
+                        <Trans>Enable direct link signing</Trans>
                       </Button>
                     </DialogFooter>
                   )}

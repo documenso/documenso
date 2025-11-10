@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { startRegistration } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
@@ -209,7 +209,11 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
                     ))
                     .with('TOO_MANY_PASSKEYS', () => (
                       <AlertDescription>
-                        <Trans>You cannot have more than {MAXIMUM_PASSKEYS} passkeys.</Trans>
+                        <Plural
+                          value={MAXIMUM_PASSKEYS}
+                          one="You cannot have more than # passkey."
+                          other="You cannot have more than # passkeys."
+                        />
                       </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (

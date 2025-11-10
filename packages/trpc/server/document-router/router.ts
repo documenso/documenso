@@ -1,11 +1,17 @@
 import { router } from '../trpc';
 import { accessAuthRequest2FAEmailRoute } from './access-auth-request-2fa-email';
+import { createAttachmentRoute } from './attachment/create-attachment';
+import { deleteAttachmentRoute } from './attachment/delete-attachment';
+import { findAttachmentsRoute } from './attachment/find-attachments';
+import { updateAttachmentRoute } from './attachment/update-attachment';
 import { createDocumentRoute } from './create-document';
+import { createDocumentFormDataRoute } from './create-document-formdata';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
 import { downloadDocumentRoute } from './download-document';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
+import { downloadDocumentBetaRoute } from './download-document-beta';
 import { downloadDocumentCertificateRoute } from './download-document-certificate';
 import { duplicateDocumentRoute } from './duplicate-document';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -34,8 +40,10 @@ export const documentRouter = router({
   share: shareDocumentRoute,
 
   // Temporary v2 beta routes to be removed once V2 is fully released.
+  downloadBeta: downloadDocumentBetaRoute,
   download: downloadDocumentRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
+  createDocumentFormData: createDocumentFormDataRoute,
 
   // Internal document routes for custom frontend requests.
   getDocumentByToken: getDocumentByTokenRoute,
@@ -53,4 +61,10 @@ export const documentRouter = router({
     find: findInboxRoute,
     getCount: getInboxCountRoute,
   }),
+  attachment: {
+    create: createAttachmentRoute,
+    update: updateAttachmentRoute,
+    delete: deleteAttachmentRoute,
+    find: findAttachmentsRoute,
+  },
 });

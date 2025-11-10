@@ -40,6 +40,7 @@ export class InngestJobProvider extends BaseJobProvider {
       {
         id: job.id,
         name: job.name,
+        optimizeParallelism: job.optimizeParallelism ?? false,
       },
       {
         event: job.trigger.name,
