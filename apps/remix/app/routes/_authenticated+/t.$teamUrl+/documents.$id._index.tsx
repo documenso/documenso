@@ -129,8 +129,8 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                   <span>
                     <Plural
                       value={envelope.recipients.length}
-                      one={<Trans># Recipient</Trans>}
-                      other={<Trans># Recipients</Trans>}
+                      one="# Recipient"
+                      other="# Recipients"
                     />
                   </span>
                 </StackAvatarsWithTooltip>
