@@ -2,6 +2,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
 import { Upload } from 'lucide-react';
 import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
@@ -16,29 +17,32 @@ import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { Button } from './button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';
 
-export type DocumentDropzoneProps = {
+export type DocumentUploadButtonProps = {
   className?: string;
   disabled?: boolean;
   loading?: boolean;
   disabledMessage?: MessageDescriptor;
   onDrop?: (_files: File[]) => void | Promise<void>;
   onDropRejected?: (fileRejections: FileRejection[], event: DropEvent) => void;
-  type?: 'document' | 'template' | 'envelope';
+  type: EnvelopeType;
+  internalVersion: '1' | '2';
   maxFiles?: number;
   [key: string]: unknown;
 };
 
-export const DocumentDropzone = ({
+export const DocumentUploadButton = ({
   className,
   loading,
   onDrop,
   onDropRejected,
   disabled,
   disabledMessage = msg`You cannot upload documents at this time.`,
-  type = 'document',
+  type,
+  internalVersion,
+
   maxFiles,
   ...props
-}: DocumentDropzoneProps) => {
+}: DocumentUploadButtonProps) => {
   const { _ } = useLingui();
 
   const { organisations } = useSession();
@@ -51,7 +55,7 @@ export const DocumentDropzone = ({
     accept: {
       'application/pdf': ['.pdf'],
     },
-    multiple: type === 'envelope',
+    multiple: internalVersion === '2',
     disabled,
     maxFiles,
     onDrop: (acceptedFiles) => {
@@ -64,9 +68,10 @@ export const DocumentDropzone = ({
   });
 
   const heading = {
-    document: msg`Upload Document`,
-    template: msg`Upload Template Document`,
-    envelope: msg`Upload Envelope`,
+    [EnvelopeType.DOCUMENT]:
+      internalVersion === '1' ? msg`Document (Legacy)` : msg`Upload Document`,
+    [EnvelopeType.TEMPLATE]:
+      internalVersion === '1' ? msg`Template (Legacy)` : msg`Upload Template`,
   };
 
   if (disabled && IS_BILLING_ENABLED()) {

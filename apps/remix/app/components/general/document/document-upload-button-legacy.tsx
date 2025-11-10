@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
 import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
@@ -17,7 +18,7 @@ import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
 import { cn } from '@documenso/ui/lib/utils';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
+import { DocumentUploadButton as DocumentUploadButtonPrimitive } from '@documenso/ui/primitives/document-upload-button';
 import {
   Tooltip,
   TooltipContent,
@@ -28,11 +29,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 
-export type DocumentUploadButtonProps = {
+export type DocumentUploadButtonLegacyProps = {
   className?: string;
 };
 
-export const DocumentUploadButton = ({ className }: DocumentUploadButtonProps) => {
+export const DocumentUploadButtonLegacy = ({ className }: DocumentUploadButtonLegacyProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
   const { user } = useSession();
@@ -144,12 +145,14 @@ export const DocumentUploadButton = ({ className }: DocumentUploadButtonProps) =
         <Tooltip>
           <TooltipTrigger asChild>
             <div>
-              <DocumentDropzone
+              <DocumentUploadButtonPrimitive
                 loading={isLoading}
                 disabled={remaining.documents === 0 || !user.emailVerified}
                 disabledMessage={disabledMessage}
                 onDrop={async (files) => onFileDrop(files[0])}
                 onDropRejected={onFileDropRejected}
+                type={EnvelopeType.DOCUMENT}
+                internalVersion="1"
               />
             </div>
           </TooltipTrigger>
