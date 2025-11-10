@@ -55,10 +55,13 @@ import { DocumentSigningRecipientProvider } from '../document-signing/document-s
 
 export type DirectTemplateSigningFormProps = {
   flowStep: DocumentFlowStep;
-  directRecipient: Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
+  directRecipient: Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token' | 'id'>;
   directRecipientFields: Field[];
   template: Omit<TTemplate, 'user'>;
-  onSubmit: (_data: DirectTemplateLocalField[]) => Promise<void>;
+  onSubmit: (
+    _data: DirectTemplateLocalField[],
+    _nextSigner?: { name: string; email: string },
+  ) => Promise<void>;
 };
 
 export type DirectTemplateLocalField = Field & {
@@ -149,7 +152,7 @@ export const DirectTemplateSigningForm = ({
     validateFieldsInserted(fieldsRequiringValidation);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (nextSigner?: { name: string; email: string }) => {
     setValidateUninsertedFields(true);
 
     const isFieldsValid = validateFieldsInserted(fieldsRequiringValidation);
@@ -161,7 +164,7 @@ export const DirectTemplateSigningForm = ({
     setIsSubmitting(true);
 
     try {
-      await onSubmit(localFields);
+      await onSubmit(localFields, nextSigner);
     } catch {
       setIsSubmitting(false);
     }
@@ -217,6 +220,30 @@ export const DirectTemplateSigningForm = ({
 
     setLocalFields(updatedFields);
   }, []);
+
+  const nextRecipient = useMemo(() => {
+    if (
+      !template.templateMeta?.signingOrder ||
+      template.templateMeta.signingOrder !== 'SEQUENTIAL' ||
+      !template.templateMeta.allowDictateNextSigner
+    ) {
+      return undefined;
+    }
+
+    const sortedRecipients = template.recipients.sort((a, b) => {
+      // Sort by signingOrder first (nulls last), then by id
+      if (a.signingOrder === null && b.signingOrder === null) return a.id - b.id;
+      if (a.signingOrder === null) return 1;
+      if (b.signingOrder === null) return -1;
+      if (a.signingOrder === b.signingOrder) return a.id - b.id;
+      return a.signingOrder - b.signingOrder;
+    });
+
+    const currentIndex = sortedRecipients.findIndex((r) => r.id === directRecipient.id);
+    return currentIndex !== -1 && currentIndex < sortedRecipients.length - 1
+      ? sortedRecipients[currentIndex + 1]
+      : undefined;
+  }, [template.templateMeta?.signingOrder, template.recipients, directRecipient.id]);
 
   return (
     <DocumentSigningRecipientProvider recipient={directRecipient}>
@@ -417,11 +444,15 @@ export const DirectTemplateSigningForm = ({
 
           <DocumentSigningCompleteDialog
             isSubmitting={isSubmitting}
-            onSignatureComplete={async () => handleSubmit()}
+            onSignatureComplete={async (nextSigner) => handleSubmit(nextSigner)}
             documentTitle={template.title}
             fields={localFields}
             fieldsValidated={fieldsValidated}
             recipient={directRecipient}
+            allowDictateNextSigner={nextRecipient && template.templateMeta?.allowDictateNextSigner}
+            defaultNextSigner={
+              nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
+            }
           />
         </div>
       </DocumentFlowFormContainerFooter>

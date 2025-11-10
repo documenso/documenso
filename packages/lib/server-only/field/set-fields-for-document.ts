@@ -158,7 +158,7 @@ export const setFieldsForDocument = async ({
           const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
 
           const errors = validateNumberField(
-            String(numberFieldParsedMeta.value),
+            String(numberFieldParsedMeta.value || ''),
             numberFieldParsedMeta,
             false,
           );

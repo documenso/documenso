@@ -34,6 +34,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { AccessAuth2FAForm } from '~/components/general/document-signing/access-auth-2fa-form';
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
 
@@ -101,6 +102,8 @@ export const DocumentSigningCompleteDialog = ({
   const [twoFactorValidationError, setTwoFactorValidationError] = useState<string | null>(null);
 
   const { derivedRecipientAccessAuth } = useRequiredDocumentSigningAuthContext();
+
+  const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
 
   const form = useForm<TNextSignerFormSchema>({
     resolver: allowDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
@@ -267,7 +270,12 @@ export const DocumentSigningCompleteDialog = ({
                               <Trans>Your Name</Trans>
                             </FormLabel>
                             <FormControl>
-                              <Input {...field} className="mt-2" placeholder={t`Enter your name`} />
+                              <Input
+                                {...field}
+                                className="mt-2"
+                                placeholder={t`Enter your name`}
+                                disabled={isNameLocked}
+                              />
                             </FormControl>
 
                             <FormMessage />
@@ -289,6 +297,7 @@ export const DocumentSigningCompleteDialog = ({
                                 type="email"
                                 className="mt-2"
                                 placeholder={t`Enter your email`}
+                                disabled={!!field.value && isEmailLocked}
                               />
                             </FormControl>
                             <FormMessage />
@@ -304,7 +313,6 @@ export const DocumentSigningCompleteDialog = ({
                 <form onSubmit={form.handleSubmit(onFormSubmit)}>
                   {allowDictateNextSigner && defaultNextSigner && (
                     <div className="mb-4 flex flex-col gap-4">
-                      {/* Todo: Envelopes - Should we say "The next recipient to sign this document will be"? */}
                       <div className="flex flex-col gap-4 md:flex-row">
                         <FormField
                           control={form.control}

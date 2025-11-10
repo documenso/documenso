@@ -441,9 +441,10 @@ export const DocumentEditForm = ({
       >
         <CardContent className="p-2">
           <PDFViewer
-            key={document.documentData.id}
-            documentData={document.documentData}
-            document={document}
+            key={document.envelopeItems[0].id}
+            envelopeItem={document.envelopeItems[0]}
+            token={undefined}
+            version="signed"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

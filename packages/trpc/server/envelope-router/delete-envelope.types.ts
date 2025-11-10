@@ -1,18 +1,18 @@
-import { EnvelopeType } from '@prisma/client';
 import { z } from 'zod';
 
-// export const deleteEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/delete',
-//     summary: 'Delete envelope',
-//     tags: ['Envelope'],
-//   },
-// };
+import type { TrpcRouteMeta } from '../trpc';
+
+export const deleteEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/delete',
+    summary: 'Delete envelope',
+    tags: ['Envelope'],
+  },
+};
 
 export const ZDeleteEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),
-  envelopeType: z.nativeEnum(EnvelopeType),
 });
 
 export const ZDeleteEnvelopeResponseSchema = z.void();
