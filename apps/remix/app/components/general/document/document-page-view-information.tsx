@@ -7,6 +7,7 @@ import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
 import type { TEnvelope } from '@documenso/lib/types/envelope';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 export type DocumentPageViewInformationProps = {
   userId: number;
@@ -39,6 +40,10 @@ export const DocumentPageViewInformation = ({
         value: DateTime.fromJSDate(envelope.updatedAt)
           .setLocale(i18n.locales?.[0] || i18n.locale)
           .toRelative(),
+      },
+      {
+        description: msg`Document ID (Legacy)`,
+        value: mapSecondaryIdToDocumentId(envelope.secondaryId),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -147,8 +147,13 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
               envelope={envelope}
-              fields={envelope.status == DocumentStatus.COMPLETED ? [] : envelope.fields}
-              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+              token={undefined}
+              fields={envelope.fields}
+              recipients={envelope.recipients}
+              overrideSettings={{
+                showRecipientSigningStatus: true,
+                showRecipientTooltip: true,
+              }}
             >
               {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
@@ -156,7 +161,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+                  <PDFViewerKonvaLazy
+                    renderer="preview"
+                    customPageRenderer={EnvelopeGenericPageRenderer}
+                  />
                 </CardContent>
               </Card>
             </EnvelopeRenderProvider>
@@ -178,9 +186,10 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
               )}
 
               <PDFViewer
-                document={envelope}
+                envelopeItem={envelope.envelopeItems[0]}
+                token={undefined}
                 key={envelope.envelopeItems[0].id}
-                documentData={envelope.envelopeItems[0].documentData}
+                version="signed"
               />
             </CardContent>
           </Card>

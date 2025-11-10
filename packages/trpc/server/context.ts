@@ -24,6 +24,7 @@ export const createTrpcContext = async ({
   const { session, user } = await getOptionalSession(c);
 
   const req = c.req.raw;
+  const res = c.res;
 
   const requestMetadata = c.get('context').requestMetadata;
 
@@ -54,6 +55,7 @@ export const createTrpcContext = async ({
       user: null,
       teamId,
       req,
+      res,
       metadata,
     };
   }
@@ -64,6 +66,7 @@ export const createTrpcContext = async ({
     user,
     teamId,
     req,
+    res,
     metadata,
   };
 };
@@ -80,6 +83,7 @@ export type TrpcContext = (
 ) & {
   teamId: number | undefined;
   req: Request;
+  res: Response;
   metadata: ApiRequestMetadata;
   logger: Logger;
 };

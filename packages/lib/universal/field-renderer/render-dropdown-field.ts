@@ -50,7 +50,7 @@ export const renderDropdownFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { pageWidth, pageHeight, pageLayer, mode, translations } = options;
+  const { pageWidth, pageHeight, pageLayer, mode, translations, color } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -73,6 +73,21 @@ export const renderDropdownFieldElement = (
   }
 
   const fontSize = dropdownMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
+
+  // Don't show any labels when exporting.
+  if (mode === 'export') {
+    selectedValue = '';
+  }
+
+  // Render the default value if readonly.
+  if (
+    dropdownMeta?.readOnly &&
+    dropdownMeta.defaultValue &&
+    dropdownMeta.values &&
+    dropdownMeta.values.some((value) => value.value === dropdownMeta.defaultValue)
+  ) {
+    selectedValue = dropdownMeta.defaultValue;
+  }
 
   if (field.inserted) {
     selectedValue = field.customText;
@@ -166,7 +181,9 @@ export const renderDropdownFieldElement = (
     pageLayer.batchDraw();
   });
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,

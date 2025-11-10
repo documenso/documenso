@@ -9,9 +9,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZDeleteEnvelopeItemRequestSchema,
   ZDeleteEnvelopeItemResponseSchema,
+  deleteEnvelopeItemMeta,
 } from './delete-envelope-item.types';
 
 export const deleteEnvelopeItemRoute = authenticatedProcedure
+  .meta(deleteEnvelopeItemMeta)
   .input(ZDeleteEnvelopeItemRequestSchema)
   .output(ZDeleteEnvelopeItemResponseSchema)
   .mutation(async ({ input, ctx }) => {

@@ -1,5 +1,6 @@
 import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
@@ -29,6 +30,7 @@ import {
 } from '@documenso/lib/types/template';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
 
+import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -77,10 +79,14 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
-export const ZCreateTemplateMutationSchema = z.object({
+export const ZCreateTemplatePayloadSchema = z.object({
   title: z.string().min(1).trim(),
-  templateDocumentDataId: z.string().min(1),
   folderId: z.string().optional(),
+});
+
+export const ZCreateTemplateMutationSchema = zodFormData({
+  payload: zfd.json(ZCreateTemplatePayloadSchema),
+  file: zfd.file(),
 });
 
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
@@ -224,7 +230,8 @@ export const ZCreateTemplateV2ResponseSchema = z.object({
 });
 
 export const ZCreateTemplateResponseSchema = z.object({
-  legacyTemplateId: z.number(),
+  envelopeId: z.string(),
+  id: z.number(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({
@@ -273,6 +280,7 @@ export const ZBulkSendTemplateMutationSchema = z.object({
   sendImmediately: z.boolean(),
 });
 
+export type TCreateTemplatePayloadSchema = z.infer<typeof ZCreateTemplatePayloadSchema>;
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;
