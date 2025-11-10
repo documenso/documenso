@@ -18,7 +18,7 @@ import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/t
 import { trpc } from '@documenso/trpc/react';
 import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 import { cn } from '@documenso/ui/lib/utils';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-upload';
+import { DocumentUploadButton } from '@documenso/ui/primitives/document-upload-button';
 import {
   Tooltip,
   TooltipContent,
@@ -175,13 +175,14 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         <Tooltip>
           <TooltipTrigger asChild>
             <div>
-              <DocumentDropzone
+              <DocumentUploadButton
                 loading={isLoading}
                 disabled={remaining.documents === 0 || !user.emailVerified}
                 disabledMessage={disabledMessage}
                 onDrop={onFileDrop}
                 onDropRejected={onFileDropRejected}
-                type="envelope"
+                type={type}
+                internalVersion="2"
                 maxFiles={maximumEnvelopeItemCount}
               />
             </div>

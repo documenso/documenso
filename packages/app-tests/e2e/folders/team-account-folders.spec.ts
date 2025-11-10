@@ -81,7 +81,7 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
     redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
   });
 
-  const fileInput = page.locator('input[type="file"]').nth(1);
+  const fileInput = page.locator('input[type="file"]').nth(2);
   await fileInput.waitFor({ state: 'attached' });
 
   await fileInput.setInputFiles(
@@ -368,7 +368,7 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await expect(page.getByText('Team Client Templates')).toBeVisible();
 
-  await page.getByRole('button', { name: 'New Template' }).click();
+  await page.getByRole('button', { name: 'Template (Legacy)' }).click();
 
   await page.getByText('Upload Template Document').click();
 
@@ -842,7 +842,7 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
   // Upload document.
   const [fileChooser] = await Promise.all([
     page.waitForEvent('filechooser'),
-    page.getByRole('button', { name: 'Upload Document' }).click(),
+    page.getByRole('button', { name: 'Document (Legacy)' }).click(),
   ]);
 
   await fileChooser.setFiles(
