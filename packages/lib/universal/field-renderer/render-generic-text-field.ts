@@ -68,6 +68,21 @@ const upsertFieldText = (field: FieldToRender, options: RenderFieldElementOption
     textToRender = '';
   }
 
+  // Fallback render readonly fields if prefilled value exists.
+  if (field?.fieldMeta?.readOnly && (fieldMeta?.type === 'text' || fieldMeta?.type === 'number')) {
+    const value = fieldMeta?.type === 'text' ? fieldMeta.text : fieldMeta.value;
+
+    if (value) {
+      textToRender = value;
+
+      textVerticalAlign = fieldMeta.verticalAlign || FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN;
+      textAlign = fieldMeta.textAlign || FIELD_DEFAULT_GENERIC_ALIGN;
+      textLetterSpacing = fieldMeta.letterSpacing || FIELD_DEFAULT_LETTER_SPACING;
+      textLineHeight = fieldMeta.lineHeight || FIELD_DEFAULT_LINE_HEIGHT;
+    }
+  }
+
+  // Override everything with value if it's inserted.
   if (field.inserted) {
     textToRender = field.customText;
 

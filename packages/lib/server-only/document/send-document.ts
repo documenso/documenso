@@ -184,9 +184,18 @@ export const sendDocument = async ({
   // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
     for (const unknownField of envelope.fields) {
+      const recipient = envelope.recipients.find((r) => r.id === unknownField.recipientId);
+
+      if (!recipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Recipient not found',
+        });
+      }
+
       const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
 
-      if (fieldToAutoInsert) {
+      // Only auto-insert fields if the recipient has not been sent the document yet.
+      if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
         fieldsToAutoInsert.push(fieldToAutoInsert);
       }
     }
@@ -207,6 +216,7 @@ export const sendDocument = async ({
     if (envelope.internalVersion === 2) {
       const autoInsertedFields = await Promise.all(
         fieldsToAutoInsert.map(async (field) => {
+          // Warning: Only auto-insert fields if the recipient has not been sent the document yet.
           return await tx.field.update({
             where: {
               id: field.fieldId,
