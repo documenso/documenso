@@ -10,7 +10,11 @@ import {
 } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { insertFieldsFromPlaceholdersInPDF } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import {
+  extractPlaceholdersFromPDF,
+  insertFieldsFromPlaceholdersInPDF,
+  removePlaceholdersFromPDF,
+} from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -422,26 +426,46 @@ export const createEnvelope = async ({
 
   for (const envelopeItem of createdEnvelope.envelopeItems) {
     const buffer = await getFileServerSide(envelopeItem.documentData);
-
-    // Use normalized PDF if normalizePdf was true, otherwise use original
-    const pdfToProcess = normalizePdf
-      ? await makeNormalizedPdf(Buffer.from(buffer))
-      : Buffer.from(buffer);
+    const pdfToProcess = Buffer.from(buffer);
 
     const envelopeOptions: EnvelopeIdOptions = {
       type: 'envelopeId',
       id: createdEnvelope.id,
     };
 
-    await insertFieldsFromPlaceholdersInPDF(
-      pdfToProcess,
-      userId,
-      teamId,
-      envelopeOptions,
-      requestMetadata,
-      envelopeItem.id,
-      createdEnvelope.recipients,
-    );
+    const placeholders = await extractPlaceholdersFromPDF(pdfToProcess);
+
+    if (placeholders.length > 0) {
+      const pdfWithoutPlaceholders = await removePlaceholdersFromPDF(pdfToProcess);
+
+      await insertFieldsFromPlaceholdersInPDF(
+        pdfWithoutPlaceholders,
+        userId,
+        teamId,
+        envelopeOptions,
+        requestMetadata,
+        envelopeItem.id,
+        createdEnvelope.recipients,
+      );
+
+      const titleToUse = envelopeItem.title || title;
+      const fileName = titleToUse.endsWith('.pdf') ? titleToUse : `${titleToUse}.pdf`;
+
+      const newDocumentData = await putPdfFileServerSide({
+        name: fileName,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(pdfWithoutPlaceholders),
+      });
+
+      await prisma.envelopeItem.update({
+        where: {
+          id: envelopeItem.id,
+        },
+        data: {
+          documentDataId: newDocumentData.id,
+        },
+      });
+    }
   }
 
   const finalEnvelope = await prisma.envelope.findFirst({

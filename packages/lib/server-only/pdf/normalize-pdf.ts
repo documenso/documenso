@@ -1,6 +1,5 @@
 import { PDFDocument } from '@cantoo/pdf-lib';
 
-import { removePlaceholdersFromPDF } from './auto-place-fields';
 import { AppError } from '../../errors/app-error';
 import { flattenAnnotations } from './flatten-annotations';
 import { flattenForm, removeOptionalContentGroups } from './flatten-form';
@@ -23,7 +22,8 @@ export const normalizePdf = async (pdf: Buffer) => {
   removeOptionalContentGroups(pdfDoc);
   await flattenForm(pdfDoc);
   flattenAnnotations(pdfDoc);
-  const pdfWithoutPlaceholders = await removePlaceholdersFromPDF(pdf);
 
-  return pdfWithoutPlaceholders;
+  const normalizedPdfBytes = await pdfDoc.save();
+
+  return Buffer.from(normalizedPdfBytes);
 };
