@@ -24,7 +24,9 @@ import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZFieldAndMetaSchema,
+  ZNumberFieldMeta,
   ZRadioFieldMeta,
+  ZTextFieldMeta,
 } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
@@ -182,9 +184,18 @@ export const sendDocument = async ({
   // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
     for (const unknownField of envelope.fields) {
+      const recipient = envelope.recipients.find((r) => r.id === unknownField.recipientId);
+
+      if (!recipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Recipient not found',
+        });
+      }
+
       const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
 
-      if (fieldToAutoInsert) {
+      // Only auto-insert fields if the recipient has not been sent the document yet.
+      if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
         fieldsToAutoInsert.push(fieldToAutoInsert);
       }
     }
@@ -205,6 +216,7 @@ export const sendDocument = async ({
     if (envelope.internalVersion === 2) {
       const autoInsertedFields = await Promise.all(
         fieldsToAutoInsert.map(async (field) => {
+          // Warning: Only auto-insert fields if the recipient has not been sent the document yet.
           return await tx.field.update({
             where: {
               id: field.fieldId,
@@ -337,6 +349,31 @@ export const extractFieldAutoInsertValues = (
   const field = parsedField.data;
   const fieldId = unknownField.id;
 
+  // Auto insert text fields with prefilled values.
+  if (field.type === FieldType.TEXT) {
+    const { text } = ZTextFieldMeta.parse(field.fieldMeta);
+
+    if (text) {
+      return {
+        fieldId,
+        customText: text,
+      };
+    }
+  }
+
+  // Auto insert number fields with prefilled values.
+  if (field.type === FieldType.NUMBER) {
+    const { value } = ZNumberFieldMeta.parse(field.fieldMeta);
+
+    if (value) {
+      return {
+        fieldId,
+        customText: value,
+      };
+    }
+  }
+
+  // Auto insert radio fields with the pre-checked value.
   if (field.type === FieldType.RADIO) {
     const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
 
@@ -350,6 +387,7 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
+  // Auto insert dropdown fields with the default value.
   if (field.type === FieldType.DROPDOWN) {
     const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
 
@@ -361,6 +399,7 @@ export const extractFieldAutoInsertValues = (
     }
   }
 
+  // Auto insert checkbox fields with the pre-checked values.
   if (field.type === FieldType.CHECKBOX) {
     const {
       values = [],
