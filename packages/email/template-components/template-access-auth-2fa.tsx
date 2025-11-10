@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 
 import { Heading, Img, Section, Text } from '../components';
 
@@ -46,7 +46,11 @@ export const TemplateAccessAuth2FA = ({
         </Section>
 
         <Text className="mt-4 text-center text-sm text-slate-600">
-          <Trans>This code will expire in {expiresInMinutes} minutes.</Trans>
+          <Plural
+            value={expiresInMinutes}
+            one="This code will expire in # minute."
+            other="This code will expire in # minutes."
+          />
         </Text>
 
         <Text className="mt-4 text-center text-sm text-slate-500">
