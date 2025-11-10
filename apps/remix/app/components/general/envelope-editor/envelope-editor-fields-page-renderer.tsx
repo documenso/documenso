@@ -616,13 +616,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
             transform: 'translateX(-50%)',
             zIndex: 50,
           }}
-          className="text-muted-foreground grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border bg-white p-1 shadow-sm"
+          // Don't use darkmode for this component, it should look the same for both light/dark modes.
+          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-sm"
         >
           {fieldButtonList.map((field) => (
             <button
               key={field.type}
               onClick={() => createFieldFromPendingTemplate(pendingFieldCreation, field.type)}
-              className="hover:text-foreground col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100"
+              className="col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
             >
               {t(field.name)}
             </button>
