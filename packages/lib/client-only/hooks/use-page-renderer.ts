@@ -107,6 +107,10 @@ export function usePageRenderer(renderFunction: RenderFunction) {
           stage: stage.current,
           pageLayer: pageLayer.current,
         });
+
+        void document.fonts.ready.then(function () {
+          pageLayer.current?.batchDraw();
+        });
       });
 
       return () => {
