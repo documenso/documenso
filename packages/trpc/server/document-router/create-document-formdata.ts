@@ -7,6 +7,7 @@ import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.s
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
+import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateDocumentFormDataRequestSchema,
@@ -38,6 +39,7 @@ export const createDocumentFormDataRoute = authenticatedProcedure
       meta,
       folderId,
       attachments,
+      formValues,
     } = payload;
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -49,7 +51,21 @@ export const createDocumentFormDataRoute = authenticatedProcedure
       });
     }
 
-    const documentData = await putPdfFileServerSide(file);
+    let pdf = Buffer.from(await file.arrayBuffer());
+
+    if (formValues) {
+      // eslint-disable-next-line require-atomic-updates
+      pdf = await insertFormValuesInPdf({
+        pdf,
+        formValues,
+      });
+    }
+
+    const documentData = await putPdfFileServerSide({
+      name: file.name,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(pdf),
+    });
 
     const createdEnvelope = await createEnvelope({
       userId: ctx.user.id,
