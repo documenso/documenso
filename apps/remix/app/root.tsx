@@ -64,7 +64,8 @@ export async function loader({ request }: Route.LoaderArgs) {
   } catch (error) {
     // If cookie is corrupted, use default theme and clear the bad cookie
     console.warn('Failed to parse theme cookie, clearing and using default theme:', error);
-    theme = 'system';
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    theme = 'system' as Theme;
     clearThemeCookie = true;
   }
 

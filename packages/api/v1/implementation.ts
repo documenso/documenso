@@ -1749,8 +1749,9 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   }),
 
   getSuiteOpInfo: authenticatedMiddleware(async (args, user, team) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
     return Promise.resolve({
-      status: 200,
+      status: 200 as const,
       body: {
         teamId: team.id,
         teamName: team.name,
