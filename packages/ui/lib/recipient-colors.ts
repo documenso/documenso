@@ -9,6 +9,8 @@ export type RecipientColorStyles = {
   base: string;
   baseRing: string;
   baseRingHover: string;
+  baseTextHover?: string;
+  fieldButton?: string;
   fieldItem: string;
   fieldItemInitials: string;
   comboxBoxTrigger: string;
@@ -56,6 +58,8 @@ export const RECIPIENT_COLOR_STYLES = {
     base: 'ring-recipient-purple hover:bg-recipient-purple/30',
     baseRing: 'rgba(133, 133, 255, 1)',
     baseRingHover: 'rgba(133, 133, 255, 0.3)',
+    baseTextHover: 'rgba(133, 133, 255, 1)',
+    fieldButton: 'hover:border-recipient-purple hover:bg-recipient-purple/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-purple',
     comboxBoxTrigger:
