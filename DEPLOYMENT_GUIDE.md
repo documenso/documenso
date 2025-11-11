@@ -793,8 +793,7 @@ npm run dev
 
 | Version | Base Documenso | Date | Changes |
 |---------|----------------|------|---------|
-| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding |
-| v1.13.1 | v1.13.1 | 2025-01-28 | Initial white-labeled fork |
+| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding and OAuth integration |
 
 ---
 

@@ -17,7 +17,7 @@ git remote -v
 ## Branching Strategy
 
 - **main**: Tracks the latest development from upstream/main
-- **release-v1.13.1**: Your current working branch based on the v1.13.1 release
+- **release-v2.0.0**: Your current working branch based on the v2.0.0 release
 - **release-vX.X.X**: Create new branches for each new release you want to use
 
 ## Workflow: Pulling New Releases
@@ -53,7 +53,7 @@ git push -u origin release-v1.14.0
 
 To switch back to a previous release:
 ```bash
-git checkout release-v1.13.1
+git checkout release-v2.0.0
 ```
 
 To use the new release:
@@ -135,7 +135,7 @@ git push -u origin release-$LATEST_TAG
 
 ### View changes between releases
 ```bash
-git log v1.13.1..v1.14.0 --oneline
+git log v2.0.0..v2.1.0 --oneline
 ```
 
 ## Automated Update Script
@@ -208,7 +208,7 @@ git stash pop
 If things go wrong:
 ```bash
 # Discard all local changes
-git reset --hard v1.13.1
+git reset --hard v2.0.0
 
 # Clean untracked files
 git clean -fd
@@ -217,10 +217,10 @@ git clean -fd
 ### See What Changed in a Release
 ```bash
 # View release notes
-gh release view v1.13.1 --repo documenso/documenso
+gh release view v2.0.0 --repo documenso/documenso
 
 # Or visit the web UI
-open https://github.com/documenso/documenso/releases/tag/v1.13.1
+open https://github.com/documenso/documenso/releases/tag/v2.0.0
 ```
 
 ## Your Current Setup
@@ -228,7 +228,7 @@ open https://github.com/documenso/documenso/releases/tag/v1.13.1
 - **Local path**: `/Users/jean-emmanuellosi/Projects/Documenso/documenso-fork`
 - **Your fork**: https://github.com/jean-losi/documenso
 - **Current release**: v2.0.0
-- **Current branch**: release-v1.13.1 (merged with v2.0.0)
+- **Current branch**: release-v2.0.0
 - **Local server**: http://localhost:3000
 
 Happy forking! 🍴

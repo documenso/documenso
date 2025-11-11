@@ -320,7 +320,7 @@ If issues arise, rollback is simple:
 2. **Code Rollback**: Revert commits
    ```bash
    git revert a95ca57e7 1c010bdf1
-   git push origin release-v1.13.1
+   git push origin release-v2.0.0
    ```
 3. **Redeploy**: Rebuild Docker image without webhook code
 

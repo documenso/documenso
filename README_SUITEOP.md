@@ -264,7 +264,7 @@ For general Documenso questions:
 
 ## 🗺️ Roadmap
 
-- [x] Initial white-label implementation (v1.13.1)
+- [x] Initial white-label implementation (v2.0.0)
 - [x] Updated to Documenso v2.0.0 (v2.0.0)
 - [x] Docker image for production deployment
 - [x] Comprehensive documentation
@@ -280,8 +280,7 @@ For general Documenso questions:
 
 | Version | Base Documenso | Date | Highlights |
 |---------|----------------|------|------------|
-| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding |
-| v1.13.1 | v1.13.1 | 2025-01-28 | Initial white-labeled release with purple branding |
+| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding and OAuth integration |
 
 ---
 
