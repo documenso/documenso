@@ -47,6 +47,10 @@ msgstr "\"{documentTitle}\" has been successfully deleted"
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "\"Add Myself\" recipient behavior:"
+msgstr "\"Add Myself\" recipient behavior:"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\" has invited you to sign \"example document\"."
@@ -1787,6 +1791,13 @@ msgstr "Authentication required"
 msgid "Authenticator app"
 msgstr "Authenticator app"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Authorize SuiteOp"
+msgstr "Authorize SuiteOp"
+
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Avatar"
 msgstr "Avatar"
@@ -1885,6 +1896,10 @@ msgstr "Branding preferences updated"
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Browser"
 msgstr "Browser"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Built on open source technology"
+msgstr "Built on open source technology"
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "Bulk Copy"
@@ -2165,6 +2180,11 @@ msgstr "Clear filters"
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
 msgstr "Clear Signature"
+
+#. placeholder {0}: teams[0].name
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Click below to authorize SuiteOp to access your team: {0}"
+msgstr "Click below to authorize SuiteOp to access your team: {0}"
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "Click here to get started"
@@ -2699,6 +2719,7 @@ msgstr "Create Subscription Claim"
 msgid "Create team"
 msgstr "Create team"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "Create Team"
@@ -3188,6 +3209,10 @@ msgstr "Do you want to delete this template?"
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 msgid "Do you want to duplicate this template?"
 msgstr "Do you want to duplicate this template?"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Documenso on GitHub"
+msgstr "Documenso on GitHub"
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
@@ -4171,6 +4196,10 @@ msgstr "Expires on {0}"
 msgid "External ID"
 msgstr "External ID"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Extra template signers are automatically removed so documents can be completed"
+msgstr "Extra template signers are automatically removed so documents can be completed"
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "Failed to create folder"
@@ -4614,8 +4643,8 @@ msgid "Here's how it works:"
 msgstr "Here's how it works:"
 
 #: apps/remix/app/components/general/user-profile-timur.tsx
-msgid "Hey I’m Timur"
-msgstr "Hey I’m Timur"
+msgid "Hey I'm Jean-Emmanuel"
+msgstr "Hey I'm Jean-Emmanuel"
 
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Hi {userName},"
@@ -4651,6 +4680,10 @@ msgstr "Home (No Folder)"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Horizontal"
 msgstr "Horizontal"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "How Templates Work with Guests"
+msgstr "How Templates Work with Guests"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
@@ -4697,6 +4730,14 @@ msgstr "ID"
 msgid "ID copied to clipboard"
 msgstr "ID copied to clipboard"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If guest count < template signers: your copy may not open"
+msgstr "If guest count < template signers: your copy may not open"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If guest count > template signers: additional guests replace the \"Myself\" recipient"
+msgstr "If guest count > template signers: additional guests replace the \"Myself\" recipient"
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
@@ -4712,6 +4753,10 @@ msgstr "If you do not want to use the authenticator prompted, you can close it, 
 #: apps/remix/app/routes/_unauthenticated+/unverified-account.tsx
 msgid "If you don't find the confirmation link in your inbox, you can request a new one below."
 msgstr "If you don't find the confirmation link in your inbox, you can request a new one below."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If you have 3 signers in the template but only 2 guests, only 2 signers will be used"
+msgstr "If you have 3 signers in the template but only 2 guests, only 2 signers will be used"
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "If your authenticator app does not support QR codes, you can use the following code instead:"
@@ -5038,6 +5083,10 @@ msgstr "Link expires in 1 hour."
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Link expires in 30 minutes."
 msgstr "Link expires in 30 minutes."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Link prefill fields to specific signers for multi-signer documents"
+msgstr "Link prefill fields to specific signers for multi-signer documents"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Link template"
@@ -5590,6 +5639,10 @@ msgstr "No suggestions found"
 msgid "No team groups found"
 msgstr "No team groups found"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "No Teams Found"
+msgstr "No Teams Found"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "No teams yet"
 msgstr "No teams yet"
@@ -5726,6 +5779,10 @@ msgstr "Once your template is set up, share the link anywhere you want. The pers
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
 msgstr "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Only \"Read Only\" text fields sync from your template"
+msgstr "Only \"Read Only\" text fields sync from your template"
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Only admins can access and view the document"
 msgstr "Only admins can access and view the document"
@@ -5751,6 +5808,11 @@ msgstr "Only PDF files are allowed"
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "Oops! Something went wrong."
 msgstr "Oops! Something went wrong."
+
+#: apps/remix/app/components/general/org-menu-switcher.tsx
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Open Source"
+msgstr "Open Source"
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Opened"
@@ -6309,6 +6371,10 @@ msgstr "Pre-formatted CSV template with example data."
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Preferences"
 msgstr "Preferences"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Prefilled text fields:"
+msgstr "Prefilled text fields:"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -7114,6 +7180,10 @@ msgstr "Select triggers"
 msgid "Select visibility"
 msgstr "Select visibility"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Select which team you want to connect with SuiteOp:"
+msgstr "Select which team you want to connect with SuiteOp:"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Selected Recipient"
@@ -7509,6 +7579,10 @@ msgctxt "Recipient role plural name"
 msgid "Signers"
 msgstr "Signers"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Signers are automatically assigned based on guest count:"
+msgstr "Signers are automatically assigned based on guest count:"
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role progressive verb"
 msgid "Signing"
@@ -7855,6 +7929,14 @@ msgstr "Successfully created passkey"
 msgid "Successfully created: {successCount}"
 msgstr "Successfully created: {successCount}"
 
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "SuiteOp Sign is built on Documenso, an open source document signing platform."
+msgstr "SuiteOp Sign is built on Documenso, an open source document signing platform."
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "SuiteOp Sign on GitHub"
+msgstr "SuiteOp Sign on GitHub"
+
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Summary:"
 msgstr "Summary:"
@@ -8158,6 +8240,10 @@ msgstr "Text Align"
 #: apps/remix/app/routes/_authenticated+/admin+/site-settings.tsx
 msgid "Text Color"
 msgstr "Text Color"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Text is filled before sending to guests"
+msgstr "Text is filled before sending to guests"
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
@@ -8683,8 +8769,8 @@ msgid "This document was created using a direct link."
 msgstr "This document was created using a direct link."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Documenso.</0>"
-msgstr "This document was sent using <0>Documenso.</0>"
+msgid "This document was sent using <0>SuiteOp.</0>"
+msgstr "This document was sent using <0>SuiteOp.</0>"
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -8873,6 +8959,19 @@ msgstr "Title"
 msgid "Title cannot be empty"
 msgstr "Title cannot be empty"
 
+#. placeholder {0}: actionVerb.toLowerCase()
+#. placeholder {1}: actionTarget.toLowerCase()
+#. placeholder {2}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To {0} this {1}, you need to be logged in as <0>{2}</0>"
+msgstr "To {0} this {1}, you need to be logged in as <0>{2}</0>"
+
+#. placeholder {0}: actionVerb.toLowerCase()
+#. placeholder {1}: actionTarget.toLowerCase()
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To {0} this {1}, you need to be logged in."
+msgstr "To {0} this {1}, you need to be logged in."
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
 msgstr "To accept this invitation you must create an account."
@@ -8912,6 +9011,10 @@ msgstr "To gain access to your account, please confirm your email address by cli
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To mark this document as viewed, you need to be logged in."
+msgstr "To mark this document as viewed, you need to be logged in."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
@@ -9723,6 +9826,10 @@ msgstr "Viewing"
 msgid "Visibility"
 msgstr "Visibility"
 
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Visit Documenso"
+msgstr "Visit Documenso"
+
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Waiting"
 msgstr "Waiting"
@@ -10077,6 +10184,10 @@ msgstr "We'll send a 6-digit code to your email"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "We're all empty"
 msgstr "We're all empty"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "We're grateful to the Documenso community for building such a solid foundation and making it available to everyone."
+msgstr "We're grateful to the Documenso community for building such a solid foundation and making it available to everyone."
 
 #: packages/email/template-components/template-document-pending.tsx
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
@@ -10670,6 +10781,10 @@ msgstr "You need to be logged in as <0>{email}</0> to view this page."
 msgid "You need to be logged in to view this page."
 msgstr "You need to be logged in to view this page."
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "You need to create a team before you can connect SuiteOp."
+msgstr "You need to create a team before you can connect SuiteOp."
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "You need to setup 2FA to mark this document as viewed."
@@ -10685,6 +10800,10 @@ msgstr "You will now be required to enter a code from your authenticator app whe
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "You will receive an Email copy of the signed document once everyone has signed."
 msgstr "You will receive an Email copy of the signed document once everyone has signed."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "You'll receive the document after guests sign"
+msgstr "You'll receive the document after guests sign"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Your Account"

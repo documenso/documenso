@@ -80,6 +80,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
+    /**
+     * SuiteOp OAuth configuration
+     */
+    NEXT_PRIVATE_SUITEOP_MASTER_KEY?: string;
+    NEXT_PRIVATE_SUITEOP_REDIRECT_URL?: string;
+
     POSTGRES_URL?: string;
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;

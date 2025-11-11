@@ -655,3 +655,22 @@ export const ZGetTemplatesQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(10),
 });
+
+/**
+ * SuiteOp OAuth schemas
+ */
+export const ZSuiteOpGetCodeRequestSchema = z.object({
+  claimCode: z.string(),
+});
+
+export const ZSuiteOpGetCodeResponseSchema = z.object({
+  token: z.string(),
+  teamId: z.number(),
+  teamName: z.string(),
+});
+
+export const ZSuiteOpGetInfoResponseSchema = z.object({
+  teamId: z.number(),
+  teamName: z.string(),
+  valid: z.boolean(),
+});

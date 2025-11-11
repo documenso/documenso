@@ -23,3 +23,8 @@ export const GLOBAL_WEBHOOK_URL =
   env('NEXT_PRIVATE_GLOBAL_WEBHOOK_URL') ?? 'https://events.suiteop.com/jkhgcu4kx5sec3';
 export const GLOBAL_WEBHOOK_SECRET = env('NEXT_PRIVATE_GLOBAL_WEBHOOK_SECRET') ?? '';
 export const GLOBAL_WEBHOOK_EVENTS = ['DOCUMENT_SIGNED', 'DOCUMENT_COMPLETED'] as const;
+
+// SuiteOp OAuth configuration
+export const SUITEOP_MASTER_KEY = env('NEXT_PRIVATE_SUITEOP_MASTER_KEY') ?? '';
+export const SUITEOP_REDIRECT_URL =
+  env('NEXT_PRIVATE_SUITEOP_REDIRECT_URL') ?? 'https://app.suiteop.com/oauth/callback';

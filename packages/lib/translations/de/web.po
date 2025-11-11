@@ -52,6 +52,10 @@ msgstr "\"{documentTitle}\" wurde erfolgreich gelöscht"
 msgid "\"{placeholderEmail}\" on behalf of \"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"{placeholderEmail}\" im Auftrag des \"Team Name\" hat Sie eingeladen, das \"Beispieldokument\" zu unterschreiben."
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "\"Add Myself\" recipient behavior:"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "\"Team Name\" has invited you to sign \"example document\"."
 msgstr "\"Team Name\" hat Sie eingeladen, das \"Beispieldokument\" zu unterschreiben."
@@ -1792,6 +1796,13 @@ msgstr "Authentifizierung erforderlich"
 msgid "Authenticator app"
 msgstr "Authenticator-App"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Authorize SuiteOp"
+msgstr ""
+
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Avatar"
 msgstr "Avatar"
@@ -1890,6 +1901,10 @@ msgstr "Markenpräferenzen aktualisiert"
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Browser"
 msgstr "Browser"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Built on open source technology"
+msgstr ""
 
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 msgid "Bulk Copy"
@@ -2170,6 +2185,11 @@ msgstr "Filter löschen"
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
 msgstr "Unterschrift löschen"
+
+#. placeholder {0}: teams[0].name
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Click below to authorize SuiteOp to access your team: {0}"
+msgstr ""
 
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 msgid "Click here to get started"
@@ -2704,6 +2724,7 @@ msgstr "Abonnementsanspruch erstellen"
 msgid "Create team"
 msgstr "Team erstellen"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 msgid "Create Team"
@@ -3193,6 +3214,10 @@ msgstr "Möchten Sie diese Vorlage löschen?"
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
 msgid "Do you want to duplicate this template?"
 msgstr "Möchten Sie diese Vorlage duplizieren?"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Documenso on GitHub"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
@@ -4176,6 +4201,10 @@ msgstr "Läuft ab am {0}"
 msgid "External ID"
 msgstr "Externe ID"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Extra template signers are automatically removed so documents can be completed"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "Ordner konnte nicht erstellt werden"
@@ -4619,8 +4648,8 @@ msgid "Here's how it works:"
 msgstr "So funktioniert es:"
 
 #: apps/remix/app/components/general/user-profile-timur.tsx
-msgid "Hey I’m Timur"
-msgstr "Hey, ich bin Timur"
+msgid "Hey I'm Jean-Emmanuel"
+msgstr ""
 
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Hi {userName},"
@@ -4656,6 +4685,10 @@ msgstr "Startseite (kein Ordner)"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 msgid "Horizontal"
 msgstr "Horizontal"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "How Templates Work with Guests"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "I agree to link my account with this organization"
@@ -4702,6 +4735,14 @@ msgstr "ID"
 msgid "ID copied to clipboard"
 msgstr "ID in die Zwischenablage kopiert"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If guest count < template signers: your copy may not open"
+msgstr ""
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If guest count > template signers: additional guests replace the \"Myself\" recipient"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 msgid "If there is any issue with your subscription, please contact us at <0>{SUPPORT_EMAIL}</0>."
 msgstr "Bei einem Problem mit Ihrem Abo kontaktieren Sie uns bitte unter <0>{SUPPORT_EMAIL}</0>."
@@ -4717,6 +4758,10 @@ msgstr "Wenn Sie die angegebene Authentifizierung nicht verwenden möchten, kön
 #: apps/remix/app/routes/_unauthenticated+/unverified-account.tsx
 msgid "If you don't find the confirmation link in your inbox, you can request a new one below."
 msgstr "Wenn Sie den Bestätigungslink nicht in Ihrem Posteingang finden, können Sie unten einen neuen anfordern."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "If you have 3 signers in the template but only 2 guests, only 2 signers will be used"
+msgstr ""
 
 #: apps/remix/app/components/forms/2fa/enable-authenticator-app-dialog.tsx
 msgid "If your authenticator app does not support QR codes, you can use the following code instead:"
@@ -5043,6 +5088,10 @@ msgstr "Link läuft in 1 Stunde ab."
 #: packages/email/templates/organisation-account-link-confirmation.tsx
 msgid "Link expires in 30 minutes."
 msgstr "Link läuft in 30 Minuten ab."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Link prefill fields to specific signers for multi-signer documents"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Link template"
@@ -5595,6 +5644,10 @@ msgstr "Keine Vorschläge gefunden"
 msgid "No team groups found"
 msgstr "Keine Teamgruppen gefunden"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "No Teams Found"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "No teams yet"
 msgstr "Noch keine Teams"
@@ -5731,6 +5784,10 @@ msgstr "Sobald Ihre Vorlage eingerichtet ist, teilen Sie den Link überall, wo S
 msgid "One of the documents in the current bundle has a signing role that is not compatible with the current signing experience."
 msgstr "Eines der Dokumente im aktuellen Paket hat eine Signaturrolle, die mit der aktuellen Signiererfahrung nicht kompatibel ist."
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Only \"Read Only\" text fields sync from your template"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Only admins can access and view the document"
 msgstr "Nur Administratoren können auf das Dokument zugreifen und es anzeigen"
@@ -5756,6 +5813,11 @@ msgstr "Nur PDF-Dateien sind erlaubt"
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "Oops! Something went wrong."
 msgstr "Hoppla! Etwas ist schief gelaufen."
+
+#: apps/remix/app/components/general/org-menu-switcher.tsx
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Open Source"
+msgstr ""
 
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Opened"
@@ -6314,6 +6376,10 @@ msgstr "Vorformatiertes CSV-Template mit Beispieldaten."
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Preferences"
 msgstr "Einstellungen"
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Prefilled text fields:"
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -7119,6 +7185,10 @@ msgstr "Auslöser auswählen"
 msgid "Select visibility"
 msgstr "Sichtbarkeit auswählen"
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "Select which team you want to connect with SuiteOp:"
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Selected Recipient"
@@ -7514,6 +7584,10 @@ msgctxt "Recipient role plural name"
 msgid "Signers"
 msgstr "Unterzeichner"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Signers are automatically assigned based on guest count:"
+msgstr ""
+
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role progressive verb"
 msgid "Signing"
@@ -7860,6 +7934,14 @@ msgstr "Passkey erfolgreich erstellt"
 msgid "Successfully created: {successCount}"
 msgstr "Erfolgreich erstellt: {successCount}"
 
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "SuiteOp Sign is built on Documenso, an open source document signing platform."
+msgstr ""
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "SuiteOp Sign on GitHub"
+msgstr ""
+
 #: packages/email/templates/bulk-send-complete.tsx
 msgid "Summary:"
 msgstr "Zusammenfassung:"
@@ -8164,6 +8246,10 @@ msgstr "Textausrichtung"
 msgid "Text Color"
 msgstr "Textfarbe"
 
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "Text is filled before sending to guests"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Text is required"
 msgstr "Text ist erforderlich"
@@ -8266,7 +8352,8 @@ msgstr "Das gesuchte Dokument konnte nicht gefunden werden."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
-msgid "The document you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The document you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Das gesuchte Dokument wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8279,7 +8366,8 @@ msgid "The email address which will show up in the \"Reply To\" field in emails"
 msgstr "Die E-Mail-Adresse, die im \"Antwort an\"-Feld in E-Mails angezeigt wird"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
-msgid "The email domain you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The email domain you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Die gesuchte E-Mail-Domain wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8337,7 +8425,8 @@ msgid "The organisation email has been created successfully."
 msgstr "Die E-Mail der Organisation wurde erfolgreich erstellt."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
-msgid "The organisation group you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation group you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Die Organisationsgruppe, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8346,12 +8435,14 @@ msgid "The organisation role that will be applied to all members in this group."
 msgstr "Die Organisationsrolle, die auf alle Mitglieder in dieser Gruppe angewendet wird."
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The organisation you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The organisation you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Die Organisation, nach der Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8444,12 +8535,14 @@ msgid "The team email <0>{teamEmail}</0> has been removed from the following tea
 msgstr "Die Team-E-Mail <0>{teamEmail}</0> wurde aus dem folgenden Team entfernt"
 
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Das Team, das Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
-msgid "The team you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The team you are looking for may have been removed, renamed or may have never\n"
 "                existed."
 msgstr "Das Team, das Sie suchen, könnte entfernt, umbenannt oder nie existiert haben."
 
@@ -8466,7 +8559,8 @@ msgid "The template you are looking for could not be found."
 msgstr "Die gesuchte Vorlage konnte nicht gefunden werden."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
-msgid "The template you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The template you are looking for may have been removed, renamed or may have never\n"
 "                  existed."
 msgstr "Die gesuchte Vorlage wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8508,7 +8602,8 @@ msgid "The URL for Documenso to send webhook events to."
 msgstr "Die URL für Documenso, um Webhook-Ereignisse zu senden."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
-msgid "The user you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The user you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Der Benutzer, nach dem Sie suchen, wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8529,7 +8624,8 @@ msgid "The webhook was successfully created."
 msgstr "Der Webhook wurde erfolgreich erstellt."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
-msgid "The webhook you are looking for may have been removed, renamed or may have never\n"
+msgid ""
+"The webhook you are looking for may have been removed, renamed or may have never\n"
 "                    existed."
 msgstr "Das gesuchte Webhook wurde möglicherweise entfernt, umbenannt oder hat möglicherweise nie existiert."
 
@@ -8658,8 +8754,8 @@ msgid "This document was created using a direct link."
 msgstr "Dieses Dokument wurde mit einem direkten Link erstellt."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Documenso.</0>"
-msgstr "Dieses Dokument wurde mit <0>Documenso.</0> gesendet"
+msgid "This document was sent using <0>SuiteOp.</0>"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 msgid "This document will be duplicated."
@@ -8848,6 +8944,19 @@ msgstr "Titel"
 msgid "Title cannot be empty"
 msgstr "Titel darf nicht leer sein"
 
+#. placeholder {0}: actionVerb.toLowerCase()
+#. placeholder {1}: actionTarget.toLowerCase()
+#. placeholder {2}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To {0} this {1}, you need to be logged in as <0>{2}</0>"
+msgstr ""
+
+#. placeholder {0}: actionVerb.toLowerCase()
+#. placeholder {1}: actionTarget.toLowerCase()
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To {0} this {1}, you need to be logged in."
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
 msgstr "Um diese Einladung anzunehmen, müssen Sie ein Konto erstellen."
@@ -8887,6 +8996,10 @@ msgstr "Um Zugang zu Ihrem Konto zu erhalten, bestätigen Sie bitte Ihre E-Mail-
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To mark this document as viewed, you need to be logged in as <0>{0}</0>"
 msgstr "Um dieses Dokument als angesehen zu markieren, müssen Sie als <0>{0}</0> angemeldet sein"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To mark this document as viewed, you need to be logged in."
+msgstr ""
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
@@ -9698,6 +9811,10 @@ msgstr "Betrachten"
 msgid "Visibility"
 msgstr "Sichtbarkeit"
 
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "Visit Documenso"
+msgstr ""
+
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 msgid "Waiting"
 msgstr "Warten"
@@ -10052,6 +10169,10 @@ msgstr "Wir senden Ihnen einen 6-stelligen Code per E-Mail"
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "We're all empty"
 msgstr "Wir sind alle leer"
+
+#: apps/remix/app/components/general/open-source-dialog.tsx
+msgid "We're grateful to the Documenso community for building such a solid foundation and making it available to everyone."
+msgstr ""
 
 #: packages/email/template-components/template-document-pending.tsx
 msgid "We're still waiting for other signers to sign this document.<0/>We'll notify you as soon as it's ready."
@@ -10645,6 +10766,10 @@ msgstr "Sie müssen als <0>{email}</0> angemeldet sein, um diese Seite anzuzeige
 msgid "You need to be logged in to view this page."
 msgstr "Sie müssen angemeldet sein, um diese Seite anzuzeigen."
 
+#: apps/remix/app/routes/_authenticated+/oauth.suiteop.authorize.tsx
+msgid "You need to create a team before you can connect SuiteOp."
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "Sie müssen 2FA einrichten, um dieses Dokument als angesehen zu markieren."
@@ -10660,6 +10785,10 @@ msgstr "Sie müssen bei der Anmeldung jetzt einen Code von Ihrer Authenticator-A
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "You will receive an Email copy of the signed document once everyone has signed."
 msgstr "Sie erhalten eine E-Mail-Kopie des unterzeichneten Dokuments, sobald alle unterschrieben haben."
+
+#: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
+msgid "You'll receive the document after guests sign"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Your Account"
@@ -10939,4 +11068,3 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

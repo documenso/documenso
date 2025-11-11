@@ -73,6 +73,7 @@ model User {
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  suiteOpAuthorizations SuiteOpAuthorization[]
 
   @@index([email])
 }
@@ -223,6 +224,25 @@ model ApiToken {
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int
   team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  suiteOpAuthorizations SuiteOpAuthorization[]
+}
+
+model SuiteOpAuthorization {
+  id             Int       @id @default(autoincrement())
+  claimCode      String    @unique
+  expiresAt      DateTime
+  claimed        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  userId         Int
+  teamId         Int
+  apiTokenId     Int
+  plaintextToken String    // Temporary storage of plaintext token until claimed
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team           Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  apiToken       ApiToken  @relation(fields: [apiTokenId], references: [id], onDelete: Cascade)
+
+  @@index([claimCode])
+  @@index([userId])
 }
 
 enum SubscriptionStatus {
@@ -859,6 +879,7 @@ model Team {
   apiTokens  ApiToken[]
   webhooks   Webhook[]
   teamGroups TeamGroup[]
+  suiteOpAuthorizations SuiteOpAuthorization[]
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
