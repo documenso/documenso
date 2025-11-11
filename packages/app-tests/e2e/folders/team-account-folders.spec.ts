@@ -82,7 +82,7 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
     redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
   });
 
-  await page.getByRole('button', { name: 'Template (Legacy)' }).click();
+  await page.getByRole('button', { name: 'Document (Legacy)' }).click();
 
   await page.getByText('Upload Template Document').click();
 
