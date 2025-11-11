@@ -3,7 +3,7 @@
 A white-labeled fork of [Documenso](https://github.com/documenso/documenso) - the open-source DocuSign alternative.
 
 <div align="center">
-  <img src="https://img.shields.io/badge/Based%20On-Documenso%20v1.13.1-purple" alt="Based on Documenso v1.13.1" />
+  <img src="https://img.shields.io/badge/Based%20On-Documenso%20v2.0.0-purple" alt="Based on Documenso v2.0.0" />
   <img src="https://img.shields.io/badge/License-AGPL--3.0-blue" alt="License: AGPL-3.0" />
   <img src="https://img.shields.io/docker/v/jeanlosi/suiteop-sign?label=Docker&color=purple" alt="Docker Version" />
 </div>
@@ -134,7 +134,7 @@ See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions.
 
 **Tags:**
 - `latest` - Most recent build
-- `v1.13.1` - Specific version (based on Documenso v1.13.1)
+- `v2.0.0` - Specific version (based on Documenso v2.0.0)
 
 **Platform:** `linux/amd64` (compatible with most cloud providers)
 
@@ -142,7 +142,7 @@ See [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) for detailed instructions.
 
 ## 🌟 Features
 
-All features from Documenso v1.13.1:
+All features from Documenso v2.0.0:
 
 - ✅ **Electronic Signatures** - Legally binding digital signatures
 - ✅ **Document Templates** - Reusable document workflows
@@ -265,6 +265,7 @@ For general Documenso questions:
 ## 🗺️ Roadmap
 
 - [x] Initial white-label implementation (v1.13.1)
+- [x] Updated to Documenso v2.0.0 (v2.0.0)
 - [x] Docker image for production deployment
 - [x] Comprehensive documentation
 - [ ] Automated testing for white-label changes
@@ -279,6 +280,7 @@ For general Documenso questions:
 
 | Version | Base Documenso | Date | Highlights |
 |---------|----------------|------|------------|
+| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding |
 | v1.13.1 | v1.13.1 | 2025-01-28 | Initial white-labeled release with purple branding |
 
 ---

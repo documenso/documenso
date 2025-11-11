@@ -21,7 +21,7 @@ Complete guide for updating, building, and deploying your white-labeled Documens
 **Repository Structure:**
 - **Origin:** `https://github.com/JeanSuiteop/documenso-fork` (your fork)
 - **Upstream:** `https://github.com/documenso/documenso` (original Documenso)
-- **Current Base Version:** v1.13.1
+- **Current Base Version:** v2.0.0
 - **Docker Image:** `jeanlosi/suiteop-sign:latest`
 - **Branding:** SuiteOp Sign (purple theme)
 
@@ -258,8 +258,8 @@ docker buildx build \
   --push \
   .
 
-# Example for v1.14.0:
-# docker buildx build --platform linux/amd64 -f docker/Dockerfile -t jeanlosi/suiteop-sign:latest -t jeanlosi/suiteop-sign:v1.14.0 --push .
+# Example for v2.0.0:
+# docker buildx build --platform linux/amd64 -f docker/Dockerfile -t jeanlosi/suiteop-sign:latest -t jeanlosi/suiteop-sign:v2.0.0 --push .
 ```
 
 **What this does:**
@@ -354,7 +354,7 @@ docker.io/jeanlosi/suiteop-sign:latest
 
 **Or specify version:**
 ```
-docker.io/jeanlosi/suiteop-sign:v1.13.1
+docker.io/jeanlosi/suiteop-sign:v2.0.0
 ```
 
 ---
@@ -793,6 +793,7 @@ npm run dev
 
 | Version | Base Documenso | Date | Changes |
 |---------|----------------|------|---------|
+| v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding |
 | v1.13.1 | v1.13.1 | 2025-01-28 | Initial white-labeled fork |
 
 ---

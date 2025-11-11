@@ -220,7 +220,7 @@ docker manifest inspect jeanlosi/suiteop-sign:latest
 
 | Component | Current | Latest Check |
 |-----------|---------|--------------|
-| Fork Base | v1.13.1 | `git fetch upstream --tags` |
+| Fork Base | v2.0.0 | `git fetch upstream --tags` |
 | Docker Image | latest | `docker pull jeanlosi/suiteop-sign:latest` |
 | Node.js | 20.x | `node --version` |
 

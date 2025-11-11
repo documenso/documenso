@@ -9,7 +9,7 @@ import { Trans } from '@lingui/react/macro';
 import type { TemplateDirectLink } from '@prisma/client';
 import { DocumentSigningOrder, type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
+import { GripVerticalIcon, HelpCircle, InfoIcon, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
@@ -32,6 +32,7 @@ import {
   DocumentReadOnlyFields,
   mapFieldsWithRecipients,
 } from '../../components/document/document-read-only-fields';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../accordion';
 import { Checkbox } from '../checkbox';
 import {
   DocumentFlowFormContainerActions,
@@ -447,6 +448,92 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         description={documentFlow.description}
       />
       <DocumentFlowFormContainerContent>
+        <div className="mb-6">
+          <Accordion type="single" collapsible>
+            <AccordionItem value="help" className="border-none">
+              <div className="relative rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/30">
+                <InfoIcon className="text-muted-foreground absolute left-4 top-4 h-5 w-5" />
+                <div className="pl-8">
+                  <AccordionTrigger className="w-full text-left hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                    <h5 className="text-foreground text-base font-semibold">
+                      <Trans>How Templates Work with Guests</Trans>
+                    </h5>
+                  </AccordionTrigger>
+                </div>
+              </div>
+              <div className="border-border relative rounded-b-lg border-t bg-gray-50 px-4 pb-4 pt-0 dark:bg-neutral-900/30">
+                <InfoIcon
+                  className="text-muted-foreground absolute left-4 top-4 h-5 w-5 opacity-0"
+                  aria-hidden="true"
+                />
+                <AccordionContent className="pl-8 pt-2">
+                  <div className="text-muted-foreground space-y-3 text-sm">
+                    <div>
+                      <p className="text-foreground font-medium">
+                        <Trans>Signers are automatically assigned based on guest count:</Trans>
+                      </p>
+                      <ul className="ml-4 mt-1 list-disc space-y-1">
+                        <li>
+                          <Trans>
+                            If you have 3 signers in the template but only 2 guests, only 2 signers
+                            will be used
+                          </Trans>
+                        </li>
+                        <li>
+                          <Trans>
+                            Extra template signers are automatically removed so documents can be
+                            completed
+                          </Trans>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="border-border border-t pt-3">
+                      <p className="text-foreground font-medium">
+                        <Trans>"Add Myself" recipient behavior:</Trans>
+                      </p>
+                      <ul className="ml-4 mt-1 list-disc space-y-1">
+                        <li>
+                          <Trans>You'll receive the document after guests sign</Trans>
+                        </li>
+                        <li>
+                          <Trans>
+                            If guest count &lt; template signers: your copy may not open
+                          </Trans>
+                        </li>
+                        <li>
+                          <Trans>
+                            If guest count &gt; template signers: additional guests replace the
+                            "Myself" recipient
+                          </Trans>
+                        </li>
+                      </ul>
+                    </div>
+
+                    <div className="border-border border-t pt-3">
+                      <p className="text-foreground font-medium">
+                        <Trans>Prefilled text fields:</Trans>
+                      </p>
+                      <ul className="ml-4 mt-1 list-disc space-y-1">
+                        <li>
+                          <Trans>Only "Read Only" text fields sync from your template</Trans>
+                        </li>
+                        <li>
+                          <Trans>Text is filled before sending to guests</Trans>
+                        </li>
+                        <li>
+                          <Trans>
+                            Link prefill fields to specific signers for multi-signer documents
+                          </Trans>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                </AccordionContent>
+              </div>
+            </AccordionItem>
+          </Accordion>
+        </div>
         {isDocumentPdfLoaded && (
           <DocumentReadOnlyFields
             showRecipientColors={true}

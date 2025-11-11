@@ -227,8 +227,8 @@ open https://github.com/documenso/documenso/releases/tag/v1.13.1
 
 - **Local path**: `/Users/jean-emmanuellosi/Projects/Documenso/documenso-fork`
 - **Your fork**: https://github.com/jean-losi/documenso
-- **Current release**: v1.13.1
-- **Current branch**: release-v1.13.1
+- **Current release**: v2.0.0
+- **Current branch**: release-v1.13.1 (merged with v2.0.0)
 - **Local server**: http://localhost:3000
 
 Happy forking! 🍴
