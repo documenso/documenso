@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useTransition } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { ChevronDownIcon, ChevronUpIcon, ChevronsUpDown, Loader } from 'lucide-react';
 import { Link } from 'react-router';
 
@@ -76,7 +77,7 @@ export const AdminOrganisationOverviewTable = ({
           return (
             <div>
               <Link
-                className="text-primary underline"
+                className="hover:underline"
                 to={`/admin/organisation-insights/${row.original.id}?dateRange=${dateRange}`}
               >
                 {row.getValue('name')}
@@ -92,7 +93,9 @@ export const AdminOrganisationOverviewTable = ({
             className="flex cursor-pointer items-center"
             onClick={() => handleColumnSort('signingVolume')}
           >
-            <span className="whitespace-nowrap">{_(msg`Document Volume`)}</span>
+            <span className="whitespace-nowrap">
+              <Trans>Document Volume</Trans>
+            </span>
             {sortBy === 'signingVolume' ? (
               sortOrder === 'asc' ? (
                 <ChevronUpIcon className="ml-2 h-4 w-4" />
@@ -110,7 +113,7 @@ export const AdminOrganisationOverviewTable = ({
       },
       {
         header: () => {
-          return <div>{_(msg`Teams`)}</div>;
+          return <Trans>Teams</Trans>;
         },
         accessorKey: 'teamCount',
         cell: ({ row }) => <div>{Number(row.original.teamCount) || 0}</div>,
@@ -118,7 +121,7 @@ export const AdminOrganisationOverviewTable = ({
       },
       {
         header: () => {
-          return <div>{_(msg`Members`)}</div>;
+          return <Trans>Members</Trans>;
         },
         accessorKey: 'memberCount',
         cell: ({ row }) => <div>{Number(row.original.memberCount) || 0}</div>,
@@ -131,7 +134,9 @@ export const AdminOrganisationOverviewTable = ({
               className="flex cursor-pointer items-center"
               onClick={() => handleColumnSort('createdAt')}
             >
-              <span className="whitespace-nowrap">{_(msg`Created`)}</span>
+              <span className="whitespace-nowrap">
+                <Trans>Created</Trans>
+              </span>
               {sortBy === 'createdAt' ? (
                 sortOrder === 'asc' ? (
                   <ChevronUpIcon className="ml-2 h-4 w-4" />

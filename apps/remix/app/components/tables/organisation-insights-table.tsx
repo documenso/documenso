@@ -3,6 +3,7 @@ import { useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Building2, Loader, TrendingUp, Users } from 'lucide-react';
+import { Link } from 'react-router';
 import { useNavigation } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
@@ -89,9 +90,12 @@ export const OrganisationInsightsTable = ({
       header: () => <span className="whitespace-nowrap">{_(msg`Name`)}</span>,
       accessorKey: 'name',
       cell: ({ row }) => (
-        <span className="block max-w-full truncate">
+        <Link
+          className="block max-w-full truncate hover:underline"
+          to={`/admin/users/${row.original.id}`}
+        >
           {(row.getValue('name') as string) || (row.getValue('email') as string)}
-        </span>
+        </Link>
       ),
       size: 220,
     },
@@ -126,9 +130,13 @@ export const OrganisationInsightsTable = ({
       header: () => <span className="whitespace-nowrap">{_(msg`Title`)}</span>,
       accessorKey: 'title',
       cell: ({ row }) => (
-        <span className="block max-w-[200px] truncate" title={row.getValue('title') as string}>
+        <Link
+          className="block max-w-[200px] truncate hover:underline"
+          to={`/admin/documents/${row.original.id}`}
+          title={row.getValue('title') as string}
+        >
           {row.getValue('title')}
-        </span>
+        </Link>
       ),
       size: 200,
     },
@@ -194,27 +202,6 @@ export const OrganisationInsightsTable = ({
     }
   };
 
-  const SummaryCard = ({
-    icon: Icon,
-    title,
-    value,
-    subtitle,
-  }: {
-    icon: React.ComponentType<{ className?: string }>;
-    title: string;
-    value: number;
-    subtitle?: string;
-  }) => (
-    <div className="bg-card flex items-start gap-x-2 rounded-lg border px-4 py-3">
-      <Icon className="text-muted-foreground h-4 w-4 items-start" />
-      <div className="-mt-0.5 space-y-2">
-        <p className="text-muted-foreground text-sm font-medium">{title}</p>
-        <p className="text-2xl font-bold">{value}</p>
-        {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
-      </div>
-    </div>
-  );
-
   return (
     <div className="relative">
       {insights.summary && (
@@ -277,3 +264,24 @@ export const OrganisationInsightsTable = ({
     </div>
   );
 };
+
+const SummaryCard = ({
+  icon: Icon,
+  title,
+  value,
+  subtitle,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  value: number;
+  subtitle?: string;
+}) => (
+  <div className="bg-card flex items-start gap-x-2 rounded-lg border px-4 py-3">
+    <Icon className="text-muted-foreground h-4 w-4 items-start" />
+    <div className="-mt-0.5 space-y-2">
+      <p className="text-muted-foreground text-sm font-medium">{title}</p>
+      <p className="text-2xl font-bold">{value}</p>
+      {subtitle && <p className="text-muted-foreground text-xs">{subtitle}</p>}
+    </div>
+  </div>
+);

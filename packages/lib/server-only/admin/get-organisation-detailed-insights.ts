@@ -238,7 +238,7 @@ async function getDocumentInsights(
     .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
     .where('e.deletedAt', 'is', null)
-    .where('e.type', '=', EnvelopeType.DOCUMENT);
+    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`);
 
   if (createdAtFrom) {
     documentsQuery = documentsQuery.where('e.createdAt', '>=', createdAtFrom);
@@ -262,7 +262,7 @@ async function getDocumentInsights(
     .innerJoin('Team as t', 'e.teamId', 't.id')
     .where('t.organisationId', '=', organisationId)
     .where('e.deletedAt', 'is', null)
-    .where('e.type', '=', EnvelopeType.DOCUMENT);
+    .where(() => sql`e.type = ${EnvelopeType.DOCUMENT}::"EnvelopeType"`);
 
   if (createdAtFrom) {
     countQuery = countQuery.where('e.createdAt', '>=', createdAtFrom);
