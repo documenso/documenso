@@ -50,7 +50,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <Trans>Sign Text Field</Trans>

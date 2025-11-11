@@ -10,11 +10,9 @@ import { DateTime } from 'luxon';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { trpc as trpcClient } from '@documenso/trpc/client';
 import { trpc } from '@documenso/trpc/react';
 import type { TFindInboxResponse } from '@documenso/trpc/server/document-router/find-inbox.types';
 import { Button } from '@documenso/ui/primitives/button';
@@ -28,6 +26,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useOptionalCurrentTeam } from '~/providers/team';
 
+import { EnvelopeDownloadDialog } from '../dialogs/envelope-download-dialog';
 import { StackAvatarsWithTooltip } from '../general/stack-avatars-with-tooltip';
 
 export type DocumentsTableProps = {
@@ -199,28 +198,6 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     return null;
   }
 
-  const onDownloadClick = async () => {
-    try {
-      const document = await trpcClient.document.getDocumentByToken.query({
-        token: recipient.token,
-      });
-
-      const documentData = document?.documentData;
-
-      if (!documentData) {
-        throw Error('No document available');
-      }
-
-      await downloadPDF({ documentData, fileName: row.title });
-    } catch (err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while downloading your document.`),
-        variant: 'destructive',
-      });
-    }
-  };
-
   // TODO: Consider if want to keep this logic for hiding viewing for CC'ers
   if (recipient?.role === RecipientRole.CC && isComplete === false) {
     return null;
@@ -230,6 +207,7 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
     isPending,
     isComplete,
     isSigned,
+    internalVersion: row.internalVersion,
   })
     .with({ isPending: true, isSigned: false }, () => (
       <Button className="w-32" asChild>
@@ -263,10 +241,17 @@ export const InboxTableActionButton = ({ row }: InboxTableActionButtonProps) => 
       </Button>
     ))
     .with({ isComplete: true }, () => (
-      <Button className="w-32" onClick={onDownloadClick}>
-        <DownloadIcon className="-ml-1 mr-2 inline h-4 w-4" />
-        <Trans>Download</Trans>
-      </Button>
+      <EnvelopeDownloadDialog
+        envelopeId={row.envelopeId}
+        envelopeStatus={row.status}
+        token={recipient?.token}
+        trigger={
+          <Button className="w-32">
+            <DownloadIcon className="-ml-1 mr-2 inline h-4 w-4" />
+            <Trans>Download</Trans>
+          </Button>
+        }
+      />
     ))
     .otherwise(() => <div></div>);
 };

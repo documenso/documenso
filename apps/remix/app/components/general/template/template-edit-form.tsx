@@ -313,8 +313,10 @@ export const TemplateEditForm = ({
       >
         <CardContent className="p-2">
           <PDFViewer
-            key={templateDocumentData.id}
-            documentData={templateDocumentData}
+            key={template.envelopeItems[0].id}
+            envelopeItem={template.envelopeItems[0]}
+            token={undefined}
+            version="signed"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

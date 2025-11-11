@@ -83,6 +83,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         folderId,
         envelopeItems: [
           {
+            // If you ever allow more than 1 in this endpoint, make sure to use `maximumEnvelopeItemCount` to limit it.
             documentDataId: documentData.id,
           },
         ],

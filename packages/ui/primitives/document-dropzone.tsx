@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Plus } from 'lucide-react';
+import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
@@ -31,8 +32,9 @@ export type DocumentDropzoneProps = {
   disabledHeading?: MessageDescriptor;
   disabledMessage?: MessageDescriptor;
   onDrop?: (_file: File[]) => void | Promise<void>;
-  onDropRejected?: () => void | Promise<void>;
+  onDropRejected?: (fileRejections: FileRejection[]) => void;
   type?: 'document' | 'template';
+  maxFiles?: number;
   [key: string]: unknown;
 };
 
@@ -45,6 +47,7 @@ export const DocumentDropzone = ({
   disabledHeading,
   disabledMessage = msg`You cannot upload documents at this time.`,
   type = 'document',
+  maxFiles,
   ...props
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
@@ -62,11 +65,8 @@ export const DocumentDropzone = ({
         void onDrop(acceptedFiles);
       }
     },
-    onDropRejected: () => {
-      if (onDropRejected) {
-        void onDropRejected();
-      }
-    },
+    onDropRejected,
+    maxFiles,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 

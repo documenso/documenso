@@ -2,7 +2,6 @@ import { DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } fro
 import { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import DocumentMetaSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 import EnvelopeSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeSchema';
@@ -23,7 +22,7 @@ export type GetRecipientEnvelopeByTokenOptions = {
   accessAuth?: TDocumentAuthMethods;
 };
 
-const ZEnvelopeForSigningResponse = z.object({
+export const ZEnvelopeForSigningResponse = z.object({
   envelope: EnvelopeSchema.pick({
     type: true,
     status: true,
@@ -31,6 +30,7 @@ const ZEnvelopeForSigningResponse = z.object({
     secondaryId: true,
     internalVersion: true,
     completedAt: true,
+    updatedAt: true,
     deletedAt: true,
     title: true,
     authOptions: true,
@@ -71,20 +71,11 @@ const ZEnvelopeForSigningResponse = z.object({
       .array(),
 
     envelopeItems: EnvelopeItemSchema.pick({
+      envelopeId: true,
       id: true,
       title: true,
-      documentDataId: true,
       order: true,
-    })
-      .extend({
-        documentData: DocumentDataSchema.pick({
-          type: true,
-          id: true,
-          data: true,
-          initialData: true,
-        }),
-      })
-      .array(),
+    }).array(),
 
     team: TeamSchema.pick({
       id: true,
@@ -116,6 +107,7 @@ const ZEnvelopeForSigningResponse = z.object({
     signingOrder: true,
     rejectionReason: true,
   }).extend({
+    directToken: z.string().nullish(),
     fields: ZFieldSchema.omit({
       documentId: true,
       templateId: true,
@@ -198,11 +190,7 @@ export const getEnvelopeForRecipientSigning = async ({
           signingOrder: 'asc',
         },
       },
-      envelopeItems: {
-        include: {
-          documentData: true,
-        },
-      },
+      envelopeItems: true,
       team: {
         select: {
           id: true,

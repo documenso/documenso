@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { DocumentData, FieldType } from '@prisma/client';
 import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
+import { base64 } from '@scure/base';
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -12,7 +13,6 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { base64 } from '@documenso/lib/universal/base64';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
@@ -83,21 +83,14 @@ export const ConfigureFieldsView = ({
 
   const normalizedDocumentData = useMemo(() => {
     if (documentData) {
-      return documentData;
+      return documentData.data;
     }
 
     if (!configData.documentData) {
       return null;
     }
 
-    const data = base64.encode(configData.documentData?.data);
-
-    return {
-      id: 'preview',
-      type: 'BYTES_64',
-      data,
-      initialData: data,
-    } satisfies DocumentData;
+    return base64.encode(configData.documentData.data);
   }, [configData.documentData]);
 
   const recipients = useMemo(() => {
@@ -541,7 +534,15 @@ export const ConfigureFieldsView = ({
             <Form {...form}>
               {normalizedDocumentData && (
                 <div>
-                  <PDFViewer documentData={normalizedDocumentData} />
+                  <PDFViewer
+                    overrideData={normalizedDocumentData}
+                    envelopeItem={{
+                      id: '',
+                      envelopeId: '',
+                    }}
+                    token={undefined}
+                    version="signed"
+                  />
 
                   <ElementVisible
                     target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}

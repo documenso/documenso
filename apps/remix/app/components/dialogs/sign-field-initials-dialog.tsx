@@ -45,7 +45,7 @@ export const SignFieldInitialsDialog = createCallable<SignFieldInitialsDialogPro
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <Trans>Sign Initials</Trans>

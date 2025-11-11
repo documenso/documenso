@@ -89,7 +89,10 @@ export const DirectTemplatePageView = ({
     setStep('sign');
   };
 
-  const onSignDirectTemplateSubmit = async (fields: DirectTemplateLocalField[]) => {
+  const onSignDirectTemplateSubmit = async (
+    fields: DirectTemplateLocalField[],
+    nextSigner?: { name: string; email: string },
+  ) => {
     try {
       let directTemplateExternalId = searchParams?.get('externalId') || undefined;
 
@@ -98,6 +101,7 @@ export const DirectTemplatePageView = ({
       }
 
       const { token } = await createDocumentFromDirectTemplate({
+        nextSigner,
         directTemplateToken,
         directTemplateExternalId,
         directRecipientName: fullName,
@@ -149,7 +153,9 @@ export const DirectTemplatePageView = ({
         <CardContent className="p-2">
           <PDFViewer
             key={template.id}
-            documentData={template.templateDocumentData}
+            envelopeItem={template.envelopeItems[0]}
+            token={directTemplateRecipient.token}
+            version="signed"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

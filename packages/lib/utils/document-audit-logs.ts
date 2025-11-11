@@ -353,6 +353,13 @@ export const formatDocumentAuditLogAction = (
       }),
       identified: msg`${prefix} deleted the document`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED }, () => ({
+      anonymous: msg({
+        message: `System auto inserted fields`,
+        context: `Audit log format`,
+      }),
+      identified: msg`System auto inserted fields`,
+    }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_INSERTED }, () => ({
       anonymous: msg({
         message: `Field signed`,
@@ -514,6 +521,14 @@ export const formatDocumentAuditLogAction = (
         message: `Document completed`,
         context: `Audit log format`,
       }),
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED }, ({ data }) => ({
+      anonymous: msg`Envelope item created`,
+      identified: msg`${prefix} created an envelope item with title ${data.envelopeItemTitle}`,
+    }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_DELETED }, ({ data }) => ({
+      anonymous: msg`Envelope item deleted`,
+      identified: msg`${prefix} deleted an envelope item with title ${data.envelopeItemTitle}`,
     }))
     .exhaustive();
 

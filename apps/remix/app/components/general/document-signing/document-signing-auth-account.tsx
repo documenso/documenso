@@ -22,7 +22,7 @@ export const DocumentSigningAuthAccount = ({
   actionVerb = 'sign',
   onOpenChange,
 }: DocumentSigningAuthAccountProps) => {
-  const { recipient } = useRequiredDocumentSigningAuthContext();
+  const { recipient, isDirectTemplate } = useRequiredDocumentSigningAuthContext();
 
   const { t } = useLingui();
 
@@ -34,8 +34,10 @@ export const DocumentSigningAuthAccount = ({
     try {
       setIsSigningOut(true);
 
+      const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`;
+
       await authClient.signOut({
-        redirectPath: `/signin#email=${email}`,
+        redirectPath: `/signin?returnTo=${encodeURIComponent(currentPath)}#embedded=true&email=${isDirectTemplate ? '' : email}`,
       });
     } catch {
       setIsSigningOut(false);
@@ -55,16 +57,28 @@ export const DocumentSigningAuthAccount = ({
         <AlertDescription>
           {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
             <span>
-              <Trans>
-                To mark this document as viewed, you need to be logged in as{' '}
-                <strong>{recipient.email}</strong>
-              </Trans>
+              {isDirectTemplate ? (
+                <Trans>To mark this document as viewed, you need to be logged in.</Trans>
+              ) : (
+                <Trans>
+                  To mark this document as viewed, you need to be logged in as{' '}
+                  <strong>{recipient.email}</strong>
+                </Trans>
+              )}
             </span>
           ) : (
             <span>
-              {/* Todo: Translate */}
-              To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be logged
-              in as <strong>{recipient.email}</strong>
+              {isDirectTemplate ? (
+                <Trans>
+                  To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be
+                  logged in.
+                </Trans>
+              ) : (
+                <Trans>
+                  To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be
+                  logged in as <strong>{recipient.email}</strong>
+                </Trans>
+              )}
             </span>
           )}
         </AlertDescription>

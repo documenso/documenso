@@ -1,4 +1,4 @@
-import type { Signature } from '@prisma/client';
+import type { FieldType, Signature } from '@prisma/client';
 import { type Field } from '@prisma/client';
 import type Konva from 'konva';
 
@@ -19,16 +19,18 @@ export type FieldToRender = Pick<
   positionX: number;
   positionY: number;
   fieldMeta?: TFieldMetaSchema | null;
-  signature?: Signature | null;
+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
 };
 
 export type RenderFieldElementOptions = {
   pageLayer: Konva.Layer;
   pageWidth: number;
   pageHeight: number;
-  mode?: 'edit' | 'sign' | 'export';
+  mode: 'edit' | 'sign' | 'export';
   editable?: boolean;
+  scale: number;
   color?: TRecipientColor;
+  translations: Record<FieldType, string> | null;
 };
 
 /**
@@ -107,6 +109,11 @@ type CalculateMultiItemPositionOptions = {
    */
   fieldPadding: number;
 
+  /**
+   * The direction of the items.
+   */
+  direction: 'horizontal' | 'vertical';
+
   type: 'checkbox' | 'radio';
 };
 
@@ -122,6 +129,7 @@ export const calculateMultiItemPosition = (options: CalculateMultiItemPositionOp
     itemSize,
     spacingBetweenItemAndText,
     fieldPadding,
+    direction,
     type,
   } = options;
 
@@ -130,6 +138,39 @@ export const calculateMultiItemPosition = (options: CalculateMultiItemPositionOp
   const innerFieldX = fieldPadding;
   const innerFieldY = fieldPadding;
 
+  if (direction === 'horizontal') {
+    const itemHeight = innerFieldHeight;
+    const itemWidth = innerFieldWidth / itemCount;
+
+    const y = innerFieldY;
+    const x = itemIndex * itemWidth + innerFieldX;
+
+    let itemInputY = y + itemHeight / 2 - itemSize / 2;
+    let itemInputX = x;
+
+    // We need a little different logic to center the radio circle icon.
+    if (type === 'radio') {
+      itemInputX = x + itemSize / 2;
+      itemInputY = y + itemHeight / 2;
+    }
+
+    const textX = x + itemSize + spacingBetweenItemAndText;
+    const textY = y;
+
+    // Multiplied by 2 for extra padding on the right hand side of the text and the next item.
+    const textWidth = itemWidth - itemSize - spacingBetweenItemAndText * 2;
+    const textHeight = itemHeight;
+
+    return {
+      itemInputX,
+      itemInputY,
+      textX,
+      textY,
+      textWidth,
+      textHeight,
+    };
+  }
+
   const itemHeight = innerFieldHeight / itemCount;
 
   const y = itemIndex * itemHeight + innerFieldY;
@@ -137,6 +178,7 @@ export const calculateMultiItemPosition = (options: CalculateMultiItemPositionOp
   let itemInputY = y + itemHeight / 2 - itemSize / 2;
   let itemInputX = innerFieldX;
 
+  // We need a little different logic to center the radio circle icon.
   if (type === 'radio') {
     itemInputX = innerFieldX + itemSize / 2;
     itemInputY = y + itemHeight / 2;

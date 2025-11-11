@@ -3,6 +3,8 @@ import { z } from 'zod';
 import { ZOrganisationSchema } from '@documenso/lib/types/organisation';
 import OrganisationClaimSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationClaimSchema';
 import OrganisationGlobalSettingsSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGlobalSettingsSchema';
+import OrganisationGroupMemberSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupMemberSchema';
+import OrganisationGroupSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
 import OrganisationMemberSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
 import SubscriptionSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
 import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
@@ -30,6 +32,18 @@ export const ZGetAdminOrganisationResponseSchema = ZOrganisationSchema.extend({
       email: true,
       name: true,
     }),
+    organisationGroupMembers: z.array(
+      OrganisationGroupMemberSchema.pick({
+        id: true,
+        groupId: true,
+      }).extend({
+        group: OrganisationGroupSchema.pick({
+          id: true,
+          type: true,
+          organisationRole: true,
+        }),
+      }),
+    ),
   }).array(),
   subscription: SubscriptionSchema.nullable(),
   organisationClaim: OrganisationClaimSchema,

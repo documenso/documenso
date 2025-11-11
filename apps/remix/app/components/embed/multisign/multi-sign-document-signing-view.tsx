@@ -226,7 +226,9 @@ export const MultiSignDocumentSigningView = ({
                   })}
                 >
                   <PDFViewer
-                    documentData={document.documentData}
+                    envelopeItem={document.envelopeItems[0]}
+                    token={token}
+                    version="signed"
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();

@@ -96,7 +96,7 @@ export const EnvelopeEditorFieldDragDrop = ({
   selectedRecipientId,
   selectedEnvelopeItemId,
 }: EnvelopeEditorFieldDragDropProps) => {
-  const { envelope, editorFields, isTemplate } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, isTemplate, getRecipientColorKey } = useCurrentEnvelopeEditor();
 
   const { t } = useLingui();
 
@@ -262,6 +262,10 @@ export const EnvelopeEditorFieldDragDrop = ({
     };
   }, [onMouseClick, onMouseMove, selectedField]);
 
+  const selectedRecipientColor = useMemo(() => {
+    return selectedRecipientId ? getRecipientColorKey(selectedRecipientId) : 'green';
+  }, [selectedRecipientId, getRecipientColorKey]);
+
   return (
     <>
       <div className="grid grid-cols-2 gap-x-2 gap-y-2.5">
@@ -273,12 +277,23 @@ export const EnvelopeEditorFieldDragDrop = ({
             onClick={() => setSelectedField(field.type)}
             onMouseDown={() => setSelectedField(field.type)}
             data-selected={selectedField === field.type ? true : undefined}
-            className="group flex h-12 cursor-pointer items-center justify-center rounded-lg border border-gray-200 px-4 transition-colors hover:border-blue-300 hover:bg-blue-50"
+            className={cn(
+              'border-border group flex h-12 cursor-pointer items-center justify-center rounded-lg border px-4 transition-colors',
+              RECIPIENT_COLOR_STYLES[selectedRecipientColor].fieldButton,
+            )}
           >
             <p
               className={cn(
-                'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                'text-muted-foreground font-noto group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                 field.className,
+                {
+                  'group-hover:text-recipient-green': selectedRecipientColor === 'green',
+                  'group-hover:text-recipient-blue': selectedRecipientColor === 'blue',
+                  'group-hover:text-recipient-purple': selectedRecipientColor === 'purple',
+                  'group-hover:text-recipient-orange': selectedRecipientColor === 'orange',
+                  'group-hover:text-recipient-yellow': selectedRecipientColor === 'yellow',
+                  'group-hover:text-recipient-pink': selectedRecipientColor === 'pink',
+                },
               )}
             >
               {field.type !== FieldType.SIGNATURE && <field.icon className="h-4 w-4" />}
@@ -291,9 +306,9 @@ export const EnvelopeEditorFieldDragDrop = ({
       {selectedField && (
         <div
           className={cn(
-            'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
-            // selectedSignerStyles?.base,
-            RECIPIENT_COLOR_STYLES.yellow.base, // Todo: Envelopes
+            'text-muted-foreground dark:text-muted-background font-noto pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+            RECIPIENT_COLOR_STYLES[selectedRecipientColor].base,
+            selectedField === FieldType.SIGNATURE && 'font-signature',
             {
               '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
               'dark:text-black/60': isFieldWithinBounds,

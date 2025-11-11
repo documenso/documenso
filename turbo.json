@@ -38,6 +38,7 @@
   "globalDependencies": ["**/.env.*local"],
   "globalEnv": [
     "APP_VERSION",
+    "PORT",
     "NEXT_PRIVATE_ENCRYPTION_KEY",
     "NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY",
     "NEXTAUTH_SECRET",

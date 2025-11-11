@@ -11,6 +11,7 @@ module.exports = {
       fontFamily: {
         sans: ['var(--font-sans)', ...fontFamily.sans],
         signature: ['var(--font-signature)'],
+        noto: ['var(--font-noto)'],
       },
       zIndex: {
         9999: '9999',

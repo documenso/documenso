@@ -10,9 +10,9 @@ import { match } from 'ts-pattern';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateTemplatePayloadSchema } from '@documenso/trpc/server/template-router/schema';
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -40,13 +40,17 @@ export const TemplateDropZoneWrapper = ({ children, className }: TemplateDropZon
     try {
       setIsLoading(true);
 
-      const documentData = await putPdfFile(file);
-
-      const { legacyTemplateId: id } = await createTemplate({
+      const payload = {
         title: file.name,
-        templateDocumentDataId: documentData.id,
         folderId: folderId ?? undefined,
-      });
+      } satisfies TCreateTemplatePayloadSchema;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+      formData.append('file', file);
+
+      const { envelopeId: id } = await createTemplate(formData);
 
       toast({
         title: _(msg`Template uploaded`),

@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { t } from '@lingui/core/macro';
@@ -7,11 +7,19 @@ import { PlusIcon, Trash } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
+import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
 import {
   type TCheckboxFieldMeta as CheckboxFieldMeta,
+  DEFAULT_FIELD_FONT_SIZE,
   ZCheckboxFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import {
+  checkboxValidationLength,
+  checkboxValidationRules,
+  checkboxValidationSigns,
+} from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import {
   Form,
   FormControl,
@@ -30,8 +38,8 @@ import {
 } from '@documenso/ui/primitives/select';
 import { Separator } from '@documenso/ui/primitives/separator';
 
-import { checkboxValidationLength, checkboxValidationRules } from './constants';
 import {
+  EditorGenericFontSizeField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
 } from './editor-field-generic-field-forms';
@@ -44,6 +52,7 @@ const ZCheckboxFieldFormSchema = ZCheckboxFieldMeta.pick({
   required: true,
   values: true,
   readOnly: true,
+  fontSize: true,
 })
   .extend({
     validationLength: z.coerce.number().optional(),
@@ -90,6 +99,7 @@ export const EditorFieldCheckboxForm = ({
       values: value.values || [{ id: 1, checked: false, value: '' }],
       required: value.required || false,
       readOnly: value.readOnly || false,
+      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
     },
   });
 
@@ -99,13 +109,17 @@ export const EditorFieldCheckboxForm = ({
     control,
   });
 
-  const addValue = () => {
+  const addValue = (numberOfValues: number = 1) => {
     const currentValues = form.getValues('values') || [];
-    const newId =
-      currentValues.length > 0 ? Math.max(...currentValues.map((val) => val.id)) + 1 : 1;
+    const currentMaxId = Math.max(...currentValues.map((val) => val.id));
 
-    const newValues = [...currentValues, { id: newId, checked: false, value: '' }];
-    form.setValue('values', newValues);
+    const newValues = Array.from({ length: numberOfValues }, (_, index) => ({
+      id: currentMaxId + index + 1,
+      checked: false,
+      value: '',
+    }));
+
+    form.setValue('values', [...currentValues, ...newValues]);
   };
 
   const removeValue = (index: number) => {
@@ -132,10 +146,34 @@ export const EditorFieldCheckboxForm = ({
     }
   }, [formValues]);
 
+  const isValidationRuleMetForPreselectedValues = useMemo(() => {
+    const preselectedValues = (formValues.values || [])?.filter((value) => value.checked);
+
+    if (formValues.validationLength && formValues.validationRule && preselectedValues.length > 0) {
+      const validationRule = checkboxValidationSigns.find(
+        (sign) => sign.label === formValues.validationRule,
+      );
+
+      if (!validationRule) {
+        return false;
+      }
+
+      return validateCheckboxLength(
+        preselectedValues.length,
+        validationRule.value,
+        formValues.validationLength,
+      );
+    }
+
+    return true;
+  }, [formValues]);
+
   return (
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
+          <EditorGenericFontSizeField formControl={form.control} />
+
           <FormField
             control={form.control}
             name="direction"
@@ -202,7 +240,25 @@ export const EditorFieldCheckboxForm = ({
                     <FormControl>
                       <Select
                         value={field.value ? String(field.value) : ''}
-                        onValueChange={field.onChange}
+                        onValueChange={(value) => {
+                          const validationNumber = Number(value);
+
+                          const currentValues = formValues.values || [];
+
+                          const minimumNumberOfValuesRequired =
+                            validationNumber - currentValues.length;
+
+                          if (!formValues.validationRule) {
+                            form.setValue('validationRule', checkboxValidationRules[0]);
+                          }
+
+                          if (minimumNumberOfValuesRequired > 0) {
+                            addValue(minimumNumberOfValuesRequired);
+                          }
+
+                          field.onChange(validationNumber);
+                          void form.trigger();
+                        }}
                       >
                         <SelectTrigger className="text-muted-foreground bg-background mt-5 w-full">
                           <SelectValue placeholder={t`Pick a number`} />
@@ -239,7 +295,7 @@ export const EditorFieldCheckboxForm = ({
                 <Trans>Checkbox values</Trans>
               </p>
 
-              <button type="button" onClick={addValue}>
+              <button type="button" onClick={() => addValue()}>
                 <PlusIcon className="h-4 w-4" />
               </button>
             </div>
@@ -285,6 +341,16 @@ export const EditorFieldCheckboxForm = ({
                 </li>
               ))}
             </ul>
+
+            {!isValidationRuleMetForPreselectedValues && (
+              <Alert variant="warning">
+                <AlertDescription>
+                  <Trans>
+                    The preselected values will be ignored unless they meet the validation criteria.
+                  </Trans>
+                </AlertDescription>
+              </Alert>
+            )}
           </section>
         </fieldset>
       </form>

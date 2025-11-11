@@ -68,6 +68,7 @@ export type SignUpFormProps = {
   isGoogleSSOEnabled?: boolean;
   isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
+  returnTo?: string;
 };
 
 export const SignUpForm = ({
@@ -76,6 +77,7 @@ export const SignUpForm = ({
   isGoogleSSOEnabled,
   isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
+  returnTo,
 }: SignUpFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -110,7 +112,7 @@ export const SignUpForm = ({
         signature,
       });
 
-      await navigate(`/unverified-account`);
+      await navigate(returnTo ? returnTo : '/unverified-account');
 
       toast({
         title: _(msg`Registration Successful`),

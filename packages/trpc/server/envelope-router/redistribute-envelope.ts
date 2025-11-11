@@ -4,10 +4,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
   ZRedistributeEnvelopeResponseSchema,
+  redistributeEnvelopeMeta,
 } from './redistribute-envelope.types';
 
 export const redistributeEnvelopeRoute = authenticatedProcedure
-  // .meta(redistributeEnvelopeMeta)
+  .meta(redistributeEnvelopeMeta)
   .input(ZRedistributeEnvelopeRequestSchema)
   .output(ZRedistributeEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {

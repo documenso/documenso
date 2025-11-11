@@ -1,15 +1,17 @@
 import { z } from 'zod';
 
-// export const redistributeEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/redistribute',
-//     summary: 'Redistribute document',
-//     description:
-//       'Redistribute the document to the provided recipients who have not actioned the document. Will use the distribution method set in the document',
-//     tags: ['Envelope'],
-//   },
-// };
+import type { TrpcRouteMeta } from '../trpc';
+
+export const redistributeEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/redistribute',
+    summary: 'Redistribute envelope',
+    description:
+      'Redistribute the envelope to the provided recipients who have not actioned the envelope. Will use the distribution method set in the envelope',
+    tags: ['Envelope'],
+  },
+};
 
 export const ZRedistributeEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),

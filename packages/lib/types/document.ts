@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
+import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
 import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
@@ -33,6 +34,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
   folderId: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Which "Template" the document was created from.
   templateId: z
@@ -73,6 +75,10 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     password: z.string().nullable().default(null),
     documentId: z.number().default(-1).optional(),
   }),
+  envelopeItems: EnvelopeItemSchema.pick({
+    id: true,
+    envelopeId: true,
+  }).array(),
 
   folder: FolderSchema.pick({
     id: true,
@@ -114,6 +120,7 @@ export const ZDocumentLiteSchema = LegacyDocumentSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Backwards compatibility.
   documentDataId: z.string().default(''),
@@ -149,6 +156,7 @@ export const ZDocumentManySchema = LegacyDocumentSchema.pick({
   useLegacyFieldInsertion: true,
 }).extend({
   envelopeId: z.string(),
+  internalVersion: z.number(),
 
   // Backwards compatibility.
   documentDataId: z.string().default(''),

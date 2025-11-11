@@ -5,7 +5,10 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
+import {
+  DEFAULT_FIELD_FONT_SIZE,
+  type TTextFieldMeta as TextFieldMeta,
+} from '@documenso/lib/types/field-meta';
 import {
   Form,
   FormControl,
@@ -69,7 +72,7 @@ export const EditorFieldTextForm = ({
       placeholder: value.placeholder || '',
       text: value.text || '',
       characterLimit: value.characterLimit || 0,
-      fontSize: value.fontSize || 14,
+      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
       textAlign: value.textAlign || 'left',
       required: value.required || false,
       readOnly: value.readOnly || false,
@@ -98,6 +101,12 @@ export const EditorFieldTextForm = ({
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
+          <div className="flex w-full flex-row gap-x-4">
+            <EditorGenericFontSizeField className="w-full" formControl={form.control} />
+
+            <EditorGenericTextAlignField className="w-full" formControl={form.control} />
+          </div>
+
           <FormField
             control={form.control}
             name="label"
@@ -143,6 +152,18 @@ export const EditorFieldTextForm = ({
                     className="h-auto"
                     placeholder={t`Add text to the field`}
                     {...field}
+                    onChange={(e) => {
+                      const values = form.getValues();
+                      const characterLimit = values.characterLimit || 0;
+                      let textValue = e.target.value;
+
+                      if (characterLimit > 0 && textValue.length > characterLimit) {
+                        textValue = textValue.slice(0, characterLimit);
+                      }
+
+                      e.target.value = textValue;
+                      field.onChange(e);
+                    }}
                     rows={1}
                   />
                 </FormControl>
@@ -166,18 +187,24 @@ export const EditorFieldTextForm = ({
                     className="bg-background"
                     placeholder={t`Field character limit`}
                     {...field}
+                    onChange={(e) => {
+                      field.onChange(e);
+
+                      const values = form.getValues();
+                      const characterLimit = parseInt(e.target.value, 10) || 0;
+
+                      const textValue = values.text || '';
+
+                      if (characterLimit > 0 && textValue.length > characterLimit) {
+                        form.setValue('text', textValue.slice(0, characterLimit));
+                      }
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          <div className="flex w-full flex-row gap-x-4">
-            <EditorGenericFontSizeField className="w-full" formControl={form.control} />
-
-            <EditorGenericTextAlignField className="w-full" formControl={form.control} />
-          </div>
 
           <div className="mt-1">
             <EditorGenericRequiredField formControl={form.control} />

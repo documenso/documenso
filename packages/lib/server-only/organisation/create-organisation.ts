@@ -205,6 +205,7 @@ export const createOrganisationClaimUpsertData = (subscriptionClaim: InternalCla
     flags: {
       ...subscriptionClaim.flags,
     },
+    envelopeItemCount: subscriptionClaim.envelopeItemCount,
     teamCount: subscriptionClaim.teamCount,
     memberCount: subscriptionClaim.memberCount,
   };

@@ -2,15 +2,17 @@ import { z } from 'zod';
 
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
 
-// export const distributeEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/distribute',
-//     summary: 'Distribute envelope',
-//     description: 'Send the document out to recipients based on your distribution method',
-//     tags: ['Envelope'],
-//   },
-// };
+import type { TrpcRouteMeta } from '../trpc';
+
+export const distributeEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/distribute',
+    summary: 'Distribute envelope',
+    description: 'Send the envelope to recipients based on your distribution method',
+    tags: ['Envelope'],
+  },
+};
 
 export const ZDistributeEnvelopeRequestSchema = z.object({
   envelopeId: z.string().describe('The ID of the envelope to send.'),

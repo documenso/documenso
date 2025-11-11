@@ -4,18 +4,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZUpdateAttachmentRequestSchema,
   ZUpdateAttachmentResponseSchema,
+  updateAttachmentMeta,
 } from './update-attachment.types';
 
 export const updateAttachmentRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/attachment/update',
-      summary: 'Update attachment',
-      description: 'Update an existing attachment',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(updateAttachmentMeta)
   .input(ZUpdateAttachmentRequestSchema)
   .output(ZUpdateAttachmentResponseSchema)
   .mutation(async ({ input, ctx }) => {

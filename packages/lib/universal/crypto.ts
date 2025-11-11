@@ -30,3 +30,5 @@ export const symmetricDecrypt = ({ key, data }: SymmetricDecryptOptions) => {
 
   return chacha.decrypt(dataAsBytes);
 };
+
+export { sha256 };

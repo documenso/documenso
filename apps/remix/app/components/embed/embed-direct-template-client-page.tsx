@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Recipient, Signature } from '@prisma/client';
-import { type DocumentData, type Field, FieldType } from '@prisma/client';
+import type { DocumentMeta, EnvelopeItem, Recipient, Signature } from '@prisma/client';
+import { type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -47,7 +47,7 @@ export type EmbedDirectTemplateClientPageProps = {
   token: string;
   envelopeId: string;
   updatedAt: Date;
-  documentData: DocumentData;
+  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | null;
@@ -59,7 +59,7 @@ export const EmbedDirectTemplateClientPage = ({
   token,
   envelopeId,
   updatedAt,
-  documentData,
+  envelopeItems,
   recipient,
   fields,
   metadata,
@@ -335,7 +335,9 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Viewer */}
         <div className="flex-1">
           <PDFViewer
-            documentData={documentData}
+            envelopeItem={envelopeItems[0]}
+            token={token}
+            version="signed"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>

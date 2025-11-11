@@ -24,7 +24,10 @@ type PasskeyData = {
   isError: boolean;
 };
 
-type SigningAuthRecipient = Pick<Recipient, 'authOptions' | 'email' | 'role' | 'name' | 'token'>;
+type SigningAuthRecipient = Pick<
+  Recipient,
+  'authOptions' | 'email' | 'role' | 'name' | 'token' | 'id'
+>;
 
 export type DocumentSigningAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
@@ -37,6 +40,7 @@ export type DocumentSigningAuthContextValue = {
   derivedRecipientAccessAuth: TRecipientAccessAuthTypes[];
   derivedRecipientActionAuth: TRecipientActionAuthTypes[];
   isAuthRedirectRequired: boolean;
+  isDirectTemplate?: boolean;
   isCurrentlyAuthenticating: boolean;
   setIsCurrentlyAuthenticating: (_value: boolean) => void;
   passkeyData: PasskeyData;
@@ -65,6 +69,7 @@ export const useRequiredDocumentSigningAuthContext = () => {
 export interface DocumentSigningAuthProviderProps {
   documentAuthOptions: Envelope['authOptions'];
   recipient: SigningAuthRecipient;
+  isDirectTemplate?: boolean;
   user?: SessionUser | null;
   children: React.ReactNode;
 }
@@ -72,6 +77,7 @@ export interface DocumentSigningAuthProviderProps {
 export const DocumentSigningAuthProvider = ({
   documentAuthOptions: initialDocumentAuthOptions,
   recipient: initialRecipient,
+  isDirectTemplate = false,
   user,
   children,
 }: DocumentSigningAuthProviderProps) => {
@@ -201,6 +207,7 @@ export const DocumentSigningAuthProvider = ({
         derivedRecipientAccessAuth,
         derivedRecipientActionAuth,
         isAuthRedirectRequired,
+        isDirectTemplate,
         isCurrentlyAuthenticating,
         setIsCurrentlyAuthenticating,
         passkeyData,

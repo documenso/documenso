@@ -55,7 +55,7 @@
     "skia-canvas": "^3.0.8",
     "stripe": "^12.7.0",
     "ts-pattern": "^5.0.5",
-    "zod": "3.24.1"
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.52.0",

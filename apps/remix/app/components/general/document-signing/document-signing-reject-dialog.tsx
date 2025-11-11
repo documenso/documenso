@@ -39,12 +39,14 @@ export interface DocumentSigningRejectDialogProps {
   documentId: number;
   token: string;
   onRejected?: (reason: string) => void | Promise<void>;
+  trigger?: React.ReactNode;
 }
 
 export function DocumentSigningRejectDialog({
   documentId,
   token,
   onRejected,
+  trigger,
 }: DocumentSigningRejectDialogProps) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -108,9 +110,11 @@ export function DocumentSigningRejectDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <Trans>Reject Document</Trans>
-        </Button>
+        {trigger ?? (
+          <Button variant="outline">
+            <Trans>Reject Document</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>

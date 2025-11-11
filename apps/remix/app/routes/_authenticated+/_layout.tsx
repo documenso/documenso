@@ -116,7 +116,7 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
 
         {!user.emailVerified && <VerifyEmailBanner email={user.email} />}
 
-        {banner && <AppBanner banner={banner} />}
+        {banner && !hideHeader && <AppBanner banner={banner} />}
 
         {!hideHeader && <Header />}
 

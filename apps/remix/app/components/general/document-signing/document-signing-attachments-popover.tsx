@@ -8,11 +8,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitive
 export type DocumentSigningAttachmentsPopoverProps = {
   envelopeId: string;
   token: string;
+  trigger?: React.ReactNode;
 };
 
 export const DocumentSigningAttachmentsPopover = ({
   envelopeId,
   token,
+  trigger,
 }: DocumentSigningAttachmentsPopoverProps) => {
   const { data: attachments } = trpc.envelope.attachment.find.useQuery({
     envelopeId,
@@ -26,15 +28,17 @@ export const DocumentSigningAttachmentsPopover = ({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="gap-2">
-          <PaperclipIcon className="h-4 w-4" />
-          <span>
-            <Trans>Attachments</Trans>{' '}
-            {attachments && attachments.data.length > 0 && (
-              <span className="ml-1">({attachments.data.length})</span>
-            )}
-          </span>
-        </Button>
+        {trigger ?? (
+          <Button variant="outline" className="gap-2">
+            <PaperclipIcon className="h-4 w-4" />
+            <span>
+              <Trans>Attachments</Trans>{' '}
+              {attachments && attachments.data.length > 0 && (
+                <span className="ml-1">({attachments.data.length})</span>
+              )}
+            </span>
+          </Button>
+        )}
       </PopoverTrigger>
 
       <PopoverContent className="w-96" align="start">

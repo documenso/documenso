@@ -1,4 +1,6 @@
-import { type Envelope, type Field } from '@prisma/client';
+import type { I18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
+import { type Envelope, type Field, FieldType } from '@prisma/client';
 
 import { extractLegacyIds } from '../universal/id';
 
@@ -75,5 +77,41 @@ export const mapFieldToLegacyField = (
   return {
     ...field,
     ...legacyId,
+  };
+};
+
+export const parseCheckboxCustomText = (customText: string): number[] => {
+  if (!customText) {
+    return [];
+  }
+
+  return JSON.parse(customText);
+};
+
+export const toCheckboxCustomText = (checkedValues: number[]): string => {
+  return JSON.stringify(checkedValues);
+};
+
+export const parseRadioCustomText = (customText: string): number => {
+  return Number(customText);
+};
+
+export const toRadioCustomText = (value: number): string => {
+  return value.toString();
+};
+
+export const getClientSideFieldTranslations = ({ t }: I18n): Record<FieldType, string> => {
+  return {
+    [FieldType.TEXT]: t(msg`Text`),
+    [FieldType.CHECKBOX]: t(msg`Checkbox`),
+    [FieldType.RADIO]: t(msg`Radio`),
+    [FieldType.DROPDOWN]: t(msg`Select Option`),
+    [FieldType.SIGNATURE]: t(msg`Signature`),
+    [FieldType.FREE_SIGNATURE]: t(msg`Free Signature`),
+    [FieldType.INITIALS]: t(msg`Initials`),
+    [FieldType.NAME]: t(msg`Name`),
+    [FieldType.NUMBER]: t(msg`Number`),
+    [FieldType.DATE]: t(msg`Date`),
+    [FieldType.EMAIL]: t(msg`Email`),
   };
 };

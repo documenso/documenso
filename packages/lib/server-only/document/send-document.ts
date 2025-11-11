@@ -3,6 +3,7 @@ import {
   DocumentSigningOrder,
   DocumentStatus,
   EnvelopeType,
+  FieldType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -13,9 +14,18 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-log
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
+import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
+import { validateCheckboxLength } from '../../advanced-fields-validation/validate-checkbox';
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldAndMetaSchema,
+  ZRadioFieldMeta,
+} from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -24,6 +34,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
+import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -56,6 +67,7 @@ export const sendDocument = async ({
       recipients: {
         orderBy: [{ signingOrder: { sort: 'asc', nulls: 'last' } }, { id: 'asc' }],
       },
+      fields: true,
       documentMeta: true,
       envelopeItems: {
         select: {
@@ -165,6 +177,89 @@ export const sendDocument = async ({
     });
   }
 
+  const fieldsToAutoInsert: { fieldId: number; customText: string }[] = [];
+
+  // Validate and autoinsert fields for V2 envelopes.
+  if (envelope.internalVersion === 2) {
+    for (const unknownField of envelope.fields) {
+      const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
+
+      if (parsedField.error) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'One or more fields have invalid metadata. Error: ' + parsedField.error.message,
+        });
+      }
+
+      const field = parsedField.data;
+      const fieldId = unknownField.id;
+
+      if (field.type === FieldType.RADIO) {
+        const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
+
+        const checkedItemIndex = values.findIndex((value) => value.checked);
+
+        if (checkedItemIndex !== -1) {
+          fieldsToAutoInsert.push({
+            fieldId,
+            customText: toRadioCustomText(checkedItemIndex),
+          });
+        }
+      }
+
+      if (field.type === FieldType.DROPDOWN) {
+        const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
+
+        if (defaultValue && values.some((value) => value.value === defaultValue)) {
+          fieldsToAutoInsert.push({
+            fieldId,
+            customText: defaultValue,
+          });
+        }
+      }
+
+      if (field.type === FieldType.CHECKBOX) {
+        const {
+          values = [],
+          validationRule,
+          validationLength,
+        } = ZCheckboxFieldMeta.parse(field.fieldMeta);
+
+        const checkedIndices: number[] = [];
+
+        values.forEach((value, i) => {
+          if (value.checked) {
+            checkedIndices.push(i);
+          }
+        });
+
+        let isValid = true;
+
+        if (validationRule && validationLength) {
+          const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+          if (!validation) {
+            throw new AppError(AppErrorCode.INVALID_REQUEST, {
+              message: 'Invalid checkbox validation rule',
+            });
+          }
+
+          isValid = validateCheckboxLength(
+            checkedIndices.length,
+            validation.value,
+            validationLength,
+          );
+        }
+
+        if (isValid && checkedIndices.length > 0) {
+          fieldsToAutoInsert.push({
+            fieldId,
+            customText: toCheckboxCustomText(checkedIndices),
+          });
+        }
+      }
+    }
+  }
+
   const updatedEnvelope = await prisma.$transaction(async (tx) => {
     if (envelope.status === DocumentStatus.DRAFT) {
       await tx.documentAuditLog.create({
@@ -173,6 +268,37 @@ export const sendDocument = async ({
           envelopeId: envelope.id,
           metadata: requestMetadata,
           data: {},
+        }),
+      });
+    }
+
+    if (envelope.internalVersion === 2) {
+      const autoInsertedFields = await Promise.all(
+        fieldsToAutoInsert.map(async (field) => {
+          return await tx.field.update({
+            where: {
+              id: field.fieldId,
+            },
+            data: {
+              customText: field.customText,
+              inserted: true,
+            },
+          });
+        }),
+      );
+
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED,
+          envelopeId: envelope.id,
+          data: {
+            fields: autoInsertedFields.map((field) => ({
+              fieldId: field.id,
+              fieldType: field.type,
+              recipientId: field.recipientId,
+            })),
+          },
+          // Don't put metadata or user here since it's a system event.
         }),
       });
     }

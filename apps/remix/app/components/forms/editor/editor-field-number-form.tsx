@@ -130,6 +130,12 @@ export const EditorFieldNumberForm = ({
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
+          <div className="flex w-full flex-row gap-x-4">
+            <EditorGenericFontSizeField className="w-full" formControl={form.control} />
+
+            <EditorGenericTextAlignField className="w-full" formControl={form.control} />
+          </div>
+
           <EditorGenericLabelField formControl={form.control} />
 
           <FormField
@@ -197,12 +203,6 @@ export const EditorFieldNumberForm = ({
               </FormItem>
             )}
           />
-
-          <div className="flex w-full flex-row gap-x-4">
-            <EditorGenericFontSizeField className="w-full" formControl={form.control} />
-
-            <EditorGenericTextAlignField className="w-full" formControl={form.control} />
-          </div>
 
           <div className="mt-1">
             <EditorGenericRequiredField formControl={form.control} />

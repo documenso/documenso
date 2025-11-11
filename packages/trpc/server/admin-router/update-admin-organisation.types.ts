@@ -12,6 +12,7 @@ export const ZUpdateAdminOrganisationRequestSchema = z.object({
     claims: ZCreateSubscriptionClaimRequestSchema.pick({
       teamCount: true,
       memberCount: true,
+      envelopeItemCount: true,
       flags: true,
     }).optional(),
     customerId: z.string().optional(),

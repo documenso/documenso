@@ -21,14 +21,14 @@
     "seed": "tsx ./seed-database.ts"
   },
   "dependencies": {
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^6.18.0",
     "kysely": "0.26.3",
-    "prisma": "^6.8.2",
+    "prisma": "^6.18.0",
     "prisma-extension-kysely": "^3.0.0",
     "prisma-kysely": "^1.8.0",
-    "prisma-json-types-generator": "^3.2.2",
+    "prisma-json-types-generator": "^3.6.2",
     "ts-pattern": "^5.0.6",
-    "zod-prisma-types": "3.2.4"
+    "zod-prisma-types": "3.3.5"
   },
   "devDependencies": {
     "dotenv": "^16.5.0",

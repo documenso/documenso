@@ -30,7 +30,6 @@ export const handleSignatureFieldClick = async (
     return {
       type: FieldType.SIGNATURE,
       value: null,
-      isBase64: false,
     };
   }
 
@@ -51,6 +50,5 @@ export const handleSignatureFieldClick = async (
   return {
     type: FieldType.SIGNATURE,
     value: signatureToInsert,
-    isBase64: signatureToInsert.startsWith('data:image'),
   };
 };
