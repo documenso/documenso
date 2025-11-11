@@ -66,8 +66,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Not found`,
             subHeading: msg`404 Not found`,
-            message: msg`The template you are looking for may have been removed, renamed or may have never
-                  existed.`,
+            message: msg`The template you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
