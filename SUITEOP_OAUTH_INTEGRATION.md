@@ -55,7 +55,7 @@ NEXT_PRIVATE_SUITEOP_REDIRECT_URL=https://app.suiteop.com/oauth/callback
 
 **Important:**
 - `NEXT_PRIVATE_SUITEOP_MASTER_KEY`: A secure random string used to authenticate SuiteOp's requests
-- `NEXT_PRIVATE_SUITEOP_REDIRECT_URL`: Must be a `suiteop.com` domain (validated in code)
+- `NEXT_PRIVATE_SUITEOP_REDIRECT_URL`: Default fallback redirect URL (used if `redirectUrl` parameter is not provided or invalid). Must be on `app.suiteop.com` domain.
 
 ---
 
@@ -66,18 +66,26 @@ NEXT_PRIVATE_SUITEOP_REDIRECT_URL=https://app.suiteop.com/oauth/callback
 From SuiteOp app, redirect the user to SuiteOp Sign:
 
 ```
-GET https://sign.suiteop.com/oauth/suiteop/authorize?state=<optional-state-parameter>
+GET https://sign.suiteop.com/oauth/suiteop/authorize?state=<optional-state>&redirectUrl=<optional-redirect-url>
 ```
 
 **Parameters:**
 - `state` (optional): A string that will be returned in the callback. Useful for maintaining session state.
+- `redirectUrl` (optional): The URL where the user should be redirected after authorization. **Must be on `app.suiteop.com` domain**. If not provided, defaults to `https://app.suiteop.com/oauth/callback`.
 
 **Example:**
 ```javascript
 const state = generateRandomState(); // Your own state generation
-const authUrl = `https://sign.suiteop.com/oauth/suiteop/authorize?state=${state}`;
+const redirectUrl = encodeURIComponent('https://app.suiteop.com/oauth/callback');
+const authUrl = `https://sign.suiteop.com/oauth/suiteop/authorize?state=${state}&redirectUrl=${redirectUrl}`;
 window.location.href = authUrl;
 ```
+
+**Redirect URL Validation:**
+- Must be a valid URL
+- Must be on the `app.suiteop.com` domain (exact match required)
+- Any path on `app.suiteop.com` is acceptable (e.g., `/oauth/callback`, `/settings/integrations`, etc.)
+- If invalid or not provided, defaults to `https://app.suiteop.com/oauth/callback`
 
 ---
 
@@ -96,8 +104,12 @@ After selection, SuiteOp Sign will:
 
 **Callback URL Format:**
 ```
-https://app.suiteop.com/oauth/callback?code=<claim-code>&state=<original-state>
+<redirectUrl>?code=<claim-code>&state=<original-state>
 ```
+
+Where `<redirectUrl>` is either:
+- The `redirectUrl` parameter provided in Step 1 (if valid)
+- Default: `https://app.suiteop.com/oauth/callback` (if not provided or invalid)
 
 ---
 
@@ -328,7 +340,7 @@ The following table is created for OAuth tracking:
 
 ### Invalid redirect URL error
 
-**Solution:** Ensure `NEXT_PRIVATE_SUITEOP_REDIRECT_URL` hostname ends with `suiteop.com`
+**Solution:** Ensure the `redirectUrl` parameter is a valid URL on the `app.suiteop.com` domain. The redirect URL must exactly match `app.suiteop.com` (not `www.app.suiteop.com` or any subdomain).
 
 ### Master key authentication fails
 

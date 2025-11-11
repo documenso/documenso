@@ -451,22 +451,20 @@ export const AddTemplatePlaceholderRecipientsFormPartial = ({
         <div className="mb-6">
           <Accordion type="single" collapsible>
             <AccordionItem value="help" className="border-none">
-              <div className="relative rounded-lg bg-gray-50 p-4 dark:bg-neutral-900/30">
-                <InfoIcon className="text-muted-foreground absolute left-4 top-4 h-5 w-5" />
-                <div className="pl-8">
-                  <AccordionTrigger className="w-full text-left hover:no-underline [&[data-state=open]>svg]:rotate-180">
-                    <h5 className="text-foreground text-base font-semibold">
-                      <Trans>How Templates Work with Guests</Trans>
-                    </h5>
-                  </AccordionTrigger>
+              <div className="relative rounded-lg border border-blue-200/50 bg-blue-50/50 p-4 dark:border-blue-900/30 dark:bg-blue-950/20">
+                <div className="flex items-start gap-3">
+                  <InfoIcon className="mt-0.5 h-4 w-4 flex-shrink-0 text-blue-600 dark:text-blue-400" />
+                  <div className="flex-1">
+                    <AccordionTrigger className="w-full text-left hover:no-underline [&[data-state=open]>svg]:rotate-180">
+                      <h5 className="text-foreground text-base font-semibold">
+                        <Trans>How Templates Work with Guests</Trans>
+                      </h5>
+                    </AccordionTrigger>
+                  </div>
                 </div>
               </div>
-              <div className="border-border relative rounded-b-lg border-t bg-gray-50 px-4 pb-4 pt-0 dark:bg-neutral-900/30">
-                <InfoIcon
-                  className="text-muted-foreground absolute left-4 top-4 h-5 w-5 opacity-0"
-                  aria-hidden="true"
-                />
-                <AccordionContent className="pl-8 pt-2">
+              <div className="border-border relative rounded-b-lg border-t border-blue-200/50 bg-blue-50/50 px-4 pb-4 pt-0 dark:border-blue-900/30 dark:bg-blue-950/20">
+                <AccordionContent className="pt-2">
                   <div className="text-muted-foreground space-y-3 text-sm">
                     <div>
                       <p className="text-foreground font-medium">

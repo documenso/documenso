@@ -31,3 +31,5 @@ ALTER TABLE "SuiteOpAuthorization" ADD CONSTRAINT "SuiteOpAuthorization_teamId_f
 -- AddForeignKey
 ALTER TABLE "SuiteOpAuthorization" ADD CONSTRAINT "SuiteOpAuthorization_apiTokenId_fkey" FOREIGN KEY ("apiTokenId") REFERENCES "ApiToken"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
+
+
