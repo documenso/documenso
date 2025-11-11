@@ -19,7 +19,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
-import type { TRecipientAccessAuth, TRecipientActionAuth } from '../../types/document-auth';
+import type { TRecipientAccessAuth } from '../../types/document-auth';
 import { DocumentAuth } from '../../types/document-auth';
 import {
   ZWebhookDocumentSchema,
@@ -37,7 +37,6 @@ export type CompleteDocumentWithTokenOptions = {
   token: string;
   id: EnvelopeIdOptions;
   userId?: number;
-  authOptions?: TRecipientActionAuth;
   accessAuthOptions?: TRecipientAccessAuth;
   requestMetadata?: RequestMetadata;
   nextSigner?: {
