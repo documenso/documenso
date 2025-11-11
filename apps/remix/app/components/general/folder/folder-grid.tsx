@@ -20,7 +20,7 @@ import { DocumentUploadButtonLegacy } from '~/components/general/document/docume
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
-import { EnvelopeUploadButton } from '../document/envelope-upload-button';
+import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
 
 export type FolderGridProps = {
   type: FolderType;
