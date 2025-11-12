@@ -82,16 +82,15 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
     redirectPath: `/t/${team.url}/documents/f/${teamFolder.id}`,
   });
 
-  await page.getByRole('button', { name: 'Document (Legacy)' }).click();
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: 'Document (Legacy)' }).click(),
+  ]);
 
-  await page.getByText('Upload Template Document').click();
-
-  await page.locator('input[type="file"]').nth(0).waitFor({ state: 'attached' });
-
-  await page
-    .locator('input[type="file"]')
-    .nth(0)
-    .setInputFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
+  await fileChooser.setFiles(
+    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
+  );
 
   await page.waitForTimeout(3000);
 
