@@ -11,6 +11,7 @@ export const createEnvelopeItemsMeta: TrpcRouteMeta = {
     method: 'POST',
     path: '/envelope/item/create-many',
     summary: 'Create envelope items',
+    contentTypes: ['multipart/form-data'],
     description: 'Create multiple envelope items for an envelope',
     tags: ['Envelope Items'],
   },

@@ -9,6 +9,7 @@ import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 
@@ -21,6 +22,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url,
 ).toString();
+
+const pdfViewerOptions = {
+  cMapUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/static/cmaps`,
+};
 
 const PDFLoader = () => (
   <>
@@ -167,6 +172,7 @@ export const PdfViewerKonva = ({
               </div>
             </div>
           }
+          // options={pdfViewerOptions}
         >
           {Array(numPages)
             .fill(null)

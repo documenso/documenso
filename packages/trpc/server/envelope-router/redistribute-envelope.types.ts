@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../schema';
 import type { TrpcRouteMeta } from '../trpc';
 
 export const redistributeEnvelopeMeta: TrpcRouteMeta = {
@@ -21,7 +22,7 @@ export const ZRedistributeEnvelopeRequestSchema = z.object({
     .describe('The IDs of the recipients to redistribute the envelope to.'),
 });
 
-export const ZRedistributeEnvelopeResponseSchema = z.void();
+export const ZRedistributeEnvelopeResponseSchema = ZSuccessResponseSchema;
 
 export type TRedistributeEnvelopeRequest = z.infer<typeof ZRedistributeEnvelopeRequestSchema>;
 export type TRedistributeEnvelopeResponse = z.infer<typeof ZRedistributeEnvelopeResponseSchema>;

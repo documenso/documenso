@@ -1,6 +1,7 @@
 import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDistributeEnvelopeRequestSchema,
@@ -53,4 +54,6 @@ export const distributeEnvelopeRoute = authenticatedProcedure
       teamId,
       requestMetadata: ctx.metadata,
     });
+
+    return ZGenericSuccessResponse;
   });

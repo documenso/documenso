@@ -9,7 +9,7 @@ import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
 import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import { findRecipientSuggestionsRoute } from './find-recipient-suggestions';
 import {

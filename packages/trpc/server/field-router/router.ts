@@ -10,7 +10,7 @@ import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-field
 import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
 import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';
 import {
   ZCreateDocumentFieldRequestSchema,
