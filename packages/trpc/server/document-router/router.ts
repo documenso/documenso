@@ -5,7 +5,6 @@ import { deleteAttachmentRoute } from './attachment/delete-attachment';
 import { findAttachmentsRoute } from './attachment/find-attachments';
 import { updateAttachmentRoute } from './attachment/update-attachment';
 import { createDocumentRoute } from './create-document';
-import { createDocumentFormDataRoute } from './create-document-formdata';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
@@ -43,7 +42,6 @@ export const documentRouter = router({
   downloadBeta: downloadDocumentBetaRoute,
   download: downloadDocumentRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
-  createDocumentFormData: createDocumentFormDataRoute,
 
   // Internal document routes for custom frontend requests.
   getDocumentByToken: getDocumentByTokenRoute,
