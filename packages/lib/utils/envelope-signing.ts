@@ -102,9 +102,8 @@ export const extractFieldInsertionValues = ({
       }
 
       const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-      const errors = validateNumberField(fieldValue.value.toString(), numberFieldParsedMeta, true);
+      const errors = validateNumberField(fieldValue.value, numberFieldParsedMeta, true);
 
-      // Todo
       if (errors.length > 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid number',
@@ -112,7 +111,7 @@ export const extractFieldInsertionValues = ({
       }
 
       return {
-        customText: fieldValue.value.toString(),
+        customText: fieldValue.value,
         inserted: true,
       };
     })
@@ -127,7 +126,6 @@ export const extractFieldInsertionValues = ({
       const parsedTextFieldMeta = ZTextFieldMeta.parse(field.fieldMeta);
       const errors = validateTextField(fieldValue.value, parsedTextFieldMeta, true);
 
-      // Todo
       if (errors.length > 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid email',
@@ -189,7 +187,6 @@ export const extractFieldInsertionValues = ({
           (sign) => sign.label === validationRule,
         );
 
-        // Todo: Envelopes - Test this.
         if (checkboxValidationRule) {
           const isValid = validateCheckboxLength(
             selectedValues.length,
@@ -224,7 +221,6 @@ export const extractFieldInsertionValues = ({
       const parsedDropdownFieldMeta = ZDropdownFieldMeta.parse(field.fieldMeta);
       const errors = validateDropdownField(fieldValue.value, parsedDropdownFieldMeta, true);
 
-      // Todo: Envelopes
       if (errors.length > 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
           message: 'Invalid dropdown value',

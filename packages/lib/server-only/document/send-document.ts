@@ -1,4 +1,4 @@
-import type { DocumentData, Envelope, EnvelopeItem } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentSigningOrder,
   DocumentStatus,
@@ -20,7 +20,14 @@ import { validateCheckboxLength } from '../../advanced-fields-validation/validat
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
-import { ZCheckboxFieldMeta, ZDropdownFieldMeta, ZRadioFieldMeta } from '../../types/field-meta';
+import {
+  ZCheckboxFieldMeta,
+  ZDropdownFieldMeta,
+  ZFieldAndMetaSchema,
+  ZNumberFieldMeta,
+  ZRadioFieldMeta,
+  ZTextFieldMeta,
+} from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -174,72 +181,22 @@ export const sendDocument = async ({
 
   const fieldsToAutoInsert: { fieldId: number; customText: string }[] = [];
 
-  // Auto insert radio and checkboxes that have default values.
+  // Validate and autoinsert fields for V2 envelopes.
   if (envelope.internalVersion === 2) {
-    for (const field of envelope.fields) {
-      if (field.type === FieldType.RADIO) {
-        const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
+    for (const unknownField of envelope.fields) {
+      const recipient = envelope.recipients.find((r) => r.id === unknownField.recipientId);
 
-        const checkedItemIndex = values.findIndex((value) => value.checked);
-
-        if (checkedItemIndex !== -1) {
-          fieldsToAutoInsert.push({
-            fieldId: field.id,
-            customText: toRadioCustomText(checkedItemIndex),
-          });
-        }
-      }
-
-      if (field.type === FieldType.DROPDOWN) {
-        const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
-
-        if (defaultValue && values.some((value) => value.value === defaultValue)) {
-          fieldsToAutoInsert.push({
-            fieldId: field.id,
-            customText: defaultValue,
-          });
-        }
-      }
-
-      if (field.type === FieldType.CHECKBOX) {
-        const {
-          values = [],
-          validationRule,
-          validationLength,
-        } = ZCheckboxFieldMeta.parse(field.fieldMeta);
-
-        const checkedIndices: number[] = [];
-
-        values.forEach((value, i) => {
-          if (value.checked) {
-            checkedIndices.push(i);
-          }
+      if (!recipient) {
+        throw new AppError(AppErrorCode.NOT_FOUND, {
+          message: 'Recipient not found',
         });
+      }
 
-        let isValid = true;
+      const fieldToAutoInsert = extractFieldAutoInsertValues(unknownField);
 
-        if (validationRule && validationLength) {
-          const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
-
-          if (!validation) {
-            throw new AppError(AppErrorCode.INVALID_REQUEST, {
-              message: 'Invalid checkbox validation rule',
-            });
-          }
-
-          isValid = validateCheckboxLength(
-            checkedIndices.length,
-            validation.value,
-            validationLength,
-          );
-        }
-
-        if (isValid) {
-          fieldsToAutoInsert.push({
-            fieldId: field.id,
-            customText: toCheckboxCustomText(checkedIndices),
-          });
-        }
+      // Only auto-insert fields if the recipient has not been sent the document yet.
+      if (fieldToAutoInsert && recipient.sendStatus !== SendStatus.SENT) {
+        fieldsToAutoInsert.push(fieldToAutoInsert);
       }
     }
   }
@@ -259,6 +216,7 @@ export const sendDocument = async ({
     if (envelope.internalVersion === 2) {
       const autoInsertedFields = await Promise.all(
         fieldsToAutoInsert.map(async (field) => {
+          // Warning: Only auto-insert fields if the recipient has not been sent the document yet.
           return await tx.field.update({
             where: {
               id: field.fieldId,
@@ -370,4 +328,114 @@ const injectFormValuesIntoDocument = async (
       documentDataId: newDocumentData.id,
     },
   });
+};
+
+/**
+ * Extracts the auto insertion values for a given field.
+ *
+ * If field is not auto insertable, returns `null`.
+ */
+export const extractFieldAutoInsertValues = (
+  unknownField: Field,
+): { fieldId: number; customText: string } | null => {
+  const parsedField = ZFieldAndMetaSchema.safeParse(unknownField);
+
+  if (parsedField.error) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'One or more fields have invalid metadata. Error: ' + parsedField.error.message,
+    });
+  }
+
+  const field = parsedField.data;
+  const fieldId = unknownField.id;
+
+  // Auto insert text fields with prefilled values.
+  if (field.type === FieldType.TEXT) {
+    const { text } = ZTextFieldMeta.parse(field.fieldMeta);
+
+    if (text) {
+      return {
+        fieldId,
+        customText: text,
+      };
+    }
+  }
+
+  // Auto insert number fields with prefilled values.
+  if (field.type === FieldType.NUMBER) {
+    const { value } = ZNumberFieldMeta.parse(field.fieldMeta);
+
+    if (value) {
+      return {
+        fieldId,
+        customText: value,
+      };
+    }
+  }
+
+  // Auto insert radio fields with the pre-checked value.
+  if (field.type === FieldType.RADIO) {
+    const { values = [] } = ZRadioFieldMeta.parse(field.fieldMeta);
+
+    const checkedItemIndex = values.findIndex((value) => value.checked);
+
+    if (checkedItemIndex !== -1) {
+      return {
+        fieldId,
+        customText: toRadioCustomText(checkedItemIndex),
+      };
+    }
+  }
+
+  // Auto insert dropdown fields with the default value.
+  if (field.type === FieldType.DROPDOWN) {
+    const { defaultValue, values = [] } = ZDropdownFieldMeta.parse(field.fieldMeta);
+
+    if (defaultValue && values.some((value) => value.value === defaultValue)) {
+      return {
+        fieldId,
+        customText: defaultValue,
+      };
+    }
+  }
+
+  // Auto insert checkbox fields with the pre-checked values.
+  if (field.type === FieldType.CHECKBOX) {
+    const {
+      values = [],
+      validationRule,
+      validationLength,
+    } = ZCheckboxFieldMeta.parse(field.fieldMeta);
+
+    const checkedIndices: number[] = [];
+
+    values.forEach((value, i) => {
+      if (value.checked) {
+        checkedIndices.push(i);
+      }
+    });
+
+    let isValid = true;
+
+    if (validationRule && validationLength) {
+      const validation = checkboxValidationSigns.find((sign) => sign.label === validationRule);
+
+      if (!validation) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'Invalid checkbox validation rule',
+        });
+      }
+
+      isValid = validateCheckboxLength(checkedIndices.length, validation.value, validationLength);
+    }
+
+    if (isValid && checkedIndices.length > 0) {
+      return {
+        fieldId,
+        customText: toCheckboxCustomText(checkedIndices),
+      };
+    }
+  }
+
+  return null;
 };

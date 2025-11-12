@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+import type { TrpcRouteMeta } from '../../trpc';
+
+export const createAttachmentMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/attachment/create',
+    summary: 'Create attachment',
+    description: 'Create a new attachment for an envelope',
+    tags: ['Envelope Attachments'],
+  },
+};
+
 export const ZCreateAttachmentRequestSchema = z.object({
   envelopeId: z.string(),
   data: z.object({
@@ -8,7 +20,9 @@ export const ZCreateAttachmentRequestSchema = z.object({
   }),
 });
 
-export const ZCreateAttachmentResponseSchema = z.void();
+export const ZCreateAttachmentResponseSchema = z.object({
+  id: z.string(),
+});
 
 export type TCreateAttachmentRequest = z.infer<typeof ZCreateAttachmentRequestSchema>;
 export type TCreateAttachmentResponse = z.infer<typeof ZCreateAttachmentResponseSchema>;

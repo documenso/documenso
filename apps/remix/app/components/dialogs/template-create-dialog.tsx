@@ -7,9 +7,9 @@ import { FilePlus, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateTemplatePayloadSchema } from '@documenso/trpc/server/template-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -54,13 +54,17 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
     setIsUploadingFile(true);
 
     try {
-      const response = await putPdfFile(file);
-
-      const { legacyTemplateId: id } = await createTemplate({
+      const payload = {
         title: file.name,
-        templateDocumentDataId: response.id,
         folderId: folderId,
-      });
+      } satisfies TCreateTemplatePayloadSchema;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+      formData.append('file', file);
+
+      const { envelopeId: id } = await createTemplate(formData);
 
       toast({
         title: _(msg`Template document uploaded`),
@@ -92,7 +96,7 @@ export const TemplateCreateDialog = ({ folderId }: TemplateCreateDialogProps) =>
       <DialogTrigger asChild>
         <Button className="cursor-pointer" disabled={!user.emailVerified}>
           <FilePlus className="-ml-1 mr-2 h-4 w-4" />
-          <Trans>New Template</Trans>
+          <Trans>Template (Legacy)</Trans>
         </Button>
       </DialogTrigger>
 

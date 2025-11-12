@@ -1,5 +1,6 @@
 import { EnvelopeType } from '@prisma/client';
 import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 import {
   ZDocumentAccessAuthTypesSchema,
@@ -9,32 +10,35 @@ import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-va
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import {
-  ZFieldHeightSchema,
+  ZClampedFieldHeightSchema,
+  ZClampedFieldPositionXSchema,
+  ZClampedFieldPositionYSchema,
+  ZClampedFieldWidthSchema,
   ZFieldPageNumberSchema,
-  ZFieldPageXSchema,
-  ZFieldPageYSchema,
-  ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
+import { zodFormData } from '../../utils/zod-form-data';
 import {
   ZDocumentExternalIdSchema,
   ZDocumentTitleSchema,
   ZDocumentVisibilitySchema,
 } from '../document-router/schema';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';
+import type { TrpcRouteMeta } from '../trpc';
 
-// Currently not in use until we allow passthrough documents on create.
-// export const createEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/create',
-//     summary: 'Create envelope',
-//     tags: ['Envelope'],
-//   },
-// };
+export const createEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/create',
+    contentTypes: ['multipart/form-data'],
+    summary: 'Create envelope',
+    description: 'Create an envelope using form data.',
+    tags: ['Envelope'],
+  },
+};
 
-export const ZCreateEnvelopeRequestSchema = z.object({
+export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
   externalId: ZDocumentExternalIdSchema.optional(),
@@ -42,12 +46,6 @@ export const ZCreateEnvelopeRequestSchema = z.object({
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),
   globalActionAuth: z.array(ZDocumentActionAuthTypesSchema).optional(),
   formValues: ZDocumentFormValuesSchema.optional(),
-  items: z
-    .object({
-      title: ZDocumentTitleSchema.optional(),
-      documentDataId: z.string(),
-    })
-    .array(),
   folderId: z
     .string()
     .describe(
@@ -57,18 +55,19 @@ export const ZCreateEnvelopeRequestSchema = z.object({
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({
-        fields: ZFieldAndMetaSchema.and(
+        fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
-            documentDataId: z
-              .string()
+            identifier: z
+              .union([z.string(), z.number()])
               .describe(
-                'The ID of the document data to create the field on. If empty, the first document data will be used.',
-              ),
+                'Either the filename or the index of the file that was uploaded to attach the field to.',
+              )
+              .optional(),
             page: ZFieldPageNumberSchema,
-            positionX: ZFieldPageXSchema,
-            positionY: ZFieldPageYSchema,
-            width: ZFieldWidthSchema,
-            height: ZFieldHeightSchema,
+            positionX: ZClampedFieldPositionXSchema,
+            positionY: ZClampedFieldPositionYSchema,
+            width: ZClampedFieldWidthSchema,
+            height: ZClampedFieldHeightSchema,
           }),
         )
           .array()
@@ -88,9 +87,15 @@ export const ZCreateEnvelopeRequestSchema = z.object({
     .optional(),
 });
 
+export const ZCreateEnvelopeRequestSchema = zodFormData({
+  payload: zfd.json(ZCreateEnvelopePayloadSchema),
+  files: zfd.repeatableOfType(zfd.file()),
+});
+
 export const ZCreateEnvelopeResponseSchema = z.object({
   id: z.string(),
 });
 
+export type TCreateEnvelopePayload = z.infer<typeof ZCreateEnvelopePayloadSchema>;
 export type TCreateEnvelopeRequest = z.infer<typeof ZCreateEnvelopeRequestSchema>;
 export type TCreateEnvelopeResponse = z.infer<typeof ZCreateEnvelopeResponseSchema>;

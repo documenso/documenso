@@ -88,14 +88,12 @@ export default function Layout({ loaderData, params, matches }: Route.ComponentP
             ? {
                 heading: msg`Organisation not found`,
                 subHeading: msg`404 Organisation not found`,
-                message: msg`The organisation you are looking for may have been removed, renamed or may have never
-                  existed.`,
+                message: msg`The organisation you are looking for may have been removed, renamed or may have never existed.`,
               }
             : {
                 heading: msg`Team not found`,
                 subHeading: msg`404 Team not found`,
-                message: msg`The team you are looking for may have been removed, renamed or may have never
-                  existed.`,
+                message: msg`The team you are looking for may have been removed, renamed or may have never existed.`,
               },
         }}
         primaryButton={
