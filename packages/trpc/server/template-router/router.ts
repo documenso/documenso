@@ -177,7 +177,19 @@ export const templateRouter = router({
 
       const { payload, file } = input;
 
-      const { title, folderId } = payload;
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
+        meta,
+        attachments,
+      } = payload;
 
       const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
 
@@ -194,13 +206,22 @@ export const templateRouter = router({
         data: {
           type: EnvelopeType.TEMPLATE,
           title,
-          folderId,
           envelopeItems: [
             {
               documentDataId: templateDocumentDataId,
             },
           ],
+          folderId,
+          externalId: externalId ?? undefined,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          templateType: type,
+          publicTitle,
+          publicDescription,
         },
+        meta,
+        attachments,
         requestMetadata: ctx.metadata,
       });
 
