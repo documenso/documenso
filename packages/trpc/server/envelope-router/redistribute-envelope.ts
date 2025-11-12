@@ -1,5 +1,6 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
@@ -32,4 +33,6 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
       recipients,
       requestMetadata: ctx.metadata,
     });
+
+    return ZGenericSuccessResponse;
   });

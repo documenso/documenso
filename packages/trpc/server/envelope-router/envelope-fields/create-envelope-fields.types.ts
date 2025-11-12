@@ -16,7 +16,6 @@ export const createEnvelopeFieldsMeta: TrpcRouteMeta = {
   openapi: {
     method: 'POST',
     path: '/envelope/field/create-many',
-    contentTypes: ['multipart/form-data'],
     summary: 'Create envelope fields',
     description: 'Create multiple fields for an envelope',
     tags: ['Envelope Fields'],
