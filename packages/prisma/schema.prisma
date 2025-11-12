@@ -319,6 +319,9 @@ model Session {
   updatedAt DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
 }
 
 enum DocumentStatus {
@@ -426,6 +429,10 @@ model Envelope {
   documentMeta   DocumentMeta @relation(fields: [documentMetaId], references: [id])
 
   envelopeAttachments EnvelopeAttachment[]
+
+  @@index([folderId])
+  @@index([teamId])
+  @@index([userId])
 }
 
 model EnvelopeItem {
@@ -444,6 +451,7 @@ model EnvelopeItem {
   field Field[]
 
   @@unique([documentDataId])
+  @@index([envelopeId])
 }
 
 model DocumentAuditLog {
@@ -526,6 +534,8 @@ model EnvelopeAttachment {
 
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 enum ReadStatus {
@@ -613,6 +623,7 @@ model Field {
   fieldMeta      Json? /// [FieldMeta] @zod.custom.use(ZFieldMetaNotOptionalSchema)
 
   @@index([envelopeId])
+  @@index([envelopeItemId])
   @@index([recipientId])
 }
 
@@ -728,6 +739,8 @@ model OrganisationGroup {
   organisationGroupMembers OrganisationGroupMember[]
 
   teamGroups TeamGroup[]
+
+  @@index([organisationId])
 }
 
 model OrganisationGroupMember {
@@ -740,6 +753,8 @@ model OrganisationGroupMember {
   organisationMemberId String
 
   @@unique([organisationMemberId, groupId])
+  @@index([groupId])
+  @@index([organisationMemberId])
 }
 
 model TeamGroup {
@@ -754,6 +769,8 @@ model TeamGroup {
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, organisationGroupId])
+  @@index([teamId])
+  @@index([organisationGroupId])
 }
 
 enum OrganisationGroupType {
@@ -865,6 +882,8 @@ model Team {
 
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
+
+  @@index([organisationId])
 }
 
 model TeamEmail {
