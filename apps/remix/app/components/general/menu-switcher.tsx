@@ -97,6 +97,12 @@ export const MenuSwitcher = () => {
           </Link>
         </DropdownMenuItem>
 
+        <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+          <Link to="/settings/analytics">
+            <Trans>Personal analytics</Trans>
+          </Link>
+        </DropdownMenuItem>
+
         <DropdownMenuItem
           className="text-muted-foreground px-4 py-2"
           onClick={() => setLanguageSwitcherOpen(true)}

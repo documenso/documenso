@@ -2,6 +2,7 @@ import type { HTMLAttributes } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import {
+  BarChart3Icon,
   BracesIcon,
   CreditCardIcon,
   Globe2Icon,
@@ -125,6 +126,19 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
             >
               <WebhookIcon className="mr-2 h-5 w-5" />
               <Trans>Webhooks</Trans>
+            </Button>
+          </Link>
+
+          <Link to="/settings/analytics">
+            <Button
+              variant="ghost"
+              className={cn(
+                'w-full justify-start',
+                pathname?.startsWith('/settings/analytics') && 'bg-secondary',
+              )}
+            >
+              <BarChart3Icon className="mr-2 h-5 w-5" />
+              <Trans>Analytics</Trans>
             </Button>
           </Link>
 
