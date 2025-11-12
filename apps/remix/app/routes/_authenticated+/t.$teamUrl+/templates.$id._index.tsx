@@ -66,8 +66,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Not found`,
             subHeading: msg`404 Not found`,
-            message: msg`The template you are looking for may have been removed, renamed or may have never
-                  existed.`,
+            message: msg`The template you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -170,8 +169,12 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
               envelope={envelope}
+              token={undefined}
               fields={envelope.fields}
-              recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+              recipients={envelope.recipients}
+              overrideSettings={{
+                showRecipientTooltip: true,
+              }}
             >
               {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
@@ -179,7 +182,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+                  <PDFViewerKonvaLazy
+                    renderer="preview"
+                    customPageRenderer={EnvelopeGenericPageRenderer}
+                  />
                 </CardContent>
               </Card>
             </EnvelopeRenderProvider>
@@ -200,9 +206,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               />
 
               <PDFViewer
-                document={envelope}
+                envelopeItem={envelope.envelopeItems[0]}
+                token={undefined}
+                version="signed"
                 key={envelope.envelopeItems[0].id}
-                documentData={envelope.envelopeItems[0].documentData}
               />
             </CardContent>
           </Card>

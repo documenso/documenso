@@ -30,7 +30,7 @@ import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 export default function EnvelopeEditorFieldsPageRenderer() {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
   const interactiveTransformer = useRef<Transformer | null>(null);
 
@@ -116,7 +116,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       fieldUpdates.height = fieldPageHeight;
     }
 
-    // Todo: envelopes Use id
     editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
 
     // Select the field if it is not already selected.
@@ -127,7 +126,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     pageLayer.current?.batchDraw();
   };
 
-  const renderFieldOnLayer = (field: TLocalField) => {
+  const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
     }
@@ -171,6 +170,15 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
     fieldGroup.on('transformend', handleResizeOrMove);
     fieldGroup.on('dragend', handleResizeOrMove);
+  };
+
+  const renderFieldOnLayer = (field: TLocalField) => {
+    try {
+      unsafeRenderFieldOnLayer(field);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**
@@ -630,13 +638,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
             transform: 'translateX(-50%)',
             zIndex: 50,
           }}
-          className="text-muted-foreground grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border bg-white p-1 shadow-sm"
+          // Don't use darkmode for this component, it should look the same for both light/dark modes.
+          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-sm"
         >
           {fieldButtonList.map((field) => (
             <button
               key={field.type}
               onClick={() => createFieldFromPendingTemplate(pendingFieldCreation, field.type)}
-              className="hover:text-foreground col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100"
+              className="col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
             >
               {t(field.name)}
             </button>

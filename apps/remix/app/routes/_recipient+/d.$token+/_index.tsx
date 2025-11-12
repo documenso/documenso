@@ -8,7 +8,6 @@ import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/env
 import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
-import { getEnvelopeRequiredAccessData } from '@documenso/lib/server-only/envelope/get-envelope-required-access-data';
 import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
 import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
 import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
@@ -98,15 +97,12 @@ const handleV2Loader = async ({ params, request }: Route.LoaderArgs) => {
         envelopeForSigning,
       } as const;
     })
-    .catch(async (e) => {
+    .catch((e) => {
       const error = AppError.parseError(e);
 
       if (error.code === AppErrorCode.UNAUTHORIZED) {
-        const requiredAccessData = await getEnvelopeRequiredAccessData({ token });
-
         return {
           isDocumentAccessValid: false,
-          ...requiredAccessData,
         } as const;
       }
 
@@ -188,6 +184,7 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
       <DocumentSigningAuthProvider
         documentAuthOptions={template.authOptions}
         recipient={directTemplateRecipient}
+        isDirectTemplate={true}
         user={user}
       >
         <>
@@ -226,20 +223,21 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
   const user = sessionData?.user;
 
   if (!data.isDocumentAccessValid) {
-    return (
-      <DocumentSigningAuthPageView
-        email={data.recipientEmail}
-        emailHasAccount={!!data.recipientHasAccount}
-      />
-    );
+    return <DocumentSigningAuthPageView email={''} emailHasAccount={true} />;
   }
 
   const { envelope, recipient } = data.envelopeForSigning;
 
+  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+    documentAuth: envelope.authOptions,
+  });
+
+  const isEmailForced = derivedRecipientAccessAuth.includes(DocumentAccessAuth.ACCOUNT);
+
   return (
     <EnvelopeSigningProvider
       envelopeData={data.envelopeForSigning}
-      email={''} // Doing this allows us to let users change the email if they want to.
+      email={isEmailForced ? user?.email || '' : ''} // Doing this allows us to let users change the email if they want to for non-auth templates.
       fullName={user?.name}
       signature={user?.signature}
     >
@@ -248,7 +246,7 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
         recipient={recipient}
         user={user}
       >
-        <EnvelopeRenderProvider envelope={envelope}>
+        <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
           <DocumentSigningPageViewV2 />
         </EnvelopeRenderProvider>
       </DocumentSigningAuthProvider>

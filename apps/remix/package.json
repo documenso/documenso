@@ -27,6 +27,7 @@
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
     "@epic-web/remember": "^1.1.0",
+    "@faker-js/faker": "^10.1.0",
     "@hono/node-server": "^1.13.7",
     "@hono/trpc-server": "^0.3.4",
     "@hookform/resolvers": "^3.1.0",
@@ -43,6 +44,7 @@
     "ai": "^5.0.82",
     "autoprefixer": "^10.4.13",
     "colord": "^2.9.3",
+    "content-disposition": "^0.5.4",
     "framer-motion": "^10.12.8",
     "hono": "4.7.0",
     "hono-rate-limiter": "^0.4.2",
@@ -90,6 +92,7 @@
     "@rollup/plugin-node-resolve": "^16.0.0",
     "@rollup/plugin-typescript": "^12.1.2",
     "@simplewebauthn/types": "^9.0.1",
+    "@types/content-disposition": "^0.5.9",
     "@types/formidable": "^2.0.6",
     "@types/luxon": "^3.3.1",
     "@types/node": "^20",
@@ -107,5 +110,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "1.13.1"
+  "version": "2.0.7"
 }

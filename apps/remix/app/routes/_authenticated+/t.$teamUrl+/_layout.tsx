@@ -60,8 +60,7 @@ export default function Layout() {
           404: {
             heading: msg`Team not found`,
             subHeading: msg`404 Team not found`,
-            message: msg`The team you are looking for may have been removed, renamed or may have never
-                existed.`,
+            message: msg`The team you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
