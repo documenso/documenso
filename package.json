@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "2.0.6",
+  "version": "2.0.7",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@documenso/remix",
