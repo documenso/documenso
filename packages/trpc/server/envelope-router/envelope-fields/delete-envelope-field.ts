@@ -7,6 +7,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
   ZDeleteEnvelopeFieldRequestSchema,
@@ -115,4 +116,6 @@ export const deleteEnvelopeFieldRoute = authenticatedProcedure
 
       return deletedField;
     });
+
+    return ZGenericSuccessResponse;
   });

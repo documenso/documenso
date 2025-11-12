@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
 
+import { ZSuccessResponseSchema } from '../schema';
 import type { TrpcRouteMeta } from '../trpc';
 
 export const distributeEnvelopeMeta: TrpcRouteMeta = {
@@ -30,7 +31,7 @@ export const ZDistributeEnvelopeRequestSchema = z.object({
   }).optional(),
 });
 
-export const ZDistributeEnvelopeResponseSchema = z.void();
+export const ZDistributeEnvelopeResponseSchema = ZSuccessResponseSchema;
 
 export type TDistributeEnvelopeRequest = z.infer<typeof ZDistributeEnvelopeRequestSchema>;
 export type TDistributeEnvelopeResponse = z.infer<typeof ZDistributeEnvelopeResponseSchema>;
