@@ -27,8 +27,20 @@ const getMultipartBody = async (req: Request) => {
   for (const key of formData.keys()) {
     const values = formData.getAll(key);
 
-    // Return array for multiple values, single value otherwise (matches URL-encoded behavior)
-    data[key] = values.length > 1 ? values : values[0];
+    // !: Handles cases where our generated SDKs send key[] syntax for arrays.
+    if (key.endsWith('[]')) {
+      const trimmedKey = key.slice(0, -2);
+
+      if (!Array.isArray(data[trimmedKey])) {
+        data[trimmedKey] = typeof data[trimmedKey] !== 'undefined' ? [data[trimmedKey]] : [];
+      }
+
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      (data[trimmedKey] as Array<unknown>).push(...values);
+    } else {
+      // Return array for multiple values, single value otherwise (matches URL-encoded behavior)
+      data[key] = values.length > 1 ? values : values[0];
+    }
   }
 
   return data;
