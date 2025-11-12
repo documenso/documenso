@@ -472,17 +472,7 @@ export const EnvelopeEditorFieldsPage = () => {
                 }
               }}
             >
-              {isAutoAddingFields ? (
-                processingProgress ? (
-                  <Trans>
-                    Processing page {processingProgress.current} of {processingProgress.total}...
-                  </Trans>
-                ) : (
-                  <Trans>Processing...</Trans>
-                )
-              ) : (
-                <Trans>Auto add fields</Trans>
-              )}
+              {isAutoAddingFields ? <Trans>Processing...</Trans> : <Trans>Auto add fields</Trans>}
             </Button>
           </section>
 

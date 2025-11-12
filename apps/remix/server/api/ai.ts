@@ -1,12 +1,12 @@
 // sort-imports-ignore
 
 // ---- PATCH pdfjs-dist's canvas require BEFORE importing it ----
-import { createRequire } from 'module';
-import { fileURLToPath } from 'url';
+import { createRequire } from 'node:module';
+import { fileURLToPath } from 'node:url';
 import { Canvas, Image } from 'skia-canvas';
 
 const require = createRequire(import.meta.url || fileURLToPath(new URL('.', import.meta.url)));
-const Module = require('module');
+const Module = require('node:module');
 
 const originalRequire = Module.prototype.require;
 Module.prototype.require = function (path: string) {
@@ -24,24 +24,23 @@ Module.prototype.require = function (path: string) {
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
 
-import { generateObject } from 'ai';
-import { mkdir, writeFile } from 'fs/promises';
-import { Hono } from 'hono';
-import { join } from 'path';
-import sharp from 'sharp';
-
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
+import { generateObject } from 'ai';
+import { Hono } from 'hono';
+import sharp from 'sharp';
 
 import type { HonoEnv } from '../router';
 import {
   type TDetectFormFieldsResponse,
-  ZDetectFormFieldsRequestSchema,
   ZDetectedFormFieldSchema,
+  ZDetectFormFieldsRequestSchema,
 } from './ai.types';
 
 const renderPdfToImage = async (pdfBytes: Uint8Array) => {
@@ -143,6 +142,8 @@ DETECTION GUIDELINES:
 
 BOUNDING BOX PLACEMENT (CRITICAL):
 - Your coordinates must capture ONLY the empty fillable space (the blank area where input goes)
+- Once you find the fillable region, LOCK the box to the full boundary of that region (top, bottom, left, right). Do not leave the box floating over just the starting edge.
+- If the field is defined by a line or a rectangular border, extend xmin/xmax/ymin/ymax across the entire line/border so the box spans the whole writable area end-to-end.
 - EXCLUDE all printed text labels, even if they are:
   · Directly to the left of the field (e.g., "Name: _____")
   · Directly above the field (e.g., "Signature" printed above a line)
@@ -150,6 +151,7 @@ BOUNDING BOX PLACEMENT (CRITICAL):
   · Inside the same outlined box as the fillable area
 - The label text helps you IDENTIFY the field type, but must be EXCLUDED from the bounding box
 - If you detect a label "Email:" followed by a blank box, draw the box around ONLY the blank box, not the word "Email:"
+- The box should never cover only the leftmost few characters of a long field. For "Signature: ____________", the box must stretch from the first underscore to the last.
 
 COORDINATE SYSTEM:
 - [ymin, xmin, ymax, xmax] normalized to 0-1000 scale
