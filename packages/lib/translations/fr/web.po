@@ -8,7 +8,7 @@ msgstr ""
 "Language: fr\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-11-07 03:40\n"
+"PO-Revision-Date: 2025-11-12 06:14\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
@@ -97,7 +97,7 @@ msgstr "{0, plural, one {# destinataire} other {# destinataires}}"
 #. placeholder {0}: envelope.recipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "{0, plural, one {# Recipient} other {# Recipients}}"
-msgstr ""
+msgstr "{0, plural, one {# Destinataire} other {# Destinataires}}"
 
 #. placeholder {0}: org.teams.length
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
@@ -155,7 +155,7 @@ msgstr "{0}"
 #. placeholder {0}: file.name
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "{0} couldn't be uploaded:"
-msgstr ""
+msgstr "{0} n'a pas pu être téléchargé :"
 
 #. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -209,7 +209,7 @@ msgstr "{charactersRemaining, plural, one {1 caractère restant} other {{charact
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "{expiresInMinutes, plural, one {This code will expire in # minute.} other {This code will expire in # minutes.}}"
-msgstr ""
+msgstr "{expiresInMinutes, plural, one {Ce code expirera dans # minute.} other {Ce code expirera dans # minutes.}}"
 
 #: packages/email/templates/document-invite.tsx
 msgid "{inviterName} <0>({inviterEmail})</0>"
@@ -261,7 +261,7 @@ msgstr "{inviterName} représentant \"{teamName}\" vous a invité à {action} {d
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "{MAXIMUM_PASSKEYS, plural, one {You cannot have more than # passkey.} other {You cannot have more than # passkeys.}}"
-msgstr ""
+msgstr "{MAXIMUM_PASSKEYS, plural, one {Vous ne pouvez pas avoir plus de # clé d'accès.} other {Vous ne pouvez pas avoir plus de # clés d'accès.}}"
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "{prefix} added a field"
@@ -1324,7 +1324,7 @@ msgstr "Une erreur est survenue"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "An error occurred during upload."
-msgstr ""
+msgstr "Une erreur est survenue lors du téléchargement."
 
 #: apps/remix/app/components/general/template/template-edit-form.tsx
 msgid "An error occurred while adding fields."
@@ -1872,7 +1872,7 @@ msgstr "Bleu"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Bottom"
-msgstr ""
+msgstr "Bas"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Brand Details"
@@ -2116,7 +2116,7 @@ msgstr "Centre"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
-msgstr ""
+msgstr "Limite de caractères"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
@@ -3243,7 +3243,7 @@ msgstr "Document \"{0}\" Annulé"
 
 #: packages/ui/primitives/document-upload-button.tsx
 msgid "Document (Legacy)"
-msgstr ""
+msgstr "Document (Legacy)"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Document & Recipients"
@@ -3379,7 +3379,7 @@ msgstr "ID du document"
 
 #: apps/remix/app/components/general/document/document-page-view-information.tsx
 msgid "Document ID (Legacy)"
-msgstr ""
+msgstr "ID de Document (Legacy)"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document inbox"
@@ -3536,7 +3536,7 @@ msgstr "Visibilité du document mise à jour"
 
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 msgid "Document Volume"
-msgstr ""
+msgstr "Volume de documents"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "Document will be permanently deleted"
@@ -3570,11 +3570,11 @@ msgstr "Documents et ressources liés à cette enveloppe."
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 msgid "Documents Completed"
-msgstr ""
+msgstr "Documents Complétés"
 
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 msgid "Documents Created"
-msgstr ""
+msgstr "Documents Créés"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Documents created from template"
@@ -3969,7 +3969,7 @@ msgstr "Activez la personnalisation de la marque pour tous les documents de cett
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Enable direct link signing"
-msgstr ""
+msgstr "Activer la signature par lien direct"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: packages/lib/constants/template.ts
@@ -4980,7 +4980,7 @@ msgstr "Rejoignez notre communauté sur <0>Discord</0> pour obtenir de l'aide et
 
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 msgid "Joined"
-msgstr ""
+msgstr "Joint"
 
 #. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
@@ -5017,7 +5017,7 @@ msgstr "30 derniers jours"
 
 #: apps/remix/app/components/filters/date-range-filter.tsx
 msgid "Last 30 Days"
-msgstr ""
+msgstr "30 derniers jours"
 
 #: apps/remix/app/components/general/period-selector.tsx
 msgid "Last 7 days"
@@ -5025,7 +5025,7 @@ msgstr "7 derniers jours"
 
 #: apps/remix/app/components/filters/date-range-filter.tsx
 msgid "Last 90 Days"
-msgstr ""
+msgstr "90 derniers jours"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Last Active"
@@ -5058,7 +5058,7 @@ msgstr "Dernière utilisation"
 
 #: apps/remix/app/components/filters/date-range-filter.tsx
 msgid "Last Year"
-msgstr ""
+msgstr "Dernière Année"
 
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
@@ -5086,11 +5086,11 @@ msgstr "Légalité des signatures électroniques"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Letter spacing"
-msgstr ""
+msgstr "Espacement des lettres"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Letter Spacing"
-msgstr ""
+msgstr "Espacement des Lettres"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Light Mode"
@@ -5102,11 +5102,11 @@ msgstr "Vous voulez avoir votre propre profil public avec des accords ?"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Line height"
-msgstr ""
+msgstr "Hauteur de ligne"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Line Height"
-msgstr ""
+msgstr "Hauteur de Ligne"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Link expires in 1 hour."
@@ -5410,7 +5410,7 @@ msgstr "Message <0>(Optionnel)</0>"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Middle"
-msgstr ""
+msgstr "Milieu"
 
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -5893,7 +5893,7 @@ msgstr "L'organisation a été mise à jour avec succès"
 #: apps/remix/app/routes/_authenticated+/admin+/organisation-insights._index.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/_layout.tsx
 msgid "Organisation Insights"
-msgstr ""
+msgstr "Aperçu de l'Organisation"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "Organisation invitation"
@@ -5993,7 +5993,7 @@ msgstr "Organisez vos documents et modèles"
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Original document (adjective)"
 msgid "Original"
-msgstr ""
+msgstr "Original"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "Otherwise, the document will be created as a draft."
@@ -6034,7 +6034,7 @@ msgstr "Page {0} sur {numPages}"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 msgid "Paid"
-msgstr ""
+msgstr "Payé"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/forms/signin.tsx
@@ -6163,7 +6163,7 @@ msgstr "par an"
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgctxt "Personal organisation (adjective)"
 msgid "Personal"
-msgstr ""
+msgstr "Personnel"
 
 #: apps/remix/app/components/general/org-menu-switcher.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
@@ -7035,7 +7035,7 @@ msgstr "Rechercher par ID d'organisation, nom, ID client ou e-mail du propriéta
 
 #: apps/remix/app/components/tables/admin-organisation-overview-table.tsx
 msgid "Search by organisation name"
-msgstr ""
+msgstr "Rechercher par nom d'organisation"
 
 #: apps/remix/app/components/general/document/document-search.tsx
 msgid "Search documents..."
@@ -7209,7 +7209,7 @@ msgstr "Sélectionner les déclencheurs"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Select vertical align"
-msgstr ""
+msgstr "Sélectionner l'alignement vertical"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
 msgid "Select visibility"
@@ -7589,7 +7589,7 @@ msgstr "Signé"
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Signed document (adjective)"
 msgid "Signed"
-msgstr ""
+msgstr "Signé"
 
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role actioned"
@@ -8159,7 +8159,7 @@ msgstr "Modèle"
 #: apps/remix/app/components/dialogs/template-create-dialog.tsx
 #: packages/ui/primitives/document-upload-button.tsx
 msgid "Template (Legacy)"
-msgstr ""
+msgstr "Modèle (Legacy)"
 
 #: apps/remix/app/routes/embed+/v1+/authoring_.completed.create.tsx
 msgid "Template Created"
@@ -8191,7 +8191,7 @@ msgstr "Le modèle a été mis à jour."
 
 #: apps/remix/app/components/general/template/template-page-view-information.tsx
 msgid "Template ID (Legacy)"
-msgstr ""
+msgstr "ID de Modèle (Legacy)"
 
 #: apps/remix/app/components/general/legacy-field-warning-popover.tsx
 msgid "Template is using legacy field insertion"
@@ -8376,7 +8376,7 @@ msgstr "Le document que vous cherchez n'a pas pu être trouvé."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "The document you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "Le document que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: packages/ui/components/document/document-send-email-message-helper.tsx
 msgid "The document's name"
@@ -8388,7 +8388,7 @@ msgstr "L'adresse e-mail qui apparaîtra dans le champ \"Répondre à\" dans les
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.email-domains.$id.tsx
 msgid "The email domain you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "Le domaine de messagerie que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: apps/remix/app/components/forms/signin.tsx
 msgid "The email or password provided is incorrect"
@@ -8445,7 +8445,7 @@ msgstr "L'e-mail de l'organisation a été créé avec succès."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation group you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "Le groupe d'organisation que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "The organisation role that will be applied to all members in this group."
@@ -8454,7 +8454,7 @@ msgstr "Le rôle d'organisation qui sera appliqué à tous les membres de ce gro
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "The organisation you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "L'organisation que vous recherchez a peut-être été supprimée, renommée ou n'a jamais existé."
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 msgid "The page you are looking for was moved, removed, renamed or might never have existed."
@@ -8547,7 +8547,7 @@ msgstr "L'email d'équipe <0>{teamEmail}</0> a été supprimé de l'équipe suiv
 #: apps/remix/app/routes/_authenticated+/_layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/_layout.tsx
 msgid "The team you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "L'équipe que vous recherchez a peut-être été supprimée, renommée ou n'a jamais existé."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The template has been moved successfully."
@@ -8563,7 +8563,7 @@ msgstr "Le modèle que vous cherchez n'a pas pu être trouvé."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "The template you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "Le modèle que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "The test webhook has been successfully sent to your endpoint."
@@ -8604,7 +8604,7 @@ msgstr "L'URL pour Documenso pour envoyer des événements webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "L'utilisateur que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "The user's two factor authentication has been reset successfully."
@@ -8624,7 +8624,7 @@ msgstr "Le webhook a été créé avec succès."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 msgid "The webhook you are looking for may have been removed, renamed or may have never existed."
-msgstr ""
+msgstr "Le webhook que vous recherchez a peut-être été supprimé, renommé ou n'a jamais existé."
 
 #: apps/remix/app/components/tables/documents-table-empty-state.tsx
 msgid "There are no active drafts at the current moment. You can upload a document to start drafting."
@@ -8943,13 +8943,13 @@ msgstr "Le titre ne peut pas être vide"
 #. placeholder {2}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To {0} this {1}, you need to be logged in as <0>{2}</0>"
-msgstr ""
+msgstr "Pour {0} ce {1}, vous devez être connecté en tant que <0>{2}</0>"
 
 #. placeholder {0}: actionVerb.toLowerCase()
 #. placeholder {1}: actionTarget.toLowerCase()
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To {0} this {1}, you need to be logged in."
-msgstr ""
+msgstr "Pour {0} ce {1}, vous devez être connecté."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
@@ -8993,7 +8993,7 @@ msgstr "Pour marquer ce document comme consulté, vous devez être connecté en 
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To mark this document as viewed, you need to be logged in."
-msgstr ""
+msgstr "Pour marquer ce document comme vu, vous devez être connecté."
 
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
 #. placeholder {0}: emptyCheckboxFields.length > 0 ? 'Checkbox' : emptyRadioFields.length > 0 ? 'Radio' : 'Select'
@@ -9052,7 +9052,7 @@ msgstr "Nom du token"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Top"
-msgstr ""
+msgstr "Haut"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Total Documents"
@@ -9595,7 +9595,7 @@ msgstr "Valeur"
 
 #: packages/lib/types/field-meta.ts
 msgid "Value must be a number"
-msgstr ""
+msgstr "La valeur doit être un nombre"
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "Verification Code Required"
@@ -9646,7 +9646,7 @@ msgstr "Vertical"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Vertical Align"
-msgstr ""
+msgstr "Alignement Vertical"
 
 #: apps/remix/app/components/tables/organisation-billing-invoices-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
@@ -11040,3 +11040,4 @@ msgstr "Votre code de vérification :"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
