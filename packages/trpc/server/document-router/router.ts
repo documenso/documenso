@@ -8,6 +8,7 @@ import { createDocumentRoute } from './create-document';
 import { createDocumentTemporaryRoute } from './create-document-temporary';
 import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
+import { downloadDocumentRoute } from './download-document';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
 import { downloadDocumentBetaRoute } from './download-document-beta';
 import { downloadDocumentCertificateRoute } from './download-document-certificate';
@@ -36,6 +37,8 @@ export const documentRouter = router({
   redistribute: redistributeDocumentRoute,
   search: searchDocumentRoute,
   share: shareDocumentRoute,
+
+  download: downloadDocumentRoute,
 
   // Deprecated endpoints which need to be removed in the future.
   downloadBeta: downloadDocumentBetaRoute,
