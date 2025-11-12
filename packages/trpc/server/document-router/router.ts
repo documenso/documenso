@@ -38,9 +38,10 @@ export const documentRouter = router({
   search: searchDocumentRoute,
   share: shareDocumentRoute,
 
-  // Temporary v2 beta routes to be removed once V2 is fully released.
-  downloadBeta: downloadDocumentBetaRoute,
   download: downloadDocumentRoute,
+
+  // Deprecated endpoints which need to be removed in the future.
+  downloadBeta: downloadDocumentBetaRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
 
   // Internal document routes for custom frontend requests.
