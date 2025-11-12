@@ -3,7 +3,6 @@ import { EnvelopeType } from '@prisma/client';
 import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 
-import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
   ZCreateAttachmentRequestSchema,
@@ -42,12 +41,14 @@ export const createAttachmentRoute = authenticatedProcedure
       type: EnvelopeType.DOCUMENT,
     });
 
-    await createAttachment({
+    const attachment = await createAttachment({
       envelopeId: envelope.id,
       teamId,
       userId,
       data,
     });
 
-    return ZGenericSuccessResponse;
+    return {
+      id: attachment.id,
+    };
   });
