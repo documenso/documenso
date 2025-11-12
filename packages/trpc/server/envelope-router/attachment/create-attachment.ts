@@ -21,10 +21,14 @@ export const createAttachmentRoute = authenticatedProcedure
       input: { envelopeId, label: data.label },
     });
 
-    await createAttachment({
+    const attachment = await createAttachment({
       envelopeId,
       teamId,
       userId,
       data,
     });
+
+    return {
+      id: attachment.id,
+    };
   });
