@@ -1,6 +1,5 @@
 import { createAttachment } from '@documenso/lib/server-only/envelope-attachment/create-attachment';
 
-import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
   ZCreateAttachmentRequestSchema,
@@ -22,12 +21,14 @@ export const createAttachmentRoute = authenticatedProcedure
       input: { envelopeId, label: data.label },
     });
 
-    await createAttachment({
+    const attachment = await createAttachment({
       envelopeId,
       teamId,
       userId,
       data,
     });
 
-    return ZGenericSuccessResponse;
+    return {
+      id: attachment.id,
+    };
   });
