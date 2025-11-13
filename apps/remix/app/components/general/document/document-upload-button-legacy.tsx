@@ -76,8 +76,10 @@ export const DocumentUploadButtonLegacy = ({ className }: DocumentUploadButtonLe
 
       const payload = {
         title: file.name,
-        timezone: userTimezone,
         folderId: folderId ?? undefined,
+        meta: {
+          timezone: userTimezone,
+        },
       } satisfies TCreateDocumentPayloadSchema;
 
       const formData = new FormData();

@@ -16,7 +16,7 @@ import {
   ZClampedFieldWidthSchema,
   ZFieldPageNumberSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import {
@@ -55,7 +55,7 @@ export const ZCreateEnvelopePayloadSchema = z.object({
   recipients: z
     .array(
       ZCreateRecipientSchema.extend({
-        fields: ZFieldAndMetaSchema.and(
+        fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z
               .union([z.string(), z.number()])

@@ -9,90 +9,85 @@ import { Callout, Steps } from 'nextra/components';
 
 This guide will walk you through the process of sending a document out for signing. You will learn how to upload a document, add recipients, place signature fields, and send the document for signing.
 
+## Uploading a Document
+
 <Steps>
-### Login Into Your Account
+### Log In to Your Account
 
 The guide assumes you have a Documenso account. If you don't, you can create a free account [here](https://documen.so/free-docs).
 
 ### Upload Document
 
-Navigate to the [Documenso dashboard](https://app.documenso.com/documents) and click on the "Add a document" button. Select the document you want to upload and wait for the upload to complete.
+Navigate to the [Documenso dashboard](https://app.documenso.com/documents) and click on the "Upload Document" button located at the top right of the page. Select the documents you want to upload and wait for the upload to complete.
 
 <Callout type="info">
-  The maximum file size for uploaded documents is 150MB in production. In staging, the limit is
-  50MB.
+  The maximum file size for uploaded documents is 150MB in production. You can upload up to 5
+  documents at a time on standard plans. In staging, the limit is 50MB.
 </Callout>
 
 ![Documenso dashboard](/document-signing/documenso-documents-dashboard.webp)
 
-After the upload is complete, you will be redirected to the document's page. You can configure the document's settings and add recipients and fields here.
+After the upload is complete, you will be redirected to the editor. You can configure the document's settings and add recipients and fields here.
 
-![Documenso document overview](/document-signing/documenso-uploaded-document.webp)
+</Steps>
 
-### (Optional) Advanced Options
+## Configuring and Sending Document
 
-Click on the "Advanced options" button to access additional settings for the document. You can set an external ID, date format, time zone, and the redirect URL.
+The Documenso editor allows you to create and configure documents or templates. The editor consists of three sections that guide you through the process of preparing your document.
 
-![Advanced settings for a document uploaded in the Documenso dashboard](/document-signing/documenso-uploaded-document-advanced-options.webp)
+1. **Document & Recipients** - Upload files and add recipients
+2. **Add Fields** - Add fields to the document
+3. **Preview** - Preview the document before sending
 
-The external ID allows you to set a custom ID for the document that can be used to identify the document in your external system(s).
+You can click each section to navigate to it, and the current section will be highlighted in the sidebar.
 
-The date format and time zone settings allow you to customize how the date and time are displayed in the document.
+![Editor page in the Documenso dashboard](/document-signing/editor-overview.webp)
 
-The redirect URL allows you to specify a URL where the signer will be redirected after signing the document.
+There is also a quick actions section on the left-hand side which allows you to:
 
-### (Optional) Document Access
+- **Document Settings** - Configure general settings, emails, or security settings for the document
+- **Send Document** - Send the document to the recipients
+- **Duplicate** - Duplicate the document
+- **Download** - Download the document PDF
+- **Delete** - Delete the document
 
-Documenso enables you to set up access control for your documents. You can require authentication for viewing the document.
+The header contains some notable items:
 
-The available options are:
+- **Title** - You can edit the title in the top-left corner of the header by clicking on the text
+- **Status** - You can see the current status of the document next to the title
+- **Attachments** - You can configure the attachments on the right-hand side of the header
 
-- **Require account** - The recipient must be signed in to view the document.
-- **None** - The document can be accessed directly by the URL sent to the recipient.
+<Steps>
 
-![Document access settings in the Documenso dashboard](/document-signing/documenso-enterprise-document-access.webp)
+### Upload Documents and Add Recipients
 
-<Callout type="info">
-  The "Document Access" feature is only available for Enterprise accounts.
-</Callout>
+The first step in the editor is to upload your document and add recipients.
 
-### (Optional) Recipient Authentication
+![Upload and add recipients page in the Documenso editor](/document-signing/editor-upload-recipients.webp)
 
-The "Recipient Authentication" feature allows you to specify the authentication method required for recipients to sign the signature field.
+#### Upload Document
 
-The available options are:
-
-- **Require passkey** - The recipient must have an account and passkey configured via their settings.
-- **Require 2FA** - The recipient must have an account and 2FA enabled via their settings.
-- **None** - No authentication required.
-
-![Document recipient action authentication in the Documenso dashboard](/document-signing/document-enterprise-recipient-action-authentication.webp)
-
-This can be overridden by setting the authentication requirements directly for each recipient in the next step.
+You can upload documents by either clicking the "Add a document" dropzone, or dragging and dropping files into the dropzone.
 
 <Callout type="info">
-  The "Recipient Authentication" feature is only available for Enterprise accounts.
+  The maximum file size for uploaded documents is 150MB in production. You can upload up to 5
+  documents at a time on standard plans. In staging, the limit is 50MB.
 </Callout>
 
-### Recipients
+#### Add Recipients
 
-Click the "+ Add Signer" button to add a new recipient. You can configure the recipient's email address, name, role, and authentication method on this page.
+Click the "+ Add Signer" button to add a new recipient. For each recipient you can configure the following:
 
-You can choose any option from the ["Recipient Authentication"](#optional-recipient-authentication) section, or you can set it to "Inherit authentication method" to use the global action signing authentication method configured in the "General Settings" step.
+- **Email address** - The recipient's email address
+- **Name** - The recipient's name
+- **Order** - The sequence in which the recipient should sign the document. Only available if the "Enable Signing Order" checkbox is enabled
+- **Role** - As seen below
 
-![The required authentication method for a recipient](/document-signing/documenso-document-recipient-authentication-method.webp)
-
-You can also set the recipient's role, which determines their actions and permissions in the document.
-
-![The recipient role](/document-signing/documenso-document-recipient-role.webp)
-
-#### Roles
-
-Documenso has 4 roles for recipients with different permissions and actions.
+Documenso has 5 roles for recipients with different permissions and actions.
 
 |   Role    |                                    Function                                     | Action required | Signature |
 | :-------: | :-----------------------------------------------------------------------------: | :-------------: | :-------: |
-|  Signer   |                Needs to sign signatures fields assigned to them.                |       Yes       |    Yes    |
+|  Signer   |                Needs to sign signature fields assigned to them.                 |       Yes       |    Yes    |
 | Approver  |          Needs to approve the document as a whole. Signature optional.          |       Yes       | Optional  |
 |  Viewer   |                   Needs to confirm they viewed the document.                    |       Yes       |    No     |
 | Assistant | Can help prepare the document by filling in fields on behalf of other signers.  |       Yes       |    No     |
@@ -100,15 +95,20 @@ Documenso has 4 roles for recipients with different permissions and actions.
 
 ### Fields
 
-Documenso supports 9 different field types that can be added to the document. Each field type collects various information from the recipients when they sign the document.
+Documenso supports 10 different field types that can be added to the document. Each field type collects various information from the recipients when they sign the document.
+
+To create a field, you can either click and drag to draw a field on the document or drag and drop the field type from the sidebar.
 
 ![The available field types in the Documenso dashboard](/document-signing/documenso-document-fields.webp)
+
+The field created will be assigned to the currently selected recipient. You can change the recipient by clicking on the recipient's name in the right sidebar.
 
 The available field types are:
 
 - **Signature** - Collects the signer's signature
 - **Email** - Collects the signer's email address
 - **Name** - Collects the signer's name
+- **Initials** - Collects the signer's initials
 - **Date** - Collects the date of the signature
 - **Text** - Collects text input from the signer
 - **Number** - Collects a number input from the signer
@@ -123,11 +123,11 @@ All fields can be placed anywhere on the document and resized as needed.
   page](/users/documents/fields).
 </Callout>
 
-#### Signature Required
+### Preview
 
-Signer Roles require at least 1 signature field. You will get an error message if you try to send a document without a signature field.
+In this section, you can preview what the document will look like once it is fully signed. This uses placeholder data for the fields.
 
-![Error message when trying to send a document without a signature field](/document-signing/documenso-no-signature-field-found.webp)
+![Preview section in the Documenso editor](/document-signing/documenso-editor-preview.webp)
 
 ### Email Settings
 
@@ -156,3 +156,54 @@ https://app.documenso.com/sign/12ACP777zxQLO52hjj_vCB
 ```
 
 </Steps>
+
+## Document Settings
+
+To access the document settings, click the "Document Settings" button in the quick actions section.
+
+### General Settings
+
+![General Documenso editor settings](/document-signing/documenso-editor-general-settings.webp)
+
+- **Language** - The language that the emails will be sent in
+- **Allowed Signature Types** - The signature types that the recipient will be allowed to use
+- **Date Format** - The date format that will be used for date fields
+- **Time Zone** - The time zone that will be used for date fields
+- **External ID** - A custom ID for the document that can be used to identify the document in your external system(s)
+- **Redirect URL** - The URL where the signer will be redirected after signing the document
+- **Document Distribution Method** - Whether to use emails to send the document, or none (which we will generate signing links for manual distribution)
+
+### Email Settings
+
+![Email Documenso editor settings](/document-signing/documenso-editor-email-settings.webp)
+
+- **Reply To** - The email address that will be used as the reply to email address
+- **Subject** - The subject of the email
+- **Message** - The message of the email
+- **Checkboxes** - You can select which emails should be sent during the document signing process
+
+### Security Settings
+
+Documenso enables you to set up access control for your documents. You can require authentication for viewing the document.
+
+The available options are:
+
+- **Require account** - The recipient must be signed in to view the document.
+- **Require 2FA** - The recipient must use 2FA to sign the document.
+- **None** - The document can be accessed directly by the URL sent to the recipient.
+
+![Security Documenso editor settings](/document-signing/documenso-editor-security-settings.webp)
+
+The "Recipient Authentication" feature allows you to specify the authentication method required for recipients to sign the signature field.
+
+The available options are:
+
+- **Require passkey** - The recipient must have an account and passkey configured via their settings.
+- **Require 2FA** - The recipient must have an account and 2FA enabled via their settings.
+- **None** - No authentication required.
+
+This can be overridden by setting the authentication requirements directly for each recipient in the next step.
+
+<Callout type="info">
+  The "Recipient Authentication" feature is only available for Enterprise accounts.
+</Callout>

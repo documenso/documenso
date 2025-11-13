@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "2.0.6",
+  "version": "2.0.11",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@documenso/remix",
@@ -45,6 +45,12 @@
     "@commitlint/config-conventional": "^17.7.0",
     "@lingui/cli": "^5.2.0",
     "@prisma/client": "^6.18.0",
+    "@trpc/client": "11.7.0",
+    "@trpc/react-query": "11.7.0",
+    "@trpc/server": "11.7.0",
+    "@ts-rest/core": "^3.52.1",
+    "@ts-rest/open-api": "^3.52.1",
+    "@ts-rest/serverless": "^3.52.1",
     "dotenv": "^16.5.0",
     "dotenv-cli": "^8.0.0",
     "eslint": "^8.40.0",
@@ -59,18 +65,13 @@
     "prisma-json-types-generator": "^3.6.2",
     "prisma-kysely": "^1.8.0",
     "rimraf": "^5.0.1",
-    "turbo": "^1.9.3",
-    "@trpc/client": "11.7.0",
-    "@trpc/react-query": "11.7.0",
-    "@trpc/server": "11.7.0",
     "superjson": "^2.2.5",
     "trpc-to-openapi": "2.4.0",
+    "turbo": "^1.9.3",
+    "vite": "^6.3.5",
+    "vite-plugin-static-copy": "^3.1.4",
     "zod-openapi": "^4.2.4",
-    "@ts-rest/core": "^3.52.1",
-    "@ts-rest/open-api": "^3.52.1",
-    "@ts-rest/serverless": "^3.52.1",
-    "zod-prisma-types": "3.3.5",
-    "vite": "^6.3.5"
+    "zod-prisma-types": "3.3.5"
   },
   "name": "@documenso/root",
   "workspaces": [

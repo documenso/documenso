@@ -8,9 +8,10 @@ import { base64 } from '@scure/base';
 import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
-import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-import 'react-pdf/dist/esm/Page/TextLayer.css';
 
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+// import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
+// import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 
@@ -26,6 +27,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.min.js',
   import.meta.url,
 ).toString();
+
+const pdfViewerOptions = {
+  cMapUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/static/cmaps`,
+};
 
 export type OnPDFViewerPageClick = (_event: {
   pageNumber: number;
@@ -234,6 +239,7 @@ export const PDFViewer = ({
                 </div>
               </div>
             }
+            // options={pdfViewerOptions}
           >
             {Array(numPages)
               .fill(null)
