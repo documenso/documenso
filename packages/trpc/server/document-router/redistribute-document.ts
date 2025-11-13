@@ -1,12 +1,12 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeDocumentRequestSchema,
   ZRedistributeDocumentResponseSchema,
   redistributeDocumentMeta,
 } from './redistribute-document.types';
-import { ZGenericSuccessResponse } from './schema';
 
 export const redistributeDocumentRoute = authenticatedProcedure
   .meta(redistributeDocumentMeta)
@@ -26,7 +26,10 @@ export const redistributeDocumentRoute = authenticatedProcedure
     await resendDocument({
       userId: ctx.user.id,
       teamId,
-      documentId,
+      id: {
+        type: 'documentId',
+        id: documentId,
+      },
       recipients,
       requestMetadata: ctx.metadata,
     });

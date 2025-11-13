@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 
-import { type Document, FieldType, type Passkey, type Recipient } from '@prisma/client';
+import { type Envelope, FieldType, type Passkey, type Recipient } from '@prisma/client';
 
 import type { SessionUser } from '@documenso/auth/server/lib/session/session';
 import { MAXIMUM_PASSKEYS } from '@documenso/lib/constants/auth';
@@ -24,17 +24,23 @@ type PasskeyData = {
   isError: boolean;
 };
 
+type SigningAuthRecipient = Pick<
+  Recipient,
+  'authOptions' | 'email' | 'role' | 'name' | 'token' | 'id'
+>;
+
 export type DocumentSigningAuthContextValue = {
   executeActionAuthProcedure: (_value: ExecuteActionAuthProcedureOptions) => Promise<void>;
-  documentAuthOptions: Document['authOptions'];
+  documentAuthOptions: Envelope['authOptions'];
   documentAuthOption: TDocumentAuthOptions;
-  setDocumentAuthOptions: (_value: Document['authOptions']) => void;
-  recipient: Recipient;
+  setDocumentAuthOptions: (_value: Envelope['authOptions']) => void;
+  recipient: SigningAuthRecipient;
   recipientAuthOption: TRecipientAuthOptions;
-  setRecipient: (_value: Recipient) => void;
+  setRecipient: (_value: SigningAuthRecipient) => void;
   derivedRecipientAccessAuth: TRecipientAccessAuthTypes[];
   derivedRecipientActionAuth: TRecipientActionAuthTypes[];
   isAuthRedirectRequired: boolean;
+  isDirectTemplate?: boolean;
   isCurrentlyAuthenticating: boolean;
   setIsCurrentlyAuthenticating: (_value: boolean) => void;
   passkeyData: PasskeyData;
@@ -61,8 +67,9 @@ export const useRequiredDocumentSigningAuthContext = () => {
 };
 
 export interface DocumentSigningAuthProviderProps {
-  documentAuthOptions: Document['authOptions'];
-  recipient: Recipient;
+  documentAuthOptions: Envelope['authOptions'];
+  recipient: SigningAuthRecipient;
+  isDirectTemplate?: boolean;
   user?: SessionUser | null;
   children: React.ReactNode;
 }
@@ -70,6 +77,7 @@ export interface DocumentSigningAuthProviderProps {
 export const DocumentSigningAuthProvider = ({
   documentAuthOptions: initialDocumentAuthOptions,
   recipient: initialRecipient,
+  isDirectTemplate = false,
   user,
   children,
 }: DocumentSigningAuthProviderProps) => {
@@ -199,6 +207,7 @@ export const DocumentSigningAuthProvider = ({
         derivedRecipientAccessAuth,
         derivedRecipientActionAuth,
         isAuthRedirectRequired,
+        isDirectTemplate,
         isCurrentlyAuthenticating,
         setIsCurrentlyAuthenticating,
         passkeyData,

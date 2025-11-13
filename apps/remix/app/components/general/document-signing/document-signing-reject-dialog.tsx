@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
-import type { Document } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router';
@@ -37,15 +36,17 @@ const ZRejectDocumentFormSchema = z.object({
 type TRejectDocumentFormSchema = z.infer<typeof ZRejectDocumentFormSchema>;
 
 export interface DocumentSigningRejectDialogProps {
-  document: Pick<Document, 'id'>;
+  documentId: number;
   token: string;
   onRejected?: (reason: string) => void | Promise<void>;
+  trigger?: React.ReactNode;
 }
 
 export function DocumentSigningRejectDialog({
-  document,
+  documentId,
   token,
   onRejected,
+  trigger,
 }: DocumentSigningRejectDialogProps) {
   const { t } = useLingui();
   const { toast } = useToast();
@@ -67,7 +68,7 @@ export function DocumentSigningRejectDialog({
   const onRejectDocument = async ({ reason }: TRejectDocumentFormSchema) => {
     try {
       await rejectDocumentWithToken({
-        documentId: document.id,
+        documentId,
         token,
         reason,
       });
@@ -110,9 +111,11 @@ export function DocumentSigningRejectDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <Trans>Reject Document</Trans>
-        </Button>
+        {trigger ?? (
+          <Button variant="outline">
+            <Trans>Reject Document</Trans>
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent>

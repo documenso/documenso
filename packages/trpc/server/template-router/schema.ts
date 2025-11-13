@@ -1,5 +1,6 @@
 import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/client';
 import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
 import { ZDocumentSchema } from '@documenso/lib/types/document';
 import {
@@ -7,15 +8,6 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import {
-  ZTemplateLiteSchema,
-  ZTemplateManySchema,
-  ZTemplateSchema,
-} from '@documenso/lib/types/template';
-import { TemplateDirectLinkSchema } from '@documenso/prisma/generated/zod/modelSchema/TemplateDirectLinkSchema';
-
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -27,7 +19,18 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '../document-router/schema';
+} from '@documenso/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
+import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import {
+  ZTemplateLiteSchema,
+  ZTemplateManySchema,
+  ZTemplateSchema,
+} from '@documenso/lib/types/template';
+import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+
+import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
 
 export const MAX_TEMPLATE_PUBLIC_TITLE_LENGTH = 50;
@@ -76,12 +79,6 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
-export const ZCreateTemplateMutationSchema = z.object({
-  title: z.string().min(1).trim(),
-  templateDocumentDataId: z.string().min(1),
-  folderId: z.string().optional(),
-});
-
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
   directRecipientEmail: z.string().email().max(254),
@@ -89,6 +86,12 @@ export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directTemplateExternalId: z.string().optional(),
   signedFieldValues: z.array(ZSignFieldWithTokenMutationSchema),
   templateUpdatedAt: z.date(),
+  nextSigner: z
+    .object({
+      email: z.string().email().max(254),
+      name: z.string().min(1).max(255),
+    })
+    .optional(),
 });
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
@@ -109,9 +112,21 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   customDocumentDataId: z
     .string()
     .describe(
-      'The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
+      '[DEPRECATED] - Use customDocumentData instead. The data ID of an alternative PDF to use when creating the document. If not provided, the PDF attached to the template will be used.',
     )
     .optional(),
+  customDocumentData: z
+    .array(
+      z.object({
+        documentDataId: z.string(),
+        envelopeItemId: z.string(),
+      }),
+    )
+    .describe(
+      'The data IDs of alternative PDFs to use when creating the document. If not provided, the PDF attached to the template will be used.',
+    )
+    .optional(),
+
   folderId: z
     .string()
     .describe(
@@ -144,13 +159,14 @@ export const ZCreateTemplateDirectLinkRequestSchema = z.object({
     .optional(),
 });
 
-const GenericDirectLinkResponseSchema = TemplateDirectLinkSchema.pick({
+const GenericDirectLinkResponseSchema = LegacyTemplateDirectLinkSchema.pick({
   id: true,
-  templateId: true,
   token: true,
   createdAt: true,
   enabled: true,
   directTemplateRecipientId: true,
+  envelopeId: true,
+  templateId: true,
 });
 
 export const ZCreateTemplateDirectLinkResponseSchema = GenericDirectLinkResponseSchema;
@@ -184,6 +200,15 @@ export const ZCreateTemplateV2RequestSchema = z.object({
   publicDescription: ZTemplatePublicDescriptionSchema.optional(),
   type: z.nativeEnum(TemplateType).optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
+    .optional(),
 });
 
 /**
@@ -192,6 +217,18 @@ export const ZCreateTemplateV2RequestSchema = z.object({
 export const ZCreateTemplateV2ResponseSchema = z.object({
   template: ZTemplateSchema,
   uploadUrl: z.string().min(1),
+});
+
+export const ZCreateTemplateResponseSchema = z.object({
+  envelopeId: z.string(),
+  id: z.number(),
+});
+
+export const ZCreateTemplatePayloadSchema = ZCreateTemplateV2RequestSchema;
+
+export const ZCreateTemplateMutationSchema = zodFormData({
+  payload: zfd.json(ZCreateTemplatePayloadSchema),
+  file: zfd.file(),
 });
 
 export const ZUpdateTemplateRequestSchema = z.object({
@@ -207,6 +244,7 @@ export const ZUpdateTemplateRequestSchema = z.object({
       publicDescription: ZTemplatePublicDescriptionSchema.optional(),
       type: z.nativeEnum(TemplateType).optional(),
       useLegacyFieldInsertion: z.boolean().optional(),
+      folderId: z.string().nullish(),
     })
     .optional(),
   meta: ZTemplateMetaUpsertSchema.optional(),
@@ -239,6 +277,7 @@ export const ZBulkSendTemplateMutationSchema = z.object({
   sendImmediately: z.boolean(),
 });
 
+export type TCreateTemplatePayloadSchema = z.input<typeof ZCreateTemplatePayloadSchema>;
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;

@@ -1,20 +1,28 @@
-import { Trans } from '@lingui/react/macro';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
 import { ChevronLeft, LucideEdit } from 'lucide-react';
-import { Link, redirect, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
-import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
+import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
+import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
+import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
-import { TemplateDirectLinkDialogWrapper } from '~/components/dialogs/template-direct-link-dialog-wrapper';
+import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
+import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
+import EnvelopeGenericPageRenderer from '~/components/general/envelope-editor/envelope-generic-page-renderer';
+import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
 import { TemplatePageViewInformation } from '~/components/general/template/template-page-view-information';
@@ -22,55 +30,64 @@ import { TemplatePageViewRecentActivity } from '~/components/general/template/te
 import { TemplatePageViewRecipients } from '~/components/general/template/template-page-view-recipients';
 import { TemplateType } from '~/components/general/template/template-type';
 import { TemplatesTableActionDropdown } from '~/components/tables/templates-table-action-dropdown';
-import { superLoaderJson, useSuperLoaderData } from '~/utils/super-json-loader';
+import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/templates.$id._index';
 
-export async function loader({ params, request }: Route.LoaderArgs) {
-  const { user } = await getSession(request);
-
-  const team = await getTeamByUrl({ userId: user.id, teamUrl: params.teamUrl });
-
-  const { id } = params;
-
-  const templateId = Number(id);
-  const templateRootPath = formatTemplatesPath(team.url);
-  const documentRootPath = formatDocumentsPath(team.url);
-
-  if (!templateId || Number.isNaN(templateId)) {
-    throw redirect(templateRootPath);
-  }
-
-  const template = await getTemplateById({
-    id: templateId,
-    userId: user.id,
-    teamId: team?.id,
-  }).catch(() => null);
-
-  if (!template || !template.templateDocumentData || (template?.teamId && !team.url)) {
-    throw redirect(templateRootPath);
-  }
-
-  return superLoaderJson({
-    user,
-    team,
-    template,
-    templateRootPath,
-    documentRootPath,
-  });
-}
-
-export default function TemplatePage() {
-  const { user, team, template, templateRootPath, documentRootPath } =
-    useSuperLoaderData<typeof loader>();
-
-  const { templateDocumentData, fields, recipients, templateMeta } = template;
-
+export default function TemplatePage({ params }: Route.ComponentProps) {
+  const { t } = useLingui();
+  const { user } = useSession();
   const navigate = useNavigate();
 
+  const team = useCurrentTeam();
+
+  const {
+    data: envelope,
+    isLoading: isLoadingEnvelope,
+    isError: isErrorEnvelope,
+  } = trpc.envelope.get.useQuery({
+    envelopeId: params.id,
+  });
+
+  if (isLoadingEnvelope) {
+    return (
+      <div className="text-foreground flex w-screen flex-col items-center justify-center gap-2 py-64">
+        <Spinner />
+        <Trans>Loading</Trans>
+      </div>
+    );
+  }
+
+  if (isErrorEnvelope || !envelope) {
+    return (
+      <GenericErrorLayout
+        errorCode={404}
+        errorCodeMap={{
+          404: {
+            heading: msg`Not found`,
+            subHeading: msg`404 Not found`,
+            message: msg`The template you are looking for may have been removed, renamed or may have never existed.`,
+          },
+        }}
+        primaryButton={
+          <Button asChild>
+            <Link to={`/t/${team.url}/templates`}>
+              <Trans>Go back</Trans>
+            </Link>
+          </Button>
+        }
+      />
+    );
+  }
+
+  const documentRootPath = formatDocumentsPath(team.url);
+  const templateRootPath = formatTemplatesPath(team.url);
+
   // Remap to fit the DocumentReadOnlyFields component.
-  const readOnlyFields = fields.map((field) => {
-    const recipient = recipients.find((recipient) => recipient.id === field.recipientId) || {
+  const readOnlyFields = envelope.fields.map((field) => {
+    const recipient = envelope.recipients.find(
+      (recipient) => recipient.id === field.recipientId,
+    ) || {
       name: '',
       email: '',
       signingStatus: SigningStatus.NOT_SIGNED,
@@ -83,13 +100,15 @@ export default function TemplatePage() {
     };
   });
 
-  const mockedDocumentMeta = templateMeta
+  const mockedDocumentMeta = envelope.documentMeta
     ? {
-        ...templateMeta,
-        signingOrder: templateMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
+        ...envelope.documentMeta,
+        signingOrder: envelope.documentMeta.signingOrder || DocumentSigningOrder.SEQUENTIAL,
         documentId: 0,
       }
     : undefined;
+
+  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
@@ -102,31 +121,42 @@ export default function TemplatePage() {
         <div>
           <h1
             className="mt-4 block max-w-[20rem] truncate text-2xl font-semibold md:max-w-[30rem] md:text-3xl"
-            title={template.title}
+            title={envelope.title}
           >
-            {template.title}
+            {envelope.title}
           </h1>
 
           <div className="mt-2.5 flex items-center">
-            <TemplateType inheritColor className="text-muted-foreground" type={template.type} />
+            <TemplateType
+              inheritColor
+              className="text-muted-foreground"
+              type={envelope.templateType}
+            />
 
-            {template.directLink?.token && (
+            {envelope.directLink?.token && (
               <TemplateDirectLinkBadge
                 className="ml-4"
-                token={template.directLink.token}
-                enabled={template.directLink.enabled}
+                token={envelope.directLink.token}
+                enabled={envelope.directLink.enabled}
               />
             )}
           </div>
         </div>
 
         <div className="mt-2 flex flex-row space-x-4 sm:mt-0 sm:self-end">
-          <TemplateDirectLinkDialogWrapper template={template} />
+          <TemplateDirectLinkDialog
+            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+            directLink={envelope.directLink}
+            recipients={envelope.recipients}
+          />
 
-          <TemplateBulkSendDialog templateId={template.id} recipients={template.recipients} />
+          <TemplateBulkSendDialog
+            templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+            recipients={envelope.recipients}
+          />
 
           <Button className="w-full" asChild>
-            <Link to={`${templateRootPath}/${template.id}/edit`}>
+            <Link to={`${templateRootPath}/${envelope.id}/edit`}>
               <LucideEdit className="mr-1.5 h-3.5 w-3.5" />
               <Trans>Edit Template</Trans>
             </Link>
@@ -135,25 +165,59 @@ export default function TemplatePage() {
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
-        <Card
-          className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-          gradient
+        {envelope.internalVersion === 2 ? (
+          <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
+            <EnvelopeRenderProvider
+              envelope={envelope}
+              token={undefined}
+              fields={envelope.fields}
+              recipients={envelope.recipients}
+              overrideSettings={{
+                showRecipientTooltip: true,
+              }}
+            >
+              {isMultiEnvelopeItem && (
+                <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+              )}
+
+              <Card className="rounded-xl before:rounded-xl" gradient>
+                <CardContent className="p-2">
+                  <PDFViewerKonvaLazy
+                    renderer="preview"
+                    customPageRenderer={EnvelopeGenericPageRenderer}
+                  />
+                </CardContent>
+              </Card>
+            </EnvelopeRenderProvider>
+          </div>
+        ) : (
+          <Card
+            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+            gradient
+          >
+            <CardContent className="p-2">
+              <DocumentReadOnlyFields
+                fields={readOnlyFields}
+                showFieldStatus={false}
+                showRecipientTooltip={true}
+                showRecipientColors={true}
+                recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+                documentMeta={mockedDocumentMeta}
+              />
+
+              <PDFViewer
+                envelopeItem={envelope.envelopeItems[0]}
+                token={undefined}
+                version="signed"
+                key={envelope.envelopeItems[0].id}
+              />
+            </CardContent>
+          </Card>
+        )}
+
+        <div
+          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
         >
-          <CardContent className="p-2">
-            <PDFViewer document={template} key={template.id} documentData={templateDocumentData} />
-          </CardContent>
-        </Card>
-
-        <DocumentReadOnlyFields
-          fields={readOnlyFields}
-          showFieldStatus={false}
-          showRecipientTooltip={true}
-          showRecipientColors={true}
-          recipientIds={recipients.map((recipient) => recipient.id)}
-          documentMeta={mockedDocumentMeta}
-        />
-
-        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
           <div className="space-y-6">
             <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
@@ -163,7 +227,11 @@ export default function TemplatePage() {
 
                 <div>
                   <TemplatesTableActionDropdown
-                    row={template}
+                    row={{
+                      ...envelope,
+                      id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+                      envelopeId: envelope.id,
+                    }}
                     teamId={team?.id}
                     templateRootPath={templateRootPath}
                     onDelete={async () => navigate(templateRootPath)}
@@ -177,9 +245,10 @@ export default function TemplatePage() {
 
               <div className="mt-4 border-t px-4 pt-4">
                 <TemplateUseDialog
-                  templateId={template.id}
-                  templateSigningOrder={template.templateMeta?.signingOrder}
-                  recipients={template.recipients}
+                  envelopeId={envelope.id}
+                  templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                  templateSigningOrder={envelope.documentMeta?.signingOrder}
+                  recipients={envelope.recipients}
                   documentRootPath={documentRootPath}
                   trigger={
                     <Button className="w-full">
@@ -191,15 +260,19 @@ export default function TemplatePage() {
             </section>
 
             {/* Template information section. */}
-            <TemplatePageViewInformation template={template} userId={user.id} />
+            <TemplatePageViewInformation template={envelope} userId={user.id} />
 
             {/* Recipients section. */}
-            <TemplatePageViewRecipients template={template} templateRootPath={templateRootPath} />
+            <TemplatePageViewRecipients
+              recipients={envelope.recipients}
+              envelopeId={envelope.id}
+              templateRootPath={templateRootPath}
+            />
 
             {/* Recent activity section. */}
             <TemplatePageViewRecentActivity
               documentRootPath={documentRootPath}
-              templateId={template.id}
+              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
             />
           </div>
         </div>
@@ -210,7 +283,9 @@ export default function TemplatePage() {
           <Trans>Documents created from template</Trans>
         </h1>
 
-        <TemplatePageViewDocumentsTable templateId={template.id} />
+        <TemplatePageViewDocumentsTable
+          templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+        />
       </div>
     </div>
   );

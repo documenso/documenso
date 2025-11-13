@@ -1,12 +1,13 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
-import { PDFDocument } from 'pdf-lib';
 import { match } from 'ts-pattern';
 
 import { env } from '@documenso/lib/utils/env';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
+import { normalizePdf } from '../../server-only/pdf/normalize-pdf';
 import { uploadS3File } from './server-actions';
 
 type File = {
@@ -41,6 +42,28 @@ export const putPdfFileServerSide = async (file: File) => {
   const { type, data } = await putFileServerSide(file);
 
   return await createDocumentData({ type, data });
+};
+
+/**
+ * Uploads a pdf file and normalizes it.
+ */
+export const putNormalizedPdfFileServerSide = async (file: File) => {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const normalized = await normalizePdf(buffer);
+
+  const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
+
+  const documentData = await putFileServerSide({
+    name: fileName,
+    type: 'application/pdf',
+    arrayBuffer: async () => Promise.resolve(normalized),
+  });
+
+  return await createDocumentData({
+    type: documentData.type,
+    data: documentData.data,
+  });
 };
 
 /**

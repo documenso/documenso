@@ -4,6 +4,7 @@ import { msg } from '@lingui/core/macro';
 import {
   DocumentSource,
   DocumentStatus,
+  EnvelopeType,
   OrganisationType,
   RecipientRole,
   SendStatus,
@@ -23,6 +24,7 @@ import { getEmailContext } from '../../../server-only/email/get-email-context';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../../types/document-email';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
+import { unsafeBuildEnvelopeIdQuery } from '../../../utils/envelope';
 import { renderCustomEmailTemplate } from '../../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../../utils/render-email-with-i18n';
 import type { JobRunIO } from '../../client/_internal/job';
@@ -37,7 +39,7 @@ export const run = async ({
 }) => {
   const { userId, documentId, recipientId, requestMetadata } = payload;
 
-  const [user, document, recipient] = await Promise.all([
+  const [user, envelope, recipient] = await Promise.all([
     prisma.user.findFirstOrThrow({
       where: {
         id: userId,
@@ -48,9 +50,15 @@ export const run = async ({
         name: true,
       },
     }),
-    prisma.document.findFirstOrThrow({
+    prisma.envelope.findFirstOrThrow({
       where: {
-        id: documentId,
+        ...unsafeBuildEnvelopeIdQuery(
+          {
+            type: 'documentId',
+            id: documentId,
+          },
+          EnvelopeType.DOCUMENT,
+        ),
         status: DocumentStatus.PENDING,
       },
       include: {
@@ -70,14 +78,14 @@ export const run = async ({
     }),
   ]);
 
-  const { documentMeta, team } = document;
+  const { documentMeta, team } = envelope;
 
   if (recipient.role === RecipientRole.CC) {
     return;
   }
 
   const isRecipientSigningRequestEmailEnabled = extractDerivedDocumentEmailSettings(
-    document.documentMeta,
+    envelope.documentMeta,
   ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
@@ -89,13 +97,13 @@ export const run = async ({
       emailType: 'RECIPIENT',
       source: {
         type: 'team',
-        teamId: document.teamId,
+        teamId: envelope.teamId,
       },
-      meta: document.documentMeta,
+      meta: envelope.documentMeta,
     });
 
-  const customEmail = document?.documentMeta;
-  const isDirectTemplate = document.source === DocumentSource.TEMPLATE_DIRECT_LINK;
+  const customEmail = envelope?.documentMeta;
+  const isDirectTemplate = envelope.source === DocumentSource.TEMPLATE_DIRECT_LINK;
 
   const recipientEmailType = RECIPIENT_ROLE_TO_EMAIL_TYPE[recipient.role];
 
@@ -113,7 +121,7 @@ export const run = async ({
 
   if (selfSigner) {
     emailMessage = i18n._(
-      msg`You have initiated the document ${`"${document.title}"`} that requires you to ${recipientActionVerb} it.`,
+      msg`You have initiated the document ${`"${envelope.title}"`} that requires you to ${recipientActionVerb} it.`,
     );
     emailSubject = i18n._(msg`Please ${recipientActionVerb} your document`);
   }
@@ -136,8 +144,8 @@ export const run = async ({
 
       emailMessage = i18n._(
         settings.includeSenderDetails
-          ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${document.title}".`
-          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${document.title}".`,
+          ? msg`${inviterName} on behalf of "${team.name}" has invited you to ${recipientActionVerb} the document "${envelope.title}".`
+          : msg`${team.name} has invited you to ${recipientActionVerb} the document "${envelope.title}".`,
       );
     }
   }
@@ -145,14 +153,14 @@ export const run = async ({
   const customEmailTemplate = {
     'signer.name': name,
     'signer.email': email,
-    'document.name': document.title,
+    'document.name': envelope.title,
   };
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
   const signDocumentLink = `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`;
 
   const template = createElement(DocumentInviteEmailTemplate, {
-    documentName: document.title,
+    documentName: envelope.title,
     inviterName: user.name || undefined,
     inviterEmail:
       organisationType === OrganisationType.ORGANISATION
@@ -210,7 +218,7 @@ export const run = async ({
     await prisma.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.EMAIL_SENT,
-        documentId: document.id,
+        envelopeId: envelope.id,
         user,
         requestMetadata,
         data: {

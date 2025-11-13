@@ -3,21 +3,19 @@ import { useMemo } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { Document, Recipient, User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
+import type { TEnvelope } from '@documenso/lib/types/envelope';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 export type DocumentPageViewInformationProps = {
   userId: number;
-  document: Document & {
-    user: Pick<User, 'id' | 'name' | 'email'>;
-    recipients: Recipient[];
-  };
+  envelope: TEnvelope;
 };
 
 export const DocumentPageViewInformation = ({
-  document,
+  envelope,
   userId,
 }: DocumentPageViewInformationProps) => {
   const isMounted = useIsMounted();
@@ -29,23 +27,27 @@ export const DocumentPageViewInformation = ({
       {
         description: msg`Uploaded by`,
         value:
-          userId === document.userId ? _(msg`You`) : (document.user.name ?? document.user.email),
+          userId === envelope.userId ? _(msg`You`) : (envelope.user.name ?? envelope.user.email),
       },
       {
         description: msg`Created`,
-        value: DateTime.fromJSDate(document.createdAt)
+        value: DateTime.fromJSDate(envelope.createdAt)
           .setLocale(i18n.locales?.[0] || i18n.locale)
           .toFormat('MMMM d, yyyy'),
       },
       {
         description: msg`Last modified`,
-        value: DateTime.fromJSDate(document.updatedAt)
+        value: DateTime.fromJSDate(envelope.updatedAt)
           .setLocale(i18n.locales?.[0] || i18n.locale)
           .toRelative(),
       },
+      {
+        description: msg`Document ID (Legacy)`,
+        value: mapSecondaryIdToDocumentId(envelope.secondaryId),
+      },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMounted, document, userId]);
+  }, [isMounted, envelope, userId]);
 
   return (
     <section className="dark:bg-background text-foreground border-border bg-widget flex flex-col rounded-xl border">

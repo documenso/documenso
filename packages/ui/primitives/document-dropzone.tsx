@@ -4,6 +4,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 import { AlertTriangle, Plus } from 'lucide-react';
+import type { FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
@@ -26,21 +27,27 @@ import { Card, CardContent } from './card';
 
 export type DocumentDropzoneProps = {
   className?: string;
+  allowMultiple?: boolean;
   disabled?: boolean;
+  disabledHeading?: MessageDescriptor;
   disabledMessage?: MessageDescriptor;
-  onDrop?: (_file: File) => void | Promise<void>;
-  onDropRejected?: () => void | Promise<void>;
+  onDrop?: (_file: File[]) => void | Promise<void>;
+  onDropRejected?: (fileRejections: FileRejection[]) => void;
   type?: 'document' | 'template';
+  maxFiles?: number;
   [key: string]: unknown;
 };
 
 export const DocumentDropzone = ({
   className,
+  allowMultiple,
   onDrop,
   onDropRejected,
   disabled,
+  disabledHeading,
   disabledMessage = msg`You cannot upload documents at this time.`,
   type = 'document',
+  maxFiles,
   ...props
 }: DocumentDropzoneProps) => {
   const { _ } = useLingui();
@@ -51,23 +58,22 @@ export const DocumentDropzone = ({
     accept: {
       'application/pdf': ['.pdf'],
     },
-    multiple: false,
+    multiple: allowMultiple,
     disabled,
-    onDrop: ([acceptedFile]) => {
-      if (acceptedFile && onDrop) {
-        void onDrop(acceptedFile);
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0 && onDrop) {
+        void onDrop(acceptedFiles);
       }
     },
-    onDropRejected: () => {
-      if (onDropRejected) {
-        void onDropRejected();
-      }
-    },
+    onDropRejected,
+    maxFiles,
     maxSize: megabytesToBytes(APP_DOCUMENT_UPLOAD_SIZE_LIMIT),
   });
 
   const heading = {
-    document: disabled ? msg`You have reached your document limit.` : msg`Add a document`,
+    document: disabled
+      ? disabledHeading || msg`You have reached your document limit.`
+      : msg`Add a document`,
     template: msg`Upload Template Document`,
   };
 
@@ -153,7 +159,7 @@ export const DocumentDropzone = ({
 
           <input {...getInputProps()} />
 
-          <p className="text-foreground mt-8 font-medium">{_(heading[type])}</p>
+          <p className="text-foreground mt-6 font-medium">{_(heading[type])}</p>
 
           <p className="text-muted-foreground/80 mt-1 text-center text-sm">
             {_(disabled ? disabledMessage : msg`Drag & drop your PDF here.`)}

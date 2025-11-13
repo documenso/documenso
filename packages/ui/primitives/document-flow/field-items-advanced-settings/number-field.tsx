@@ -100,7 +100,7 @@ export const NumberFieldAdvancedSettings = ({
           <Trans>Number format</Trans>
         </Label>
         <Select
-          value={fieldState.numberFormat}
+          value={fieldState.numberFormat ?? ''}
           onValueChange={(val) => handleInput('numberFormat', val)}
         >
           <SelectTrigger className="text-muted-foreground bg-background mt-2 w-full">
@@ -197,7 +197,7 @@ export const NumberFieldAdvancedSettings = ({
               id="minValue"
               className="bg-background mt-2"
               placeholder={t`E.g. 0`}
-              value={fieldState.minValue}
+              value={fieldState.minValue ?? ''}
               onChange={(e) => handleInput('minValue', e.target.value)}
             />
           </div>
@@ -209,7 +209,7 @@ export const NumberFieldAdvancedSettings = ({
               id="maxValue"
               className="bg-background mt-2"
               placeholder={t`E.g. 100`}
-              value={fieldState.maxValue}
+              value={fieldState.maxValue ?? ''}
               onChange={(e) => handleInput('maxValue', e.target.value)}
             />
           </div>

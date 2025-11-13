@@ -146,6 +146,7 @@ test('[TEAMS]: search does not reveal documents from other teams', async ({ page
     redirectPath: `/t/${teamA.url}/documents`,
   });
 
+  await page.waitForTimeout(100);
   await page.getByPlaceholder('Search documents...').fill('Unique');
   await page.waitForURL(/query=Unique/);
 

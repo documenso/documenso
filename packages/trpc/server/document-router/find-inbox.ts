@@ -1,7 +1,8 @@
-import type { Document, Prisma } from '@prisma/client';
-import { DocumentStatus, RecipientRole } from '@prisma/client';
+import type { Envelope, Prisma } from '@prisma/client';
+import { DocumentStatus, EnvelopeType, RecipientRole } from '@prisma/client';
 
 import type { FindResultResponse } from '@documenso/lib/types/search-params';
+import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
 import { maskRecipientTokensForDocument } from '@documenso/lib/utils/mask-recipient-tokens-for-document';
 import { prisma } from '@documenso/prisma';
 
@@ -16,11 +17,16 @@ export const findInboxRoute = authenticatedProcedure
 
     const userId = ctx.user.id;
 
-    return await findInbox({
+    const envelopes = await findInbox({
       userId,
       page,
       perPage,
     });
+
+    return {
+      ...envelopes,
+      data: envelopes.data.map(mapEnvelopesToDocumentMany),
+    };
   });
 
 export type FindInboxOptions = {
@@ -28,7 +34,7 @@ export type FindInboxOptions = {
   page?: number;
   perPage?: number;
   orderBy?: {
-    column: keyof Omit<Document, 'document'>;
+    column: keyof Omit<Envelope, 'envelope'>;
     direction: 'asc' | 'desc';
   };
 };
@@ -38,12 +44,17 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+      email: true,
+    },
   });
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';
 
-  const whereClause: Prisma.DocumentWhereInput = {
+  const whereClause: Prisma.EnvelopeWhereInput = {
+    type: EnvelopeType.DOCUMENT,
     status: {
       not: DocumentStatus.DRAFT,
     },
@@ -59,7 +70,7 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
   };
 
   const [data, count] = await Promise.all([
-    prisma.document.findMany({
+    prisma.envelope.findMany({
       where: whereClause,
       skip: Math.max(page - 1, 0) * perPage,
       take: perPage,
@@ -81,9 +92,17 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
             url: true,
           },
         },
+        envelopeItems: {
+          select: {
+            id: true,
+            envelopeId: true,
+            title: true,
+            order: true,
+          },
+        },
       },
     }),
-    prisma.document.count({
+    prisma.envelope.count({
       where: whereClause,
     }),
   ]);

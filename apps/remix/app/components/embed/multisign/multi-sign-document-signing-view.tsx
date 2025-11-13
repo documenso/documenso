@@ -212,7 +212,7 @@ export const MultiSignDocumentSigningView = ({
               {allowDocumentRejection && (
                 <div className="embed--Actions mb-4 mt-8 flex w-full flex-row-reverse items-baseline justify-between">
                   <DocumentSigningRejectDialog
-                    document={document}
+                    documentId={document.id}
                     token={token}
                     onRejected={onRejected}
                   />
@@ -226,7 +226,9 @@ export const MultiSignDocumentSigningView = ({
                   })}
                 >
                   <PDFViewer
-                    documentData={document.documentData}
+                    envelopeItem={document.envelopeItems[0]}
+                    token={token}
+                    version="signed"
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();

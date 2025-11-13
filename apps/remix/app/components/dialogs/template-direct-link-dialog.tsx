@@ -3,13 +3,15 @@ import { useEffect, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
+import { type Recipient, RecipientRole, type TemplateDirectLink } from '@prisma/client';
 import {
-  type Recipient,
-  RecipientRole,
-  type Template,
-  type TemplateDirectLink,
-} from '@prisma/client';
-import { CircleDotIcon, CircleIcon, ClipboardCopyIcon, InfoIcon, LoaderIcon } from 'lucide-react';
+  CircleDotIcon,
+  CircleIcon,
+  ClipboardCopyIcon,
+  InfoIcon,
+  LinkIcon,
+  LoaderIcon,
+} from 'lucide-react';
 import { Link, useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
@@ -31,6 +33,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@documenso/ui/primitives/dialog';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
@@ -47,20 +50,19 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type TemplateDirectLinkDialogProps = {
-  template: Template & {
-    directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
-    recipients: Recipient[];
-  };
-  open: boolean;
-  onOpenChange: (_open: boolean) => void;
+  templateId: number;
+  directLink?: Pick<TemplateDirectLink, 'token' | 'enabled'> | null;
+  recipients: Recipient[];
+  trigger?: React.ReactNode;
 };
 
 type TemplateDirectLinkStep = 'ONBOARD' | 'SELECT_RECIPIENT' | 'MANAGE' | 'CONFIRM_DELETE';
 
 export const TemplateDirectLinkDialog = ({
-  template,
-  open,
-  onOpenChange,
+  templateId,
+  directLink,
+  recipients,
+  trigger,
 }: TemplateDirectLinkDialogProps) => {
   const { toast } = useToast();
   const { quota, remaining } = useLimits();
@@ -69,8 +71,9 @@ export const TemplateDirectLinkDialog = ({
 
   const [, copy] = useCopyToClipboard();
 
-  const [isEnabled, setIsEnabled] = useState(template.directLink?.enabled ?? false);
-  const [token, setToken] = useState(template.directLink?.token ?? null);
+  const [open, setOpen] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(directLink?.enabled ?? false);
+  const [token, setToken] = useState(directLink?.token ?? null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState<TemplateDirectLinkStep>(
     token ? 'MANAGE' : 'ONBOARD',
@@ -80,11 +83,11 @@ export const TemplateDirectLinkDialog = ({
 
   const validDirectTemplateRecipients = useMemo(
     () =>
-      template.recipients.filter(
+      recipients.filter(
         (recipient) =>
           recipient.role !== RecipientRole.CC && recipient.role !== RecipientRole.ASSISTANT,
       ),
-    [template.recipients],
+    [recipients],
   );
 
   const {
@@ -140,7 +143,7 @@ export const TemplateDirectLinkDialog = ({
       onSuccess: async () => {
         await revalidate();
 
-        onOpenChange(false);
+        setOpen(false);
         setToken(null);
 
         toast({
@@ -178,7 +181,7 @@ export const TemplateDirectLinkDialog = ({
     setSelectedRecipientId(recipientId);
 
     await createTemplateDirectLink({
-      templateId: template.id,
+      templateId,
       directRecipientId: recipientId,
     });
   };
@@ -195,300 +198,311 @@ export const TemplateDirectLinkDialog = ({
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
-      <fieldset disabled={isLoading} className="relative">
-        <AnimateGenericFadeInOut motionKey={currentStep}>
-          {match({ token, currentStep })
-            .with({ token: P.nullish, currentStep: 'ONBOARD' }, () => (
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>
-                    <Trans>Create Direct Signing Link</Trans>
-                  </DialogTitle>
+    <Dialog open={open} onOpenChange={(value) => !isLoading && setOpen(value)}>
+      <DialogTrigger asChild>
+        {trigger || (
+          <Button variant="outline" className="px-3">
+            <LinkIcon className="mr-1.5 h-3.5 w-3.5" />
 
-                  <DialogDescription>
-                    <Trans>Here's how it works:</Trans>
-                  </DialogDescription>
-                </DialogHeader>
+            {directLink ? <Trans>Manage Direct Link</Trans> : <Trans>Create Direct Link</Trans>}
+          </Button>
+        )}
+      </DialogTrigger>
+      <DialogContent hideClose>
+        <fieldset disabled={isLoading} className="relative">
+          <AnimateGenericFadeInOut motionKey={currentStep}>
+            {match({ token, currentStep })
+              .with({ token: P.nullish, currentStep: 'ONBOARD' }, () => (
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>
+                      <Trans>Create Direct Signing Link</Trans>
+                    </DialogTitle>
 
-                <ul className="mt-4 space-y-4 pl-12">
-                  {DIRECT_TEMPLATE_DOCUMENTATION.map((step, index) => (
-                    <li className="relative" key={index}>
-                      <div className="absolute -left-12">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-neutral-200 text-sm font-bold">
-                          {index + 1}
+                    <DialogDescription>
+                      <Trans>Here's how it works:</Trans>
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <ul className="mt-4 space-y-4 pl-12">
+                    {DIRECT_TEMPLATE_DOCUMENTATION.map((step, index) => (
+                      <li className="relative" key={index}>
+                        <div className="absolute -left-12">
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full border-[3px] border-neutral-200 text-sm font-bold">
+                            {index + 1}
+                          </div>
                         </div>
-                      </div>
 
-                      <h3 className="font-semibold">{_(step.title)}</h3>
-                      <p className="text-muted-foreground mt-1 text-sm">{_(step.description)}</p>
-                    </li>
-                  ))}
-                </ul>
+                        <h3 className="font-semibold">{_(step.title)}</h3>
+                        <p className="text-muted-foreground mt-1 text-sm">{_(step.description)}</p>
+                      </li>
+                    ))}
+                  </ul>
 
-                {remaining.directTemplates === 0 && (
-                  <Alert variant="warning">
-                    <AlertTitle>
-                      <Trans>
-                        Direct template link usage exceeded ({quota.directTemplates}/
-                        {quota.directTemplates})
-                      </Trans>
-                    </AlertTitle>
-                    <AlertDescription>
-                      <Trans>
-                        You have reached the maximum limit of {quota.directTemplates} direct
-                        templates.{' '}
-                        <Link
-                          className="mt-1 block underline underline-offset-4"
-                          to={`/o/${organisation.url}/settings/billing`}
-                        >
-                          Upgrade your account to continue!
-                        </Link>
-                      </Trans>
-                    </AlertDescription>
-                  </Alert>
-                )}
+                  {remaining.directTemplates === 0 && (
+                    <Alert variant="warning">
+                      <AlertTitle>
+                        <Trans>
+                          Direct template link usage exceeded ({quota.directTemplates}/
+                          {quota.directTemplates})
+                        </Trans>
+                      </AlertTitle>
+                      <AlertDescription>
+                        <Trans>
+                          You have reached the maximum limit of {quota.directTemplates} direct
+                          templates.{' '}
+                          <Link
+                            className="mt-1 block underline underline-offset-4"
+                            to={`/o/${organisation.url}/settings/billing`}
+                          >
+                            Upgrade your account to continue!
+                          </Link>
+                        </Trans>
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
-                {remaining.directTemplates !== 0 && (
-                  <DialogFooter className="mx-auto mt-4">
-                    <Button type="button" onClick={() => setCurrentStep('SELECT_RECIPIENT')}>
-                      <Trans> Enable direct link signing</Trans>
-                    </Button>
-                  </DialogFooter>
-                )}
-              </DialogContent>
-            ))
-            .with({ token: P.nullish, currentStep: 'SELECT_RECIPIENT' }, () => (
-              <DialogContent className="relative">
-                {isCreatingTemplateDirectLink && validDirectTemplateRecipients.length !== 0 && (
-                  <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
-                    <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
-                  </div>
-                )}
-
-                <DialogHeader>
-                  <DialogTitle>
-                    <Trans>Choose Direct Link Recipient</Trans>
-                  </DialogTitle>
-
-                  <DialogDescription>
-                    <Trans>Choose an existing recipient from below to continue</Trans>
-                  </DialogDescription>
-                </DialogHeader>
-
-                <div className="custom-scrollbar max-h-[60vh] overflow-y-auto rounded-md border">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>
-                          <Trans>Recipient</Trans>
-                        </TableHead>
-                        <TableHead>
-                          <Trans>Role</Trans>
-                        </TableHead>
-                        <TableHead></TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {validDirectTemplateRecipients.length === 0 && (
-                        <TableRow>
-                          <TableCell colSpan={3} className="h-16 text-center">
-                            <p className="text-muted-foreground">
-                              <Trans>No valid recipients found</Trans>
-                            </p>
-                          </TableCell>
-                        </TableRow>
-                      )}
-
-                      {validDirectTemplateRecipients.map((row) => (
-                        <TableRow
-                          className="cursor-pointer"
-                          key={row.id}
-                          onClick={async () => onRecipientTableRowClick(row.id)}
-                        >
-                          <TableCell>
-                            <div className="text-muted-foreground text-sm">
-                              <p>{row.name}</p>
-                              <p className="text-muted-foreground/70 text-xs">{row.email}</p>
-                            </div>
-                          </TableCell>
-
-                          <TableCell className="text-muted-foreground text-sm">
-                            {_(RECIPIENT_ROLES_DESCRIPTION[row.role].roleName)}
-                          </TableCell>
-
-                          <TableCell>
-                            {selectedRecipientId === row.id ? (
-                              <CircleDotIcon className="h-5 w-5 text-neutral-300" />
-                            ) : (
-                              <CircleIcon className="h-5 w-5 text-neutral-300" />
-                            )}
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-
-                {/* Prevent creating placeholder direct template recipient if the email already exists. */}
-                {!template.recipients.some(
-                  (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
-                ) && (
-                  <DialogFooter className="mx-auto">
-                    <div className="flex flex-col items-center justify-center">
-                      {validDirectTemplateRecipients.length !== 0 && (
-                        <p className="text-muted-foreground text-sm">
-                          <Trans>Or</Trans>
-                        </p>
-                      )}
-
-                      <Button
-                        type="button"
-                        className="mt-2"
-                        loading={isCreatingTemplateDirectLink && !selectedRecipientId}
-                        onClick={async () =>
-                          createTemplateDirectLink({
-                            templateId: template.id,
-                          })
-                        }
-                      >
-                        <Trans>Create one automatically</Trans>
+                  {remaining.directTemplates !== 0 && (
+                    <DialogFooter className="mx-auto mt-4">
+                      <Button type="button" onClick={() => setCurrentStep('SELECT_RECIPIENT')}>
+                        <Trans>Enable direct link signing</Trans>
                       </Button>
+                    </DialogFooter>
+                  )}
+                </DialogContent>
+              ))
+              .with({ token: P.nullish, currentStep: 'SELECT_RECIPIENT' }, () => (
+                <DialogContent className="relative">
+                  {isCreatingTemplateDirectLink && validDirectTemplateRecipients.length !== 0 && (
+                    <div className="absolute inset-0 z-50 flex items-center justify-center rounded bg-white/50 dark:bg-black/50">
+                      <LoaderIcon className="h-6 w-6 animate-spin text-gray-500" />
                     </div>
-                  </DialogFooter>
-                )}
-              </DialogContent>
-            ))
-            .with({ token: P.string, currentStep: 'MANAGE' }, ({ token }) => (
-              <DialogContent className="relative">
-                <DialogHeader>
-                  <DialogTitle>
-                    <Trans>Direct Link Signing</Trans>
-                  </DialogTitle>
+                  )}
 
-                  <DialogDescription>
-                    <Trans>Manage the direct link signing for this template</Trans>
-                  </DialogDescription>
-                </DialogHeader>
+                  <DialogHeader>
+                    <DialogTitle>
+                      <Trans>Choose Direct Link Recipient</Trans>
+                    </DialogTitle>
 
-                <div>
-                  <div className="flex flex-row items-center justify-between">
-                    <Label className="flex flex-row">
-                      <Trans>Enable Direct Link Signing</Trans>
-                      <Tooltip>
-                        <TooltipTrigger tabIndex={-1} className="ml-2">
-                          <InfoIcon className="h-4 w-4" />
-                        </TooltipTrigger>
-                        <TooltipContent className="text-foreground z-9999 max-w-md p-4">
-                          <Trans>
-                            Disabling direct link signing will prevent anyone from accessing the
-                            link.
-                          </Trans>
-                        </TooltipContent>
-                      </Tooltip>
-                    </Label>
+                    <DialogDescription>
+                      <Trans>Choose an existing recipient from below to continue</Trans>
+                    </DialogDescription>
+                  </DialogHeader>
 
-                    <Switch
-                      className="mt-2"
-                      checked={isEnabled}
-                      onCheckedChange={(value) => setIsEnabled(value)}
-                    />
+                  <div className="custom-scrollbar max-h-[60vh] overflow-y-auto rounded-md border">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>
+                            <Trans>Recipient</Trans>
+                          </TableHead>
+                          <TableHead>
+                            <Trans>Role</Trans>
+                          </TableHead>
+                          <TableHead></TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {validDirectTemplateRecipients.length === 0 && (
+                          <TableRow>
+                            <TableCell colSpan={3} className="h-16 text-center">
+                              <p className="text-muted-foreground">
+                                <Trans>No valid recipients found</Trans>
+                              </p>
+                            </TableCell>
+                          </TableRow>
+                        )}
+
+                        {validDirectTemplateRecipients.map((row) => (
+                          <TableRow
+                            className="cursor-pointer"
+                            key={row.id}
+                            onClick={async () => onRecipientTableRowClick(row.id)}
+                          >
+                            <TableCell>
+                              <div className="text-muted-foreground text-sm">
+                                <p>{row.name}</p>
+                                <p className="text-muted-foreground/70 text-xs">{row.email}</p>
+                              </div>
+                            </TableCell>
+
+                            <TableCell className="text-muted-foreground text-sm">
+                              {_(RECIPIENT_ROLES_DESCRIPTION[row.role].roleName)}
+                            </TableCell>
+
+                            <TableCell>
+                              {selectedRecipientId === row.id ? (
+                                <CircleDotIcon className="h-5 w-5 text-neutral-300" />
+                              ) : (
+                                <CircleIcon className="h-5 w-5 text-neutral-300" />
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
                   </div>
 
-                  <div className="mt-2">
-                    <Label htmlFor="copy-direct-link">
-                      <Trans>Copy Shareable Link</Trans>
-                    </Label>
+                  {/* Prevent creating placeholder direct template recipient if the email already exists. */}
+                  {!recipients.some(
+                    (recipient) => recipient.email === DIRECT_TEMPLATE_RECIPIENT_EMAIL,
+                  ) && (
+                    <DialogFooter className="mx-auto">
+                      <div className="flex flex-col items-center justify-center">
+                        {validDirectTemplateRecipients.length !== 0 && (
+                          <p className="text-muted-foreground text-sm">
+                            <Trans>Or</Trans>
+                          </p>
+                        )}
 
-                    <div className="relative mt-1">
-                      <Input
-                        id="copy-direct-link"
-                        disabled
-                        value={formatDirectTemplatePath(token).replace(/https?:\/\//, '')}
-                        readOnly
-                        className="pr-12"
-                      />
-
-                      <div className="absolute bottom-0 right-1 top-0 flex items-center justify-center">
                         <Button
-                          variant="none"
                           type="button"
-                          className="h-8 w-8"
-                          onClick={() => void onCopyClick(token)}
+                          className="mt-2"
+                          loading={isCreatingTemplateDirectLink && !selectedRecipientId}
+                          onClick={async () =>
+                            createTemplateDirectLink({
+                              templateId,
+                            })
+                          }
                         >
-                          <ClipboardCopyIcon className="h-4 w-4 flex-shrink-0" />
+                          <Trans>Create one automatically</Trans>
                         </Button>
                       </div>
+                    </DialogFooter>
+                  )}
+                </DialogContent>
+              ))
+              .with({ token: P.string, currentStep: 'MANAGE' }, ({ token }) => (
+                <DialogContent className="relative">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <Trans>Direct Link Signing</Trans>
+                    </DialogTitle>
+
+                    <DialogDescription>
+                      <Trans>Manage the direct link signing for this template</Trans>
+                    </DialogDescription>
+                  </DialogHeader>
+
+                  <div>
+                    <div className="flex flex-row items-center justify-between">
+                      <Label className="flex flex-row">
+                        <Trans>Enable Direct Link Signing</Trans>
+                        <Tooltip>
+                          <TooltipTrigger tabIndex={-1} className="ml-2">
+                            <InfoIcon className="h-4 w-4" />
+                          </TooltipTrigger>
+                          <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                            <Trans>
+                              Disabling direct link signing will prevent anyone from accessing the
+                              link.
+                            </Trans>
+                          </TooltipContent>
+                        </Tooltip>
+                      </Label>
+
+                      <Switch
+                        className="mt-2"
+                        checked={isEnabled}
+                        onCheckedChange={(value) => setIsEnabled(value)}
+                      />
+                    </div>
+
+                    <div className="mt-2">
+                      <Label htmlFor="copy-direct-link">
+                        <Trans>Copy Shareable Link</Trans>
+                      </Label>
+
+                      <div className="relative mt-1">
+                        <Input
+                          id="copy-direct-link"
+                          disabled
+                          value={formatDirectTemplatePath(token).replace(/https?:\/\//, '')}
+                          readOnly
+                          className="pr-12"
+                        />
+
+                        <div className="absolute bottom-0 right-1 top-0 flex items-center justify-center">
+                          <Button
+                            variant="none"
+                            type="button"
+                            className="h-8 w-8"
+                            onClick={() => void onCopyClick(token)}
+                          >
+                            <ClipboardCopyIcon className="h-4 w-4 flex-shrink-0" />
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <DialogFooter className="mt-4">
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    className="mr-auto w-full sm:w-auto"
-                    loading={isDeletingTemplateDirectLink}
-                    onClick={() => setCurrentStep('CONFIRM_DELETE')}
-                  >
-                    <Trans>Remove</Trans>
-                  </Button>
+                  <DialogFooter className="mt-4">
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      className="mr-auto w-full sm:w-auto"
+                      loading={isDeletingTemplateDirectLink}
+                      onClick={() => setCurrentStep('CONFIRM_DELETE')}
+                    >
+                      <Trans>Remove</Trans>
+                    </Button>
 
-                  <Button
-                    type="button"
-                    loading={isTogglingTemplateAccess}
-                    onClick={async () => {
-                      await toggleTemplateDirectLink({
-                        templateId: template.id,
-                        enabled: isEnabled,
-                      }).catch(() => null);
+                    <Button
+                      type="button"
+                      loading={isTogglingTemplateAccess}
+                      onClick={async () => {
+                        await toggleTemplateDirectLink({
+                          templateId,
+                          enabled: isEnabled,
+                        }).catch(() => null);
 
-                      onOpenChange(false);
-                    }}
-                  >
-                    <Trans>Save</Trans>
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            ))
-            .with({ token: P.string, currentStep: 'CONFIRM_DELETE' }, () => (
-              <DialogContent className="relative">
-                <DialogHeader>
-                  <DialogTitle>
-                    <Trans>Are you sure?</Trans>
-                  </DialogTitle>
+                        setOpen(false);
+                      }}
+                    >
+                      <Trans>Save</Trans>
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              ))
+              .with({ token: P.string, currentStep: 'CONFIRM_DELETE' }, () => (
+                <DialogContent className="relative">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <Trans>Are you sure?</Trans>
+                    </DialogTitle>
 
-                  <DialogDescription>
-                    <Trans>
-                      Please note that proceeding will remove direct linking recipient and turn it
-                      into a placeholder.
-                    </Trans>
-                  </DialogDescription>
-                </DialogHeader>
+                    <DialogDescription>
+                      <Trans>
+                        Please note that proceeding will remove direct linking recipient and turn it
+                        into a placeholder.
+                      </Trans>
+                    </DialogDescription>
+                  </DialogHeader>
 
-                <DialogFooter>
-                  <Button
-                    type="button"
-                    variant="secondary"
-                    onClick={() => setCurrentStep('MANAGE')}
-                  >
-                    <Trans>Cancel</Trans>
-                  </Button>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => setCurrentStep('MANAGE')}
+                    >
+                      <Trans>Cancel</Trans>
+                    </Button>
 
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    loading={isDeletingTemplateDirectLink}
-                    onClick={() => void deleteTemplateDirectLink({ templateId: template.id })}
-                  >
-                    <Trans>Confirm</Trans>
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            ))
-            .otherwise(() => null)}
-        </AnimateGenericFadeInOut>
-      </fieldset>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      loading={isDeletingTemplateDirectLink}
+                      onClick={() => void deleteTemplateDirectLink({ templateId })}
+                    >
+                      <Trans>Confirm</Trans>
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              ))
+              .otherwise(() => null)}
+          </AnimateGenericFadeInOut>
+        </fieldset>
+      </DialogContent>
     </Dialog>
   );
 };

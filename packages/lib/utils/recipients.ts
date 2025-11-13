@@ -1,6 +1,8 @@
+import type { Envelope } from '@prisma/client';
 import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
+import { extractLegacyIds } from '../universal/id';
 
 export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`;
 
@@ -43,4 +45,16 @@ export const canRecipientFieldsBeModified = (recipient: Recipient, fields: Field
   }
 
   return recipient.role !== RecipientRole.VIEWER && recipient.role !== RecipientRole.CC;
+};
+
+export const mapRecipientToLegacyRecipient = (
+  recipient: Recipient,
+  envelope: Pick<Envelope, 'type' | 'secondaryId'>,
+) => {
+  const legacyId = extractLegacyIds(envelope);
+
+  return {
+    ...recipient,
+    ...legacyId,
+  };
 };
