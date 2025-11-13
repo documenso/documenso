@@ -36,6 +36,10 @@ msgstr "\"{documentName}\" wurde von einem Administrator gelöscht."
 msgid "“{documentName}” has been signed"
 msgstr "„{documentName}“ wurde unterschrieben"
 
+#: packages/email/template-components/template-document-remainder.tsx
+msgid "“{documentName}” still needs your signature"
+msgstr ""
+
 #: packages/email/template-components/template-document-completed.tsx
 msgid "“{documentName}” was signed by all signers"
 msgstr "„{documentName}“ wurde von allen Unterzeichnern signiert"
@@ -3452,6 +3456,10 @@ msgstr "Dokument abgelehnt"
 msgid "Document Rejected"
 msgstr "Dokument Abgelehnt"
 
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Document reminder email"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-edit-form.tsx
 msgid "Document sent"
 msgstr "Dokument gesendet"
@@ -6726,6 +6734,19 @@ msgstr "Erinnerung: {0}"
 msgid "Reminder: {0} invited you to {recipientActionVerb} a document"
 msgstr "Erinnerung: {0} hat dich eingeladen, ein Dokument {recipientActionVerb}"
 
+#: packages/email/template-components/template-document-remainder.tsx
+msgid "Reminder: Pending signature"
+msgstr ""
+
+#: packages/email/templates/document-reminder.tsx
+msgid "Reminder: Pending Signature"
+msgstr ""
+
+#. placeholder {0}: envelope.title
+#: packages/lib/jobs/definitions/emails/send-document-reminder-email.handler.ts
+msgid "Reminder: Pending signature for \"{0}\""
+msgstr ""
+
 #: packages/lib/server-only/document/resend-document.ts
 msgid "Reminder: Please {recipientActionVerb} this document"
 msgstr "Erinnerung: Bitte {recipientActionVerb} dieses Dokument"
@@ -7263,6 +7284,10 @@ msgstr "E-Mail über das Löschen des Dokuments senden"
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send document pending email"
 msgstr "E-Mail über ausstehende Dokumente senden"
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "Send document reminder email"
+msgstr ""
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
@@ -8775,6 +8800,10 @@ msgid "This email is sent to the recipient requesting them to sign the document.
 msgstr "Diese E-Mail wird an den Empfänger gesendet und fordert ihn auf, das Dokument zu unterschreiben."
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
+msgid "This email will be automatically sent to recipients who haven’t signed the document within 48 hours"
+msgstr ""
+
+#: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "This email will be sent to the recipient who has just signed the document, if there are still other recipients who have not signed yet."
 msgstr "Diese E-Mail wird an den Empfänger gesendet, der das Dokument gerade unterschrieben hat, wenn es noch andere Empfänger gibt, die noch nicht unterschrieben haben."
 
@@ -8793,6 +8822,10 @@ msgstr "Dieses Feld kann nicht geändert oder gelöscht werden. Wenn Sie den dir
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
 msgstr "Dieser Ordner enthält mehrere Elemente. Wenn Sie ihn löschen, werden alle Unterordner entfernt und alle darin enthaltenen Dokumente und Vorlagen in den Stammordner verschoben."
+
+#: packages/email/template-components/template-document-remainder.tsx
+msgid "This is a reminder that your signature is still required.<0/>Please review and sign the document at your earliest convenience."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
@@ -11040,4 +11073,3 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-

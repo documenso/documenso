@@ -12,6 +12,7 @@ import handle from 'hono-react-router-adapter/node';
 
 import server from './hono/server/router.js';
 import * as build from './index.js';
+import './jobs/cron/emailReminder';
 
 server.use(
   serveStatic({

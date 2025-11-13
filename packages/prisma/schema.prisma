@@ -528,6 +528,13 @@ model EnvelopeAttachment {
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
 }
 
+model ReminderLog {
+  id          String   @id @default(cuid())
+  envelopeId  String
+  recipientId String
+  sentAt      DateTime @default(now())
+}
+
 enum ReadStatus {
   NOT_OPENED
   OPENED
