@@ -21,13 +21,14 @@ import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/de
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
 import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
 import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
-import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../document-router/schema';
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
 import {
   ZBulkSendTemplateMutationSchema,
@@ -159,20 +160,38 @@ export const templateRouter = router({
    * @private
    */
   createTemplate: authenticatedProcedure
-    // .meta({ // Note before releasing this to public, update the response schema to be correct.
-    //   openapi: {
-    //     method: 'POST',
-    //     path: '/template/create',
-    //     summary: 'Create template',
-    //     description: 'Create a new template',
-    //     tags: ['Template'],
-    //   },
-    // })
+    .meta({
+      openapi: {
+        method: 'POST',
+        path: '/template/create',
+        contentTypes: ['multipart/form-data'],
+        summary: 'Create template',
+        description: 'Create a new template',
+        tags: ['Template'],
+      },
+    })
     .input(ZCreateTemplateMutationSchema)
     .output(ZCreateTemplateResponseSchema)
     .mutation(async ({ input, ctx }) => {
       const { teamId } = ctx;
-      const { title, templateDocumentDataId, folderId } = input;
+
+      const { payload, file } = input;
+
+      const {
+        title,
+        folderId,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        publicTitle,
+        publicDescription,
+        type,
+        meta,
+        attachments,
+      } = payload;
+
+      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
 
       ctx.logger.info({
         input: {
@@ -187,18 +206,28 @@ export const templateRouter = router({
         data: {
           type: EnvelopeType.TEMPLATE,
           title,
-          folderId,
           envelopeItems: [
             {
               documentDataId: templateDocumentDataId,
             },
           ],
+          folderId,
+          externalId: externalId ?? undefined,
+          visibility,
+          globalAccessAuth,
+          globalActionAuth,
+          templateType: type,
+          publicTitle,
+          publicDescription,
         },
+        meta,
+        attachments,
         requestMetadata: ctx.metadata,
       });
 
       return {
-        legacyTemplateId: mapSecondaryIdToTemplateId(envelope.secondaryId),
+        envelopeId: envelope.id,
+        id: mapSecondaryIdToTemplateId(envelope.secondaryId),
       };
     }),
 
@@ -519,6 +548,7 @@ export const templateRouter = router({
         directTemplateExternalId,
         signedFieldValues,
         templateUpdatedAt,
+        nextSigner,
       } = input;
 
       ctx.logger.info({
@@ -541,6 +571,7 @@ export const templateRouter = router({
               email: ctx.user.email,
             }
           : undefined,
+        nextSigner,
         requestMetadata: ctx.metadata,
       });
     }),

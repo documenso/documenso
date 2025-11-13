@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import Konva from 'konva';
 import type { RenderParameters } from 'pdfjs-dist/types/src/display/api';
@@ -24,6 +24,8 @@ export function usePageRenderer(renderFunction: RenderFunction) {
 
   const stage = useRef<Konva.Stage | null>(null);
   const pageLayer = useRef<Konva.Layer | null>(null);
+
+  const [renderError, setRenderError] = useState<boolean>(false);
 
   /**
    * The raw viewport with no scaling. Basically the actual PDF size.
@@ -105,6 +107,10 @@ export function usePageRenderer(renderFunction: RenderFunction) {
           stage: stage.current,
           pageLayer: pageLayer.current,
         });
+
+        void document.fonts.ready.then(function () {
+          pageLayer.current?.batchDraw();
+        });
       });
 
       return () => {
@@ -122,5 +128,7 @@ export function usePageRenderer(renderFunction: RenderFunction) {
     unscaledViewport,
     scaledViewport,
     pageContext,
+    renderError,
+    setRenderError,
   };
 }

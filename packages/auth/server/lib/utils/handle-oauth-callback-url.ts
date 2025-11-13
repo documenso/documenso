@@ -5,6 +5,7 @@ import { deleteCookie } from 'hono/cookie';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 
 import type { OAuthClientOptions } from '../../config';
@@ -176,6 +177,12 @@ export const validateOauth = async (options: HandleOAuthCallbackUrlOptions) => {
   if (redirectState !== storedState || !redirectPath) {
     redirectPath = '/';
   }
+
+  if (!isValidReturnTo(redirectPath)) {
+    redirectPath = '/';
+  }
+
+  redirectPath = normalizeReturnTo(redirectPath) || '/';
 
   const tokens = await oAuthClient.validateAuthorizationCode(
     token_endpoint,

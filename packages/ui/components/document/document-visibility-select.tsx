@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 
+import { useLingui } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
@@ -27,6 +28,8 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     { currentTeamMemberRole, isTeamSettings = false, disabled, canUpdateVisibility, ...props },
     ref,
   ) => {
+    const { t } = useLingui();
+
     const isAdmin = currentTeamMemberRole === TeamMemberRole.ADMIN;
     const isManager = currentTeamMemberRole === TeamMemberRole.MANAGER;
     const canEdit = isTeamSettings || canUpdateVisibility;
@@ -34,7 +37,7 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     return (
       <Select {...props} disabled={!canEdit || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-          <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
+          <SelectValue data-testid="documentVisibilitySelectValue" placeholder={t`Everyone`} />
         </SelectTrigger>
 
         <SelectContent position="popper">
