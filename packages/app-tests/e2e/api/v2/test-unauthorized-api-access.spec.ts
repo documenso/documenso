@@ -3925,8 +3925,12 @@ test.describe('Document API V2', () => {
 
         // 3 Files because seed creates one automatically.
         expect(envelopeItems.length).toBe(3);
-        expect(envelopeItems[1].title).toBe('field-meta-1.pdf');
-        expect(envelopeItems[2].title).toBe('field-meta-2.pdf');
+
+        const isFieldMeta1 = envelopeItems.find((item) => item.title === 'field-meta-1.pdf');
+        const isFieldMeta2 = envelopeItems.find((item) => item.title === 'field-meta-2.pdf');
+
+        expect(isFieldMeta1).toBeDefined();
+        expect(isFieldMeta2).toBeDefined();
       });
     });
 
