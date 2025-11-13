@@ -148,7 +148,7 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
       </Link>
 
       {IS_BILLING_ENABLED() && hasManageableBillingOrgs && (
-        <Link to="/settings/billing">
+        <Link to={isPersonalLayoutMode ? '/settings/billing-personal' : `/settings/billing`}>
           <Button
             variant="ghost"
             className={cn(

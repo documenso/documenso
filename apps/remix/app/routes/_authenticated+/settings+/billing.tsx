@@ -1,5 +1,4 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { UserBillingOrganisationsTable } from '~/components/tables/user-billing-organisations-table';
@@ -10,15 +9,13 @@ export function meta() {
 }
 
 export default function SettingsBilling() {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
   return (
     <div>
       <SettingsHeader
-        title={_(msg`Billing`)}
-        subtitle={_(
-          msg`Manage billing and subscriptions for organisations where you have billing management permissions.`,
-        )}
+        title={t`Billing`}
+        subtitle={t`Manage billing and subscriptions for organisations where you have billing management permissions.`}
       />
 
       <UserBillingOrganisationsTable />
