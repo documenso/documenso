@@ -44,7 +44,7 @@ Before using the `EmbedCreateDocument` component, you'll need to obtain a presig
 You can create a presign token by making a request to:
 
 ```
-POST /api/v2-beta/embedding/create-presign-token
+POST /api/v2/embedding/create-presign-token
 ```
 
 This API endpoint requires authentication with your Documenso API key. The token has a default expiration of 1 hour, but you can customize this duration based on your security requirements.
@@ -134,7 +134,7 @@ import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@documenso/
 
 function DocumentCreator() {
   // In a real application, you would fetch this token from your backend
-  // using your API key at /api/v2-beta/embedding/create-presign-token
+  // using your API key at /api/v2/embedding/create-presign-token
   const presignToken = 'YOUR_PRESIGN_TOKEN';
   const [documentId, setDocumentId] = useState<number | null>(null);
 
