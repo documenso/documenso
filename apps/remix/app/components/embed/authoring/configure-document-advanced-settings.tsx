@@ -81,33 +81,6 @@ export const ConfigureDocumentAdvancedSettings = ({
 
         <TabsContent value="general" className="mt-0">
           <div className="flex flex-col space-y-6">
-            {/* <FormField
-              control={control}
-              name="meta.externalId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex flex-row items-center">
-                    <Trans>External ID</Trans>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="mx-2 h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent className="text-muted-foreground max-w-xs">
-                        <Trans>
-                          Add an external ID to the document. This can be used to identify the
-                          document in external systems.
-                        </Trans>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <Input className="bg-background" {...field} disabled={isSubmitting} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
             {features.allowConfigureSignatureTypes && (
               <FormField
                 control={control}
