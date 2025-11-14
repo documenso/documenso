@@ -8,7 +8,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 
 import { Body, Container, Head, Hr, Html, Img, Link, Preview, Section, Text } from '../components';
 import { useBranding } from '../providers/branding';
-import { TemplateBody } from '../template-components/template-body';
+import { TemplateCustomMessageBody } from '../template-components/template-custom-message-body';
 import type { TemplateDocumentInviteProps } from '../template-components/template-document-invite';
 import { TemplateDocumentInvite } from '../template-components/template-document-invite';
 import { TemplateFooter } from '../template-components/template-footer';
@@ -106,7 +106,7 @@ export const DocumentInviteEmailTemplate = ({
 
               <Text className="mt-2 text-base text-slate-400">
                 {customBody ? (
-                  <TemplateBody text={customBody} />
+                  <TemplateCustomMessageBody text={customBody} />
                 ) : (
                   <Trans>
                     {inviterName} has invited you to {action} the document "{documentName}".
