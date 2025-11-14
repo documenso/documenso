@@ -28,9 +28,13 @@ import {
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
+import { seedBlankTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type {
+  TUseEnvelopePayload,
+  TUseEnvelopeResponse,
+} from '@documenso/trpc/server/envelope-router/use-envelope.types';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -3071,6 +3075,82 @@ test.describe('Document API V2', () => {
 
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
+      });
+    });
+
+    test.describe('Envelope use endpoint', () => {
+      test('should block unauthorized access to envelope use endpoint', async ({ request }) => {
+        const doc = await seedTemplate({
+          title: 'Team template 1',
+          userId: userA.id,
+          teamId: teamA.id,
+          internalVersion: 2,
+        });
+
+        const payload: TUseEnvelopePayload = {
+          envelopeId: doc.id,
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+
+        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/use`, {
+          headers: { Authorization: `Bearer ${tokenB}` },
+          multipart: formData,
+        });
+
+        expect(res.ok()).toBeFalsy();
+        expect(res.status()).toBe(404);
+      });
+
+      test('should allow authorized access to envelope use endpoint', async ({ page, request }) => {
+        const doc = await seedTemplate({
+          title: 'Team template 1',
+          userId: userA.id,
+          teamId: teamA.id,
+          internalVersion: 2,
+        });
+
+        const payload: TUseEnvelopePayload = {
+          envelopeId: doc.id,
+          distributeDocument: true,
+          recipients: [
+            {
+              id: doc.recipients[0].id,
+              email: doc.recipients[0].email,
+              name: 'New Name',
+            },
+          ],
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+
+        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/use`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+          multipart: formData,
+        });
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data: TUseEnvelopeResponse = await res.json();
+
+        const createdEnvelope = await prisma.envelope.findFirst({
+          where: {
+            id: data.id,
+          },
+          include: {
+            recipients: true,
+          },
+        });
+
+        expect(createdEnvelope).toBeDefined();
+        expect(createdEnvelope?.recipients.length).toBe(1);
+        expect(createdEnvelope?.recipients[0].email).toBe(doc.recipients[0].email);
+        expect(createdEnvelope?.recipients[0].name).toBe('New Name');
+        expect(createdEnvelope?.recipients[0].token).toBe(data.recipients[0].token);
+        expect(createdEnvelope?.recipients[0].token).not.toBe(doc.recipients[0].token);
       });
     });
 

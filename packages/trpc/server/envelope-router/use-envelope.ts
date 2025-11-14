@@ -1,6 +1,7 @@
 import { EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
@@ -26,7 +27,7 @@ export const useEnvelopeRoute = authenticatedProcedure
     const {
       envelopeId,
       externalId,
-      recipients,
+      recipients = [],
       distributeDocument,
       customDocumentData = [],
       folderId,
@@ -166,5 +167,14 @@ export const useEnvelopeRoute = authenticatedProcedure
 
     return {
       id: createdEnvelope.id,
+      recipients: createdEnvelope.recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+        token: recipient.token,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+      })),
     };
   });

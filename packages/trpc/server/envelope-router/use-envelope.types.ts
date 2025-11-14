@@ -16,6 +16,7 @@ import {
 } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import RecipientSchema from '@documenso/prisma/generated/zod/modelSchema/RecipientSchema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
@@ -44,7 +45,8 @@ export const ZUseEnvelopePayloadSchema = z.object({
         signingOrder: z.number().optional(),
       }),
     )
-    .describe('The information of the recipients to create the document with.'),
+    .describe('The information of the recipients to create the document with.')
+    .optional(),
   distributeDocument: z
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')
@@ -114,6 +116,18 @@ export const ZUseEnvelopeRequestSchema = zodFormData({
 
 export const ZUseEnvelopeResponseSchema = z.object({
   id: z.string().describe('The ID of the created envelope.'),
+  recipients: RecipientSchema.pick({
+    id: true,
+    name: true,
+    email: true,
+    token: true,
+    role: true,
+    signingOrder: true,
+  })
+    .extend({
+      signingUrl: z.string(),
+    })
+    .array(),
 });
 
 export type TUseEnvelopePayload = z.infer<typeof ZUseEnvelopePayloadSchema>;
