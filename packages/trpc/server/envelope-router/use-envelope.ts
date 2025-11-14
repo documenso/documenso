@@ -1,12 +1,12 @@
 import { EnvelopeType } from '@prisma/client';
 
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -174,7 +174,7 @@ export const useEnvelopeRoute = authenticatedProcedure
         token: recipient.token,
         role: recipient.role,
         signingOrder: recipient.signingOrder,
-        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+        signingUrl: formatSigningLink(recipient.token),
       })),
     };
   });

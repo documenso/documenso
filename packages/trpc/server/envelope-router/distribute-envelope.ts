@@ -1,7 +1,7 @@
 import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
 import { sendDocument } from '@documenso/lib/server-only/document/send-document';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDistributeEnvelopeRequestSchema,
@@ -65,7 +65,7 @@ export const distributeEnvelopeRoute = authenticatedProcedure
         token: recipient.token,
         role: recipient.role,
         signingOrder: recipient.signingOrder,
-        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+        signingUrl: formatSigningLink(recipient.token),
       })),
     };
   });

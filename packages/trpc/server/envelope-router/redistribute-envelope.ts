@@ -1,6 +1,6 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
@@ -44,7 +44,7 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
         token: recipient.token,
         role: recipient.role,
         signingOrder: recipient.signingOrder,
-        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+        signingUrl: formatSigningLink(recipient.token),
       })),
     };
   });
