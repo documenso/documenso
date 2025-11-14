@@ -29,7 +29,6 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
@@ -45,6 +44,7 @@ import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
+import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
 const EnvelopeEditorFieldsPageRenderer = lazy(
   async () => import('./envelope-editor-fields-page-renderer'),
@@ -164,12 +164,13 @@ export const EnvelopeEditorFieldsPage = () => {
               <Trans>Selected Recipient</Trans>
             </h3>
 
-            <RecipientSelector
+            <EnvelopeRecipientSelector
               selectedRecipient={editorFields.selectedRecipient}
               onSelectedRecipientChange={(recipient) =>
                 editorFields.setSelectedRecipient(recipient.id)
               }
               recipients={envelope.recipients}
+              fields={envelope.fields}
               className="w-full"
               align="end"
             />
