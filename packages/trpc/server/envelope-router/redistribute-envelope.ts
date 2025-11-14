@@ -1,6 +1,6 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 
-import { ZGenericSuccessResponse } from '../schema';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
@@ -23,7 +23,7 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
       },
     });
 
-    await resendDocument({
+    const envelope = await resendDocument({
       userId: ctx.user.id,
       teamId,
       id: {
@@ -34,5 +34,17 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
       requestMetadata: ctx.metadata,
     });
 
-    return ZGenericSuccessResponse;
+    return {
+      success: true,
+      id: envelope.id,
+      recipients: envelope.recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+        token: recipient.token,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        signingUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${recipient.token}`,
+      })),
+    };
   });
