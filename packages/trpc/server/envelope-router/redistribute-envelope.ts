@@ -1,6 +1,6 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
