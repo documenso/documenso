@@ -126,7 +126,7 @@ export const EnvelopeDownloadDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4 overflow-hidden">
           {isLoadingEnvelopeItems ? (
             <>
               {Array.from({ length: 1 }).map((_, index) => (
@@ -159,7 +159,9 @@ export const EnvelopeDownloadDialog = ({
 
                 <div className="min-w-0 flex-1">
                   {/* Todo: Envelopes - Fix overflow */}
-                  <h4 className="text-foreground truncate text-sm font-medium">{item.title}</h4>
+                  <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
+                    {item.title}
+                  </h4>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     <Trans>PDF Document</Trans>
                   </p>
