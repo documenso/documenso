@@ -106,6 +106,13 @@ export const EnvelopeEditorFieldsPage = () => {
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
   }, []);
 
+  const canRecipientBeModified = useMemo(
+    () =>
+      editorFields.selectedRecipient !== null &&
+      canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields),
+    [editorFields.selectedRecipient, envelope.fields],
+  );
+
   return (
     <div className="relative flex h-full">
       <div className="flex w-full flex-col overflow-y-auto">
@@ -175,32 +182,35 @@ export const EnvelopeEditorFieldsPage = () => {
               align="end"
             />
 
-            {editorFields.selectedRecipient &&
-              !canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields) && (
-                <Alert className="mt-4" variant="warning">
-                  <AlertDescription>
-                    <Trans>
-                      This recipient can no longer be modified as they have signed a field, or
-                      completed the document.
-                    </Trans>
-                  </AlertDescription>
-                </Alert>
-              )}
+            {!canRecipientBeModified && (
+              <Alert className="mt-4" variant="warning">
+                <AlertDescription>
+                  <Trans>
+                    This recipient can no longer be modified as they have signed a field, or
+                    completed the document.
+                  </Trans>
+                </AlertDescription>
+              </Alert>
+            )}
           </section>
 
-          <Separator className="my-4" />
+          {canRecipientBeModified && (
+            <>
+              <Separator className="my-4" />
 
-          {/* Add fields section. */}
-          <section className="px-4">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">
-              <Trans>Add Fields</Trans>
-            </h3>
+              {/* Add fields section. */}
+              <section className="px-4">
+                <h3 className="text-foreground mb-2 text-sm font-semibold">
+                  <Trans>Add Fields</Trans>
+                </h3>
 
-            <EnvelopeEditorFieldDragDrop
-              selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
-              selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
-            />
-          </section>
+                <EnvelopeEditorFieldDragDrop
+                  selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
+                  selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
+                />
+              </section>
+            </>
+          )}
 
           {/* Field details section. */}
           <AnimateGenericFadeInOut key={editorFields.selectedField?.formId}>

@@ -39,7 +39,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(122, 195, 85, 1)',
     baseRingHover: 'rgba(122, 195, 85, 0.3)',
     baseTextHover: 'rgba(122, 195, 85, 1)',
-    fieldButton: 'hover:border-recipient-green hover:bg-recipient-green/30 ',
+    fieldButton: 'hover:border-recipient-green bg-recipient-green/5 hover:bg-recipient-green/30 ',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-green',
     comboxBoxTrigger:
@@ -52,7 +52,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(56, 123, 199, 1)',
     baseRingHover: 'rgba(56, 123, 199, 0.3)',
     baseTextHover: 'rgba(56, 123, 199, 1)',
-    fieldButton: 'hover:border-recipient-blue hover:bg-recipient-blue/30',
+    fieldButton: 'hover:border-recipient-blue bg-recipient-blue/5 hover:bg-recipient-blue/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-blue',
     comboxBoxTrigger:
@@ -65,7 +65,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(151, 71, 255, 1)',
     baseRingHover: 'rgba(151, 71, 255, 0.3)',
     baseTextHover: 'rgba(151, 71, 255, 1)',
-    fieldButton: 'hover:border-recipient-purple hover:bg-recipient-purple/30',
+    fieldButton: 'hover:border-recipient-purple bg-recipient-purple/5 hover:bg-recipient-purple/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-purple',
     comboxBoxTrigger:
@@ -78,7 +78,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(246, 159, 30, 1)',
     baseRingHover: 'rgba(246, 159, 30, 0.3)',
     baseTextHover: 'rgba(246, 159, 30, 1)',
-    fieldButton: 'hover:border-recipient-orange hover:bg-recipient-orange/30',
+    fieldButton: 'hover:border-recipient-orange bg-recipient-orange/5 hover:bg-recipient-orange/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-orange',
     comboxBoxTrigger:
@@ -91,7 +91,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(219, 186, 0, 1)',
     baseRingHover: 'rgba(219, 186, 0, 0.3)',
     baseTextHover: 'rgba(219, 186, 0, 1)',
-    fieldButton: 'hover:border-recipient-yellow hover:bg-recipient-yellow/30',
+    fieldButton: 'hover:border-recipient-yellow bg-recipient-yellow/5 hover:bg-recipient-yellow/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-yellow',
     comboxBoxTrigger:
@@ -104,7 +104,7 @@ export const RECIPIENT_COLOR_STYLES = {
     baseRing: 'rgba(217, 74, 186, 1)',
     baseRingHover: 'rgba(217, 74, 186, 0.3)',
     baseTextHover: 'rgba(217, 74, 186, 1)',
-    fieldButton: 'hover:border-recipient-pink hover:bg-recipient-pink/30',
+    fieldButton: 'hover:border-recipient-pink bg-recipient-pink/5 hover:bg-recipient-pink/30',
     fieldItem: 'group/field-item rounded-[2px]',
     fieldItemInitials: 'group-hover/field-item:bg-recipient-pink',
     comboxBoxTrigger:

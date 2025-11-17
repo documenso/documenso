@@ -278,8 +278,20 @@ export const EnvelopeEditorFieldDragDrop = ({
             onMouseDown={() => setSelectedField(field.type)}
             data-selected={selectedField === field.type ? true : undefined}
             className={cn(
-              'border-border group flex h-12 cursor-pointer items-center justify-center rounded-lg border px-4 transition-colors',
+              'group flex h-12 cursor-pointer items-center justify-center rounded-lg border px-4 transition-colors',
               RECIPIENT_COLOR_STYLES[selectedRecipientColor].fieldButton,
+              {
+                'text-recipient-green border-recipient-green/30':
+                  selectedRecipientColor === 'green',
+                'text-recipient-blue border-recipient-blue/30': selectedRecipientColor === 'blue',
+                'text-recipient-purple border-recipient-purple/30':
+                  selectedRecipientColor === 'purple',
+                'text-recipient-orange border-recipient-orange/30':
+                  selectedRecipientColor === 'orange',
+                'text-recipient-yellow border-recipient-yellow/30':
+                  selectedRecipientColor === 'yellow',
+                'text-recipient-pink border-recipient-pink/30': selectedRecipientColor === 'pink',
+              },
             )}
           >
             <p
@@ -287,12 +299,12 @@ export const EnvelopeEditorFieldDragDrop = ({
                 'text-muted-foreground font-noto group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
                 field.className,
                 {
-                  'group-hover:text-recipient-green': selectedRecipientColor === 'green',
-                  'group-hover:text-recipient-blue': selectedRecipientColor === 'blue',
-                  'group-hover:text-recipient-purple': selectedRecipientColor === 'purple',
-                  'group-hover:text-recipient-orange': selectedRecipientColor === 'orange',
-                  'group-hover:text-recipient-yellow': selectedRecipientColor === 'yellow',
-                  'group-hover:text-recipient-pink': selectedRecipientColor === 'pink',
+                  'text-recipient-green': selectedRecipientColor === 'green',
+                  'text-recipient-blue': selectedRecipientColor === 'blue',
+                  'text-recipient-purple': selectedRecipientColor === 'purple',
+                  'text-recipient-orange': selectedRecipientColor === 'orange',
+                  'text-recipient-yellow': selectedRecipientColor === 'yellow',
+                  'text-recipient-pink': selectedRecipientColor === 'pink',
                 },
               )}
             >
