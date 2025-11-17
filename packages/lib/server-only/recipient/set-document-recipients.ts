@@ -28,7 +28,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
-import { canRecipientBeModified } from '../../utils/recipients';
+import { canRecipientBeModified, sanitizeRecipientName } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -114,6 +114,7 @@ export const setDocumentRecipients = async ({
 
   const normalizedRecipients = recipients.map((recipient) => ({
     ...recipient,
+    name: sanitizeRecipientName(recipient.name),
     email: recipient.email.toLowerCase(),
   }));
 

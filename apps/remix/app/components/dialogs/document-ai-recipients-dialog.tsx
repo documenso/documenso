@@ -1,0 +1,366 @@
+import { useEffect, useMemo, useState } from 'react';
+
+import { zodResolver } from '@hookform/resolvers/zod';
+import { msg } from '@lingui/core/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
+import { RecipientRole } from '@prisma/client';
+import { PlusIcon, TrashIcon } from 'lucide-react';
+import { type FieldError, useFieldArray, useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { nanoid } from '@documenso/lib/universal/id';
+import { trpc } from '@documenso/trpc/react';
+import { RecipientAutoCompleteInput } from '@documenso/ui/components/recipient/recipient-autocomplete-input';
+import type { RecipientAutoCompleteOption } from '@documenso/ui/components/recipient/recipient-autocomplete-input';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
+import { cn } from '@documenso/ui/lib/utils';
+import { Button } from '@documenso/ui/primitives/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@documenso/ui/primitives/dialog';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@documenso/ui/primitives/form/form';
+import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
+
+import type { RecipientForCreation } from '~/utils/analyze-ai-recipients';
+
+const ZDocumentAiRecipientSchema = z.object({
+  formId: z.string().min(1),
+  name: z
+    .string()
+    .min(1, { message: msg`Name is required`.id })
+    .max(255),
+  email: z
+    .string()
+    .min(1, { message: msg`Email is required`.id })
+    .email({ message: msg`Invalid email`.id })
+    .max(254),
+  role: z.nativeEnum(RecipientRole),
+});
+
+const ZDocumentAiRecipientsForm = z.object({
+  recipients: z
+    .array(ZDocumentAiRecipientSchema)
+    .min(1, { message: msg`Please add at least one recipient`.id }),
+});
+
+type TDocumentAiRecipientsForm = z.infer<typeof ZDocumentAiRecipientsForm>;
+
+export type DocumentAiRecipientsDialogProps = {
+  open: boolean;
+  recipients: RecipientForCreation[] | null;
+  onOpenChange: (open: boolean) => void;
+  onCancel: () => void;
+  onSubmit: (recipients: RecipientForCreation[]) => Promise<void> | void;
+};
+
+export const DocumentAiRecipientsDialog = ({
+  open,
+  recipients,
+  onOpenChange,
+  onCancel,
+  onSubmit,
+}: DocumentAiRecipientsDialogProps) => {
+  const { t } = useLingui();
+
+  const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+
+  const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
+
+  const { data: recipientSuggestionsData, isLoading } = trpc.recipient.suggestions.find.useQuery(
+    {
+      query: debouncedRecipientSearchQuery,
+    },
+    {
+      enabled: debouncedRecipientSearchQuery.length > 1,
+    },
+  );
+
+  const recipientSuggestions = recipientSuggestionsData?.results || [];
+
+  const defaultRecipients = useMemo(() => {
+    if (recipients && recipients.length > 0) {
+      const sorted = [...recipients].sort((a, b) => {
+        const orderA = a.signingOrder ?? 0;
+        const orderB = b.signingOrder ?? 0;
+
+        return orderA - orderB;
+      });
+
+      return sorted.map((recipient) => ({
+        formId: nanoid(),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+      }));
+    }
+
+    return [
+      {
+        formId: nanoid(),
+        name: '',
+        email: '',
+        role: RecipientRole.SIGNER,
+      },
+    ];
+  }, [recipients]);
+
+  const form = useForm<TDocumentAiRecipientsForm>({
+    resolver: zodResolver(ZDocumentAiRecipientsForm),
+    defaultValues: {
+      recipients: defaultRecipients,
+    },
+  });
+  const {
+    formState: { isSubmitting },
+  } = form;
+
+  useEffect(() => {
+    form.reset({
+      recipients: defaultRecipients,
+    });
+  }, [defaultRecipients, form]);
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: 'recipients',
+  });
+
+  const handleRecipientAutoCompleteSelect = (
+    index: number,
+    suggestion: RecipientAutoCompleteOption,
+  ) => {
+    form.setValue(`recipients.${index}.email`, suggestion.email);
+    form.setValue(`recipients.${index}.name`, suggestion.name ?? suggestion.email);
+  };
+
+  const handleAddSigner = () => {
+    append({
+      formId: nanoid(),
+      name: '',
+      email: '',
+      role: RecipientRole.SIGNER,
+    });
+  };
+
+  const handleRemoveSigner = (index: number) => {
+    remove(index);
+  };
+
+  const handleSubmit = form.handleSubmit(async (values) => {
+    const normalizedRecipients: RecipientForCreation[] = values.recipients.map(
+      (recipient, index) => ({
+        name: recipient.name.trim(),
+        email: recipient.email.trim(),
+        role: recipient.role,
+        signingOrder: index + 1,
+      }),
+    );
+
+    try {
+      await onSubmit(normalizedRecipients);
+    } catch {
+      // Form level errors are surfaced via toasts in the parent. Keep the dialog open.
+    }
+  });
+
+  const getRecipientsRootError = (
+    error: typeof form.formState.errors.recipients,
+  ): FieldError | undefined => {
+    if (typeof error !== 'object' || !error || !('root' in error)) {
+      return undefined;
+    }
+
+    const candidate = (error as { root?: FieldError }).root;
+    return typeof candidate === 'object' ? candidate : undefined;
+  };
+
+  const recipientsRootError = getRecipientsRootError(form.formState.errors.recipients);
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>
+            <Trans>Review detected recipients</Trans>
+          </DialogTitle>
+          <DialogDescription>
+            <Trans>
+              Confirm, edit, or add recipients before continuing. You can adjust any information
+              below before importing it into your document.
+            </Trans>
+          </DialogDescription>
+        </DialogHeader>
+
+        <Form {...form}>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-4">
+              {fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="flex flex-col gap-4 md:flex-row md:items-center md:gap-x-2"
+                >
+                  <FormField
+                    control={form.control}
+                    name={`recipients.${index}.email`}
+                    render={({ field: emailField }) => (
+                      <FormItem
+                        className={cn('relative w-full', {
+                          'mb-6':
+                            form.formState.errors.recipients?.[index] &&
+                            !form.formState.errors.recipients[index]?.email,
+                        })}
+                      >
+                        {index === 0 && (
+                          <FormLabel required>
+                            <Trans>Email</Trans>
+                          </FormLabel>
+                        )}
+                        <FormControl>
+                          <RecipientAutoCompleteInput
+                            type="email"
+                            placeholder={t`Email`}
+                            value={emailField.value}
+                            options={recipientSuggestions}
+                            onSelect={(suggestion) =>
+                              handleRecipientAutoCompleteSelect(index, suggestion)
+                            }
+                            onSearchQueryChange={(query) => {
+                              emailField.onChange(query);
+                              setRecipientSearchQuery(query);
+                            }}
+                            loading={isLoading}
+                            disabled={isSubmitting}
+                            maxLength={254}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`recipients.${index}.name`}
+                    render={({ field: nameField }) => (
+                      <FormItem
+                        className={cn('w-full', {
+                          'mb-6':
+                            form.formState.errors.recipients?.[index] &&
+                            !form.formState.errors.recipients[index]?.name,
+                        })}
+                      >
+                        {index === 0 && (
+                          <FormLabel>
+                            <Trans>Name</Trans>
+                          </FormLabel>
+                        )}
+                        <FormControl>
+                          <RecipientAutoCompleteInput
+                            type="text"
+                            placeholder={t`Name`}
+                            value={nameField.value}
+                            options={recipientSuggestions}
+                            onSelect={(suggestion) =>
+                              handleRecipientAutoCompleteSelect(index, suggestion)
+                            }
+                            onSearchQueryChange={(query) => {
+                              nameField.onChange(query);
+                              setRecipientSearchQuery(query);
+                            }}
+                            loading={isLoading}
+                            disabled={isSubmitting}
+                            maxLength={255}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name={`recipients.${index}.role`}
+                    render={({ field: roleField }) => (
+                      <FormItem
+                        className={cn('mt-2 w-full md:mt-auto md:w-fit', {
+                          'mb-6':
+                            form.formState.errors.recipients?.[index] &&
+                            !form.formState.errors.recipients[index]?.role,
+                        })}
+                      >
+                        {index === 0 && (
+                          <FormLabel>
+                            <Trans>Role</Trans>
+                          </FormLabel>
+                        )}
+                        <FormControl>
+                          <RecipientRoleSelect
+                            value={roleField.value}
+                            onValueChange={roleField.onChange}
+                            disabled={isSubmitting}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className={cn('mt-2 w-full px-2 md:mt-auto md:w-auto', {
+                      'mb-6': form.formState.errors.recipients?.[index],
+                    })}
+                    onClick={() => handleRemoveSigner(index)}
+                    disabled={isSubmitting || fields.length === 1}
+                  >
+                    <TrashIcon className="h-4 w-4" />
+                  </Button>
+                </div>
+              ))}
+
+              <FormErrorMessage className="mt-2" error={recipientsRootError} />
+
+              <div className="flex">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleAddSigner}
+                  className="w-full md:w-auto"
+                  disabled={isSubmitting}
+                >
+                  <PlusIcon className="mr-2 h-4 w-4" />
+                  <Trans>Add signer</Trans>
+                </Button>
+              </div>
+            </div>
+
+            <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-end sm:gap-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
+                <Button type="button" variant="ghost" onClick={onCancel} disabled={isSubmitting}>
+                  <Trans>Cancel</Trans>
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  <Trans>Use recipients</Trans>
+                </Button>
+              </div>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
+  );
+};

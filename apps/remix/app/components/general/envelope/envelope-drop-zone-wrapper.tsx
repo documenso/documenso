@@ -27,7 +27,14 @@ import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-rou
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { DocumentAiPromptDialog } from '~/components/dialogs/document-ai-prompt-dialog';
+import { DocumentAiRecipientsDialog } from '~/components/dialogs/document-ai-recipients-dialog';
 import { useCurrentTeam } from '~/providers/team';
+import {
+  type RecipientForCreation,
+  analyzeRecipientsFromDocument,
+  ensureRecipientEmails,
+} from '~/utils/analyze-ai-recipients';
 
 export interface EnvelopeDropZoneWrapperProps {
   children: ReactNode;
@@ -52,6 +59,11 @@ export const EnvelopeDropZoneWrapper = ({
   const organisation = useCurrentOrganisation();
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showAiPromptDialog, setShowAiPromptDialog] = useState(false);
+  const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
+  const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
+  const [showAiRecipientsDialog, setShowAiRecipientsDialog] = useState(false);
+  const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const userTimezone =
     TIME_ZONES.find((timezone) => timezone === Intl.DateTimeFormat().resolvedOptions().timeZone) ??
@@ -60,6 +72,7 @@ export const EnvelopeDropZoneWrapper = ({
   const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const { mutateAsync: createEnvelope } = trpc.envelope.create.useMutation();
+  const { mutateAsync: createRecipients } = trpc.envelope.recipient.createMany.useMutation();
 
   const isUploadDisabled = remaining.documents === 0 || !user.emailVerified;
 
@@ -108,14 +121,18 @@ export const EnvelopeDropZoneWrapper = ({
           documentId: id,
           timestamp: new Date().toISOString(),
         });
+
+        // Show AI prompt dialog for documents
+        setUploadedDocumentId(id);
+        setPendingRecipients(null);
+        setShowAiRecipientsDialog(false);
+        setShouldNavigateAfterPromptClose(true);
+        setShowAiPromptDialog(true);
+      } else {
+        // Templates - navigate immediately
+        const pathPrefix = formatTemplatesPath(team.url);
+        await navigate(`${pathPrefix}/${id}/edit`);
       }
-
-      const pathPrefix =
-        type === EnvelopeType.DOCUMENT
-          ? formatDocumentsPath(team.url)
-          : formatTemplatesPath(team.url);
-
-      await navigate(`${pathPrefix}/${id}/edit`);
     } catch (err) {
       const error = AppError.parseError(err);
 
@@ -201,6 +218,115 @@ export const EnvelopeDropZoneWrapper = ({
       variant: 'destructive',
     });
   };
+
+  const navigateToEnvelopeEditor = () => {
+    if (!uploadedDocumentId) {
+      return;
+    }
+
+    const pathPrefix = formatDocumentsPath(team.url);
+    void navigate(`${pathPrefix}/${uploadedDocumentId}/edit`);
+  };
+
+  const handleAiAccept = async () => {
+    if (!uploadedDocumentId) {
+      return;
+    }
+
+    try {
+      const recipients = await analyzeRecipientsFromDocument(uploadedDocumentId);
+
+      if (recipients.length === 0) {
+        toast({
+          title: t`No recipients detected`,
+          description: t`You can add recipients manually in the editor`,
+          duration: 5000,
+        });
+
+        throw new Error('NO_RECIPIENTS_DETECTED');
+      }
+
+      const recipientsWithEmails = ensureRecipientEmails(recipients, uploadedDocumentId);
+
+      setPendingRecipients(recipientsWithEmails);
+      setShouldNavigateAfterPromptClose(false);
+      setShowAiPromptDialog(false);
+      setShowAiRecipientsDialog(true);
+    } catch (error) {
+      if (!(error instanceof Error && error.message === 'NO_RECIPIENTS_DETECTED')) {
+        const parsedError = AppError.parseError(error);
+
+        toast({
+          title: t`Failed to analyze recipients`,
+          description: parsedError.userMessage || t`You can add recipients manually in the editor`,
+          variant: 'destructive',
+          duration: 7500,
+        });
+      }
+
+      throw error;
+    }
+  };
+
+  const handleAiSkip = () => {
+    setShouldNavigateAfterPromptClose(true);
+    setShowAiPromptDialog(false);
+    navigateToEnvelopeEditor();
+  };
+
+  const handleRecipientsCancel = () => {
+    setShowAiRecipientsDialog(false);
+    setPendingRecipients(null);
+    navigateToEnvelopeEditor();
+  };
+
+  const handleRecipientsConfirm = async (recipientsToCreate: RecipientForCreation[]) => {
+    if (!uploadedDocumentId) {
+      return;
+    }
+
+    try {
+      await createRecipients({
+        envelopeId: uploadedDocumentId,
+        data: recipientsToCreate,
+      });
+
+      toast({
+        title: t`Recipients added`,
+        description: t`Successfully detected ${recipientsToCreate.length} recipient(s)`,
+        duration: 5000,
+      });
+
+      setShowAiRecipientsDialog(false);
+      setPendingRecipients(null);
+      navigateToEnvelopeEditor();
+    } catch (error) {
+      const parsedError = AppError.parseError(error);
+
+      toast({
+        title: t`Failed to add recipients`,
+        description: parsedError.userMessage || t`Please review the recipients and try again`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+
+      throw error;
+    }
+  };
+
+  const handlePromptDialogOpenChange = (open: boolean) => {
+    setShowAiPromptDialog(open);
+
+    if (open) {
+      setShouldNavigateAfterPromptClose(true);
+      return;
+    }
+
+    if (!open && shouldNavigateAfterPromptClose) {
+      navigateToEnvelopeEditor();
+    }
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
       'application/pdf': ['.pdf'],
@@ -267,6 +393,27 @@ export const EnvelopeDropZoneWrapper = ({
           </div>
         </div>
       )}
+
+      <DocumentAiPromptDialog
+        open={showAiPromptDialog}
+        onOpenChange={handlePromptDialogOpenChange}
+        onAccept={handleAiAccept}
+        onSkip={handleAiSkip}
+      />
+
+      <DocumentAiRecipientsDialog
+        open={showAiRecipientsDialog}
+        recipients={pendingRecipients}
+        onOpenChange={(open) => {
+          if (!open) {
+            handleRecipientsCancel();
+          } else {
+            setShowAiRecipientsDialog(true);
+          }
+        }}
+        onCancel={handleRecipientsCancel}
+        onSubmit={handleRecipientsConfirm}
+      />
     </div>
   );
 };

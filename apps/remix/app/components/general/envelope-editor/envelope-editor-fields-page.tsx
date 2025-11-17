@@ -137,13 +137,13 @@ const enforceMinimumFieldDimensions = (params: {
 };
 
 const processAllPagesWithAI = async (params: {
-  documentDataId: string;
+  envelopeId: string;
   onProgress: (current: number, total: number) => void;
 }): Promise<{
   fieldsPerPage: Map<number, TDetectedFormField[]>;
   errors: Map<number, Error>;
 }> => {
-  const { documentDataId, onProgress } = params;
+  const { envelopeId, onProgress } = params;
   const fieldsPerPage = new Map<number, TDetectedFormField[]>();
   const errors = new Map<number, Error>();
 
@@ -156,7 +156,7 @@ const processAllPagesWithAI = async (params: {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ documentId: documentDataId }),
+      body: JSON.stringify({ envelopeId }),
       credentials: 'include',
     });
 
@@ -359,10 +359,10 @@ export const EnvelopeEditorFieldsPage = () => {
                 setProcessingProgress(null);
 
                 try {
-                  if (!editorFields.selectedRecipient || !currentEnvelopeItem) {
+                  if (!currentEnvelopeItem) {
                     toast({
-                      title: t`Warning`,
-                      description: t`Please select a recipient before adding fields.`,
+                      title: t`Error`,
+                      description: t`No document selected. Please reload the page and try again.`,
                       variant: 'destructive',
                     });
                     return;
@@ -378,7 +378,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   }
 
                   const { fieldsPerPage, errors } = await processAllPagesWithAI({
-                    documentDataId: currentEnvelopeItem.documentDataId,
+                    envelopeId: envelope.id,
                     onProgress: (current, total) => {
                       setProcessingProgress({ current, total });
                     },
@@ -412,6 +412,22 @@ export const EnvelopeEditorFieldsPage = () => {
                       }
 
                       const fieldType = detected.label as FieldType;
+                      const resolvedRecipientId =
+                        envelope.recipients.find(
+                          (recipient) => recipient.id === detected.recipientId,
+                        )?.id ??
+                        editorFields.selectedRecipient?.id ??
+                        envelope.recipients[0]?.id;
+
+                      if (!resolvedRecipientId) {
+                        console.warn(
+                          'Skipping detected field because no recipient could be resolved',
+                          {
+                            detectedRecipientId: detected.recipientId,
+                          },
+                        );
+                        continue;
+                      }
 
                       try {
                         editorFields.addField({
@@ -422,7 +438,7 @@ export const EnvelopeEditorFieldsPage = () => {
                           positionY,
                           width,
                           height,
-                          recipientId: editorFields.selectedRecipient.id,
+                          recipientId: resolvedRecipientId,
                           fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[fieldType]),
                         });
                         totalAdded++;

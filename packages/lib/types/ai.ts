@@ -12,4 +12,5 @@ export type TDetectedFormField = {
     | 'CHECKBOX'
     | 'DROPDOWN';
   pageNumber: number;
+  recipientId: number;
 };

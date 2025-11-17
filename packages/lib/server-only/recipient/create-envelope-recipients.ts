@@ -12,7 +12,7 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
+import { mapRecipientToLegacyRecipient, sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export interface CreateEnvelopeRecipientsOptions {
@@ -85,6 +85,7 @@ export const createEnvelopeRecipients = async ({
 
   const normalizedRecipients = recipientsToCreate.map((recipient) => ({
     ...recipient,
+    name: sanitizeRecipientName(recipient.name),
     email: recipient.email.toLowerCase(),
   }));
 

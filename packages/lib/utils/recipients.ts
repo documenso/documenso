@@ -4,6 +4,8 @@ import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prism
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { extractLegacyIds } from '../universal/id';
 
+const UNKNOWN_RECIPIENT_NAME_PLACEHOLDER = '<UNKNOWN>';
+
 export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`;
 
 /**
@@ -57,4 +59,22 @@ export const mapRecipientToLegacyRecipient = (
     ...recipient,
     ...legacyId,
   };
+};
+
+export const sanitizeRecipientName = (name?: string | null) => {
+  if (!name) {
+    return '';
+  }
+
+  const trimmedName = name.trim();
+
+  if (!trimmedName) {
+    return '';
+  }
+
+  if (trimmedName.toUpperCase() === UNKNOWN_RECIPIENT_NAME_PLACEHOLDER) {
+    return '';
+  }
+
+  return trimmedName;
 };
