@@ -27,7 +27,7 @@ import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fiel
 import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
 import {
   type TBaseEmbedAuthoringSchema,
-  ZBaseEmbedAuthoringSchema,
+  ZBaseEmbedAuthoringEditSchema,
 } from '~/types/embed-authoring-base-schema';
 
 import type { Route } from './+types/document.edit.$id';
@@ -87,6 +87,8 @@ export default function EmbeddingAuthoringTemplateEditPage() {
   const { toast } = useToast();
 
   const { template } = useLoaderData<typeof loader>();
+
+  const [hasFinishedInit, setHasFinishedInit] = useState(false);
 
   const signatureTypes = useMemo(() => {
     const types: string[] = [];
@@ -159,6 +161,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
   const [features, setFeatures] = useState<TBaseEmbedAuthoringSchema['features'] | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [canGoBack, setCanGoBack] = useState(true);
 
   const { mutateAsync: updateEmbeddingTemplate } =
     trpc.embeddingPresign.updateEmbeddingTemplate.useMutation();
@@ -230,7 +233,9 @@ export default function EmbeddingAuthoringTemplateEditPage() {
           signingOrder: signer.signingOrder,
           fields: fields
             .filter((field) => field.signerEmail === signer.email)
-            .map((f) => ({
+            // There's a gnarly discriminated union that makes this hard to satisfy, we're casting for the second
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            .map<any>((f) => ({
               ...f,
               id: f.nativeId,
               envelopeItemId: template.templateDocumentData.envelopeItemId,
@@ -273,7 +278,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
     try {
       const hash = window.location.hash.slice(1);
 
-      const result = ZBaseEmbedAuthoringSchema.safeParse(
+      const result = ZBaseEmbedAuthoringEditSchema.safeParse(
         JSON.parse(decodeURIComponent(atob(hash))),
       );
 
@@ -283,20 +288,32 @@ export default function EmbeddingAuthoringTemplateEditPage() {
 
       setFeatures(result.data.features);
 
+      if (result.data.onlyEditFields) {
+        setCurrentStep(2);
+        setCanGoBack(false);
+      }
+
       // Extract externalId from the parsed data if available
       if (result.data.externalId) {
         setExternalId(result.data.externalId);
       }
+
+      setHasFinishedInit(true);
     } catch (err) {
       console.error('Error parsing embedding params:', err);
     }
   }, []);
+
+  if (!hasFinishedInit) {
+    return null;
+  }
 
   return (
     <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg p-6">
       <ConfigureDocumentProvider isTemplate={false} features={features ?? {}}>
         <Stepper currentStep={currentStep} setCurrentStep={setCurrentStep}>
           <ConfigureDocumentView
+            type="template"
             defaultValues={configuration ?? undefined}
             disableUpload={true}
             onSubmit={handleConfigurePageViewSubmit}
@@ -306,7 +323,7 @@ export default function EmbeddingAuthoringTemplateEditPage() {
             configData={configuration!}
             documentData={template.templateDocumentData}
             defaultValues={fields ?? undefined}
-            onBack={handleBackToConfig}
+            onBack={canGoBack ? handleBackToConfig : undefined}
             onSubmit={handleConfigureFieldsSubmit}
           />
         </Stepper>

@@ -42,7 +42,7 @@ export type ConfigureFieldsViewProps = {
   configData: TConfigureEmbedFormSchema;
   documentData?: DocumentData;
   defaultValues?: Partial<TConfigureFieldsFormSchema>;
-  onBack: (data: TConfigureFieldsFormSchema) => void;
+  onBack?: (data: TConfigureFieldsFormSchema) => void;
   onSubmit: (data: TConfigureFieldsFormSchema) => void;
 };
 
@@ -481,15 +481,17 @@ export const ConfigureFieldsView = ({
               </div>
 
               <div className="mt-6 flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex-1"
-                  loading={form.formState.isSubmitting}
-                  onClick={() => onBack(form.getValues())}
-                >
-                  <Trans>Back</Trans>
-                </Button>
+                {onBack && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="flex-1"
+                    loading={form.formState.isSubmitting}
+                    onClick={() => onBack(form.getValues())}
+                  >
+                    <Trans>Back</Trans>
+                  </Button>
+                )}
 
                 <Button
                   className="flex-1"
@@ -642,15 +644,17 @@ export const ConfigureFieldsView = ({
             </div>
 
             <div className="mt-6 flex gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex-1"
-                loading={form.formState.isSubmitting}
-                onClick={() => onBack(form.getValues())}
-              >
-                <Trans>Back</Trans>
-              </Button>
+              {onBack && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1"
+                  loading={form.formState.isSubmitting}
+                  onClick={() => onBack(form.getValues())}
+                >
+                  <Trans>Back</Trans>
+                </Button>
+              )}
 
               <Button
                 className="flex-1"
