@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-11-12 06:14\n"
+"PO-Revision-Date: 2025-11-17 02:33\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -8943,13 +8943,13 @@ msgstr "Tytuł nie może być pusty"
 #. placeholder {2}: recipient.email
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To {0} this {1}, you need to be logged in as <0>{2}</0>"
-msgstr ""
+msgstr "Aby {0} ten {1}, musisz być zalogowany jako <0>{2}</0>"
 
 #. placeholder {0}: actionVerb.toLowerCase()
 #. placeholder {1}: actionTarget.toLowerCase()
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
 msgid "To {0} this {1}, you need to be logged in."
-msgstr ""
+msgstr "Aby {0} ten {1}, musisz być zalogowany."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
@@ -10532,7 +10532,7 @@ msgstr "Nie możesz przesyłać zaszyfrowanych plików PDF"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "You cannot upload more than {maximumEnvelopeItemCount} items per envelope."
-msgstr ""
+msgstr "Nie możesz przesłać więcej niż {maximumEnvelopeItemCount} elementów na kopertę."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription"
