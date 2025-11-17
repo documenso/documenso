@@ -19,6 +19,7 @@ import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
+import { ZRecipientWithSigningUrlSchema } from './schema';
 
 export const useEnvelopeMeta: TrpcRouteMeta = {
   openapi: {
@@ -44,7 +45,8 @@ export const ZUseEnvelopePayloadSchema = z.object({
         signingOrder: z.number().optional(),
       }),
     )
-    .describe('The information of the recipients to create the document with.'),
+    .describe('The information of the recipients to create the document with.')
+    .optional(),
   distributeDocument: z
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')
@@ -114,6 +116,7 @@ export const ZUseEnvelopeRequestSchema = zodFormData({
 
 export const ZUseEnvelopeResponseSchema = z.object({
   id: z.string().describe('The ID of the created envelope.'),
+  recipients: ZRecipientWithSigningUrlSchema.array(),
 });
 
 export type TUseEnvelopePayload = z.infer<typeof ZUseEnvelopePayloadSchema>;
