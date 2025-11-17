@@ -2,7 +2,7 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType, SigningStatus } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
@@ -201,7 +201,10 @@ export const EnvelopeEditorPreviewPage = () => {
       envelope={envelope}
       token={undefined}
       fields={fieldsWithPlaceholders}
-      recipients={envelope.recipients}
+      recipients={envelope.recipients.map((recipient) => ({
+        ...recipient,
+        signingStatus: SigningStatus.SIGNED,
+      }))}
       overrideSettings={{
         mode: 'export',
       }}

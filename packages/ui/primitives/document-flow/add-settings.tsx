@@ -419,7 +419,7 @@ export const AddSettingsFormPartial = ({
                                 void handleAutoSave();
                               }}
                               className="bg-background w-full"
-                              emptySelectionPlaceholder="Select signature types"
+                              emptySelectionPlaceholder={t`Select signature types`}
                             />
                           </FormControl>
 

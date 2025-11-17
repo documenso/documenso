@@ -336,7 +336,7 @@ export const EmbedDirectTemplateClientPage = ({
         <div className="flex-1">
           <PDFViewer
             envelopeItem={envelopeItems[0]}
-            token={token}
+            token={recipient.token}
             version="signed"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />

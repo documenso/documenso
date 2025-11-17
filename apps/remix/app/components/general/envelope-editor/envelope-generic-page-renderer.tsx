@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
-import { type Recipient, SigningStatus } from '@prisma/client';
+import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
 import type Konva from 'konva';
 
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -19,6 +19,7 @@ export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
   const {
+    envelopeStatus,
     currentEnvelopeItem,
     fields,
     recipients,
@@ -42,6 +43,10 @@ export default function EnvelopeGenericPageRenderer() {
   const { _className, scale } = pageContext;
 
   const localPageFields = useMemo((): GenericLocalField[] => {
+    if (envelopeStatus === DocumentStatus.COMPLETED) {
+      return [];
+    }
+
     return fields
       .filter(
         (field) =>
@@ -54,11 +59,20 @@ export default function EnvelopeGenericPageRenderer() {
           throw new Error(`Recipient not found for field ${field.id}`);
         }
 
+        const isInserted = recipient.signingStatus === SigningStatus.SIGNED && field.inserted;
+
         return {
           ...field,
+          inserted: isInserted,
+          customText: isInserted ? field.customText : '',
           recipient,
         };
-      });
+      })
+      .filter(
+        ({ inserted, fieldMeta, recipient }) =>
+          (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) ||
+          fieldMeta?.readOnly,
+      );
   }, [fields, pageContext.pageNumber, currentEnvelopeItem?.id, recipients]);
 
   const unsafeRenderFieldOnLayer = (field: GenericLocalField) => {
@@ -67,11 +81,7 @@ export default function EnvelopeGenericPageRenderer() {
       return;
     }
 
-    const { recipient } = field;
-
     const fieldTranslations = getClientSideFieldTranslations(i18n);
-
-    const isInserted = recipient.signingStatus === SigningStatus.SIGNED && field.inserted;
 
     renderField({
       scale,
@@ -83,7 +93,6 @@ export default function EnvelopeGenericPageRenderer() {
         height: Number(field.height),
         positionX: Number(field.positionX),
         positionY: Number(field.positionY),
-        customText: isInserted ? field.customText : '',
         fieldMeta: field.fieldMeta,
         signature: {
           signatureImageAsBase64: '',
@@ -95,7 +104,7 @@ export default function EnvelopeGenericPageRenderer() {
       pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
       editable: false,
-      mode: overrideSettings?.mode ?? 'sign',
+      mode: overrideSettings?.mode ?? 'edit',
     });
   };
 

@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
@@ -425,7 +424,7 @@ export const AddTemplateSettingsFormPartial = ({
                         void handleAutoSave();
                       }}
                       className="bg-background w-full"
-                      emptySelectionPlaceholder="Select signature types"
+                      emptySelectionPlaceholder={t`Select signature types`}
                     />
                   </FormControl>
 

@@ -212,7 +212,7 @@ export const EnvelopeEditorRecipientForm = () => {
   );
 
   const hasDocumentBeenSent = recipients.some(
-    (recipient) => recipient.sendStatus === SendStatus.SENT,
+    (recipient) => recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
   );
 
   const canRecipientBeModified = (recipientId?: number) => {

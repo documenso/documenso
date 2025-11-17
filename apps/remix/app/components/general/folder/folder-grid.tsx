@@ -6,7 +6,6 @@ import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -17,11 +16,11 @@ import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
 import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
-import { DocumentUploadButton } from '~/components/general/document/document-upload-button';
+import { DocumentUploadButtonLegacy } from '~/components/general/document/document-upload-button-legacy';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
-import { EnvelopeUploadButton } from '../document/envelope-upload-button';
+import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
 
 export type FolderGridProps = {
   type: FolderType;
@@ -99,14 +98,12 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {(IS_ENVELOPES_ENABLED || organisation.organisationClaim.flags.allowEnvelopes) && (
-            <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
-          )}
+          <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
           {type === FolderType.DOCUMENT ? (
-            <DocumentUploadButton />
+            <DocumentUploadButtonLegacy /> // If you delete this, delete the component as well.
           ) : (
-            <TemplateCreateDialog folderId={parentId ?? undefined} />
+            <TemplateCreateDialog folderId={parentId ?? undefined} /> // If you delete this, delete the component as well.
           )}
 
           <FolderCreateDialog type={type} />

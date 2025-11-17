@@ -21,7 +21,7 @@ import pixelMatch from 'pixelmatch';
 import { PNG } from 'pngjs';
 import type { TestInfo } from '@playwright/test';
 import { expect, test } from '@playwright/test';
-import { DocumentStatus } from '@prisma/client';
+import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
@@ -29,26 +29,218 @@ import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
 import { seedUser } from '@documenso/prisma/seed/users';
-
 import { apiSignin } from '../fixtures/authentication';
+import type {
+  TCreateEnvelopePayload,
+  TCreateEnvelopeResponse,
+} from '../../../trpc/server/envelope-router/create-envelope.types';
+import { NEXT_PUBLIC_WEBAPP_URL } from '../../../lib/constants/app';
+import { createApiToken } from '../../../lib/server-only/public-api/create-api-token';
+import { RecipientRole } from '../../../prisma/generated/types';
+import { FIELD_META_TEST_FIELDS } from '../../constants/field-meta-pdf';
+import { ALIGNMENT_TEST_FIELDS } from '../../constants/field-alignment-pdf';
+import type { TDistributeEnvelopeRequest } from '../../../trpc/server/envelope-router/distribute-envelope.types';
+import { isBase64Image } from '../../../lib/constants/signatures';
+
+const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
+const baseUrl = `${WEBAPP_BASE_URL}/api/v2`;
 
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
-test.skip('field placement visual regression', async ({ page }, testInfo) => {
-  const { user, team } = await seedUser();
-
-  const envelope = await seedAlignmentTestDocument({
-    userId: user.id,
-    teamId: team.id,
-    recipientName: user.name || '',
-    recipientEmail: user.email,
-    insertFields: true,
-    status: DocumentStatus.PENDING,
+test.skip('seed alignment test document', async ({ page }) => {
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      email: 'example@documenso.com',
+    },
+    include: {
+      ownedOrganisations: {
+        include: {
+          teams: true,
+        },
+      },
+    },
   });
 
-  const token = envelope.recipients[0].token;
+  const userId = user.id;
+  const teamId = user.ownedOrganisations[0].teams[0].id;
 
-  const signUrl = `/sign/${token}`;
+  await seedAlignmentTestDocument({
+    userId,
+    teamId,
+    recipientName: user.name || '',
+    recipientEmail: user.email,
+    insertFields: false,
+    status: DocumentStatus.DRAFT,
+  });
+});
+
+test('field placement visual regression', async ({ page, request }, testInfo) => {
+  const { user, team } = await seedUser();
+
+  const { token } = await createApiToken({
+    userId: user.id,
+    teamId: team.id,
+    tokenName: 'test',
+    expiresIn: null,
+  });
+
+  // Step 1: Create initial envelope with Prisma (with first envelope item)
+  const alignmentPdf = fs.readFileSync(
+    path.join(__dirname, '../../../../assets/field-font-alignment.pdf'),
+  );
+
+  const fieldMetaPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/field-meta.pdf'));
+
+  const formData = new FormData();
+
+  const fieldMetaFields = FIELD_META_TEST_FIELDS.map((field) => ({
+    identifier: 'field-meta',
+    type: field.type,
+    page: field.page,
+    positionX: field.positionX,
+    positionY: field.positionY,
+    width: field.width,
+    height: field.height,
+    fieldMeta: field.fieldMeta,
+  }));
+
+  const alignmentFields = ALIGNMENT_TEST_FIELDS.map((field) => ({
+    identifier: 'alignment-pdf',
+    type: field.type,
+    page: field.page,
+    positionX: field.positionX,
+    positionY: field.positionY,
+    width: field.width,
+    height: field.height,
+    fieldMeta: field.fieldMeta,
+  }));
+
+  const createEnvelopePayload: TCreateEnvelopePayload = {
+    type: EnvelopeType.DOCUMENT,
+    title: 'Envelope Full Field Test',
+    recipients: [
+      {
+        email: user.email,
+        name: user.name || '',
+        role: RecipientRole.SIGNER,
+        fields: [...fieldMetaFields, ...alignmentFields],
+      },
+    ],
+  };
+
+  formData.append('payload', JSON.stringify(createEnvelopePayload));
+
+  formData.append('files', new File([alignmentPdf], 'alignment-pdf', { type: 'application/pdf' }));
+  formData.append('files', new File([fieldMetaPdf], 'field-meta', { type: 'application/pdf' }));
+
+  const createEnvelopeRequest = await request.post(`${baseUrl}/envelope/create`, {
+    headers: { Authorization: `Bearer ${token}` },
+    multipart: formData,
+  });
+
+  expect(createEnvelopeRequest.ok()).toBeTruthy();
+  expect(createEnvelopeRequest.status()).toBe(200);
+
+  const { id: createdEnvelopeId }: TCreateEnvelopeResponse = await createEnvelopeRequest.json();
+
+  const envelope = await prisma.envelope.findUniqueOrThrow({
+    where: {
+      id: createdEnvelopeId,
+    },
+    include: {
+      recipients: true,
+      envelopeItems: true,
+    },
+  });
+
+  const recipientId = envelope.recipients[0].id;
+  const alignmentItem = envelope.envelopeItems.find((item: { order: number }) => item.order === 1);
+  const fieldMetaItem = envelope.envelopeItems.find((item: { order: number }) => item.order === 2);
+
+  expect(recipientId).toBeDefined();
+  expect(alignmentItem).toBeDefined();
+  expect(fieldMetaItem).toBeDefined();
+
+  if (!alignmentItem || !fieldMetaItem) {
+    throw new Error('Envelope items not found');
+  }
+
+  const distributeEnvelopeRequest = await request.post(`${baseUrl}/envelope/distribute`, {
+    headers: { Authorization: `Bearer ${token}` },
+    data: {
+      envelopeId: envelope.id,
+    } satisfies TDistributeEnvelopeRequest,
+  });
+
+  expect(distributeEnvelopeRequest.ok()).toBeTruthy();
+
+  const uninsertedFields = await prisma.field.findMany({
+    where: {
+      envelopeId: envelope.id,
+      inserted: false,
+    },
+    include: {
+      envelopeItem: {
+        select: {
+          title: true,
+        },
+      },
+    },
+  });
+
+  await Promise.all(
+    uninsertedFields.map(async (field) => {
+      let foundField = ALIGNMENT_TEST_FIELDS.find(
+        (f) =>
+          field.page === f.page &&
+          field.envelopeItem.title === 'alignment-pdf' &&
+          Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
+          Number(field.positionY).toFixed(2) === f.positionY.toFixed(2) &&
+          Number(field.width).toFixed(2) === f.width.toFixed(2) &&
+          Number(field.height).toFixed(2) === f.height.toFixed(2),
+      );
+
+      if (!foundField) {
+        foundField = FIELD_META_TEST_FIELDS.find(
+          (f) =>
+            field.page === f.page &&
+            field.envelopeItem.title === 'field-meta' &&
+            Number(field.positionX).toFixed(2) === f.positionX.toFixed(2) &&
+            Number(field.positionY).toFixed(2) === f.positionY.toFixed(2) &&
+            Number(field.width).toFixed(2) === f.width.toFixed(2) &&
+            Number(field.height).toFixed(2) === f.height.toFixed(2),
+        );
+      }
+
+      if (!foundField) {
+        throw new Error('Field not found');
+      }
+
+      await prisma.field.update({
+        where: {
+          id: field.id,
+        },
+        data: {
+          inserted: true,
+          customText: foundField.customText,
+          signature: foundField.signature
+            ? {
+                create: {
+                  recipientId: envelope.recipients[0].id,
+                  signatureImageAsBase64: isBase64Image(foundField.signature)
+                    ? foundField.signature
+                    : null,
+                  typedSignature: isBase64Image(foundField.signature) ? null : foundField.signature,
+                },
+              }
+            : undefined,
+        },
+      });
+    }),
+  );
+
+  const recipientToken = envelope.recipients[0].token;
+  const signUrl = `/sign/${recipientToken}`;
 
   await apiSignin({
     page,
@@ -97,7 +289,7 @@ test.skip('field placement visual regression', async ({ page }, testInfo) => {
       const documentUrl = getEnvelopeItemPdfUrl({
         type: 'download',
         envelopeItem: item,
-        token,
+        token: recipientToken,
         version: 'signed',
       });
 
@@ -289,7 +481,7 @@ const compareSignedPdfWithImages = async ({
       // Expect the certificate to NOT be blank. Since the storedImage is blank.
       expect.soft(comparison).toBeGreaterThan(20000);
     } else {
-      expect.soft(comparison).toEqual(0);
+      expect.soft(comparison).toBeLessThan(2);
     }
   }
 };

@@ -8,6 +8,7 @@ import { createEnvelopeItemsRoute } from './create-envelope-items';
 import { deleteEnvelopeRoute } from './delete-envelope';
 import { deleteEnvelopeItemRoute } from './delete-envelope-item';
 import { distributeEnvelopeRoute } from './distribute-envelope';
+import { downloadEnvelopeItemRoute } from './download-envelope-item';
 import { duplicateEnvelopeRoute } from './duplicate-envelope';
 import { createEnvelopeFieldsRoute } from './envelope-fields/create-envelope-fields';
 import { deleteEnvelopeFieldRoute } from './envelope-fields/delete-envelope-field';
@@ -46,6 +47,7 @@ export const envelopeRouter = router({
     createMany: createEnvelopeItemsRoute,
     updateMany: updateEnvelopeItemsRoute,
     delete: deleteEnvelopeItemRoute,
+    download: downloadEnvelopeItemRoute,
   },
   recipient: {
     get: getEnvelopeRecipientRoute,

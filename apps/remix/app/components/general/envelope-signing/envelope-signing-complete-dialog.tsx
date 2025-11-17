@@ -75,14 +75,12 @@ export const EnvelopeSignerCompleteDialog = () => {
     accessAuthOptions?: TRecipientAccessAuth,
   ) => {
     try {
-      const payload = {
+      await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
-        authOptions: accessAuthOptions,
+        accessAuthOptions,
         ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
-      };
-
-      await completeDocument(payload);
+      });
 
       analytics.capture('App: Recipient has completed signing', {
         signerId: recipient.id,

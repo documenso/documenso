@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { type DocumentData, DocumentStatus, type EnvelopeItem } from '@prisma/client';
+import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
 import { DownloadIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 
@@ -100,7 +100,14 @@ export const DocumentCertificateQRView = ({
       )}
 
       {internalVersion === 2 ? (
-        <EnvelopeRenderProvider envelope={{ envelopeItems }} token={token}>
+        <EnvelopeRenderProvider
+          envelope={{
+            envelopeItems,
+            status: DocumentStatus.COMPLETED,
+            type: EnvelopeType.DOCUMENT,
+          }}
+          token={token}
+        >
           <DocumentCertificateQrV2
             title={title}
             recipientCount={recipientCount}
@@ -130,7 +137,7 @@ export const DocumentCertificateQRView = ({
               envelopeItems={envelopeItems}
               token={token}
               trigger={
-                <Button type="button" variant="outline" className="flex-1">
+                <Button type="button" variant="outline" className="w-fit">
                   <DownloadIcon className="mr-2 h-5 w-5" />
                   <Trans>Download</Trans>
                 </Button>
@@ -189,7 +196,7 @@ const DocumentCertificateQrV2 = ({
           envelopeItems={envelopeItems}
           token={token}
           trigger={
-            <Button type="button" variant="outline" className="flex-1">
+            <Button type="button" variant="outline" className="w-fit">
               <DownloadIcon className="mr-2 h-5 w-5" />
               <Trans>Download</Trans>
             </Button>

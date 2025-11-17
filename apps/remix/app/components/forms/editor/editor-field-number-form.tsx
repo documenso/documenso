@@ -6,6 +6,11 @@ import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
 import {
+  DEFAULT_FIELD_FONT_SIZE,
+  FIELD_DEFAULT_GENERIC_ALIGN,
+  FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN,
+  FIELD_DEFAULT_LETTER_SPACING,
+  FIELD_DEFAULT_LINE_HEIGHT,
   type TNumberFieldMeta as NumberFieldMeta,
   ZNumberFieldMeta,
 } from '@documenso/lib/types/field-meta';
@@ -31,9 +36,12 @@ import { Separator } from '@documenso/ui/primitives/separator';
 import {
   EditorGenericFontSizeField,
   EditorGenericLabelField,
+  EditorGenericLetterSpacingField,
+  EditorGenericLineHeightField,
   EditorGenericReadOnlyField,
   EditorGenericRequiredField,
   EditorGenericTextAlignField,
+  EditorGenericVerticalAlignField,
 } from './editor-field-generic-field-forms';
 
 const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
@@ -43,6 +51,9 @@ const ZNumberFieldFormSchema = ZNumberFieldMeta.pick({
   numberFormat: true,
   fontSize: true,
   textAlign: true,
+  lineHeight: true,
+  letterSpacing: true,
+  verticalAlign: true,
   required: true,
   readOnly: true,
   minValue: true,
@@ -99,8 +110,11 @@ export const EditorFieldNumberForm = ({
       placeholder: value.placeholder || '',
       value: value.value || '',
       numberFormat: value.numberFormat || null,
-      fontSize: value.fontSize || 14,
-      textAlign: value.textAlign || 'left',
+      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
+      lineHeight: value.lineHeight ?? FIELD_DEFAULT_LINE_HEIGHT,
+      letterSpacing: value.letterSpacing ?? FIELD_DEFAULT_LETTER_SPACING,
+      verticalAlign: value.verticalAlign ?? FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN,
       required: value.required || false,
       readOnly: value.readOnly || false,
       minValue: value.minValue,
@@ -118,6 +132,10 @@ export const EditorFieldNumberForm = ({
   useEffect(() => {
     const validatedFormValues = ZNumberFieldFormSchema.safeParse(formValues);
 
+    if (formValues.readOnly && !formValues.value) {
+      void form.trigger('value');
+    }
+
     if (validatedFormValues.success) {
       onValueChange({
         type: 'number',
@@ -130,10 +148,12 @@ export const EditorFieldNumberForm = ({
     <Form {...form}>
       <form>
         <fieldset className="flex flex-col gap-2">
-          <div className="flex w-full flex-row gap-x-4">
-            <EditorGenericFontSizeField className="w-full" formControl={form.control} />
+          <EditorGenericFontSizeField className="w-full" formControl={form.control} />
 
+          <div className="flex w-full flex-row gap-x-4">
             <EditorGenericTextAlignField className="w-full" formControl={form.control} />
+
+            <EditorGenericVerticalAlignField className="w-full" formControl={form.control} />
           </div>
 
           <EditorGenericLabelField formControl={form.control} />
@@ -203,6 +223,12 @@ export const EditorFieldNumberForm = ({
               </FormItem>
             )}
           />
+
+          <div className="flex w-full flex-row gap-x-4">
+            <EditorGenericLineHeightField className="w-full" formControl={form.control} />
+
+            <EditorGenericLetterSpacingField className="w-full" formControl={form.control} />
+          </div>
 
           <div className="mt-1">
             <EditorGenericRequiredField formControl={form.control} />
