@@ -22,12 +22,14 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
 import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
+import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
 import { trpc } from '@documenso/trpc/react';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
@@ -82,7 +84,8 @@ const ZEnvelopeRecipientsForm = z.object({
 type TEnvelopeRecipientsForm = z.infer<typeof ZEnvelopeRecipientsForm>;
 
 export const EnvelopeEditorRecipientForm = () => {
-  const { envelope, setRecipientsDebounced, updateEnvelope } = useCurrentEnvelopeEditor();
+  const { envelope, setRecipientsDebounced, updateEnvelope, isTemplate } =
+    useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
 
@@ -119,6 +122,7 @@ export const EnvelopeEditorRecipientForm = () => {
       role: RecipientRole.SIGNER,
       signingOrder: 1,
       actionAuth: [],
+      ...(isTemplate ? generateRecipientPlaceholder(1) : {}),
     },
   ];
 
@@ -234,14 +238,27 @@ export const EnvelopeEditorRecipientForm = () => {
   };
 
   const onAddSigner = () => {
-    appendSigner({
+    let newRecipient = {
       formId: nanoid(12),
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
-    });
+    };
+
+    if (isTemplate) {
+      const placeholderRecipientCount = signers.length > 1 ? signers.length + 1 : 2;
+
+      newRecipient = {
+        ...newRecipient,
+        ...generateRecipientPlaceholder(placeholderRecipientCount),
+      };
+    }
+
+    appendSigner(newRecipient);
+
+    void form.trigger('signers');
   };
 
   const onRemoveSigner = (index: number) => {
@@ -806,7 +823,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                       })}
                                     >
                                       {!showAdvancedSettings && index === 0 && (
-                                        <FormLabel required>
+                                        <FormLabel required={!isTemplate}>
                                           <Trans>Email</Trans>
                                         </FormLabel>
                                       )}
@@ -815,7 +832,12 @@ export const EnvelopeEditorRecipientForm = () => {
                                         <RecipientAutoCompleteInput
                                           type="email"
                                           placeholder={t`Email`}
-                                          value={field.value}
+                                          value={
+                                            isTemplate &&
+                                            isTemplateRecipientEmailPlaceholder(field.value)
+                                              ? ''
+                                              : field.value
+                                          }
                                           disabled={
                                             snapshot.isDragging ||
                                             isSubmitting ||
