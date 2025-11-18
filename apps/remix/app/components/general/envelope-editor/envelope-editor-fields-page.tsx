@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -65,6 +65,8 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
 };
 
 export const EnvelopeEditorFieldsPage = () => {
+  const [searchParams] = useSearchParams();
+
   const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -207,6 +209,37 @@ export const EnvelopeEditorFieldsPage = () => {
             {selectedField && (
               <section>
                 <Separator className="my-4" />
+
+                {searchParams.get('devmode') && (
+                  <>
+                    <div className="px-4">
+                      <h3 className="text-foreground mb-3 text-sm font-semibold">
+                        <Trans>Developer Mode</Trans>
+                      </h3>
+
+                      <div className="bg-muted/50 border-border text-foreground space-y-2 rounded-md border p-3 text-sm">
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Pos X:&nbsp;</span>
+                          {selectedField.positionX.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Pos Y:&nbsp;</span>
+                          {selectedField.positionY.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Width:&nbsp;</span>
+                          {selectedField.width.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Height:&nbsp;</span>
+                          {selectedField.height.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator className="my-4" />
+                  </>
+                )}
 
                 <div className="[&_label]:text-foreground/70 px-4 [&_label]:text-xs">
                   <h3 className="text-sm font-semibold">
