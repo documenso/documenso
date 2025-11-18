@@ -62,10 +62,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [showRecipientDetectionPrompt, setShowAiPromptDialog] = useState(false);
+  const [showExtractionPrompt, setShowExtractionPrompt] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showSuggestedRecipientsDialog, setShowAiRecipientsDialog] = useState(false);
+  const [showRecipientsDialog, setShowRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const { mutateAsync: createEnvelope } = trpc.envelope.create.useMutation();
@@ -125,9 +125,9 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       if (type === EnvelopeType.DOCUMENT) {
         setUploadedDocumentId(id);
         setPendingRecipients(null);
-        setShowAiRecipientsDialog(false);
+        setShowRecipientsDialog(false);
         setShouldNavigateAfterPromptClose(true);
-        setShowAiPromptDialog(true);
+        setShowExtractionPrompt(true);
 
         toast({
           title: t`Document uploaded`,
@@ -219,15 +219,18 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           duration: 5000,
         });
 
-        throw new Error('NO_RECIPIENTS_DETECTED');
+        setShouldNavigateAfterPromptClose(true);
+        setShowExtractionPrompt(false);
+        navigateToEnvelopeEditor();
+        return;
       }
 
       const recipientsWithEmails = ensureRecipientEmails(recipients, uploadedDocumentId);
 
       setPendingRecipients(recipientsWithEmails);
       setShouldNavigateAfterPromptClose(false);
-      setShowAiPromptDialog(false);
-      setShowAiRecipientsDialog(true);
+      setShowExtractionPrompt(false);
+      setShowRecipientsDialog(true);
     } catch (err) {
       if (!(err instanceof Error && err.message === 'NO_RECIPIENTS_DETECTED')) {
         const error = AppError.parseError(err);
@@ -246,12 +249,12 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
   const handleSkipRecipientDetection = () => {
     setShouldNavigateAfterPromptClose(true);
-    setShowAiPromptDialog(false);
+    setShowExtractionPrompt(false);
     navigateToEnvelopeEditor();
   };
 
   const handleRecipientsCancel = () => {
-    setShowAiRecipientsDialog(false);
+    setShowRecipientsDialog(false);
     setPendingRecipients(null);
     navigateToEnvelopeEditor();
   };
@@ -273,7 +276,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         duration: 5000,
       });
 
-      setShowAiRecipientsDialog(false);
+      setShowRecipientsDialog(false);
       setPendingRecipients(null);
       navigateToEnvelopeEditor();
     } catch (err) {
@@ -291,7 +294,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   };
 
   const handlePromptDialogOpenChange = (open: boolean) => {
-    setShowAiPromptDialog(open);
+    setShowExtractionPrompt(open);
 
     if (open) {
       setShouldNavigateAfterPromptClose(true);
@@ -337,20 +340,20 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       </TooltipProvider>
 
       <RecipientDetectionPromptDialog
-        open={showRecipientDetectionPrompt}
+        open={showExtractionPrompt}
         onOpenChange={handlePromptDialogOpenChange}
         onAccept={handleStartRecipientDetection}
         onSkip={handleSkipRecipientDetection}
       />
 
       <SuggestedRecipientsDialog
-        open={showSuggestedRecipientsDialog}
+        open={showRecipientsDialog}
         recipients={pendingRecipients}
         onOpenChange={(open) => {
           if (!open) {
             handleRecipientsCancel();
           } else {
-            setShowAiRecipientsDialog(true);
+            setShowRecipientsDialog(true);
           }
         }}
         onCancel={handleRecipientsCancel}

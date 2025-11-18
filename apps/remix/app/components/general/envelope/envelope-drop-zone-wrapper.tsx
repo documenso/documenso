@@ -58,10 +58,10 @@ export const EnvelopeDropZoneWrapper = ({
   const organisation = useCurrentOrganisation();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [showRecipientDetectionPrompt, setShowRecipientDetectionPrompt] = useState(false);
+  const [showExtractionPrompt, setShowExtractionPrompt] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showSuggestedRecipientsDialog, setShowSuggestedRecipientsDialog] = useState(false);
+  const [showRecipientsDialog, setShowRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const userTimezone =
@@ -124,9 +124,9 @@ export const EnvelopeDropZoneWrapper = ({
         // Show AI prompt dialog for documents
         setUploadedDocumentId(id);
         setPendingRecipients(null);
-        setShowSuggestedRecipientsDialog(false);
+        setShowRecipientsDialog(false);
         setShouldNavigateAfterPromptClose(true);
-        setShowRecipientDetectionPrompt(true);
+        setShowExtractionPrompt(true);
       } else {
         // Templates - navigate immediately
         const pathPrefix = formatTemplatesPath(team.url);
@@ -242,15 +242,18 @@ export const EnvelopeDropZoneWrapper = ({
           duration: 5000,
         });
 
-        throw new Error('NO_RECIPIENTS_DETECTED');
+        setShouldNavigateAfterPromptClose(true);
+        setShowExtractionPrompt(false);
+        navigateToEnvelopeEditor();
+        return;
       }
 
       const recipientsWithEmails = ensureRecipientEmails(recipients, uploadedDocumentId);
 
       setPendingRecipients(recipientsWithEmails);
       setShouldNavigateAfterPromptClose(false);
-      setShowRecipientDetectionPrompt(false);
-      setShowSuggestedRecipientsDialog(true);
+      setShowExtractionPrompt(false);
+      setShowRecipientsDialog(true);
     } catch (error) {
       if (!(error instanceof Error && error.message === 'NO_RECIPIENTS_DETECTED')) {
         const parsedError = AppError.parseError(error);
@@ -269,12 +272,12 @@ export const EnvelopeDropZoneWrapper = ({
 
   const handleSkipRecipientDetection = () => {
     setShouldNavigateAfterPromptClose(true);
-    setShowRecipientDetectionPrompt(false);
+    setShowExtractionPrompt(false);
     navigateToEnvelopeEditor();
   };
 
   const handleRecipientsCancel = () => {
-    setShowSuggestedRecipientsDialog(false);
+    setShowRecipientsDialog(false);
     setPendingRecipients(null);
     navigateToEnvelopeEditor();
   };
@@ -296,7 +299,7 @@ export const EnvelopeDropZoneWrapper = ({
         duration: 5000,
       });
 
-      setShowSuggestedRecipientsDialog(false);
+      setShowRecipientsDialog(false);
       setPendingRecipients(null);
       navigateToEnvelopeEditor();
     } catch (error) {
@@ -314,7 +317,7 @@ export const EnvelopeDropZoneWrapper = ({
   };
 
   const handlePromptDialogOpenChange = (open: boolean) => {
-    setShowRecipientDetectionPrompt(open);
+    setShowExtractionPrompt(open);
 
     if (open) {
       setShouldNavigateAfterPromptClose(true);
@@ -394,20 +397,20 @@ export const EnvelopeDropZoneWrapper = ({
       )}
 
       <RecipientDetectionPromptDialog
-        open={showRecipientDetectionPrompt}
+        open={showExtractionPrompt}
         onOpenChange={handlePromptDialogOpenChange}
         onAccept={handleStartRecipientDetection}
         onSkip={handleSkipRecipientDetection}
       />
 
       <SuggestedRecipientsDialog
-        open={showSuggestedRecipientsDialog}
+        open={showRecipientsDialog}
         recipients={pendingRecipients}
         onOpenChange={(open) => {
           if (!open) {
             handleRecipientsCancel();
           } else {
-            setShowSuggestedRecipientsDialog(true);
+            setShowRecipientsDialog(true);
           }
         }}
         onCancel={handleRecipientsCancel}

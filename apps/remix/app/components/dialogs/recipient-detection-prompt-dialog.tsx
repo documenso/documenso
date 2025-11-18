@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { LoaderIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Button } from '@documenso/ui/primitives/button';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@documenso/ui/primitives/alert-dialog';
 
 type RecipientDetectionStep = 'PROMPT' | 'PROCESSING';
 
@@ -32,14 +32,14 @@ export const RecipientDetectionPromptDialog = ({
 }: RecipientDetectionPromptDialogProps) => {
   const [currentStep, setCurrentStep] = useState<RecipientDetectionStep>('PROMPT');
 
-  // Reset to first step when dialog closes
   useEffect(() => {
     if (!open) {
       setCurrentStep('PROMPT');
     }
   }, [open]);
 
-  const handleStartDetection = () => {
+  const handleStartDetection = (e: React.MouseEvent) => {
+    e.preventDefault();
     setCurrentStep('PROCESSING');
 
     Promise.resolve(onAccept()).catch(() => {
@@ -52,54 +52,75 @@ export const RecipientDetectionPromptDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
         <fieldset disabled={currentStep === 'PROCESSING'}>
-          <AnimateGenericFadeInOut motionKey={currentStep}>
+          <AnimateGenericFadeInOut motionKey={currentStep} className="grid gap-4">
             {match(currentStep)
               .with('PROMPT', () => (
                 <>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
                       <Trans>Auto-detect recipients?</Trans>
-                    </DialogTitle>
-                    <DialogDescription>
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
                       <Trans>
                         Would you like to automatically detect recipients in your document? This can
                         save you time in setting up your document.
                       </Trans>
-                    </DialogDescription>
-                  </DialogHeader>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
 
-                  <DialogFooter>
-                    <Button type="button" variant="secondary" onClick={handleSkip}>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel onClick={handleSkip}>
                       <Trans>Skip for now</Trans>
-                    </Button>
-                    <Button type="button" onClick={handleStartDetection}>
+                    </AlertDialogCancel>
+                    <AlertDialogAction onClick={handleStartDetection}>
                       <Trans>Detect recipients</Trans>
-                    </Button>
-                  </DialogFooter>
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
                 </>
               ))
               .with('PROCESSING', () => (
-                <>
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center justify-center gap-2">
-                      <LoaderIcon className="h-5 w-5 animate-spin" />
+                <div className="flex flex-col items-center justify-center py-4">
+                  <div className="relative mb-4 flex items-center justify-center">
+                    <div
+                      className="border-muted-foreground/20 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left flex-col gap-y-1 overflow-hidden rounded-lg border px-2 py-4 backdrop-blur-sm"
+                      style={{ transform: 'translateZ(0px)' }}
+                    >
+                      <div className="bg-muted-foreground/20 h-2 w-full rounded-[2px]"></div>
+                      <div className="bg-muted-foreground/20 h-2 w-5/6 rounded-[2px]"></div>
+                      <div className="bg-muted-foreground/20 h-2 w-full rounded-[2px]"></div>
+
+                      <div className="bg-muted-foreground/20 h-2 w-4/5 rounded-[2px]"></div>
+                      <div className="bg-muted-foreground/20 h-2 w-full rounded-[2px]"></div>
+                      <div className="bg-muted-foreground/20 h-2 w-3/4 rounded-[2px]"></div>
+                    </div>
+
+                    <div
+                      className="bg-documenso/80 animate-scan pointer-events-none absolute left-1/2 top-0 z-20 h-0.5 w-24 -translate-x-1/2"
+                      style={{
+                        transform: 'translateX(-50%) translateZ(0px)',
+                      }}
+                    />
+                  </div>
+
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="text-center">
                       <Trans>Analyzing your document</Trans>
-                    </DialogTitle>
-                    <DialogDescription className="text-center">
+                    </AlertDialogTitle>
+                    <AlertDialogDescription className="text-center">
                       <Trans>
                         Scanning your document to detect recipient names, emails, and signing order.
                       </Trans>
-                    </DialogDescription>
-                  </DialogHeader>
-                </>
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                </div>
               ))
               .exhaustive()}
           </AnimateGenericFadeInOut>
         </fieldset>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };

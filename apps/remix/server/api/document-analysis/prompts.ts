@@ -106,6 +106,7 @@ IMPORTANT:
 - If no clear ordering, omit signingOrder
 - Return empty array if absolutely no recipients can be detected
 - Do NOT invent recipients - only extract what's clearly present
+- If a signature line exists but no name is associated with it, DO NOT return a recipient with name "<UNKNOWN>". Skip it.
 
 EXAMPLES:
 Good:
@@ -116,4 +117,5 @@ Good:
 Bad:
   - Extracting the document title as a recipient name
   - Making up email addresses that aren't in the document
-  - Adding people not mentioned in the document`;
+  - Adding people not mentioned in the document
+  - Using placeholder names like "<UNKNOWN>", "Unknown", "Signer"`;
