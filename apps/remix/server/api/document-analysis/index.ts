@@ -1,108 +1,30 @@
-// sort-imports-ignore
-
-// ---- PATCH pdfjs-dist's canvas require BEFORE importing it ----
-import { createRequire } from 'node:module';
-import { fileURLToPath } from 'node:url';
-import { Canvas, Image } from 'skia-canvas';
-
-const require = createRequire(import.meta.url || fileURLToPath(new URL('.', import.meta.url)));
-const Module = require('node:module');
-
-const originalRequire = Module.prototype.require;
-Module.prototype.require = function (path: string) {
-  if (path === 'canvas') {
-    return {
-      createCanvas: (width: number, height: number) => new Canvas(width, height),
-      Image, // needed by pdfjs-dist
-    };
-  }
-  // eslint-disable-next-line prefer-rest-params, @typescript-eslint/consistent-type-assertions
-  return originalRequire.apply(this, arguments as unknown as [string]);
-};
-
-// Use dynamic require to bypass Vite SSR transformation
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const pdfjsLib = require('pdfjs-dist/legacy/build/pdf.js');
-
-import { mkdir, writeFile } from 'node:fs/promises';
-import { join } from 'node:path';
-
 import { generateObject } from 'ai';
 import { Hono } from 'hono';
-import sharp from 'sharp';
-import { z } from 'zod';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { Canvas, Image } from 'skia-canvas';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { resizeAndCompressImage } from '@documenso/lib/server-only/image/resize-and-compress-image';
+import { renderPdfToImage } from '@documenso/lib/server-only/pdf/render-pdf-to-image';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { env } from '@documenso/lib/utils/env';
+import { resolveRecipientEmail } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
-import { ANALYZE_RECIPIENTS_PROMPT, DETECT_OBJECTS_PROMPT } from './ai.prompts';
-import type { HonoEnv } from '../router';
+import type { HonoEnv } from '../../router';
+import { ANALYZE_RECIPIENTS_PROMPT, DETECT_OBJECTS_PROMPT } from './prompts';
 import {
   type TAnalyzeRecipientsResponse,
-  type TDetectedRecipient,
   type TDetectFormFieldsResponse,
+  type TDetectedRecipient,
   ZAnalyzeRecipientsRequestSchema,
-  ZDetectedRecipientLLMSchema,
-  ZDetectedFormFieldSchema,
   ZDetectFormFieldsRequestSchema,
-} from './ai.types';
-
-const renderPdfToImage = async (pdfBytes: Uint8Array) => {
-  const loadingTask = pdfjsLib.getDocument({ data: pdfBytes });
-  const pdf = await loadingTask.promise;
-
-  try {
-    const scale = 4;
-
-    const pages = await Promise.all(
-      Array.from({ length: pdf.numPages }, async (_, index) => {
-        const pageNumber = index + 1;
-        const page = await pdf.getPage(pageNumber);
-
-        try {
-          const viewport = page.getViewport({ scale });
-
-          const virtualCanvas = new Canvas(viewport.width, viewport.height);
-          const context = virtualCanvas.getContext('2d');
-          context.imageSmoothingEnabled = false;
-
-          await page.render({ canvasContext: context, viewport }).promise;
-
-          return {
-            image: await virtualCanvas.toBuffer('png'),
-            pageNumber,
-            width: Math.floor(viewport.width),
-            height: Math.floor(viewport.height),
-          };
-        } finally {
-          page.cleanup();
-        }
-      }),
-    );
-
-    return pages;
-  } finally {
-    await pdf.destroy();
-  }
-};
-
-const resizeAndCompressImage = async (imageBuffer: Buffer): Promise<Buffer> => {
-  const metadata = await sharp(imageBuffer).metadata();
-  const originalWidth = metadata.width || 0;
-
-  if (originalWidth > 1000) {
-    return await sharp(imageBuffer)
-      .resize({ width: 1000, withoutEnlargement: true })
-      .jpeg({ quality: 70 })
-      .toBuffer();
-  }
-
-  return await sharp(imageBuffer).jpeg({ quality: 70 }).toBuffer();
-};
+  ZDetectedFormFieldSchema,
+  ZDetectedRecipientLLMSchema,
+} from './types';
 
 type FieldDetectionRecipient = {
   id: number;
@@ -202,20 +124,6 @@ const runFormFieldDetection = async (
 
 // Limit recipient detection to first 3 pages for performance and cost efficiency
 const MAX_PAGES_FOR_RECIPIENT_ANALYSIS = 3;
-
-const recipientEmailSchema = z.string().email();
-
-const resolveRecipientEmail = (candidateEmail: string | undefined) => {
-  if (candidateEmail) {
-    const trimmedEmail = candidateEmail.trim();
-
-    if (recipientEmailSchema.safeParse(trimmedEmail).success) {
-      return trimmedEmail;
-    }
-  }
-
-  return undefined;
-};
 
 const authorizeDocumentAccess = async (envelopeId: string, userId: number) => {
   const envelope = await prisma.envelope.findUnique({

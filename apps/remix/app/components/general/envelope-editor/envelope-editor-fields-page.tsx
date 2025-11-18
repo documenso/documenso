@@ -12,7 +12,7 @@ import { match } from 'ts-pattern';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { getPageCanvasRefs } from '@documenso/lib/client-only/utils/page-canvas-registry';
-import type { TDetectedFormField } from '@documenso/lib/types/ai';
+import type { TDetectedFormField } from '@documenso/lib/types/document-analysis';
 import type {
   TCheckboxFieldMeta,
   TDateFieldMeta,

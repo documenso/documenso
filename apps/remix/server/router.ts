@@ -14,7 +14,7 @@ import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
-import { aiRoute } from './api/ai';
+import { aiRoute } from './api/document-analysis/index';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';

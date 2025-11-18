@@ -1,5 +1,6 @@
 import type { Envelope } from '@prisma/client';
 import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
+import { z } from 'zod';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { extractLegacyIds } from '../universal/id';
@@ -7,6 +8,18 @@ import { extractLegacyIds } from '../universal/id';
 const UNKNOWN_RECIPIENT_NAME_PLACEHOLDER = '<UNKNOWN>';
 
 export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`;
+
+export const resolveRecipientEmail = (candidateEmail: string | undefined | null) => {
+  if (candidateEmail) {
+    const trimmedEmail = candidateEmail.trim();
+
+    if (z.string().email().safeParse(trimmedEmail).success) {
+      return trimmedEmail;
+    }
+  }
+
+  return undefined;
+};
 
 /**
  * Whether a recipient can be modified by the document owner.

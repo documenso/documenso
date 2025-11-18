@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { TDetectedFormField } from '@documenso/lib/types/ai';
+import type { TDetectedFormField } from '@documenso/lib/types/document-analysis';
 
 export const ZGenerateTextRequestSchema = z.object({
   prompt: z.string().min(1, 'Prompt is required').max(5000, 'Prompt is too long'),
