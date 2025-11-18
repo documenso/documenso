@@ -227,7 +227,7 @@ const runFormFieldDetection = async (
   const prompt = buildFieldDetectionPrompt(recipients);
 
   const result = await generateObject({
-    model: 'google/gemini-2.5-pro',
+    model: 'google/gemini-3-pro-preview',
     output: 'array',
     schema: ZDetectedFormFieldSchema,
     messages: [
@@ -284,33 +284,7 @@ const MAX_PAGES_FOR_RECIPIENT_ANALYSIS = 3;
 
 const recipientEmailSchema = z.string().email();
 
-const sanitizeEmailLocalPart = (value: string) => {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '.')
-    .replace(/\.+/g, '.')
-    .replace(/^\.+|\.+$/g, '')
-    .slice(0, 32);
-};
-
-const createPlaceholderRecipientEmail = (name: string, envelopeId: string, position: number) => {
-  const normalizedName = sanitizeEmailLocalPart(name);
-  const baseLocalPart = normalizedName ? `${normalizedName}.${position}` : `recipient-${position}`;
-  const sanitizedEnvelopeSuffix = envelopeId
-    .replace(/[^a-z0-9]/gi, '')
-    .toLowerCase()
-    .slice(0, 6);
-  const suffix = sanitizedEnvelopeSuffix ? `-${sanitizedEnvelopeSuffix}` : '';
-
-  return `${baseLocalPart}${suffix}@documenso.ai`;
-};
-
-const resolveRecipientEmail = (
-  candidateEmail: string | undefined,
-  name: string,
-  envelopeId: string,
-  position: number,
-) => {
+const resolveRecipientEmail = (candidateEmail: string | undefined) => {
   if (candidateEmail) {
     const trimmedEmail = candidateEmail.trim();
 
@@ -319,7 +293,7 @@ const resolveRecipientEmail = (
     }
   }
 
-  return createPlaceholderRecipientEmail(name, envelopeId, position);
+  return undefined;
 };
 
 const authorizeDocumentAccess = async (envelopeId: string, userId: number) => {
@@ -388,13 +362,11 @@ EXTRACTION RULES:
 3. Look for "Approved by:", "Reviewed by:", "CC:" sections
 4. Extract FULL NAMES as they appear in the document
 5. If an email address is visible near a name, include it exactly in the "email" field
-6. If NO email is found, create a realistic placeholder email using the person's name and the domain "documenso.ai" (e.g., john.doe@documenso.ai). Every recipient MUST have an email.
-7. Ensure placeholder emails look unique when multiple people share the same name (append a number if needed)
-8. Assign signing order based on document flow (numbered items, "First signer:", "Second signer:", or top-to-bottom sequence)
+6. If NO email is found, leave the email field empty.
+7. Assign signing order based on document flow (numbered items, "First signer:", "Second signer:", or top-to-bottom sequence)
 
 IMPORTANT:
 - Only extract recipients explicitly mentioned in the document
-- Email is mandatory for every recipient (real, sample, or placeholder derived from the document text)
 - Default role is SIGNER if unclear (signature lines = SIGNER)
 - Signing order starts at 1 (first signer = 1, second = 2, etc.)
 - If no clear ordering, omit signingOrder
@@ -710,12 +682,7 @@ export const aiRoute = new Hono<HonoEnv>()
         const { pageNumber, recipients } = result.value;
 
         const recipientsWithEmails = recipients.map((recipient) => {
-          const email = resolveRecipientEmail(
-            recipient.email,
-            recipient.name,
-            envelopeId,
-            recipientIndex,
-          );
+          const email = resolveRecipientEmail(recipient.email);
 
           const normalizedRecipient: TDetectedRecipient = {
             ...recipient,

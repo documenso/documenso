@@ -84,10 +84,7 @@ export const ZDetectedRecipientLLMSchema = createRecipientSchema(
 );
 
 export const ZDetectedRecipientSchema = createRecipientSchema(
-  z
-    .string()
-    .email()
-    .describe('Email address for the recipient (real, sample, or generated placeholder).'),
+  z.string().email().optional().describe('Email address for the recipient (if found in document).'),
 );
 
 export const ZAnalyzeRecipientsRequestSchema = z.object({
