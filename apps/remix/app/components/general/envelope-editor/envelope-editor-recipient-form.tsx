@@ -238,25 +238,17 @@ export const EnvelopeEditorRecipientForm = () => {
   };
 
   const onAddSigner = () => {
-    let newRecipient = {
+    const placeholderRecipientCount = signers.length > 1 ? signers.length + 1 : 2;
+
+    appendSigner({
       formId: nanoid(12),
       name: '',
       email: '',
       role: RecipientRole.SIGNER,
       actionAuth: [],
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
-    };
-
-    if (isTemplate) {
-      const placeholderRecipientCount = signers.length > 1 ? signers.length + 1 : 2;
-
-      newRecipient = {
-        ...newRecipient,
-        ...generateRecipientPlaceholder(placeholderRecipientCount),
-      };
-    }
-
-    appendSigner(newRecipient);
+      ...(isTemplate ? generateRecipientPlaceholder(placeholderRecipientCount) : {}),
+    });
 
     void form.trigger('signers');
   };
