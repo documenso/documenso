@@ -202,8 +202,12 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </p>
             ))}
 
-          <div className="mt-8 flex w-full max-w-sm items-center justify-center gap-4">
-            <DocumentShareButton documentId={document.id} token={recipient.token} />
+          <div className="mt-8 flex w-full max-w-xs flex-col items-stretch gap-4 md:w-auto md:max-w-none md:flex-row md:items-center">
+            <DocumentShareButton
+              documentId={document.id}
+              token={recipient.token}
+              className="w-full max-w-none md:flex-1"
+            />
 
             {isDocumentCompleted(document.status) && (
               <EnvelopeDownloadDialog
@@ -212,12 +216,20 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
                 envelopeItems={document.envelopeItems}
                 token={recipient?.token}
                 trigger={
-                  <Button type="button" variant="outline" className="flex-1">
+                  <Button type="button" variant="outline" className="flex-1 md:flex-initial">
                     <DownloadIcon className="mr-2 h-5 w-5" />
                     <Trans>Download</Trans>
                   </Button>
                 }
               />
+            )}
+
+            {user && (
+              <Button asChild>
+                <Link to="/">
+                  <Trans>Go Back Home</Trans>
+                </Link>
+              </Button>
             )}
           </div>
         </div>
@@ -237,12 +249,6 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
               <ClaimAccount defaultName={recipientName} defaultEmail={recipient.email} />
             </div>
-          )}
-
-          {user && (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-2">
-              <Trans>Go Back Home</Trans>
-            </Link>
           )}
         </div>
       </div>
