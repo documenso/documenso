@@ -33,13 +33,13 @@ import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface SetDocumentRecipientsOptions {
+export type SetDocumentRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
   recipients: RecipientData[];
   requestMetadata: ApiRequestMetadata;
-}
+};
 
 export const setDocumentRecipients = async ({
   userId,

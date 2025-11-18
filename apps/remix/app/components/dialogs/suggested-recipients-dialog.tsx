@@ -34,9 +34,9 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
 
-import type { RecipientForCreation } from '~/utils/analyze-ai-recipients';
+import type { RecipientForCreation } from '~/utils/detect-document-recipients';
 
-const ZDocumentAiRecipientSchema = z.object({
+const ZSuggestedRecipientSchema = z.object({
   formId: z.string().min(1),
   name: z
     .string()
@@ -50,15 +50,15 @@ const ZDocumentAiRecipientSchema = z.object({
   role: z.nativeEnum(RecipientRole),
 });
 
-const ZDocumentAiRecipientsForm = z.object({
+const ZSuggestedRecipientsFormSchema = z.object({
   recipients: z
-    .array(ZDocumentAiRecipientSchema)
+    .array(ZSuggestedRecipientSchema)
     .min(1, { message: msg`Please add at least one recipient`.id }),
 });
 
-type TDocumentAiRecipientsForm = z.infer<typeof ZDocumentAiRecipientsForm>;
+type TSuggestedRecipientsFormSchema = z.infer<typeof ZSuggestedRecipientsFormSchema>;
 
-export type DocumentAiRecipientsDialogProps = {
+export type SuggestedRecipientsDialogProps = {
   open: boolean;
   recipients: RecipientForCreation[] | null;
   onOpenChange: (open: boolean) => void;
@@ -66,13 +66,13 @@ export type DocumentAiRecipientsDialogProps = {
   onSubmit: (recipients: RecipientForCreation[]) => Promise<void> | void;
 };
 
-export const DocumentAiRecipientsDialog = ({
+export const SuggestedRecipientsDialog = ({
   open,
   recipients,
   onOpenChange,
   onCancel,
   onSubmit,
-}: DocumentAiRecipientsDialogProps) => {
+}: SuggestedRecipientsDialogProps) => {
   const { t } = useLingui();
 
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
@@ -117,8 +117,8 @@ export const DocumentAiRecipientsDialog = ({
     ];
   }, [recipients]);
 
-  const form = useForm<TDocumentAiRecipientsForm>({
-    resolver: zodResolver(ZDocumentAiRecipientsForm),
+  const form = useForm<TSuggestedRecipientsFormSchema>({
+    resolver: zodResolver(ZSuggestedRecipientsFormSchema),
     defaultValues: {
       recipients: defaultRecipients,
     },

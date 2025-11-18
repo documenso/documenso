@@ -1,7 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import {
@@ -27,14 +26,14 @@ import type { TCreateEnvelopePayload } from '@documenso/trpc/server/envelope-rou
 import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { DocumentAiPromptDialog } from '~/components/dialogs/document-ai-prompt-dialog';
-import { DocumentAiRecipientsDialog } from '~/components/dialogs/document-ai-recipients-dialog';
+import { RecipientDetectionPromptDialog } from '~/components/dialogs/recipient-detection-prompt-dialog';
+import { SuggestedRecipientsDialog } from '~/components/dialogs/suggested-recipients-dialog';
 import { useCurrentTeam } from '~/providers/team';
 import {
   type RecipientForCreation,
-  analyzeRecipientsFromDocument,
+  detectRecipientsInDocument,
   ensureRecipientEmails,
-} from '~/utils/analyze-ai-recipients';
+} from '~/utils/detect-document-recipients';
 
 export interface EnvelopeDropZoneWrapperProps {
   children: ReactNode;
@@ -59,10 +58,10 @@ export const EnvelopeDropZoneWrapper = ({
   const organisation = useCurrentOrganisation();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [showAiPromptDialog, setShowAiPromptDialog] = useState(false);
+  const [showRecipientDetectionPrompt, setShowRecipientDetectionPrompt] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showAiRecipientsDialog, setShowAiRecipientsDialog] = useState(false);
+  const [showSuggestedRecipientsDialog, setShowSuggestedRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const userTimezone =
@@ -125,9 +124,9 @@ export const EnvelopeDropZoneWrapper = ({
         // Show AI prompt dialog for documents
         setUploadedDocumentId(id);
         setPendingRecipients(null);
-        setShowAiRecipientsDialog(false);
+        setShowSuggestedRecipientsDialog(false);
         setShouldNavigateAfterPromptClose(true);
-        setShowAiPromptDialog(true);
+        setShowRecipientDetectionPrompt(true);
       } else {
         // Templates - navigate immediately
         const pathPrefix = formatTemplatesPath(team.url);
@@ -228,13 +227,13 @@ export const EnvelopeDropZoneWrapper = ({
     void navigate(`${pathPrefix}/${uploadedDocumentId}/edit`);
   };
 
-  const handleAiAccept = async () => {
+  const handleStartRecipientDetection = async () => {
     if (!uploadedDocumentId) {
       return;
     }
 
     try {
-      const recipients = await analyzeRecipientsFromDocument(uploadedDocumentId);
+      const recipients = await detectRecipientsInDocument(uploadedDocumentId);
 
       if (recipients.length === 0) {
         toast({
@@ -250,14 +249,14 @@ export const EnvelopeDropZoneWrapper = ({
 
       setPendingRecipients(recipientsWithEmails);
       setShouldNavigateAfterPromptClose(false);
-      setShowAiPromptDialog(false);
-      setShowAiRecipientsDialog(true);
+      setShowRecipientDetectionPrompt(false);
+      setShowSuggestedRecipientsDialog(true);
     } catch (error) {
       if (!(error instanceof Error && error.message === 'NO_RECIPIENTS_DETECTED')) {
         const parsedError = AppError.parseError(error);
 
         toast({
-          title: t`Failed to analyze recipients`,
+          title: t`Failed to detect recipients`,
           description: parsedError.userMessage || t`You can add recipients manually in the editor`,
           variant: 'destructive',
           duration: 7500,
@@ -268,14 +267,14 @@ export const EnvelopeDropZoneWrapper = ({
     }
   };
 
-  const handleAiSkip = () => {
+  const handleSkipRecipientDetection = () => {
     setShouldNavigateAfterPromptClose(true);
-    setShowAiPromptDialog(false);
+    setShowRecipientDetectionPrompt(false);
     navigateToEnvelopeEditor();
   };
 
   const handleRecipientsCancel = () => {
-    setShowAiRecipientsDialog(false);
+    setShowSuggestedRecipientsDialog(false);
     setPendingRecipients(null);
     navigateToEnvelopeEditor();
   };
@@ -297,7 +296,7 @@ export const EnvelopeDropZoneWrapper = ({
         duration: 5000,
       });
 
-      setShowAiRecipientsDialog(false);
+      setShowSuggestedRecipientsDialog(false);
       setPendingRecipients(null);
       navigateToEnvelopeEditor();
     } catch (error) {
@@ -315,7 +314,7 @@ export const EnvelopeDropZoneWrapper = ({
   };
 
   const handlePromptDialogOpenChange = (open: boolean) => {
-    setShowAiPromptDialog(open);
+    setShowRecipientDetectionPrompt(open);
 
     if (open) {
       setShouldNavigateAfterPromptClose(true);
@@ -394,21 +393,21 @@ export const EnvelopeDropZoneWrapper = ({
         </div>
       )}
 
-      <DocumentAiPromptDialog
-        open={showAiPromptDialog}
+      <RecipientDetectionPromptDialog
+        open={showRecipientDetectionPrompt}
         onOpenChange={handlePromptDialogOpenChange}
-        onAccept={handleAiAccept}
-        onSkip={handleAiSkip}
+        onAccept={handleStartRecipientDetection}
+        onSkip={handleSkipRecipientDetection}
       />
 
-      <DocumentAiRecipientsDialog
-        open={showAiRecipientsDialog}
+      <SuggestedRecipientsDialog
+        open={showSuggestedRecipientsDialog}
         recipients={pendingRecipients}
         onOpenChange={(open) => {
           if (!open) {
             handleRecipientsCancel();
           } else {
-            setShowAiRecipientsDialog(true);
+            setShowSuggestedRecipientsDialog(true);
           }
         }}
         onCancel={handleRecipientsCancel}

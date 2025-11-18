@@ -1,17 +1,19 @@
 import { RecipientRole } from '@prisma/client';
 
-import { AppError } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 
-export type AiRecipient = {
+export type SuggestedRecipient = {
   name: string;
   email?: string;
   role: 'SIGNER' | 'APPROVER' | 'CC';
   signingOrder?: number;
 };
 
-export const analyzeRecipientsFromDocument = async (envelopeId: string): Promise<AiRecipient[]> => {
+export const detectRecipientsInDocument = async (
+  envelopeId: string,
+): Promise<SuggestedRecipient[]> => {
   try {
-    const response = await fetch('/api/ai/analyze-recipients', {
+    const response = await fetch('/api/ai/detect-recipients', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -20,10 +22,12 @@ export const analyzeRecipientsFromDocument = async (envelopeId: string): Promise
     });
 
     if (!response.ok) {
-      throw new Error('Failed to analyze recipients');
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Failed to detect recipients',
+      });
     }
 
-    return (await response.json()) as AiRecipient[];
+    return (await response.json()) as SuggestedRecipient[];
   } catch (error) {
     throw AppError.parseError(error);
   }
@@ -37,7 +41,7 @@ export type RecipientForCreation = {
 };
 
 export const ensureRecipientEmails = (
-  recipients: AiRecipient[],
+  recipients: SuggestedRecipient[],
   envelopeId: string,
 ): RecipientForCreation[] => {
   const allowedRoles: RecipientRole[] = [

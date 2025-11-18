@@ -21,7 +21,7 @@ import { mapFieldToLegacyField } from '../../utils/fields';
 import { canRecipientBeModified, sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface UpdateEnvelopeRecipientsOptions {
+export type UpdateEnvelopeRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
@@ -35,7 +35,7 @@ export interface UpdateEnvelopeRecipientsOptions {
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
   requestMetadata: ApiRequestMetadata;
-}
+};
 
 export const updateEnvelopeRecipients = async ({
   userId,

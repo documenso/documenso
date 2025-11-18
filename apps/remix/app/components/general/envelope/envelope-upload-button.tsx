@@ -27,14 +27,14 @@ import {
 } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { DocumentAiPromptDialog } from '~/components/dialogs/document-ai-prompt-dialog';
-import { DocumentAiRecipientsDialog } from '~/components/dialogs/document-ai-recipients-dialog';
+import { RecipientDetectionPromptDialog } from '~/components/dialogs/recipient-detection-prompt-dialog';
+import { SuggestedRecipientsDialog } from '~/components/dialogs/suggested-recipients-dialog';
 import { useCurrentTeam } from '~/providers/team';
 import {
   type RecipientForCreation,
-  analyzeRecipientsFromDocument,
+  detectRecipientsInDocument,
   ensureRecipientEmails,
-} from '~/utils/analyze-ai-recipients';
+} from '~/utils/detect-document-recipients';
 
 export type EnvelopeUploadButtonProps = {
   className?: string;
@@ -62,10 +62,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const { quota, remaining, refreshLimits, maximumEnvelopeItemCount } = useLimits();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [showAiPromptDialog, setShowAiPromptDialog] = useState(false);
+  const [showRecipientDetectionPrompt, setShowAiPromptDialog] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showAiRecipientsDialog, setShowAiRecipientsDialog] = useState(false);
+  const [showSuggestedRecipientsDialog, setShowAiRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const { mutateAsync: createEnvelope } = trpc.envelope.create.useMutation();
@@ -204,13 +204,13 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     void navigate(`${pathPrefix}/${uploadedDocumentId}/edit`);
   };
 
-  const handleAiAccept = async () => {
+  const handleStartRecipientDetection = async () => {
     if (!uploadedDocumentId) {
       return;
     }
 
     try {
-      const recipients = await analyzeRecipientsFromDocument(uploadedDocumentId);
+      const recipients = await detectRecipientsInDocument(uploadedDocumentId);
 
       if (recipients.length === 0) {
         toast({
@@ -244,7 +244,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
     }
   };
 
-  const handleAiSkip = () => {
+  const handleSkipRecipientDetection = () => {
     setShouldNavigateAfterPromptClose(true);
     setShowAiPromptDialog(false);
     navigateToEnvelopeEditor();
@@ -336,15 +336,15 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         </Tooltip>
       </TooltipProvider>
 
-      <DocumentAiPromptDialog
-        open={showAiPromptDialog}
+      <RecipientDetectionPromptDialog
+        open={showRecipientDetectionPrompt}
         onOpenChange={handlePromptDialogOpenChange}
-        onAccept={handleAiAccept}
-        onSkip={handleAiSkip}
+        onAccept={handleStartRecipientDetection}
+        onSkip={handleSkipRecipientDetection}
       />
 
-      <DocumentAiRecipientsDialog
-        open={showAiRecipientsDialog}
+      <SuggestedRecipientsDialog
+        open={showSuggestedRecipientsDialog}
         recipients={pendingRecipients}
         onOpenChange={(open) => {
           if (!open) {

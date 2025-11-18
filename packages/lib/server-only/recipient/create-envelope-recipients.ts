@@ -15,7 +15,7 @@ import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { mapRecipientToLegacyRecipient, sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface CreateEnvelopeRecipientsOptions {
+export type CreateEnvelopeRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
@@ -28,7 +28,7 @@ export interface CreateEnvelopeRecipientsOptions {
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
   requestMetadata: ApiRequestMetadata;
-}
+};
 
 export const createEnvelopeRecipients = async ({
   userId,

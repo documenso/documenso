@@ -15,22 +15,22 @@ import {
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
 
-type DocumentAiStep = 'PROMPT' | 'PROCESSING';
+type RecipientDetectionStep = 'PROMPT' | 'PROCESSING';
 
-export type DocumentAiPromptDialogProps = {
+export type RecipientDetectionPromptDialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onAccept: () => Promise<void> | void;
   onSkip: () => void;
 };
 
-export const DocumentAiPromptDialog = ({
+export const RecipientDetectionPromptDialog = ({
   open,
   onOpenChange,
   onAccept,
   onSkip,
-}: DocumentAiPromptDialogProps) => {
-  const [currentStep, setCurrentStep] = useState<DocumentAiStep>('PROMPT');
+}: RecipientDetectionPromptDialogProps) => {
+  const [currentStep, setCurrentStep] = useState<RecipientDetectionStep>('PROMPT');
 
   // Reset to first step when dialog closes
   useEffect(() => {
@@ -39,7 +39,7 @@ export const DocumentAiPromptDialog = ({
     }
   }, [open]);
 
-  const handleUseAi = () => {
+  const handleStartDetection = () => {
     setCurrentStep('PROCESSING');
 
     Promise.resolve(onAccept()).catch(() => {
@@ -61,12 +61,12 @@ export const DocumentAiPromptDialog = ({
                 <>
                   <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
-                      <Trans>Use AI to prepare your document?</Trans>
+                      <Trans>Auto-detect recipients?</Trans>
                     </DialogTitle>
                     <DialogDescription>
                       <Trans>
-                        Would you like to use AI to automatically add recipients to your document?
-                        This can save you time in setting up your document.
+                        Would you like to automatically detect recipients in your document? This can
+                        save you time in setting up your document.
                       </Trans>
                     </DialogDescription>
                   </DialogHeader>
@@ -75,8 +75,8 @@ export const DocumentAiPromptDialog = ({
                     <Button type="button" variant="secondary" onClick={handleSkip}>
                       <Trans>Skip for now</Trans>
                     </Button>
-                    <Button type="button" onClick={handleUseAi}>
-                      <Trans>Use AI</Trans>
+                    <Button type="button" onClick={handleStartDetection}>
+                      <Trans>Detect recipients</Trans>
                     </Button>
                   </DialogFooter>
                 </>
@@ -90,8 +90,7 @@ export const DocumentAiPromptDialog = ({
                     </DialogTitle>
                     <DialogDescription className="text-center">
                       <Trans>
-                        Our AI is scanning your document to detect recipient names, emails, and
-                        signing order.
+                        Scanning your document to detect recipient names, emails, and signing order.
                       </Trans>
                     </DialogDescription>
                   </DialogHeader>

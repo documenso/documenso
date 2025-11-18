@@ -54,30 +54,7 @@ const EnvelopeEditorFieldsPageRenderer = lazy(
   async () => import('./envelope-editor-fields-page-renderer'),
 );
 
-/**
- * Enforces minimum field dimensions and centers the field when expanding to meet minimums.
- *
- * AI often detects form lines as very thin fields (0.2-0.5% height). This function ensures
- * fields meet minimum usability requirements by expanding them to at least 30px height and
- * 36px width, while keeping them centered on their original position.
- *
- * @param params - Field dimensions and page size
- * @param params.positionX - Field X position as percentage (0-100)
- * @param params.positionY - Field Y position as percentage (0-100)
- * @param params.width - Field width as percentage (0-100)
- * @param params.height - Field height as percentage (0-100)
- * @param params.pageWidth - Page width in pixels
- * @param params.pageHeight - Page height in pixels
- * @returns Adjusted field dimensions with minimums enforced and centered
- *
- * @example
- * // AI detected a thin line: 0.3% height
- * const adjusted = enforceMinimumFieldDimensions({
- *   positionX: 20, positionY: 50, width: 30, height: 0.3,
- *   pageWidth: 800, pageHeight: 1100
- * });
- * // Result: height expanded to ~2.7% (30px), centered on original position
- */
+// Expands fields to minimum usable dimensions (30px height, 36px width) and centers them
 const enforceMinimumFieldDimensions = (params: {
   positionX: number;
   positionY: number;
@@ -94,7 +71,6 @@ const enforceMinimumFieldDimensions = (params: {
   const MIN_HEIGHT_PX = 30;
   const MIN_WIDTH_PX = 36;
 
-  // Convert percentage to pixels to check against minimums
   const widthPx = (params.width / 100) * params.pageWidth;
   const heightPx = (params.height / 100) * params.pageHeight;
 
@@ -136,7 +112,7 @@ const enforceMinimumFieldDimensions = (params: {
   };
 };
 
-const processAllPagesWithAI = async (params: {
+const detectFormFieldsInDocument = async (params: {
   envelopeId: string;
   onProgress: (current: number, total: number) => void;
 }): Promise<{
@@ -148,10 +124,9 @@ const processAllPagesWithAI = async (params: {
   const errors = new Map<number, Error>();
 
   try {
-    // Make single API call to process all pages server-side
     onProgress(0, 1);
 
-    const response = await fetch('/api/ai/detect-form-fields', {
+    const response = await fetch('/api/ai/detect-fields', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -162,12 +137,11 @@ const processAllPagesWithAI = async (params: {
 
     if (!response.ok) {
       const errorText = await response.text();
-      throw new Error(`AI detection failed: ${response.statusText} - ${errorText}`);
+      throw new Error(`Field detection failed: ${response.statusText} - ${errorText}`);
     }
 
     const detectedFields: TDetectedFormField[] = await response.json();
 
-    // Group fields by page number
     for (const field of detectedFields) {
       if (!fieldsPerPage.has(field.pageNumber)) {
         fieldsPerPage.set(field.pageNumber, []);
@@ -177,7 +151,6 @@ const processAllPagesWithAI = async (params: {
 
     onProgress(1, 1);
   } catch (error) {
-    // If request fails, treat it as error for all pages
     errors.set(0, error instanceof Error ? error : new Error(String(error)));
   }
 
@@ -206,7 +179,7 @@ export const EnvelopeEditorFieldsPage = () => {
   const { t } = useLingui();
   const { toast } = useToast();
 
-  const [isAutoAddingFields, setIsAutoAddingFields] = useState(false);
+  const [isDetectingFields, setIsAutoAddingFields] = useState(false);
   const [processingProgress, setProcessingProgress] = useState<{
     current: number;
     total: number;
@@ -224,14 +197,10 @@ export const EnvelopeEditorFieldsPage = () => {
 
     const isMetaSame = isDeepEqual(selectedField.fieldMeta, fieldMeta);
 
-    // Todo: Envelopes - Clean up console logs.
     if (!isMetaSame) {
-      console.log('TRIGGER UPDATE');
       editorFields.updateFieldByFormId(selectedField.formId, {
         fieldMeta,
       });
-    } else {
-      console.log('DATA IS SAME, NO UPDATE');
     }
   };
 
@@ -251,7 +220,7 @@ export const EnvelopeEditorFieldsPage = () => {
     <div className="relative flex h-full">
       <div className="relative flex w-full flex-col overflow-y-auto">
         {/* Horizontal envelope item selector */}
-        {isAutoAddingFields && (
+        {isDetectingFields && (
           <>
             <div className="edge-glow edge-glow-top pointer-events-none fixed left-0 right-0 top-0 z-20 h-16" />
             <div className="edge-glow edge-glow-right pointer-events-none fixed bottom-0 right-0 top-0 z-20 w-16" />
@@ -353,7 +322,7 @@ export const EnvelopeEditorFieldsPage = () => {
             <Button
               className="mt-4 w-full"
               variant="outline"
-              disabled={isAutoAddingFields}
+              disabled={isDetectingFields}
               onClick={async () => {
                 setIsAutoAddingFields(true);
                 setProcessingProgress(null);
@@ -377,7 +346,7 @@ export const EnvelopeEditorFieldsPage = () => {
                     return;
                   }
 
-                  const { fieldsPerPage, errors } = await processAllPagesWithAI({
+                  const { fieldsPerPage, errors } = await detectFormFieldsInDocument({
                     envelopeId: envelope.id,
                     onProgress: (current, total) => {
                       setProcessingProgress({ current, total });
@@ -488,7 +457,7 @@ export const EnvelopeEditorFieldsPage = () => {
                 }
               }}
             >
-              {isAutoAddingFields ? <Trans>Processing...</Trans> : <Trans>Auto add fields</Trans>}
+              {isDetectingFields ? <Trans>Processing...</Trans> : <Trans>Auto add fields</Trans>}
             </Button>
           </section>
 
