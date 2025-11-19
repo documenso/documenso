@@ -95,6 +95,14 @@ export const ConfigureFieldsView = ({
     return base64.encode(configData.documentData.data);
   }, [configData.documentData]);
 
+  const normalizedEnvelopeItem = useMemo(() => {
+    if (envelopeItem) {
+      return envelopeItem;
+    }
+
+    return { id: '', envelopeId: '' };
+  }, [envelopeItem]);
+
   const recipients = useMemo(() => {
     return configData.signers.map<Recipient>((signer, index) => ({
       id: signer.nativeId || index,
@@ -536,55 +544,50 @@ export const ConfigureFieldsView = ({
             )}
 
             <Form {...form}>
-              {normalizedDocumentData ||
-                (envelopeItem && (
-                  <div>
-                    <PDFViewer
-                      presignToken={presignToken}
-                      overrideData={normalizedDocumentData}
-                      envelopeItem={envelopeItem}
-                      token={undefined}
-                      version="signed"
-                    />
+              <div>
+                <PDFViewer
+                  presignToken={presignToken}
+                  overrideData={normalizedDocumentData}
+                  envelopeItem={normalizedEnvelopeItem}
+                  token={undefined}
+                  version="signed"
+                />
 
-                    <ElementVisible
-                      target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-                    >
-                      {localFields.map((field, index) => {
-                        const recipientIndex = recipients.findIndex(
-                          (r) => r.id === field.recipientId,
-                        );
+                <ElementVisible
+                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+                >
+                  {localFields.map((field, index) => {
+                    const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 
-                        return (
-                          <FieldItem
-                            key={field.formId}
-                            field={field}
-                            minHeight={MIN_HEIGHT_PX}
-                            minWidth={MIN_WIDTH_PX}
-                            defaultHeight={DEFAULT_HEIGHT_PX}
-                            defaultWidth={DEFAULT_WIDTH_PX}
-                            onResize={(node) => onFieldResize(node, index)}
-                            onMove={(node) => onFieldMove(node, index)}
-                            onRemove={() => remove(index)}
-                            onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                            onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
-                            onFocus={() => setLastActiveField(field)}
-                            onBlur={() => setLastActiveField(null)}
-                            onAdvancedSettings={() => {
-                              setCurrentField(field);
-                              setShowAdvancedSettings(true);
-                            }}
-                            recipientIndex={recipientIndex}
-                            active={activeFieldId === field.formId}
-                            onFieldActivate={() => setActiveFieldId(field.formId)}
-                            onFieldDeactivate={() => setActiveFieldId(null)}
-                            disabled={selectedRecipient?.id !== field.recipientId}
-                          />
-                        );
-                      })}
-                    </ElementVisible>
-                  </div>
-                ))}
+                    return (
+                      <FieldItem
+                        key={field.formId}
+                        field={field}
+                        minHeight={MIN_HEIGHT_PX}
+                        minWidth={MIN_WIDTH_PX}
+                        defaultHeight={DEFAULT_HEIGHT_PX}
+                        defaultWidth={DEFAULT_WIDTH_PX}
+                        onResize={(node) => onFieldResize(node, index)}
+                        onMove={(node) => onFieldMove(node, index)}
+                        onRemove={() => remove(index)}
+                        onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                        onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                        onFocus={() => setLastActiveField(field)}
+                        onBlur={() => setLastActiveField(null)}
+                        onAdvancedSettings={() => {
+                          setCurrentField(field);
+                          setShowAdvancedSettings(true);
+                        }}
+                        recipientIndex={recipientIndex}
+                        active={activeFieldId === field.formId}
+                        onFieldActivate={() => setActiveFieldId(field.formId)}
+                        onFieldDeactivate={() => setActiveFieldId(null)}
+                        disabled={selectedRecipient?.id !== field.recipientId}
+                      />
+                    );
+                  })}
+                </ElementVisible>
+              </div>
             </Form>
           </div>
         </div>
