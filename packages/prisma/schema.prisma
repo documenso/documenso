@@ -538,6 +538,13 @@ model EnvelopeAttachment {
   @@index([envelopeId])
 }
 
+model ReminderLog {
+  id          String   @id @default(cuid())
+  envelopeId  String
+  recipientId String
+  sentAt      DateTime @default(now())
+}
+
 enum ReadStatus {
   NOT_OPENED
   OPENED

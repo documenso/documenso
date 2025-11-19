@@ -83,9 +83,12 @@
     "@documenso/prisma": "^0.0.0",
     "@lingui/conf": "^5.2.0",
     "@lingui/core": "^5.2.0",
+    "bullmq": "^5.63.0",
     "inngest-cli": "^0.29.1",
+    "ioredis": "^5.8.2",
     "luxon": "^3.5.0",
     "mupdf": "^1.0.0",
+    "node-cron": "^4.2.1",
     "react": "^18",
     "typescript": "5.6.2",
     "zod": "^3.25.76"

@@ -10,6 +10,7 @@ export enum DocumentEmailEvents {
   DocumentCompleted = 'documentCompleted',
   DocumentDeleted = 'documentDeleted',
   OwnerDocumentCompleted = 'ownerDocumentCompleted',
+  DocumentReminder = 'documentReminder',
 }
 
 export const ZDocumentEmailSettingsSchema = z
@@ -52,6 +53,12 @@ export const ZDocumentEmailSettingsSchema = z
       .boolean()
       .describe('Whether to send an email to the document owner when the document is complete.')
       .default(true),
+    documentReminder: z
+      .boolean()
+      .describe(
+        'Whether to send reminder emails to recipients who have not yet signed after 48 hours',
+      )
+      .default(true),
   })
   .strip()
   .catch(() => ({ ...DEFAULT_DOCUMENT_EMAIL_SETTINGS }));
@@ -77,6 +84,7 @@ export const extractDerivedDocumentEmailSettings = (
     documentPending: false,
     documentCompleted: false,
     documentDeleted: false,
+    documentReminder: false,
     ownerDocumentCompleted: emailSettings.ownerDocumentCompleted,
   };
 };
@@ -88,5 +96,6 @@ export const DEFAULT_DOCUMENT_EMAIL_SETTINGS: TDocumentEmailSettings = {
   documentPending: true,
   documentCompleted: true,
   documentDeleted: true,
+  documentReminder: true,
   ownerDocumentCompleted: true,
 };

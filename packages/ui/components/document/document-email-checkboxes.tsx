@@ -267,7 +267,6 @@ export const DocumentEmailCheckboxes = ({
           htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
         >
           <Trans>Send document completed email to the owner</Trans>
-
           <Tooltip>
             <TooltipTrigger>
               <InfoIcon className="mx-2 h-4 w-4" />
@@ -284,6 +283,45 @@ export const DocumentEmailCheckboxes = ({
                 <Trans>
                   This will be sent to the document owner once the document has been fully
                   completed.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
+          id={DocumentEmailEvents.DocumentReminder}
+          className="h-5 w-5"
+          checked={value.documentReminder}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.DocumentReminder]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          htmlFor={DocumentEmailEvents.DocumentReminder}
+        >
+          <Trans>Send document reminder email</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+              <h2>
+                <strong>
+                  <Trans>Document reminder email</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This email will be automatically sent to recipients who haven’t signed the
+                  document within 48 hours
                 </Trans>
               </p>
             </TooltipContent>
