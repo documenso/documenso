@@ -38,7 +38,7 @@ export const MicrosoftAuthOptions: OAuthClientOptions = {
 
 export const OidcAuthOptions: OAuthClientOptions = {
   id: 'oidc',
-  scope: ['openid', 'email', 'profile'],
+  scope: env('NEXT_PRIVATE_OIDC_SCOPES')?.split(',') ?? ['openid', 'email', 'profile'],
   clientId: env('NEXT_PRIVATE_OIDC_CLIENT_ID') ?? '',
   clientSecret: env('NEXT_PRIVATE_OIDC_CLIENT_SECRET') ?? '',
   redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/oidc`,
