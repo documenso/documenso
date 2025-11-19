@@ -2,9 +2,16 @@ import { z } from 'zod';
 
 export const ZDetectedFormFieldSchema = z.object({
   boundingBox: z
-    .array(z.number().min(0).max(1000))
-    .length(4)
-    .describe('Bounding box [ymin, xmin, ymax, xmax] in normalized 0-1000 range'),
+    .object({
+      ymin: z.number().min(0).max(1000),
+      xmin: z.number().min(0).max(1000),
+      ymax: z.number().min(0).max(1000),
+      xmax: z.number().min(0).max(1000),
+    })
+    .refine((box) => box.xmin < box.xmax && box.ymin < box.ymax, {
+      message: 'Bounding box must have min < max for both axes',
+    })
+    .describe('Bounding box {ymin, xmin, ymax, xmax} in normalized 0-1000 range'),
   label: z
     .enum([
       'SIGNATURE',

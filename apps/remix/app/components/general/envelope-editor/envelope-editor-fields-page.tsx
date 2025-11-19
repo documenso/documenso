@@ -190,7 +190,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
       for (const [pageNumber, fields] of fieldsPerPage.entries()) {
         for (const detected of fields) {
-          const [ymin, xmin, ymax, xmax] = detected.boundingBox;
+          const { ymin, xmin, ymax, xmax } = detected.boundingBox;
           const positionX = (xmin / 1000) * 100;
           const positionY = (ymin / 1000) * 100;
           const width = ((xmax - xmin) / 1000) * 100;
@@ -407,7 +407,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   let totalAdded = 0;
                   for (const [pageNumber, detectedFields] of fieldsPerPage.entries()) {
                     for (const detected of detectedFields) {
-                      const [ymin, xmin, ymax, xmax] = detected.boundingBox;
+                      const { ymin, xmin, ymax, xmax } = detected.boundingBox;
                       const positionX = (xmin / 1000) * 100;
                       const positionY = (ymin / 1000) * 100;
                       const width = ((xmax - xmin) / 1000) * 100;

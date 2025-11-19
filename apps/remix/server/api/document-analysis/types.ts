@@ -28,9 +28,11 @@ export type TDetectFormFieldsRequest = z.infer<typeof ZDetectFormFieldsRequestSc
 export type TDetectFormFieldsResponse = z.infer<typeof ZDetectFormFieldsResponseSchema>;
 export type { TDetectedFormField };
 
+const ZRecipientRoleEnum = z.enum(['SIGNER', 'APPROVER', 'CC']);
+
 const recipientFieldShape = {
   name: z.string().describe('Full name of the recipient'),
-  role: z.enum(['SIGNER', 'APPROVER', 'CC']).describe('Recipient role based on document context'),
+  role: ZRecipientRoleEnum.describe('Recipient role based on document context'),
   signingOrder: z
     .number()
     .int()
@@ -39,11 +41,12 @@ const recipientFieldShape = {
     .describe('Sequential signing order if document indicates ordering'),
 } as const;
 
-const createRecipientSchema = <TSchema extends z.ZodTypeAny>(emailSchema: TSchema) =>
-  z.object({
+function createRecipientSchema<TSchema extends z.ZodTypeAny>(emailSchema: TSchema) {
+  return z.object({
     ...recipientFieldShape,
     email: emailSchema,
   });
+}
 
 export const ZDetectedRecipientLLMSchema = createRecipientSchema(
   z
@@ -69,3 +72,4 @@ export const ZAnalyzeRecipientsResponseSchema = z.array(ZDetectedRecipientSchema
 export type TDetectedRecipient = z.infer<typeof ZDetectedRecipientSchema>;
 export type TAnalyzeRecipientsRequest = z.infer<typeof ZAnalyzeRecipientsRequestSchema>;
 export type TAnalyzeRecipientsResponse = z.infer<typeof ZAnalyzeRecipientsResponseSchema>;
+export type TRecipientRole = z.infer<typeof ZRecipientRoleEnum>;

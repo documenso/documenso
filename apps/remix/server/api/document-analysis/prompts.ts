@@ -4,7 +4,7 @@ IMPORTANT RULES:
 1. Only detect EMPTY/UNFILLED fields (ignore boxes that already contain text or data)
 2. Analyze nearby text labels to determine the field type
 3. Return bounding boxes for the fillable area only, NOT the label text
-4. Each boundingBox must be in the format [ymin, xmin, ymax, xmax] where all coordinates are NORMALIZED to a 0-1000 scale
+4. Each boundingBox must be in the format {ymin, xmin, ymax, xmax} where all coordinates are NORMALIZED to a 0-1000 scale
 
 CRITICAL: UNDERSTANDING FILLABLE AREAS
 The "fillable area" is ONLY the empty space where a user will write, type, sign, or check.
@@ -56,7 +56,7 @@ BOUNDING BOX PLACEMENT (CRITICAL):
 - The box should never cover only the leftmost few characters of a long field. For "Signature: ____________", the box must stretch from the first underscore to the last.
 
 COORDINATE SYSTEM:
-- [ymin, xmin, ymax, xmax] normalized to 0-1000 scale
+- {ymin, xmin, ymax, xmax} normalized to 0-1000 scale
 - Top-left corner: ymin and xmin close to 0
 - Bottom-right corner: ymax and xmax close to 1000
 - Coordinates represent positions on a 1000x1000 grid overlaid on the image
@@ -78,7 +78,7 @@ When detecting thin horizontal lines for SIGNATURE, INITIALS, NAME, EMAIL, DATE,
 6. Example: If you detect a signature line at ymax=500 with clear whitespace extending up to y=400:
    - Available whitespace: 100 units
    - Use 60-80% of that: 60-80 units
-   - Expanded field: [ymin=420, xmin=200, ymax=500, xmax=600] (creates 80-unit tall field)
+   - Expanded field: {ymin: 420, xmin: 200, ymax: 500, xmax: 600} (creates 80-unit tall field)
    - This gives comfortable signing space while respecting the form layout`;
 
 export const ANALYZE_RECIPIENTS_PROMPT = `You are analyzing a document to identify recipients who need to sign, approve, or receive copies.

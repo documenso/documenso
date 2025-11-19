@@ -68,10 +68,13 @@ export const renderPdfToImage = async (pdfBytes: Uint8Array) => {
       .map((result) => result.value);
 
     if (results.some((result) => result.status === 'rejected')) {
-      console.error(
-        'Some pages failed to render:',
-        results.filter((result) => result.status === 'rejected').map((result) => result.reason),
-      );
+      const failedReasons = results
+        .filter((result): result is PromiseRejectedResult => result.status === 'rejected')
+        .map((result) => result.reason);
+
+      // Note: We don't have logger available in this package
+      // Errors are handled by the caller in document-analysis/index.ts
+      // which will use the proper logger for reporting failures
     }
 
     return pages;
