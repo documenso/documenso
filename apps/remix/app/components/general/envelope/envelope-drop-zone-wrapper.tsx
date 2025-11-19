@@ -120,13 +120,11 @@ export const EnvelopeDropZoneWrapper = ({
           timestamp: new Date().toISOString(),
         });
 
-        // Show AI prompt dialog for documents
         setUploadedDocumentId(id);
         setPendingRecipients(null);
         setShouldNavigateAfterPromptClose(true);
         setShowExtractionPrompt(true);
       } else {
-        // Templates - navigate immediately
         const pathPrefix = formatTemplatesPath(team.url);
         await navigate(`${pathPrefix}/${id}/edit`);
       }
@@ -175,7 +173,6 @@ export const EnvelopeDropZoneWrapper = ({
       return;
     }
 
-    // Since users can only upload only one file (no multi-upload), we only handle the first file rejection
     const { file, errors } = fileRejections[0];
 
     if (!errors.length) {

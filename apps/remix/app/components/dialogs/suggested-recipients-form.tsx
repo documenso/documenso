@@ -171,9 +171,7 @@ export const SuggestedRecipientsForm = ({
     try {
       await onSubmit(normalizedRecipients);
     } catch (error) {
-      // Log for debugging
       console.error('Failed to submit recipients:', error);
-      // Form level errors are surfaced via toasts in the parent. Keep the dialog open.
     }
   });
 
@@ -194,9 +192,7 @@ export const SuggestedRecipientsForm = ({
     try {
       await onAutoAddFields(normalizedRecipients);
     } catch (error) {
-      // Log for debugging
       console.error('Failed to auto-add fields:', error);
-      // Form level errors are surfaced via toasts in the parent. Keep the dialog open.
     }
   });
 

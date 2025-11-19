@@ -42,9 +42,6 @@ export type EnvelopeUploadButtonProps = {
   folderId?: string;
 };
 
-/**
- * Upload an envelope
- */
 export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUploadButtonProps) => {
   const { t } = useLingui();
   const { toast } = useToast();

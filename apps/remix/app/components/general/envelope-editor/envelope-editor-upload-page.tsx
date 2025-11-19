@@ -173,7 +173,6 @@ export const EnvelopeEditorUploadPage = () => {
       fields: envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
     });
 
-    // Reset editor fields.
     editorFields.resetForm(fieldsWithoutDeletedItem);
   };
 

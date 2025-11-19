@@ -163,7 +163,6 @@ const authorizeDocumentAccess = async (envelopeId: string, userId: number) => {
     });
   }
 
-  // Return the first document data from the envelope
   const documentData = envelope.envelopeItems[0]?.documentData;
 
   if (!documentData) {
@@ -193,7 +192,6 @@ export const aiRoute = new Hono<HonoEnv>()
 
       const { envelopeId } = parsed.data;
 
-      // Use shared authorization function
       const documentData = await authorizeDocumentAccess(envelopeId, user.id);
 
       const envelopeRecipients = await prisma.recipient.findMany({
@@ -410,7 +408,6 @@ export const aiRoute = new Hono<HonoEnv>()
 
       const { envelopeId } = parsed.data;
 
-      // Use shared authorization function
       const documentData = await authorizeDocumentAccess(envelopeId, user.id);
 
       const pdfBytes = await getFileServerSide({
@@ -420,7 +417,6 @@ export const aiRoute = new Hono<HonoEnv>()
 
       const renderedPages = await renderPdfToImage(pdfBytes);
 
-      // Only analyze first few pages for performance
       const pagesToAnalyze = renderedPages.slice(0, MAX_PAGES_FOR_RECIPIENT_ANALYSIS);
 
       const results = await Promise.allSettled(

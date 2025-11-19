@@ -29,7 +29,6 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitive
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';
 
-// Define a type for signer items
 type SignerItem = TConfigureEmbedFormSchema['signers'][number];
 
 export interface ConfigureDocumentRecipientsProps {
@@ -97,18 +96,15 @@ export const ConfigureDocumentRecipients = ({
       const currentSigners = getValues('signers') || [...signers];
       const signer = currentSigners[index];
 
-      // Remove signer from current position and insert at new position
       const remainingSigners = currentSigners.filter((_: unknown, idx: number) => idx !== index);
       const newPosition = Math.min(Math.max(0, newOrder - 1), currentSigners.length - 1);
       remainingSigners.splice(newPosition, 0, signer);
 
-      // Update signing order for each item
       const updatedSigners = remainingSigners.map((s: SignerItem, idx: number) => ({
         ...s,
         signingOrder: signingOrder === DocumentSigningOrder.SEQUENTIAL ? idx + 1 : undefined,
       }));
 
-      // Update the form
       replace(updatedSigners);
     },
     [signers, replace, getValues],
@@ -118,17 +114,14 @@ export const ConfigureDocumentRecipients = ({
     (result: DropResult) => {
       if (!result.destination) return;
 
-      // Use the move function from useFieldArray which preserves input values
       move(result.source.index, result.destination.index);
 
-      // Update signing orders after move
       const currentSigners = getValues('signers');
       const updatedSigners = currentSigners.map((signer: SignerItem, index: number) => ({
         ...signer,
         signingOrder: signingOrder === DocumentSigningOrder.SEQUENTIAL ? index + 1 : undefined,
       }));
 
-      // Update the form with new ordering
       replace(updatedSigners);
     },
     [move, replace, getValues],
