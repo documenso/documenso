@@ -28,7 +28,7 @@ export const renderPdfToImage = async (pdfBytes: Uint8Array) => {
   try {
     const scale = 2;
 
-    const pages = await Promise.all(
+    const results = await Promise.allSettled(
       Array.from({ length: pdf.numPages }, async (_, index) => {
         const pageNumber = index + 1;
         const page = await pdf.getPage(pageNumber);
@@ -53,6 +53,26 @@ export const renderPdfToImage = async (pdfBytes: Uint8Array) => {
         }
       }),
     );
+
+    const pages = results
+      .filter(
+        (
+          result,
+        ): result is PromiseFulfilledResult<{
+          image: Buffer;
+          pageNumber: number;
+          width: number;
+          height: number;
+        }> => result.status === 'fulfilled',
+      )
+      .map((result) => result.value);
+
+    if (results.some((result) => result.status === 'rejected')) {
+      console.error(
+        'Some pages failed to render:',
+        results.filter((result) => result.status === 'rejected').map((result) => result.reason),
+      );
+    }
 
     return pages;
   } finally {

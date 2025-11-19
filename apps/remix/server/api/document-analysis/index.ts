@@ -22,6 +22,7 @@ import {
   type TDetectedRecipient,
   ZAnalyzeRecipientsRequestSchema,
   ZDetectFormFieldsRequestSchema,
+  ZDetectFormFieldsResponseSchema,
   ZDetectedFormFieldSchema,
   ZDetectedRecipientLLMSchema,
 } from './types';
@@ -180,6 +181,13 @@ export const aiRoute = new Hono<HonoEnv>()
     try {
       const { user } = await getSession(c.req.raw);
 
+      if (!user.emailVerified) {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'Email verification required',
+          userMessage: 'Please verify your email to use AI features',
+        });
+      }
+
       const body = await c.req.json();
       const parsed = ZDetectFormFieldsRequestSchema.safeParse(body);
 
@@ -259,13 +267,23 @@ export const aiRoute = new Hono<HonoEnv>()
       );
 
       const detectedFields: TDetectFormFieldsResponse = [];
+      const failedPages: number[] = [];
+
       for (const [index, result] of results.entries()) {
         if (result.status === 'fulfilled') {
           detectedFields.push(...result.value);
         } else {
           const pageNumber = renderedPages[index]?.pageNumber ?? index + 1;
           console.error(`Failed to detect fields on page ${pageNumber}:`, result.reason);
+          failedPages.push(pageNumber);
         }
+      }
+
+      if (failedPages.length > 0) {
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: `Failed to detect fields on pages: ${failedPages.join(', ')}`,
+          userMessage: 'We could not detect fields on some pages. Please try again.',
+        });
       }
 
       if (env('NEXT_PUBLIC_AI_DEBUG_PREVIEW') === 'true') {
@@ -378,7 +396,9 @@ export const aiRoute = new Hono<HonoEnv>()
         }
       }
 
-      return c.json<TDetectFormFieldsResponse>(detectedFields);
+      const validatedResponse = ZDetectFormFieldsResponseSchema.parse(detectedFields);
+
+      return c.json<TDetectFormFieldsResponse>(validatedResponse);
     } catch (error) {
       if (error instanceof AppError) {
         throw error;
@@ -395,6 +415,13 @@ export const aiRoute = new Hono<HonoEnv>()
   .post('/detect-recipients', async (c) => {
     try {
       const { user } = await getSession(c.req.raw);
+
+      if (!user.emailVerified) {
+        throw new AppError(AppErrorCode.UNAUTHORIZED, {
+          message: 'Email verification required',
+          userMessage: 'Please verify your email to use AI features',
+        });
+      }
 
       const body = await c.req.json();
       const parsed = ZAnalyzeRecipientsRequestSchema.safeParse(body);
@@ -455,9 +482,13 @@ export const aiRoute = new Hono<HonoEnv>()
       const allRecipients: TDetectedRecipient[] = [];
       let recipientIndex = 1;
 
-      for (const result of results) {
+      const failedPages: number[] = [];
+
+      for (const [index, result] of results.entries()) {
         if (result.status !== 'fulfilled') {
-          console.error('Failed to analyze recipients on a page:', result.reason);
+          const pageNumber = pagesToAnalyze[index]?.pageNumber ?? index + 1;
+          console.error(`Failed to analyze recipients on page ${pageNumber}:`, result.reason);
+          failedPages.push(pageNumber);
           continue;
         }
 
@@ -477,6 +508,13 @@ export const aiRoute = new Hono<HonoEnv>()
         });
 
         allRecipients.push(...recipientsWithEmails);
+      }
+
+      if (failedPages.length > 0) {
+        throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+          message: `Failed to analyze recipients on pages: ${failedPages.join(', ')}`,
+          userMessage: 'We could not analyze recipients on some pages. Please try again.',
+        });
       }
 
       return c.json<TAnalyzeRecipientsResponse>(allRecipients);
