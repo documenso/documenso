@@ -200,22 +200,22 @@
 @keyframes edgeGlow {
   0%,
   100% {
-    opacity: 0.3;
+    opacity: 0.6;
   }
   50% {
-    opacity: 0.6;
+    opacity: 1;
   }
 }
 
 .edge-glow {
-  animation: edgeGlow 2s ease-in-out infinite;
+  animation: edgeGlow 1.25s ease-in-out infinite;
 }
 
 .edge-glow-top {
   background: linear-gradient(
     to bottom,
-    rgba(162, 231, 113, 0.4) 0%,
-    rgba(162, 231, 113, 0.2) 20%,
+    rgba(162, 231, 113, 0.8) 0%,
+    rgba(162, 231, 113, 0.4) 20%,
     transparent 100%
   );
 }
@@ -223,8 +223,8 @@
 .edge-glow-right {
   background: linear-gradient(
     to left,
-    rgba(162, 231, 113, 0.4) 0%,
-    rgba(162, 231, 113, 0.2) 20%,
+    rgba(162, 231, 113, 0.8) 0%,
+    rgba(162, 231, 113, 0.4) 20%,
     transparent 100%
   );
 }
@@ -232,8 +232,8 @@
 .edge-glow-bottom {
   background: linear-gradient(
     to top,
-    rgba(162, 231, 113, 0.4) 0%,
-    rgba(162, 231, 113, 0.2) 20%,
+    rgba(162, 231, 113, 0.8) 0%,
+    rgba(162, 231, 113, 0.4) 20%,
     transparent 100%
   );
 }
@@ -241,8 +241,8 @@
 .edge-glow-left {
   background: linear-gradient(
     to right,
-    rgba(162, 231, 113, 0.4) 0%,
-    rgba(162, 231, 113, 0.2) 20%,
+    rgba(162, 231, 113, 0.8) 0%,
+    rgba(162, 231, 113, 0.4) 20%,
     transparent 100%
   );
 }

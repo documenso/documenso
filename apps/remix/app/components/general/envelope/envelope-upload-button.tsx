@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
@@ -28,8 +28,8 @@ import {
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecipientDetectionPromptDialog } from '~/components/dialogs/recipient-detection-prompt-dialog';
-import { SuggestedRecipientsDialog } from '~/components/dialogs/suggested-recipients-dialog';
 import { useCurrentTeam } from '~/providers/team';
+import { detectFieldsInDocument } from '~/utils/detect-document-fields';
 import {
   type RecipientForCreation,
   detectRecipientsInDocument,
@@ -65,8 +65,8 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
   const [showExtractionPrompt, setShowExtractionPrompt] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showRecipientsDialog, setShowRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
+  const [isAutoAddingFields, setIsAutoAddingFields] = useState(false);
 
   const { mutateAsync: createEnvelope } = trpc.envelope.create.useMutation();
   const { mutateAsync: createRecipients } = trpc.envelope.recipient.createMany.useMutation();
@@ -121,11 +121,9 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           ? formatDocumentsPath(team.url)
           : formatTemplatesPath(team.url);
 
-      // Show AI prompt dialog for documents only
       if (type === EnvelopeType.DOCUMENT) {
         setUploadedDocumentId(id);
         setPendingRecipients(null);
-        setShowRecipientsDialog(false);
         setShouldNavigateAfterPromptClose(true);
         setShowExtractionPrompt(true);
 
@@ -135,7 +133,6 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           duration: 5000,
         });
       } else {
-        // Templates - navigate immediately
         await navigate(`${pathPrefix}/${id}/edit`);
 
         toast({
@@ -162,7 +159,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         .otherwise(() => t`An error occurred while uploading your document.`);
 
       toast({
-        title: t`Error`,
+        title: t`Upload failed`,
         description: errorMessage,
         variant: 'destructive',
         duration: 7500,
@@ -229,12 +226,11 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
       setPendingRecipients(recipientsWithEmails);
       setShouldNavigateAfterPromptClose(false);
-      setShowExtractionPrompt(false);
-      setShowRecipientsDialog(true);
     } catch (err) {
-      if (!(err instanceof Error && err.message === 'NO_RECIPIENTS_DETECTED')) {
-        const error = AppError.parseError(err);
+      const error = AppError.parseError(err);
 
+      // Only show toast if this wasn't a "no recipients found" case
+      if (error.code !== 'NO_RECIPIENTS_DETECTED') {
         toast({
           title: t`Failed to analyze recipients`,
           description: error.userMessage || t`You can add recipients manually in the editor`,
@@ -243,19 +239,13 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         });
       }
 
-      throw err;
+      throw error;
     }
   };
 
   const handleSkipRecipientDetection = () => {
     setShouldNavigateAfterPromptClose(true);
     setShowExtractionPrompt(false);
-    navigateToEnvelopeEditor();
-  };
-
-  const handleRecipientsCancel = () => {
-    setShowRecipientsDialog(false);
-    setPendingRecipients(null);
     navigateToEnvelopeEditor();
   };
 
@@ -272,11 +262,17 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
 
       toast({
         title: t`Recipients added`,
-        description: t`Successfully detected ${recipientsToCreate.length} recipient(s)`,
+        description: t`Successfully detected ${recipientsToCreate.length} ${plural(
+          recipientsToCreate.length,
+          {
+            one: 'recipient',
+            other: 'recipients',
+          },
+        )}`,
         duration: 5000,
       });
 
-      setShowRecipientsDialog(false);
+      setShowExtractionPrompt(false);
       setPendingRecipients(null);
       navigateToEnvelopeEditor();
     } catch (err) {
@@ -289,7 +285,72 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         duration: 7500,
       });
 
-      throw err;
+      // Error is handled, dialog stays open for retry
+    }
+  };
+
+  const handleAutoAddFields = async (recipientsToCreate: RecipientForCreation[]) => {
+    if (!uploadedDocumentId) {
+      return;
+    }
+
+    setIsAutoAddingFields(true);
+
+    try {
+      await createRecipients({
+        envelopeId: uploadedDocumentId,
+        data: recipientsToCreate,
+      });
+
+      let detectedFields;
+      try {
+        detectedFields = await detectFieldsInDocument(uploadedDocumentId);
+      } catch (error) {
+        console.error('Field detection failed:', error);
+
+        toast({
+          title: t`Field detection failed`,
+          description: t`Recipients added successfully, but field detection encountered an error. You can add fields manually.`,
+          variant: 'destructive',
+          duration: 7500,
+        });
+
+        setShowExtractionPrompt(false);
+        setPendingRecipients(null);
+        setIsAutoAddingFields(false);
+
+        const pathPrefix = formatDocumentsPath(team.url);
+        void navigate(`${pathPrefix}/${uploadedDocumentId}/edit?step=addFields`);
+        return;
+      }
+
+      if (detectedFields.length > 0) {
+        sessionStorage.setItem(
+          `autoPlaceFields_${uploadedDocumentId}`,
+          JSON.stringify({
+            fields: detectedFields,
+            recipientCount: recipientsToCreate.length,
+          }),
+        );
+      }
+
+      setShowExtractionPrompt(false);
+      setPendingRecipients(null);
+      setIsAutoAddingFields(false);
+
+      const pathPrefix = formatDocumentsPath(team.url);
+      void navigate(`${pathPrefix}/${uploadedDocumentId}/edit?step=addFields`);
+    } catch (err) {
+      const error = AppError.parseError(err);
+
+      toast({
+        title: t`Failed to add recipients`,
+        description: error.userMessage || t`Please try again`,
+        variant: 'destructive',
+        duration: 7500,
+      });
+
+      setIsAutoAddingFields(false);
     }
   };
 
@@ -344,20 +405,10 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         onOpenChange={handlePromptDialogOpenChange}
         onAccept={handleStartRecipientDetection}
         onSkip={handleSkipRecipientDetection}
-      />
-
-      <SuggestedRecipientsDialog
-        open={showRecipientsDialog}
         recipients={pendingRecipients}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleRecipientsCancel();
-          } else {
-            setShowRecipientsDialog(true);
-          }
-        }}
-        onCancel={handleRecipientsCancel}
-        onSubmit={handleRecipientsConfirm}
+        onRecipientsSubmit={handleRecipientsConfirm}
+        onAutoAddFields={handleAutoAddFields}
+        isProcessingRecipients={isAutoAddingFields}
       />
     </div>
   );

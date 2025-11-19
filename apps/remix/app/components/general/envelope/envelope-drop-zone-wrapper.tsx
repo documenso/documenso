@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
+import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Loader } from 'lucide-react';
@@ -27,7 +28,6 @@ import { cn } from '@documenso/ui/lib/utils';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { RecipientDetectionPromptDialog } from '~/components/dialogs/recipient-detection-prompt-dialog';
-import { SuggestedRecipientsDialog } from '~/components/dialogs/suggested-recipients-dialog';
 import { useCurrentTeam } from '~/providers/team';
 import {
   type RecipientForCreation,
@@ -61,7 +61,6 @@ export const EnvelopeDropZoneWrapper = ({
   const [showExtractionPrompt, setShowExtractionPrompt] = useState(false);
   const [uploadedDocumentId, setUploadedDocumentId] = useState<string | null>(null);
   const [pendingRecipients, setPendingRecipients] = useState<RecipientForCreation[] | null>(null);
-  const [showRecipientsDialog, setShowRecipientsDialog] = useState(false);
   const [shouldNavigateAfterPromptClose, setShouldNavigateAfterPromptClose] = useState(true);
 
   const userTimezone =
@@ -124,7 +123,6 @@ export const EnvelopeDropZoneWrapper = ({
         // Show AI prompt dialog for documents
         setUploadedDocumentId(id);
         setPendingRecipients(null);
-        setShowRecipientsDialog(false);
         setShouldNavigateAfterPromptClose(true);
         setShowExtractionPrompt(true);
       } else {
@@ -148,7 +146,7 @@ export const EnvelopeDropZoneWrapper = ({
         .otherwise(() => t`An error occurred during upload.`);
 
       toast({
-        title: t`Error`,
+        title: t`Upload failed`,
         description: errorMessage,
         variant: 'destructive',
         duration: 7500,
@@ -252,8 +250,6 @@ export const EnvelopeDropZoneWrapper = ({
 
       setPendingRecipients(recipientsWithEmails);
       setShouldNavigateAfterPromptClose(false);
-      setShowExtractionPrompt(false);
-      setShowRecipientsDialog(true);
     } catch (error) {
       if (!(error instanceof Error && error.message === 'NO_RECIPIENTS_DETECTED')) {
         const parsedError = AppError.parseError(error);
@@ -276,12 +272,6 @@ export const EnvelopeDropZoneWrapper = ({
     navigateToEnvelopeEditor();
   };
 
-  const handleRecipientsCancel = () => {
-    setShowRecipientsDialog(false);
-    setPendingRecipients(null);
-    navigateToEnvelopeEditor();
-  };
-
   const handleRecipientsConfirm = async (recipientsToCreate: RecipientForCreation[]) => {
     if (!uploadedDocumentId) {
       return;
@@ -295,11 +285,17 @@ export const EnvelopeDropZoneWrapper = ({
 
       toast({
         title: t`Recipients added`,
-        description: t`Successfully detected ${recipientsToCreate.length} recipient(s)`,
+        description: t`Successfully detected ${recipientsToCreate.length} ${plural(
+          recipientsToCreate.length,
+          {
+            one: 'recipient',
+            other: 'recipients',
+          },
+        )}`,
         duration: 5000,
       });
 
-      setShowRecipientsDialog(false);
+      setShowExtractionPrompt(false);
       setPendingRecipients(null);
       navigateToEnvelopeEditor();
     } catch (error) {
@@ -401,20 +397,8 @@ export const EnvelopeDropZoneWrapper = ({
         onOpenChange={handlePromptDialogOpenChange}
         onAccept={handleStartRecipientDetection}
         onSkip={handleSkipRecipientDetection}
-      />
-
-      <SuggestedRecipientsDialog
-        open={showRecipientsDialog}
         recipients={pendingRecipients}
-        onOpenChange={(open) => {
-          if (!open) {
-            handleRecipientsCancel();
-          } else {
-            setShowRecipientsDialog(true);
-          }
-        }}
-        onCancel={handleRecipientsCancel}
-        onSubmit={handleRecipientsConfirm}
+        onRecipientsSubmit={handleRecipientsConfirm}
       />
     </div>
   );
