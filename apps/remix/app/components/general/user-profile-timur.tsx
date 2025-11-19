@@ -30,7 +30,7 @@ export const UserProfileTimur = ({ className, rows = 2 }: UserProfileTimurProps)
         <img
           src={timurImage}
           className="h-20 w-20 rounded-full"
-          alt="image of timur ercan founder of documenso"
+          alt="image of timur ercan founder of doku-seal"
         />
       </div>
 

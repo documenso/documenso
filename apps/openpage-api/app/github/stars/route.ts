@@ -1,7 +1,7 @@
 import cors from '@/lib/cors';
 
 export async function GET(request: Request) {
-  const res = await fetch('https://api.github.com/repos/documenso/documenso');
+  const res = await fetch('https://api.github.com/repos/doku-seal/doku-seal');
   const { stargazers_count } = await res.json();
 
   return cors(

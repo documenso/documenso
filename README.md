@@ -1,7 +1,7 @@
 > 🚨 🚨 🚨
 > Doku-Seal 2.0.0 is live on Product Hunt 🎉 <a href="https://doku.se/launch" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">Join us to celebrate the best Doku-Seal yet 🪩</a>
 
-<img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Doku-Seal Logo">
+<img src="https://github.com/doku-seal/doku-seal/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Doku-Seal Logo">
 
 <p align="center" style="margin-top: 20px">
   <p align="center">
@@ -14,7 +14,7 @@
     ·
     <a href="https://doku-seal.com">Website</a>
     ·
-    <a href="https://github.com/documenso/documenso/issues">Issues</a>
+    <a href="https://github.com/doku-seal/doku-seal/issues">Issues</a>
     ·
     <a href="https://doku.se/live">Upcoming Releases</a>
     ·
@@ -24,17 +24,17 @@
 
 <p align="center">
    <a href="https://doku.se/discord"><img src="https://img.shields.io/badge/Discord-doku.se/discord-%235865F2" alt="Join Doku-Seal on Discord"></a>
-   <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
-   <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
-   <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
-   <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso">
+   <a href="https://github.com/doku-seal/doku-seal/stargazers"><img src="https://img.shields.io/github/stars/doku-seal/doku-seal" alt="Github Stars"></a>
+   <a href="https://github.com/doku-seal/doku-seal/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
+   <a href="https://github.com/doku-seal/doku-seal/pulse"><img src="https://img.shields.io/github/commit-activity/m/doku-seal/doku-seal" alt="Commits-per-month"></a>
+   <a href="https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/doku-seal/doku-seal">
    <img alt="open in devcontainer" src="https://img.shields.io/static/v1?label=Dev%20Containers&message=Enabled&color=blue&logo=visualstudiocode" />
    </a>
    <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg" alt="Contributor Covenant"></a>
 </p>
 
 <div align="center">
-  <img src="https://github.com/documenso/documenso/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
+  <img src="https://github.com/doku-seal/doku-seal/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
 </div>
 
 ## About Doku-Seal
@@ -46,22 +46,22 @@ Join us in creating the next generation of open trust infrastructure.
 ## Recognition
 
 <p align="center">
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Doku-Seal - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Doku-Seal - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/posts/doku-seal?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-doku-seal" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Doku-Seal - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/posts/doku-seal?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-doku-seal" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Doku-Seal - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 </p>
 
 ## Community and Next Steps 🎯
 
 - Check out the first source code release in this repository and test it.
-- Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
+- Tell us what you think in the [Discussions](https://github.com/doku-seal/doku-seal/discussions).
 - Join the [Discord server](https://doku.se/discord) for any questions and getting to know to other community members.
 - ⭐ the repository to help us raise awareness.
 - Spread the word on Twitter that Doku-Seal is working towards a more open signing tool.
-- Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release.
+- Fix or create [issues](https://github.com/doku-seal/doku-seal/issues), that are needed for the first production release.
 
 ## Contributing
 
-- To contribute, please see our [contribution guide](https://github.com/documenso/documenso/blob/main/CONTRIBUTING.md).
+- To contribute, please see our [contribution guide](https://github.com/doku-seal/doku-seal/blob/main/CONTRIBUTING.md).
 
 ## Contact us
 
@@ -188,11 +188,11 @@ git clone https://github.com/<your-username>/doku-seal
 
 - Click below to launch a ready-to-use Gitpod workspace in your browser.
 
-[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/documenso/documenso)
+[![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/doku-seal/doku-seal)
 
 ### Run in DevContainer
 
-We support DevContainers for VSCode. [Click here to get started.](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/documenso/documenso)
+We support DevContainers for VSCode. [Click here to get started.](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/doku-seal/doku-seal)
 
 ### Video walkthrough
 
@@ -222,10 +222,10 @@ We support a variety of deployment methods, and are actively working on adding m
 First, clone the code from Github:
 
 ```
-git clone https://github.com/documenso/documenso.git
+git clone https://github.com/doku-seal/doku-seal.git
 ```
 
-Then, inside the `documenso` folder, copy the example env file:
+Then, inside the `doku-seal` folder, copy the example env file:
 
 ```
 cp .env.example .env
@@ -267,7 +267,7 @@ You can use a systemd service file to run the app. Here is a simple example of t
 
 ```bash
 [Unit]
-Description=documenso
+Description=doku-seal
 After=network.target
 
 [Service]
@@ -289,15 +289,15 @@ WantedBy=multi-user.target
 
 ### Render
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/doku-seal/doku-seal)
 
 ### Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=doku-seal-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/doku-seal/doku-seal&branch=main&name=doku-seal-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
 ## Elestio
 
-[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/documenso)
+[![Deploy on Elestio](https://elest.io/images/logos/deploy-to-elestio-btn.png)](https://elest.io/open-source/doku-seal)
 
 ## Troubleshooting
 
@@ -321,7 +321,7 @@ For k8s or docker-compose
 
 ```yaml
 containers:
-  - name: documenso
+  - name: doku-seal
     image: doku-seal:latest
     imagePullPolicy: IfNotPresent
     command:

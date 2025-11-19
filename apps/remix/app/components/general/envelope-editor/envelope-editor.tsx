@@ -175,7 +175,7 @@ export default function EnvelopeEditor() {
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="bg-documenso absolute inset-y-0 left-0"
+                className="bg-doku-seal absolute inset-y-0 left-0"
                 style={{
                   width: `${(100 / envelopeEditorSteps.length) * (currentStepData.order ?? 0)}%`,
                 }}

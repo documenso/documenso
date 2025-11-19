@@ -12,7 +12,7 @@ Our Vue SDK provides a simple way to embed a signing experience within your Vue 
 To install the SDK, run the following command:
 
 ```bash
-npm install @documenso/embed-vue
+npm install @doku-seal/embed-vue
 ```
 
 ## Usage
@@ -25,7 +25,7 @@ If you have a direct link template, you can simply provide the token for the tem
 
 ```html
 <script setup lang="ts">
-  import { EmbedDirectTemplate } from '@documenso/embed-vue';
+  import { EmbedDirectTemplate } from '@doku-seal/embed-vue';
 
   const token = ref('YOUR_TOKEN_HERE'); // Replace with the actual token
 </script>
@@ -60,7 +60,7 @@ If you have a direct link template, you can simply provide the token for the tem
 If you have a signing token, you can provide it to the `EmbedSignDocument` component.
 
 ```jsx
-import { EmbedSignDocument } from '@documenso/embed-vue';
+import { EmbedSignDocument } from '@doku-seal/embed-vue';
 
 const MyEmbeddingComponent = () => {
   const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
@@ -87,11 +87,11 @@ Platform customers have access to advanced styling options:
 
 ```html
 <script setup lang="ts">
-  import { EmbedDirectTemplate } from '@documenso/embed-vue';
+  import { EmbedDirectTemplate } from '@doku-seal/embed-vue';
 
   const token = ref('your-token');
   const customCss = `
-  .documenso-embed {
+  .doku-seal-embed {
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }

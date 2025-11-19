@@ -112,7 +112,7 @@ export const DocumentFlowFormContainerStep = ({
         <motion.div
           layout="size"
           layoutId="document-flow-container-step"
-          className="bg-documenso absolute inset-y-0 left-0"
+          className="bg-doku-seal absolute inset-y-0 left-0"
           style={{
             width: `${(100 / maxStep) * step}%`,
           }}
@@ -161,7 +161,7 @@ export const DocumentFlowFormContainerActions = ({
 
       <Button
         type="button"
-        className="bg-documenso flex-1"
+        className="bg-doku-seal flex-1"
         size="lg"
         disabled={disabled || disableNextStep || loading || !canGoNext}
         loading={loading}

@@ -38,7 +38,7 @@ Platform customers have access to advanced styling options to customize the embe
 <EmbedDirectTemplate
   token={token}
   css={`
-    .documenso-embed {
+    .doku-seal-embed {
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -75,12 +75,12 @@ We support embedding across a range of popular JavaScript frameworks, including:
 
 | Framework | Package                                                                            |
 | --------- | ---------------------------------------------------------------------------------- |
-| React     | [@documenso/embed-react](https://www.npmjs.com/package/@documenso/embed-react)     |
-| Preact    | [@documenso/embed-preact](https://www.npmjs.com/package/@documenso/embed-preact)   |
-| Vue       | [@documenso/embed-vue](https://www.npmjs.com/package/@documenso/embed-vue)         |
-| Svelte    | [@documenso/embed-svelte](https://www.npmjs.com/package/@documenso/embed-svelte)   |
-| Solid     | [@documenso/embed-solid](https://www.npmjs.com/package/@documenso/embed-solid)     |
-| Angular   | [@documenso/embed-angular](https://www.npmjs.com/package/@documenso/embed-angular) |
+| React     | [@doku-seal/embed-react](https://www.npmjs.com/package/@doku-seal/embed-react)     |
+| Preact    | [@doku-seal/embed-preact](https://www.npmjs.com/package/@doku-seal/embed-preact)   |
+| Vue       | [@doku-seal/embed-vue](https://www.npmjs.com/package/@doku-seal/embed-vue)         |
+| Svelte    | [@doku-seal/embed-svelte](https://www.npmjs.com/package/@doku-seal/embed-svelte)   |
+| Solid     | [@doku-seal/embed-solid](https://www.npmjs.com/package/@doku-seal/embed-solid)     |
+| Angular   | [@doku-seal/embed-angular](https://www.npmjs.com/package/@doku-seal/embed-angular) |
 
 Additionally, we provide **web components** for more generalized use. However, please note that web components are still in their early stages and haven't been extensively tested.
 
@@ -105,7 +105,7 @@ This will copy the URL to your clipboard, e.g. `https://stg-app.doku-seal.com/d/
 3. Provide the token to the `EmbedDirectTemplate` component in your frameworks SDK
 
 ```jsx
-import { EmbedDirectTemplate } from '@documenso/embed-react';
+import { EmbedDirectTemplate } from '@doku-seal/embed-react';
 
 const MyEmbeddingComponent = () => {
   const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
@@ -145,7 +145,7 @@ So `https://stg-app.doku-seal.com/sign/lm7Tp2_yhvFfzdeJQzYQF` will become `lm7Tp
 2. Provide the token to the `EmbedSignDocument` component in your frameworks SDK
 
 ```jsx
-import { EmbedSignDocument } from '@documenso/embed-react';
+import { EmbedSignDocument } from '@doku-seal/embed-react';
 
 const MyEmbeddingComponent = () => {
   const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token

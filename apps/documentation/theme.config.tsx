@@ -44,7 +44,7 @@ const themeConfig: DocsThemeConfig = {
   chat: {
     link: 'https://doku.se/discord',
   },
-  docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
+  docsRepositoryBase: 'https://github.com/doku-seal/doku-seal/tree/main/apps/documentation',
   footer: {
     text: (
       <span>

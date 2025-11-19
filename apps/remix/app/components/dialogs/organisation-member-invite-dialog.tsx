@@ -266,7 +266,7 @@ export const OrganisationMemberInviteDialog = ({
     });
 
     downloadFile({
-      filename: 'documenso-organisation-member-invites-template.csv',
+      filename: 'doku-seal-organisation-member-invites-template.csv',
       data: blob,
     });
   };

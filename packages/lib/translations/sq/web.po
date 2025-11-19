@@ -6,13 +6,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: sq\n"
-"Project-Id-Version: documenso-app\n"
+"Project-Id-Version: doku-seal-app\n"
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: 2025-06-19 06:05\n"
 "Last-Translator: \n"
 "Language-Team: Albanian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Crowdin-Project: documenso-app\n"
+"X-Crowdin-Project: doku-seal-app\n"
 "X-Crowdin-Project-ID: 694691\n"
 "X-Crowdin-Language: sq\n"
 "X-Crowdin-File: web.po\n"
@@ -402,8 +402,8 @@ msgid "<0>\"{0}\"</0>is no longer available to sign"
 msgstr "<0>\"{0}\"</0>nuk është më i disponueshëm për nënshkrim"
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "<0>{teamName}</0> has requested to use your email address for their team on Documenso."
-msgstr "<0>{teamName}</0> ka kërkuar të përdorë adresën tuaj të email-it për ekipin e tyre në Documenso."
+msgid "<0>{teamName}</0> has requested to use your email address for their team on Doku-Seal."
+msgstr "<0>{teamName}</0> ka kërkuar të përdorë adresën tuaj të email-it për ekipin e tyre në Doku-Seal."
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "<0>Click to upload</0> or drag and drop"
@@ -592,8 +592,8 @@ msgid "A means to print or download documents for your records"
 msgstr "Një mjet për të printuar ose shkarkuar dokumente për regjistrat tuaj"
 
 #: packages/email/templates/organisation-join.tsx
-msgid "A member has joined your organisation on Documenso"
-msgstr "Një anëtar është bashkuar me organizatën tuaj në Documenso"
+msgid "A member has joined your organisation on Doku-Seal"
+msgstr "Një anëtar është bashkuar me organizatën tuaj në Doku-Seal"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-left-email.handler.ts
 msgid "A member has left your organisation"
@@ -604,8 +604,8 @@ msgid "A member has left your organisation {organisationName}"
 msgstr "Një anëtar ka lënë organizatën tuaj {organisationName}"
 
 #: packages/email/templates/organisation-leave.tsx
-msgid "A member has left your organisation on Documenso"
-msgstr "Një anëtar ka lënë organizatën tuaj në Documenso"
+msgid "A member has left your organisation on Doku-Seal"
+msgstr "Një anëtar ka lënë organizatën tuaj në Doku-Seal"
 
 #: packages/lib/jobs/definitions/emails/send-organisation-member-joined-email.handler.ts
 msgid "A new member has joined your organisation"
@@ -638,16 +638,16 @@ msgstr "Një marrës u përditësua"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/create-team-email-verification.ts
-msgid "A request to use your email has been initiated by {0} on Documenso"
-msgstr "Një kërkesë për të përdorur email-in tuaj është iniciuar nga {0} në Documenso"
+msgid "A request to use your email has been initiated by {0} on Doku-Seal"
+msgstr "Një kërkesë për të përdorur email-in tuaj është iniciuar nga {0} në Doku-Seal"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso"
-msgstr "Një sekret që do të dërgohet në URL-në tuaj kështu që ju mund të verifikoni që kërkesa është dërguar nga Documenso"
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Doku-Seal"
+msgstr "Një sekret që do të dërgohet në URL-në tuaj kështu që ju mund të verifikoni që kërkesa është dërguar nga Doku-Seal"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
-msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Documenso."
-msgstr "Një sekret që do të dërgohet në URL-në tuaj kështu që ju mund të verifikoni që kërkesa është dërguar nga Documenso."
+msgid "A secret that will be sent to your URL so you can verify that the request has been sent by Doku-Seal."
+msgstr "Një sekret që do të dërgohet në URL-në tuaj kështu që ju mund të verifikoni që kërkesa është dërguar nga Doku-Seal."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "A stable internet connection"
@@ -686,12 +686,12 @@ msgid "Accept"
 msgstr "Prano"
 
 #: packages/email/templates/organisation-invite.tsx
-msgid "Accept invitation to join an organisation on Documenso"
-msgstr "Pranoni ftesën për t'u bashkuar me një organizatë në Documenso"
+msgid "Accept invitation to join an organisation on Doku-Seal"
+msgstr "Pranoni ftesën për t'u bashkuar me një organizatë në Doku-Seal"
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "Accept team email request for {teamName} on Documenso"
-msgstr "Prano kërkesën për email të ekipit për {teamName} në Documenso"
+msgid "Accept team email request for {teamName} on Doku-Seal"
+msgstr "Prano kërkesën për email të ekipit për {teamName} në Doku-Seal"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Acceptance and Consent"
@@ -1576,8 +1576,8 @@ msgid "By enabling 2FA, you will be required to enter a code from your authentic
 msgstr "Duke aktivizuar 2FA, do të keni nevojë të fusni një kod nga aplikacioni i vërtetimit tuaj çdo herë që hyni me përdorimin e fjalëkalimit në email."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "By proceeding to use the electronic signature service provided by Documenso, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
-msgstr "Duke vazhduar të përdorni shërbimin e nënshkrimit elektronik të ofruar nga Documenso, ju pohoni se keni lexuar dhe kuptuar këtë informacion. Ju pranoni të gjitha kushtet dhe termet e lidhura me përdorimin e nënshkrimeve elektronike dhe transaksioneve elektronike siç janë përshkruar këtu."
+msgid "By proceeding to use the electronic signature service provided by Doku-Seal, you affirm that you have read and understood this disclosure. You agree to all terms and conditions related to the use of electronic signatures and electronic transactions as outlined herein."
+msgstr "Duke vazhduar të përdorni shërbimin e nënshkrimit elektronik të ofruar nga Doku-Seal, ju pohoni se keni lexuar dhe kuptuar këtë informacion. Ju pranoni të gjitha kushtet dhe termet e lidhura me përdorimin e nënshkrimeve elektronike dhe transaksioneve elektronike siç janë përshkruar këtu."
 
 #: apps/remix/app/components/general/document-signing/document-signing-disclosure.tsx
 msgid "By proceeding with your electronic signature, you acknowledge and consent that it will be used to sign the given document and holds the same legal validity as a handwritten signature. By completing the electronic signing process, you affirm your understanding and acceptance of these conditions."
@@ -2623,8 +2623,8 @@ msgid "Do you want to duplicate this template?"
 msgstr "Dëshiron të dyfishosh këtë model?"
 
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
-msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
-msgstr "Documenso do të fshijë <0>të gjitha dokumentet tuaja</0>, së bashku me të gjitha dokumentet e përfunduara, nënshkrimet dhe të gjitha burimet e tjera që i përkasin Llogarisë tuaj."
+msgid "Doku-Seal will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
+msgstr "Doku-Seal do të fshijë <0>të gjitha dokumentet tuaja</0>, së bashku me të gjitha dokumentet e përfunduara, nënshkrimet dhe të gjitha burimet e tjera që i përkasin Llogarisë tuaj."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
@@ -3936,8 +3936,8 @@ msgid "It's currently not your turn to sign. You will receive an email with inst
 msgstr "Aktualisht nuk është radha juaj për të nënshkruar. Do të merrni një email me udhëzime kur të arrijë radha juaj për të nënshkruar dokumentin."
 
 #: packages/email/templates/organisation-invite.tsx
-msgid "Join {organisationName} on Documenso"
-msgstr "Përdorni {organisationName} në Documenso"
+msgid "Join {organisationName} on Doku-Seal"
+msgstr "Përdorni {organisationName} në Doku-Seal"
 
 #. placeholder {0}: DateTime.fromJSDate(team.createdAt).toRelative({ style: 'short' })
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
@@ -6284,8 +6284,8 @@ msgstr "Ekipi"
 
 #. placeholder {0}: team.name
 #: packages/lib/server-only/team/delete-team.ts
-msgid "Team \"{0}\" has been deleted on Documenso"
-msgstr "Ekipi \"{0}\" është fshirë në Documenso"
+msgid "Team \"{0}\" has been deleted on Doku-Seal"
+msgstr "Ekipi \"{0}\" është fshirë në Doku-Seal"
 
 #: packages/lib/constants/teams-translations.ts
 msgid "Team Admin"
@@ -6327,8 +6327,8 @@ msgid "Team email removed"
 msgstr "Emaili i ekipit është hequr"
 
 #: packages/email/templates/team-email-removed.tsx
-msgid "Team email removed for {teamName} on Documenso"
-msgstr "Emaili i ekipit është hequr për {teamName} në Documenso"
+msgid "Team email removed for {teamName} on Doku-Seal"
+msgstr "Emaili i ekipit është hequr për {teamName} në Doku-Seal"
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Team email verification"
@@ -6517,8 +6517,8 @@ msgid "Thank you for completing the signing process."
 msgstr "Faleminderit që përfunduat procesin e nënshkrimit."
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
-msgid "Thank you for using Documenso to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
-msgstr "Faleminderit që përdorni Documenso për të kryer firmën tuaj elektronike të dokumenteve. Qëllimi i këtij zbulimi është t'ju informojë për procesin, ligjshmërinë dhe të drejtat tuaja në lidhje me përdorimin e firmave elektronike në platformën tonë. Duke zgjedhur të përdorni një firmë elektronike, ju po pranoni termat dhe kushtet e përcaktuara më poshtë."
+msgid "Thank you for using Doku-Seal to perform your electronic document signing. The purpose of this disclosure is to inform you about the process, legality, and your rights regarding the use of electronic signatures on our platform. By opting to use an electronic signature, you are agreeing to the terms and conditions outlined below."
+msgstr "Faleminderit që përdorni Doku-Seal për të kryer firmën tuaj elektronike të dokumenteve. Qëllimi i këtij zbulimi është t'ju informojë për procesin, ligjshmërinë dhe të drejtat tuaja në lidhje me përdorimin e firmave elektronike në platformën tonë. Duke zgjedhur të përdorni një firmë elektronike, ju po pranoni termat dhe kushtet e përcaktuara më poshtë."
 
 #: packages/email/template-components/template-forgot-password.tsx
 msgid "That's okay, it happens! Click the button below to reset your password."
@@ -6770,8 +6770,8 @@ msgstr "Llojet e nënshkrimeve që marrësit lejohen të përdorin gjatë nënsh
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id.tsx
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
-msgid "The URL for Documenso to send webhook events to."
-msgstr "URL për Documenso për të dërguar ngjarje të webhook."
+msgid "The URL for Doku-Seal to send webhook events to."
+msgstr "URL për Doku-Seal për të dërguar ngjarje të webhook."
 
 #: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
 msgid "The user you are looking for may have been removed, renamed or may have never\n"
@@ -6877,8 +6877,8 @@ msgid "This document has been signed by all recipients"
 msgstr "Ky dokument është nënshkruar nga të gjithë marrësit"
 
 #: apps/remix/app/components/general/document/document-certificate-qr-view.tsx
-msgid "This document is available in your Documenso account. You can view more details, recipients, and audit logs there."
-msgstr "Ky dokument është i disponueshëm në llogarinë tuaj Documenso. Ju mund të shihni më shumë detaje, marrësit dhe regjistrat e auditimeve atje."
+msgid "This document is available in your Doku-Seal account. You can view more details, recipients, and audit logs there."
+msgstr "Ky dokument është i disponueshëm në llogarinë tuaj Doku-Seal. Ju mund të shihni më shumë detaje, marrësit dhe regjistrat e auditimeve atje."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "This document is currently a draft and has not been sent"
@@ -6897,8 +6897,8 @@ msgid "This document was created using a direct link."
 msgstr "Ky dokument është krijuar duke përdorur një lidhje të drejtpërdrejtë."
 
 #: packages/email/template-components/template-footer.tsx
-msgid "This document was sent using <0>Documenso.</0>"
-msgstr "Ky dokument është dërguar duke përdorur <0>Documenso.</0>"
+msgid "This document was sent using <0>Doku-Seal.</0>"
+msgstr "Ky dokument është dërguar duke përdorur <0>Doku-Seal.</0>"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx
 msgid "This email confirms that you have rejected the document <0>\"{documentName}\"</0> sent by {documentOwnerName}."
@@ -7760,8 +7760,8 @@ msgid "Waiting for Your Turn"
 msgstr "Duke pritur për radhen tuaj"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/_index.tsx
-msgid "Want to send slick signing links like this one? <0>Check out Documenso.</0>"
-msgstr "Dëshironi të dërgoni lidhje nënshkrimi të shpejta si kjo? <0>Shikoni Documenso.</0>"
+msgid "Want to send slick signing links like this one? <0>Check out Doku-Seal.</0>"
+msgstr "Dëshironi të dërgoni lidhje nënshkrimi të shpejta si kjo? <0>Shikoni Doku-Seal.</0>"
 
 #: apps/remix/app/routes/_profile+/_layout.tsx
 msgid "Want your own public profile?"
@@ -8077,8 +8077,8 @@ msgid "Welcome back! Here's an overview of your account."
 msgstr "Mirë se vini përsëri! Këtu është një përmbledhje e llogarisë tuaj."
 
 #: packages/email/template-components/template-confirmation-email.tsx
-msgid "Welcome to Documenso!"
-msgstr "Mirësevini në Documenso!"
+msgid "Welcome to Doku-Seal!"
+msgstr "Mirësevini në Doku-Seal!"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Were you trying to edit this document instead?"
@@ -8107,8 +8107,8 @@ msgid "When you use our platform to affix your electronic signature to documents
 msgstr "Kur përdorni platformën tonë për të vendosur firmën tuaj elektronike në dokumente, jeni duke dhënë pëlqimin për ta bërë këtë nën Aktin e Nënshkrimeve Elektronike në Tregtinë Globale dhe Kombëtare (E-Sign Act) dhe ligjet e tjera të zbatueshme. Kjo veprimtari tregon miratimin tuaj për të përdorur mënyrat elektronike për të nënshkruar dokumente dhe për të marrë njoftime."
 
 #: apps/remix/app/routes/_profile+/p.$url.tsx
-msgid "While waiting for them to do so you can create your own Documenso account and get started with document signing right away."
-msgstr "Ndërsa prisni që ata ta bëjnë këtë, mund të krijoni llogarinë tuaj Documenso dhe të filloni me nënshkrimet e dokumenteve menjëherë."
+msgid "While waiting for them to do so you can create your own Doku-Seal account and get started with document signing right away."
+msgstr "Ndërsa prisni që ata ta bëjnë këtë, mund të krijoni llogarinë tuaj Doku-Seal dhe të filloni me nënshkrimet e dokumenteve menjëherë."
 
 #: apps/remix/app/components/dialogs/organisation-create-dialog.tsx
 msgid "Whitelabeling, unlimited members and more"
@@ -8256,8 +8256,8 @@ msgid "You can enable access to allow all organisation members to access this te
 msgstr "Ju mund të lejoni qasje për të lejuar që të gjithë anëtarët e organizatës të kenë qasje në këtë ekip si standard."
 
 #: packages/email/templates/confirm-team-email.tsx
-msgid "You can revoke access at any time in your team settings on Documenso <0>here.</0>"
-msgstr "Mund të revokoni aksesin në çdo kohë në cilësimet e ekipit tuaj në Documenso <0>këtu.</0>"
+msgid "You can revoke access at any time in your team settings on Doku-Seal <0>here.</0>"
+msgstr "Mund të revokoni aksesin në çdo kohë në cilësimet e ekipit tuaj në Doku-Seal <0>këtu.</0>"
 
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "You can update the profile URL by updating the team URL in the general settings page."
@@ -8351,8 +8351,8 @@ msgstr "Ju jeni ftuar nga <0>{0}</0> për t'u bashkuar me organizatën e tyre."
 
 #. placeholder {0}: organisation.name
 #: packages/lib/server-only/organisation/create-organisation-member-invites.ts
-msgid "You have been invited to join {0} on Documenso"
-msgstr "Ju jeni ftuar të bashkoheni me {0} në Documenso"
+msgid "You have been invited to join {0} on Doku-Seal"
+msgstr "Ju jeni ftuar të bashkoheni me {0} në Doku-Seal"
 
 #: packages/email/templates/organisation-invite.tsx
 msgid "You have been invited to join the following organisation"
@@ -8396,8 +8396,8 @@ msgid "You have reached the maximum limit of {0} direct templates. <0>Upgrade yo
 msgstr "Ju keni arritur limitin maksimal të {0} shablloneve direkte. <0>Përmirësoni llogarinë tuaj për të vazhduar!</0>"
 
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
-msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>support@documenso.com</0> if you would like to adjust your plan."
-msgstr "Ju keni arritur numrin maksimal të ekipeve për planin tuaj. Ju lutemi kontaktoni shitjet në <0>support@documenso.com</0> nëse dëshironi të ndryshoni planin tuaj."
+msgid "You have reached the maximum number of teams for your plan. Please contact sales at <0>support@doku-seal.com</0> if you would like to adjust your plan."
+msgstr "Ju keni arritur numrin maksimal të ekipeve për planin tuaj. Ju lutemi kontaktoni shitjet në <0>support@doku-seal.com</0> nëse dëshironi të ndryshoni planin tuaj."
 
 #: apps/remix/app/components/general/document/document-upload.tsx
 #: apps/remix/app/components/general/document/document-drop-zone-wrapper.tsx
@@ -8609,12 +8609,12 @@ msgid "Your documents"
 msgstr "Dokumentet tuaja"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has already been confirmed. You can now use all features of Documenso."
-msgstr "Emaili juaj tashmë është konfirmuar. Tani mund të përdorni të gjitha funksionet e Documenso."
+msgid "Your email has already been confirmed. You can now use all features of Doku-Seal."
+msgstr "Emaili juaj tashmë është konfirmuar. Tani mund të përdorni të gjitha funksionet e Doku-Seal."
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
-msgid "Your email has been successfully confirmed! You can now use all features of Documenso."
-msgstr "Email-i juaj është konfirmuar me sukses! Tani mund të përdorni të gjitha veçoritë e Documenso."
+msgid "Your email has been successfully confirmed! You can now use all features of Doku-Seal."
+msgstr "Email-i juaj është konfirmuar me sukses! Tani mund të përdorni të gjitha veçoritë e Doku-Seal."
 
 #. placeholder {0}: teamEmail.team.name
 #. placeholder {1}: teamEmail.team.url
@@ -8661,8 +8661,8 @@ msgid "Your personal organisation"
 msgstr "Organizata juaj personale"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
-msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>support@documenso.com</0> if you would like to discuss your options."
-msgstr "Plani juaj nuk mbulon ftesën e anëtarëve. Ju lutemi përditësoni ose kontaktoni me shitjet në <0>support@documenso.com</0> nëse dëshironi të diskutoni opsionet tuaja."
+msgid "Your plan does not support inviting members. Please upgrade or your plan or contact sales at <0>support@doku-seal.com</0> if you would like to discuss your options."
+msgstr "Plani juaj nuk mbulon ftesën e anëtarëve. Ju lutemi përditësoni ose kontaktoni me shitjet në <0>support@doku-seal.com</0> nëse dëshironi të diskutoni opsionet tuaja."
 
 #: apps/remix/app/components/forms/profile.tsx
 msgid "Your profile has been updated successfully."

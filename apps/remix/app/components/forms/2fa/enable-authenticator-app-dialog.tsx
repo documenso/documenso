@@ -122,7 +122,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       });
 
       downloadFile({
-        filename: 'documenso-2FA-recovery-codes.txt',
+        filename: 'doku-seal-2FA-recovery-codes.txt',
         data: blob,
       });
     }

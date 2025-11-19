@@ -4,8 +4,8 @@ If you plan to contribute to Doku-Seal, please take a moment to feel awesome ✨
 
 ## Before getting started
 
-- Before jumping into a PR be sure to search [existing PRs](https://github.com/documenso/documenso/pulls) or [issues](https://github.com/documenso/documenso/issues) for an open or closed item that relates to your submission.
-- Select an issue from [here](https://github.com/documenso/documenso/issues) or create a new one
+- Before jumping into a PR be sure to search [existing PRs](https://github.com/doku-seal/doku-seal/pulls) or [issues](https://github.com/doku-seal/doku-seal/issues) for an open or closed item that relates to your submission.
+- Select an issue from [here](https://github.com/doku-seal/doku-seal/issues) or create a new one
 - Consider the results from the discussion on the issue
 - Accept the [Contributor License Agreement](https://doku.se/cla) to ensure we can accept your contributions.
 
@@ -40,7 +40,7 @@ The development branch is <code>main</code>. All pull requests should be made ag
   git checkout -b feat/doc-999-somefeature-that-rocks
   ```
 
-3. See the [Developer Setup](https://github.com/documenso/documenso/blob/main/README.md#developer-setup) for more setup details.
+3. See the [Developer Setup](https://github.com/doku-seal/doku-seal/blob/main/README.md#developer-setup) for more setup details.
 
 ## Building
 

@@ -30,7 +30,7 @@ export const SendDocumentActionDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" className={className}>
-          {loading && <Loader className="text-documenso mr-2 h-5 w-5 animate-spin" />}
+          {loading && <Loader className="text-doku-seal mr-2 h-5 w-5 animate-spin" />}
           <Trans>Send</Trans>
         </Button>
       </DialogTrigger>

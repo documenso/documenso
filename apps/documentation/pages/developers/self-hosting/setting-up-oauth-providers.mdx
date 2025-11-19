@@ -17,8 +17,8 @@ To use Google OAuth, you will need to create a Google Cloud Platform project and
 6. When prompted to select an application type, select Web application
 7. Enter a name for your client ID, and click Create
 8. Click the download button to download the client secret
-9. Set the authorized javascript origins to `https://<documenso-domain>`
-10. Set the authorized redirect URIs to `https://<documenso-domain>/api/auth/callback/google`
+9. Set the authorized javascript origins to `https://<doku-seal-domain>`
+10. Set the authorized redirect URIs to `https://<doku-seal-domain>/api/auth/callback/google`
 11. In the Doku-Seal environment variables, set the following:
 
 ```
@@ -40,7 +40,7 @@ To use Microsoft OAuth, you will need to create an Azure AD application registra
 4. Click **New registration**
 5. Enter a name for your application (e.g., "Doku-Seal")
 6. Under **Supported account types**, select **Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)** to allow any Microsoft account to sign in
-7. Under **Redirect URI**, select **Web** and enter: `https://<documenso-domain>/api/auth/callback/microsoft`
+7. Under **Redirect URI**, select **Web** and enter: `https://<doku-seal-domain>/api/auth/callback/microsoft`
 8. Click **Register**
 
 ### Configure the application

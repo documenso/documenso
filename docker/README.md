@@ -13,7 +13,7 @@ Before you begin, ensure that you have the following installed:
 
 This setup includes a PostgreSQL database and the Doku-Seal application. You will need to provide your own SMTP details via environment variables.
 
-1. Download the Docker Compose file from the Doku-Seal repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
+1. Download the Docker Compose file from the Doku-Seal repository: [compose.yml](https://raw.githubusercontent.com/doku-seal/doku-seal/release/docker/production/compose.yml)
 2. Navigate to the directory containing the `compose.yml` file.
 3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
 
@@ -65,7 +65,7 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
    "
    
    # Restart container
-   docker-compose restart documenso
+   docker-compose restart doku-seal
    ```
    
    **Option B: Use Existing Certificate**
@@ -73,7 +73,7 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
    If you have an existing `.p12` certificate, update the volume binding in `compose.yml`:
    ```yaml
    volumes:
-     - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
+     - /path/to/your/cert.p12:/opt/doku-seal/cert.p12:ro
    ```
    
 
@@ -94,7 +94,7 @@ If you prefer to host the Doku-Seal application on your container provider of ch
 1. Pull the Doku-Seal Docker image:
 
 ```
-docker pull documenso/documenso
+docker pull doku-seal/doku-seal
 ```
 
 Or, if using GitHub's Package Registry:
@@ -119,8 +119,8 @@ docker run -d \
   -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>" \
   -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>" \
   -e NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>" \
-  -v /path/to/your/cert.p12:/opt/documenso/cert.p12:ro \
-  documenso/documenso
+  -v /path/to/your/cert.p12:/opt/doku-seal/cert.p12:ro \
+  doku-seal/doku-seal
 ```
 
 Replace the placeholders with your actual database and SMTP details.
@@ -154,7 +154,7 @@ If you encounter errors related to certificate access, here are common solutions
 
 3. **Verify Docker mount:**
    ```bash
-   docker exec -it <container_name> ls -la /opt/documenso/cert.p12
+   docker exec -it <container_name> ls -la /opt/doku-seal/cert.p12
    ```
 
 
@@ -164,7 +164,7 @@ Check application logs for detailed error information:
 
 ```bash
 # For Docker Compose
-docker-compose logs -f documenso
+docker-compose logs -f doku-seal
 
 # For standalone container
 docker logs -f <container_name>
@@ -216,7 +216,7 @@ Here's a markdown table documenting all the provided environment variables:
 | `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file, will be used instead of file path.                     |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/doku-seal/cert.p12`.                                        |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport to use for file uploads (database or s3).                                             |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
 | `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |

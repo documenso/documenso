@@ -89,16 +89,16 @@ test('[TEAMS]: can create a document inside a document folder', async ({ page })
   ]);
 
   await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
+    path.join(__dirname, '../../../assets/doku-seal-supporter-pledge.pdf'),
   );
 
   await page.waitForTimeout(3000);
 
-  await expectTextToBeVisible(page, 'documenso-supporter-pledge.pdf');
+  await expectTextToBeVisible(page, 'doku-seal-supporter-pledge.pdf');
 
   await page.goto(`/t/${team.url}/documents/f/${teamFolder.id}`);
 
-  await expectTextToBeVisible(page, 'documenso-supporter-pledge.pdf');
+  await expectTextToBeVisible(page, 'doku-seal-supporter-pledge.pdf');
 });
 
 test('[TEAMS]: can pin a document folder', async ({ page }) => {
@@ -122,7 +122,7 @@ test('[TEAMS]: can pin a document folder', async ({ page }) => {
 
   await page.reload();
 
-  await expect(page.locator('svg.text-documenso.h-3.w-3')).toBeVisible();
+  await expect(page.locator('svg.text-doku-seal.h-3.w-3')).toBeVisible();
 });
 
 test('[TEAMS]: can unpin a document folder', async ({ page }) => {
@@ -147,7 +147,7 @@ test('[TEAMS]: can unpin a document folder', async ({ page }) => {
 
   await page.reload();
 
-  await expect(page.locator('svg.text-documenso.h-3.w-3')).not.toBeVisible();
+  await expect(page.locator('svg.text-doku-seal.h-3.w-3')).not.toBeVisible();
 });
 
 test('[TEAMS]: can rename a document folder', async ({ page }) => {
@@ -381,16 +381,16 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
   await page
     .locator('input[type="file"]')
     .nth(0)
-    .setInputFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
+    .setInputFiles(path.join(__dirname, '../../../assets/doku-seal-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
 
   // Expect redirect.
-  await expectTextToBeVisible(page, 'documenso-supporter-pledge.pdf');
+  await expectTextToBeVisible(page, 'doku-seal-supporter-pledge.pdf');
 
   // Return to folder and verify file is visible.
   await page.goto(`/t/${team.url}/templates/f/${folder.id}`);
-  await expectTextToBeVisible(page, 'documenso-supporter-pledge.pdf');
+  await expectTextToBeVisible(page, 'doku-seal-supporter-pledge.pdf');
 });
 
 test('[TEAMS]: can pin a template folder', async ({ page }) => {
@@ -415,7 +415,7 @@ test('[TEAMS]: can pin a template folder', async ({ page }) => {
 
   await page.reload();
 
-  await expect(page.locator('svg.text-documenso.h-3.w-3')).toBeVisible();
+  await expect(page.locator('svg.text-doku-seal.h-3.w-3')).toBeVisible();
 });
 
 test('[TEAMS]: can unpin a template folder', async ({ page }) => {
@@ -442,7 +442,7 @@ test('[TEAMS]: can unpin a template folder', async ({ page }) => {
   await page.reload();
   await page.waitForTimeout(1000);
 
-  await expect(page.locator('svg.text-documenso.h-3.w-3')).not.toBeVisible();
+  await expect(page.locator('svg.text-doku-seal.h-3.w-3')).not.toBeVisible();
 });
 
 test('[TEAMS]: can rename a template folder', async ({ page }) => {
@@ -850,12 +850,12 @@ test('[TEAMS]: documents inherit folder visibility', async ({ page }) => {
   ]);
 
   await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
+    path.join(__dirname, '../../../assets/doku-seal-supporter-pledge.pdf'),
   );
 
   await page.waitForTimeout(3000);
 
-  await expectTextToBeVisible(page, 'documenso-supporter-pledge.pdf');
+  await expectTextToBeVisible(page, 'doku-seal-supporter-pledge.pdf');
 
   await expect(page.getByRole('combobox').filter({ hasText: 'Admins only' })).toBeVisible();
 });

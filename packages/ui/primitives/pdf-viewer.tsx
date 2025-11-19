@@ -44,7 +44,7 @@ export type OnPDFViewerPageClick = (_event: {
 
 const PDFLoader = () => (
   <>
-    <Loader className="text-documenso h-12 w-12 animate-spin" />
+    <Loader className="text-doku-seal h-12 w-12 animate-spin" />
 
     <p className="text-muted-foreground mt-4">
       <Trans>Loading document...</Trans>

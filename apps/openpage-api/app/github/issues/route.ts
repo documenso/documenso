@@ -2,7 +2,7 @@ import cors from '@/lib/cors';
 
 export async function GET(request: Request) {
   const res = await fetch(
-    'https://api.github.com/search/issues?q=repo:documenso/documenso+type:issue+state:open&page=0&per_page=1',
+    'https://api.github.com/search/issues?q=repo:doku-seal/doku-seal+type:issue+state:open&page=0&per_page=1',
   );
   const { total_count } = await res.json();
 

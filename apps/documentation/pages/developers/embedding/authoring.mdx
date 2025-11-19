@@ -16,7 +16,7 @@ The embedded authoring feature enables your users to create new documents withou
 To implement document creation in your application, use the `EmbedCreateDocument` component from our SDK:
 
 ```jsx
-import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@documenso/embed-react';
+import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@doku-seal/embed-react';
 
 const DocumentCreator = () => {
   // You'll need to obtain a presign token using your API key
@@ -110,7 +110,7 @@ You can customize the appearance of the embedded component using standard CSS cl
   className="h-screen w-full rounded-lg border-none shadow-md"
   presignToken="YOUR_PRESIGN_TOKEN"
   css={`
-    .documenso-embed {
+    .doku-seal-embed {
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
@@ -130,7 +130,7 @@ Here's a complete example of integrating document creation in a React applicatio
 ```tsx
 import { useState } from 'react';
 
-import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@documenso/embed-react';
+import { unstable_EmbedCreateDocument as EmbedCreateDocument } from '@doku-seal/embed-react';
 
 function DocumentCreator() {
   // In a real application, you would fetch this token from your backend

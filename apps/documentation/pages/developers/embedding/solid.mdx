@@ -12,7 +12,7 @@ Our Solid.js SDK provides a simple way to embed a signing experience within your
 To install the SDK, run the following command:
 
 ```bash
-npm install @documenso/embed-solid
+npm install @doku-seal/embed-solid
 ```
 
 ## Usage
@@ -24,7 +24,7 @@ To embed a signing experience, you'll need to provide the token for the document
 If you have a direct link template, you can simply provide the token for the template to the `EmbedDirectTemplate` component.
 
 ```jsx
-import { EmbedDirectTemplate } from '@documenso/embed-solid';
+import { EmbedDirectTemplate } from '@doku-seal/embed-solid';
 
 const MyEmbeddingComponent = () => {
   const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
@@ -58,7 +58,7 @@ const MyEmbeddingComponent = () => {
 If you have a signing token, you can provide it to the `EmbedSignDocument` component.
 
 ```jsx
-import { EmbedSignDocument } from '@documenso/embed-solid';
+import { EmbedSignDocument } from '@doku-seal/embed-solid';
 
 const MyEmbeddingComponent = () => {
   const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
@@ -84,12 +84,12 @@ const MyEmbeddingComponent = () => {
 Platform customers have access to advanced styling options:
 
 ```jsx
-import { EmbedDirectTemplate } from '@documenso/embed-solid';
+import { EmbedDirectTemplate } from '@doku-seal/embed-solid';
 
 const MyEmbeddingComponent = () => {
   const token = 'your-token';
   const customCss = `
-    .documenso-embed {
+    .doku-seal-embed {
       border-radius: 8px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }

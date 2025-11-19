@@ -12,7 +12,7 @@ export const getCertificateStatus = () => {
   }
 
   const defaultPath =
-    env('NODE_ENV') === 'production' ? '/opt/documenso/cert.p12' : './example/cert.p12';
+    env('NODE_ENV') === 'production' ? '/opt/doku-seal/cert.p12' : './example/cert.p12';
 
   const filePath = env('NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH') || defaultPath;
 

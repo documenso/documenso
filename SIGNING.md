@@ -43,7 +43,7 @@ Want to create a production ready docker image? Follow these steps:
 - Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
 
 ```
-docker run -d --restart=unless-stopped -p 3000:3000 -v doku-seal:/app/data --name documenso doku-seal:latest
+docker run -d --restart=unless-stopped -p 3000:3000 -v doku-seal:/app/data --name doku-seal doku-seal:latest
 ```
 
 Command Breakdown:
@@ -64,4 +64,4 @@ We support a variety of deployment methods, and are actively working on adding m
 
 ## Render
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/doku-seal/doku-seal)

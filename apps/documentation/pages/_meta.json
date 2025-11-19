@@ -21,12 +21,12 @@
     "items": {
       "changelog": {
         "title": "Changelog",
-        "href": "https://documenso.com/changelog",
+        "href": "https://doku-seal.com/changelog",
         "newWindow": true
       },
       "blog": {
         "title": "Blog",
-        "href": "https://documenso.com/blog",
+        "href": "https://doku-seal.com/blog",
         "newWindow": true
       }
     }

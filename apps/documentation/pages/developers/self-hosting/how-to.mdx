@@ -21,12 +21,12 @@ The following guide will walk you through setting up Doku-Seal manually on your 
 The first step is to clone the repository:
 
 ```bash
-git clone https://github.com/documenso/documenso.git
+git clone https://github.com/doku-seal/doku-seal.git
 ```
 
 ### Configure the Environment Variables
 
-Navigate to the `documenso` folder and create a `.env` file from the example `.env.example` file:
+Navigate to the `doku-seal` folder and create a `.env` file from the example `.env.example` file:
 
 ```bash
 cp .env.example .env
@@ -80,8 +80,8 @@ The following guide will walk you through setting up Doku-Seal using Docker. You
 
 We provide a Docker container for Doku-Seal, published on both DockerHub and GitHub Container Registry.
 
-- [DockerHub](https://hub.docker.com/r/documenso/documenso)
-- [GitHub Container Registry](https://ghcr.io/documenso/documenso)
+- [DockerHub](https://hub.docker.com/r/doku-seal/doku-seal)
+- [GitHub Container Registry](https://ghcr.io/doku-seal/doku-seal)
 
 You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
 
@@ -95,7 +95,7 @@ This setup includes a PostgreSQL database and the Doku-Seal application. You wil
 
 ### Download the Docker Compose File
 
-Download the Docker Compose file from the Doku-Seal repository - [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml).
+Download the Docker Compose file from the Doku-Seal repository - [compose.yml](https://raw.githubusercontent.com/doku-seal/doku-seal/release/docker/production/compose.yml).
 
 ### Navigate to the `compose.yml` File
 
@@ -145,7 +145,7 @@ This method avoids file permission issues by creating the certificate directly i
    echo
 
    # Generate certificate inside container using environment variable
-   docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
+   docker exec -e CERT_PASS="$CERT_PASS" -it doku-seal-production-doku-seal-1 bash -c "
      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
        -keyout /tmp/private.key \
        -out /tmp/certificate.crt \
@@ -165,7 +165,7 @@ This method avoids file permission issues by creating the certificate directly i
 
 4. Restart the container to apply changes:
    ```bash
-   docker-compose restart documenso
+   docker-compose restart doku-seal
    ```
 
 #### Option B: Use an Existing Certificate File
@@ -187,12 +187,12 @@ If you have an existing `.p12` certificate file:
 
    ```yaml
    volumes:
-     - /path/to/your/cert.p12:/opt/documenso/cert.p12:ro
+     - /path/to/your/cert.p12:/opt/doku-seal/cert.p12:ro
    ```
 
 4. **Add certificate configuration** to your `.env` file:
    ```bash
-   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+   NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/doku-seal/cert.p12
    NEXT_PRIVATE_SIGNING_PASSPHRASE=your_certificate_password
    ```
 
@@ -226,13 +226,13 @@ If you prefer to host the Doku-Seal application on a specific container provider
 Pull the Doku-Seal Docker image from DockerHub:
 
 ```bash
-docker pull documenso/documenso
+docker pull doku-seal/doku-seal
 ```
 
 Or, pull the image from GitHub Container Registry:
 
 ```bash
-docker pull ghcr.io/documenso/documenso
+docker pull ghcr.io/doku-seal/doku-seal
 ```
 
 ### Run the Docker Container
@@ -251,8 +251,8 @@ docker run -d \
  -e NEXT_PRIVATE_SMTP_TRANSPORT="<your-next-private-smtp-transport>"
  -e NEXT_PRIVATE_SMTP_FROM_NAME="<your-next-private-smtp-from-name>"
  -e NEXT_PRIVATE_SMTP_FROM_ADDRESS="<your-next-private-smtp-from-address>"
- -v /path/to/your/keyfile.p12:/opt/documenso/cert.p12
- documenso/documenso
+ -v /path/to/your/keyfile.p12:/opt/doku-seal/cert.p12
+ doku-seal/doku-seal
 ```
 
 Replace the placeholders with the actual values.
@@ -281,7 +281,7 @@ The environment variables listed above are a subset of those available for confi
 | `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                    |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                  |
-| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                        |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/doku-seal/cert.p12`.                                        |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                    |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                |
 | `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                      |
@@ -315,14 +315,14 @@ You can run the application using a `systemd.service` file. Here is a simple exa
 
 ```bash
 [Unit]
-Description=documenso
+Description=doku-seal
 After=network.target
 
 [Service]
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/remix
+WorkingDirectory=/var/www/doku-seal/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always
@@ -339,10 +339,10 @@ We offer several alternative deployment methods for Doku-Seal if you need more o
 
 ## Render
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/doku-seal/doku-seal)
 
 ## Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/doku-seal/doku-seal&branch=main&name=doku-seal-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
 <CallToAction className="mt-12" utmSource="self-hosting" />

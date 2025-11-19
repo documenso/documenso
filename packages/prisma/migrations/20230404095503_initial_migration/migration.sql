@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "IdentityProvider" AS ENUM ('DOCUMENSO', 'GOOGLE');
+CREATE TYPE "IdentityProvider" AS ENUM ('DOKU_SEAL', 'GOOGLE');
 
 -- CreateEnum
 CREATE TYPE "DocumentStatus" AS ENUM ('DRAFT', 'PENDING', 'COMPLETED');
@@ -24,7 +24,7 @@ CREATE TABLE "User" (
     "emailVerified" TIMESTAMP(3),
     "password" TEXT,
     "source" TEXT,
-    "identityProvider" "IdentityProvider" NOT NULL DEFAULT 'DOCUMENSO',
+    "identityProvider" "IdentityProvider" NOT NULL DEFAULT 'DOKU_SEAL',
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
