@@ -11,10 +11,6 @@ import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fi
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import {
-  registerPageCanvas,
-  unregisterPageCanvas,
-} from '@documenso/lib/client-only/utils/page-canvas-registry';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import {
   MIN_FIELD_HEIGHT_PX,
@@ -61,15 +57,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       ),
     [editorFields.localFields, pageContext.pageNumber],
   );
-
-  /**
-   * Cleanup: Unregister canvas when component unmounts
-   */
-  useEffect(() => {
-    return () => {
-      unregisterPageCanvas(pageContext.pageNumber);
-    };
-  }, [pageContext.pageNumber]);
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
     const { current: container } = canvasElement;
@@ -231,15 +218,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     currentStage.on('transformend', () => setIsFieldChanging(false));
 
     currentPageLayer.batchDraw();
-
-    // Register this page's canvas references now that everything is initialized
-    if (canvasElement.current && currentStage) {
-      registerPageCanvas({
-        pageNumber: pageContext.pageNumber,
-        pdfCanvas: canvasElement.current,
-        konvaStage: currentStage,
-      });
-    }
   };
 
   /**

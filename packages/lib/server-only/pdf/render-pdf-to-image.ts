@@ -26,7 +26,7 @@ export const renderPdfToImage = async (pdfBytes: Uint8Array) => {
   const pdf = await loadingTask.promise;
 
   try {
-    const scale = 4;
+    const scale = 2;
 
     const pages = await Promise.all(
       Array.from({ length: pdf.numPages }, async (_, index) => {

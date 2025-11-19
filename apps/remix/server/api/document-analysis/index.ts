@@ -445,12 +445,6 @@ export const aiRoute = new Hono<HonoEnv>()
             ],
           });
 
-          console.info('AI analyze recipients raw response', {
-            envelopeId,
-            pageNumber: page.pageNumber,
-            recipients: result.object,
-          });
-
           return {
             pageNumber: page.pageNumber,
             recipients: result.object,
@@ -467,7 +461,7 @@ export const aiRoute = new Hono<HonoEnv>()
           continue;
         }
 
-        const { pageNumber, recipients } = result.value;
+        const { recipients } = result.value;
 
         const recipientsWithEmails = recipients.map((recipient) => {
           const email = resolveRecipientEmail(recipient.email);
@@ -480,12 +474,6 @@ export const aiRoute = new Hono<HonoEnv>()
           recipientIndex += 1;
 
           return normalizedRecipient;
-        });
-
-        console.info('AI analyze recipients normalized response', {
-          envelopeId,
-          pageNumber,
-          recipients: recipientsWithEmails,
         });
 
         allRecipients.push(...recipientsWithEmails);

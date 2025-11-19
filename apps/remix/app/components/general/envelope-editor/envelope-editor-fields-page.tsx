@@ -11,7 +11,6 @@ import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { getPageCanvasRefs } from '@documenso/lib/client-only/utils/page-canvas-registry';
 import type { TDetectedFormField } from '@documenso/lib/types/document-analysis';
 import type {
   TCheckboxFieldMeta,
@@ -53,63 +52,6 @@ import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 const EnvelopeEditorFieldsPageRenderer = lazy(
   async () => import('./envelope-editor-fields-page-renderer'),
 );
-
-const enforceMinimumFieldDimensions = (params: {
-  positionX: number;
-  positionY: number;
-  width: number;
-  height: number;
-  pageWidth: number;
-  pageHeight: number;
-}): {
-  positionX: number;
-  positionY: number;
-  width: number;
-  height: number;
-} => {
-  const MIN_HEIGHT_PX = 30;
-  const MIN_WIDTH_PX = 36;
-
-  const widthPx = (params.width / 100) * params.pageWidth;
-  const heightPx = (params.height / 100) * params.pageHeight;
-
-  let adjustedWidth = params.width;
-  let adjustedHeight = params.height;
-  let adjustedPositionX = params.positionX;
-  let adjustedPositionY = params.positionY;
-
-  if (widthPx < MIN_WIDTH_PX) {
-    const centerXPx = (params.positionX / 100) * params.pageWidth + widthPx / 2;
-    adjustedWidth = (MIN_WIDTH_PX / params.pageWidth) * 100;
-    adjustedPositionX = ((centerXPx - MIN_WIDTH_PX / 2) / params.pageWidth) * 100;
-
-    if (adjustedPositionX < 0) {
-      adjustedPositionX = 0;
-    } else if (adjustedPositionX + adjustedWidth > 100) {
-      adjustedPositionX = 100 - adjustedWidth;
-    }
-  }
-
-  if (heightPx < MIN_HEIGHT_PX) {
-    const centerYPx = (params.positionY / 100) * params.pageHeight + heightPx / 2;
-    adjustedHeight = (MIN_HEIGHT_PX / params.pageHeight) * 100;
-
-    adjustedPositionY = ((centerYPx - MIN_HEIGHT_PX / 2) / params.pageHeight) * 100;
-
-    if (adjustedPositionY < 0) {
-      adjustedPositionY = 0;
-    } else if (adjustedPositionY + adjustedHeight > 100) {
-      adjustedPositionY = 100 - adjustedHeight;
-    }
-  }
-
-  return {
-    positionX: adjustedPositionX,
-    positionY: adjustedPositionY,
-    width: adjustedWidth,
-    height: adjustedHeight,
-  };
-};
 
 const detectFormFieldsInDocument = async (params: {
   envelopeId: string;
@@ -247,30 +189,12 @@ export const EnvelopeEditorFieldsPage = () => {
       }
 
       for (const [pageNumber, fields] of fieldsPerPage.entries()) {
-        const pageCanvasRefs = getPageCanvasRefs(pageNumber);
-
         for (const detected of fields) {
           const [ymin, xmin, ymax, xmax] = detected.boundingBox;
-          let positionX = (xmin / 1000) * 100;
-          let positionY = (ymin / 1000) * 100;
-          let width = ((xmax - xmin) / 1000) * 100;
-          let height = ((ymax - ymin) / 1000) * 100;
-
-          if (pageCanvasRefs) {
-            const adjusted = enforceMinimumFieldDimensions({
-              positionX,
-              positionY,
-              width,
-              height,
-              pageWidth: pageCanvasRefs.pdfCanvas.width,
-              pageHeight: pageCanvasRefs.pdfCanvas.height,
-            });
-
-            positionX = adjusted.positionX;
-            positionY = adjusted.positionY;
-            width = adjusted.width;
-            height = adjusted.height;
-          }
+          const positionX = (xmin / 1000) * 100;
+          const positionY = (ymin / 1000) * 100;
+          const width = ((xmax - xmin) / 1000) * 100;
+          const height = ((ymax - ymin) / 1000) * 100;
 
           const fieldType = detected.label as FieldType;
           const resolvedRecipientId =
@@ -482,30 +406,12 @@ export const EnvelopeEditorFieldsPage = () => {
 
                   let totalAdded = 0;
                   for (const [pageNumber, detectedFields] of fieldsPerPage.entries()) {
-                    const pageCanvasRefs = getPageCanvasRefs(pageNumber);
-
                     for (const detected of detectedFields) {
                       const [ymin, xmin, ymax, xmax] = detected.boundingBox;
-                      let positionX = (xmin / 1000) * 100;
-                      let positionY = (ymin / 1000) * 100;
-                      let width = ((xmax - xmin) / 1000) * 100;
-                      let height = ((ymax - ymin) / 1000) * 100;
-
-                      if (pageCanvasRefs) {
-                        const adjusted = enforceMinimumFieldDimensions({
-                          positionX,
-                          positionY,
-                          width,
-                          height,
-                          pageWidth: pageCanvasRefs.pdfCanvas.width,
-                          pageHeight: pageCanvasRefs.pdfCanvas.height,
-                        });
-
-                        positionX = adjusted.positionX;
-                        positionY = adjusted.positionY;
-                        width = adjusted.width;
-                        height = adjusted.height;
-                      }
+                      const positionX = (xmin / 1000) * 100;
+                      const positionY = (ymin / 1000) * 100;
+                      const width = ((xmax - xmin) / 1000) * 100;
+                      const height = ((ymax - ymin) / 1000) * 100;
 
                       const fieldType = detected.label as FieldType;
                       const resolvedRecipientId =
