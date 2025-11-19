@@ -2,7 +2,7 @@ import * as fs from 'node:fs';
 
 import { getCertificateStatus } from '@doku-seal/lib/server-only/cert/cert-status';
 import { env } from '@doku-seal/lib/utils/env';
-import { signWithP12 } from '@doku-seal/pdf-sign';
+import { signWithP12 } from '@documenso/pdf-sign';
 
 import { addSigningPlaceholder } from '../helpers/add-signing-placeholder';
 import { updateSigningPlaceholder } from '../helpers/update-signing-placeholder';

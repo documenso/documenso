@@ -89,7 +89,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 - [shadcn/ui](https://ui.shadcn.com/) - Component Library
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
-- [@doku-seal/pdf-sign](https://www.npmjs.com/package/@doku-seal/pdf-sign) - PDF Signatures (launching soon)
+- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments

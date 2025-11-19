@@ -12,7 +12,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@doku-seal/pdf-sign": "^0.1.0",
+    "@documenso/pdf-sign": "^0.1.0",
     "@doku-seal/tsconfig": "*",
     "ts-pattern": "^5.0.5"
   },

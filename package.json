@@ -79,7 +79,7 @@
     "packages/*"
   ],
   "dependencies": {
-    "@doku-seal/pdf-sign": "^0.1.0",
+    "@documenso/pdf-sign": "^0.1.0",
     "@doku-seal/prisma": "^0.0.0",
     "@lingui/conf": "^5.2.0",
     "@lingui/core": "^5.2.0",

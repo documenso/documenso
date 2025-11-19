@@ -65,7 +65,7 @@ export default defineConfig({
     exclude: [
       'node_modules',
       '@node-rs/bcrypt',
-      '@doku-seal/pdf-sign',
+      '@documenso/pdf-sign',
       'sharp',
       'playwright',
       'playwright-core',
@@ -95,7 +95,7 @@ export default defineConfig({
     rollupOptions: {
       external: [
         '@node-rs/bcrypt',
-        '@doku-seal/pdf-sign',
+        '@documenso/pdf-sign',
         '@aws-sdk/cloudfront-signer',
         'nodemailer',
         /playwright/,
