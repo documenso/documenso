@@ -5,8 +5,8 @@ import type { MessageDescriptor } from '@lingui/core';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { motion } from 'framer-motion';
 
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { Dialog, DialogClose, DialogContent, DialogFooter } from '@documenso/ui/primitives/dialog';
+import { parseMessageDescriptor } from '@doku-seal/lib/utils/i18n';
+import { Dialog, DialogClose, DialogContent, DialogFooter } from '@doku-seal/ui/primitives/dialog';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../button';

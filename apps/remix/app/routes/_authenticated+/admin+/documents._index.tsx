@@ -6,16 +6,16 @@ import { Trans } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { trpc } from '@documenso/trpc/react';
-import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { trpc } from '@doku-seal/trpc/react';
+import { Avatar, AvatarFallback } from '@doku-seal/ui/primitives/avatar';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 

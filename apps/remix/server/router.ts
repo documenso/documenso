@@ -6,13 +6,13 @@ import { requestId } from 'hono/request-id';
 import type { RequestIdVariables } from 'hono/request-id';
 import type { Logger } from 'pino';
 
-import { tsRestHonoApp } from '@documenso/api/hono';
-import { auth } from '@documenso/auth/server';
-import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
-import { jobsClient } from '@documenso/lib/jobs/client';
-import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
-import { logger } from '@documenso/lib/utils/logger';
-import { openApiDocument } from '@documenso/trpc/server/open-api';
+import { tsRestHonoApp } from '@doku-seal/api/hono';
+import { auth } from '@doku-seal/auth/server';
+import { API_V2_BETA_URL, API_V2_URL } from '@doku-seal/lib/constants/app';
+import { jobsClient } from '@doku-seal/lib/jobs/client';
+import { getIpAddress } from '@doku-seal/lib/universal/get-ip-address';
+import { logger } from '@doku-seal/lib/utils/logger';
+import { openApiDocument } from '@doku-seal/trpc/server/open-api';
 
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';

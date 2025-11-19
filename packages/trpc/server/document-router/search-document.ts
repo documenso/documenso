@@ -1,4 +1,4 @@
-import { searchDocumentsWithKeyword } from '@documenso/lib/server-only/document/search-documents-with-keyword';
+import { searchDocumentsWithKeyword } from '@doku-seal/lib/server-only/document/search-documents-with-keyword';
 
 import { authenticatedProcedure } from '../trpc';
 import {

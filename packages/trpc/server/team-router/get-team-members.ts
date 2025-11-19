@@ -1,4 +1,4 @@
-import { getTeamMembers } from '@documenso/lib/server-only/team/get-team-members';
+import { getTeamMembers } from '@doku-seal/lib/server-only/team/get-team-members';
 
 import { authenticatedProcedure } from '../trpc';
 import {

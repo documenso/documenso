@@ -5,8 +5,8 @@ import { SigningStatus } from '@prisma/client';
 import type { Field, Recipient } from '@prisma/client';
 import { ClockIcon, EyeOffIcon, LockIcon } from 'lucide-react';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
 
 import { isTemplateRecipientEmailPlaceholder } from '../../../lib/constants/template';
 import { extractInitials } from '../../../lib/utils/recipient-formatter';

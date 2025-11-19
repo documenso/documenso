@@ -5,8 +5,8 @@ import { TooltipArrow } from '@radix-ui/react-tooltip';
 import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
 
 import { cn } from '../../lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../../primitives/tooltip';

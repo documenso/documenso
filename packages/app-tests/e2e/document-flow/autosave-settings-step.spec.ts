@@ -2,9 +2,9 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { EnvelopeType } from '@prisma/client';
 
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { seedBlankDocument } from '@doku-seal/prisma/seed/documents';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -215,7 +215,7 @@ test.describe('AutoSave Settings Step', () => {
   test('should autosave the redirect URL change', async ({ page }) => {
     const { user, document, team } = await setupDocument(page);
 
-    const newRedirectUrl = 'https://documenso.com/test/';
+    const newRedirectUrl = 'https://doku-seal.com/test/';
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 
-import { SIGNATURE_CANVAS_DPI, isBase64Image } from '@documenso/lib/constants/signatures';
+import { SIGNATURE_CANVAS_DPI, isBase64Image } from '@doku-seal/lib/constants/signatures';
 
 import { cn } from '../../lib/utils';
 

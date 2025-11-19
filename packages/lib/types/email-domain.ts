@@ -1,6 +1,6 @@
 import type { z } from 'zod';
 
-import { EmailDomainSchema } from '@documenso/prisma/generated/zod/modelSchema/EmailDomainSchema';
+import { EmailDomainSchema } from '@doku-seal/prisma/generated/zod/modelSchema/EmailDomainSchema';
 
 import { ZOrganisationEmailLiteSchema } from './organisation-email';
 

@@ -13,8 +13,8 @@ import {
   FIELD_DEFAULT_LINE_HEIGHT,
   type TNumberFieldMeta as NumberFieldMeta,
   ZNumberFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+} from '@doku-seal/lib/types/field-meta';
+import { numberFormatValues } from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import {
   Form,
   FormControl,
@@ -22,16 +22,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Separator } from '@documenso/ui/primitives/separator';
+} from '@doku-seal/ui/primitives/select';
+import { Separator } from '@doku-seal/ui/primitives/separator';
 
 import {
   EditorGenericFontSizeField,

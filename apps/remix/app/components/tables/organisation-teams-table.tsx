@@ -6,19 +6,19 @@ import { Trans } from '@lingui/react/macro';
 import { useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { trpc } from '@documenso/trpc/react';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { ZUrlSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { trpc } from '@doku-seal/trpc/react';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 import { TeamDeleteDialog } from '../dialogs/team-delete-dialog';
 

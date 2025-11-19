@@ -1,7 +1,7 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { jobsClient } from '@documenso/lib/jobs/client';
-import type { TClaimFlags } from '@documenso/lib/types/subscription';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { jobsClient } from '@doku-seal/lib/jobs/client';
+import type { TClaimFlags } from '@doku-seal/lib/types/subscription';
+import { prisma } from '@doku-seal/prisma';
 
 import { adminProcedure } from '../trpc';
 import {

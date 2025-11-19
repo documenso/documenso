@@ -3,10 +3,10 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DownloadIcon } from 'lucide-react';
 
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type DocumentAuditLogDownloadButtonProps = {
   className?: string;

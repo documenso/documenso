@@ -7,27 +7,27 @@ import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 import { EditIcon, MoreHorizontal, Trash2Icon } from 'lucide-react';
 import { useSearchParams } from 'react-router';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { isTeamRoleWithinUserHierarchy } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/teams-translations';
+import { ZUrlSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { isTeamRoleWithinUserHierarchy } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+} from '@doku-seal/ui/primitives/dropdown-menu';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 import { useCurrentTeam } from '~/providers/team';
 

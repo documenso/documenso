@@ -1,10 +1,10 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 
-import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getTemplateById } from '@doku-seal/lib/server-only/template/get-template-by-id';
+import { mapSecondaryIdToTemplateId } from '@doku-seal/lib/utils/envelope';
+import { seedBlankTemplate } from '@doku-seal/prisma/seed/templates';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -209,7 +209,7 @@ test.describe('AutoSave Settings Step - Templates', () => {
   test('should autosave the redirect URL change', async ({ page }) => {
     const { user, template, team } = await setupTemplate(page);
 
-    const newRedirectUrl = 'https://documenso.com/test/';
+    const newRedirectUrl = 'https://doku-seal.com/test/';
 
     await page.getByRole('button', { name: 'Advanced Options' }).click();
 

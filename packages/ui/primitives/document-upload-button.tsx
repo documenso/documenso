@@ -8,11 +8,11 @@ import type { DropEvent, FileRejection } from 'react-dropzone';
 import { useDropzone } from 'react-dropzone';
 import { Link } from 'react-router';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { megabytesToBytes } from '@doku-seal/lib/universal/unit-convertions';
+import { isPersonalLayout } from '@doku-seal/lib/utils/organisations';
 
 import { Button } from './button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip';

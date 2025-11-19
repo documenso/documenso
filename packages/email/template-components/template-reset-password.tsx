@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 
-import { env } from '@documenso/lib/utils/env';
+import { env } from '@doku-seal/lib/utils/env';
 
 import { Button, Section, Text } from '../components';
 import { TemplateDocumentImage } from './template-document-image';
@@ -29,7 +29,7 @@ export const TemplateResetPassword = ({ assetBaseUrl }: TemplateResetPasswordPro
 
         <Section className="mb-6 mt-8 text-center">
           <Button
-            className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+            className="bg-doku-seal-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
             href={`${NEXT_PUBLIC_WEBAPP_URL ?? 'http://localhost:3000'}/signin`}
           >
             <Trans>Sign In</Trans>

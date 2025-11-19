@@ -1,4 +1,4 @@
-import { deleteAttachment } from '@documenso/lib/server-only/envelope-attachment/delete-attachment';
+import { deleteAttachment } from '@doku-seal/lib/server-only/envelope-attachment/delete-attachment';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';

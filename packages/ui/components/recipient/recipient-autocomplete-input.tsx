@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { Trans } from '@lingui/react/macro';
 import { PopoverAnchor } from '@radix-ui/react-popover';
 
-import { Popover, PopoverContent } from '@documenso/ui/primitives/popover';
+import { Popover, PopoverContent } from '@doku-seal/ui/primitives/popover';
 
 import { Command, CommandGroup, CommandItem } from '../../primitives/command';
 import { Input } from '../../primitives/input';

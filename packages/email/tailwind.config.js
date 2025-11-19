@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
-const baseConfig = require('@documenso/tailwind-config');
+const baseConfig = require('@doku-seal/tailwind-config');
 const path = require('path');
 
 module.exports = {

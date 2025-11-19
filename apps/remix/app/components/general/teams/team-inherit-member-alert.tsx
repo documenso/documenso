@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import type { TeamGroup } from '@prisma/client';
 
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
 
 import { TeamMemberInheritDisableDialog } from '~/components/dialogs/team-inherit-member-disable-dialog';
 import { TeamMemberInheritEnableDialog } from '~/components/dialogs/team-inherit-member-enable-dialog';

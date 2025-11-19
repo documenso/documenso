@@ -4,8 +4,8 @@ import { motion } from 'framer-motion';
 import { AnimatePresence } from 'framer-motion';
 import { CheckSquareIcon, CopyIcon } from 'lucide-react';
 
-import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCopyToClipboard } from '@doku-seal/lib/client-only/hooks/use-copy-to-clipboard';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { cn } from '../../lib/utils';
 

@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organisations';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';

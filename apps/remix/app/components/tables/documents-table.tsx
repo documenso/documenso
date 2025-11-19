@@ -7,16 +7,16 @@ import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import type { TFindDocumentsResponse } from '@documenso/trpc/server/document-router/find-documents.types';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import type { TFindDocumentsResponse } from '@doku-seal/trpc/server/document-router/find-documents.types';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { useCurrentTeam } from '~/providers/team';

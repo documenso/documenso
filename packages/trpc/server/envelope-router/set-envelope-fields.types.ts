@@ -6,8 +6,8 @@ import {
   ZClampedFieldPositionXSchema,
   ZClampedFieldPositionYSchema,
   ZClampedFieldWidthSchema,
-} from '@documenso/lib/types/field';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+} from '@doku-seal/lib/types/field';
+import { ZFieldMetaSchema } from '@doku-seal/lib/types/field-meta';
 
 export const ZSetEnvelopeFieldsRequestSchema = z.object({
   envelopeId: z.string(),

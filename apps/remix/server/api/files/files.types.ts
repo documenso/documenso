@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import DocumentDataSchema from '@doku-seal/prisma/generated/zod/modelSchema/DocumentDataSchema';
 
 export const ZUploadPdfRequestSchema = z.object({
   file: z.instanceof(File),

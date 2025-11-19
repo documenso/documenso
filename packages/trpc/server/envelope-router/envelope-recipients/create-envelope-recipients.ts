@@ -1,4 +1,4 @@
-import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
+import { createEnvelopeRecipients } from '@doku-seal/lib/server-only/recipient/create-envelope-recipients';
 
 import { authenticatedProcedure } from '../../trpc';
 import {

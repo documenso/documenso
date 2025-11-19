@@ -1,4 +1,4 @@
-import { linkOrganisationAccount } from '@documenso/ee/server-only/lib/link-organisation-account';
+import { linkOrganisationAccount } from '@doku-seal/ee/server-only/lib/link-organisation-account';
 
 import { procedure } from '../trpc';
 import {

@@ -10,13 +10,13 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
-import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import { ZCreateApiTokenRequestSchema } from '@documenso/trpc/server/api-token-router/create-api-token.types';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { useCopyToClipboard } from '@doku-seal/lib/client-only/hooks/use-copy-to-clipboard';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZCreateApiTokenRequestSchema } from '@doku-seal/trpc/server/api-token-router/create-api-token.types';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
 import {
   Form,
   FormControl,
@@ -25,17 +25,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/select';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

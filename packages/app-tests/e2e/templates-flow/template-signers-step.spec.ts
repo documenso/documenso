@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { seedBlankTemplate } from '@doku-seal/prisma/seed/templates';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -37,10 +37,10 @@ import { apiSignin } from '../fixtures/authentication';
 //     await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
 //     // Add 2 signers.
-//     await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+//     await page.getByPlaceholder('Email').fill('recipient1@doku-seal.com');
 //     await page.getByPlaceholder('Name').fill('Recipient 1');
 //     await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-//     await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+//     await page.getByPlaceholder('Email').nth(1).fill('recipient2@doku-seal.com');
 //     await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
 //     // Display advanced settings.
@@ -87,10 +87,10 @@ test('[TEMPLATE_FLOW]: add placeholder', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Add Placeholder' })).toBeVisible();
 
   // Add 2 signers.
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@doku-seal.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
   await page.getByRole('button', { name: 'Add Placeholder Recipient' }).click();
-  await page.getByPlaceholder('Email').nth(1).fill('recipient2@documenso.com');
+  await page.getByPlaceholder('Email').nth(1).fill('recipient2@doku-seal.com');
   await page.getByPlaceholder('Name').nth(1).fill('Recipient 2');
 
   // Advanced settings should not be visible for non EE users.

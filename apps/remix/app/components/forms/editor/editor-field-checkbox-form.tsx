@@ -7,19 +7,19 @@ import { PlusIcon, Trash } from 'lucide-react';
 import { useForm, useWatch } from 'react-hook-form';
 import { z } from 'zod';
 
-import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
+import { validateCheckboxLength } from '@doku-seal/lib/advanced-fields-validation/validate-checkbox';
 import {
   type TCheckboxFieldMeta as CheckboxFieldMeta,
   DEFAULT_FIELD_FONT_SIZE,
   ZCheckboxFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+} from '@doku-seal/lib/types/field-meta';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   checkboxValidationLength,
   checkboxValidationRules,
   checkboxValidationSigns,
-} from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+} from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
 import {
   Form,
   FormControl,
@@ -27,16 +27,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Separator } from '@documenso/ui/primitives/separator';
+} from '@doku-seal/ui/primitives/select';
+import { Separator } from '@doku-seal/ui/primitives/separator';
 
 import {
   EditorGenericFontSizeField,

@@ -5,23 +5,23 @@ import { EnvelopeType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
-import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
-import { trpc } from '@documenso/trpc/react';
+import { unsafeGetEntireEnvelope } from '@doku-seal/lib/server-only/admin/get-entire-document';
+import { trpc } from '@doku-seal/trpc/react';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@documenso/ui/primitives/accordion';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/ui/primitives/accordion';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
 import { DocumentStatus } from '~/components/general/document/document-status';

@@ -1,10 +1,10 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { verifyEmbeddingPresignToken } from '@doku-seal/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { createEnvelope } from '@doku-seal/lib/server-only/envelope/create-envelope';
+import { mapSecondaryIdToTemplateId } from '@doku-seal/lib/utils/envelope';
+import { prisma } from '@doku-seal/prisma';
 
 import { procedure } from '../trpc';
 import {

@@ -6,30 +6,30 @@ import { DocumentDistributionMethod, DocumentStatus } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
+import { DocumentSignatureType } from '@doku-seal/lib/constants/document';
+import { isValidLanguageCode } from '@doku-seal/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
-} from '@documenso/lib/constants/trpc';
-import type { TDocument } from '@documenso/lib/types/document';
-import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
-import type { TAddFieldsFormSchema } from '@documenso/ui/primitives/document-flow/add-fields.types';
-import { AddSettingsFormPartial } from '@documenso/ui/primitives/document-flow/add-settings';
-import type { TAddSettingsFormSchema } from '@documenso/ui/primitives/document-flow/add-settings.types';
-import { AddSignersFormPartial } from '@documenso/ui/primitives/document-flow/add-signers';
-import type { TAddSignersFormSchema } from '@documenso/ui/primitives/document-flow/add-signers.types';
-import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/add-subject';
-import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
-import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { Stepper } from '@documenso/ui/primitives/stepper';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/lib/constants/trpc';
+import type { TDocument } from '@doku-seal/lib/types/document';
+import { ZDocumentAccessAuthTypesSchema } from '@doku-seal/lib/types/document-auth';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
+import { AddFieldsFormPartial } from '@doku-seal/ui/primitives/document-flow/add-fields';
+import type { TAddFieldsFormSchema } from '@doku-seal/ui/primitives/document-flow/add-fields.types';
+import { AddSettingsFormPartial } from '@doku-seal/ui/primitives/document-flow/add-settings';
+import type { TAddSettingsFormSchema } from '@doku-seal/ui/primitives/document-flow/add-settings.types';
+import { AddSignersFormPartial } from '@doku-seal/ui/primitives/document-flow/add-signers';
+import type { TAddSignersFormSchema } from '@doku-seal/ui/primitives/document-flow/add-signers.types';
+import { AddSubjectFormPartial } from '@doku-seal/ui/primitives/document-flow/add-subject';
+import type { TAddSubjectFormSchema } from '@doku-seal/ui/primitives/document-flow/add-subject.types';
+import { DocumentFlowFormContainer } from '@doku-seal/ui/primitives/document-flow/document-flow-root';
+import type { DocumentFlowStep } from '@doku-seal/ui/primitives/document-flow/types';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { Stepper } from '@doku-seal/ui/primitives/stepper';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

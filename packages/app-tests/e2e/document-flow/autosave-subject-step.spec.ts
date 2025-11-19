@@ -2,9 +2,9 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { EnvelopeType } from '@prisma/client';
 
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { seedBlankDocument } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { seedBlankDocument } from '@doku-seal/prisma/seed/documents';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -22,7 +22,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
 
   await page.getByRole('button', { name: 'Continue' }).click();
 
-  await page.getByPlaceholder('Email').fill('recipient1@documenso.com');
+  await page.getByPlaceholder('Email').fill('recipient1@doku-seal.com');
   await page.getByPlaceholder('Name').fill('Recipient 1');
 
   await page.getByRole('button', { name: 'Continue' }).click();

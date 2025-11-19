@@ -1,4 +1,4 @@
-import { updateAttachment } from '@documenso/lib/server-only/envelope-attachment/update-attachment';
+import { updateAttachment } from '@doku-seal/lib/server-only/envelope-attachment/update-attachment';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';

@@ -1,6 +1,6 @@
-# Docker Setup for Documenso
+# Docker Setup for Doku-Seal
 
-The following guide will walk you through setting up Documenso using Docker. You can choose between a production setup using Docker Compose or a standalone container.
+The following guide will walk you through setting up Doku-Seal using Docker. You can choose between a production setup using Docker Compose or a standalone container.
 
 ## Prerequisites
 
@@ -11,9 +11,9 @@ Before you begin, ensure that you have the following installed:
 
 ## Option 1: Production Docker Compose Setup
 
-This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details via environment variables.
+This setup includes a PostgreSQL database and the Doku-Seal application. You will need to provide your own SMTP details via environment variables.
 
-1. Download the Docker Compose file from the Documenso repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
+1. Download the Docker Compose file from the Doku-Seal repository: [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml)
 2. Navigate to the directory containing the `compose.yml` file.
 3. Create a `.env` file in the same directory and add your SMTP details as well as a few extra environment variables, following the example below:
 
@@ -53,7 +53,7 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
    echo
    
    # Generate certificate inside container using environment variable
-   docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
+   docker exec -e CERT_PASS="$CERT_PASS" -it doku-seal-production-doku-seal-1 bash -c "
      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
        -keyout /tmp/private.key \
        -out /tmp/certificate.crt \
@@ -83,15 +83,15 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="<your-certificate-password>"
 docker-compose --env-file ./.env up -d
 ```
 
-This will start the PostgreSQL database and the Documenso application containers.
+This will start the PostgreSQL database and the Doku-Seal application containers.
 
-6. Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+6. Access the Doku-Seal application by visiting `http://localhost:3000` in your web browser.
 
 ## Option 2: Standalone Docker Container
 
-If you prefer to host the Documenso application on your container provider of choice, you can use the pre-built Docker image from DockerHub or GitHub's Package Registry. Note that you will need to provide your own database and SMTP host.
+If you prefer to host the Doku-Seal application on your container provider of choice, you can use the pre-built Docker image from DockerHub or GitHub's Package Registry. Note that you will need to provide your own database and SMTP host.
 
-1. Pull the Documenso Docker image:
+1. Pull the Doku-Seal Docker image:
 
 ```
 docker pull documenso/documenso
@@ -100,7 +100,7 @@ docker pull documenso/documenso
 Or, if using GitHub's Package Registry:
 
 ```
-docker pull ghcr.io/documenso/documenso
+docker pull ghcr.io/doku-seal/doku-seal
 ```
 
 2. Run the Docker container, providing the necessary environment variables for your database and SMTP host:
@@ -125,11 +125,11 @@ docker run -d \
 
 Replace the placeholders with your actual database and SMTP details.
 
-3. Access the Documenso application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+3. Access the Doku-Seal application by visiting the URL you provided in the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
 
 ## Success
 
-You have now successfully set up Documenso using Docker. You can start organizing and managing your documents efficiently.
+You have now successfully set up Doku-Seal using Docker. You can start organizing and managing your documents efficiently.
 
 ## Troubleshooting
 
@@ -172,7 +172,7 @@ docker logs -f <container_name>
 
 ### Health Checks
 
-Check the status of your Documenso instance:
+Check the status of your Doku-Seal instance:
 
 ```bash
 # Basic health check (database + certificate)
@@ -194,17 +194,17 @@ The health endpoint will show:
 2. **Database connection issues:** Ensure your database is running and accessible
 3. **SMTP errors:** Verify your email server settings in the .env file
 
-If you encounter any issues or have further questions, please refer to the official Documenso documentation or seek assistance from the community.
+If you encounter any issues or have further questions, please refer to the official Doku-Seal documentation or seek assistance from the community.
 
 ## Advanced Configuration
 
-The environment variables listed above are a subset of those that are available for configuring Documenso. For a complete list of environment variables and their descriptions, refer to the table below:
+The environment variables listed above are a subset of those that are available for configuring Doku-Seal. For a complete list of environment variables and their descriptions, refer to the table below:
 
 Here's a markdown table documenting all the provided environment variables:
 
 | Variable                                     | Description                                                                                         |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `PORT`                                       | The port to run the Documenso application on, defaults to `3000`.                                   |
+| `PORT`                                       | The port to run the Doku-Seal application on, defaults to `3000`.                                   |
 | `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |

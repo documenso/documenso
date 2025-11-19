@@ -1,7 +1,7 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

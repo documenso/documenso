@@ -25,10 +25,10 @@ import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
-import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
-import { prisma } from '@documenso/prisma';
-import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getEnvelopeItemPdfUrl } from '@doku-seal/lib/utils/envelope-download';
+import { prisma } from '@doku-seal/prisma';
+import { seedAlignmentTestDocument } from '@doku-seal/prisma/seed/initial-seed';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 import { apiSignin } from '../fixtures/authentication';
 import type {
   TCreateEnvelopePayload,
@@ -50,7 +50,7 @@ test.describe.configure({ mode: 'parallel', timeout: 60000 });
 test.skip('seed alignment test document', async ({ page }) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
-      email: 'example@documenso.com',
+      email: 'example@doku-seal.com',
     },
     include: {
       ownedOrganisations: {

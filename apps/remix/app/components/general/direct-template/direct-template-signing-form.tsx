@@ -6,37 +6,37 @@ import { FieldType } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@doku-seal/lib/constants/date-formats';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@doku-seal/lib/constants/time-zones';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import type { TTemplate } from '@documenso/lib/types/template';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
+} from '@doku-seal/lib/types/field-meta';
+import type { TTemplate } from '@doku-seal/lib/types/template';
+import { isFieldUnsignedAndRequired } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { sortFieldsByPosition, validateFieldsInserted } from '@doku-seal/lib/utils/fields';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useStep } from '@documenso/ui/primitives/stepper';
+} from '@doku-seal/ui/primitives/document-flow/document-flow-root';
+import type { DocumentFlowStep } from '@doku-seal/ui/primitives/document-flow/types';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useStep } from '@doku-seal/ui/primitives/stepper';
 
 import { DocumentSigningCheckboxField } from '~/components/general/document-signing/document-signing-checkbox-field';
 import { DocumentSigningCompleteDialog } from '~/components/general/document-signing/document-signing-complete-dialog';

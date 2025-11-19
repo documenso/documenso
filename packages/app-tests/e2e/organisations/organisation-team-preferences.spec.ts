@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/test';
 
-import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
-import { prisma } from '@documenso/prisma';
-import { DocumentVisibility } from '@documenso/prisma/client';
-import { seedTeamDocumentWithMeta } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getTeamSettings } from '@doku-seal/lib/server-only/team/get-team-settings';
+import { prisma } from '@doku-seal/prisma';
+import { DocumentVisibility } from '@doku-seal/prisma/client';
+import { seedTeamDocumentWithMeta } from '@doku-seal/prisma/seed/documents';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
@@ -126,7 +126,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
   await page.getByTestId('enable-branding').click();
   await page.getByRole('option', { name: 'Yes' }).click();
   await page.getByRole('textbox', { name: 'Brand Website' }).click();
-  await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://documenso.com');
+  await page.getByRole('textbox', { name: 'Brand Website' }).fill('https://doku-seal.com');
   await page.getByRole('textbox', { name: 'Brand Details' }).click();
   await page.getByRole('textbox', { name: 'Brand Details' }).fill('BrandDetails');
   await page.getByRole('button', { name: 'Update' }).first().click();
@@ -138,7 +138,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
 
   // Check that the team settings have inherited these values.
   expect(teamSettings.brandingEnabled).toEqual(true);
-  expect(teamSettings.brandingUrl).toEqual('https://documenso.com');
+  expect(teamSettings.brandingUrl).toEqual('https://doku-seal.com');
   expect(teamSettings.brandingCompanyDetails).toEqual('BrandDetails');
 
   // Edit the team branding settings
@@ -177,7 +177,7 @@ test('[ORGANISATIONS]: manage branding preferences', async ({ page }) => {
 
   // Check that the team settings now inherit from organisation again.
   expect(inheritedTeamSettings.brandingEnabled).toEqual(true);
-  expect(inheritedTeamSettings.brandingUrl).toEqual('https://documenso.com');
+  expect(inheritedTeamSettings.brandingUrl).toEqual('https://doku-seal.com');
   expect(inheritedTeamSettings.brandingCompanyDetails).toEqual('BrandDetails');
 
   // Verify that a document can be created successfully with the branding settings
@@ -202,7 +202,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   // Update email preferences at organisation level.
   // Set reply to email
   await page.getByRole('textbox', { name: 'Reply to email' }).click();
-  await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@documenso.com');
+  await page.getByRole('textbox', { name: 'Reply to email' }).fill('organisation@doku-seal.com');
 
   // Update email document settings by enabling/disabling some checkboxes
   await page.getByRole('checkbox', { name: 'Send recipient signed email' }).uncheck();
@@ -217,7 +217,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   });
 
   // Check that the team settings have inherited these values.
-  expect(teamSettings.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(teamSettings.emailReplyTo).toEqual('organisation@doku-seal.com');
   expect(teamSettings.emailDocumentSettings).toEqual({
     recipientSigningRequest: true,
     recipientRemoved: true,
@@ -301,7 +301,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
   });
 
   // Check that the team settings now inherit from organisation again.
-  expect(inheritedTeamSettings.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(inheritedTeamSettings.emailReplyTo).toEqual('organisation@doku-seal.com');
   expect(inheritedTeamSettings.emailDocumentSettings).toEqual({
     recipientSigningRequest: true,
     recipientRemoved: true,
@@ -321,7 +321,7 @@ test('[ORGANISATIONS]: manage email preferences', async ({ page }) => {
     },
   });
 
-  expect(documentMeta.emailReplyTo).toEqual('organisation@documenso.com');
+  expect(documentMeta.emailReplyTo).toEqual('organisation@doku-seal.com');
   expect(documentMeta.emailSettings).toEqual({
     recipientSigningRequest: true,
     recipientRemoved: true,

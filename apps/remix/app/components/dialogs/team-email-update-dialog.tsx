@@ -8,8 +8,8 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -26,9 +26,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type TeamEmailUpdateDialogProps = {
   teamEmail: TeamEmail;

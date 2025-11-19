@@ -1,6 +1,6 @@
 import { createCookie } from 'react-router';
 
-import { env } from '@documenso/lib/utils/env';
+import { env } from '@doku-seal/lib/utils/env';
 
 export const langCookie = createCookie('lang', {
   path: '/',

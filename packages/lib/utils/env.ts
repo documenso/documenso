@@ -1,4 +1,4 @@
-/// <reference types="@documenso/tsconfig/process-env.d.ts" />
+/// <reference types="@doku-seal/tsconfig/process-env.d.ts" />
 
 declare global {
   interface Window {

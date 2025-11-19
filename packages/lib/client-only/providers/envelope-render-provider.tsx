@@ -3,8 +3,8 @@ import React from 'react';
 
 import type { Field, Recipient } from '@prisma/client';
 
-import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
+import type { TRecipientColor } from '@doku-seal/ui/lib/recipient-colors';
+import { AVAILABLE_RECIPIENT_COLORS } from '@doku-seal/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';

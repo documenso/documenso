@@ -2,8 +2,8 @@ import type { ClientResponse, InferRequestType } from 'hono/client';
 import { hc } from 'hono/client';
 import superjson from 'superjson';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError } from '@documenso/lib/errors/app-error';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { AppError } from '@doku-seal/lib/errors/app-error';
 
 import type { AuthAppType } from '../server';
 import type { SessionValidationResult } from '../server/lib/session/session';

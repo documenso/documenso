@@ -5,9 +5,9 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useNavigate } from 'react-router';
 
-import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -16,9 +16,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type AdminDocumentDeleteDialogProps = {
   envelopeId: string;

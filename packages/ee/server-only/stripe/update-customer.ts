@@ -1,4 +1,4 @@
-import { stripe } from '@documenso/lib/server-only/stripe';
+import { stripe } from '@doku-seal/lib/server-only/stripe';
 
 type UpdateCustomerOptions = {
   customerId: string;

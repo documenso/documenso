@@ -4,8 +4,8 @@ import {
   seedCompletedDocument,
   seedDraftDocument,
   seedPendingDocument,
-} from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+} from '@doku-seal/prisma/seed/documents';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
 import { checkDocumentTabCount } from '../fixtures/documents';

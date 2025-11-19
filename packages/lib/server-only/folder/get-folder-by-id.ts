@@ -1,5 +1,5 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import type { TFolderType } from '../../types/folder-type';

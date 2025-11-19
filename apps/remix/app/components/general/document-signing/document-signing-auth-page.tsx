@@ -4,9 +4,9 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
-import { authClient } from '@documenso/auth/client';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { authClient } from '@doku-seal/auth/client';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type DocumentSigningAuthPageViewProps = {
   email?: string;

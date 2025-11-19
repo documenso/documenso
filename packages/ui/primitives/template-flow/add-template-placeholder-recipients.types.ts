@@ -1,7 +1,7 @@
 import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
+import { ZRecipientActionAuthTypesSchema } from '@doku-seal/lib/types/document-auth';
 
 export const ZAddTemplatePlacholderRecipientsFormSchema = z
   .object({

@@ -6,20 +6,20 @@ import { CheckCircle2Icon, ClockIcon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { ZUrlSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { OrganisationEmailDomainDeleteDialog } from '../dialogs/organisation-email-domain-delete-dialog';
 

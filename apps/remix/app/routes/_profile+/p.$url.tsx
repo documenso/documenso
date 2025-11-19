@@ -3,13 +3,13 @@ import { FileIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
-import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
-import { getPublicProfileByUrl } from '@documenso/lib/server-only/profile/get-public-profile-by-url';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { formatDirectTemplatePath } from '@documenso/lib/utils/templates';
-import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { useOptionalSession } from '@doku-seal/lib/client-only/providers/session';
+import { getPublicProfileByUrl } from '@doku-seal/lib/server-only/profile/get-public-profile-by-url';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { formatDirectTemplatePath } from '@doku-seal/lib/utils/templates';
+import { Avatar, AvatarFallback, AvatarImage } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Table,
   TableBody,
@@ -17,8 +17,8 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@documenso/ui/primitives/table';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+} from '@doku-seal/ui/primitives/table';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 import type { Route } from './+types/p.$url';
 
@@ -134,7 +134,7 @@ export default function PublicProfilePage({ loaderData }: Route.ComponentProps) 
             {!user?.id && (
               <span className="mt-2 inline-block">
                 <Trans>
-                  While waiting for them to do so you can create your own Documenso account and get
+                  While waiting for them to do so you can create your own Doku-Seal account and get
                   started with document signing right away.
                 </Trans>
               </span>

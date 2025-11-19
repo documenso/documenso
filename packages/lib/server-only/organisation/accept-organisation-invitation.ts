@@ -1,7 +1,7 @@
 import type { OrganisationGroup, OrganisationMemberRole } from '@prisma/client';
 import { OrganisationGroupType, OrganisationMemberInviteStatus } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';

@@ -1,10 +1,10 @@
 import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
-import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { deleteDocument } from '@doku-seal/lib/server-only/document/delete-document';
+import { deleteTemplate } from '@doku-seal/lib/server-only/template/delete-template';
+import { prisma } from '@doku-seal/prisma';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';

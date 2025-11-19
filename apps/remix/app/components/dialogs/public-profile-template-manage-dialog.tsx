@@ -11,14 +11,14 @@ import { useForm } from 'react-hook-form';
 import { P, match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { type Template } from '@documenso/prisma/types/template-legacy-schema';
-import { trpc } from '@documenso/trpc/react';
+import { type Template } from '@doku-seal/prisma/types/template-legacy-schema';
+import { trpc } from '@doku-seal/trpc/react';
 import {
   MAX_TEMPLATE_PUBLIC_DESCRIPTION_LENGTH,
   MAX_TEMPLATE_PUBLIC_TITLE_LENGTH,
-} from '@documenso/trpc/server/template-router/schema';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/trpc/server/template-router/schema';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -28,7 +28,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -36,8 +36,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Table,
   TableBody,
@@ -45,9 +45,9 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@documenso/ui/primitives/table';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/table';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

@@ -1,21 +1,21 @@
 import { P, match } from 'ts-pattern';
 
-import type { BrandingSettings } from '@documenso/email/providers/branding';
-import { prisma } from '@documenso/prisma';
+import type { BrandingSettings } from '@doku-seal/email/providers/branding';
+import { prisma } from '@doku-seal/prisma';
 import type {
   DocumentMeta,
   EmailDomain,
   Organisation,
   OrganisationEmail,
   OrganisationType,
-} from '@documenso/prisma/client';
+} from '@doku-seal/prisma/client';
 import {
   EmailDomainStatus,
   type OrganisationClaim,
   type OrganisationGlobalSettings,
-} from '@documenso/prisma/client';
+} from '@doku-seal/prisma/client';
 
-import { DOCUMENSO_INTERNAL_EMAIL } from '../../constants/email';
+import { DOKU_SEAL_INTERNAL_EMAIL } from '../../constants/email';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import {
   organisationGlobalSettingsToBranding,
@@ -99,7 +99,7 @@ export const getEmailContext = async (
   if (options.emailType === 'INTERNAL') {
     return {
       ...emailContext,
-      senderEmail: DOCUMENSO_INTERNAL_EMAIL,
+      senderEmail: DOKU_SEAL_INTERNAL_EMAIL,
       replyToEmail: undefined,
       emailLanguage, // Not sure if we want to use this for internal emails.
     };
@@ -110,7 +110,7 @@ export const getEmailContext = async (
   const senderEmailId = match(meta?.emailId)
     .with(P.string, (emailId) => emailId) // Explicit string means to use the provided email ID.
     .with(undefined, () => emailContext.settings.emailId) // Undefined means to use the inherited email ID.
-    .with(null, () => null) // Explicit null means to use the Documenso email.
+    .with(null, () => null) // Explicit null means to use the Doku-Seal email.
     .exhaustive();
 
   const foundSenderEmail = emailContext.allowedEmails.find((email) => email.id === senderEmailId);
@@ -125,7 +125,7 @@ export const getEmailContext = async (
         name: foundSenderEmail.emailName,
         address: foundSenderEmail.email,
       }
-    : DOCUMENSO_INTERNAL_EMAIL;
+    : DOKU_SEAL_INTERNAL_EMAIL;
 
   return {
     ...emailContext,

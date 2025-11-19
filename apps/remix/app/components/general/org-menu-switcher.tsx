@@ -13,27 +13,27 @@ import {
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
-import { authClient } from '@documenso/auth/client';
-import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
-import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { isAdmin } from '@documenso/lib/utils/is-admin';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { LanguageSwitcherDialog } from '@documenso/ui/components/common/language-switcher-dialog';
-import { cn } from '@documenso/ui/lib/utils';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { authClient } from '@doku-seal/auth/client';
+import { useOptionalCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
+import { EXTENDED_TEAM_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/teams-translations';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { isAdmin } from '@doku-seal/lib/utils/is-admin';
+import { canExecuteOrganisationAction } from '@doku-seal/lib/utils/organisations';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { canExecuteTeamAction } from '@doku-seal/lib/utils/teams';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { LanguageSwitcherDialog } from '@doku-seal/ui/components/common/language-switcher-dialog';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
+} from '@doku-seal/ui/primitives/dropdown-menu';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 

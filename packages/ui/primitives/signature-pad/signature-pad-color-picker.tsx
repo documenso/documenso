@@ -6,7 +6,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 import { cn } from '../../lib/utils';
 

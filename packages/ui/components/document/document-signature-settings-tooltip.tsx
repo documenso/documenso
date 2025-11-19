@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { InfoIcon } from 'lucide-react';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 export const DocumentSignatureSettingsTooltip = () => {
   return (

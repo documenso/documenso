@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/api",
+  "name": "@doku-seal/api",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -15,8 +15,8 @@
     "v1/"
   ],
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
+    "@doku-seal/lib": "*",
+    "@doku-seal/prisma": "*",
     "@ts-rest/core": "^3.52.0",
     "@ts-rest/open-api": "^3.52.0",
     "@ts-rest/serverless": "^3.52.0",

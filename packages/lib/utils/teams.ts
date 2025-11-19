@@ -5,8 +5,8 @@ import type {
   TeamGlobalSettings,
 } from '@prisma/client';
 
-import type { TeamGroup } from '@documenso/prisma/generated/types';
-import type { TeamMemberRole } from '@documenso/prisma/generated/types';
+import type { TeamGroup } from '@doku-seal/prisma/generated/types';
+import type { TeamMemberRole } from '@doku-seal/prisma/generated/types';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import {

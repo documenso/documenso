@@ -5,7 +5,7 @@ import { createCallable } from 'react-call';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { Button } from '@documenso/ui/primitives/button';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -13,15 +13,15 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
   email: z.string().min(1, { message: msg`Email is required`.id }),

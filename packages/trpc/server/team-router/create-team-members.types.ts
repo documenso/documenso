@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { TeamMemberRole } from '@documenso/prisma/generated/types';
+import { TeamMemberRole } from '@doku-seal/prisma/generated/types';
 
 export const ZCreateTeamMembersRequestSchema = z.object({
   teamId: z.number(),

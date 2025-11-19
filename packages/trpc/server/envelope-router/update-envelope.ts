@@ -1,4 +1,4 @@
-import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+import { updateEnvelope } from '@doku-seal/lib/server-only/envelope/update-envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {

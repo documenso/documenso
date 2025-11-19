@@ -6,22 +6,22 @@ import { Trans } from '@lingui/react/macro';
 import { EditIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
-import { trpc } from '@documenso/trpc/react';
-import type { TGetOrganisationEmailDomainResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-email-domain.types';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
-import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { generateEmailDomainRecords } from '@doku-seal/lib/utils/email-domains';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TGetOrganisationEmailDomainResponse } from '@doku-seal/trpc/server/enterprise-router/get-organisation-email-domain.types';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { DataTable, type DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
+} from '@doku-seal/ui/primitives/dropdown-menu';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
 
 import { OrganisationEmailCreateDialog } from '~/components/dialogs/organisation-email-create-dialog';
 import { OrganisationEmailDeleteDialog } from '~/components/dialogs/organisation-email-delete-dialog';

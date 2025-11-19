@@ -1,6 +1,6 @@
 import sharp from 'sharp';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 export type GetAvatarImageOptions = {
   id: string;

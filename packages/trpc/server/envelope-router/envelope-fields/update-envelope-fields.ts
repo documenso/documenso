@@ -1,4 +1,4 @@
-import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
+import { updateEnvelopeFields } from '@doku-seal/lib/server-only/field/update-envelope-fields';
 
 import { authenticatedProcedure } from '../../trpc';
 import {

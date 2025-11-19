@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { ONE_DAY } from '../../constants/time';
 import { sendForgotPassword } from '../auth/send-forgot-password';

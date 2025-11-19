@@ -6,16 +6,16 @@ import type { Field } from '@prisma/client';
 import { type Recipient } from '@prisma/client';
 import { useNavigate, useSearchParams } from 'react-router';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { TTemplate } from '@documenso/lib/types/template';
-import { isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
-import { trpc } from '@documenso/trpc/react';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { Stepper } from '@documenso/ui/primitives/stepper';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import type { TTemplate } from '@doku-seal/lib/types/template';
+import { isRequiredField } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { trpc } from '@doku-seal/trpc/react';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
+import { DocumentFlowFormContainer } from '@doku-seal/ui/primitives/document-flow/document-flow-root';
+import type { DocumentFlowStep } from '@doku-seal/ui/primitives/document-flow/types';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { Stepper } from '@doku-seal/ui/primitives/stepper';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from '~/components/general/document-signing/document-signing-auth-provider';
 import { useRequiredDocumentSigningContext } from '~/components/general/document-signing/document-signing-provider';

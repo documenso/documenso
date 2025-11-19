@@ -20,8 +20,8 @@ import path from 'node:path';
 import { groupBy } from 'remeda';
 import { match } from 'ts-pattern';
 
-import { prisma } from '@documenso/prisma';
-import { signPdf } from '@documenso/signing';
+import { prisma } from '@doku-seal/prisma';
+import { signPdf } from '@doku-seal/signing';
 
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';

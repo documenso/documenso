@@ -1,4 +1,4 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
 
 /**
  * getAssetBuffer is used to retrieve array buffers for various assets

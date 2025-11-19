@@ -1,14 +1,14 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
-import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
-import { deleteTemplateField } from '@documenso/lib/server-only/field/delete-template-field';
-import { getFieldById } from '@documenso/lib/server-only/field/get-field-by-id';
-import { removeSignedFieldWithToken } from '@documenso/lib/server-only/field/remove-signed-field-with-token';
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
-import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
-import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
+import { createEnvelopeFields } from '@doku-seal/lib/server-only/field/create-envelope-fields';
+import { deleteDocumentField } from '@doku-seal/lib/server-only/field/delete-document-field';
+import { deleteTemplateField } from '@doku-seal/lib/server-only/field/delete-template-field';
+import { getFieldById } from '@doku-seal/lib/server-only/field/get-field-by-id';
+import { removeSignedFieldWithToken } from '@doku-seal/lib/server-only/field/remove-signed-field-with-token';
+import { setFieldsForDocument } from '@doku-seal/lib/server-only/field/set-fields-for-document';
+import { setFieldsForTemplate } from '@doku-seal/lib/server-only/field/set-fields-for-template';
+import { signFieldWithToken } from '@doku-seal/lib/server-only/field/sign-field-with-token';
+import { updateEnvelopeFields } from '@doku-seal/lib/server-only/field/update-envelope-fields';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, procedure, router } from '../trpc';

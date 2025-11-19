@@ -8,13 +8,13 @@ import { AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useOptionalCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { SUPPORT_EMAIL } from '@documenso/lib/constants/app';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { useOptionalCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { SUPPORT_EMAIL } from '@doku-seal/lib/constants/app';
+import { canExecuteOrganisationAction } from '@doku-seal/lib/utils/organisations';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -23,8 +23,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export const OrganisationBillingBanner = () => {
   const { _ } = useLingui();
@@ -145,7 +145,7 @@ export const OrganisationBillingBanner = () => {
                 <DialogDescription>
                   <Trans>
                     Your plan is no longer valid. Please subscribe to a new plan to continue using
-                    Documenso.
+                    Doku-Seal.
                   </Trans>
                 </DialogDescription>
               </DialogHeader>

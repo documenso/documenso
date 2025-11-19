@@ -1,8 +1,8 @@
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/create-embedding-presign-token';
-import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
-import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { createEmbeddingPresignToken } from '@doku-seal/lib/server-only/embedding-presign/create-embedding-presign-token';
+import { getOrganisationClaimByTeamId } from '@doku-seal/lib/server-only/organisation/get-organisation-claims';
+import { getApiTokenByToken } from '@doku-seal/lib/server-only/public-api/get-api-token-by-token';
 
 import { procedure } from '../trpc';
 import {

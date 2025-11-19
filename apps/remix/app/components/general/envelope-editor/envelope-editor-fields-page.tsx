@@ -9,8 +9,8 @@ import { Link, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { useCurrentEnvelopeEditor } from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentEnvelopeRender } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
 import type {
   TCheckboxFieldMeta,
   TDateFieldMeta,
@@ -23,13 +23,13 @@ import type {
   TRadioFieldMeta,
   TSignatureFieldMeta,
   TTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
-import { Separator } from '@documenso/ui/primitives/separator';
+} from '@doku-seal/lib/types/field-meta';
+import { canRecipientFieldsBeModified } from '@doku-seal/lib/utils/recipients';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import PDFViewerKonvaLazy from '@doku-seal/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Separator } from '@doku-seal/ui/primitives/separator';
 
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';

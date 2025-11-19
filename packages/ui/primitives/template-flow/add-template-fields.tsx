@@ -21,41 +21,41 @@ import {
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
+import { useDocumentElement } from '@doku-seal/lib/client-only/hooks/use-document-element';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@doku-seal/lib/constants/template';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
-} from '@documenso/lib/types/field-meta';
-import { nanoid } from '@documenso/lib/universal/id';
-import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+} from '@doku-seal/lib/types/field-meta';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { parseMessageDescriptor } from '@doku-seal/lib/utils/i18n';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@documenso/ui/primitives/command';
+} from '@doku-seal/ui/primitives/command';
 import {
   DocumentFlowFormContainerActions,
   DocumentFlowFormContainerContent,
   DocumentFlowFormContainerFooter,
   DocumentFlowFormContainerHeader,
   DocumentFlowFormContainerStep,
-} from '@documenso/ui/primitives/document-flow/document-flow-root';
-import { FieldItem } from '@documenso/ui/primitives/document-flow/field-item';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/document-flow/document-flow-root';
+import { FieldItem } from '@doku-seal/ui/primitives/document-flow/field-item';
+import type { DocumentFlowStep } from '@doku-seal/ui/primitives/document-flow/types';
+import { FRIENDLY_FIELD_TYPE } from '@doku-seal/ui/primitives/document-flow/types';
+import { Popover, PopoverContent, PopoverTrigger } from '@doku-seal/ui/primitives/popover';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { getRecipientColorStyles, useRecipientColors } from '../../lib/recipient-colors';
 import type { FieldFormType } from '../document-flow/add-fields';

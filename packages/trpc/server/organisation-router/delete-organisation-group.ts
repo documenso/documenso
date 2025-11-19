@@ -1,9 +1,9 @@
 import { OrganisationGroupType } from '@prisma/client';
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
-import { prisma } from '@documenso/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/organisations';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { buildOrganisationWhereQuery } from '@doku-seal/lib/utils/organisations';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

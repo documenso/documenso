@@ -6,7 +6,7 @@ import {
   splitLink,
 } from '@trpc/client';
 
-import { getBaseUrl } from '@documenso/lib/universal/get-base-url';
+import { getBaseUrl } from '@doku-seal/lib/universal/get-base-url';
 
 import type { AppRouter } from '../server/router';
 import { dataTransformer } from '../utils/data-transformer';

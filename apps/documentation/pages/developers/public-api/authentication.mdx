@@ -1,21 +1,21 @@
 ---
 title: API Authentication
-description: Learn how to create a Documenso API key and authenticate your API requests.
+description: Learn how to create a Doku-Seal API key and authenticate your API requests.
 ---
 
 # API Authentication
 
-Documenso uses API keys for authentication. An API key is a unique token that is generated for each client. The client must provide the key whenever it makes an API call. This way, Documenso can identify the clients making the requests and authorize their access to the API.
+Doku-Seal uses API keys for authentication. An API key is a unique token that is generated for each client. The client must provide the key whenever it makes an API call. This way, Doku-Seal can identify the clients making the requests and authorize their access to the API.
 
 ## Creating an API Key
 
 To create an API key, navigate to the user settings page. Click on your avatar in the top right corner of the dashboard and select "Team Settings" from the dropdown menu.
 
-![A screenshot of the Documenso's dashboard that shows the dropdown menu when you click on your user avatar](/public-api-images/documenso-user-dropdown-menu.webp)
+![A screenshot of the Doku-Seal's dashboard that shows the dropdown menu when you click on your user avatar](/public-api-images/documenso-user-dropdown-menu.webp)
 
 Once you're on the settings page, navigate to the **API Tokens** tab. This page lists your existing keys and enables you to create new ones.
 
-![A screenshot of the Documenso's user settings page that shows the API Tokens page](/public-api-images/api-tokens-page-documenso.webp)
+![A screenshot of the Doku-Seal's user settings page that shows the API Tokens page](/public-api-images/api-tokens-page-documenso.webp)
 
 To create a new API key, you must:
 
@@ -26,9 +26,9 @@ To create a new API key, you must:
 
 After providing the required information, click the "Create token" button to generate the API key.
 
-![A screenshot of the newly created API token in the Documenso dashboard](/public-api-images/documenso-api-key-blurred.webp)
+![A screenshot of the newly created API token in the Doku-Seal dashboard](/public-api-images/documenso-api-key-blurred.webp)
 
-Once you've created the token, Documenso will display the key on the screen. Make sure to copy the key and store it securely. You won't be able to see the key again once you refresh/leave the page.
+Once you've created the token, Doku-Seal will display the key on the screen. Make sure to copy the key and store it securely. You won't be able to see the key again once you refresh/leave the page.
 
 ## Using the API Key
 
@@ -37,7 +37,7 @@ You must include the API key in the `Authorization` request header to authentica
 Here's a sample API request using cURL:
 
 ```bash
-curl --location 'https://app.documenso.com/api/v2/envelope/create' \
+curl --location 'https://app.doku-seal.com/api/v2/envelope/create' \
 --header 'Authorization: api_xxxxxxxxxxxxxxxx' \
 --form 'payload={ "title": "Some Title", "type": "DOCUMENT" }'
 ```

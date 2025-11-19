@@ -3,13 +3,13 @@ import { EmailDomainStatus } from '@prisma/client';
 import { generateKeyPair } from 'crypto';
 import { promisify } from 'util';
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
-import { generateDatabaseId } from '@documenso/lib/universal/id';
-import { generateEmailDomainRecords } from '@documenso/lib/utils/email-domains';
-import { env } from '@documenso/lib/utils/env';
-import { prisma } from '@documenso/prisma';
+import { DOKU_SEAL_ENCRYPTION_KEY } from '@doku-seal/lib/constants/crypto';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { symmetricEncrypt } from '@doku-seal/lib/universal/crypto';
+import { generateDatabaseId } from '@doku-seal/lib/universal/id';
+import { generateEmailDomainRecords } from '@doku-seal/lib/utils/email-domains';
+import { env } from '@doku-seal/lib/utils/env';
+import { prisma } from '@doku-seal/prisma';
 
 export const getSesClient = () => {
   const accessKeyId = env('NEXT_PRIVATE_SES_ACCESS_KEY_ID');
@@ -62,13 +62,13 @@ type DomainRecord = {
 };
 
 export const createEmailDomain = async ({ domain, organisationId }: CreateEmailDomainOptions) => {
-  const encryptionKey = DOCUMENSO_ENCRYPTION_KEY;
+  const encryptionKey = DOKU_SEAL_ENCRYPTION_KEY;
 
   if (!encryptionKey) {
-    throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY');
+    throw new Error('Missing DOKU_SEAL_ENCRYPTION_KEY');
   }
 
-  const selector = `documenso-${organisationId}`.replace(/[_.]/g, '-');
+  const selector = `doku-seal-${organisationId}`.replace(/[_.]/g, '-');
   const recordName = `${selector}._domainkey.${domain}`;
 
   // Check if domain already exists

@@ -1,4 +1,4 @@
-import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
+import { duplicateEnvelope } from '@doku-seal/lib/server-only/envelope/duplicate-envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {

@@ -1,4 +1,4 @@
-import { findPasskeys } from '@documenso/lib/server-only/auth/find-passkeys';
+import { findPasskeys } from '@doku-seal/lib/server-only/auth/find-passkeys';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZFindPasskeysRequestSchema, ZFindPasskeysResponseSchema } from './find-passkeys.types';

@@ -1,11 +1,11 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { prefixedId } from '@documenso/lib/universal/id';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getEnvelopeWhereInput } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import { prefixedId } from '@doku-seal/lib/universal/id';
+import { putNormalizedPdfFileServerSide } from '@doku-seal/lib/universal/upload/put-file.server';
+import { createDocumentAuditLogData } from '@doku-seal/lib/utils/document-audit-logs';
+import { canEnvelopeItemsBeModified } from '@doku-seal/lib/utils/envelope';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

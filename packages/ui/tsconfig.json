@@ -1,5 +1,5 @@
 {
-  "extends": "@documenso/tsconfig/react-library.json",
+  "extends": "@doku-seal/tsconfig/react-library.json",
   "include": [
     "."
   ],

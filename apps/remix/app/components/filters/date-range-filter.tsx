@@ -3,15 +3,15 @@ import { useTransition } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import type { DateRange } from '@documenso/lib/types/search-params';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import type { DateRange } from '@doku-seal/lib/types/search-params';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 type DateRangeFilterProps = {
   currentRange: DateRange;

@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
 
 import { SignInForm } from '~/components/forms/signin';
 import { BrandingLogo } from '~/components/general/branding-logo';

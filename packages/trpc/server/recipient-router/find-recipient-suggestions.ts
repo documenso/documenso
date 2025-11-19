@@ -1,4 +1,4 @@
-import { getRecipientSuggestions } from '@documenso/lib/server-only/recipient/get-recipient-suggestions';
+import { getRecipientSuggestions } from '@doku-seal/lib/server-only/recipient/get-recipient-suggestions';
 
 import { authenticatedProcedure } from '../trpc';
 import {

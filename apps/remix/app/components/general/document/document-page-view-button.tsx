@@ -4,11 +4,11 @@ import { CheckCircle, Download, EyeIcon, Pencil } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { Button } from '@documenso/ui/primitives/button';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import type { TEnvelope } from '@doku-seal/lib/types/envelope';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 

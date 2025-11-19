@@ -1,11 +1,11 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getEnvelopeWhereInput } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import { createDocumentAuditLogData } from '@doku-seal/lib/utils/document-audit-logs';
+import { canRecipientFieldsBeModified } from '@doku-seal/lib/utils/recipients';
+import { prisma } from '@doku-seal/prisma';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';

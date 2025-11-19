@@ -5,10 +5,10 @@ import type { Recipient } from '@prisma/client';
 import { PenIcon, PlusIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import { isTemplateRecipientEmailPlaceholder } from '@doku-seal/lib/constants/template';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
 
 export type TemplatePageViewRecipientsProps = {
   recipients: Recipient[];

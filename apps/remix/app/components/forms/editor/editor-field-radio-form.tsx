@@ -10,8 +10,8 @@ import {
   DEFAULT_FIELD_FONT_SIZE,
   type TRadioFieldMeta as RadioFieldMeta,
   ZRadioFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+} from '@doku-seal/lib/types/field-meta';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   Form,
   FormControl,
@@ -19,16 +19,16 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Separator } from '@documenso/ui/primitives/separator';
+} from '@doku-seal/ui/primitives/select';
+import { Separator } from '@doku-seal/ui/primitives/separator';
 
 import {
   EditorGenericFontSizeField,

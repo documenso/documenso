@@ -3,14 +3,14 @@ import { FieldType } from '@prisma/client';
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { isRecipientAuthorized } from '@documenso/lib/server-only/document/is-recipient-authorized';
-import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { useOptionalSession } from '@doku-seal/lib/client-only/providers/session';
+import { getDocumentAndSenderByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { isRecipientAuthorized } from '@doku-seal/lib/server-only/document/is-recipient-authorized';
+import { getFieldsForToken } from '@doku-seal/lib/server-only/field/get-fields-for-token';
+import { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { DocumentSigningAuthPageView } from '~/components/general/document-signing/document-signing-auth-page';
 import { truncateTitle } from '~/utils/truncate-title';

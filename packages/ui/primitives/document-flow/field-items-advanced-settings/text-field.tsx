@@ -1,18 +1,18 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { type TTextFieldMeta as TextFieldMeta } from '@documenso/lib/types/field-meta';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { validateTextField } from '@doku-seal/lib/advanced-fields-validation/validate-text';
+import { type TTextFieldMeta as TextFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { Textarea } from '@documenso/ui/primitives/textarea';
+} from '@doku-seal/ui/primitives/select';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
 
 type TextFieldAdvancedSettingsProps = {
   fieldState: TextFieldMeta;

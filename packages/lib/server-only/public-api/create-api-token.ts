@@ -1,7 +1,7 @@
 import type { Duration } from 'luxon';
 import { DateTime } from 'luxon';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 // temporary choice for testing only

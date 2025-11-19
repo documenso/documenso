@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/tailwind-config",
+  "name": "@doku-seal/tailwind-config",
   "version": "0.0.0",
   "main": "index.cjs",
   "types": "index.d.ts",

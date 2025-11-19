@@ -7,23 +7,23 @@ import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
 import { Loader, LucideChevronDown, LucideChevronUp, X } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import PDFViewer from '@documenso/ui/primitives/pdf-viewer';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { DocumentReadOnlyFields } from '@doku-seal/ui/components/document/document-read-only-fields';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
+import PDFViewer from '@doku-seal/ui/primitives/pdf-viewer';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningContext } from '../../general/document-signing/document-signing-provider';
 import { DocumentSigningRejectDialog } from '../../general/document-signing/document-signing-reject-dialog';

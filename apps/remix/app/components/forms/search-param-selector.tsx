@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router';
 
-import { Select, SelectContent, SelectTrigger, SelectValue } from '@documenso/ui/primitives/select';
+import { Select, SelectContent, SelectTrigger, SelectValue } from '@doku-seal/ui/primitives/select';
 
 export type SearchParamSelector = {
   paramKey: string;

@@ -2,9 +2,9 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
-import OrganisationLeaveEmailTemplate from '@documenso/email/templates/organisation-leave';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import OrganisationLeaveEmailTemplate from '@doku-seal/email/templates/organisation-leave';
+import { prisma } from '@doku-seal/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../../constants/app';

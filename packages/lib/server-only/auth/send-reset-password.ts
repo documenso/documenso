@@ -1,8 +1,8 @@
 import { createElement } from 'react';
 
-import { mailer } from '@documenso/email/mailer';
-import { ResetPasswordTemplate } from '@documenso/email/templates/reset-password';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import { ResetPasswordTemplate } from '@doku-seal/email/templates/reset-password';
+import { prisma } from '@doku-seal/prisma';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { env } from '../../utils/env';
@@ -38,8 +38,8 @@ export const sendResetPassword = async ({ userId }: SendResetPasswordOptions) =>
       name: user.name || '',
     },
     from: {
-      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Documenso',
-      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@documenso.com',
+      name: env('NEXT_PRIVATE_SMTP_FROM_NAME') || 'Doku-Seal',
+      address: env('NEXT_PRIVATE_SMTP_FROM_ADDRESS') || 'noreply@doku-seal.com',
     },
     subject: 'Password Reset Success!',
     html,

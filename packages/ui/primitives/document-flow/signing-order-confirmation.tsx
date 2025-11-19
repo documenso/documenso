@@ -7,7 +7,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
-} from '@documenso/ui/primitives/alert-dialog';
+} from '@doku-seal/ui/primitives/alert-dialog';
 
 export type SigningOrderConfirmationProps = {
   open: boolean;

@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { pick } from 'remeda';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import { prisma } from '@documenso/prisma';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { createApiToken } from '@doku-seal/lib/server-only/public-api/create-api-token';
+import { prisma } from '@doku-seal/prisma';
 import {
   DocumentDistributionMethod,
   DocumentSigningOrder,
@@ -16,16 +16,16 @@ import {
   FieldType,
   FolderType,
   RecipientRole,
-} from '@documenso/prisma/client';
-import { seedUser } from '@documenso/prisma/seed/users';
-import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+} from '@doku-seal/prisma/client';
+import { seedUser } from '@doku-seal/prisma/seed/users';
+import type { TCreateEnvelopeItemsPayload } from '@doku-seal/trpc/server/envelope-router/create-envelope-items.types';
 import type {
   TCreateEnvelopePayload,
   TCreateEnvelopeResponse,
-} from '@documenso/trpc/server/envelope-router/create-envelope.types';
-import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
-import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
-import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
+} from '@doku-seal/trpc/server/envelope-router/create-envelope.types';
+import type { TCreateEnvelopeRecipientsRequest } from '@doku-seal/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
+import type { TGetEnvelopeResponse } from '@doku-seal/trpc/server/envelope-router/get-envelope.types';
+import type { TUpdateEnvelopeRequest } from '@doku-seal/trpc/server/envelope-router/update-envelope.types';
 
 import { ALIGNMENT_TEST_FIELDS } from '../../../constants/field-alignment-pdf';
 import { FIELD_META_TEST_FIELDS } from '../../../constants/field-meta-pdf';
@@ -185,7 +185,7 @@ test.describe('API V2 Envelopes', () => {
           distributionMethod: DocumentDistributionMethod.NONE,
           signingOrder: DocumentSigningOrder.SEQUENTIAL,
           allowDictateNextSigner: true,
-          redirectUrl: 'https://documenso.com',
+          redirectUrl: 'https://doku-seal.com',
           language: 'de',
           typedSignatureEnabled: true,
           uploadSignatureEnabled: false,
@@ -204,7 +204,7 @@ test.describe('API V2 Envelopes', () => {
         attachments: [
           {
             label: 'Test Attachment',
-            data: 'https://documenso.com',
+            data: 'https://doku-seal.com',
             type: 'link',
           },
         ],

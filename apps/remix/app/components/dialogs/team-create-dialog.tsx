@@ -9,20 +9,20 @@ import { useForm } from 'react-hook-form';
 import { useSearchParams } from 'react-router';
 import type { z } from 'zod';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
 import {
   IS_BILLING_ENABLED,
   NEXT_PUBLIC_WEBAPP_URL,
   SUPPORT_EMAIL,
-} from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import { ZCreateTeamRequestSchema } from '@documenso/trpc/server/team-router/create-team.types';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+} from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZCreateTeamRequestSchema } from '@doku-seal/trpc/server/team-router/create-team.types';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -31,7 +31,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -39,10 +39,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type TeamCreateDialogProps = {
   trigger?: React.ReactNode;

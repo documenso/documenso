@@ -1,11 +1,11 @@
 import type { OrganisationMemberInviteStatus } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { FindResultResponse } from '@documenso/lib/types/search-params';
-import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
-import { prisma } from '@documenso/prisma';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/organisations';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { FindResultResponse } from '@doku-seal/lib/types/search-params';
+import { buildOrganisationWhereQuery } from '@doku-seal/lib/utils/organisations';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

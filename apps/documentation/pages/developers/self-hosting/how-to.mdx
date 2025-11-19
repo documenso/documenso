@@ -1,6 +1,6 @@
 ---
-title: How to Self-Host Documenso
-description: Learn how to self-host Documenso on your server or cloud infrastructure using Docker or other deployment methods.
+title: How to Self-Host Doku-Seal
+description: Learn how to self-host Doku-Seal on your server or cloud infrastructure using Docker or other deployment methods.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -13,7 +13,7 @@ We support various deployment methods and are actively working on adding more. P
 
 ## Manual Deployment
 
-The following guide will walk you through setting up Documenso manually on your server or cloud infrastructure.
+The following guide will walk you through setting up Doku-Seal manually on your server or cloud infrastructure.
 
 <Steps>
 ### Clone the Repository
@@ -44,7 +44,7 @@ Open the `.env` file and fill in the following variables:
 ```
 
 <Callout type="info">
-  If you use a reverse proxy in front of Documenso, don't forget to provide the public URL for the
+  If you use a reverse proxy in front of Doku-Seal, don't forget to provide the public URL for the
   `NEXT_PUBLIC_WEBAPP_URL` variable!
 </Callout>
 
@@ -76,9 +76,9 @@ This will start the server on `localhost:3000`. Any reverse proxy can handle the
 
 ## Docker
 
-The following guide will walk you through setting up Documenso using Docker. You can choose between a Docker Compose production setup or a standalone container.
+The following guide will walk you through setting up Doku-Seal using Docker. You can choose between a Docker Compose production setup or a standalone container.
 
-We provide a Docker container for Documenso, published on both DockerHub and GitHub Container Registry.
+We provide a Docker container for Doku-Seal, published on both DockerHub and GitHub Container Registry.
 
 - [DockerHub](https://hub.docker.com/r/documenso/documenso)
 - [GitHub Container Registry](https://ghcr.io/documenso/documenso)
@@ -89,13 +89,13 @@ Please note that you must provide environment variables for connecting to the da
 
 ### Option 1: Production Docker Compose Setup
 
-This setup includes a PostgreSQL database and the Documenso application. You will need to provide your own SMTP details using environment variables.
+This setup includes a PostgreSQL database and the Doku-Seal application. You will need to provide your own SMTP details using environment variables.
 
 <Steps>
 
 ### Download the Docker Compose File
 
-Download the Docker Compose file from the Documenso repository - [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml).
+Download the Docker Compose file from the Doku-Seal repository - [compose.yml](https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml).
 
 ### Navigate to the `compose.yml` File
 
@@ -207,23 +207,23 @@ After setting up your certificate, save the `compose.yml` file and run the follo
 docker-compose --env-file ./.env up -d
 ```
 
-The command will start the PostgreSQL database and the Documenso application containers.
+The command will start the PostgreSQL database and the Doku-Seal application containers.
 
 ### Access the Application
 
-Access the Documenso application by visiting `http://localhost:3000` in your web browser.
+Access the Doku-Seal application by visiting `http://localhost:3000` in your web browser.
 
 </Steps>
 
 ### Option 2: Standalone Docker Container
 
-If you prefer to host the Documenso application on a specific container provider, use the pre-built Docker image from DockerHub or GitHub's Package Registry. You will need to provide your own database and SMTP host.
+If you prefer to host the Doku-Seal application on a specific container provider, use the pre-built Docker image from DockerHub or GitHub's Package Registry. You will need to provide your own database and SMTP host.
 
 <Steps>
 
 ### Pull the Docker Image
 
-Pull the Documenso Docker image from DockerHub:
+Pull the Doku-Seal Docker image from DockerHub:
 
 ```bash
 docker pull documenso/documenso
@@ -259,17 +259,17 @@ Replace the placeholders with the actual values.
 
 ### Access the Application
 
-You can access the Documenso application by visiting the URL you provided for the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
+You can access the Doku-Seal application by visiting the URL you provided for the `NEXT_PUBLIC_WEBAPP_URL` environment variable in your web browser.
 
 </Steps>
 
 ### Advanced Configuration
 
-The environment variables listed above are a subset of those available for configuring Documenso. The table below provides a complete list of environment variables and their descriptions.
+The environment variables listed above are a subset of those available for configuring Doku-Seal. The table below provides a complete list of environment variables and their descriptions.
 
 | Variable                                     | Description                                                                                         |
 | -------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| `PORT`                                       | The port on which the Documenso application runs. It defaults to `3000`.                            |
+| `PORT`                                       | The port on which the Doku-Seal application runs. It defaults to `3000`.                            |
 | `NEXTAUTH_SECRET`                            | The secret key used by NextAuth.js for encryption and signing.                                      |
 | `NEXT_PRIVATE_ENCRYPTION_KEY`                | The primary encryption key for symmetric encryption and decryption (at least 32 characters).        |
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |
@@ -331,7 +331,7 @@ Restart=always
 WantedBy=multi-user.target
 ```
 
-We offer several alternative deployment methods for Documenso if you need more options.
+We offer several alternative deployment methods for Doku-Seal if you need more options.
 
 ## Railway
 

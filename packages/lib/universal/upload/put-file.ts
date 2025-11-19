@@ -2,11 +2,11 @@ import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
 
-import { env } from '@documenso/lib/utils/env';
+import { env } from '@doku-seal/lib/utils/env';
 import type {
   TGetPresignedPostUrlResponse,
   TUploadPdfResponse,
-} from '@documenso/remix/server/api/files/files.types';
+} from '@doku-seal/remix/server/api/files/files.types';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError } from '../../errors/app-error';

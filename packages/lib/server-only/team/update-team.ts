@@ -1,9 +1,9 @@
 import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/teams';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 import { buildTeamWhereQuery } from '../../utils/teams';
 

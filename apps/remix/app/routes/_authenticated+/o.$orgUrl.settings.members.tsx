@@ -5,9 +5,9 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link, useLocation, useSearchParams } from 'react-router';
 
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Tabs, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
 
 import { OrganisationMemberInviteDialog } from '~/components/dialogs/organisation-member-invite-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';

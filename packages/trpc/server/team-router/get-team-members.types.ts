@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/generated/types';
-import OrganisationMemberSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
+import { OrganisationMemberRole, TeamMemberRole } from '@doku-seal/prisma/generated/types';
+import OrganisationMemberSchema from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
 
 // export const getTeamMembersMeta: TrpcOpenApiMeta = {
 //   openapi: {

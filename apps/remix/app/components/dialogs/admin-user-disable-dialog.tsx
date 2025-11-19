@@ -5,11 +5,11 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { match } from 'ts-pattern';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import type { TGetUserResponse } from '@documenso/trpc/server/admin-router/get-user.types';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TGetUserResponse } from '@doku-seal/trpc/server/admin-router/get-user.types';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type AdminUserDisableDialogProps = {
   className?: string;

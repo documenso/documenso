@@ -1,29 +1,29 @@
 > 🚨 🚨 🚨
-> Documenso 2.0.0 is live on Product Hunt 🎉 <a href="https://documen.so/launch" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">Join us to celebrate the best Documenso yet 🪩</a>
+> Doku-Seal 2.0.0 is live on Product Hunt 🎉 <a href="https://doku.se/launch" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">Join us to celebrate the best Doku-Seal yet 🪩</a>
 
-<img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
+<img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Doku-Seal Logo">
 
 <p align="center" style="margin-top: 20px">
   <p align="center">
   The Open Source DocuSign Alternative.
   <br>
-    <a href="https://documenso.com"><strong>Learn more »</strong></a>
+    <a href="https://doku-seal.com"><strong>Learn more »</strong></a>
     <br />
     <br />
-    <a href="https://documen.so/discord">Discord</a>
+    <a href="https://doku.se/discord">Discord</a>
     ·
-    <a href="https://documenso.com">Website</a>
+    <a href="https://doku-seal.com">Website</a>
     ·
     <a href="https://github.com/documenso/documenso/issues">Issues</a>
     ·
-    <a href="https://documen.so/live">Upcoming Releases</a>
+    <a href="https://doku.se/live">Upcoming Releases</a>
     ·
-    <a href="https://documen.so/roadmap">Roadmap</a>
+    <a href="https://doku.se/roadmap">Roadmap</a>
   </p>
 </p>
 
 <p align="center">
-   <a href="https://documen.so/discord"><img src="https://img.shields.io/badge/Discord-documen.so/discord-%235865F2" alt="Join Documenso on Discord"></a>
+   <a href="https://doku.se/discord"><img src="https://img.shields.io/badge/Discord-doku.se/discord-%235865F2" alt="Join Doku-Seal on Discord"></a>
    <a href="https://github.com/documenso/documenso/stargazers"><img src="https://img.shields.io/github/stars/documenso/documenso" alt="Github Stars"></a>
    <a href="https://github.com/documenso/documenso/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-AGPLv3-purple" alt="License"></a>
    <a href="https://github.com/documenso/documenso/pulse"><img src="https://img.shields.io/github/commit-activity/m/documenso/documenso" alt="Commits-per-month"></a>
@@ -37,26 +37,26 @@
   <img src="https://github.com/documenso/documenso/assets/13398220/d96ed533-6f34-4a97-be9b-442bdb189c69" style="width: 80%;" />
 </div>
 
-## About Documenso
+## About Doku-Seal
 
-Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Documenso aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Documenso and review how it works under the hood.
+Signing documents digitally should be fast and easy and should be the best practice for every document signed worldwide. This is technically quite easy today, but it also introduces a new party to every signature: The signing tool providers. While this is not a problem in itself, it should make us think about how we want these providers of trust to work. Doku-Seal aims to be the world's most trusted document-signing tool. This trust is built by empowering you to self-host Doku-Seal and review how it works under the hood.
 
 Join us in creating the next generation of open trust infrastructure.
 
 ## Recognition
 
 <p align="center">
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Documenso - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
-  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Documenso - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-top-post-badge&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=395047&theme=light&period=daily" alt="Doku-Seal - The&#0032;open&#0032;source&#0032;DocuSign&#0032;alternative | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+  <a href="https://www.producthunt.com/posts/documenso?utm_source=badge-featured&utm_medium=badge&utm_souce=badge-documenso" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=395047&theme=light" alt="Doku-Seal - The&#0032;Open&#0032;Source&#0032;DocuSign&#0032;Alternative&#0046; | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 </p>
 
 ## Community and Next Steps 🎯
 
 - Check out the first source code release in this repository and test it.
 - Tell us what you think in the [Discussions](https://github.com/documenso/documenso/discussions).
-- Join the [Discord server](https://documen.so/discord) for any questions and getting to know to other community members.
+- Join the [Discord server](https://doku.se/discord) for any questions and getting to know to other community members.
 - ⭐ the repository to help us raise awareness.
-- Spread the word on Twitter that Documenso is working towards a more open signing tool.
+- Spread the word on Twitter that Doku-Seal is working towards a more open signing tool.
 - Fix or create [issues](https://github.com/documenso/documenso/issues), that are needed for the first production release.
 
 ## Contributing
@@ -89,7 +89,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 - [shadcn/ui](https://ui.shadcn.com/) - Component Library
 - [react-email](https://react.email/) - Email Templates
 - [tRPC](https://trpc.io/) - API
-- [@documenso/pdf-sign](https://www.npmjs.com/package/@documenso/pdf-sign) - PDF Signatures (launching soon)
+- [@doku-seal/pdf-sign](https://www.npmjs.com/package/@doku-seal/pdf-sign) - PDF Signatures (launching soon)
 - [React-PDF](https://github.com/wojtekmaj/react-pdf) - Viewing PDFs
 - [PDF-Lib](https://github.com/Hopding/pdf-lib) - PDF manipulation
 - [Stripe](https://stripe.com/) - Payments
@@ -100,7 +100,7 @@ Contact us if you are interested in our Enterprise plan for large organizations 
 
 ### Requirements
 
-To run Documenso locally, you will need
+To run Doku-Seal locally, you will need
 
 - Node.js (v22 or above)
 - Postgres SQL Database
@@ -117,7 +117,7 @@ Want to get up and running quickly? Follow these steps:
 After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/<your-username>/documenso
+git clone https://github.com/<your-username>/doku-seal
 ```
 
 2. Set up your `.env` file using the recommendations in the `.env.example` file. Alternatively, just run `cp .env.example .env` to get started with our handpicked defaults.
@@ -149,14 +149,14 @@ npm run d
 
 ### Manual Setup
 
-Follow these steps to setup Documenso on your local machine:
+Follow these steps to setup Doku-Seal on your local machine:
 
 1. [Fork this repository](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks) to your GitHub account.
 
 After forking the repository, clone it to your local device by using the following command:
 
 ```sh
-git clone https://github.com/<your-username>/documenso
+git clone https://github.com/<your-username>/doku-seal
 ```
 
 2. Run `npm i` in the root directory
@@ -180,7 +180,7 @@ git clone https://github.com/<your-username>/documenso
 
 ---
 
-- Optional: Seed the database using `npm run prisma:seed -w @documenso/prisma` to create a test user and document.
+- Optional: Seed the database using `npm run prisma:seed -w @doku-seal/prisma` to create a test user and document.
 - Optional: Create your own signing certificate.
   - To generate your own using these steps and a Linux Terminal or Windows Subsystem for Linux (WSL), see **[Create your own signing certificate](./SIGNING.md)**.
 
@@ -196,16 +196,16 @@ We support DevContainers for VSCode. [Click here to get started.](https://vscode
 
 ### Video walkthrough
 
-If you're a visual learner and prefer to watch a video walkthrough of setting up Documenso locally, check out this video:
+If you're a visual learner and prefer to watch a video walkthrough of setting up Doku-Seal locally, check out this video:
 
 [![Watch the video](https://img.youtube.com/vi/Y0ppIQrEnZs/hqdefault.jpg)](https://youtu.be/Y0ppIQrEnZs)
 
 ## Docker
 
-We provide a Docker container for Documenso, which is published on both DockerHub and GitHub Container Registry.
+We provide a Docker container for Doku-Seal, which is published on both DockerHub and GitHub Container Registry.
 
-- DockerHub: [https://hub.docker.com/r/documenso/documenso](https://hub.docker.com/r/documenso/documenso)
-- GitHub Container Registry: [https://ghcr.io/documenso/documenso](https://ghcr.io/documenso/documenso)
+- DockerHub: [https://hub.docker.com/r/doku-seal/doku-seal](https://hub.docker.com/r/doku-seal/doku-seal)
+- GitHub Container Registry: [https://ghcr.io/doku-seal/doku-seal](https://ghcr.io/doku-seal/doku-seal)
 
 You can pull the Docker image from either of these registries and run it with your preferred container hosting provider.
 
@@ -240,7 +240,7 @@ The following environment variables must be set:
 - `NEXT_PRIVATE_SMTP_FROM_NAME`
 - `NEXT_PRIVATE_SMTP_FROM_ADDRESS`
 
-> If you are using a reverse proxy in front of Documenso, don't forget to provide the public URL for the `NEXT_PUBLIC_WEBAPP_URL` variable!
+> If you are using a reverse proxy in front of Doku-Seal, don't forget to provide the public URL for the `NEXT_PUBLIC_WEBAPP_URL` variable!
 
 Now you can install the dependencies and build it:
 
@@ -274,7 +274,7 @@ After=network.target
 Environment=PATH=/path/to/your/node/binaries
 Type=simple
 User=www-data
-WorkingDirectory=/var/www/documenso/apps/remix
+WorkingDirectory=/var/www/doku-seal/apps/remix
 ExecStart=/usr/bin/next start -p 3500
 TimeoutSec=15
 Restart=always
@@ -293,7 +293,7 @@ WantedBy=multi-user.target
 
 ### Koyeb
 
-[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=doku-seal-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
 
 ## Elestio
 
@@ -314,7 +314,7 @@ If you are deploying to a cluster that uses only IPv6, You can use a custom comm
 For local docker run
 
 ```bash
-docker run -it documenso:latest npm run start -- -H ::
+docker run -it doku-seal:latest npm run start -- -H ::
 ```
 
 For k8s or docker-compose
@@ -322,7 +322,7 @@ For k8s or docker-compose
 ```yaml
 containers:
   - name: documenso
-    image: documenso:latest
+    image: doku-seal:latest
     imagePullPolicy: IfNotPresent
     command:
       - npm

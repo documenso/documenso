@@ -1,4 +1,4 @@
-import { deleteDocument } from '@documenso/lib/server-only/document/delete-document';
+import { deleteDocument } from '@doku-seal/lib/server-only/document/delete-document';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';

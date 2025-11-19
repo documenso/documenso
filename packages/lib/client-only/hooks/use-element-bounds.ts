@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
 
 export const useElementBounds = (elementOrSelector: HTMLElement | string, withScroll = false) => {
   const [bounds, setBounds] = useState({

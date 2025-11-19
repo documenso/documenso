@@ -2,9 +2,9 @@ import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { trpc } from '@documenso/trpc/react';
-import type { TFindSubscriptionClaimsResponse } from '@documenso/trpc/server/admin-router/find-subscription-claims.types';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TFindSubscriptionClaimsResponse } from '@doku-seal/trpc/server/admin-router/find-subscription-claims.types';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -13,8 +13,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { SubscriptionClaimForm } from '../forms/subscription-claim-form';
 

@@ -1,5 +1,5 @@
-import { plainClient } from '@documenso/lib/plain/client';
-import { prisma } from '@documenso/prisma';
+import { plainClient } from '@doku-seal/lib/plain/client';
+import { prisma } from '@doku-seal/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';

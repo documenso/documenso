@@ -3,9 +3,9 @@ import { z } from 'zod';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
-import { ZEnvelopeLiteSchema } from '@documenso/lib/types/envelope';
+} from '@doku-seal/lib/types/document-auth';
+import { ZDocumentMetaUpdateSchema } from '@doku-seal/lib/types/document-meta';
+import { ZEnvelopeLiteSchema } from '@doku-seal/lib/types/envelope';
 
 import {
   ZDocumentExternalIdSchema,

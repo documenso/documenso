@@ -10,10 +10,10 @@ import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { TEAM_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/teams';
-import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
+import { TEAM_MEMBER_ROLE_HIERARCHY } from '@doku-seal/lib/constants/teams';
+import { TEAM_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/teams-translations';
+import { trpc } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -31,18 +31,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { MultiSelectCombobox } from '@doku-seal/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/select';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -154,10 +154,10 @@ export const TeamMemberCreateDialog = ({ trigger, ...props }: TeamMemberCreateDi
                       To be able to add members to a team, you must first add them to the
                       organisation. For more information, please see the{' '}
                       <Link
-                        to="https://docs.documenso.com/users/organisations/members"
+                        to="https://docs.doku-seal.com/users/organisations/members"
                         target="_blank"
                         rel="noreferrer"
-                        className="text-documenso-700 hover:text-documenso-600 hover:underline"
+                        className="text-doku-seal-700 hover:text-doku-seal-600 hover:underline"
                       >
                         documentation
                       </Link>

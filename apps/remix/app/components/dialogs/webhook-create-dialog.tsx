@@ -8,9 +8,9 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
-import { ZCreateWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZCreateWebhookRequestSchema } from '@doku-seal/trpc/server/webhook-router/schema';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -28,11 +28,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { PasswordInput } from '@doku-seal/ui/primitives/password-input';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 
@@ -142,7 +142,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                       </FormControl>
 
                       <FormDescription>
-                        <Trans>The URL for Documenso to send webhook events to.</Trans>
+                        <Trans>The URL for Doku-Seal to send webhook events to.</Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -220,7 +220,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     <FormDescription>
                       <Trans>
                         A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso
+                        has been sent by Doku-Seal
                       </Trans>
                       .
                     </FormDescription>

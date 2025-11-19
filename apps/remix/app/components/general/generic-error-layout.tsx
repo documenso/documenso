@@ -6,8 +6,8 @@ import { motion } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import { Link, useNavigate } from 'react-router';
 
-import backgroundPattern from '@documenso/assets/images/background-pattern.png';
-import { Button } from '@documenso/ui/primitives/button';
+import backgroundPattern from '@doku-seal/assets/images/background-pattern.png';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 type ErrorCodeMap = Record<
   number,

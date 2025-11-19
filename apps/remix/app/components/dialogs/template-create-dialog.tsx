@@ -6,11 +6,11 @@ import { Trans } from '@lingui/react/macro';
 import { FilePlus, Loader } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { formatTemplatesPath } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import type { TCreateTemplatePayloadSchema } from '@documenso/trpc/server/template-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { formatTemplatesPath } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TCreateTemplatePayloadSchema } from '@doku-seal/trpc/server/template-router/schema';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -20,9 +20,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { DocumentDropzone } from '@doku-seal/ui/primitives/document-dropzone';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

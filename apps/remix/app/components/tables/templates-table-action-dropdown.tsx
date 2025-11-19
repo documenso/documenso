@@ -5,14 +5,14 @@ import type { Recipient, TemplateDirectLink } from '@prisma/client';
 import { Copy, Edit, FolderIcon, MoreHorizontal, Share2Icon, Trash2, Upload } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
+} from '@doku-seal/ui/primitives/dropdown-menu';
 
 import { TemplateBulkSendDialog } from '../dialogs/template-bulk-send-dialog';
 import { TemplateDeleteDialog } from '../dialogs/template-delete-dialog';

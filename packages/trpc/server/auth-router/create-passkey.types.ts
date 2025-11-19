@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZRegistrationResponseJSONSchema } from '@documenso/lib/types/webauthn';
+import { ZRegistrationResponseJSONSchema } from '@doku-seal/lib/types/webauthn';
 
 export const ZCreatePasskeyRequestSchema = z.object({
   passkeyName: z.string().trim().min(1),

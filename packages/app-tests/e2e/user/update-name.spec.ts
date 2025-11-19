@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getUserByEmail } from '@doku-seal/lib/server-only/user/get-user-by-email';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';

@@ -1,6 +1,6 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { buildTeamWhereQuery } from '../../utils/teams';
 

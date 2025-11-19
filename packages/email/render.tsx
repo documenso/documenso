@@ -1,6 +1,6 @@
 import * as ReactEmail from '@react-email/render';
 
-import config from '@documenso/tailwind-config';
+import config from '@doku-seal/tailwind-config';
 
 import { Tailwind } from './components';
 import { BrandingProvider, type BrandingSettings } from './providers/branding';

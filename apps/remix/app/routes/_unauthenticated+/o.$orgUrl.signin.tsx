@@ -5,13 +5,13 @@ import { Trans, useLingui } from '@lingui/react/macro';
 import { MailsIcon } from 'lucide-react';
 import { Link, redirect, useSearchParams } from 'react-router';
 
-import { authClient } from '@documenso/auth/client';
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { authClient } from '@doku-seal/auth/client';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { appMetaTags } from '~/utils/meta';
@@ -209,7 +209,7 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
 
         <div className="text-muted-foreground mt-1 flex items-center justify-center text-xs">
           <Link to="/signin">
-            <Trans>Return to Documenso sign in page here</Trans>
+            <Trans>Return to Doku-Seal sign in page here</Trans>
           </Link>
         </div>
       </div>

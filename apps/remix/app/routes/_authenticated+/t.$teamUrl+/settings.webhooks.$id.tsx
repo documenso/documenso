@@ -7,10 +7,10 @@ import { useRevalidator } from 'react-router';
 import { Link } from 'react-router';
 import type { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
-import { ZEditWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZEditWebhookRequestSchema } from '@doku-seal/trpc/server/webhook-router/schema';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -19,12 +19,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { PasswordInput } from '@doku-seal/ui/primitives/password-input';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { WebhookTestDialog } from '~/components/dialogs/webhook-test-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
@@ -146,7 +146,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
                     </FormControl>
 
                     <FormDescription>
-                      <Trans>The URL for Documenso to send webhook events to.</Trans>
+                      <Trans>The URL for Doku-Seal to send webhook events to.</Trans>
                     </FormDescription>
 
                     <FormMessage />
@@ -218,7 +218,7 @@ export default function WebhookPage({ params }: Route.ComponentProps) {
                   <FormDescription>
                     <Trans>
                       A secret that will be sent to your URL so you can verify that the request has
-                      been sent by Documenso.
+                      been sent by Doku-Seal.
                     </Trans>
                   </FormDescription>
                   <FormMessage />

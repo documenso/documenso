@@ -4,9 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { match } from 'ts-pattern';
 
-import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { incrementDocumentId } from '@documenso/lib/server-only/envelope/increment-id';
-import { prefixedId } from '@documenso/lib/universal/id';
+import { createEnvelope } from '@doku-seal/lib/server-only/envelope/create-envelope';
+import { incrementDocumentId } from '@doku-seal/lib/server-only/envelope/increment-id';
+import { prefixedId } from '@doku-seal/lib/universal/id';
 
 import { prisma } from '..';
 import {

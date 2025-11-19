@@ -1,8 +1,8 @@
 import type { DocumentStatus } from '@prisma/client';
 import { EnvelopeType } from '@prisma/client';
 
-import type { DateRange } from '@documenso/lib/types/search-params';
-import { kyselyPrisma, sql } from '@documenso/prisma';
+import type { DateRange } from '@doku-seal/lib/types/search-params';
+import { kyselyPrisma, sql } from '@doku-seal/prisma';
 
 export type OrganisationSummary = {
   totalTeams: number;

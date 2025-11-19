@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/ee",
+  "name": "@doku-seal/ee",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -13,8 +13,8 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
+    "@doku-seal/lib": "*",
+    "@doku-seal/prisma": "*",
     "luxon": "^3.4.0",
     "micro": "^10.0.1",
     "react": "^18",

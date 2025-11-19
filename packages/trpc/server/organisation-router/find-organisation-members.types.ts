@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import OrganisationMemberRoleSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
-import OrganisationGroupSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
-import { OrganisationMemberSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import OrganisationMemberRoleSchema from '@doku-seal/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
+import OrganisationGroupSchema from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationGroupSchema';
+import { OrganisationMemberSchema } from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationMemberSchema';
 
 // export const getOrganisationMembersMeta: TrpcOpenApiMeta = {
 //   openapi: {

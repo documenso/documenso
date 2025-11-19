@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZEnvelopeRecipientLiteSchema } from '@documenso/lib/types/recipient';
+import { ZEnvelopeRecipientLiteSchema } from '@doku-seal/lib/types/recipient';
 
 import { ZCreateRecipientSchema } from '../../recipient-router/schema';
 import type { TrpcRouteMeta } from '../../trpc';

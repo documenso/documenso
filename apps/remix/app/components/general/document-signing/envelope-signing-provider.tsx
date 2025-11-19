@@ -10,17 +10,17 @@ import {
 } from '@prisma/client';
 import { prop, sortBy } from 'remeda';
 
-import { isBase64Image } from '@documenso/lib/constants/signatures';
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
+import { isBase64Image } from '@doku-seal/lib/constants/signatures';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@doku-seal/lib/constants/trpc';
+import type { EnvelopeForSigningResponse } from '@doku-seal/lib/server-only/envelope/get-envelope-for-recipient-signing';
+import type { TRecipientActionAuth } from '@doku-seal/lib/types/document-auth';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
-} from '@documenso/lib/utils/advanced-fields-helpers';
-import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
-import { trpc } from '@documenso/trpc/react';
-import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
+} from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { extractFieldInsertionValues } from '@doku-seal/lib/utils/envelope-signing';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TSignEnvelopeFieldValue } from '@doku-seal/trpc/server/envelope-router/sign-envelope-field.types';
 
 export type EnvelopeSigningContextValue = {
   isDirectTemplate: boolean;

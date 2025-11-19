@@ -1,16 +1,16 @@
 import { UserSecurityAuditLogType } from '@prisma/client';
 
-import { getOrganisationAuthenticationPortalOptions } from '@documenso/auth/server/lib/utils/organisation-portal';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { getOrganisationAuthenticationPortalOptions } from '@doku-seal/auth/server/lib/utils/organisation-portal';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
 import {
   ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER,
   ORGANISATION_USER_ACCOUNT_TYPE,
-} from '@documenso/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { addUserToOrganisation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
-import { ZOrganisationAccountLinkMetadataSchema } from '@documenso/lib/types/organisation';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/constants/organisations';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { addUserToOrganisation } from '@doku-seal/lib/server-only/organisation/accept-organisation-invitation';
+import { ZOrganisationAccountLinkMetadataSchema } from '@doku-seal/lib/types/organisation';
+import type { RequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { prisma } from '@doku-seal/prisma';
 
 export interface LinkOrganisationAccountOptions {
   token: string;

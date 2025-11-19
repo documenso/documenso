@@ -9,22 +9,22 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import { P, match } from 'ts-pattern';
 
-import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
-import { AUTO_SIGNABLE_FIELD_TYPES } from '@documenso/lib/constants/autosign';
-import { DocumentAuth } from '@documenso/lib/types/document-auth';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
+import { unsafe_useEffectOnce } from '@doku-seal/lib/client-only/hooks/use-effect-once';
+import { AUTO_SIGNABLE_FIELD_TYPES } from '@doku-seal/lib/constants/autosign';
+import { DocumentAuth } from '@doku-seal/lib/types/document-auth';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { trpc } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
-import { Form } from '@documenso/ui/primitives/form/form';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { FRIENDLY_FIELD_TYPE } from '@doku-seal/ui/primitives/document-flow/types';
+import { Form } from '@doku-seal/ui/primitives/form/form';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
 

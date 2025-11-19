@@ -1,6 +1,6 @@
-import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
-import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
+import { getHighestOrganisationRoleInGroup } from '@doku-seal/lib/utils/organisations';
+import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '@doku-seal/lib/utils/teams';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import type { TGetOrganisationSessionResponse } from './get-organisation-session.types';

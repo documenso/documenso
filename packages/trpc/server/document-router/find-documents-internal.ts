@@ -1,8 +1,8 @@
-import { findDocuments } from '@documenso/lib/server-only/document/find-documents';
-import type { GetStatsInput } from '@documenso/lib/server-only/document/get-stats';
-import { getStats } from '@documenso/lib/server-only/document/get-stats';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
+import { findDocuments } from '@doku-seal/lib/server-only/document/find-documents';
+import type { GetStatsInput } from '@doku-seal/lib/server-only/document/get-stats';
+import { getStats } from '@doku-seal/lib/server-only/document/get-stats';
+import { getTeamById } from '@doku-seal/lib/server-only/team/get-team';
+import { mapEnvelopesToDocumentMany } from '@doku-seal/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
 import {

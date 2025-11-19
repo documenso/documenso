@@ -1,1 +1,1 @@
-# @documenso/documentation
+# @doku-seal/documentation

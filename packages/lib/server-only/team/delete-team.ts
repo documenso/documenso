@@ -4,11 +4,11 @@ import { msg } from '@lingui/core/macro';
 import { OrganisationGroupType, type Team } from '@prisma/client';
 import { uniqueBy } from 'remeda';
 
-import { mailer } from '@documenso/email/mailer';
-import { TeamDeleteEmailTemplate } from '@documenso/email/templates/team-delete';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import { TeamDeleteEmailTemplate } from '@doku-seal/email/templates/team-delete';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
@@ -147,7 +147,7 @@ export const sendTeamDeleteEmail = async ({
   await mailer.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`Team "${team.name}" has been deleted on Documenso`),
+    subject: i18n._(msg`Team "${team.name}" has been deleted on Doku-Seal`),
     html,
     text,
   });

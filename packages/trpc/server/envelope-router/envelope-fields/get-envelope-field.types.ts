@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZEnvelopeFieldSchema } from '@documenso/lib/types/field';
+import { ZEnvelopeFieldSchema } from '@doku-seal/lib/types/field';
 
 import type { TrpcRouteMeta } from '../../trpc';
 

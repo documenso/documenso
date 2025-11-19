@@ -1,1 +1,1 @@
-module.exports = require('@documenso/prettier-config');
+module.exports = require('@doku-seal/prettier-config');

@@ -7,10 +7,10 @@ import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -18,16 +18,16 @@ import {
   FormField,
   FormItem,
   FormLabel,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Textarea } from '@documenso/ui/primitives/textarea';
+} from '@doku-seal/ui/primitives/select';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 

@@ -3,15 +3,15 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Edit, Loader, Mail, MoreHorizontal, X } from 'lucide-react';
 
-import type { getTeamWithEmail } from '@documenso/lib/server-only/team/get-team-email-by-email';
-import { trpc } from '@documenso/trpc/react';
+import type { getTeamWithEmail } from '@doku-seal/lib/server-only/team/get-team-email-by-email';
+import { trpc } from '@doku-seal/trpc/react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dropdown-menu';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { TeamEmailDeleteDialog } from '~/components/dialogs/team-email-delete-dialog';
 import { TeamEmailUpdateDialog } from '~/components/dialogs/team-email-update-dialog';

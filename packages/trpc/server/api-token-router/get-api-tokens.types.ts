@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import ApiTokenSchema from '@documenso/prisma/generated/zod/modelSchema/ApiTokenSchema';
+import ApiTokenSchema from '@doku-seal/prisma/generated/zod/modelSchema/ApiTokenSchema';
 
 export const ZGetApiTokensRequestSchema = z.void();
 

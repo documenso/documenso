@@ -3,11 +3,11 @@ import { useLayoutEffect, useState } from 'react';
 import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
-import { trpc } from '@documenso/trpc/react';
-import { Stepper } from '@documenso/ui/primitives/stepper';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { DocumentSignatureType } from '@doku-seal/lib/constants/document';
+import { putPdfFile } from '@doku-seal/lib/universal/upload/put-file';
+import { trpc } from '@doku-seal/trpc/react';
+import { Stepper } from '@doku-seal/ui/primitives/stepper';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { ConfigureDocumentProvider } from '~/components/embed/authoring/configure-document-context';
 import { ConfigureDocumentView } from '~/components/embed/authoring/configure-document-view';

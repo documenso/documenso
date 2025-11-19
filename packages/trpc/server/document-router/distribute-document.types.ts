@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { ZDocumentLiteSchema } from '@documenso/lib/types/document';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentLiteSchema } from '@doku-seal/lib/types/document';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -10,7 +10,7 @@ import {
   ZDocumentMetaRedirectUrlSchema,
   ZDocumentMetaSubjectSchema,
   ZDocumentMetaTimezoneSchema,
-} from '@documenso/lib/types/document-meta';
+} from '@doku-seal/lib/types/document-meta';
 
 import type { TrpcRouteMeta } from '../trpc';
 

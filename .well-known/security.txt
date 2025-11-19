@@ -2,6 +2,6 @@
 Contact: https://github.com/documenso/documenso/issues/new?assignees=&labels=bug&projects=&template=bug-report.yml
 
 # Report critical issues privately to let us take appropriate action before publishing.
-Contact: mailto:security@documenso.com
+Contact: mailto:security@doku-seal.com
 Preferred-Languages: en
-Canonical: https://documenso.com/.well-known/security.txt
+Canonical: https://doku-seal.com/.well-known/security.txt

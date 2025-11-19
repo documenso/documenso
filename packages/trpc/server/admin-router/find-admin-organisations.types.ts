@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
-import OrganisationSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationSchema';
-import SubscriptionSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
-import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import OrganisationSchema from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationSchema';
+import SubscriptionSchema from '@doku-seal/prisma/generated/zod/modelSchema/SubscriptionSchema';
+import UserSchema from '@doku-seal/prisma/generated/zod/modelSchema/UserSchema';
 
 export const ZFindAdminOrganisationsRequestSchema = ZFindSearchParamsSchema.extend({
   ownerUserId: z.number().optional(),

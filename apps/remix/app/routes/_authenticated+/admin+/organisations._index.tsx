@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react';
 import { useLingui } from '@lingui/react/macro';
 import { useLocation, useSearchParams } from 'react-router';
 
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { Input } from '@documenso/ui/primitives/input';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { Input } from '@doku-seal/ui/primitives/input';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminOrganisationsTable } from '~/components/tables/admin-organisations-table';

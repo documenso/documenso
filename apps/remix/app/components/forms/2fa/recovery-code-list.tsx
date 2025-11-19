@@ -2,8 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Copy } from 'lucide-react';
 
-import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { useCopyToClipboard } from '@doku-seal/lib/client-only/hooks/use-copy-to-clipboard';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type RecoveryCodeListProps = {
   recoveryCodes: string[];

@@ -1,5 +1,5 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { verifyEmbeddingPresignToken } from '@doku-seal/lib/server-only/embedding-presign/verify-embedding-presign-token';
 
 import { procedure } from '../trpc';
 import {

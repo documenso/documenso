@@ -5,13 +5,13 @@ import { Trans } from '@lingui/react/macro';
 import { ReadStatus } from '@prisma/client';
 import { Link } from 'react-router';
 
-import LogoImage from '@documenso/assets/logo.png';
-import { authClient } from '@documenso/auth/client';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
-import { Sheet, SheetContent } from '@documenso/ui/primitives/sheet';
-import { ThemeSwitcher } from '@documenso/ui/primitives/theme-switcher';
+import LogoImage from '@doku-seal/assets/logo.png';
+import { authClient } from '@doku-seal/auth/client';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { isPersonalLayout } from '@doku-seal/lib/utils/organisations';
+import { trpc } from '@doku-seal/trpc/react';
+import { Sheet, SheetContent } from '@doku-seal/ui/primitives/sheet';
+import { ThemeSwitcher } from '@doku-seal/ui/primitives/theme-switcher';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 
@@ -86,7 +86,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
         <Link to="/" onClick={handleMenuItemClick}>
           <img
             src={LogoImage}
-            alt="Documenso Logo"
+            alt="Doku-Seal Logo"
             className="dark:invert"
             width={170}
             height={25}
@@ -124,7 +124,7 @@ export const AppNavMobile = ({ isMenuOpen, onMenuOpenChange }: AppNavMobileProps
           </div>
 
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Documenso, Inc. <br /> All rights reserved.
+            © {new Date().getFullYear()} Doku-Seal, Inc. <br /> All rights reserved.
           </p>
         </div>
       </SheetContent>

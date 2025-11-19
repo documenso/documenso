@@ -1,6 +1,6 @@
 import type { UserSecurityAuditLog, UserSecurityAuditLogType } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import type { FindResultResponse } from '../../types/search-params';
 

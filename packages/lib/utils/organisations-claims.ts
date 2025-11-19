@@ -1,6 +1,6 @@
 import type { SubscriptionClaim } from '@prisma/client';
 
-import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT } from '@documenso/ee/server-only/limits/constants';
+import { DEFAULT_MINIMUM_ENVELOPE_ITEM_COUNT } from '@doku-seal/ee/server-only/limits/constants';
 
 export const generateDefaultSubscriptionClaim = (): Omit<
   SubscriptionClaim,

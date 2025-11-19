@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZDocumentSchema } from '@documenso/lib/types/document';
+import { ZDocumentSchema } from '@doku-seal/lib/types/document';
 
 import type { TrpcRouteMeta } from '../trpc';
 

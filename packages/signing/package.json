@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/signing",
+  "name": "@doku-seal/signing",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -12,8 +12,8 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@documenso/pdf-sign": "^0.1.0",
-    "@documenso/tsconfig": "*",
+    "@doku-seal/pdf-sign": "^0.1.0",
+    "@doku-seal/tsconfig": "*",
     "ts-pattern": "^5.0.5"
   },
   "devDependencies": {

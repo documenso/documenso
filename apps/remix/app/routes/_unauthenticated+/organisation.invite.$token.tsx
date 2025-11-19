@@ -1,10 +1,10 @@
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { acceptOrganisationInvitation } from '@documenso/lib/server-only/organisation/accept-organisation-invitation';
-import { prisma } from '@documenso/prisma';
-import { Button } from '@documenso/ui/primitives/button';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { acceptOrganisationInvitation } from '@doku-seal/lib/server-only/organisation/accept-organisation-invitation';
+import { prisma } from '@doku-seal/prisma';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import type { Route } from './+types/organisation.invite.$token';
 

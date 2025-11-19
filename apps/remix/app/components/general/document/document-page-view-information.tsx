@@ -5,9 +5,9 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DateTime } from 'luxon';
 
-import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { useIsMounted } from '@doku-seal/lib/client-only/hooks/use-is-mounted';
+import type { TEnvelope } from '@doku-seal/lib/types/envelope';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
 
 export type DocumentPageViewInformationProps = {
   userId: number;

@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/eslint-config",
+  "name": "@doku-seal/eslint-config",
   "version": "0.0.0",
   "main": "./index.cjs",
   "license": "MIT",

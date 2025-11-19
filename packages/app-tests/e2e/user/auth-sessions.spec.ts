@@ -1,6 +1,6 @@
 import { type Page, expect, test } from '@playwright/test';
 
-import { seedUser } from '@documenso/prisma/seed/users';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 import { expectTextToBeVisible } from '../fixtures/generic';

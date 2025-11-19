@@ -7,11 +7,11 @@ import { AlertTriangle, CheckCircle2, Loader, XCircle } from 'lucide-react';
 import { Link, redirect, useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { authClient } from '@documenso/auth/client';
-import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
-import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
-import { Button } from '@documenso/ui/primitives/button';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { authClient } from '@doku-seal/auth/client';
+import { useOptionalSession } from '@doku-seal/lib/client-only/providers/session';
+import { EMAIL_VERIFICATION_STATE } from '@doku-seal/lib/constants/email';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import type { Route } from './+types/verify-email.$token';
 
@@ -147,7 +147,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
             <p className="text-muted-foreground mt-4">
               <Trans>
                 Your email has been successfully confirmed! You can now use all features of
-                Documenso.
+                Doku-Seal.
               </Trans>
             </p>
 
@@ -174,7 +174,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
 
             <p className="text-muted-foreground mt-4">
               <Trans>
-                Your email has already been confirmed. You can now use all features of Documenso.
+                Your email has already been confirmed. You can now use all features of Doku-Seal.
               </Trans>
             </p>
 

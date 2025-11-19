@@ -1,8 +1,8 @@
 import { expect, test } from '@playwright/test';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { createApiToken } from '@doku-seal/lib/server-only/public-api/create-api-token';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 test.describe('Embedding Presign API', () => {
   test('createEmbeddingPresignToken: should create a token with default expiration', async ({

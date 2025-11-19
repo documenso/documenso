@@ -1,9 +1,9 @@
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
-import { isTokenExpired } from '@documenso/lib/utils/token-verification';
-import { prisma } from '@documenso/prisma';
-import { Button } from '@documenso/ui/primitives/button';
+import { isTokenExpired } from '@doku-seal/lib/utils/token-verification';
+import { prisma } from '@doku-seal/prisma';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import type { Route } from './+types/team.verify.email.$token';
 

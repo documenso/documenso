@@ -2,13 +2,13 @@ import { sValidator } from '@hono/standard-validator';
 import type { Prisma } from '@prisma/client';
 import { Hono } from 'hono';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { prisma } from '@documenso/prisma';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getTeamById } from '@doku-seal/lib/server-only/team/get-team';
+import { putNormalizedPdfFileServerSide } from '@doku-seal/lib/universal/upload/put-file.server';
+import { getPresignPostUrl } from '@doku-seal/lib/universal/upload/server-actions';
+import { prisma } from '@doku-seal/prisma';
 
 import type { HonoEnv } from '../../router';
 import { handleEnvelopeItemFileRequest } from './files.helpers';

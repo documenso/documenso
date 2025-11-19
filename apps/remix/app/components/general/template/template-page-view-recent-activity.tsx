@@ -5,9 +5,9 @@ import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 export type TemplatePageViewRecentActivityProps = {
   templateId: number;

@@ -1,5 +1,5 @@
-import type { Stripe } from '@documenso/lib/server-only/stripe';
-import { stripe } from '@documenso/lib/server-only/stripe';
+import type { Stripe } from '@doku-seal/lib/server-only/stripe';
+import { stripe } from '@doku-seal/lib/server-only/stripe';
 
 export const isPriceSeatsBased = async (priceId: string) => {
   const foundStripePrice = await stripe.prices.retrieve(priceId, {

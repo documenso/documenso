@@ -4,19 +4,19 @@ import { zfd } from 'zod-form-data';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
-import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
-import { ZDocumentVisibilitySchema } from '@documenso/lib/types/document-visibility';
-import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
+} from '@doku-seal/lib/types/document-auth';
+import { ZDocumentFormValuesSchema } from '@doku-seal/lib/types/document-form-values';
+import { ZDocumentMetaCreateSchema } from '@doku-seal/lib/types/document-meta';
+import { ZDocumentVisibilitySchema } from '@doku-seal/lib/types/document-visibility';
+import { ZEnvelopeAttachmentTypeSchema } from '@doku-seal/lib/types/envelope-attachment';
 import {
   ZFieldHeightSchema,
   ZFieldPageNumberSchema,
   ZFieldPageXSchema,
   ZFieldPageYSchema,
   ZFieldWidthSchema,
-} from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+} from '@doku-seal/lib/types/field';
+import { ZFieldAndMetaSchema } from '@doku-seal/lib/types/field-meta';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import { ZCreateRecipientSchema } from '../recipient-router/schema';

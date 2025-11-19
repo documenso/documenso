@@ -43,7 +43,7 @@ Want to create a production ready docker image? Follow these steps:
 - Publish the image to your docker registry of choice (or) If you prefer running the image from local, run the below command
 
 ```
-docker run -d --restart=unless-stopped -p 3000:3000 -v documenso:/app/data --name documenso documenso:latest
+docker run -d --restart=unless-stopped -p 3000:3000 -v doku-seal:/app/data --name documenso doku-seal:latest
 ```
 
 Command Breakdown:
@@ -52,7 +52,7 @@ Command Breakdown:
 - `-p` - Passes down which ports to use. First half is the host port, Second half is the app port. You can change the first half anything you want and reverse proxy to that port.
 - `-v` - Volume let's you persist the data
 - `--name` - Name of the container
-- `documenso:latest` - Image you have built
+- `doku-seal:latest` - Image you have built
 
 ## Deployment
 

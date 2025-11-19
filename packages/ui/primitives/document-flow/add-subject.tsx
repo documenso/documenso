@@ -10,14 +10,14 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { InfoIcon } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { TDocument } from '@documenso/lib/types/document';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import { trpc } from '@documenso/trpc/react';
-import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import type { TDocument } from '@doku-seal/lib/types/document';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
+import { formatSigningLink } from '@doku-seal/lib/utils/recipients';
+import { trpc } from '@doku-seal/trpc/react';
+import { DocumentSendEmailMessageHelper } from '@doku-seal/ui/components/document/document-send-email-message-helper';
 import {
   Form,
   FormControl,
@@ -25,15 +25,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
+} from '@doku-seal/ui/primitives/form/form';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+} from '@doku-seal/ui/primitives/select';
+import { Tabs, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
 
 import { CopyTextButton } from '../../components/common/copy-text-button';
 import { DocumentEmailCheckboxes } from '../../components/document/document-email-checkboxes';
@@ -240,7 +240,7 @@ export const AddSubjectFormPartial = ({
                                     </SelectItem>
                                   ))}
 
-                                  <SelectItem value={'-1'}>Documenso</SelectItem>
+                                  <SelectItem value={'-1'}>Doku-Seal</SelectItem>
                                 </SelectContent>
                               </Select>
                             </FormControl>

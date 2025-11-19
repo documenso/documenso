@@ -1,12 +1,12 @@
 import { EnvelopeType, type Field, FieldType } from '@prisma/client';
 import { isDeepEqual } from 'remeda';
 
-import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
-import { validateRadioField } from '@documenso/lib/advanced-fields-validation/validate-radio';
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
+import { validateCheckboxField } from '@doku-seal/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@doku-seal/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@doku-seal/lib/advanced-fields-validation/validate-number';
+import { validateRadioField } from '@doku-seal/lib/advanced-fields-validation/validate-radio';
+import { validateTextField } from '@doku-seal/lib/advanced-fields-validation/validate-text';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZCheckboxFieldMeta,
@@ -15,13 +15,13 @@ import {
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+} from '@doku-seal/lib/types/field-meta';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffFieldChanges,
-} from '@documenso/lib/utils/document-audit-logs';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/utils/document-audit-logs';
+import { prisma } from '@doku-seal/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';

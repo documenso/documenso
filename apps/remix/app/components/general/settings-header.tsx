@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { cn } from '@documenso/ui/lib/utils';
+import { cn } from '@doku-seal/ui/lib/utils';
 
 export type SettingsHeaderProps = {
   title: string | React.ReactNode;

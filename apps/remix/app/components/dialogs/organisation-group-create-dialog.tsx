@@ -8,13 +8,13 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
-import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import { ZCreateOrganisationGroupRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-group.types';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@doku-seal/lib/constants/organisations';
+import { EXTENDED_ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZCreateOrganisationGroupRequestSchema } from '@doku-seal/trpc/server/organisation-router/create-organisation-group.types';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -32,17 +32,17 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { MultiSelectCombobox } from '@doku-seal/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/select';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type OrganisationGroupCreateDialogProps = {
   trigger?: React.ReactNode;

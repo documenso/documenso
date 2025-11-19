@@ -18,22 +18,22 @@ import {
 import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
-import { SignatureIcon } from '@documenso/ui/icons/signature';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { PopoverHover } from '@documenso/ui/primitives/popover';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import type { TEnvelope } from '@doku-seal/lib/types/envelope';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { formatSigningLink } from '@doku-seal/lib/utils/recipients';
+import { CopyTextButton } from '@doku-seal/ui/components/common/copy-text-button';
+import { SignatureIcon } from '@doku-seal/ui/icons/signature';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { PopoverHover } from '@doku-seal/ui/primitives/popover';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type DocumentPageViewRecipientsProps = {
   envelope: TEnvelope;

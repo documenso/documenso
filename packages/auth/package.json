@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/auth",
+  "name": "@doku-seal/auth",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -10,8 +10,8 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
+    "@doku-seal/lib": "*",
+    "@doku-seal/prisma": "*",
     "@hono/standard-validator": "^0.1.2",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",

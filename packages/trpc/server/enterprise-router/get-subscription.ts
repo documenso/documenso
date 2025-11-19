@@ -1,7 +1,7 @@
-import { getInternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
-import { getSubscription } from '@documenso/ee/server-only/stripe/get-subscription';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { getInternalClaimPlans } from '@doku-seal/ee/server-only/stripe/get-internal-claim-plans';
+import { getSubscription } from '@doku-seal/ee/server-only/stripe/get-subscription';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZGetSubscriptionRequestSchema } from './get-subscription.types';

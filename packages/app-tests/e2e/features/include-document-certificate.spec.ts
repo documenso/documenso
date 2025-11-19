@@ -2,12 +2,12 @@ import { PDFDocument } from '@cantoo/pdf-lib';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 
-import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
-import { prisma } from '@documenso/prisma';
-import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
-import { seedTeam } from '@documenso/prisma/seed/teams';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { getDocumentByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { getEnvelopeItemPdfUrl } from '@doku-seal/lib/utils/envelope-download';
+import { prisma } from '@doku-seal/prisma';
+import { seedPendingDocumentWithFullFields } from '@doku-seal/prisma/seed/documents';
+import { seedTeam } from '@doku-seal/prisma/seed/teams';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 import { signSignaturePad } from '../fixtures/signature';

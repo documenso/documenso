@@ -2,13 +2,13 @@ import type { Team, User } from '@prisma/client';
 import type { TsRestRequest } from '@ts-rest/serverless';
 import type { Logger } from 'pino';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getApiTokenByToken } from '@documenso/lib/server-only/public-api/get-api-token-by-token';
-import type { BaseApiLog, RootApiLog } from '@documenso/lib/types/api-logs';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { extractRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { nanoid } from '@documenso/lib/universal/id';
-import { logger } from '@documenso/lib/utils/logger';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getApiTokenByToken } from '@doku-seal/lib/server-only/public-api/get-api-token-by-token';
+import type { BaseApiLog, RootApiLog } from '@doku-seal/lib/types/api-logs';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { extractRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { logger } from '@doku-seal/lib/utils/logger';
 
 type B = {
   // appRoute: any;

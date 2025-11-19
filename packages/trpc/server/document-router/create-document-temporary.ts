@@ -1,12 +1,12 @@
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
-import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { prisma } from '@documenso/prisma';
+import { getServerLimits } from '@doku-seal/ee/server-only/limits/server';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { createDocumentData } from '@doku-seal/lib/server-only/document-data/create-document-data';
+import { createEnvelope } from '@doku-seal/lib/server-only/envelope/create-envelope';
+import { getPresignPostUrl } from '@doku-seal/lib/universal/upload/server-actions';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

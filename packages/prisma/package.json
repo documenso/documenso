@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/prisma",
+  "name": "@doku-seal/prisma",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",

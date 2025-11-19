@@ -4,12 +4,12 @@ import { useLingui } from '@lingui/react/macro';
 import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
 import type Konva from 'konva';
 
-import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
-import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
-import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
+import { usePageRenderer } from '@doku-seal/lib/client-only/hooks/use-page-renderer';
+import { useCurrentEnvelopeRender } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import type { TEnvelope } from '@doku-seal/lib/types/envelope';
+import { renderField } from '@doku-seal/lib/universal/field-renderer/render-field';
+import { getClientSideFieldTranslations } from '@doku-seal/lib/utils/fields';
+import { EnvelopeRecipientFieldTooltip } from '@doku-seal/ui/components/document/envelope-recipient-field-tooltip';
 
 type GenericLocalField = TEnvelope['fields'][number] & {
   recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;

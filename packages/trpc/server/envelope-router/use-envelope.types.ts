@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -13,9 +13,9 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '@documenso/lib/types/document-meta';
-import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
-import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+} from '@doku-seal/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@doku-seal/lib/types/envelope-attachment';
+import { ZFieldMetaPrefillFieldsSchema } from '@doku-seal/lib/types/field-meta';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';

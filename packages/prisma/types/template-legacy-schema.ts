@@ -5,7 +5,7 @@
 import { TemplateType } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
+import { ZDocumentAuthOptionsSchema } from '@doku-seal/lib/types/document-auth';
 
 import { DocumentVisibilitySchema } from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';
 import TemplateDirectLinkSchema from '../generated/zod/modelSchema/TemplateDirectLinkSchema';

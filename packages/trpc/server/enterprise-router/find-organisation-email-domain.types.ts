@@ -1,8 +1,8 @@
 import { EmailDomainStatus } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZEmailDomainManySchema } from '@documenso/lib/types/email-domain';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZEmailDomainManySchema } from '@doku-seal/lib/types/email-domain';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@doku-seal/lib/types/search-params';
 
 export const ZFindOrganisationEmailDomainsRequestSchema = ZFindSearchParamsSchema.extend({
   organisationId: z.string(),

@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { Link, redirect } from 'react-router';
 
-import { getResetTokenValidity } from '@documenso/lib/server-only/user/get-reset-token-validity';
+import { getResetTokenValidity } from '@doku-seal/lib/server-only/user/get-reset-token-validity';
 
 import { ResetPasswordForm } from '~/components/forms/reset-password';
 import { appMetaTags } from '~/utils/meta';

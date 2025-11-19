@@ -1,6 +1,6 @@
 import { match } from 'ts-pattern';
 
-import { env } from '@documenso/lib/utils/env';
+import { env } from '@doku-seal/lib/utils/env';
 
 import { signWithGoogleCloudHSM } from './transports/google-cloud-hsm';
 import { signWithLocalCert } from './transports/local-cert';

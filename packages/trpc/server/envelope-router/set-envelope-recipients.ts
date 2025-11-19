@@ -1,8 +1,8 @@
 import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
-import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
+import { setDocumentRecipients } from '@doku-seal/lib/server-only/recipient/set-document-recipients';
+import { setTemplateRecipients } from '@doku-seal/lib/server-only/recipient/set-template-recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {

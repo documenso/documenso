@@ -7,25 +7,25 @@ import { EnvelopeType } from '@prisma/client';
 import { useNavigate, useParams } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import type { TCreateDocumentPayloadSchema } from '@documenso/trpc/server/document-router/create-document.types';
-import { cn } from '@documenso/ui/lib/utils';
-import { DocumentUploadButton as DocumentUploadButtonPrimitive } from '@documenso/ui/primitives/document-upload-button';
+import { useLimits } from '@doku-seal/ee/server-only/limits/provider/client';
+import { useAnalytics } from '@doku-seal/lib/client-only/hooks/use-analytics';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@doku-seal/lib/constants/app';
+import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@doku-seal/lib/constants/time-zones';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TCreateDocumentPayloadSchema } from '@doku-seal/trpc/server/document-router/create-document.types';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { DocumentUploadButton as DocumentUploadButtonPrimitive } from '@doku-seal/ui/primitives/document-upload-button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

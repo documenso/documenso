@@ -1,22 +1,22 @@
 import { env } from '../utils/env';
 
-export const DOCUMENSO_ENCRYPTION_KEY = env('NEXT_PRIVATE_ENCRYPTION_KEY');
+export const DOKU_SEAL_ENCRYPTION_KEY = env('NEXT_PRIVATE_ENCRYPTION_KEY');
 
-export const DOCUMENSO_ENCRYPTION_SECONDARY_KEY = env('NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY');
+export const DOKU_SEAL_ENCRYPTION_SECONDARY_KEY = env('NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY');
 
 // if (typeof window === 'undefined') {
-//   if (!DOCUMENSO_ENCRYPTION_KEY || !DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
-//     throw new Error('Missing DOCUMENSO_ENCRYPTION_KEY or DOCUMENSO_ENCRYPTION_SECONDARY_KEY keys');
+//   if (!DOKU_SEAL_ENCRYPTION_KEY || !DOKU_SEAL_ENCRYPTION_SECONDARY_KEY) {
+//     throw new Error('Missing DOKU_SEAL_ENCRYPTION_KEY or DOKU_SEAL_ENCRYPTION_SECONDARY_KEY keys');
 //   }
 
-//   if (DOCUMENSO_ENCRYPTION_KEY === DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+//   if (DOKU_SEAL_ENCRYPTION_KEY === DOKU_SEAL_ENCRYPTION_SECONDARY_KEY) {
 //     throw new Error(
-//       'DOCUMENSO_ENCRYPTION_KEY and DOCUMENSO_ENCRYPTION_SECONDARY_KEY cannot be equal',
+//       'DOKU_SEAL_ENCRYPTION_KEY and DOKU_SEAL_ENCRYPTION_SECONDARY_KEY cannot be equal',
 //     );
 //   }
 // }
 
-// if (DOCUMENSO_ENCRYPTION_KEY === 'CAFEBABE') {
+// if (DOKU_SEAL_ENCRYPTION_KEY === 'CAFEBABE') {
 //   console.warn('*********************************************************************');
 //   console.warn('*');
 //   console.warn('*');

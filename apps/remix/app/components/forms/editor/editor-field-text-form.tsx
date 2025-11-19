@@ -13,7 +13,7 @@ import {
   FIELD_DEFAULT_LINE_HEIGHT,
   type TTextFieldMeta as TextFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
+} from '@doku-seal/lib/types/field-meta';
 import {
   Form,
   FormControl,
@@ -21,9 +21,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Textarea } from '@documenso/ui/primitives/textarea';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
 
 import {
   EditorGenericFontSizeField,

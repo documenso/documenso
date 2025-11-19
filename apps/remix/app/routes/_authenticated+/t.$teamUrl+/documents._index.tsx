@@ -7,16 +7,16 @@ import { useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { parseToIntegerArray } from '@documenso/lib/utils/params';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
-import { trpc } from '@documenso/trpc/react';
-import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
-import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
-import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { parseToIntegerArray } from '@doku-seal/lib/utils/params';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { ExtendedDocumentStatus } from '@doku-seal/prisma/types/extended-document-status';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TFindDocumentsInternalResponse } from '@doku-seal/trpc/server/document-router/find-documents-internal.types';
+import { ZFindDocumentsInternalRequestSchema } from '@doku-seal/trpc/server/document-router/find-documents-internal.types';
+import { Avatar, AvatarFallback, AvatarImage } from '@doku-seal/ui/primitives/avatar';
+import { Tabs, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';

@@ -8,10 +8,10 @@ import { FolderIcon, HomeIcon, Search } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { trpc } from '@documenso/trpc/react';
-import type { TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TFolderWithSubfolders } from '@doku-seal/trpc/server/folder-router/schema';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -19,16 +19,16 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type FolderMoveDialogProps = {
   foldersData: TFolderWithSubfolders[] | undefined;

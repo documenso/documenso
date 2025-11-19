@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react';
 import { FieldType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
 import {
   type TBaseFieldMeta as BaseFieldMeta,
   type TCheckboxFieldMeta as CheckboxFieldMeta,
@@ -20,8 +20,8 @@ import {
   type TRadioFieldMeta as RadioFieldMeta,
   type TTextFieldMeta as TextFieldMeta,
   ZFieldMetaSchema,
-} from '@documenso/lib/types/field-meta';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/lib/types/field-meta';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import type { FieldFormType } from './add-fields';
 import {

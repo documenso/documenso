@@ -4,13 +4,13 @@ import { InfoIcon } from 'lucide-react';
 import type { Control } from 'react-hook-form';
 import { useFormContext } from 'react-hook-form';
 
-import { DATE_FORMATS } from '@documenso/lib/constants/date-formats';
-import { DOCUMENT_SIGNATURE_TYPES } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
-import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
-import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
-import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
-import { Combobox } from '@documenso/ui/primitives/combobox';
+import { DATE_FORMATS } from '@doku-seal/lib/constants/date-formats';
+import { DOCUMENT_SIGNATURE_TYPES } from '@doku-seal/lib/constants/document';
+import { SUPPORTED_LANGUAGES } from '@doku-seal/lib/constants/i18n';
+import { TIME_ZONES } from '@doku-seal/lib/constants/time-zones';
+import { DocumentEmailCheckboxes } from '@doku-seal/ui/components/document/document-email-checkboxes';
+import { DocumentSendEmailMessageHelper } from '@doku-seal/ui/components/document/document-send-email-message-helper';
+import { Combobox } from '@doku-seal/ui/primitives/combobox';
 import {
   FormControl,
   FormDescription,
@@ -18,19 +18,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { MultiSelectCombobox } from '@documenso/ui/primitives/multi-select-combobox';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { MultiSelectCombobox } from '@doku-seal/ui/primitives/multi-select-combobox';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+} from '@doku-seal/ui/primitives/select';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';

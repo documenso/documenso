@@ -4,10 +4,10 @@ import { useLingui } from '@lingui/react/macro';
 import { OrganisationGroupType, OrganisationMemberRole } from '@prisma/client';
 import { useLocation, useSearchParams } from 'react-router';
 
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Input } from '@documenso/ui/primitives/input';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { Input } from '@doku-seal/ui/primitives/input';
 
 import { TeamGroupCreateDialog } from '~/components/dialogs/team-group-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';

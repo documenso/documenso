@@ -3,13 +3,13 @@ import type { Team } from '@prisma/client';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { Link, redirect } from 'react-router';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { getTeamById } from '@documenso/lib/server-only/team/get-team';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { Button } from '@documenso/ui/primitives/button';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { getDocumentAndSenderByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
+import { getTeamById } from '@doku-seal/lib/server-only/team/get-team';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import type { Route } from './+types/waiting';
 

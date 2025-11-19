@@ -1,6 +1,6 @@
 import type { Role } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 export type UpdateUserOptions = {
   id: number;

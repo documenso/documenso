@@ -1,4 +1,4 @@
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 export interface GetUserByEmailOptions {
   email: string;

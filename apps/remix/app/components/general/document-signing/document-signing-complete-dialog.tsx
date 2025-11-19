@@ -8,13 +8,13 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
 import {
   type TRecipientAccessAuth,
   ZDocumentAccessAuthSchema,
-} from '@documenso/lib/types/document-auth';
-import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/lib/types/document-auth';
+import { fieldsContainUnsignedRequiredField } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -23,7 +23,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -31,8 +31,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { AccessAuth2FAForm } from '~/components/general/document-signing/access-auth-2fa-form';

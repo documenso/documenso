@@ -14,18 +14,18 @@ This guide will walk you through the process of sending a document out for signi
 <Steps>
 ### Log In to Your Account
 
-The guide assumes you have a Documenso account. If you don't, you can create a free account [here](https://documen.so/free-docs).
+The guide assumes you have a Doku-Seal account. If you don't, you can create a free account [here](https://doku.se/free-docs).
 
 ### Upload Document
 
-Navigate to the [Documenso dashboard](https://app.documenso.com/documents) and click on the "Upload Document" button located at the top right of the page. Select the documents you want to upload and wait for the upload to complete.
+Navigate to the [Doku-Seal dashboard](https://app.doku-seal.com/documents) and click on the "Upload Document" button located at the top right of the page. Select the documents you want to upload and wait for the upload to complete.
 
 <Callout type="info">
   The maximum file size for uploaded documents is 150MB in production. You can upload up to 5
   documents at a time on standard plans. In staging, the limit is 50MB.
 </Callout>
 
-![Documenso dashboard](/document-signing/documenso-documents-dashboard.webp)
+![Doku-Seal dashboard](/document-signing/documenso-documents-dashboard.webp)
 
 After the upload is complete, you will be redirected to the editor. You can configure the document's settings and add recipients and fields here.
 
@@ -33,7 +33,7 @@ After the upload is complete, you will be redirected to the editor. You can conf
 
 ## Configuring and Sending Document
 
-The Documenso editor allows you to create and configure documents or templates. The editor consists of three sections that guide you through the process of preparing your document.
+The Doku-Seal editor allows you to create and configure documents or templates. The editor consists of three sections that guide you through the process of preparing your document.
 
 1. **Document & Recipients** - Upload files and add recipients
 2. **Add Fields** - Add fields to the document
@@ -41,7 +41,7 @@ The Documenso editor allows you to create and configure documents or templates. 
 
 You can click each section to navigate to it, and the current section will be highlighted in the sidebar.
 
-![Editor page in the Documenso dashboard](/document-signing/editor-overview.webp)
+![Editor page in the Doku-Seal dashboard](/document-signing/editor-overview.webp)
 
 There is also a quick actions section on the left-hand side which allows you to:
 
@@ -63,7 +63,7 @@ The header contains some notable items:
 
 The first step in the editor is to upload your document and add recipients.
 
-![Upload and add recipients page in the Documenso editor](/document-signing/editor-upload-recipients.webp)
+![Upload and add recipients page in the Doku-Seal editor](/document-signing/editor-upload-recipients.webp)
 
 #### Upload Document
 
@@ -83,7 +83,7 @@ Click the "+ Add Signer" button to add a new recipient. For each recipient you c
 - **Order** - The sequence in which the recipient should sign the document. Only available if the "Enable Signing Order" checkbox is enabled
 - **Role** - As seen below
 
-Documenso has 5 roles for recipients with different permissions and actions.
+Doku-Seal has 5 roles for recipients with different permissions and actions.
 
 |   Role    |                                    Function                                     | Action required | Signature |
 | :-------: | :-----------------------------------------------------------------------------: | :-------------: | :-------: |
@@ -95,11 +95,11 @@ Documenso has 5 roles for recipients with different permissions and actions.
 
 ### Fields
 
-Documenso supports 10 different field types that can be added to the document. Each field type collects various information from the recipients when they sign the document.
+Doku-Seal supports 10 different field types that can be added to the document. Each field type collects various information from the recipients when they sign the document.
 
 To create a field, you can either click and drag to draw a field on the document or drag and drop the field type from the sidebar.
 
-![The available field types in the Documenso dashboard](/document-signing/documenso-document-fields.webp)
+![The available field types in the Doku-Seal dashboard](/document-signing/documenso-document-fields.webp)
 
 The field created will be assigned to the currently selected recipient. You can change the recipient by clicking on the recipient's name in the right sidebar.
 
@@ -127,15 +127,15 @@ All fields can be placed anywhere on the document and resized as needed.
 
 In this section, you can preview what the document will look like once it is fully signed. This uses placeholder data for the fields.
 
-![Preview section in the Documenso editor](/document-signing/documenso-editor-preview.webp)
+![Preview section in the Doku-Seal editor](/document-signing/documenso-editor-preview.webp)
 
 ### Email Settings
 
 Before sending the document, you can configure the email settings and customize the subject line, message, and sender name.
 
-![Email settings in the Documenso dashboard](/document-signing/documenso-document-email-settings.webp)
+![Email settings in the Doku-Seal dashboard](/document-signing/documenso-document-email-settings.webp)
 
-If you leave the email subject and message empty, Documenso will use the default email template.
+If you leave the email subject and message empty, Doku-Seal will use the default email template.
 
 ### Sending the Document
 
@@ -147,12 +147,12 @@ After configuring the document, click the "Send" button to send the document to 
 
 If you need to copy the signing link for each recipient, you can do so by clicking on the recipient whose link you want to copy. The signing link is copied automatically to your clipboard.
 
-![How to copy the signing link for each recipient from the Documenso dashboard](/document-signing/documenso-signing-links.webp)
+![How to copy the signing link for each recipient from the Doku-Seal dashboard](/document-signing/documenso-signing-links.webp)
 
 The signing link has the following format:
 
 ```bash
-https://app.documenso.com/sign/12ACP777zxQLO52hjj_vCB
+https://app.doku-seal.com/sign/12ACP777zxQLO52hjj_vCB
 ```
 
 </Steps>
@@ -163,7 +163,7 @@ To access the document settings, click the "Document Settings" button in the qui
 
 ### General Settings
 
-![General Documenso editor settings](/document-signing/documenso-editor-general-settings.webp)
+![General Doku-Seal editor settings](/document-signing/documenso-editor-general-settings.webp)
 
 - **Language** - The language that the emails will be sent in
 - **Allowed Signature Types** - The signature types that the recipient will be allowed to use
@@ -175,7 +175,7 @@ To access the document settings, click the "Document Settings" button in the qui
 
 ### Email Settings
 
-![Email Documenso editor settings](/document-signing/documenso-editor-email-settings.webp)
+![Email Doku-Seal editor settings](/document-signing/documenso-editor-email-settings.webp)
 
 - **Reply To** - The email address that will be used as the reply to email address
 - **Subject** - The subject of the email
@@ -184,7 +184,7 @@ To access the document settings, click the "Document Settings" button in the qui
 
 ### Security Settings
 
-Documenso enables you to set up access control for your documents. You can require authentication for viewing the document.
+Doku-Seal enables you to set up access control for your documents. You can require authentication for viewing the document.
 
 The available options are:
 
@@ -192,7 +192,7 @@ The available options are:
 - **Require 2FA** - The recipient must use 2FA to sign the document.
 - **None** - The document can be accessed directly by the URL sent to the recipient.
 
-![Security Documenso editor settings](/document-signing/documenso-editor-security-settings.webp)
+![Security Doku-Seal editor settings](/document-signing/documenso-editor-security-settings.webp)
 
 The "Recipient Authentication" feature allows you to specify the authentication method required for recipients to sign the signature field.
 

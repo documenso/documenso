@@ -7,17 +7,17 @@ import { Cloud, FileText, Loader, X } from 'lucide-react';
 import { useDropzone } from 'react-dropzone';
 import { useFormContext } from 'react-hook-form';
 
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@doku-seal/lib/constants/app';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';

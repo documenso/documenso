@@ -1,7 +1,7 @@
 import { DocumentSigningOrder, FieldType, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -13,15 +13,15 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '@documenso/lib/types/document-meta';
+} from '@doku-seal/lib/types/document-meta';
 import {
   ZFieldHeightSchema,
   ZFieldPageNumberSchema,
   ZFieldPageXSchema,
   ZFieldPageYSchema,
   ZFieldWidthSchema,
-} from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+} from '@doku-seal/lib/types/field';
+import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@doku-seal/lib/types/field-meta';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
 

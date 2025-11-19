@@ -2,12 +2,12 @@ import type { DocsThemeConfig } from 'nextra-theme-docs';
 import { useConfig } from 'nextra-theme-docs';
 
 const themeConfig: DocsThemeConfig = {
-  logo: <span>Documenso</span>,
+  logo: <span>Doku-Seal</span>,
   head: function useHead() {
     const config = useConfig<{ title?: string; description?: string }>();
 
-    const title = `${config.frontMatter.title} | Documenso Docs` || 'Documenso Docs';
-    const description = config.frontMatter.description || 'The official Documenso documentation';
+    const title = `${config.frontMatter.title} | Doku-Seal Docs` || 'Doku-Seal Docs';
+    const description = config.frontMatter.description || 'The official Doku-Seal documentation';
 
     return (
       <>
@@ -39,18 +39,18 @@ const themeConfig: DocsThemeConfig = {
     );
   },
   project: {
-    link: 'https://documen.so/github',
+    link: 'https://doku.se/github',
   },
   chat: {
-    link: 'https://documen.so/discord',
+    link: 'https://doku.se/discord',
   },
   docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
   footer: {
     text: (
       <span>
         {new Date().getFullYear()} ©{' '}
-        <a href="https://documen.so" target="_blank">
-          Documenso
+        <a href="https://doku.se" target="_blank">
+          Doku-Seal
         </a>
         .
       </span>
@@ -60,7 +60,7 @@ const themeConfig: DocsThemeConfig = {
   primarySaturation: 48.47,
   useNextSeoProps() {
     return {
-      titleTemplate: '%s | Documenso Docs',
+      titleTemplate: '%s | Doku-Seal Docs',
     };
   },
 };

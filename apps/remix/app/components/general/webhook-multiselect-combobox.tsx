@@ -2,8 +2,8 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { WebhookTriggerEvents } from '@prisma/client';
 
-import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
-import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
+import { toFriendlyWebhookEventName } from '@doku-seal/lib/universal/webhook/to-friendly-webhook-event-name';
+import { MultiSelect, type Option } from '@doku-seal/ui/primitives/multiselect';
 
 type WebhookMultiSelectComboboxProps = {
   listValues: string[];

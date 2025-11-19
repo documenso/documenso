@@ -11,13 +11,13 @@ import { FcGoogle } from 'react-icons/fc';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-import communityCardsImage from '@documenso/assets/images/community-cards.png';
-import { authClient } from '@documenso/auth/client';
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import communityCardsImage from '@doku-seal/assets/images/community-cards.png';
+import { authClient } from '@doku-seal/auth/client';
+import { useAnalytics } from '@doku-seal/lib/client-only/hooks/use-analytics';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { ZPasswordSchema } from '@doku-seal/trpc/server/auth-router/schema';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -25,11 +25,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { PasswordInput } from '@doku-seal/ui/primitives/password-input';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { UserProfileTimur } from '~/components/general/user-profile-timur';
 
@@ -389,7 +389,7 @@ export const SignUpForm = ({
               <p className="text-muted-foreground mt-4 text-sm">
                 <Trans>
                   Already have an account?{' '}
-                  <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
+                  <Link to="/signin" className="text-doku-seal-700 duration-200 hover:opacity-70">
                     Sign in instead
                   </Link>
                 </Trans>
@@ -410,17 +410,17 @@ export const SignUpForm = ({
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
-              to="https://documen.so/terms"
+              to="https://doku.se/terms"
               target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
+              className="text-doku-seal-700 duration-200 hover:opacity-70"
             >
               Terms of Service
             </Link>{' '}
             and{' '}
             <Link
-              to="https://documen.so/privacy"
+              to="https://doku.se/privacy"
               target="_blank"
-              className="text-documenso-700 duration-200 hover:opacity-70"
+              className="text-doku-seal-700 duration-200 hover:opacity-70"
             >
               Privacy Policy
             </Link>

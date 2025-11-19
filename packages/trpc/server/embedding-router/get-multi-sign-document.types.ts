@@ -1,12 +1,12 @@
 import { z } from 'zod';
 
-import { ZDocumentLiteSchema } from '@documenso/lib/types/document';
-import { ZRecipientLiteSchema } from '@documenso/lib/types/recipient';
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
-import DocumentMetaSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
-import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
-import FieldSchema from '@documenso/prisma/generated/zod/modelSchema/FieldSchema';
-import SignatureSchema from '@documenso/prisma/generated/zod/modelSchema/SignatureSchema';
+import { ZDocumentLiteSchema } from '@doku-seal/lib/types/document';
+import { ZRecipientLiteSchema } from '@doku-seal/lib/types/recipient';
+import DocumentDataSchema from '@doku-seal/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import DocumentMetaSchema from '@doku-seal/prisma/generated/zod/modelSchema/DocumentMetaSchema';
+import EnvelopeItemSchema from '@doku-seal/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
+import FieldSchema from '@doku-seal/prisma/generated/zod/modelSchema/FieldSchema';
+import SignatureSchema from '@doku-seal/prisma/generated/zod/modelSchema/SignatureSchema';
 
 export const ZGetMultiSignDocumentRequestSchema = z.object({
   token: z.string().min(1, { message: 'Token is required' }),

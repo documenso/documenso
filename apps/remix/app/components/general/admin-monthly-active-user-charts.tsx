@@ -3,7 +3,7 @@ import type { TooltipProps } from 'recharts';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import type { NameType, ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
-import type { GetMonthlyActiveUsersResult } from '@documenso/lib/server-only/admin/get-users-stats';
+import type { GetMonthlyActiveUsersResult } from '@doku-seal/lib/server-only/admin/get-users-stats';
 
 export type MonthlyActiveUsersChartProps = {
   className?: string;

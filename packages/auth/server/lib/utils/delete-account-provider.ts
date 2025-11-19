@@ -1,8 +1,8 @@
 import { UserSecurityAuditLogType } from '@prisma/client';
 import type { Context } from 'hono';
 
-import { ORGANISATION_USER_ACCOUNT_TYPE } from '@documenso/lib/constants/organisations';
-import { prisma } from '@documenso/prisma';
+import { ORGANISATION_USER_ACCOUNT_TYPE } from '@doku-seal/lib/constants/organisations';
+import { prisma } from '@doku-seal/prisma';
 
 import { getSession } from './get-session';
 

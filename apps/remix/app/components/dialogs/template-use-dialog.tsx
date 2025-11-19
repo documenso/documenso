@@ -11,21 +11,21 @@ import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import * as z from 'zod';
 
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@doku-seal/lib/constants/app';
 import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
-} from '@documenso/lib/constants/template';
+} from '@doku-seal/lib/constants/template';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
-} from '@documenso/lib/constants/trpc';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+} from '@doku-seal/lib/constants/trpc';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { putPdfFile } from '@doku-seal/lib/universal/upload/put-file';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   Dialog,
   DialogClose,
@@ -35,7 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -43,12 +43,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import type { Toast } from '@documenso/ui/primitives/use-toast';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
+import type { Toast } from '@doku-seal/ui/primitives/use-toast';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 const ZAddRecipientsForNewDocumentSchema = z.object({
   distributeDocument: z.boolean(),

@@ -14,15 +14,15 @@ import {
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { SessionProvider } from '@documenso/lib/client-only/providers/session';
-import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
-import { createPublicEnv, env } from '@documenso/lib/utils/env';
-import { extractLocaleData } from '@documenso/lib/utils/i18n';
-import { TrpcProvider } from '@documenso/trpc/react';
-import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
-import { Toaster } from '@documenso/ui/primitives/toaster';
-import { TooltipProvider } from '@documenso/ui/primitives/tooltip';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { SessionProvider } from '@doku-seal/lib/client-only/providers/session';
+import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@doku-seal/lib/constants/i18n';
+import { createPublicEnv, env } from '@doku-seal/lib/utils/env';
+import { extractLocaleData } from '@doku-seal/lib/utils/i18n';
+import { TrpcProvider } from '@doku-seal/trpc/react';
+import { getOrganisationSession } from '@doku-seal/trpc/server/organisation-router/get-organisation-session';
+import { Toaster } from '@doku-seal/ui/primitives/toaster';
+import { TooltipProvider } from '@doku-seal/ui/primitives/tooltip';
 
 import type { Route } from './+types/root';
 import stylesheet from './app.css?url';
@@ -32,7 +32,7 @@ import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
 
 const { trackPageview } = Plausible({
-  domain: 'documenso.com',
+  domain: 'doku-seal.com',
   trackLocalhost: false,
 });
 

@@ -3,10 +3,10 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { SigningStatus } from '@prisma/client';
 import { useRevalidator } from 'react-router';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { getDocumentAndSenderByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { getOrganisationClaimByTeamId } from '@doku-seal/lib/server-only/organisation/get-organisation-claims';
+import { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { DocumentSigningAuthProvider } from '~/components/general/document-signing/document-signing-auth-provider';

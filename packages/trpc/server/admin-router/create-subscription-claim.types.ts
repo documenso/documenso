@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { ZClaimFlagsSchema } from '@documenso/lib/types/subscription';
+import { ZClaimFlagsSchema } from '@doku-seal/lib/types/subscription';
 
 export const ZCreateSubscriptionClaimRequestSchema = z.object({
   name: z.string().min(1),

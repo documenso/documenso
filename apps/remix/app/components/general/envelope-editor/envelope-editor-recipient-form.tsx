@@ -17,36 +17,36 @@ import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { isDeepEqual, prop, sortBy } from 'remeda';
 import { z } from 'zod';
 
-import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useLimits } from '@doku-seal/ee/server-only/limits/provider/client';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { useCurrentEnvelopeEditor } from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
 import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
-import { nanoid } from '@documenso/lib/universal/id';
-import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
+} from '@doku-seal/lib/types/document-auth';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { canRecipientBeModified as utilCanRecipientBeModified } from '@doku-seal/lib/utils/recipients';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@doku-seal/ui/components/recipient/recipient-action-auth-select';
 import {
   RecipientAutoCompleteInput,
   type RecipientAutoCompleteOption,
-} from '@documenso/ui/components/recipient/recipient-autocomplete-input';
-import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/ui/components/recipient/recipient-autocomplete-input';
+import { RecipientRoleSelect } from '@doku-seal/ui/components/recipient/recipient-role-select';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@documenso/ui/primitives/card';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { SigningOrderConfirmation } from '@documenso/ui/primitives/document-flow/signing-order-confirmation';
+} from '@doku-seal/ui/primitives/card';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { SigningOrderConfirmation } from '@doku-seal/ui/primitives/document-flow/signing-order-confirmation';
 import {
   Form,
   FormControl,
@@ -54,11 +54,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { FormErrorMessage } from '@doku-seal/ui/primitives/form/form-error-message';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 const ZEnvelopeRecipientsForm = z.object({
   signers: z.array(

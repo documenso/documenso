@@ -9,11 +9,11 @@ Webhooks are HTTP callbacks triggered by specific events. When the user subscrib
 
 Some of the common use cases for webhooks include:
 
-1. **Real-time Data Syncing**: Webhooks provide a way to keep data in sync across different platforms. For example, you can keep your system up-to-date with your Documenso documents by subscribing to events like document creation or signing.
+1. **Real-time Data Syncing**: Webhooks provide a way to keep data in sync across different platforms. For example, you can keep your system up-to-date with your Doku-Seal documents by subscribing to events like document creation or signing.
 2. **Automating Workflows**: They can trigger automated workflows that start when an event occurs. For example, the webhook could trigger an email when a document is signed.
-3. **Integrating Third-Party Services**: Webhooks can be used to integrate Documenso with third-party services. For example, you could use a webhook to send data to a CRM system when a document is signed.
+3. **Integrating Third-Party Services**: Webhooks can be used to integrate Doku-Seal with third-party services. For example, you could use a webhook to send data to a CRM system when a document is signed.
 
-Documenso supports Webhooks and allows you to subscribe to the following events:
+Doku-Seal supports Webhooks and allows you to subscribe to the following events:
 
 - `document.created`
 - `document.sent`
@@ -25,13 +25,13 @@ Documenso supports Webhooks and allows you to subscribe to the following events:
 
 ## Create a webhook subscription
 
-You can create a webhook subscription from the user settings page. Click on your avatar in the top right corner of the dashboard and select "**[User settings](https://app.documenso.com/settings)**" from the dropdown menu.
+You can create a webhook subscription from the user settings page. Click on your avatar in the top right corner of the dashboard and select "**[User settings](https://app.doku-seal.com/settings)**" from the dropdown menu.
 
-![A screenshot of the Documenso's dashboard that shows the dropdown menu when you click on your user avatar](/webhook-images/dashboard-user-dropdown-menu.webp)
+![A screenshot of the Doku-Seal's dashboard that shows the dropdown menu when you click on your user avatar](/webhook-images/dashboard-user-dropdown-menu.webp)
 
-Then, navigate to the "**[Webhooks](https://app.documenso.com/settings/webhooks)**" tab, where you can see a list of your existing webhooks and create new ones.
+Then, navigate to the "**[Webhooks](https://app.doku-seal.com/settings/webhooks)**" tab, where you can see a list of your existing webhooks and create new ones.
 
-![A screenshot of the Documenso's user settings page that shows the Webhooks tab and the Create Webhook button](/webhook-images/webhooks-settings-page.webp)
+![A screenshot of the Doku-Seal's user settings page that shows the Webhooks tab and the Create Webhook button](/webhook-images/webhooks-settings-page.webp)
 
 Clicking on the "**Create Webhook**" button opens a modal to create a new webhook subscription.
 
@@ -39,7 +39,7 @@ To create a new webhook subscription, you need to provide the following informat
 
 - Enter the webhook URL that will receive the event payload.
 - Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`, `document.cancelled`.
-- Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Secret` header of the request.
+- Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Doku-Seal-Secret` header of the request.
 
 ![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/webhooks-page-create-webhook-modal.webp)
 
@@ -47,7 +47,7 @@ After you have filled in the required information, click on the "**Create Webhoo
 
 The screenshot below illustrates a newly created webhook subscription.
 
-![A screenshot of the Documenso's user settings page that shows the newly created webhook subscription](/webhook-images/webhooks-page.webp)
+![A screenshot of the Doku-Seal's user settings page that shows the newly created webhook subscription](/webhook-images/webhooks-page.webp)
 
 You can edit or delete your webhook subscriptions by clicking the "**Edit**" or "**Delete**" buttons next to the webhook.
 
@@ -150,7 +150,7 @@ Example payload for the `document.created` event:
         "id": 52,
         "documentId": 10,
         "templateId": null,
-        "email": "signer@documenso.com",
+        "email": "signer@doku-seal.com",
         "name": "John Doe",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
         "documentDeletedAt": null,
@@ -212,7 +212,7 @@ Example payload for the `document.sent` event:
         "id": 52,
         "documentId": 10,
         "templateId": null,
-        "email": "signer2@documenso.com",
+        "email": "signer2@doku-seal.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
         "documentDeletedAt": null,
@@ -230,7 +230,7 @@ Example payload for the `document.sent` event:
         "id": 53,
         "documentId": 10,
         "templateId": null,
-        "email": "signer1@documenso.com",
+        "email": "signer1@doku-seal.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
         "documentDeletedAt": null,
@@ -292,7 +292,7 @@ Example payload for the `document.opened` event:
         "id": 52,
         "documentId": 10,
         "templateId": null,
-        "email": "signer2@documenso.com",
+        "email": "signer2@doku-seal.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
         "documentDeletedAt": null,
@@ -354,7 +354,7 @@ Example payload for the `document.signed` event:
         "id": 51,
         "documentId": 10,
         "templateId": null,
-        "email": "signer1@documenso.com",
+        "email": "signer1@doku-seal.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
         "documentDeletedAt": null,
@@ -419,7 +419,7 @@ Example payload for the `document.completed` event:
         "id": 50,
         "documentId": 10,
         "templateId": null,
-        "email": "signer2@documenso.com",
+        "email": "signer2@doku-seal.com",
         "name": "Signer 2",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
         "documentDeletedAt": null,
@@ -440,7 +440,7 @@ Example payload for the `document.completed` event:
         "id": 51,
         "documentId": 10,
         "templateId": null,
-        "email": "signer1@documenso.com",
+        "email": "signer1@doku-seal.com",
         "name": "Signer 1",
         "token": "HkrptwS42ZBXdRKj1TyUo",
         "documentDeletedAt": null,
@@ -505,7 +505,7 @@ Example payload for the `document.rejected` event:
         "id": 52,
         "documentId": 10,
         "templateId": null,
-        "email": "signer@documenso.com",
+        "email": "signer@doku-seal.com",
         "name": "Signer",
         "token": "vbT8hi3jKQmrFP_LN1WcS",
         "documentDeletedAt": null,
@@ -598,7 +598,7 @@ Example payload for the `document.rejected` event:
         "id": 7,
         "documentId": 7,
         "templateId": null,
-        "email": "signer@documenso.com",
+        "email": "signer@doku-seal.com",
         "name": "Signer",
         "token": "XkKx1HCs6Znm2UBJA2j6o",
         "documentDeletedAt": null,
@@ -623,13 +623,13 @@ Example payload for the `document.rejected` event:
 
 You can trigger test webhook events to test the webhook functionality. To trigger a test webhook, navigate to the [Webhooks page](/developers/webhooks) and click on the "Test Webhook" button.
 
-![Documenso's Webhooks Page](/webhook-images/test-webhooks-page.webp)
+![Doku-Seal's Webhooks Page](/webhook-images/test-webhooks-page.webp)
 
 This opens a dialog where you can select the event type to test.
 
-![Documenso's individual webhook page](/webhook-images/test-webhook-dialog.webp)
+![Doku-Seal's individual webhook page](/webhook-images/test-webhook-dialog.webp)
 
-Choose the appropriate event and click "Send Test Webhook." You’ll shortly receive a test payload from Documenso with sample data.
+Choose the appropriate event and click "Send Test Webhook." You’ll shortly receive a test payload from Doku-Seal with sample data.
 
 ## Availability
 

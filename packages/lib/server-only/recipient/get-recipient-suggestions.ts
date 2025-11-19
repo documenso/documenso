@@ -1,7 +1,7 @@
 import { EnvelopeType, Prisma } from '@prisma/client';
 
-import { buildTeamWhereQuery } from '@documenso/lib/utils/teams';
-import { prisma } from '@documenso/prisma';
+import { buildTeamWhereQuery } from '@doku-seal/lib/utils/teams';
+import { prisma } from '@doku-seal/prisma';
 
 export type GetRecipientSuggestionsOptions = {
   userId: number;

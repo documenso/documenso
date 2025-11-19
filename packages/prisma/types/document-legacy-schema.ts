@@ -5,8 +5,8 @@
 import { DocumentSource } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZDocumentAuthOptionsSchema } from '@documenso/lib/types/document-auth';
-import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
+import { ZDocumentAuthOptionsSchema } from '@doku-seal/lib/types/document-auth';
+import { ZDocumentFormValuesSchema } from '@doku-seal/lib/types/document-form-values';
 
 import DocumentStatusSchema from '../generated/zod/inputTypeSchemas/DocumentStatusSchema';
 import DocumentVisibilitySchema from '../generated/zod/inputTypeSchemas/DocumentVisibilitySchema';

@@ -2,11 +2,11 @@ import { createElement } from 'react';
 
 import { msg } from '@lingui/core/macro';
 
-import { mailer } from '@documenso/email/mailer';
-import { TeamEmailRemovedTemplate } from '@documenso/email/templates/team-email-removed';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import { TeamEmailRemovedTemplate } from '@doku-seal/email/templates/team-email-removed';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/teams';
+import { prisma } from '@doku-seal/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { env } from '../../utils/env';

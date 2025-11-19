@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
+import EnvelopeItemSchema from '@doku-seal/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';

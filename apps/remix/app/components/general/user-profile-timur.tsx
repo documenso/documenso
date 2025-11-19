@@ -1,11 +1,11 @@
 import { Trans } from '@lingui/react/macro';
 import { File } from 'lucide-react';
 
-import timurImage from '@documenso/assets/images/timur.png';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { VerifiedIcon } from '@documenso/ui/icons/verified';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import timurImage from '@doku-seal/assets/images/timur.png';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { VerifiedIcon } from '@doku-seal/ui/icons/verified';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 export type UserProfileTimurProps = {
   className?: string;

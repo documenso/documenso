@@ -1,4 +1,4 @@
-import { createPasskeyRegistrationOptions } from '@documenso/lib/server-only/auth/create-passkey-registration-options';
+import { createPasskeyRegistrationOptions } from '@doku-seal/lib/server-only/auth/create-passkey-registration-options';
 
 import { authenticatedProcedure } from '../trpc';
 import {

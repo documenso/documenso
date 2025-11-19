@@ -2,9 +2,9 @@ import { useLayoutEffect } from 'react';
 
 import { Outlet, useLoaderData } from 'react-router';
 
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
-import { TrpcProvider } from '@documenso/trpc/react';
+import { verifyEmbeddingPresignToken } from '@doku-seal/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { getOrganisationClaimByTeamId } from '@doku-seal/lib/server-only/organisation/get-organisation-claims';
+import { TrpcProvider } from '@doku-seal/trpc/react';
 
 import { ZBaseEmbedAuthoringSchema } from '~/types/embed-authoring-base-schema';
 import { injectCss } from '~/utils/css-vars';

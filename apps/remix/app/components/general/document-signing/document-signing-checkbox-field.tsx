@@ -5,23 +5,23 @@ import { useLingui } from '@lingui/react';
 import { Loader } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { ZCheckboxFieldMeta } from '@documenso/lib/types/field-meta';
-import { fromCheckboxValue, toCheckboxValue } from '@documenso/lib/universal/field-checkbox';
-import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
-import { trpc } from '@documenso/trpc/react';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@doku-seal/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@doku-seal/lib/types/document-auth';
+import { ZCheckboxFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { fromCheckboxValue, toCheckboxValue } from '@doku-seal/lib/universal/field-checkbox';
+import type { FieldWithSignatureAndFieldMeta } from '@doku-seal/prisma/types/field-with-signature-and-fieldmeta';
+import { trpc } from '@doku-seal/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { cn } from '@documenso/ui/lib/utils';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
-import { Label } from '@documenso/ui/primitives/label';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { checkboxValidationSigns } from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { Label } from '@doku-seal/ui/primitives/label';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';

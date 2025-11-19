@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
+import EnvelopeItemSchema from '@doku-seal/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
 import type { TrpcRouteMeta } from '../trpc';

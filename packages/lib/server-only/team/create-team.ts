@@ -1,8 +1,8 @@
 import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import {
@@ -28,7 +28,7 @@ export type CreateTeamOptions = {
   /**
    * Unique URL of the team.
    *
-   * Used as the URL path, example: https://documenso.com/t/{teamUrl}/settings
+   * Used as the URL path, example: https://doku-seal.com/t/{teamUrl}/settings
    */
   teamUrl: string;
 

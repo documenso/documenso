@@ -6,12 +6,12 @@ import { Trans } from '@lingui/react/macro';
 import type { Prisma } from '@prisma/client';
 import { useRevalidator } from 'react-router';
 
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { trpc } from '@documenso/trpc/react';
-import { Alert } from '@documenso/ui/primitives/alert';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { trpc } from '@doku-seal/trpc/react';
+import { Alert } from '@doku-seal/ui/primitives/alert';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type TeamEmailDeleteDialogProps = {
   trigger?: React.ReactNode;

@@ -1,10 +1,10 @@
 import { type Page, expect, test } from '@playwright/test';
 import type { Envelope, Team } from '@prisma/client';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { prisma } from '@documenso/prisma';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { prisma } from '@doku-seal/prisma';
+import { seedBlankTemplate } from '@doku-seal/prisma/seed/templates';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 

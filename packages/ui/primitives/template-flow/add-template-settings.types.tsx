@@ -3,20 +3,20 @@ import { DocumentDistributionMethod } from '@prisma/client';
 import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@doku-seal/lib/constants/date-formats';
+import { DocumentSignatureType } from '@doku-seal/lib/constants/document';
+import { SUPPORTED_LANGUAGE_CODES } from '@doku-seal/lib/constants/i18n';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@doku-seal/lib/constants/time-zones';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+} from '@doku-seal/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaTimezoneSchema,
-} from '@documenso/lib/types/document-meta';
-import { isValidRedirectUrl } from '@documenso/lib/utils/is-valid-redirect-url';
+} from '@doku-seal/lib/types/document-meta';
+import { isValidRedirectUrl } from '@doku-seal/lib/utils/is-valid-redirect-url';
 
 export const ZAddTemplateSettingsFormSchema = z.object({
   title: z.string().trim().min(1, { message: "Title can't be empty" }),

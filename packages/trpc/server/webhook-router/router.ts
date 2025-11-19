@@ -1,9 +1,9 @@
-import { createWebhook } from '@documenso/lib/server-only/webhooks/create-webhook';
-import { deleteWebhookById } from '@documenso/lib/server-only/webhooks/delete-webhook-by-id';
-import { editWebhook } from '@documenso/lib/server-only/webhooks/edit-webhook';
-import { getWebhookById } from '@documenso/lib/server-only/webhooks/get-webhook-by-id';
-import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-webhooks-by-team-id';
-import { triggerTestWebhook } from '@documenso/lib/server-only/webhooks/trigger-test-webhook';
+import { createWebhook } from '@doku-seal/lib/server-only/webhooks/create-webhook';
+import { deleteWebhookById } from '@doku-seal/lib/server-only/webhooks/delete-webhook-by-id';
+import { editWebhook } from '@doku-seal/lib/server-only/webhooks/edit-webhook';
+import { getWebhookById } from '@doku-seal/lib/server-only/webhooks/get-webhook-by-id';
+import { getWebhooksByTeamId } from '@doku-seal/lib/server-only/webhooks/get-webhooks-by-team-id';
+import { triggerTestWebhook } from '@doku-seal/lib/server-only/webhooks/trigger-test-webhook';
 
 import { authenticatedProcedure, router } from '../trpc';
 import {

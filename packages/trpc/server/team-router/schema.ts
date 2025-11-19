@@ -1,7 +1,7 @@
 import { TeamMemberRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { PROTECTED_TEAM_URLS } from '@documenso/lib/constants/teams';
+import { PROTECTED_TEAM_URLS } from '@doku-seal/lib/constants/teams';
 
 /**
  * Restrict team URLs schema.

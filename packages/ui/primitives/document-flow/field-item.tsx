@@ -8,10 +8,10 @@ import { createPortal } from 'react-dom';
 import { Rnd } from 'react-rnd';
 import { useSearchParams } from 'react-router';
 
-import { useElementBounds } from '@documenso/lib/client-only/hooks/use-element-bounds';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import type { TFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@documenso/lib/types/field-meta';
+import { useElementBounds } from '@doku-seal/lib/client-only/hooks/use-element-bounds';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import type { TFieldMetaSchema } from '@doku-seal/lib/types/field-meta';
+import { ZCheckboxFieldMeta, ZRadioFieldMeta } from '@doku-seal/lib/types/field-meta';
 
 import { useRecipientColors } from '../../lib/recipient-colors';
 import { cn } from '../../lib/utils';
@@ -270,7 +270,7 @@ export const FieldItem = ({
               'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
               {
                 'bg-foreground/5 border-primary border': !fieldHasCheckedValues,
-                'bg-documenso-200 border-primary border': fieldHasCheckedValues,
+                'bg-doku-seal-200 border-primary border': fieldHasCheckedValues,
               },
             )}
           >

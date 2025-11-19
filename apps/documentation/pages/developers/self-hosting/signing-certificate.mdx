@@ -1,13 +1,13 @@
 ---
 title: Signing Certificate
-description: Learn how to generate or buy a signing certificate for your Documenso instance.
+description: Learn how to generate or buy a signing certificate for your Doku-Seal instance.
 ---
 
 import { Callout, Steps } from 'nextra/components';
 
 # Generate or Buy
 
-Self-hosting your Documenso instance requires your own certificate to sign documents. [This article](https://documenso.com/blog/building-documenso-pt1) explains why.
+Self-hosting your Doku-Seal instance requires your own certificate to sign documents. [This article](https://doku-seal.com/blog/building-documenso-pt1) explains why.
 
 When it comes to certificates, you have two options:
 
@@ -25,7 +25,7 @@ When it comes to certificates, you have two options:
 
 If you don't have special requirements for the signature of your signed documents, you can use a self-generated (self-signed) certificate.
 
-The main drawback is that mainstream PDF readers like Adobe won't recognize the signature as a trusted source or show a green checkmark. The certificate will still include your company/personal data to prove your Documenso instance signed the document. It also guarantees that the document wasn't altered after signing.
+The main drawback is that mainstream PDF readers like Adobe won't recognize the signature as a trusted source or show a green checkmark. The certificate will still include your company/personal data to prove your Doku-Seal instance signed the document. It also guarantees that the document wasn't altered after signing.
 
 You can generate your signing certificate by following [this guide](/developers/local-development/signing-certificate).
 
@@ -37,7 +37,7 @@ If you are based in Europe, it might make sense to go with a European one, thoug
 
 ### Technical Process
 
-Receiving your signing certificate is similar to receiving an SSL certificate. Since you need the actual certificate as part of the Documenso config, you must generate a secret private key and a CSR (Certificate Signing Request).
+Receiving your signing certificate is similar to receiving an SSL certificate. Since you need the actual certificate as part of the Doku-Seal config, you must generate a secret private key and a CSR (Certificate Signing Request).
 
 <Steps>
 
@@ -49,7 +49,7 @@ Generate a private key (on a secure machine or in an HSM, depending on your secu
 
 Have the Certificate Authority sign the Certificate Signing Request.
 
-### Configure Documenso to use the certificate
+### Configure Doku-Seal to use the certificate
 
 Configure your instance to use the new certificate by configuring the following environment variables in your `.env` file:
 

@@ -1,9 +1,9 @@
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { DOCUMENSO_ENCRYPTION_KEY } from '@documenso/lib/constants/crypto';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { symmetricDecrypt } from '@documenso/lib/universal/crypto';
-import { formatOrganisationCallbackUrl } from '@documenso/lib/utils/organisation-authentication-portal';
-import { prisma } from '@documenso/prisma';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { DOKU_SEAL_ENCRYPTION_KEY } from '@doku-seal/lib/constants/crypto';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { symmetricDecrypt } from '@doku-seal/lib/universal/crypto';
+import { formatOrganisationCallbackUrl } from '@doku-seal/lib/utils/organisation-authentication-portal';
+import { prisma } from '@doku-seal/prisma';
 
 type GetOrganisationAuthenticationPortalOptions =
   | {
@@ -67,14 +67,14 @@ export const getOrganisationAuthenticationPortalOptions = async (
     });
   }
 
-  if (!DOCUMENSO_ENCRYPTION_KEY) {
+  if (!DOKU_SEAL_ENCRYPTION_KEY) {
     throw new AppError(AppErrorCode.NOT_SETUP, {
       message: 'Encryption key is not set',
     });
   }
 
   const clientSecret = Buffer.from(
-    symmetricDecrypt({ key: DOCUMENSO_ENCRYPTION_KEY, data: encryptedClientSecret }),
+    symmetricDecrypt({ key: DOKU_SEAL_ENCRYPTION_KEY, data: encryptedClientSecret }),
   ).toString('utf-8');
 
   return {

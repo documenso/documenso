@@ -2,12 +2,12 @@ import { Plural, Trans } from '@lingui/react/macro';
 import { ChevronLeft, Users2 } from 'lucide-react';
 import { Link, redirect } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { logDocumentAccess } from '@documenso/lib/utils/logger';
-import { canAccessTeamDocument, formatDocumentsPath } from '@documenso/lib/utils/teams';
+import { getSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { getDocumentWithDetailsById } from '@doku-seal/lib/server-only/document/get-document-with-details-by-id';
+import { getTeamByUrl } from '@doku-seal/lib/server-only/team/get-team';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { logDocumentAccess } from '@doku-seal/lib/utils/logger';
+import { canAccessTeamDocument, formatDocumentsPath } from '@doku-seal/lib/utils/teams';
 
 import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { DocumentEditForm } from '~/components/general/document/document-edit-form';

@@ -1,8 +1,8 @@
 import { EnvelopeType } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { setFieldsForDocument } from '@documenso/lib/server-only/field/set-fields-for-document';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
+import { setFieldsForDocument } from '@doku-seal/lib/server-only/field/set-fields-for-document';
+import { setFieldsForTemplate } from '@doku-seal/lib/server-only/field/set-fields-for-template';
 
 import { authenticatedProcedure } from '../trpc';
 import {

@@ -6,7 +6,7 @@ import path from 'node:path';
 import type { Canvas } from 'skia-canvas';
 import { FontLibrary } from 'skia-canvas';
 
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+import type { FieldWithSignature } from '@doku-seal/prisma/types/field-with-signature';
 
 import { renderField } from '../../universal/field-renderer/render-field';
 

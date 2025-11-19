@@ -9,17 +9,17 @@ import {
   SigningStatus,
 } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
-import { DocumentInviteEmailTemplate } from '@documenso/email/templates/document-invite';
+import { mailer } from '@doku-seal/email/mailer';
+import { DocumentInviteEmailTemplate } from '@doku-seal/email/templates/document-invite';
 import {
   RECIPIENT_ROLES_DESCRIPTION,
   RECIPIENT_ROLE_TO_EMAIL_TYPE,
-} from '@documenso/lib/constants/recipient-roles';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { renderCustomEmailTemplate } from '@documenso/lib/utils/render-custom-email-template';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/constants/recipient-roles';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { createDocumentAuditLogData } from '@doku-seal/lib/utils/document-audit-logs';
+import { renderCustomEmailTemplate } from '@doku-seal/lib/utils/render-custom-email-template';
+import { prisma } from '@doku-seal/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';

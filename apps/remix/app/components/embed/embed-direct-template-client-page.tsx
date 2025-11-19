@@ -9,28 +9,28 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
 
-import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
+import { useThrottleFn } from '@doku-seal/lib/client-only/hooks/use-throttle-fn';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@doku-seal/lib/constants/date-formats';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@doku-seal/lib/constants/time-zones';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
-} from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import { trpc } from '@documenso/trpc/react';
+} from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { validateFieldsInserted } from '@doku-seal/lib/utils/fields';
+import { trpc } from '@doku-seal/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { Button } from '@documenso/ui/primitives/button';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { ZDirectTemplateEmbedDataSchema } from '~/types/embed-direct-template-schema';

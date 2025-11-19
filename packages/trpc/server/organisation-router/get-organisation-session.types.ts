@@ -1,9 +1,9 @@
 import { z } from 'zod';
 
-import { ZOrganisationSchema } from '@documenso/lib/types/organisation';
-import { OrganisationMemberRole, TeamMemberRole } from '@documenso/prisma/generated/types';
-import SubscriptionSchema from '@documenso/prisma/generated/zod/modelSchema/SubscriptionSchema';
-import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+import { ZOrganisationSchema } from '@doku-seal/lib/types/organisation';
+import { OrganisationMemberRole, TeamMemberRole } from '@doku-seal/prisma/generated/types';
+import SubscriptionSchema from '@doku-seal/prisma/generated/zod/modelSchema/SubscriptionSchema';
+import TeamSchema from '@doku-seal/prisma/generated/zod/modelSchema/TeamSchema';
 
 export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend({
   teams: z.array(

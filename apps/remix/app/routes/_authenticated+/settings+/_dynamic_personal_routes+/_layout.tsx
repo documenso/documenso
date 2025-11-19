@@ -2,10 +2,10 @@ import { useEffect } from 'react';
 
 import { Outlet, useNavigate } from 'react-router';
 
-import { OrganisationProvider } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { TrpcProvider } from '@documenso/trpc/react';
+import { OrganisationProvider } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { isPersonalLayout } from '@doku-seal/lib/utils/organisations';
+import { TrpcProvider } from '@doku-seal/trpc/react';
 
 import { TeamProvider } from '~/providers/team';
 

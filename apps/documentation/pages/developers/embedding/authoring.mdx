@@ -5,7 +5,7 @@ description: Learn how to use embedded authoring to create documents and templat
 
 # Embedded Authoring
 
-In addition to embedding signing experiences, Documenso now supports embedded authoring, allowing you to integrate document and template creation directly within your application.
+In addition to embedding signing experiences, Doku-Seal now supports embedded authoring, allowing you to integrate document and template creation directly within your application.
 
 ## How Embedded Authoring Works
 
@@ -47,9 +47,9 @@ You can create a presign token by making a request to:
 POST /api/v2/embedding/create-presign-token
 ```
 
-This API endpoint requires authentication with your Documenso API key. The token has a default expiration of 1 hour, but you can customize this duration based on your security requirements.
+This API endpoint requires authentication with your Doku-Seal API key. The token has a default expiration of 1 hour, but you can customize this duration based on your security requirements.
 
-You can find more details on this request at our [API Documentation](https://openapi.documenso.com/reference#tag/embedding)
+You can find more details on this request at our [API Documentation](https://openapi.doku-seal.com/reference#tag/embedding)
 
 ## Configuration Options
 
@@ -59,7 +59,7 @@ The `EmbedCreateDocument` component accepts several configuration options:
 | ------------------ | ------- | ------------------------------------------------------------------ |
 | `presignToken`     | string  | **Required**. The authentication token for the embedding session.  |
 | `externalId`       | string  | Optional reference ID from your system to link with the document.  |
-| `host`             | string  | Optional custom host URL. Defaults to `https://app.documenso.com`. |
+| `host`             | string  | Optional custom host URL. Defaults to `https://app.doku-seal.com`. |
 | `css`              | string  | Optional custom CSS to style the embedded component.               |
 | `cssVars`          | object  | Optional CSS variables for colors, spacing, and more.              |
 | `darkModeDisabled` | boolean | Optional flag to disable dark mode.                                |

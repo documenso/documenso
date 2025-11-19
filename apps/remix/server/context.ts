@@ -1,10 +1,10 @@
 import type { Context, Next } from 'hono';
 
-import { extractSessionCookieFromHeaders } from '@documenso/auth/server/lib/session/session-cookies';
+import { extractSessionCookieFromHeaders } from '@doku-seal/auth/server/lib/session/session-cookies';
 import {
   type RequestMetadata,
   extractRequestMetadata,
-} from '@documenso/lib/universal/extract-request-metadata';
+} from '@doku-seal/lib/universal/extract-request-metadata';
 
 export type AppContext = {
   requestMetadata: RequestMetadata;

@@ -8,10 +8,10 @@ import { Loader } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { useCurrentEnvelopeRender } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 

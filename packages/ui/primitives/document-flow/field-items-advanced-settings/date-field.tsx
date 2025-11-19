@@ -1,16 +1,16 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { validateFields as validateDateFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import { type TDateFieldMeta as DateFieldMeta } from '@documenso/lib/types/field-meta';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { validateFields as validateDateFields } from '@doku-seal/lib/advanced-fields-validation/validate-fields';
+import { type TDateFieldMeta as DateFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 type DateFieldAdvancedSettingsProps = {
   fieldState: DateFieldMeta;

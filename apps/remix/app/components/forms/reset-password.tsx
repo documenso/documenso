@@ -7,11 +7,11 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { authClient } from '@documenso/auth/client';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { ZPasswordSchema } from '@documenso/trpc/server/auth-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { authClient } from '@doku-seal/auth/client';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { ZPasswordSchema } from '@doku-seal/trpc/server/auth-router/schema';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -19,9 +19,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { PasswordInput } from '@documenso/ui/primitives/password-input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { PasswordInput } from '@doku-seal/ui/primitives/password-input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export const ZResetPasswordFormSchema = z
   .object({

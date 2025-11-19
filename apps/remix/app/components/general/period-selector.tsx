@@ -3,14 +3,14 @@ import { useMemo } from 'react';
 import { Trans } from '@lingui/react/macro';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 
-import type { PeriodSelectorValue } from '@documenso/lib/server-only/document/find-documents';
+import type { PeriodSelectorValue } from '@doku-seal/lib/server-only/document/find-documents';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 const isPeriodSelectorValue = (value: unknown): value is PeriodSelectorValue => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

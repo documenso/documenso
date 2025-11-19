@@ -1,13 +1,13 @@
 import { OrganisationType } from '@prisma/client';
 
-import { createCheckoutSession } from '@documenso/ee/server-only/stripe/create-checkout-session';
-import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
-import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
-import { INTERNAL_CLAIM_ID, internalClaims } from '@documenso/lib/types/subscription';
-import { generateStripeOrganisationCreateMetadata } from '@documenso/lib/utils/billing';
-import { prisma } from '@documenso/prisma';
+import { createCheckoutSession } from '@doku-seal/ee/server-only/stripe/create-checkout-session';
+import { createCustomer } from '@doku-seal/ee/server-only/stripe/create-customer';
+import { IS_BILLING_ENABLED, NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { createOrganisation } from '@doku-seal/lib/server-only/organisation/create-organisation';
+import { INTERNAL_CLAIM_ID, internalClaims } from '@doku-seal/lib/types/subscription';
+import { generateStripeOrganisationCreateMetadata } from '@doku-seal/lib/utils/billing';
+import { prisma } from '@doku-seal/prisma';
 
 import { authenticatedProcedure } from '../trpc';
 import {

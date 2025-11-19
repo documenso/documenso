@@ -12,19 +12,19 @@ import { nanoid } from 'nanoid';
 import type { Control } from 'react-hook-form';
 import { useFieldArray, useFormContext, useFormState } from 'react-hook-form';
 
-import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { RecipientRoleSelect } from '@doku-seal/ui/components/recipient/recipient-role-select';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 import { useConfigureDocument } from './configure-document-context';
 import type { TConfigureEmbedFormSchema } from './configure-document-view.types';

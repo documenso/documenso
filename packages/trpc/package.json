@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/trpc",
+  "name": "@doku-seal/trpc",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -10,8 +10,8 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@documenso/lib": "*",
-    "@documenso/prisma": "*",
+    "@doku-seal/lib": "*",
+    "@doku-seal/prisma": "*",
     "@tanstack/react-query": "5.90.5",
     "@trpc/client": "11.7.0",
     "@trpc/react-query": "11.7.0",

@@ -3,18 +3,18 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useNavigate } from 'react-router';
 
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcReact } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { trpc as trpcReact } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

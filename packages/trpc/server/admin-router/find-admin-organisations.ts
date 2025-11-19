@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 
-import type { FindResultResponse } from '@documenso/lib/types/search-params';
-import { prisma } from '@documenso/prisma';
+import type { FindResultResponse } from '@doku-seal/lib/types/search-params';
+import { prisma } from '@doku-seal/prisma';
 
 import { adminProcedure } from '../trpc';
 import {

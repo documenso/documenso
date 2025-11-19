@@ -7,7 +7,7 @@ import { RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 import { Check, ChevronsUpDown, Info } from 'lucide-react';
 import { sortBy } from 'remeda';
 
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
 
 import { getRecipientColorStyles } from '../lib/recipient-colors';
 import { cn } from '../lib/utils';

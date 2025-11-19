@@ -5,20 +5,20 @@ import { OrganisationMemberRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@documenso/lib/constants/organisations';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { ORGANISATION_MEMBER_ROLE_HIERARCHY } from '@doku-seal/lib/constants/organisations';
+import { ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
 import {
   formatOrganisationCallbackUrl,
   formatOrganisationLoginUrl,
-} from '@documenso/lib/utils/organisation-authentication-portal';
-import { trpc } from '@documenso/trpc/react';
-import { domainRegex } from '@documenso/trpc/server/enterprise-router/create-organisation-email-domain.types';
-import type { TGetOrganisationAuthenticationPortalResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-authentication-portal.types';
-import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from '@documenso/trpc/server/enterprise-router/update-organisation-authentication-portal.types';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/lib/utils/organisation-authentication-portal';
+import { trpc } from '@doku-seal/trpc/react';
+import { domainRegex } from '@doku-seal/trpc/server/enterprise-router/create-organisation-email-domain.types';
+import type { TGetOrganisationAuthenticationPortalResponse } from '@doku-seal/trpc/server/enterprise-router/get-organisation-authentication-portal.types';
+import { ZUpdateOrganisationAuthenticationPortalRequestSchema } from '@doku-seal/trpc/server/enterprise-router/update-organisation-authentication-portal.types';
+import { CopyTextButton } from '@doku-seal/ui/components/common/copy-text-button';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -26,20 +26,20 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/select';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';

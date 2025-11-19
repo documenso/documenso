@@ -6,11 +6,11 @@ import { Undo2 } from 'lucide-react';
 import type { StrokeOptions } from 'perfect-freehand';
 import { getStroke } from 'perfect-freehand';
 
-import { unsafe_useEffectOnce } from '@documenso/lib/client-only/hooks/use-effect-once';
+import { unsafe_useEffectOnce } from '@doku-seal/lib/client-only/hooks/use-effect-once';
 import {
   SIGNATURE_CANVAS_DPI,
   SIGNATURE_MIN_COVERAGE_THRESHOLD,
-} from '@documenso/lib/constants/signatures';
+} from '@doku-seal/lib/constants/signatures';
 
 import { cn } from '../../lib/utils';
 import { getSvgPathFromStroke } from './helper';

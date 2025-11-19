@@ -1,4 +1,4 @@
-import { numberFormatValues } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { numberFormatValues } from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import type { TNumberFieldMeta as NumberFieldMeta } from '../types/field-meta';
 

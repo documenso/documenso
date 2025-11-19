@@ -7,7 +7,7 @@ import { Trans } from '@lingui/react/macro';
 import { AnimatePresence } from 'framer-motion';
 import { Check, ChevronsUpDown, Loader, XIcon } from 'lucide-react';
 
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
 
 import { cn } from '../lib/utils';
 import { Button } from './button';

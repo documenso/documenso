@@ -1,4 +1,4 @@
-import { stripeWebhookHandler } from '@documenso/ee/server-only/stripe/webhook/handler';
+import { stripeWebhookHandler } from '@doku-seal/ee/server-only/stripe/webhook/handler';
 
 import type { Route } from './+types/webhook.trigger';
 

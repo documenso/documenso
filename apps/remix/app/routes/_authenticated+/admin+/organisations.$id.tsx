@@ -9,18 +9,18 @@ import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router';
 import type { z } from 'zod';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
-import { trpc } from '@documenso/trpc/react';
-import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
-import { ZUpdateAdminOrganisationRequestSchema } from '@documenso/trpc/server/admin-router/update-admin-organisation.types';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { DataTable, type DataTableColumnDef } from '@documenso/ui/primitives/data-table';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { SUBSCRIPTION_STATUS_MAP } from '@doku-seal/lib/constants/billing';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@doku-seal/lib/types/subscription';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TGetAdminOrganisationResponse } from '@doku-seal/trpc/server/admin-router/get-admin-organisation.types';
+import { ZUpdateAdminOrganisationRequestSchema } from '@doku-seal/trpc/server/admin-router/update-admin-organisation.types';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { DataTable, type DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
 import {
   Form,
   FormControl,
@@ -29,10 +29,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';

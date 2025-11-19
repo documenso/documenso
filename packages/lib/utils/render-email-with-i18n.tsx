@@ -1,7 +1,7 @@
 import { I18nProvider } from '@lingui/react';
 
-import type { RenderOptions } from '@documenso/email/render';
-import { render } from '@documenso/email/render';
+import type { RenderOptions } from '@doku-seal/email/render';
+import { render } from '@doku-seal/email/render';
 
 import { getI18nInstance } from '../client-only/providers/i18n-server';
 import {

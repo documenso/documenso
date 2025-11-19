@@ -7,14 +7,14 @@ import type { Recipient } from '@prisma/client';
 import { RecipientRole } from '@prisma/client';
 import { useSearchParams } from 'react-router';
 
-import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
-import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCopyToClipboard } from '@doku-seal/lib/client-only/hooks/use-copy-to-clipboard';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@doku-seal/lib/constants/recipient-roles';
+import { formatSigningLink } from '@doku-seal/lib/utils/recipients';
+import { CopyTextButton } from '@doku-seal/ui/components/common/copy-text-button';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -24,8 +24,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type DocumentRecipientLinkCopyDialogProps = {
   trigger?: React.ReactNode;

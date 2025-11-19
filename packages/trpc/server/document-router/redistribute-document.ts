@@ -1,4 +1,4 @@
-import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { resendDocument } from '@doku-seal/lib/server-only/document/resend-document';
 
 import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';

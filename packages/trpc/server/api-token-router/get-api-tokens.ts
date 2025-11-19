@@ -1,4 +1,4 @@
-import { getApiTokens } from '@documenso/lib/server-only/public-api/get-api-tokens';
+import { getApiTokens } from '@doku-seal/lib/server-only/public-api/get-api-tokens';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZGetApiTokensRequestSchema, ZGetApiTokensResponseSchema } from './get-api-tokens.types';

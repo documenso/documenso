@@ -3,11 +3,11 @@ import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { Hono } from 'hono';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
-import { ZAuthenticationResponseJSONSchema } from '@documenso/lib/types/webauthn';
-import { getAuthenticatorOptions } from '@documenso/lib/utils/authenticator';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TAuthenticationResponseJSONSchema } from '@doku-seal/lib/types/webauthn';
+import { ZAuthenticationResponseJSONSchema } from '@doku-seal/lib/types/webauthn';
+import { getAuthenticatorOptions } from '@doku-seal/lib/utils/authenticator';
+import { prisma } from '@doku-seal/prisma';
 
 import { onAuthorize } from '../lib/utils/authorizer';
 import type { HonoAuthContext } from '../types/context';

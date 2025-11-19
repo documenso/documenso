@@ -3,27 +3,27 @@ import { useEffect } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { type Control, useFormContext } from 'react-hook-form';
 
-import { FIELD_MIN_LINE_HEIGHT } from '@documenso/lib/types/field-meta';
-import { FIELD_MAX_LINE_HEIGHT } from '@documenso/lib/types/field-meta';
-import { FIELD_MIN_LETTER_SPACING } from '@documenso/lib/types/field-meta';
-import { FIELD_MAX_LETTER_SPACING } from '@documenso/lib/types/field-meta';
-import { cn } from '@documenso/ui/lib/utils';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { FIELD_MIN_LINE_HEIGHT } from '@doku-seal/lib/types/field-meta';
+import { FIELD_MAX_LINE_HEIGHT } from '@doku-seal/lib/types/field-meta';
+import { FIELD_MIN_LETTER_SPACING } from '@doku-seal/lib/types/field-meta';
+import { FIELD_MAX_LETTER_SPACING } from '@doku-seal/lib/types/field-meta';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   FormControl,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 // Can't seem to get the non-any type to work with correct types.
 // Eg Control<{ fontSize?: number } doesn't seem to work when there are required items.

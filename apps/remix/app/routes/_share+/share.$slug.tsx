@@ -1,7 +1,7 @@
 import { redirect, useLoaderData } from 'react-router';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { getDocumentByAccessToken } from '@documenso/lib/server-only/document/get-document-by-access-token';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { getDocumentByAccessToken } from '@doku-seal/lib/server-only/document/get-document-by-access-token';
 
 import { DocumentCertificateQRView } from '~/components/general/document/document-certificate-qr-view';
 
@@ -13,15 +13,15 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
   }
 
   return [
-    { title: 'Documenso - Share' },
-    { description: 'I just signed a document in style with Documenso!' },
+    { title: 'Doku-Seal - Share' },
+    { description: 'I just signed a document in style with Doku-Seal!' },
     {
       property: 'og:title',
-      content: 'Documenso - Join the open source signing revolution',
+      content: 'Doku-Seal - Join the open source signing revolution',
     },
     {
       property: 'og:description',
-      content: 'I just signed with Documenso!',
+      content: 'I just signed with Doku-Seal!',
     },
     {
       property: 'og:type',
@@ -45,7 +45,7 @@ export function meta({ params: { slug } }: Route.MetaArgs) {
     },
     {
       name: 'twitter:description',
-      content: 'I just signed with Documenso!',
+      content: 'I just signed with Doku-Seal!',
     },
   ];
 }
@@ -70,8 +70,8 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
     return {};
   }
 
-  // Is hardcoded because this whole meta is hardcoded anyway for Documenso.
-  throw redirect('https://documenso.com');
+  // Is hardcoded because this whole meta is hardcoded anyway for Doku-Seal.
+  throw redirect('https://doku-seal.com');
 };
 
 export default function SharePage() {

@@ -5,18 +5,18 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { canExecuteOrganisationAction, isPersonalLayout } from '@doku-seal/lib/utils/organisations';
+import { trpc } from '@doku-seal/trpc/react';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 import { OrganisationLeaveDialog } from '../dialogs/organisation-leave-dialog';
 

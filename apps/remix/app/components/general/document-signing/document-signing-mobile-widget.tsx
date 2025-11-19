@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { match } from 'ts-pattern';
 
-import { Button } from '@documenso/ui/primitives/button';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 

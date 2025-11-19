@@ -1,4 +1,4 @@
-import { validateApiToken } from '@documenso/lib/server-only/webhooks/zapier/validateApiToken';
+import { validateApiToken } from '@doku-seal/lib/server-only/webhooks/zapier/validateApiToken';
 
 export const testCredentialsHandler = async (req: Request) => {
   try {

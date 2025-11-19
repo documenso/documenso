@@ -1,7 +1,7 @@
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { kyselyPrisma, sql } from '@documenso/prisma';
+import { kyselyPrisma, sql } from '@doku-seal/prisma';
 
 export const getCompletedDocumentsMonthly = async () => {
   const qb = kyselyPrisma.$kysely

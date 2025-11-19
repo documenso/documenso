@@ -7,30 +7,30 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { P, match } from 'ts-pattern';
 
-import { useAnalytics } from '@documenso/lib/client-only/hooks/use-analytics';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
-import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
+import { useAnalytics } from '@doku-seal/lib/client-only/hooks/use-analytics';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@doku-seal/lib/constants/date-formats';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@doku-seal/lib/constants/time-zones';
+import type { DocumentAndSender } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import type { TRecipientAccessAuth } from '@doku-seal/lib/types/document-auth';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import type { CompletedField } from '@documenso/lib/types/fields';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
-import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
-import { trpc } from '@documenso/trpc/react';
-import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+} from '@doku-seal/lib/types/field-meta';
+import type { CompletedField } from '@doku-seal/lib/types/fields';
+import { isFieldUnsignedAndRequired } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { validateFieldsInserted } from '@doku-seal/lib/utils/fields';
+import type { FieldWithSignatureAndFieldMeta } from '@doku-seal/prisma/types/field-with-signature-and-fieldmeta';
+import type { RecipientWithFields } from '@doku-seal/prisma/types/recipient-with-fields';
+import { trpc } from '@doku-seal/trpc/react';
+import { DocumentReadOnlyFields } from '@doku-seal/ui/components/document/document-read-only-fields';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';

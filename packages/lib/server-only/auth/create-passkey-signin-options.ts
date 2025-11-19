@@ -1,7 +1,7 @@
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
 import { DateTime } from 'luxon';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { getAuthenticatorOptions } from '../../utils/authenticator';
 

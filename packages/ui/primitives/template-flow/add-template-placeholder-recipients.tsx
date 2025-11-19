@@ -12,21 +12,21 @@ import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircle, Link2Icon, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
-import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
-import { nanoid } from '@documenso/lib/universal/id';
-import { generateRecipientPlaceholder } from '@documenso/lib/utils/templates';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
-import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { FormErrorMessage } from '@documenso/ui/primitives/form/form-error-message';
-import { Input } from '@documenso/ui/primitives/input';
-import { toast } from '@documenso/ui/primitives/use-toast';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { isTemplateRecipientEmailPlaceholder } from '@doku-seal/lib/constants/template';
+import { ZRecipientAuthOptionsSchema } from '@doku-seal/lib/types/document-auth';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { generateRecipientPlaceholder } from '@doku-seal/lib/utils/templates';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@doku-seal/ui/components/recipient/recipient-action-auth-select';
+import { RecipientRoleSelect } from '@doku-seal/ui/components/recipient/recipient-role-select';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { FormErrorMessage } from '@doku-seal/ui/primitives/form/form-error-message';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { toast } from '@doku-seal/ui/primitives/use-toast';
 
 import {
   DocumentReadOnlyFields,

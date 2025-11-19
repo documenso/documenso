@@ -11,23 +11,23 @@ import {
 } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { trpc } from '@documenso/trpc/react';
-import { Badge } from '@documenso/ui/primitives/badge';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { SUBSCRIPTION_STATUS_MAP } from '@doku-seal/lib/constants/billing';
+import { ZUrlSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import { trpc } from '@doku-seal/trpc/react';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+} from '@doku-seal/ui/primitives/dropdown-menu';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 type AdminOrganisationsTableOptions = {
   ownerUserId?: number;

@@ -3,14 +3,14 @@ import type { Context } from 'hono';
 import type { Logger } from 'pino';
 import { z } from 'zod';
 
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import type { RootApiLog } from '@documenso/lib/types/api-logs';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { alphaid } from '@documenso/lib/universal/id';
-import { logger } from '@documenso/lib/utils/logger';
+import type { SessionUser } from '@doku-seal/auth/server/lib/session/session';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import type { RootApiLog } from '@doku-seal/lib/types/api-logs';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { alphaid } from '@doku-seal/lib/universal/id';
+import { logger } from '@doku-seal/lib/utils/logger';
 // This is a bit nasty. Todo: Extract
-import type { HonoEnv } from '@documenso/remix/server/router';
+import type { HonoEnv } from '@doku-seal/remix/server/router';
 
 type CreateTrpcContextOptions = {
   c: Context<HonoEnv>;

@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/email",
+  "name": "@doku-seal/email",
   "version": "0.0.0",
   "main": "./index.ts",
   "types": "./index.ts",
@@ -17,8 +17,8 @@
     "worker:test": "tsup worker/index.ts --format esm"
   },
   "dependencies": {
-    "@documenso/tailwind-config": "*",
-    "@documenso/nodemailer-resend": "2.0.0",
+    "@doku-seal/tailwind-config": "*",
+    "@doku-seal/nodemailer-resend": "2.0.0",
     "@react-email/body": "0.0.4",
     "@react-email/button": "0.0.11",
     "@react-email/column": "0.0.8",
@@ -41,7 +41,7 @@
     "resend": "2.0.0"
   },
   "devDependencies": {
-    "@documenso/tsconfig": "*",
+    "@doku-seal/tsconfig": "*",
     "@types/nodemailer": "^6.4.14",
     "tsup": "^7.1.0"
   }

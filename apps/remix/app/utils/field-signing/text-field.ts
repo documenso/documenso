@@ -1,8 +1,8 @@
 import { FieldType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TFieldText } from '@documenso/lib/types/field';
-import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TFieldText } from '@doku-seal/lib/types/field';
+import type { TSignEnvelopeFieldValue } from '@doku-seal/trpc/server/envelope-router/sign-envelope-field.types';
 
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
 

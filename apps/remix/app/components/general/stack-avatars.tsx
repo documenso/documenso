@@ -5,8 +5,8 @@ import type { Recipient } from '@prisma/client';
 import {
   getExtraRecipientsType,
   getRecipientType,
-} from '@documenso/lib/client-only/recipient-type';
-import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
+} from '@doku-seal/lib/client-only/recipient-type';
+import { recipientAbbreviation } from '@doku-seal/lib/utils/recipient-formatter';
 
 import { StackAvatar } from './stack-avatar';
 

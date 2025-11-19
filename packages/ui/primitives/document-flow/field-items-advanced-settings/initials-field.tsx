@@ -1,9 +1,9 @@
 import { Trans, useLingui } from '@lingui/react/macro';
 
-import { validateFields as validateInitialsFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
-import { type TInitialsFieldMeta as InitialsFieldMeta } from '@documenso/lib/types/field-meta';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { validateFields as validateInitialsFields } from '@doku-seal/lib/advanced-fields-validation/validate-fields';
+import { type TInitialsFieldMeta as InitialsFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../select';
 

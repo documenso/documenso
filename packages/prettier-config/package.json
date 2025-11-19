@@ -1,5 +1,5 @@
 {
-  "name": "@documenso/prettier-config",
+  "name": "@doku-seal/prettier-config",
   "version": "0.0.0",
   "main": "./index.cjs",
   "license": "MIT",

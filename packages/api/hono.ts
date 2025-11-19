@@ -1,22 +1,22 @@
 import { TsRestHttpError, fetchRequestHandler } from '@ts-rest/serverless/fetch';
 import { Hono } from 'hono';
 
-import { ApiContractV1 } from '@documenso/api/v1/contract';
-import { ApiContractV1Implementation } from '@documenso/api/v1/implementation';
-import { OpenAPIV1 } from '@documenso/api/v1/openapi';
-import { testCredentialsHandler } from '@documenso/lib/server-only/public-api/test-credentials';
-import { listDocumentsHandler } from '@documenso/lib/server-only/webhooks/zapier/list-documents';
-import { subscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/subscribe';
-import { unsubscribeHandler } from '@documenso/lib/server-only/webhooks/zapier/unsubscribe';
+import { ApiContractV1 } from '@doku-seal/api/v1/contract';
+import { ApiContractV1Implementation } from '@doku-seal/api/v1/implementation';
+import { OpenAPIV1 } from '@doku-seal/api/v1/openapi';
+import { testCredentialsHandler } from '@doku-seal/lib/server-only/public-api/test-credentials';
+import { listDocumentsHandler } from '@doku-seal/lib/server-only/webhooks/zapier/list-documents';
+import { subscribeHandler } from '@doku-seal/lib/server-only/webhooks/zapier/subscribe';
+import { unsubscribeHandler } from '@doku-seal/lib/server-only/webhooks/zapier/unsubscribe';
 // This is a bit nasty. Todo: Extract
-import type { HonoEnv } from '@documenso/remix/server/router';
+import type { HonoEnv } from '@doku-seal/remix/server/router';
 
 // This is bad, ts-router will be created on each request.
 // But don't really have a choice here.
 export const tsRestHonoApp = new Hono<HonoEnv>();
 
 tsRestHonoApp
-  .get('/openapi', (c) => c.redirect('https://openapi-v1.documenso.com'))
+  .get('/openapi', (c) => c.redirect('https://openapi-v1.doku-seal.com'))
   .get('/openapi.json', (c) => c.json(OpenAPIV1))
   .get('/me', async (c) => testCredentialsHandler(c.req.raw));
 

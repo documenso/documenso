@@ -4,16 +4,16 @@ import { Trans } from '@lingui/react/macro';
 import { Role } from '@prisma/client';
 import { Check, ChevronsUpDown } from 'lucide-react';
 
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Command,
   CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
-} from '@documenso/ui/primitives/command';
-import { Popover, PopoverContent, PopoverTrigger } from '@documenso/ui/primitives/popover';
+} from '@doku-seal/ui/primitives/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@doku-seal/ui/primitives/popover';
 
 type ComboboxProps = {
   listValues: string[];

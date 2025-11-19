@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
 
 type CallToActionProps = {
   className?: string;
@@ -15,7 +15,7 @@ export const CallToAction = ({ className, utmSource = 'generic-cta' }: CallToAct
         <h2 className="text-center text-2xl font-bold">Looking for the managed solution?</h2>
 
         <p className="text-muted-foreground mt-4 max-w-[55ch] text-center leading-normal">
-          You can get started with Documenso in minutes. We handle the infrastructure, so you can
+          You can get started with Doku-Seal in minutes. We handle the infrastructure, so you can
           focus on signing documents.
         </p>
 
@@ -25,7 +25,7 @@ export const CallToAction = ({ className, utmSource = 'generic-cta' }: CallToAct
           size="lg"
           asChild
         >
-          <Link href={`https://app.documenso.com/signup?utm_source=${utmSource}`} target="_blank">
+          <Link href={`https://app.doku-seal.com/signup?utm_source=${utmSource}`} target="_blank">
             Get started
           </Link>
         </Button>

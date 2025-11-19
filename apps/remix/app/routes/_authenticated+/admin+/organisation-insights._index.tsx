@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 
-import { getOrganisationInsights } from '@documenso/lib/server-only/admin/get-signing-volume';
-import type { DateRange } from '@documenso/lib/types/search-params';
+import { getOrganisationInsights } from '@doku-seal/lib/server-only/admin/get-signing-volume';
+import type { DateRange } from '@doku-seal/lib/types/search-params';
 
 import { DateRangeFilter } from '~/components/filters/date-range-filter';
 import {

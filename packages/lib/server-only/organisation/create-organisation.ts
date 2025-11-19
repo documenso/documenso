@@ -2,8 +2,8 @@ import type { Prisma } from '@prisma/client';
 import { OrganisationType } from '@prisma/client';
 import { OrganisationMemberRole } from '@prisma/client';
 
-import { createCustomer } from '@documenso/ee/server-only/stripe/create-customer';
-import { prisma } from '@documenso/prisma';
+import { createCustomer } from '@doku-seal/ee/server-only/stripe/create-customer';
+import { prisma } from '@doku-seal/prisma';
 
 import { IS_BILLING_ENABLED } from '../../constants/app';
 import { ORGANISATION_INTERNAL_GROUPS } from '../../constants/organisations';

@@ -7,10 +7,10 @@ import { Trans } from '@lingui/react/macro';
 import { Copy, Sparkles } from 'lucide-react';
 import { FaXTwitter } from 'react-icons/fa6';
 
-import { useCopyShareLink } from '@documenso/lib/client-only/hooks/use-copy-share-link';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { generateTwitterIntent } from '@documenso/lib/universal/generate-twitter-intent';
-import { trpc } from '@documenso/trpc/react';
+import { useCopyShareLink } from '@doku-seal/lib/client-only/hooks/use-copy-share-link';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { generateTwitterIntent } from '@doku-seal/lib/universal/generate-twitter-intent';
+import { trpc } from '@doku-seal/trpc/react';
 
 import { cn } from '../../lib/utils';
 import { Button } from '../../primitives/button';

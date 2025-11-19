@@ -1,11 +1,11 @@
 import { FieldType } from '@prisma/client';
 
-import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TFieldCheckbox } from '@documenso/lib/types/field';
-import { parseCheckboxCustomText } from '@documenso/lib/utils/fields';
-import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+import { validateCheckboxLength } from '@doku-seal/lib/advanced-fields-validation/validate-checkbox';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TFieldCheckbox } from '@doku-seal/lib/types/field';
+import { parseCheckboxCustomText } from '@doku-seal/lib/utils/fields';
+import type { TSignEnvelopeFieldValue } from '@doku-seal/trpc/server/envelope-router/sign-envelope-field.types';
+import { checkboxValidationSigns } from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import { SignFieldCheckboxDialog } from '~/components/dialogs/sign-field-checkbox-dialog';
 

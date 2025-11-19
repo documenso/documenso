@@ -1,12 +1,12 @@
 import { sValidator } from '@hono/standard-validator';
 import { Hono } from 'hono';
 
-import { AppError } from '@documenso/lib/errors/app-error';
-import { disableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/disable-2fa';
-import { enableTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/enable-2fa';
-import { setupTwoFactorAuthentication } from '@documenso/lib/server-only/2fa/setup-2fa';
-import { viewBackupCodes } from '@documenso/lib/server-only/2fa/view-backup-codes';
-import { prisma } from '@documenso/prisma';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { disableTwoFactorAuthentication } from '@doku-seal/lib/server-only/2fa/disable-2fa';
+import { enableTwoFactorAuthentication } from '@doku-seal/lib/server-only/2fa/enable-2fa';
+import { setupTwoFactorAuthentication } from '@doku-seal/lib/server-only/2fa/setup-2fa';
+import { viewBackupCodes } from '@doku-seal/lib/server-only/2fa/view-backup-codes';
+import { prisma } from '@doku-seal/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
 import { getSession } from '../lib/utils/get-session';

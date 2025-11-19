@@ -1,5 +1,5 @@
-import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@documenso/lib/constants/organisations';
-import { prisma } from '@documenso/prisma';
+import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@doku-seal/lib/constants/organisations';
+import { prisma } from '@doku-seal/prisma';
 
 import { procedure } from '../trpc';
 import {

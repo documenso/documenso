@@ -9,15 +9,15 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { base64 } from '@documenso/lib/universal/base64';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { base64 } from '@doku-seal/lib/universal/base64';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Avatar, AvatarFallback, AvatarImage } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -25,8 +25,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export const ZAvatarImageFormSchema = z.object({
   bytes: z.string().nullish(),

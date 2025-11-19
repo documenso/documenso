@@ -1,1 +1,1 @@
-# @documenso/openpage-api
+# @doku-seal/openpage-api

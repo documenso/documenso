@@ -4,10 +4,10 @@ import React from 'react';
 import type { Session } from '@prisma/client';
 import { useLocation } from 'react-router';
 
-import { authClient } from '@documenso/auth/client';
-import type { SessionUser } from '@documenso/auth/server/lib/session/session';
-import { trpc } from '@documenso/trpc/client';
-import type { TGetOrganisationSessionResponse } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
+import { authClient } from '@doku-seal/auth/client';
+import type { SessionUser } from '@doku-seal/auth/server/lib/session/session';
+import { trpc } from '@doku-seal/trpc/client';
+import type { TGetOrganisationSessionResponse } from '@doku-seal/trpc/server/organisation-router/get-organisation-session.types';
 
 import { SKIP_QUERY_BATCH_META } from '../../constants/trpc';
 

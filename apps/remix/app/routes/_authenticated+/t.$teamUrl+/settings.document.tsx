@@ -1,9 +1,9 @@
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { trpc } from '@documenso/trpc/react';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { DocumentSignatureType } from '@doku-seal/lib/constants/document';
+import { trpc } from '@doku-seal/trpc/react';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import {
   DocumentPreferencesForm,

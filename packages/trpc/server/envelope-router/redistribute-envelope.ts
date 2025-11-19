@@ -1,5 +1,5 @@
-import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
+import { resendDocument } from '@doku-seal/lib/server-only/document/resend-document';
+import { formatSigningLink } from '@doku-seal/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {

@@ -13,19 +13,19 @@ import { GripVerticalIcon, HelpCircle, Plus, Trash } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { prop, sortBy } from 'remeda';
 
-import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
-import { nanoid } from '@documenso/lib/universal/id';
-import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { RecipientActionAuthSelect } from '@documenso/ui/components/recipient/recipient-action-auth-select';
-import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
-import { cn } from '@documenso/ui/lib/utils';
+import { useLimits } from '@doku-seal/ee/server-only/limits/provider/client';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
+import { useDebouncedValue } from '@doku-seal/lib/client-only/hooks/use-debounced-value';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { ZRecipientAuthOptionsSchema } from '@doku-seal/lib/types/document-auth';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { canRecipientBeModified as utilCanRecipientBeModified } from '@doku-seal/lib/utils/recipients';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { RecipientActionAuthSelect } from '@doku-seal/ui/components/recipient/recipient-action-auth-select';
+import { RecipientRoleSelect } from '@doku-seal/ui/components/recipient/recipient-role-select';
+import { cn } from '@doku-seal/ui/lib/utils';
 
 import {
   DocumentReadOnlyFields,

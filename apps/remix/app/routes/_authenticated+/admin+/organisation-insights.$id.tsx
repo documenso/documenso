@@ -1,6 +1,6 @@
-import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
-import type { DateRange } from '@documenso/lib/types/search-params';
-import { getAdminOrganisation } from '@documenso/trpc/server/admin-router/get-admin-organisation';
+import { getOrganisationDetailedInsights } from '@doku-seal/lib/server-only/admin/get-organisation-detailed-insights';
+import type { DateRange } from '@doku-seal/lib/types/search-params';
+import { getAdminOrganisation } from '@doku-seal/trpc/server/admin-router/get-admin-organisation';
 
 import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
 

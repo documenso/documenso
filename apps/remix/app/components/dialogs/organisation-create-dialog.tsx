@@ -12,19 +12,19 @@ import { Link, useSearchParams } from 'react-router';
 import { match } from 'ts-pattern';
 import type { z } from 'zod';
 
-import type { InternalClaimPlans } from '@documenso/ee/server-only/stripe/get-internal-claim-plans';
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
-import { parseMessageDescriptorMacro } from '@documenso/lib/utils/i18n';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
-import { ZCreateOrganisationRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation.types';
-import { cn } from '@documenso/ui/lib/utils';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
+import type { InternalClaimPlans } from '@doku-seal/ee/server-only/stripe/get-internal-claim-plans';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { INTERNAL_CLAIM_ID } from '@doku-seal/lib/types/subscription';
+import { parseMessageDescriptorMacro } from '@doku-seal/lib/utils/i18n';
+import { isPersonalLayout } from '@doku-seal/lib/utils/organisations';
+import { trpc } from '@doku-seal/trpc/react';
+import { ZCreateOrganisationRequestSchema } from '@doku-seal/trpc/server/organisation-router/create-organisation.types';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -41,11 +41,11 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
+import { Tabs, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { IndividualPersonalLayoutCheckoutButton } from '../general/billing-plans';
 
@@ -415,7 +415,7 @@ const BillingPlanForm = ({
         ))}
 
         <Link
-          to="https://documen.so/enterprise-cta"
+          to="https://doku.se/enterprise-cta"
           target="_blank"
           className="bg-muted/30 flex items-center space-x-2 rounded-md border p-4"
         >
@@ -433,7 +433,7 @@ const BillingPlanForm = ({
 
       <div className="mt-6 text-center">
         <Link
-          to="https://documenso.com/pricing"
+          to="https://doku-seal.com/pricing"
           className="text-primary hover:text-primary/80 flex items-center justify-center gap-1 text-sm hover:underline"
           target="_blank"
         >

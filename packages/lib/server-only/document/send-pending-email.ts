@@ -3,9 +3,9 @@ import { createElement } from 'react';
 import { msg } from '@lingui/core/macro';
 import { EnvelopeType } from '@prisma/client';
 
-import { mailer } from '@documenso/email/mailer';
-import { DocumentPendingEmailTemplate } from '@documenso/email/templates/document-pending';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import { DocumentPendingEmailTemplate } from '@doku-seal/email/templates/document-pending';
+import { prisma } from '@doku-seal/prisma';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';

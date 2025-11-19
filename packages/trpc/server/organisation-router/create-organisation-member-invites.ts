@@ -1,4 +1,4 @@
-import { createOrganisationMemberInvites } from '@documenso/lib/server-only/organisation/create-organisation-member-invites';
+import { createOrganisationMemberInvites } from '@doku-seal/lib/server-only/organisation/create-organisation-member-invites';
 
 import { authenticatedProcedure } from '../trpc';
 import {

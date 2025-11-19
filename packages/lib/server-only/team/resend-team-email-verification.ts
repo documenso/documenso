@@ -1,7 +1,7 @@
-import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { createTokenVerification } from '@documenso/lib/utils/token-verification';
-import { prisma } from '@documenso/prisma';
+import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/teams';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { createTokenVerification } from '@doku-seal/lib/utils/token-verification';
+import { prisma } from '@doku-seal/prisma';
 
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { sendTeamEmailVerificationEmail } from './create-team-email-verification';

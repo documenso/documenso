@@ -10,10 +10,10 @@ import {
   DEFAULT_STANDARD_FONT_SIZE,
   MIN_HANDWRITING_FONT_SIZE,
   MIN_STANDARD_FONT_SIZE,
-} from '@documenso/lib/constants/pdf';
-import { fromCheckboxValue } from '@documenso/lib/universal/field-checkbox';
-import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
+} from '@doku-seal/lib/constants/pdf';
+import { fromCheckboxValue } from '@doku-seal/lib/universal/field-checkbox';
+import { isSignatureFieldType } from '@doku-seal/prisma/guards/is-signature-field';
+import type { FieldWithSignature } from '@doku-seal/prisma/types/field-with-signature';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import {

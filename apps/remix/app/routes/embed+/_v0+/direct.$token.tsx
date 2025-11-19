@@ -1,17 +1,17 @@
 import { data } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEnvelopeForDirectTemplateSigning } from '@documenso/lib/server-only/envelope/get-envelope-for-direct-template-signing';
-import { getEnvelopeRequiredAccessData } from '@documenso/lib/server-only/envelope/get-envelope-required-access-data';
-import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
-import { getTemplateByDirectLinkToken } from '@documenso/lib/server-only/template/get-template-by-direct-link-token';
-import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
-import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { prisma } from '@documenso/prisma';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { EnvelopeRenderProvider } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getEnvelopeForDirectTemplateSigning } from '@doku-seal/lib/server-only/envelope/get-envelope-for-direct-template-signing';
+import { getEnvelopeRequiredAccessData } from '@doku-seal/lib/server-only/envelope/get-envelope-required-access-data';
+import { getOrganisationClaimByTeamId } from '@doku-seal/lib/server-only/organisation/get-organisation-claims';
+import { getTemplateByDirectLinkToken } from '@doku-seal/lib/server-only/template/get-template-by-direct-link-token';
+import { DocumentAccessAuth } from '@doku-seal/lib/types/document-auth';
+import { extractDocumentAuthMethods } from '@doku-seal/lib/utils/document-auth';
+import { prisma } from '@doku-seal/prisma';
 
 import { EmbedDirectTemplateClientPage } from '~/components/embed/embed-direct-template-client-page';
 import { EmbedSignDocumentV2ClientPage } from '~/components/embed/embed-document-signing-page-v2';

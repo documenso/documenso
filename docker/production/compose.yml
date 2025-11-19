@@ -1,4 +1,4 @@
-name: documenso-production
+name: doku-seal-production
 
 services:
   database:
@@ -15,8 +15,8 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
 
-  documenso:
-    image: documenso/documenso:latest
+  doku-seal:
+    image: doku-seal/doku-seal:latest
     depends_on:
       database:
         condition: service_healthy
@@ -59,12 +59,12 @@ services:
       - NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT=${NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT}
       - NEXT_PUBLIC_POSTHOG_KEY=${NEXT_PUBLIC_POSTHOG_KEY}
       - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
-      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/doku-seal/cert.p12}
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
     ports:
       - ${PORT:-3000}:${PORT:-3000}
     volumes:
-      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+      - /opt/doku-seal/cert.p12:/opt/doku-seal/cert.p12:ro
 
 volumes:
   database:

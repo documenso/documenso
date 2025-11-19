@@ -7,11 +7,11 @@ import { AlertTriangle, CheckCheckIcon, CheckIcon, Loader, MailOpen } from 'luci
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { cn } from '@documenso/ui/lib/utils';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import { formatDocumentAuditLogAction } from '@doku-seal/lib/utils/document-audit-logs';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { cn } from '@doku-seal/ui/lib/utils';
 
 export type DocumentPageViewRecentActivityProps = {
   documentId: number;

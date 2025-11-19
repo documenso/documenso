@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import React from 'react';
 
-import type { TeamSession } from '@documenso/trpc/server/organisation-router/get-organisation-session.types';
+import type { TeamSession } from '@doku-seal/trpc/server/organisation-router/get-organisation-session.types';
 
 type TeamProviderValue = TeamSession;
 

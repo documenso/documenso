@@ -1,8 +1,8 @@
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { z } from 'zod';
 
-import { OrganisationMemberInviteSchema } from '@documenso/prisma/generated/zod/modelSchema/OrganisationMemberInviteSchema';
-import OrganisationSchema from '@documenso/prisma/generated/zod/modelSchema/OrganisationSchema';
+import { OrganisationMemberInviteSchema } from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationMemberInviteSchema';
+import OrganisationSchema from '@doku-seal/prisma/generated/zod/modelSchema/OrganisationSchema';
 
 export const ZGetOrganisationMemberInvitesRequestSchema = z.object({
   status: z.nativeEnum(OrganisationMemberInviteStatus).optional(),

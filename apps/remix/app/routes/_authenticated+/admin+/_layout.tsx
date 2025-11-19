@@ -10,10 +10,10 @@ import {
 } from 'lucide-react';
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { isAdmin } from '@documenso/lib/utils/is-admin';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { getSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { isAdmin } from '@doku-seal/lib/utils/is-admin';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import type { Route } from './+types/_layout';
 

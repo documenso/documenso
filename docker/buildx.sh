@@ -26,7 +26,7 @@ docker buildx build \
     -f "$SCRIPT_DIR/Dockerfile" \
     --platform=$PLATFORM \
     --progress=plain \
-    -t "documenso-base" \
+    -t "doku-seal-base" \
     "$MONOREPO_ROOT"
 
 # Handle repository tagging
@@ -34,28 +34,28 @@ if [ ! -z "$DOCKER_REPOSITORY" ]; then
     echo "Using custom repository: $DOCKER_REPOSITORY"
     
     # Add tags for custom repository
-    docker tag "documenso-base" "$DOCKER_REPOSITORY:latest"
-    docker tag "documenso-base" "$DOCKER_REPOSITORY:$GIT_SHA"
+    docker tag "doku-seal-base" "$DOCKER_REPOSITORY:latest"
+    docker tag "doku-seal-base" "$DOCKER_REPOSITORY:$GIT_SHA"
 
     # Add version tag if available
     if [ ! -z "$APP_VERSION" ] && [ "$APP_VERSION" != "undefined" ]; then
-        docker tag "documenso-base" "$DOCKER_REPOSITORY:$APP_VERSION"
+        docker tag "doku-seal-base" "$DOCKER_REPOSITORY:$APP_VERSION"
     fi
 else
     echo "Using default repositories: dockerhub and ghcr.io"
     
     # Add tags for both default repositories
-    docker tag "documenso-base" "documenso/documenso:latest"
-    docker tag "documenso-base" "documenso/documenso:$GIT_SHA"
-    docker tag "documenso-base" "ghcr.io/documenso/documenso:latest"
-    docker tag "documenso-base" "ghcr.io/documenso/documenso:$GIT_SHA"
+    docker tag "doku-seal-base" "doku-seal/doku-seal:latest"
+    docker tag "doku-seal-base" "doku-seal/doku-seal:$GIT_SHA"
+    docker tag "doku-seal-base" "ghcr.io/doku-seal/doku-seal:latest"
+    docker tag "doku-seal-base" "ghcr.io/doku-seal/doku-seal:$GIT_SHA"
 
     # Add version tags if available
     if [ ! -z "$APP_VERSION" ] && [ "$APP_VERSION" != "undefined" ]; then
-        docker tag "documenso-base" "documenso/documenso:$APP_VERSION"
-        docker tag "documenso-base" "ghcr.io/documenso/documenso:$APP_VERSION"
+        docker tag "doku-seal-base" "doku-seal/doku-seal:$APP_VERSION"
+        docker tag "doku-seal-base" "ghcr.io/doku-seal/doku-seal:$APP_VERSION"
     fi
 fi
 
 # Remove the temporary base tag
-docker rmi "documenso-base"
+docker rmi "doku-seal-base"

@@ -1,7 +1,7 @@
 import type Stripe from 'stripe';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { stripe } from '@documenso/lib/server-only/stripe';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { stripe } from '@doku-seal/lib/server-only/stripe';
 
 export type CreateCheckoutSessionOptions = {
   customerId: string;

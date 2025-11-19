@@ -11,11 +11,11 @@ import {
 import {
   DOCUMENT_AUDIT_LOG_TYPE,
   RECIPIENT_DIFF_TYPE,
-} from '@documenso/lib/types/document-audit-logs';
-import type { RequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { fieldsContainUnsignedRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
-import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/types/document-audit-logs';
+import type { RequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
+import { fieldsContainUnsignedRequiredField } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { createDocumentAuditLogData } from '@doku-seal/lib/utils/document-audit-logs';
+import { prisma } from '@doku-seal/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { jobs } from '../../jobs/client';

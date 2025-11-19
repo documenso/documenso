@@ -66,7 +66,7 @@ module.exports = {
           DEFAULT: 'hsl(var(--widget))',
           foreground: 'hsl(var(--widget-foreground))',
         },
-        documenso: {
+        'doku-seal': {
           DEFAULT: '#A2E771',
           50: '#FFFFFF',
           100: '#FDFFFD',

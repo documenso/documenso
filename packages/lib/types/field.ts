@@ -1,7 +1,7 @@
 import { FieldType, Prisma } from '@prisma/client';
 import { z } from 'zod';
 
-import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSchema';
+import { FieldSchema } from '@doku-seal/prisma/generated/zod/modelSchema/FieldSchema';
 
 import {
   FIELD_SIGNATURE_META_DEFAULT_VALUES,

@@ -3,11 +3,11 @@ import nextra from 'nextra';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: [
-    '@documenso/assets',
-    '@documenso/lib',
-    '@documenso/tailwind-config',
-    '@documenso/trpc',
-    '@documenso/ui',
+    '@doku-seal/assets',
+    '@doku-seal/lib',
+    '@doku-seal/tailwind-config',
+    '@doku-seal/trpc',
+    '@doku-seal/ui',
   ],
 };
 

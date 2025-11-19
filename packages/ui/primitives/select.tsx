@@ -4,7 +4,7 @@ import * as SelectPrimitive from '@radix-ui/react-select';
 import { AnimatePresence } from 'framer-motion';
 import { Check, ChevronDown, Loader } from 'lucide-react';
 
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
 
 import { cn } from '../lib/utils';
 

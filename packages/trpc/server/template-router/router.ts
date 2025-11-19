@@ -1,32 +1,32 @@
 import type { Envelope } from '@prisma/client';
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
-import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { jobs } from '@documenso/lib/jobs/client';
-import { createDocumentData } from '@documenso/lib/server-only/document-data/create-document-data';
-import { getDocumentWithDetailsById } from '@documenso/lib/server-only/document/get-document-with-details-by-id';
-import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { duplicateEnvelope } from '@documenso/lib/server-only/envelope/duplicate-envelope';
-import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
+import { getServerLimits } from '@doku-seal/ee/server-only/limits/server';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { jobs } from '@doku-seal/lib/jobs/client';
+import { createDocumentData } from '@doku-seal/lib/server-only/document-data/create-document-data';
+import { getDocumentWithDetailsById } from '@doku-seal/lib/server-only/document/get-document-with-details-by-id';
+import { sendDocument } from '@doku-seal/lib/server-only/document/send-document';
+import { createEnvelope } from '@doku-seal/lib/server-only/envelope/create-envelope';
+import { duplicateEnvelope } from '@doku-seal/lib/server-only/envelope/duplicate-envelope';
+import { updateEnvelope } from '@doku-seal/lib/server-only/envelope/update-envelope';
 import {
   ZCreateDocumentFromDirectTemplateResponseSchema,
   createDocumentFromDirectTemplate,
-} from '@documenso/lib/server-only/template/create-document-from-direct-template';
-import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
-import { createTemplateDirectLink } from '@documenso/lib/server-only/template/create-template-direct-link';
-import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
-import { deleteTemplateDirectLink } from '@documenso/lib/server-only/template/delete-template-direct-link';
-import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
-import { getTemplateById } from '@documenso/lib/server-only/template/get-template-by-id';
-import { toggleTemplateDirectLink } from '@documenso/lib/server-only/template/toggle-template-direct-link';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
-import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
-import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
+} from '@doku-seal/lib/server-only/template/create-document-from-direct-template';
+import { createDocumentFromTemplate } from '@doku-seal/lib/server-only/template/create-document-from-template';
+import { createTemplateDirectLink } from '@doku-seal/lib/server-only/template/create-template-direct-link';
+import { deleteTemplate } from '@doku-seal/lib/server-only/template/delete-template';
+import { deleteTemplateDirectLink } from '@doku-seal/lib/server-only/template/delete-template-direct-link';
+import { findTemplates } from '@doku-seal/lib/server-only/template/find-templates';
+import { getTemplateById } from '@doku-seal/lib/server-only/template/get-template-by-id';
+import { toggleTemplateDirectLink } from '@doku-seal/lib/server-only/template/toggle-template-direct-link';
+import { putNormalizedPdfFileServerSide } from '@doku-seal/lib/universal/upload/put-file.server';
+import { getPresignPostUrl } from '@doku-seal/lib/universal/upload/server-actions';
+import { mapSecondaryIdToTemplateId } from '@doku-seal/lib/utils/envelope';
+import { mapFieldToLegacyField } from '@doku-seal/lib/utils/fields';
+import { mapRecipientToLegacyRecipient } from '@doku-seal/lib/utils/recipients';
+import { mapEnvelopeToTemplateLite } from '@doku-seal/lib/utils/templates';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';

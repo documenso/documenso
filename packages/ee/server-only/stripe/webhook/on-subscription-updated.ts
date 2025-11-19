@@ -1,10 +1,10 @@
 import { OrganisationType, SubscriptionStatus } from '@prisma/client';
 import { match } from 'ts-pattern';
 
-import { createOrganisationClaimUpsertData } from '@documenso/lib/server-only/organisation/create-organisation';
-import { type Stripe, stripe } from '@documenso/lib/server-only/stripe';
-import { INTERNAL_CLAIM_ID } from '@documenso/lib/types/subscription';
-import { prisma } from '@documenso/prisma';
+import { createOrganisationClaimUpsertData } from '@doku-seal/lib/server-only/organisation/create-organisation';
+import { type Stripe, stripe } from '@doku-seal/lib/server-only/stripe';
+import { INTERNAL_CLAIM_ID } from '@doku-seal/lib/types/subscription';
+import { prisma } from '@doku-seal/prisma';
 
 export type OnSubscriptionUpdatedOptions = {
   subscription: Stripe.Subscription;

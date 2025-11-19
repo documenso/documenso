@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
-import type { GetSignerConversionMonthlyResult } from '@documenso/lib/server-only/user/get-signer-conversion';
+import type { GetSignerConversionMonthlyResult } from '@doku-seal/lib/server-only/user/get-signer-conversion';
 
 export type AdminStatsSignerConversionChartProps = {
   className?: string;

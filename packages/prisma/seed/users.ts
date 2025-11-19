@@ -1,8 +1,8 @@
 import { OrganisationType, Role } from '@prisma/client';
 import { customAlphabet } from 'nanoid';
 
-import { hashSync } from '@documenso/lib/server-only/auth/hash';
-import { createPersonalOrganisation } from '@documenso/lib/server-only/organisation/create-organisation';
+import { hashSync } from '@doku-seal/lib/server-only/auth/hash';
+import { createPersonalOrganisation } from '@doku-seal/lib/server-only/organisation/create-organisation';
 
 import { prisma } from '..';
 import { setOrganisationType } from './organisations';
@@ -21,7 +21,7 @@ type SeedUserOptions = {
 
 const nanoid = customAlphabet('1234567890abcdef', 10);
 
-export const seedTestEmail = () => `${nanoid()}@test.documenso.com`;
+export const seedTestEmail = () => `${nanoid()}@test.doku-seal.com`;
 
 export const seedUser = async ({
   name = nanoid(),
@@ -35,7 +35,7 @@ export const seedUser = async ({
   isPersonalOrganisation = false,
 }: SeedUserOptions = {}) => {
   if (!email) {
-    email = `${nanoid()}@test.documenso.com`;
+    email = `${nanoid()}@test.doku-seal.com`;
   }
 
   const user = await prisma.user.create({

@@ -29,7 +29,7 @@ jobs:
       - name: Check and commit any files created
         run: |
           git config --global user.name 'github-actions'
-          git config --global user.email 'github-actions@documenso.com'
+          git config --global user.email 'github-actions@doku-seal.com'
           git add packages/lib/translations
           git diff --staged --quiet --exit-code || (git commit -m "chore: extract translations" && git push)
 

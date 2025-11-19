@@ -7,13 +7,13 @@ import { ChevronLeft } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { Link } from 'react-router';
 
-import { getSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { getTeamByUrl } from '@documenso/lib/server-only/team/get-team';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { logDocumentAccess } from '@documenso/lib/utils/logger';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { Card } from '@documenso/ui/primitives/card';
+import { getSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { getTeamByUrl } from '@doku-seal/lib/server-only/team/get-team';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
+import { logDocumentAccess } from '@doku-seal/lib/utils/logger';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { Card } from '@doku-seal/ui/primitives/card';
 
 import { DocumentAuditLogDownloadButton } from '~/components/general/document/document-audit-log-download-button';
 import { DocumentCertificateDownloadButton } from '~/components/general/document/document-certificate-download-button';

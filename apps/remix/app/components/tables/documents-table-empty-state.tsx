@@ -3,7 +3,7 @@ import { useLingui } from '@lingui/react';
 import { Bird, CheckCircle2 } from 'lucide-react';
 import { match } from 'ts-pattern';
 
-import { ExtendedDocumentStatus } from '@documenso/prisma/types/extended-document-status';
+import { ExtendedDocumentStatus } from '@doku-seal/prisma/types/extended-document-status';
 
 export type DocumentsTableEmptyStateProps = { status: ExtendedDocumentStatus };
 

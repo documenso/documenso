@@ -4,10 +4,10 @@ import { Trans } from '@lingui/react/macro';
 import { AlertCircle } from 'lucide-react';
 import { useRevalidator } from 'react-router';
 
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { PopoverHover } from '@documenso/ui/primitives/popover';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import { trpc } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { PopoverHover } from '@doku-seal/ui/primitives/popover';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type LegacyFieldWarningPopoverProps = {
   type?: 'document' | 'template';

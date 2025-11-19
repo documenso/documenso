@@ -9,10 +9,10 @@ import { AnimatePresence } from 'framer-motion';
 import { Search } from 'lucide-react';
 import { Link, useLocation } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { isPersonalLayout } from '@doku-seal/lib/utils/organisations';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { useOptionalCurrentTeam } from '~/providers/team';
 

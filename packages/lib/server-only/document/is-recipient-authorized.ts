@@ -2,7 +2,7 @@ import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
 import { match } from 'ts-pattern';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { validateTwoFactorTokenFromEmail } from '../2fa/email/validate-2fa-token-from-email';
 import { verifyTwoFactorAuthenticationToken } from '../2fa/verify-2fa-token';

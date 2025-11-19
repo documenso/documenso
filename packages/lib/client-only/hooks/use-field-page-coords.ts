@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from 'react';
 
 import type { Field } from '@prisma/client';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
 
 export const useFieldPageCoords = (
   field: Pick<Field, 'positionX' | 'positionY' | 'width' | 'height' | 'page'>,

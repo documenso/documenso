@@ -1,9 +1,9 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { jobs } from '@documenso/lib/jobs/client';
-import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { jobs } from '@doku-seal/lib/jobs/client';
+import { unsafeGetEntireEnvelope } from '@doku-seal/lib/server-only/admin/get-entire-document';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
 
 import { adminProcedure } from '../trpc';
 import {

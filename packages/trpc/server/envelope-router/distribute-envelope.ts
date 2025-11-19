@@ -1,6 +1,6 @@
-import { updateDocumentMeta } from '@documenso/lib/server-only/document-meta/upsert-document-meta';
-import { sendDocument } from '@documenso/lib/server-only/document/send-document';
-import { formatSigningLink } from '@documenso/lib/utils/recipients';
+import { updateDocumentMeta } from '@doku-seal/lib/server-only/document-meta/upsert-document-meta';
+import { sendDocument } from '@doku-seal/lib/server-only/document/send-document';
+import { formatSigningLink } from '@doku-seal/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {

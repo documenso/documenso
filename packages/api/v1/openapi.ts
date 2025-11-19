@@ -1,6 +1,6 @@
 import { generateOpenApi } from '@ts-rest/open-api';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
 
 import { ApiContractV1 } from './contract';
 
@@ -9,9 +9,9 @@ export const OpenAPIV1 = Object.assign(
     ApiContractV1,
     {
       info: {
-        title: 'Documenso API',
+        title: 'Doku-Seal API',
         version: '1.0.0',
-        description: 'The Documenso API for retrieving, creating, updating and deleting documents.',
+        description: 'The Doku-Seal API for retrieving, creating, updating and deleting documents.',
       },
       servers: [
         {

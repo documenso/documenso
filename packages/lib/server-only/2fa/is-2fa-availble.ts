@@ -1,6 +1,6 @@
 import type { User } from '@prisma/client';
 
-import { DOCUMENSO_ENCRYPTION_KEY } from '../../constants/crypto';
+import { DOKU_SEAL_ENCRYPTION_KEY } from '../../constants/crypto';
 
 type IsTwoFactorAuthenticationEnabledOptions = {
   user: User;
@@ -9,5 +9,5 @@ type IsTwoFactorAuthenticationEnabledOptions = {
 export const isTwoFactorAuthenticationEnabled = ({
   user,
 }: IsTwoFactorAuthenticationEnabledOptions) => {
-  return user.twoFactorEnabled && typeof DOCUMENSO_ENCRYPTION_KEY === 'string';
+  return user.twoFactorEnabled && typeof DOKU_SEAL_ENCRYPTION_KEY === 'string';
 };

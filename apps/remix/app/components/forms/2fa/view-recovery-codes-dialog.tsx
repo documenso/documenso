@@ -6,11 +6,11 @@ import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { authClient } from '@documenso/auth/client';
-import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { authClient } from '@doku-seal/auth/client';
+import { downloadFile } from '@doku-seal/lib/client-only/download-file';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -20,15 +20,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { PinInput, PinInputGroup, PinInputSlot } from '@documenso/ui/primitives/pin-input';
+} from '@doku-seal/ui/primitives/form/form';
+import { PinInput, PinInputGroup, PinInputSlot } from '@doku-seal/ui/primitives/pin-input';
 
 import { RecoveryCodeList } from './recovery-code-list';
 

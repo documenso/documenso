@@ -4,13 +4,13 @@ import {
   EnvelopeType,
 } from '@prisma/client';
 
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffDocumentMetaChanges,
-} from '@documenso/lib/utils/document-audit-logs';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/utils/document-audit-logs';
+import { prisma } from '@doku-seal/prisma';
 
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';

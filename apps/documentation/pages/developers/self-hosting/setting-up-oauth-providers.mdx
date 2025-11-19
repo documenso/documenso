@@ -1,6 +1,6 @@
 ---
 title: Setting up OAuth Providers
-description: Learn how to set up OAuth providers for your own instance of Documenso.
+description: Learn how to set up OAuth providers for your own instance of Doku-Seal.
 ---
 
 ## Google OAuth (Gmail)
@@ -19,7 +19,7 @@ To use Google OAuth, you will need to create a Google Cloud Platform project and
 8. Click the download button to download the client secret
 9. Set the authorized javascript origins to `https://<documenso-domain>`
 10. Set the authorized redirect URIs to `https://<documenso-domain>/api/auth/callback/google`
-11. In the Documenso environment variables, set the following:
+11. In the Doku-Seal environment variables, set the following:
 
 ```
 NEXT_PRIVATE_GOOGLE_CLIENT_ID=<your-client-id>
@@ -38,7 +38,7 @@ To use Microsoft OAuth, you will need to create an Azure AD application registra
 2. Navigate to **Azure Active Directory** (or **Microsoft Entra ID** in newer Azure portals)
 3. In the left sidebar, click **App registrations**
 4. Click **New registration**
-5. Enter a name for your application (e.g., "Documenso")
+5. Enter a name for your application (e.g., "Doku-Seal")
 6. Under **Supported account types**, select **Accounts in any organizational directory (Any Azure AD directory - Multitenant) and personal Microsoft accounts (e.g. Skype, Xbox)** to allow any Microsoft account to sign in
 7. Under **Redirect URI**, select **Web** and enter: `https://<documenso-domain>/api/auth/callback/microsoft`
 8. Click **Register**
@@ -51,7 +51,7 @@ To use Microsoft OAuth, you will need to create an Azure AD application registra
 4. Under **Client secrets**, click **New client secret**
 5. Add a description and select an expiration period
 6. Click **Add** and copy the **Value** (not the Secret ID) - this will be your `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET`
-7. In the Documenso environment variables, set the following:
+7. In the Doku-Seal environment variables, set the following:
 
 ```
 NEXT_PRIVATE_MICROSOFT_CLIENT_ID=<your-application-client-id>

@@ -1,11 +1,11 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { getServerLimits } from '@documenso/ee/server-only/limits/server';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { getServerLimits } from '@doku-seal/ee/server-only/limits/server';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { createEnvelope } from '@doku-seal/lib/server-only/envelope/create-envelope';
+import { insertFormValuesInPdf } from '@doku-seal/lib/server-only/pdf/insert-form-values-in-pdf';
+import { putNormalizedPdfFileServerSide } from '@doku-seal/lib/universal/upload/put-file.server';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {

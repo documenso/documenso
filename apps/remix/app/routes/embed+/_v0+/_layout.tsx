@@ -5,7 +5,7 @@ import {
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
   OIDC_PROVIDER_LABEL,
-} from '@documenso/lib/constants/auth';
+} from '@doku-seal/lib/constants/auth';
 
 import { EmbedAuthenticationRequired } from '~/components/embed/embed-authentication-required';
 import { EmbedDocumentCompleted } from '~/components/embed/embed-document-completed';

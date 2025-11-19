@@ -1,15 +1,15 @@
 import { z } from 'zod';
 
-import { DocumentDataSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
-import { DocumentMetaSchema } from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
-import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
-import { FolderSchema } from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
-import TeamSchema from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
-import { UserSchema } from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
+import { DocumentDataSchema } from '@doku-seal/prisma/generated/zod/modelSchema/DocumentDataSchema';
+import { DocumentMetaSchema } from '@doku-seal/prisma/generated/zod/modelSchema/DocumentMetaSchema';
+import EnvelopeItemSchema from '@doku-seal/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
+import { FolderSchema } from '@doku-seal/prisma/generated/zod/modelSchema/FolderSchema';
+import TeamSchema from '@doku-seal/prisma/generated/zod/modelSchema/TeamSchema';
+import { UserSchema } from '@doku-seal/prisma/generated/zod/modelSchema/UserSchema';
 import {
   LegacyTemplateDirectLinkSchema,
   TemplateSchema,
-} from '@documenso/prisma/types/template-legacy-schema';
+} from '@doku-seal/prisma/types/template-legacy-schema';
 
 import { ZFieldSchema } from './field';
 import { ZRecipientLiteSchema } from './recipient';

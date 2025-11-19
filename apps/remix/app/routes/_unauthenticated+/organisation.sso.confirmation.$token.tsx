@@ -7,17 +7,17 @@ import { data, isRouteErrorResponse } from 'react-router';
 import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@documenso/lib/constants/organisations';
-import { ZOrganisationAccountLinkMetadataSchema } from '@documenso/lib/types/organisation';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { formatOrganisationLoginPath } from '@documenso/lib/utils/organisation-authentication-portal';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { prisma } from '@documenso/prisma';
-import { trpc } from '@documenso/trpc/react';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
+import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@doku-seal/lib/constants/organisations';
+import { ZOrganisationAccountLinkMetadataSchema } from '@doku-seal/lib/types/organisation';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { formatOrganisationLoginPath } from '@doku-seal/lib/utils/organisation-authentication-portal';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { prisma } from '@doku-seal/prisma';
+import { trpc } from '@doku-seal/trpc/react';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Card,
   CardContent,
@@ -25,10 +25,10 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from '@documenso/ui/primitives/card';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { Separator } from '@documenso/ui/primitives/separator';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/card';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { Separator } from '@doku-seal/ui/primitives/separator';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { GenericErrorLayout, defaultErrorCodeMap } from '~/components/general/generic-error-layout';
 

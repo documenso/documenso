@@ -1,7 +1,7 @@
 import { Trans } from '@lingui/react/macro';
 import { DialogClose } from '@radix-ui/react-dialog';
 
-import { Button } from '@documenso/ui/primitives/button';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 
 export type MissingSignatureFieldDialogProps = {
   isOpen: boolean;

@@ -19,15 +19,15 @@ import { useNavigate, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentEnvelopeEditor } from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
 import {
   mapSecondaryIdToDocumentId,
   mapSecondaryIdToTemplateId,
-} from '@documenso/lib/utils/envelope';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Button } from '@documenso/ui/primitives/button';
-import { Separator } from '@documenso/ui/primitives/separator';
-import { SpinnerBox } from '@documenso/ui/primitives/spinner';
+} from '@doku-seal/lib/utils/envelope';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Separator } from '@doku-seal/ui/primitives/separator';
+import { SpinnerBox } from '@doku-seal/ui/primitives/spinner';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';

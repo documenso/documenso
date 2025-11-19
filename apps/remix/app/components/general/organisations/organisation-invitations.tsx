@@ -5,13 +5,13 @@ import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { AnimatePresence } from 'framer-motion';
 import { BellIcon } from 'lucide-react';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { trpc } from '@documenso/trpc/react';
-import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { AvatarWithText } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { trpc } from '@doku-seal/trpc/react';
+import { AnimateGenericFadeInOut } from '@doku-seal/ui/components/animate/animate-generic-fade-in-out';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { AvatarWithText } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -19,8 +19,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export const OrganisationInvitations = ({ className }: { className?: string }) => {
   const { data, isLoading } = trpc.organisation.member.invite.getMany.useQuery({

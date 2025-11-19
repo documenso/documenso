@@ -1,18 +1,18 @@
 import { EnvelopeType, RecipientRole, SendStatus, SigningStatus } from '@prisma/client';
 
-import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
-import type { TRecipientAccessAuthTypes } from '@documenso/lib/types/document-auth';
+import { DOCUMENT_AUDIT_LOG_TYPE } from '@doku-seal/lib/types/document-audit-logs';
+import type { TRecipientAccessAuthTypes } from '@doku-seal/lib/types/document-auth';
 import {
   type TRecipientActionAuthTypes,
   ZRecipientAuthOptionsSchema,
-} from '@documenso/lib/types/document-auth';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
+} from '@doku-seal/lib/types/document-auth';
+import type { ApiRequestMetadata } from '@doku-seal/lib/universal/extract-request-metadata';
 import {
   createDocumentAuditLogData,
   diffRecipientChanges,
-} from '@documenso/lib/utils/document-audit-logs';
-import { createRecipientAuthOptions } from '@documenso/lib/utils/document-auth';
-import { prisma } from '@documenso/prisma';
+} from '@doku-seal/lib/utils/document-audit-logs';
+import { createRecipientAuthOptions } from '@doku-seal/lib/utils/document-auth';
+import { prisma } from '@doku-seal/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractLegacyIds } from '../../universal/id';

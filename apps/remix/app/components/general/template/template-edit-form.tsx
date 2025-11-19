@@ -5,28 +5,28 @@ import { useLingui } from '@lingui/react';
 import { useNavigate } from 'react-router';
 import { z } from 'zod';
 
-import { DocumentSignatureType } from '@documenso/lib/constants/document';
-import { isValidLanguageCode } from '@documenso/lib/constants/i18n';
+import { DocumentSignatureType } from '@doku-seal/lib/constants/document';
+import { isValidLanguageCode } from '@doku-seal/lib/constants/i18n';
 import {
   DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
   SKIP_QUERY_BATCH_META,
-} from '@documenso/lib/constants/trpc';
-import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import type { TTemplate } from '@documenso/lib/types/template';
-import { trpc } from '@documenso/trpc/react';
-import { cn } from '@documenso/ui/lib/utils';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
-import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { Stepper } from '@documenso/ui/primitives/stepper';
-import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
-import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
-import { AddTemplatePlaceholderRecipientsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients';
-import type { TAddTemplatePlacholderRecipientsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-placeholder-recipients.types';
-import { AddTemplateSettingsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-settings';
-import type { TAddTemplateSettingsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-settings.types';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/lib/constants/trpc';
+import { ZDocumentAccessAuthTypesSchema } from '@doku-seal/lib/types/document-auth';
+import type { TTemplate } from '@doku-seal/lib/types/template';
+import { trpc } from '@doku-seal/trpc/react';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
+import { DocumentFlowFormContainer } from '@doku-seal/ui/primitives/document-flow/document-flow-root';
+import type { DocumentFlowStep } from '@doku-seal/ui/primitives/document-flow/types';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { Stepper } from '@doku-seal/ui/primitives/stepper';
+import { AddTemplateFieldsFormPartial } from '@doku-seal/ui/primitives/template-flow/add-template-fields';
+import type { TAddTemplateFieldsFormSchema } from '@doku-seal/ui/primitives/template-flow/add-template-fields.types';
+import { AddTemplatePlaceholderRecipientsFormPartial } from '@doku-seal/ui/primitives/template-flow/add-template-placeholder-recipients';
+import type { TAddTemplatePlacholderRecipientsFormSchema } from '@doku-seal/ui/primitives/template-flow/add-template-placeholder-recipients.types';
+import { AddTemplateSettingsFormPartial } from '@doku-seal/ui/primitives/template-flow/add-template-settings';
+import type { TAddTemplateSettingsFormSchema } from '@doku-seal/ui/primitives/template-flow/add-template-settings.types';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 

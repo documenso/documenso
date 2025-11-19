@@ -1,6 +1,6 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { AppError, AppErrorCode } from '../../errors/app-error';

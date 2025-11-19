@@ -1,8 +1,8 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
-import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
-import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
-import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { verifyEmbeddingPresignToken } from '@doku-seal/lib/server-only/embedding-presign/verify-embedding-presign-token';
+import { updateEnvelope } from '@doku-seal/lib/server-only/envelope/update-envelope';
+import { setFieldsForTemplate } from '@doku-seal/lib/server-only/field/set-fields-for-template';
+import { setTemplateRecipients } from '@doku-seal/lib/server-only/recipient/set-template-recipients';
 
 import { procedure } from '../trpc';
 import {

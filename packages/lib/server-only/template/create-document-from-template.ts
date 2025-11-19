@@ -13,8 +13,8 @@ import {
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
-import { nanoid, prefixedId } from '@documenso/lib/universal/id';
-import { prisma } from '@documenso/prisma';
+import { nanoid, prefixedId } from '@doku-seal/lib/universal/id';
+import { prisma } from '@doku-seal/prisma';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { SupportedLanguageCodes } from '../../constants/i18n';

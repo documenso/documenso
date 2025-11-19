@@ -1,7 +1,7 @@
 import type { Context, Next } from 'hono';
 import { setCookie } from 'hono/cookie';
 
-import { AppDebugger } from '@documenso/lib/utils/debugger';
+import { AppDebugger } from '@doku-seal/lib/utils/debugger';
 
 import { handleRedirects } from './redirects';
 

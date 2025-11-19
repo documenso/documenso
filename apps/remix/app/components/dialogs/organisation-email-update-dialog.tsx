@@ -6,10 +6,10 @@ import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { trpc } from '@documenso/trpc/react';
-import type { TGetOrganisationEmailDomainResponse } from '@documenso/trpc/server/enterprise-router/get-organisation-email-domain.types';
-import { ZUpdateOrganisationEmailRequestSchema } from '@documenso/trpc/server/enterprise-router/update-organisation-email.types';
-import { Button } from '@documenso/ui/primitives/button';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TGetOrganisationEmailDomainResponse } from '@doku-seal/trpc/server/enterprise-router/get-organisation-email-domain.types';
+import { ZUpdateOrganisationEmailRequestSchema } from '@doku-seal/trpc/server/enterprise-router/update-organisation-email.types';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -27,9 +27,9 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type OrganisationEmailUpdateDialogProps = {
   trigger: React.ReactNode;

@@ -5,16 +5,16 @@ import { Building2Icon, InboxIcon, SettingsIcon, UsersIcon } from 'lucide-react'
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
-import { TEAM_MEMBER_ROLE_MAP } from '@documenso/lib/constants/teams-translations';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { canExecuteTeamAction } from '@documenso/lib/utils/teams';
-import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
-import { Button } from '@documenso/ui/primitives/button';
-import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { ScrollArea, ScrollBar } from '@documenso/ui/primitives/scroll-area';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
+import { TEAM_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/teams-translations';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { canExecuteOrganisationAction } from '@doku-seal/lib/utils/organisations';
+import { canExecuteTeamAction } from '@doku-seal/lib/utils/teams';
+import { Avatar, AvatarFallback, AvatarImage } from '@doku-seal/ui/primitives/avatar';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Card, CardContent } from '@doku-seal/ui/primitives/card';
+import { ScrollArea, ScrollBar } from '@doku-seal/ui/primitives/scroll-area';
 
 import { OrganisationInvitations } from '~/components/general/organisations/organisation-invitations';
 import { InboxTable } from '~/components/tables/inbox-table';

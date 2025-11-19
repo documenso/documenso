@@ -2,12 +2,12 @@ import { DocumentSigningOrder, DocumentVisibility, TemplateType } from '@prisma/
 import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
-import { ZDocumentSchema } from '@documenso/lib/types/document';
+import { ZDocumentSchema } from '@doku-seal/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+} from '@doku-seal/lib/types/document-auth';
+import { ZDocumentEmailSettingsSchema } from '@doku-seal/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -19,16 +19,16 @@ import {
   ZDocumentMetaTimezoneSchema,
   ZDocumentMetaTypedSignatureEnabledSchema,
   ZDocumentMetaUploadSignatureEnabledSchema,
-} from '@documenso/lib/types/document-meta';
-import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
-import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
-import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+} from '@doku-seal/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@doku-seal/lib/types/envelope-attachment';
+import { ZFieldMetaPrefillFieldsSchema } from '@doku-seal/lib/types/field-meta';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@doku-seal/lib/types/search-params';
 import {
   ZTemplateLiteSchema,
   ZTemplateManySchema,
   ZTemplateSchema,
-} from '@documenso/lib/types/template';
-import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+} from '@doku-seal/lib/types/template';
+import { LegacyTemplateDirectLinkSchema } from '@doku-seal/prisma/types/template-legacy-schema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';

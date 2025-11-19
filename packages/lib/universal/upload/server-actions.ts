@@ -7,7 +7,7 @@ import {
 import slugify from '@sindresorhus/slugify';
 import path from 'node:path';
 
-import { env } from '@documenso/lib/utils/env';
+import { env } from '@doku-seal/lib/utils/env';
 
 import { ONE_HOUR, ONE_SECOND } from '../../constants/time';
 import { alphaid } from '../id';

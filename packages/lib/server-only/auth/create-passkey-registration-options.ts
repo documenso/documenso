@@ -2,7 +2,7 @@ import { generateRegistrationOptions } from '@simplewebauthn/server';
 import type { AuthenticatorTransportFuture } from '@simplewebauthn/types';
 import { DateTime } from 'luxon';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 import { PASSKEY_TIMEOUT } from '../../constants/auth';
 import { getAuthenticatorOptions } from '../../utils/authenticator';

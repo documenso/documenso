@@ -7,9 +7,9 @@ import {
   SigningStatus,
 } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
-import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
-import { seedUser } from '@documenso/prisma/seed/users';
+import { prisma } from '@doku-seal/prisma';
+import { seedPendingDocumentWithFullFields } from '@doku-seal/prisma/seed/documents';
+import { seedUser } from '@doku-seal/prisma/seed/users';
 
 import { signDirectSignaturePad, signSignaturePad } from '../fixtures/signature';
 

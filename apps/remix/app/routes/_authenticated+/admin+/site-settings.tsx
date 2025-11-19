@@ -6,14 +6,14 @@ import { useForm } from 'react-hook-form';
 import { useRevalidator } from 'react-router';
 import type { z } from 'zod';
 
-import { getSiteSettings } from '@documenso/lib/server-only/site-settings/get-site-settings';
+import { getSiteSettings } from '@doku-seal/lib/server-only/site-settings/get-site-settings';
 import {
   SITE_SETTINGS_BANNER_ID,
   ZSiteSettingsBannerSchema,
-} from '@documenso/lib/server-only/site-settings/schemas/banner';
-import { trpc as trpcReact } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { ColorPicker } from '@documenso/ui/primitives/color-picker';
+} from '@doku-seal/lib/server-only/site-settings/schemas/banner';
+import { trpc as trpcReact } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { ColorPicker } from '@doku-seal/ui/primitives/color-picker';
 import {
   Form,
   FormControl,
@@ -22,10 +22,10 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Switch } from '@documenso/ui/primitives/switch';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/form/form';
+import { Switch } from '@doku-seal/ui/primitives/switch';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { SettingsHeader } from '~/components/general/settings-header';
 

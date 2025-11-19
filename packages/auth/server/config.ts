@@ -1,5 +1,5 @@
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { env } from '@documenso/lib/utils/env';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { env } from '@doku-seal/lib/utils/env';
 
 /**
  * How long a session should live for in milliseconds.

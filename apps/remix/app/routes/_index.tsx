@@ -1,10 +1,10 @@
 import { redirect } from 'react-router';
 
-import { extractCookieFromHeaders } from '@documenso/auth/server/lib/utils/cookies';
-import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
-import { getTeams } from '@documenso/lib/server-only/team/get-teams';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { ZTeamUrlSchema } from '@documenso/trpc/server/team-router/schema';
+import { extractCookieFromHeaders } from '@doku-seal/auth/server/lib/utils/cookies';
+import { getOptionalSession } from '@doku-seal/auth/server/lib/utils/get-session';
+import { getTeams } from '@doku-seal/lib/server-only/team/get-teams';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { ZTeamUrlSchema } from '@doku-seal/trpc/server/team-router/schema';
 
 import type { Route } from './+types/_index';
 

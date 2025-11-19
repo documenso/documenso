@@ -1,10 +1,10 @@
 import type { DocumentData } from '@prisma/client';
 import { DocumentDataType, EnvelopeType } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { getPresignGetUrl } from '@documenso/lib/universal/upload/server-actions';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { getPresignGetUrl } from '@doku-seal/lib/universal/upload/server-actions';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
 
 import { authenticatedProcedure } from '../trpc';
 import {

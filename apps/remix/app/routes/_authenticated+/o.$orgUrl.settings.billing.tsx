@@ -5,9 +5,9 @@ import { Loader } from 'lucide-react';
 import type Stripe from 'stripe';
 import { match } from 'ts-pattern';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
-import { trpc } from '@documenso/trpc/react';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { canExecuteOrganisationAction } from '@doku-seal/lib/utils/organisations';
+import { trpc } from '@doku-seal/trpc/react';
 
 import { BillingPlans } from '~/components/general/billing-plans';
 import { OrganisationBillingPortalButton } from '~/components/general/organisations/organisation-billing-portal-button';

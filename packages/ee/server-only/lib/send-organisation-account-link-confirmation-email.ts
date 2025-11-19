@@ -4,17 +4,17 @@ import { msg } from '@lingui/core/macro';
 import crypto from 'crypto';
 import { DateTime } from 'luxon';
 
-import { mailer } from '@documenso/email/mailer';
-import { OrganisationAccountLinkConfirmationTemplate } from '@documenso/email/templates/organisation-account-link-confirmation';
-import { getI18nInstance } from '@documenso/lib/client-only/providers/i18n-server';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { DOCUMENSO_INTERNAL_EMAIL } from '@documenso/lib/constants/email';
-import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@documenso/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEmailContext } from '@documenso/lib/server-only/email/get-email-context';
-import type { TOrganisationAccountLinkMetadata } from '@documenso/lib/types/organisation';
-import { renderEmailWithI18N } from '@documenso/lib/utils/render-email-with-i18n';
-import { prisma } from '@documenso/prisma';
+import { mailer } from '@doku-seal/email/mailer';
+import { OrganisationAccountLinkConfirmationTemplate } from '@doku-seal/email/templates/organisation-account-link-confirmation';
+import { getI18nInstance } from '@doku-seal/lib/client-only/providers/i18n-server';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { DOKU_SEAL_INTERNAL_EMAIL } from '@doku-seal/lib/constants/email';
+import { ORGANISATION_ACCOUNT_LINK_VERIFICATION_TOKEN_IDENTIFIER } from '@doku-seal/lib/constants/organisations';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getEmailContext } from '@doku-seal/lib/server-only/email/get-email-context';
+import type { TOrganisationAccountLinkMetadata } from '@doku-seal/lib/types/organisation';
+import { renderEmailWithI18N } from '@doku-seal/lib/utils/render-email-with-i18n';
+import { prisma } from '@doku-seal/prisma';
 
 export type SendOrganisationAccountLinkConfirmationEmailProps = TOrganisationAccountLinkMetadata & {
   organisationName: string;
@@ -108,7 +108,7 @@ export const sendOrganisationAccountLinkConfirmationEmail = async ({
       address: user.email,
       name: user.name || '',
     },
-    from: DOCUMENSO_INTERNAL_EMAIL,
+    from: DOKU_SEAL_INTERNAL_EMAIL,
     subject:
       type === 'create'
         ? i18n._(msg`Account creation request`)

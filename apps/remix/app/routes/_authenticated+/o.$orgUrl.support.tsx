@@ -4,10 +4,10 @@ import { Trans } from '@lingui/react/macro';
 import { BookIcon, HelpCircleIcon, Link2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
-import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { useSession } from '@doku-seal/lib/client-only/providers/session';
+import { IS_BILLING_ENABLED } from '@doku-seal/lib/constants/app';
+import { Button } from '@doku-seal/ui/primitives/button';
 
 import { SupportTicketForm } from '~/components/forms/support-ticket-form';
 import { appMetaTags } from '~/utils/meta';
@@ -52,7 +52,7 @@ export default function SupportPage() {
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <BookIcon className="text-muted-foreground h-5 w-5" />
               <Link
-                to="https://docs.documenso.com"
+                to="https://docs.doku-seal.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -61,14 +61,14 @@ export default function SupportPage() {
               </Link>
             </h2>
             <p className="text-muted-foreground mt-1">
-              <Trans>Read our documentation to get started with Documenso.</Trans>
+              <Trans>Read our documentation to get started with Doku-Seal.</Trans>
             </p>
           </div>
           <div className="rounded-lg border p-4">
             <h2 className="flex items-center gap-2 text-lg font-bold">
               <Link2Icon className="text-muted-foreground h-5 w-5" />
               <Link
-                to="https://documen.so/discord"
+                to="https://doku.se/discord"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:underline"
@@ -80,7 +80,7 @@ export default function SupportPage() {
               <Trans>
                 Join our community on{' '}
                 <Link
-                  to="https://documen.so/discord"
+                  to="https://doku.se/discord"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:underline"

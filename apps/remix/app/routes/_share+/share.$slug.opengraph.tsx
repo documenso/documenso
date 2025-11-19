@@ -2,8 +2,8 @@ import satori from 'satori';
 import sharp from 'sharp';
 import { P, match } from 'ts-pattern';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { getRecipientOrSenderByShareLinkSlug } from '@doku-seal/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
 
 import type { Route } from './+types/share.$slug.opengraph';
 

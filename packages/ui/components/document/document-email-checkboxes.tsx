@@ -1,9 +1,9 @@
 import { Trans } from '@lingui/react/macro';
 import { InfoIcon } from 'lucide-react';
 
-import type { TDocumentEmailSettings } from '@documenso/lib/types/document-email';
-import { DocumentEmailEvents } from '@documenso/lib/types/document-email';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
+import type { TDocumentEmailSettings } from '@doku-seal/lib/types/document-email';
+import { DocumentEmailEvents } from '@doku-seal/lib/types/document-email';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
 
 import { cn } from '../../lib/utils';
 import { Checkbox } from '../../primitives/checkbox';

@@ -4,7 +4,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { cva } from 'class-variance-authority';
 import { createPortal } from 'react-dom';
 
-import { useFieldPageCoords } from '@documenso/lib/client-only/hooks/use-field-page-coords';
+import { useFieldPageCoords } from '@doku-seal/lib/client-only/hooks/use-field-page-coords';
 
 import { cn } from '../..//lib/utils';
 import {

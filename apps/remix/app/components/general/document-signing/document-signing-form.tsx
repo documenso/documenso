@@ -7,18 +7,18 @@ import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/cl
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
-import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
-import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
-import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { Button } from '@documenso/ui/primitives/button';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+import type { DocumentAndSender } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import type { TRecipientAccessAuth } from '@doku-seal/lib/types/document-auth';
+import { isFieldUnsignedAndRequired } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { sortFieldsByPosition } from '@doku-seal/lib/utils/fields';
+import type { RecipientWithFields } from '@doku-seal/prisma/types/recipient-with-fields';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
+import { RadioGroup, RadioGroupItem } from '@doku-seal/ui/primitives/radio-group';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import {
   AssistantConfirmationDialog,

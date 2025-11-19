@@ -1,6 +1,6 @@
 import { SubscriptionStatus } from '@prisma/client';
 
-import { prisma } from '@documenso/prisma';
+import { prisma } from '@doku-seal/prisma';
 
 export type GetActiveSubscriptionsByUserIdOptions = {
   userId: number;

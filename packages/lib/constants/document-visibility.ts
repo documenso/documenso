@@ -1,4 +1,4 @@
-import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
+import { DocumentVisibility } from '@doku-seal/lib/types/document-visibility';
 
 import type { TDocumentVisibility } from '../types/document-visibility';
 

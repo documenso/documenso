@@ -1,4 +1,4 @@
-import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
+import { deleteEnvelopeRecipient } from '@doku-seal/lib/server-only/recipient/delete-envelope-recipient';
 
 import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';

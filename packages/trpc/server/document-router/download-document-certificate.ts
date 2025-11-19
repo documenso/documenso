@@ -1,12 +1,12 @@
 import { EnvelopeType } from '@prisma/client';
 import { DateTime } from 'luxon';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { AppError } from '@documenso/lib/errors/app-error';
-import { encryptSecondaryData } from '@documenso/lib/server-only/crypto/encrypt';
-import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { isDocumentCompleted } from '@documenso/lib/utils/document';
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { encryptSecondaryData } from '@doku-seal/lib/server-only/crypto/encrypt';
+import { getEnvelopeById } from '@doku-seal/lib/server-only/envelope/get-envelope-by-id';
+import { isDocumentCompleted } from '@doku-seal/lib/utils/document';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
 import {

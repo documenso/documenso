@@ -1,6 +1,6 @@
 import { Trans } from '@lingui/react/macro';
 
-import { findUsers } from '@documenso/lib/server-only/user/get-all-users';
+import { findUsers } from '@doku-seal/lib/server-only/user/get-all-users';
 
 import { AdminDashboardUsersTable } from '~/components/tables/admin-dashboard-users-table';
 

@@ -8,11 +8,11 @@ import { DateTime } from 'luxon';
 import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
-} from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import { formatDocumentsPath } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import PDFViewerKonvaLazy from '@doku-seal/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
@@ -20,8 +20,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@documenso/ui/primitives/dialog';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+} from '@doku-seal/ui/primitives/dialog';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 
@@ -78,7 +78,7 @@ export const DocumentCertificateQRView = ({
 
               <DialogDescription>
                 <Trans>
-                  This document is available in your Documenso account. You can view more details,
+                  This document is available in your Doku-Seal account. You can view more details,
                   recipients, and audit logs there.
                 </Trans>
               </DialogDescription>

@@ -6,17 +6,17 @@ import type { DocumentMeta, Field, Recipient } from '@prisma/client';
 import { SigningStatus } from '@prisma/client';
 import { Clock, EyeOffIcon } from 'lucide-react';
 
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { isTemplateRecipientEmailPlaceholder } from '@documenso/lib/constants/template';
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import { FieldRootContainer } from '@documenso/ui/components/field/field';
-import { SignatureIcon } from '@documenso/ui/icons/signature';
-import { Avatar, AvatarFallback } from '@documenso/ui/primitives/avatar';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { PopoverHover } from '@documenso/ui/primitives/popover';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { isTemplateRecipientEmailPlaceholder } from '@doku-seal/lib/constants/template';
+import { parseMessageDescriptor } from '@doku-seal/lib/utils/i18n';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import { FieldRootContainer } from '@doku-seal/ui/components/field/field';
+import { SignatureIcon } from '@doku-seal/ui/icons/signature';
+import { Avatar, AvatarFallback } from '@doku-seal/ui/primitives/avatar';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { FRIENDLY_FIELD_TYPE } from '@doku-seal/ui/primitives/document-flow/types';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { PopoverHover } from '@doku-seal/ui/primitives/popover';
 
 import { getRecipientColorStyles } from '../../lib/recipient-colors';
 import { FieldContent } from '../../primitives/document-flow/field-content';

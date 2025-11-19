@@ -5,22 +5,22 @@ import { useLingui } from '@lingui/react';
 import { Plural, Trans } from '@lingui/react/macro';
 import { useRevalidator } from 'react-router';
 
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { ZTextFieldMeta } from '@documenso/lib/types/field-meta';
-import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
-import { trpc } from '@documenso/trpc/react';
+import { validateTextField } from '@doku-seal/lib/advanced-fields-validation/validate-text';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@doku-seal/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@doku-seal/lib/types/document-auth';
+import { ZTextFieldMeta } from '@doku-seal/lib/types/field-meta';
+import type { FieldWithSignatureAndFieldMeta } from '@doku-seal/prisma/types/field-with-signature-and-fieldmeta';
+import { trpc } from '@doku-seal/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { cn } from '@documenso/ui/lib/utils';
-import { Button } from '@documenso/ui/primitives/button';
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@documenso/ui/primitives/dialog';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from '@doku-seal/ui/primitives/dialog';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
 import { DocumentSigningFieldContainer } from './document-signing-field-container';

@@ -4,9 +4,9 @@ import type { SubscriptionClaim } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
-import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
-import { ZCreateSubscriptionClaimRequestSchema } from '@documenso/trpc/server/admin-router/create-subscription-claim.types';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
+import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@doku-seal/lib/types/subscription';
+import { ZCreateSubscriptionClaimRequestSchema } from '@doku-seal/trpc/server/admin-router/create-subscription-claim.types';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
 import {
   Form,
   FormControl,
@@ -15,8 +15,8 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 
 export type SubscriptionClaimFormValues = z.infer<typeof ZCreateSubscriptionClaimRequestSchema>;
 

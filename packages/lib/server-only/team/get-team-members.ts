@@ -1,5 +1,5 @@
-import { prisma } from '@documenso/prisma';
-import type { TGetTeamMembersResponse } from '@documenso/trpc/server/team-router/get-team-members.types';
+import { prisma } from '@doku-seal/prisma';
+import type { TGetTeamMembersResponse } from '@doku-seal/trpc/server/team-router/get-team-members.types';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { getHighestOrganisationRoleInGroup } from '../../utils/organisations';

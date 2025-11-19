@@ -1,5 +1,5 @@
-import { updateTeam } from '@documenso/lib/server-only/team/update-team';
-import { updateTeamPublicProfile } from '@documenso/lib/server-only/team/update-team-public-profile';
+import { updateTeam } from '@doku-seal/lib/server-only/team/update-team';
+import { updateTeamPublicProfile } from '@doku-seal/lib/server-only/team/update-team-public-profile';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZUpdateTeamRequestSchema, ZUpdateTeamResponseSchema } from './update-team.types';

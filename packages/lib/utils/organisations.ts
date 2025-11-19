@@ -5,7 +5,7 @@ import {
   type OrganisationMemberRole,
 } from '@prisma/client';
 
-import type { ORGANISATION_MEMBER_ROLE_MAP } from '@documenso/lib/constants/organisations-translations';
+import type { ORGANISATION_MEMBER_ROLE_MAP } from '@doku-seal/lib/constants/organisations-translations';
 
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../constants/date-formats';
 import {

@@ -1,7 +1,7 @@
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 
-import type { DateRange } from '@documenso/lib/types/search-params';
-import { kyselyPrisma, sql } from '@documenso/prisma';
+import type { DateRange } from '@doku-seal/lib/types/search-params';
+import { kyselyPrisma, sql } from '@doku-seal/prisma';
 
 export type OrganisationInsights = {
   id: number;

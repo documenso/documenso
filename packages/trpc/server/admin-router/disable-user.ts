@@ -1,6 +1,6 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { disableUser } from '@documenso/lib/server-only/user/disable-user';
-import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { disableUser } from '@doku-seal/lib/server-only/user/disable-user';
+import { getUserById } from '@doku-seal/lib/server-only/user/get-user-by-id';
 
 import { adminProcedure } from '../trpc';
 import { ZDisableUserRequestSchema, ZDisableUserResponseSchema } from './disable-user.types';

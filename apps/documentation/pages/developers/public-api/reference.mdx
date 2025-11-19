@@ -1,6 +1,6 @@
 ---
 title: API Reference
-description: Reference documentation for the Documenso public API.
+description: Reference documentation for the Doku-Seal public API.
 ---
 
 import { Callout, Steps } from 'nextra/components';
@@ -11,7 +11,7 @@ On this page we will refer to both Documents and Templates as Envelopes for conv
 
 <Callout type="info">
   This page is used to demonstrate some of the endpoints and how to use them. For the full API
-  reference, please see the [API Reference](https://openapi.documenso.com/).
+  reference, please see the [API Reference](https://openapi.doku-seal.com/).
 </Callout>
 
 ## Get Envelope
@@ -24,10 +24,10 @@ The main details you generally want to extract are the following:
 - **Fields** - The fields the user will sign
 - **Items** - The PDF files the user will see and sign
 
-This is done by doing a the following GET [request](https://openapi.documenso.com/reference#tag/envelope/POST/envelope/create)
+This is done by doing a the following GET [request](https://openapi.doku-seal.com/reference#tag/envelope/POST/envelope/create)
 
 ```sh
-curl -X GET "https://app.documenso.com/api/v2/envelope/envelope_xxxxxxxxxxxxx" \
+curl -X GET "https://app.doku-seal.com/api/v2/envelope/envelope_xxxxxxxxxxxxx" \
   -H "Authorization: api_xxxxxxxxxxxxxx"
 ```
 
@@ -57,7 +57,7 @@ A successful response looks as follows:
       "signingStatus": "NOT_SIGNED",
       "sendStatus": "NOT_SENT",
       "id": 0,
-      "email": "recipient+1@documenso.com",
+      "email": "recipient+1@doku-seal.com",
       "name": "",
       "token": "cxH2Ss79Hj94M1U3PxRAG",
       "documentDeletedAt": null,
@@ -98,7 +98,7 @@ You will need to:
 Note that the identifier on a field is linking to the files you upload. It can either be the index of the file or the filename. In this example it uses the index of the file.
 
 ```sh
-curl -X POST "https://app.documenso.com/api/v2/envelope/create" \
+curl -X POST "https://app.doku-seal.com/api/v2/envelope/create" \
   -H "Authorization: api_xxxxxxxxxxxxxx" \
   -H "Content-Type: multipart/form-data" \
   -F 'payload={
@@ -145,25 +145,25 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/create" \
 
 <Callout type="info">
   See the full request and response formats for the create endpoint
-  [here](https://openapi.documenso.com/reference#tag/envelope/POST/envelope/create)
+  [here](https://openapi.doku-seal.com/reference#tag/envelope/POST/envelope/create)
 </Callout>
 
 ## Use Template
 
-Documenso allows you to generate documents from templates. This is useful when you have a standard document format you want to reuse.
+Doku-Seal allows you to generate documents from templates. This is useful when you have a standard document format you want to reuse.
 
 The API endpoint for generating a document from a template is `/api/v2/envelopes/use`, and it takes a JSON payload with the following fields:
 
 <Callout type="info">
   See the full request and response formats for the use endpoint
-  [here](https://openapi.documenso.com/reference#tag/envelope/POST/envelope/use)
+  [here](https://openapi.doku-seal.com/reference#tag/envelope/POST/envelope/use)
 </Callout>
 
 <Steps>
 
 ### Grab the Template ID
 
-The first step is to retrieve the ID of the template you want to use. This can be done via the API or from the Documenso UI.
+The first step is to retrieve the ID of the template you want to use. This can be done via the API or from the Doku-Seal UI.
 
 You can get the ID by navigating to the template page and looking at the URL. The ID is the last part of the URL which looks like this "envelope_xxxxxxxx"
 
@@ -177,7 +177,7 @@ See the [Get Envelope](#get-envelope) section for more details on how to retriev
 
 ### Generate the Document
 
-To generate a document from the template, you need to make a POST request to the [`/api/v2/envelope/use`](https://openapi.documenso.com/reference#tag/envelope/POST/envelope/use) endpoint.
+To generate a document from the template, you need to make a POST request to the [`/api/v2/envelope/use`](https://openapi.doku-seal.com/reference#tag/envelope/POST/envelope/use) endpoint.
 
 You will need to replace the following:
 
@@ -190,7 +190,7 @@ You will need to replace the following:
 If you want to send the document immediately, you can add the `distributeDocument` parameter to the payload.
 
 ```sh
-curl -X POST "https://app.documenso.com/api/v2/envelope/use" \
+curl -X POST "https://app.doku-seal.com/api/v2/envelope/use" \
   -H "Authorization: api_xxxxxxxxxxxxxx" \
   -H "Content-Type: multipart/form-data" \
   -F 'payload={
@@ -217,7 +217,7 @@ You will need to replace the following:
 - `envelope_item_xxxxxxxxxxxxxxxxx` with the `envelopeItemId` of the item you want to replace
 
 ```sh
-curl -X POST "https://app.documenso.com/api/v2/envelope/use" \
+curl -X POST "https://app.doku-seal.com/api/v2/envelope/use" \
   -H "Authorization: api_xxxxxxxxxxxxxx" \
   -H "Content-Type: multipart/form-data" \
   -F 'payload={
@@ -239,7 +239,7 @@ curl -X POST "https://app.documenso.com/api/v2/envelope/use" \
   -F "files=@./CUSTOM_FILE_NAME_HERE.pdf;type=application/pdf"
 ```
 
-You can now access the document in your Documenso account dashboard.
+You can now access the document in your Doku-Seal account dashboard.
 
 #### Pre-fill Fields On Document Creation
 
@@ -278,12 +278,12 @@ The API allows you to pre-fill fields on document creation. This is useful when 
 
 ## Add Recipients
 
-The API allows you to add recipients to an envelope via the [`/api/v2/envelope/recipient/create-many`](https://openapi.documenso.com/reference#tag/envelope-recipients/POST/envelope/recipient/create-many) endpoint.
+The API allows you to add recipients to an envelope via the [`/api/v2/envelope/recipient/create-many`](https://openapi.doku-seal.com/reference#tag/envelope-recipients/POST/envelope/recipient/create-many) endpoint.
 
 The following is an example of a request which creates 2 new recipients on the envelope.
 
 ```sh
-curl https://app.documenso.com/api/v2/envelope/recipient/create-many \
+curl https://app.doku-seal.com/api/v2/envelope/recipient/create-many \
   --request POST \
   --header 'Authorization: api_xxxxxxxxxxxxxx' \
   --header 'Content-Type: application/json' \
@@ -292,12 +292,12 @@ curl https://app.documenso.com/api/v2/envelope/recipient/create-many \
     "data": [
       {
         "name": "Recipient Name",
-        "email": "example@documenso.com",
+        "email": "example@doku-seal.com",
         "role": "SIGNER"
       },
       {
         "name": "Recipient Two",
-        "email": "example+2@documenso.com",
+        "email": "example+2@doku-seal.com",
         "role": "APPROVER"
       }
     ]
@@ -306,7 +306,7 @@ curl https://app.documenso.com/api/v2/envelope/recipient/create-many \
 
 ## Add Fields
 
-The API allows you to add fields to an envelope via the [`/api/v2/envelope/field/create-many`](https://openapi.documenso.com/reference#tag/envelope-fields/POST/envelope/field/create-many) endpoint.
+The API allows you to add fields to an envelope via the [`/api/v2/envelope/field/create-many`](https://openapi.doku-seal.com/reference#tag/envelope-fields/POST/envelope/field/create-many) endpoint.
 
 Before adding fields to an envelope, you will need the following details:
 
@@ -321,7 +321,7 @@ The following is an example of a request which creates 2 new fields on the first
 Note that width, height, positionX and positionY are percentage numbers between 0 and 100, which scale the field relative to the size of the PDF.
 
 ```sh
-curl https://app.documenso.com/api/v2/envelope/field/create-many \
+curl https://app.doku-seal.com/api/v2/envelope/field/create-many \
   --request POST \
   --header 'Authorization: api_xxxxxxxxxxxxxx' \
   --header 'Content-Type: application/json' \

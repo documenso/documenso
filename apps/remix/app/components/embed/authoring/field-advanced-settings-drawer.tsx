@@ -1,11 +1,11 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 
-import { type TFieldMetaSchema as FieldMeta } from '@documenso/lib/types/field-meta';
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
-import { FieldAdvancedSettings } from '@documenso/ui/primitives/document-flow/field-item-advanced-settings';
-import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/types';
-import { Sheet, SheetContent, SheetTitle } from '@documenso/ui/primitives/sheet';
+import { type TFieldMetaSchema as FieldMeta } from '@doku-seal/lib/types/field-meta';
+import { parseMessageDescriptor } from '@doku-seal/lib/utils/i18n';
+import { FieldAdvancedSettings } from '@doku-seal/ui/primitives/document-flow/field-item-advanced-settings';
+import { FRIENDLY_FIELD_TYPE } from '@doku-seal/ui/primitives/document-flow/types';
+import { Sheet, SheetContent, SheetTitle } from '@doku-seal/ui/primitives/sheet';
 
 import type { TConfigureFieldsFormSchemaField } from './configure-fields-view.types';
 

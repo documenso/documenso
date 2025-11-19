@@ -5,20 +5,20 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { ChevronDown, ChevronUp, Trash } from 'lucide-react';
 
-import { validateCheckboxField } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { type TCheckboxFieldMeta as CheckboxFieldMeta } from '@documenso/lib/types/field-meta';
-import { Button } from '@documenso/ui/primitives/button';
-import { Checkbox } from '@documenso/ui/primitives/checkbox';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
+import { validateCheckboxField } from '@doku-seal/lib/advanced-fields-validation/validate-checkbox';
+import { type TCheckboxFieldMeta as CheckboxFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Checkbox } from '@doku-seal/ui/primitives/checkbox';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Switch } from '@documenso/ui/primitives/switch';
+} from '@doku-seal/ui/primitives/select';
+import { Switch } from '@doku-seal/ui/primitives/switch';
 
 import { checkboxValidationLength, checkboxValidationRules } from './constants';
 

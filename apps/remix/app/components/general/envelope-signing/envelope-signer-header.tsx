@@ -4,16 +4,16 @@ import { BanIcon, DownloadCloudIcon } from 'lucide-react';
 import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@documenso/ui/primitives/dropdown-menu';
-import { Separator } from '@documenso/ui/primitives/separator';
+} from '@doku-seal/ui/primitives/dropdown-menu';
+import { Separator } from '@doku-seal/ui/primitives/separator';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';

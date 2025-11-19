@@ -3,12 +3,12 @@ import { ReadStatus, RecipientRole, SigningStatus } from '@prisma/client';
 import { ArrowRight, EyeIcon, XCircle } from 'lucide-react';
 import { match } from 'ts-pattern';
 
-import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-document-by-token';
-import type { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
-import { Badge } from '@documenso/ui/primitives/badge';
-import { Button } from '@documenso/ui/primitives/button';
-import { Progress } from '@documenso/ui/primitives/progress';
+import type { DocumentAndSender } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import type { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
+import { Alert, AlertDescription, AlertTitle } from '@doku-seal/ui/primitives/alert';
+import { Badge } from '@doku-seal/ui/primitives/badge';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Progress } from '@doku-seal/ui/primitives/progress';
 
 // Get the return type from getRecipientByToken
 type RecipientWithFields = Awaited<ReturnType<typeof getRecipientByToken>>;

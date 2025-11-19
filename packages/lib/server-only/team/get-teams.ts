@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-import { prisma } from '@documenso/prisma';
-import { TeamMemberRole } from '@documenso/prisma/generated/types';
-import { TeamSchema } from '@documenso/prisma/generated/zod/modelSchema/TeamSchema';
+import { prisma } from '@doku-seal/prisma';
+import { TeamMemberRole } from '@doku-seal/prisma/generated/types';
+import { TeamSchema } from '@doku-seal/prisma/generated/zod/modelSchema/TeamSchema';
 
 import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '../../utils/teams';
 

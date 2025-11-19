@@ -1,6 +1,6 @@
 import type { ActionFunctionArgs } from 'react-router';
 
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS } from '@doku-seal/lib/constants/i18n';
 
 import { langCookie } from '~/storage/lang-cookie.server';
 

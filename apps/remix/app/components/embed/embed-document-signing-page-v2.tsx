@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 
-import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { mapSecondaryIdToDocumentId } from '@doku-seal/lib/utils/envelope';
 
 import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
 import { injectCss } from '~/utils/css-vars';

@@ -1,6 +1,6 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { enableUser } from '@documenso/lib/server-only/user/enable-user';
-import { getUserById } from '@documenso/lib/server-only/user/get-user-by-id';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { enableUser } from '@doku-seal/lib/server-only/user/enable-user';
+import { getUserById } from '@doku-seal/lib/server-only/user/get-user-by-id';
 
 import { adminProcedure } from '../trpc';
 import { ZEnableUserRequestSchema, ZEnableUserResponseSchema } from './enable-user.types';

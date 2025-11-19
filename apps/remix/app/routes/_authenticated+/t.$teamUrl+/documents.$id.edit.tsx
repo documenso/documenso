@@ -5,12 +5,12 @@ import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Link, useNavigate } from 'react-router';
 
-import { EnvelopeEditorProvider } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import { Button } from '@documenso/ui/primitives/button';
-import { Spinner } from '@documenso/ui/primitives/spinner';
+import { EnvelopeEditorProvider } from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
+import { EnvelopeRenderProvider } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import { formatDocumentsPath, formatTemplatesPath } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { Spinner } from '@doku-seal/ui/primitives/spinner';
 
 import EnvelopeEditor from '~/components/general/envelope-editor/envelope-editor';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';

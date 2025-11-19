@@ -4,25 +4,25 @@ import { DateTime } from 'luxon';
 import { P, match } from 'ts-pattern';
 import { z } from 'zod';
 
-import { validateCheckboxLength } from '@documenso/lib/advanced-fields-validation/validate-checkbox';
-import { validateDropdownField } from '@documenso/lib/advanced-fields-validation/validate-dropdown';
-import { validateNumberField } from '@documenso/lib/advanced-fields-validation/validate-number';
-import { validateTextField } from '@documenso/lib/advanced-fields-validation/validate-text';
-import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@documenso/lib/constants/date-formats';
-import { isBase64Image } from '@documenso/lib/constants/signatures';
-import { DEFAULT_DOCUMENT_TIME_ZONE } from '@documenso/lib/constants/time-zones';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TDocumentMeta } from '@documenso/lib/types/document-meta';
+import { validateCheckboxLength } from '@doku-seal/lib/advanced-fields-validation/validate-checkbox';
+import { validateDropdownField } from '@doku-seal/lib/advanced-fields-validation/validate-dropdown';
+import { validateNumberField } from '@doku-seal/lib/advanced-fields-validation/validate-number';
+import { validateTextField } from '@doku-seal/lib/advanced-fields-validation/validate-text';
+import { DEFAULT_DOCUMENT_DATE_FORMAT } from '@doku-seal/lib/constants/date-formats';
+import { isBase64Image } from '@doku-seal/lib/constants/signatures';
+import { DEFAULT_DOCUMENT_TIME_ZONE } from '@doku-seal/lib/constants/time-zones';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TDocumentMeta } from '@doku-seal/lib/types/document-meta';
 import {
   ZCheckboxFieldMeta,
   ZDropdownFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
   ZTextFieldMeta,
-} from '@documenso/lib/types/field-meta';
-import { toCheckboxCustomText, toRadioCustomText } from '@documenso/lib/utils/fields';
-import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
-import { checkboxValidationSigns } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
+} from '@doku-seal/lib/types/field-meta';
+import { toCheckboxCustomText, toRadioCustomText } from '@doku-seal/lib/utils/fields';
+import type { TSignEnvelopeFieldValue } from '@doku-seal/trpc/server/envelope-router/sign-envelope-field.types';
+import { checkboxValidationSigns } from '@doku-seal/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 export type ExtractFieldInsertionValuesOptions = {
   fieldValue: TSignEnvelopeFieldValue;

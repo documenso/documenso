@@ -3,10 +3,10 @@ import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
-import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { onCreateUserHook } from '@doku-seal/lib/server-only/user/create-user';
+import { isValidReturnTo, normalizeReturnTo } from '@doku-seal/lib/utils/is-valid-return-to';
+import { prisma } from '@doku-seal/prisma';
 
 import type { OAuthClientOptions } from '../../config';
 import { AuthenticationErrorCode } from '../errors/error-codes';

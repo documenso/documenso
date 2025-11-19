@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import OrganisationMemberRoleSchema from '@documenso/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
+import OrganisationMemberRoleSchema from '@doku-seal/prisma/generated/zod/inputTypeSchemas/OrganisationMemberRoleSchema';
 
 import { domainRegex } from './create-organisation-email-domain.types';
 

@@ -5,15 +5,15 @@ import type { Organisation, Prisma } from '@prisma/client';
 import { OrganisationMemberInviteStatus } from '@prisma/client';
 import { nanoid } from 'nanoid';
 
-import { syncMemberCountWithStripeSeatPlan } from '@documenso/ee/server-only/stripe/update-subscription-item-quantity';
-import { mailer } from '@documenso/email/mailer';
-import { OrganisationInviteEmailTemplate } from '@documenso/email/templates/organisation-invite';
-import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/organisations';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { isOrganisationRoleWithinUserHierarchy } from '@documenso/lib/utils/organisations';
-import { prisma } from '@documenso/prisma';
-import type { TCreateOrganisationMemberInvitesRequestSchema } from '@documenso/trpc/server/organisation-router/create-organisation-member-invites.types';
+import { syncMemberCountWithStripeSeatPlan } from '@doku-seal/ee/server-only/stripe/update-subscription-item-quantity';
+import { mailer } from '@doku-seal/email/mailer';
+import { OrganisationInviteEmailTemplate } from '@doku-seal/email/templates/organisation-invite';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@doku-seal/lib/constants/app';
+import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '@doku-seal/lib/constants/organisations';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { isOrganisationRoleWithinUserHierarchy } from '@doku-seal/lib/utils/organisations';
+import { prisma } from '@doku-seal/prisma';
+import type { TCreateOrganisationMemberInvitesRequestSchema } from '@doku-seal/trpc/server/organisation-router/create-organisation-member-invites.types';
 
 import { getI18nInstance } from '../../client-only/providers/i18n-server';
 import { generateDatabaseId } from '../../universal/id';
@@ -214,7 +214,7 @@ export const sendOrganisationMemberInviteEmail = async ({
   await mailer.sendMail({
     to: email,
     from: senderEmail,
-    subject: i18n._(msg`You have been invited to join ${organisation.name} on Documenso`),
+    subject: i18n._(msg`You have been invited to join ${organisation.name} on Doku-Seal`),
     html,
     text,
   });

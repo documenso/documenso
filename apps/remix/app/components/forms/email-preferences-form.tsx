@@ -4,15 +4,15 @@ import type { TeamGlobalSettings } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { FROM_ADDRESS } from '@documenso/lib/constants/email';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { FROM_ADDRESS } from '@doku-seal/lib/constants/email';
 import {
   DEFAULT_DOCUMENT_EMAIL_SETTINGS,
   ZDocumentEmailSettingsSchema,
-} from '@documenso/lib/types/document-email';
-import { trpc } from '@documenso/trpc/react';
-import { DocumentEmailCheckboxes } from '@documenso/ui/components/document/document-email-checkboxes';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/lib/types/document-email';
+import { trpc } from '@doku-seal/trpc/react';
+import { DocumentEmailCheckboxes } from '@doku-seal/ui/components/document/document-email-checkboxes';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Form,
   FormControl,
@@ -21,15 +21,15 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
+} from '@doku-seal/ui/primitives/select';
 
 const ZEmailPreferencesFormSchema = z.object({
   emailId: z.string().nullable(),

@@ -1,11 +1,11 @@
 import { FieldType, ReadStatus, SigningStatus } from '@prisma/client';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { signFieldWithToken } from '@documenso/lib/server-only/field/sign-field-with-token';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
-import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
-import { prisma } from '@documenso/prisma';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getDocumentByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { signFieldWithToken } from '@doku-seal/lib/server-only/field/sign-field-with-token';
+import { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
+import { extractDocumentAuthMethods } from '@doku-seal/lib/utils/document-auth';
+import { prisma } from '@doku-seal/prisma';
 
 import { procedure } from '../trpc';
 import {

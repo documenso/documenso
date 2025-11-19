@@ -3,18 +3,18 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { useRevalidator } from 'react-router';
 
-import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
-import { ZInitialsFieldMeta } from '@documenso/lib/types/field-meta';
-import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
-import type { FieldWithSignature } from '@documenso/prisma/types/field-with-signature';
-import { trpc } from '@documenso/trpc/react';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@doku-seal/lib/constants/trpc';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import type { TRecipientActionAuth } from '@doku-seal/lib/types/document-auth';
+import { ZInitialsFieldMeta } from '@doku-seal/lib/types/field-meta';
+import { extractInitials } from '@doku-seal/lib/utils/recipient-formatter';
+import type { FieldWithSignature } from '@doku-seal/prisma/types/field-with-signature';
+import { trpc } from '@doku-seal/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
   TSignFieldWithTokenMutationSchema,
-} from '@documenso/trpc/server/field-router/schema';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/trpc/server/field-router/schema';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { DocumentSigningFieldContainer } from './document-signing-field-container';
 import {

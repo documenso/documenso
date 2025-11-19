@@ -7,15 +7,15 @@ import type { DateTimeFormatOptions } from 'luxon';
 import { useSearchParams } from 'react-router';
 import { UAParser } from 'ua-parser-js';
 
-import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
-import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
-import { formatDocumentAuditLogAction } from '@documenso/lib/utils/document-audit-logs';
-import { trpc } from '@documenso/trpc/react';
-import type { DataTableColumnDef } from '@documenso/ui/primitives/data-table';
-import { DataTable } from '@documenso/ui/primitives/data-table';
-import { DataTablePagination } from '@documenso/ui/primitives/data-table-pagination';
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
-import { TableCell } from '@documenso/ui/primitives/table';
+import { useUpdateSearchParams } from '@doku-seal/lib/client-only/hooks/use-update-search-params';
+import { ZUrlSearchParamsSchema } from '@doku-seal/lib/types/search-params';
+import { formatDocumentAuditLogAction } from '@doku-seal/lib/utils/document-audit-logs';
+import { trpc } from '@doku-seal/trpc/react';
+import type { DataTableColumnDef } from '@doku-seal/ui/primitives/data-table';
+import { DataTable } from '@doku-seal/ui/primitives/data-table';
+import { DataTablePagination } from '@doku-seal/ui/primitives/data-table-pagination';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
+import { TableCell } from '@doku-seal/ui/primitives/table';
 
 export type DocumentLogsTableProps = {
   documentId: number;

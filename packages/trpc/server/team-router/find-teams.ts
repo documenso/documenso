@@ -1,4 +1,4 @@
-import { findTeams } from '@documenso/lib/server-only/team/find-teams';
+import { findTeams } from '@doku-seal/lib/server-only/team/find-teams';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZFindTeamsRequestSchema, ZFindTeamsResponseSchema } from './find-teams.types';

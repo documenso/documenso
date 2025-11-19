@@ -1,5 +1,5 @@
-import { AppError } from '@documenso/lib/errors/app-error';
-import { prisma } from '@documenso/prisma';
+import { AppError } from '@doku-seal/lib/errors/app-error';
+import { prisma } from '@doku-seal/prisma';
 
 export type DisableUserOptions = {
   id: number;

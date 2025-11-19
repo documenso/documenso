@@ -1,6 +1,6 @@
 import type { RegistrationResponseJSON } from '@simplewebauthn/types';
 
-import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
+import { createPasskey } from '@doku-seal/lib/server-only/auth/create-passkey';
 
 import { authenticatedProcedure } from '../trpc';
 import { ZCreatePasskeyRequestSchema, ZCreatePasskeyResponseSchema } from './create-passkey.types';

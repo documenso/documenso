@@ -2,7 +2,7 @@ import { Trans } from '@lingui/react/macro';
 import { ChevronLeft, Loader } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { Skeleton } from '@documenso/ui/primitives/skeleton';
+import { Skeleton } from '@doku-seal/ui/primitives/skeleton';
 
 export default function DocumentEditSkeleton() {
   return (

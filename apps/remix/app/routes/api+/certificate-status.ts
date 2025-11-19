@@ -1,4 +1,4 @@
-import { getCertificateStatus } from '@documenso/lib/server-only/cert/cert-status';
+import { getCertificateStatus } from '@doku-seal/lib/server-only/cert/cert-status';
 
 export const loader = () => {
   try {

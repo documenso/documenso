@@ -3,11 +3,11 @@ import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
-import { FolderType } from '@documenso/lib/types/folder-type';
-import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
-import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
-import { trpc } from '@documenso/trpc/react';
-import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import { FolderType } from '@doku-seal/lib/types/folder-type';
+import { formatAvatarUrl } from '@doku-seal/lib/utils/avatars';
+import { formatDocumentsPath, formatTemplatesPath } from '@doku-seal/lib/utils/teams';
+import { trpc } from '@doku-seal/trpc/react';
+import { Avatar, AvatarFallback, AvatarImage } from '@doku-seal/ui/primitives/avatar';
 
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';

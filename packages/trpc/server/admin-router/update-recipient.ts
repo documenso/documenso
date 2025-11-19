@@ -1,4 +1,4 @@
-import { updateRecipient } from '@documenso/lib/server-only/admin/update-recipient';
+import { updateRecipient } from '@doku-seal/lib/server-only/admin/update-recipient';
 
 import { adminProcedure } from '../trpc';
 import {

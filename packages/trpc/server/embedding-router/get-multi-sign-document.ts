@@ -1,9 +1,9 @@
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getDocumentAndSenderByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { viewedDocument } from '@documenso/lib/server-only/document/viewed-document';
-import { getCompletedFieldsForToken } from '@documenso/lib/server-only/field/get-completed-fields-for-token';
-import { getFieldsForToken } from '@documenso/lib/server-only/field/get-fields-for-token';
-import { getRecipientByToken } from '@documenso/lib/server-only/recipient/get-recipient-by-token';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
+import { getDocumentAndSenderByToken } from '@doku-seal/lib/server-only/document/get-document-by-token';
+import { viewedDocument } from '@doku-seal/lib/server-only/document/viewed-document';
+import { getCompletedFieldsForToken } from '@doku-seal/lib/server-only/field/get-completed-fields-for-token';
+import { getFieldsForToken } from '@doku-seal/lib/server-only/field/get-fields-for-token';
+import { getRecipientByToken } from '@doku-seal/lib/server-only/recipient/get-recipient-by-token';
 
 import { procedure } from '../trpc';
 import {

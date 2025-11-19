@@ -1,4 +1,4 @@
-import { createOrGetShareLink } from '@documenso/lib/server-only/share/create-or-get-share-link';
+import { createOrGetShareLink } from '@doku-seal/lib/server-only/share/create-or-get-share-link';
 
 import { procedure } from '../trpc';
 import { ZShareDocumentRequestSchema, ZShareDocumentResponseSchema } from './share-document.types';

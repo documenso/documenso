@@ -2,7 +2,7 @@ import { CodeChallengeMethod, OAuth2Client, generateCodeVerifier, generateState 
 import type { Context } from 'hono';
 import { setCookie } from 'hono/cookie';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { AppError, AppErrorCode } from '@doku-seal/lib/errors/app-error';
 
 import type { OAuthClientOptions } from '../../config';
 import { sessionCookieOptions } from '../session/session-cookies';

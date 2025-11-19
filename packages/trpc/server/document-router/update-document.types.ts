@@ -1,12 +1,12 @@
 // import type { OpenApiMeta } from 'trpc-to-openapi';
 import { z } from 'zod';
 
-import { ZDocumentLiteSchema } from '@documenso/lib/types/document';
+import { ZDocumentLiteSchema } from '@doku-seal/lib/types/document';
 import {
   ZDocumentAccessAuthTypesSchema,
   ZDocumentActionAuthTypesSchema,
-} from '@documenso/lib/types/document-auth';
-import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
+} from '@doku-seal/lib/types/document-auth';
+import { ZDocumentMetaUpdateSchema } from '@doku-seal/lib/types/document-meta';
 
 import type { TrpcRouteMeta } from '../trpc';
 import {

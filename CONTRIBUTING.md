@@ -1,13 +1,13 @@
-# Contributing to Documenso
+# Contributing to Doku-Seal
 
-If you plan to contribute to Documenso, please take a moment to feel awesome ✨ People like you are what open source is about ♥. Any contributions, no matter how big or small, are highly appreciated.
+If you plan to contribute to Doku-Seal, please take a moment to feel awesome ✨ People like you are what open source is about ♥. Any contributions, no matter how big or small, are highly appreciated.
 
 ## Before getting started
 
 - Before jumping into a PR be sure to search [existing PRs](https://github.com/documenso/documenso/pulls) or [issues](https://github.com/documenso/documenso/issues) for an open or closed item that relates to your submission.
 - Select an issue from [here](https://github.com/documenso/documenso/issues) or create a new one
 - Consider the results from the discussion on the issue
-- Accept the [Contributor License Agreement](https://documen.so/cla) to ensure we can accept your contributions.
+- Accept the [Contributor License Agreement](https://doku.se/cla) to ensure we can accept your contributions.
 
 ## Taking issues
 
@@ -27,7 +27,7 @@ Always feel free to ask questions or seek clarification on the issue.
 
 ## Developing
 
-The development branch is <code>main</code>. All pull requests should be made against this branch. If you need help getting started, [join us on Discord](https://documen.so/discord).
+The development branch is <code>main</code>. All pull requests should be made against this branch. If you need help getting started, [join us on Discord](https://doku.se/discord).
 
 1. [Fork](https://help.github.com/articles/fork-a-repo/) this repository to your
    own GitHub account and then

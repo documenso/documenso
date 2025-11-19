@@ -20,22 +20,22 @@ import {
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-client-rect';
-import { useAutoSave } from '@documenso/lib/client-only/hooks/use-autosave';
-import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
+import { getBoundingClientRect } from '@doku-seal/lib/client-only/get-bounding-client-rect';
+import { useAutoSave } from '@doku-seal/lib/client-only/hooks/use-autosave';
+import { useDocumentElement } from '@doku-seal/lib/client-only/hooks/use-document-element';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
 import {
   type TFieldMetaSchema as FieldMeta,
   ZFieldMetaSchema,
-} from '@documenso/lib/types/field-meta';
-import { nanoid } from '@documenso/lib/universal/id';
-import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsUninserted } from '@documenso/lib/utils/fields';
-import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
+} from '@doku-seal/lib/types/field-meta';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { validateFieldsUninserted } from '@doku-seal/lib/utils/fields';
+import { parseMessageDescriptor } from '@doku-seal/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
-} from '@documenso/lib/utils/recipients';
+} from '@doku-seal/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
 import { useRecipientColors } from '../../lib/recipient-colors';

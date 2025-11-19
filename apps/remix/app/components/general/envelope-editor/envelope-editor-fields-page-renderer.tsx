@@ -7,20 +7,20 @@ import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Transformer } from 'konva/lib/shapes/Transformer';
 import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
 
-import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
-import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
-import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
-import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
+import type { TLocalField } from '@doku-seal/lib/client-only/hooks/use-editor-fields';
+import { usePageRenderer } from '@doku-seal/lib/client-only/hooks/use-page-renderer';
+import { useCurrentEnvelopeEditor } from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentEnvelopeRender } from '@doku-seal/lib/client-only/providers/envelope-render-provider';
+import { FIELD_META_DEFAULT_VALUES } from '@doku-seal/lib/types/field-meta';
 import {
   MIN_FIELD_HEIGHT_PX,
   MIN_FIELD_WIDTH_PX,
   convertPixelToPercentage,
-} from '@documenso/lib/universal/field-renderer/field-renderer';
-import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
-import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
-import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
-import { CommandDialog } from '@documenso/ui/primitives/command';
+} from '@doku-seal/lib/universal/field-renderer/field-renderer';
+import { renderField } from '@doku-seal/lib/universal/field-renderer/render-field';
+import { getClientSideFieldTranslations } from '@doku-seal/lib/utils/fields';
+import { canRecipientFieldsBeModified } from '@doku-seal/lib/utils/recipients';
+import { CommandDialog } from '@doku-seal/ui/primitives/command';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';

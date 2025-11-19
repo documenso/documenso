@@ -19,13 +19,13 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import * as z from 'zod';
 
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
-import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
-import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
-import { cn } from '@documenso/ui/lib/utils';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { Button } from '@documenso/ui/primitives/button';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import type { TEnvelope } from '@doku-seal/lib/types/envelope';
+import { trpc, trpc as trpcReact } from '@doku-seal/trpc/react';
+import { DocumentSendEmailMessageHelper } from '@doku-seal/ui/components/document/document-send-email-message-helper';
+import { cn } from '@doku-seal/ui/lib/utils';
+import { Alert, AlertDescription } from '@doku-seal/ui/primitives/alert';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Dialog,
   DialogClose,
@@ -35,7 +35,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@documenso/ui/primitives/dialog';
+} from '@doku-seal/ui/primitives/dialog';
 import {
   Form,
   FormControl,
@@ -43,19 +43,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@documenso/ui/primitives/form/form';
-import { Input } from '@documenso/ui/primitives/input';
+} from '@doku-seal/ui/primitives/form/form';
+import { Input } from '@doku-seal/ui/primitives/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@documenso/ui/primitives/select';
-import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
-import { Textarea } from '@documenso/ui/primitives/textarea';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/select';
+import { Tabs, TabsList, TabsTrigger } from '@doku-seal/ui/primitives/tabs';
+import { Textarea } from '@doku-seal/ui/primitives/textarea';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@doku-seal/ui/primitives/tooltip';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 export type EnvelopeDistributeDialogProps = {
   envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
@@ -279,7 +279,7 @@ export const EnvelopeDistributeDialog = ({
                                             </SelectItem>
                                           ))}
 
-                                          <SelectItem value={'-1'}>Documenso</SelectItem>
+                                          <SelectItem value={'-1'}>Doku-Seal</SelectItem>
                                         </SelectContent>
                                       </Select>
                                     </FormControl>

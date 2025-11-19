@@ -25,11 +25,11 @@ docker buildx build \
     -f "$SCRIPT_DIR/Dockerfile" \
     --platform=$PLATFORM \
     --progress=plain \
-    -t "documenso/documenso:latest" \
-    -t "documenso/documenso:$GIT_SHA" \
-    -t "documenso/documenso:$APP_VERSION" \
-    -t "ghcr.io/documenso/documenso:latest" \
-    -t "ghcr.io/documenso/documenso:$GIT_SHA" \
-    -t "ghcr.io/documenso/documenso:$APP_VERSION" \
+    -t "doku-seal/doku-seal:latest" \
+    -t "doku-seal/doku-seal:$GIT_SHA" \
+    -t "doku-seal/doku-seal:$APP_VERSION" \
+    -t "ghcr.io/doku-seal/doku-seal:latest" \
+    -t "ghcr.io/doku-seal/doku-seal:$GIT_SHA" \
+    -t "ghcr.io/doku-seal/doku-seal:$APP_VERSION" \
     --push \
     "$MONOREPO_ROOT"

@@ -10,27 +10,27 @@ import { X } from 'lucide-react';
 import { ErrorCode as DropzoneErrorCode, type FileRejection } from 'react-dropzone';
 import { Link } from 'react-router';
 
-import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
+import { useLimits } from '@doku-seal/ee/server-only/limits/provider/client';
 import {
   useCurrentEnvelopeEditor,
   useDebounceFunction,
-} from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
-import { nanoid } from '@documenso/lib/universal/id';
-import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
-import { trpc } from '@documenso/trpc/react';
-import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
-import { Button } from '@documenso/ui/primitives/button';
+} from '@doku-seal/lib/client-only/providers/envelope-editor-provider';
+import { useCurrentOrganisation } from '@doku-seal/lib/client-only/providers/organisation';
+import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@doku-seal/lib/constants/app';
+import { nanoid } from '@doku-seal/lib/universal/id';
+import { canEnvelopeItemsBeModified } from '@doku-seal/lib/utils/envelope';
+import { trpc } from '@doku-seal/trpc/react';
+import type { TCreateEnvelopeItemsPayload } from '@doku-seal/trpc/server/envelope-router/create-envelope-items.types';
+import { Button } from '@doku-seal/ui/primitives/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@documenso/ui/primitives/card';
-import { DocumentDropzone } from '@documenso/ui/primitives/document-dropzone';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/primitives/card';
+import { DocumentDropzone } from '@doku-seal/ui/primitives/document-dropzone';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { EnvelopeItemDeleteDialog } from '~/components/dialogs/envelope-item-delete-dialog';
 

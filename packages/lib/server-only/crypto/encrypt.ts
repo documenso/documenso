@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { DOCUMENSO_ENCRYPTION_SECONDARY_KEY } from '@documenso/lib/constants/crypto';
-import { symmetricEncrypt } from '@documenso/lib/universal/crypto';
+import { DOKU_SEAL_ENCRYPTION_SECONDARY_KEY } from '@doku-seal/lib/constants/crypto';
+import { symmetricEncrypt } from '@doku-seal/lib/universal/crypto';
 
 export const ZEncryptedDataSchema = z.object({
   data: z.string(),
@@ -25,7 +25,7 @@ export type EncryptDataOptions = {
  * @returns The encrypted data.
  */
 export const encryptSecondaryData = ({ data, expiresAt }: EncryptDataOptions) => {
-  if (!DOCUMENSO_ENCRYPTION_SECONDARY_KEY) {
+  if (!DOKU_SEAL_ENCRYPTION_SECONDARY_KEY) {
     throw new Error('Missing encryption key');
   }
 
@@ -35,7 +35,7 @@ export const encryptSecondaryData = ({ data, expiresAt }: EncryptDataOptions) =>
   };
 
   return symmetricEncrypt({
-    key: DOCUMENSO_ENCRYPTION_SECONDARY_KEY,
+    key: DOKU_SEAL_ENCRYPTION_SECONDARY_KEY,
     data: JSON.stringify(dataToEncrypt),
   });
 };

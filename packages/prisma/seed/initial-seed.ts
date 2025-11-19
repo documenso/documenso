@@ -1,14 +1,14 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { ALIGNMENT_TEST_FIELDS } from '@documenso/app-tests/constants/field-alignment-pdf';
-import { FIELD_META_TEST_FIELDS } from '@documenso/app-tests/constants/field-meta-pdf';
-import { isBase64Image } from '@documenso/lib/constants/signatures';
+import { ALIGNMENT_TEST_FIELDS } from '@doku-seal/app-tests/constants/field-alignment-pdf';
+import { FIELD_META_TEST_FIELDS } from '@doku-seal/app-tests/constants/field-meta-pdf';
+import { isBase64Image } from '@doku-seal/lib/constants/signatures';
 import {
   incrementDocumentId,
   incrementTemplateId,
-} from '@documenso/lib/server-only/envelope/increment-id';
-import { nanoid, prefixedId } from '@documenso/lib/universal/id';
+} from '@doku-seal/lib/server-only/envelope/increment-id';
+import { nanoid, prefixedId } from '@doku-seal/lib/universal/id';
 
 import { prisma } from '..';
 import {
@@ -45,13 +45,13 @@ export const seedDatabase = async () => {
 
   const exampleUserExists = await prisma.user.findFirst({
     where: {
-      email: 'example@documenso.com',
+      email: 'example@doku-seal.com',
     },
   });
 
   const adminUserExists = await prisma.user.findFirst({
     where: {
-      email: 'admin@documenso.com',
+      email: 'admin@doku-seal.com',
     },
   });
 
@@ -61,12 +61,12 @@ export const seedDatabase = async () => {
 
   const exampleUser = await seedUser({
     name: 'Example User',
-    email: 'example@documenso.com',
+    email: 'example@doku-seal.com',
   });
 
   const adminUser = await seedUser({
     name: 'Admin User',
-    email: 'admin@documenso.com',
+    email: 'admin@doku-seal.com',
     isAdmin: true,
   });
 

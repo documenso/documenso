@@ -7,25 +7,25 @@ import type { DocumentMeta, EnvelopeItem } from '@prisma/client';
 import { type Field, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
-import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
-import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
-import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { validateFieldsInserted } from '@documenso/lib/utils/fields';
-import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
-import { trpc } from '@documenso/trpc/react';
+import { useThrottleFn } from '@doku-seal/lib/client-only/hooks/use-throttle-fn';
+import { PDF_VIEWER_PAGE_SELECTOR } from '@doku-seal/lib/constants/pdf-viewer';
+import { isFieldUnsignedAndRequired } from '@doku-seal/lib/utils/advanced-fields-helpers';
+import { validateFieldsInserted } from '@doku-seal/lib/utils/fields';
+import type { RecipientWithFields } from '@doku-seal/prisma/types/recipient-with-fields';
+import { trpc } from '@doku-seal/trpc/react';
 import {
   type DocumentField,
   DocumentReadOnlyFields,
-} from '@documenso/ui/components/document/document-read-only-fields';
-import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
-import { Button } from '@documenso/ui/primitives/button';
-import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { Input } from '@documenso/ui/primitives/input';
-import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
-import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
-import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
-import { useToast } from '@documenso/ui/primitives/use-toast';
+} from '@doku-seal/ui/components/document/document-read-only-fields';
+import { FieldToolTip } from '@doku-seal/ui/components/field/field-tooltip';
+import { Button } from '@doku-seal/ui/primitives/button';
+import { ElementVisible } from '@doku-seal/ui/primitives/element-visible';
+import { Input } from '@doku-seal/ui/primitives/input';
+import { Label } from '@doku-seal/ui/primitives/label';
+import { PDFViewer } from '@doku-seal/ui/primitives/pdf-viewer';
+import { RadioGroup, RadioGroupItem } from '@doku-seal/ui/primitives/radio-group';
+import { SignaturePadDialog } from '@doku-seal/ui/primitives/signature-pad/signature-pad-dialog';
+import { useToast } from '@doku-seal/ui/primitives/use-toast';
 
 import { BrandingLogo } from '~/components/general/branding-logo';
 import { injectCss } from '~/utils/css-vars';

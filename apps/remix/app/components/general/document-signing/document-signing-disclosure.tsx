@@ -3,7 +3,7 @@ import type { HTMLAttributes } from 'react';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
-import { cn } from '@documenso/ui/lib/utils';
+import { cn } from '@doku-seal/ui/lib/utils';
 
 export type DocumentSigningDisclosureProps = HTMLAttributes<HTMLParagraphElement>;
 
@@ -23,7 +23,7 @@ export const DocumentSigningDisclosure = ({
         <Trans>
           Read the full{' '}
           <Link
-            className="text-documenso-700 underline"
+            className="text-doku-seal-700 underline"
             to="/articles/signature-disclosure"
             target="_blank"
           >
