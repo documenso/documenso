@@ -79,16 +79,6 @@ export const ZTemplateMetaUpsertSchema = z.object({
   allowDictateNextSigner: z.boolean().optional(),
 });
 
-export const ZCreateTemplatePayloadSchema = z.object({
-  title: z.string().min(1).trim(),
-  folderId: z.string().optional(),
-});
-
-export const ZCreateTemplateMutationSchema = zodFormData({
-  payload: zfd.json(ZCreateTemplatePayloadSchema),
-  file: zfd.file(),
-});
-
 export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
   directRecipientName: z.string().max(255).optional(),
   directRecipientEmail: z.string().email().max(254),
@@ -234,6 +224,13 @@ export const ZCreateTemplateResponseSchema = z.object({
   id: z.number(),
 });
 
+export const ZCreateTemplatePayloadSchema = ZCreateTemplateV2RequestSchema;
+
+export const ZCreateTemplateMutationSchema = zodFormData({
+  payload: zfd.json(ZCreateTemplatePayloadSchema),
+  file: zfd.file(),
+});
+
 export const ZUpdateTemplateRequestSchema = z.object({
   templateId: z.number(),
   data: z
@@ -280,7 +277,7 @@ export const ZBulkSendTemplateMutationSchema = z.object({
   sendImmediately: z.boolean(),
 });
 
-export type TCreateTemplatePayloadSchema = z.infer<typeof ZCreateTemplatePayloadSchema>;
+export type TCreateTemplatePayloadSchema = z.input<typeof ZCreateTemplatePayloadSchema>;
 export type TCreateTemplateMutationSchema = z.infer<typeof ZCreateTemplateMutationSchema>;
 export type TDuplicateTemplateMutationSchema = z.infer<typeof ZDuplicateTemplateMutationSchema>;
 export type TDeleteTemplateMutationSchema = z.infer<typeof ZDeleteTemplateMutationSchema>;

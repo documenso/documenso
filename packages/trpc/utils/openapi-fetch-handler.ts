@@ -24,11 +24,17 @@ const getMultipartBody = async (req: Request) => {
 
   const data: Record<string, unknown> = {};
 
-  for (const key of formData.keys()) {
-    const values = formData.getAll(key);
+  for (const [key, value] of formData.entries()) {
+    // !: Handles cases where our generated SDKs send key[] syntax for arrays.
+    const normalizedKey = key.endsWith('[]') ? key.slice(0, -2) : key;
 
-    // Return array for multiple values, single value otherwise (matches URL-encoded behavior)
-    data[key] = values.length > 1 ? values : values[0];
+    if (data[normalizedKey] === undefined) {
+      data[normalizedKey] = value;
+    } else if (Array.isArray(data[normalizedKey])) {
+      data[normalizedKey].push(value);
+    } else {
+      data[normalizedKey] = [data[normalizedKey], value];
+    }
   }
 
   return data;

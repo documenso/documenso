@@ -3,7 +3,6 @@ import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embeddin
 import { updateEnvelope } from '@documenso/lib/server-only/envelope/update-envelope';
 import { setFieldsForTemplate } from '@documenso/lib/server-only/field/set-fields-for-template';
 import { setTemplateRecipients } from '@documenso/lib/server-only/recipient/set-template-recipients';
-import { nanoid } from '@documenso/lib/universal/id';
 
 import { procedure } from '../trpc';
 import {
@@ -53,11 +52,6 @@ export const updateEmbeddingTemplateRoute = procedure
         requestMetadata: ctx.metadata,
       });
 
-      const recipientsWithClientId = recipients.map((recipient) => ({
-        ...recipient,
-        clientId: nanoid(),
-      }));
-
       const { recipients: updatedRecipients } = await setTemplateRecipients({
         userId: apiToken.userId,
         teamId: apiToken.teamId ?? undefined,
@@ -65,7 +59,7 @@ export const updateEmbeddingTemplateRoute = procedure
           type: 'templateId',
           id: templateId,
         },
-        recipients: recipientsWithClientId.map((recipient) => ({
+        recipients: recipients.map((recipient) => ({
           id: recipient.id,
           email: recipient.email,
           name: recipient.name ?? '',
@@ -74,8 +68,8 @@ export const updateEmbeddingTemplateRoute = procedure
         })),
       });
 
-      const fields = recipientsWithClientId.flatMap((recipient) => {
-        const recipientId = updatedRecipients.find((r) => r.email === recipient.email)?.id;
+      const fields = recipients.flatMap((recipient) => {
+        const recipientId = updatedRecipients.find((r) => r.id === recipient.id)?.id;
 
         if (!recipientId) {
           throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
@@ -86,8 +80,6 @@ export const updateEmbeddingTemplateRoute = procedure
         return (recipient.fields ?? []).map((field) => ({
           ...field,
           recipientId,
-          // !: Temp property to be removed once we don't link based on signer email
-          signerEmail: recipient.email,
         }));
       });
 

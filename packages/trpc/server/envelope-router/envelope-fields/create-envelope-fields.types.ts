@@ -8,7 +8,7 @@ import {
   ZFieldPageNumberSchema,
   ZFieldSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import type { TrpcRouteMeta } from '../../trpc';
 
@@ -16,14 +16,13 @@ export const createEnvelopeFieldsMeta: TrpcRouteMeta = {
   openapi: {
     method: 'POST',
     path: '/envelope/field/create-many',
-    contentTypes: ['multipart/form-data'],
     summary: 'Create envelope fields',
     description: 'Create multiple fields for an envelope',
     tags: ['Envelope Fields'],
   },
 };
 
-const ZCreateFieldSchema = ZFieldAndMetaSchema.and(
+const ZCreateFieldSchema = ZEnvelopeFieldAndMetaSchema.and(
   z.object({
     recipientId: z.number().describe('The ID of the recipient to create the field for'),
     envelopeItemId: z

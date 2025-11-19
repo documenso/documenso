@@ -233,7 +233,19 @@ export const EnvelopeEditorSettingsDialog = ({
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
-    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+    const {
+      timezone,
+      dateFormat,
+      redirectUrl,
+      language,
+      signatureTypes,
+      distributionMethod,
+      emailId,
+      emailSettings,
+      message,
+      subject,
+      emailReplyTo,
+    } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
@@ -251,10 +263,16 @@ export const EnvelopeEditorSettingsDialog = ({
           timezone,
           dateFormat,
           redirectUrl,
+          emailId,
+          message,
+          subject,
+          emailReplyTo,
+          emailSettings,
+          distributionMethod,
           language: isValidLanguageCode(language) ? language : undefined,
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 

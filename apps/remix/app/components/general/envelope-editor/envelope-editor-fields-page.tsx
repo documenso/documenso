@@ -5,7 +5,7 @@ import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -32,7 +32,6 @@ import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animat
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
-import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -49,6 +48,7 @@ import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
+import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
 const EnvelopeEditorFieldsPageRenderer = lazy(
   async () => import('./envelope-editor-fields-page-renderer'),
@@ -171,6 +171,8 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
 };
 
 export const EnvelopeEditorFieldsPage = () => {
+  const [searchParams] = useSearchParams();
+
   const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -407,12 +409,13 @@ export const EnvelopeEditorFieldsPage = () => {
               <Trans>Selected Recipient</Trans>
             </h3>
 
-            <RecipientSelector
+            <EnvelopeRecipientSelector
               selectedRecipient={editorFields.selectedRecipient}
               onSelectedRecipientChange={(recipient) =>
                 editorFields.setSelectedRecipient(recipient.id)
               }
               recipients={envelope.recipients}
+              fields={envelope.fields}
               className="w-full"
               align="end"
             />
@@ -590,6 +593,37 @@ export const EnvelopeEditorFieldsPage = () => {
             {selectedField && (
               <section>
                 <Separator className="my-4" />
+
+                {searchParams.get('devmode') && (
+                  <>
+                    <div className="px-4">
+                      <h3 className="text-foreground mb-3 text-sm font-semibold">
+                        <Trans>Developer Mode</Trans>
+                      </h3>
+
+                      <div className="bg-muted/50 border-border text-foreground space-y-2 rounded-md border p-3 text-sm">
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Pos X:&nbsp;</span>
+                          {selectedField.positionX.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Pos Y:&nbsp;</span>
+                          {selectedField.positionY.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Width:&nbsp;</span>
+                          {selectedField.width.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="text-muted-foreground min-w-12">Height:&nbsp;</span>
+                          {selectedField.height.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator className="my-4" />
+                  </>
+                )}
 
                 <div className="[&_label]:text-foreground/70 px-4 [&_label]:text-xs">
                   <h3 className="text-sm font-semibold">
