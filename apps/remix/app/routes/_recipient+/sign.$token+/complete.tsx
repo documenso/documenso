@@ -84,6 +84,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const canSignUp = !isExistingUser && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true';
 
+  const redirectToFolder =
+    user && document.userId === user.id && document.folderId && document.team?.url;
+
+  const homePath = redirectToFolder
+    ? `/t/${document.team.url}/documents/f/${document.folderId}`
+    : '/';
+
   return {
     isDocumentAccessValid: true,
     canSignUp,
@@ -92,6 +99,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     signatures,
     document,
     recipient,
+    homePath,
   };
 }
 
@@ -109,6 +117,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     document,
     recipient,
     recipientEmail,
+    homePath,
   } = loaderData;
 
   if (!isDocumentAccessValid) {
@@ -226,7 +235,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
             {user && (
               <Button asChild>
-                <Link to="/">
+                <Link to={homePath}>
                   <Trans>Go Back Home</Trans>
                 </Link>
               </Button>

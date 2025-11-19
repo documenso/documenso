@@ -127,7 +127,7 @@ export const DocumentShareButton = ({
           <Button
             variant="outline"
             disabled={!token || !documentId}
-            className={cn('w-full max-w-lg flex-1 text-[11px]', className)}
+            className={cn('h-11 w-full max-w-lg flex-1', className)}
             loading={isLoading}
           >
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
