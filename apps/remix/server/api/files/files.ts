@@ -5,6 +5,7 @@ import { Hono } from 'hono';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { getPresignPostUrl } from '@documenso/lib/universal/upload/server-actions';
@@ -16,6 +17,7 @@ import {
   type TGetPresignedPostUrlResponse,
   ZGetEnvelopeItemFileDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileRequestParamsSchema,
+  ZGetEnvelopeItemFileRequestQuerySchema,
   ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema,
   ZGetEnvelopeItemFileTokenRequestParamsSchema,
   ZGetPresignedPostUrlRequestSchema,
@@ -68,12 +70,24 @@ export const filesRoute = new Hono<HonoEnv>()
   .get(
     '/envelope/:envelopeId/envelopeItem/:envelopeItemId',
     sValidator('param', ZGetEnvelopeItemFileRequestParamsSchema),
+    sValidator('query', ZGetEnvelopeItemFileRequestQuerySchema),
     async (c) => {
       const { envelopeId, envelopeItemId } = c.req.valid('param');
+      const { token } = c.req.query();
 
       const session = await getOptionalSession(c);
 
-      if (!session.user) {
+      let userId = session.user?.id;
+
+      if (token) {
+        const presignToken = await verifyEmbeddingPresignToken({
+          token,
+        }).catch(() => undefined);
+
+        userId = presignToken?.userId;
+      }
+
+      if (!userId) {
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
@@ -104,7 +118,7 @@ export const filesRoute = new Hono<HonoEnv>()
       }
 
       const team = await getTeamById({
-        userId: session.user.id,
+        userId: userId,
         teamId: envelope.teamId,
       }).catch((error) => {
         console.error(error);
