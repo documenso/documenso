@@ -84,10 +84,10 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const canSignUp = !isExistingUser && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true';
 
-  const redirectToFolder =
+  const canRedirectToFolder =
     user && document.userId === user.id && document.folderId && document.team?.url;
 
-  const homePath = redirectToFolder
+  const returnToHomePath = canRedirectToFolder
     ? `/t/${document.team.url}/documents/f/${document.folderId}`
     : '/';
 
@@ -99,7 +99,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     signatures,
     document,
     recipient,
-    homePath,
+    returnToHomePath,
   };
 }
 
@@ -117,7 +117,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     document,
     recipient,
     recipientEmail,
-    homePath,
+    returnToHomePath,
   } = loaderData;
 
   if (!isDocumentAccessValid) {
@@ -127,7 +127,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
   return (
     <div
       className={cn(
-        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-24 md:-mx-8 md:px-8 lg:pt-36 xl:pt-44',
+        '-mx-4 flex flex-col items-center overflow-hidden px-4 pt-16 md:-mx-8 md:px-8 lg:pt-20 xl:pt-28',
         { 'pt-0 lg:pt-0 xl:pt-0': canSignUp },
       )}
     >
@@ -235,7 +235,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
 
             {user && (
               <Button asChild>
-                <Link to={homePath}>
+                <Link to={returnToHomePath}>
                   <Trans>Go Back Home</Trans>
                 </Link>
               </Button>
