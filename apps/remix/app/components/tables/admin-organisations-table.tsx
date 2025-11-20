@@ -113,7 +113,9 @@ export const AdminOrganisationsTable = ({
                 isPaid ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {isPaid ? t`Paid` : t`Free`}
+              {isPaid
+                ? t({ message: `Paid`, context: `Subscription status` })
+                : t({ message: `Free`, context: `Subscription status` })}
             </div>
           );
         },
