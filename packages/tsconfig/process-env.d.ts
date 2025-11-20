@@ -80,6 +80,11 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
+    /**
+     * Google Generative AI (Gemini)
+     */
+    GOOGLE_GENERATIVE_AI_API_KEY?: string;
+
     POSTGRES_URL?: string;
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;

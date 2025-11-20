@@ -83,6 +83,7 @@
     "@documenso/prisma": "^0.0.0",
     "@lingui/conf": "^5.2.0",
     "@lingui/core": "^5.2.0",
+    "ai": "^5.0.82",
     "inngest-cli": "^0.29.1",
     "luxon": "^3.5.0",
     "mupdf": "^1.0.0",

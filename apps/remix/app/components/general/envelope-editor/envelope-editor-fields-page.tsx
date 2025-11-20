@@ -1,7 +1,7 @@
-import { lazy, useEffect, useMemo } from 'react';
+import { lazy, useEffect, useMemo, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
@@ -11,6 +11,7 @@ import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import type { TDetectedFormField } from '@documenso/lib/types/document-analysis';
 import type {
   TCheckboxFieldMeta,
   TDateFieldMeta,
@@ -24,12 +25,14 @@ import type {
   TSignatureFieldMeta,
   TTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
+import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
@@ -49,6 +52,51 @@ import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 const EnvelopeEditorFieldsPageRenderer = lazy(
   async () => import('./envelope-editor-fields-page-renderer'),
 );
+
+const detectFormFieldsInDocument = async (params: {
+  envelopeId: string;
+  onProgress: (current: number, total: number) => void;
+}): Promise<{
+  fieldsPerPage: Map<number, TDetectedFormField[]>;
+  errors: Map<number, Error>;
+}> => {
+  const { envelopeId, onProgress } = params;
+  const fieldsPerPage = new Map<number, TDetectedFormField[]>();
+  const errors = new Map<number, Error>();
+
+  try {
+    onProgress(0, 1);
+
+    const response = await fetch('/api/ai/detect-fields', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ envelopeId }),
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Field detection failed: ${response.statusText} - ${errorText}`);
+    }
+
+    const detectedFields: TDetectedFormField[] = await response.json();
+
+    for (const field of detectedFields) {
+      if (!fieldsPerPage.has(field.pageNumber)) {
+        fieldsPerPage.set(field.pageNumber, []);
+      }
+      fieldsPerPage.get(field.pageNumber)!.push(field);
+    }
+
+    onProgress(1, 1);
+  } catch (error) {
+    errors.set(0, error instanceof Error ? error : new Error(String(error)));
+  }
+
+  return { fieldsPerPage, errors };
+};
 
 const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
   [FieldType.SIGNATURE]: msg`Signature Settings`,
@@ -72,6 +120,14 @@ export const EnvelopeEditorFieldsPage = () => {
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
   const { t } = useLingui();
+  const { toast } = useToast();
+
+  const [isDetectingFields, setIsAutoAddingFields] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState<{
+    current: number;
+    total: number;
+  } | null>(null);
+  const [hasAutoPlacedFields, setHasAutoPlacedFields] = useState(false);
 
   const selectedField = useMemo(
     () => structuredClone(editorFields.selectedField),
@@ -85,20 +141,13 @@ export const EnvelopeEditorFieldsPage = () => {
 
     const isMetaSame = isDeepEqual(selectedField.fieldMeta, fieldMeta);
 
-    // Todo: Envelopes - Clean up console logs.
     if (!isMetaSame) {
-      console.log('TRIGGER UPDATE');
       editorFields.updateFieldByFormId(selectedField.formId, {
         fieldMeta,
       });
-    } else {
-      console.log('DATA IS SAME, NO UPDATE');
     }
   };
 
-  /**
-   * Set the selected recipient to the first recipient in the envelope.
-   */
   useEffect(() => {
     const firstSelectableRecipient = envelope.recipients.find(
       (recipient) =>
@@ -108,10 +157,128 @@ export const EnvelopeEditorFieldsPage = () => {
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
   }, []);
 
+  useEffect(() => {
+    if (hasAutoPlacedFields || !currentEnvelopeItem) {
+      return;
+    }
+
+    const storageKey = `autoPlaceFields_${envelope.id}`;
+    const storedData = sessionStorage.getItem(storageKey);
+
+    if (!storedData) {
+      return;
+    }
+
+    sessionStorage.removeItem(storageKey);
+    setHasAutoPlacedFields(true);
+
+    try {
+      const { fields: detectedFields, recipientCount } = JSON.parse(storedData) as {
+        fields: TDetectedFormField[];
+        recipientCount: number;
+      };
+
+      let totalAdded = 0;
+
+      const fieldsPerPage = new Map<number, TDetectedFormField[]>();
+      for (const field of detectedFields) {
+        if (!fieldsPerPage.has(field.pageNumber)) {
+          fieldsPerPage.set(field.pageNumber, []);
+        }
+        fieldsPerPage.get(field.pageNumber)!.push(field);
+      }
+
+      for (const [pageNumber, fields] of fieldsPerPage.entries()) {
+        for (const detected of fields) {
+          const { ymin, xmin, ymax, xmax } = detected.boundingBox;
+          const positionX = (xmin / 1000) * 100;
+          const positionY = (ymin / 1000) * 100;
+          const width = ((xmax - xmin) / 1000) * 100;
+          const height = ((ymax - ymin) / 1000) * 100;
+
+          const fieldType = detected.label as FieldType;
+          const resolvedRecipientId =
+            envelope.recipients.find((recipient) => recipient.id === detected.recipientId)?.id ??
+            editorFields.selectedRecipient?.id ??
+            envelope.recipients[0]?.id;
+
+          if (!resolvedRecipientId) {
+            console.warn('Skipping detected field because no recipient could be resolved', {
+              detectedRecipientId: detected.recipientId,
+            });
+            continue;
+          }
+
+          try {
+            editorFields.addField({
+              envelopeItemId: currentEnvelopeItem.id,
+              page: pageNumber,
+              type: fieldType,
+              positionX,
+              positionY,
+              width,
+              height,
+              recipientId: resolvedRecipientId,
+              fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[fieldType]),
+            });
+            totalAdded++;
+          } catch (error) {
+            console.error(`Failed to add field on page ${pageNumber}:`, error);
+          }
+        }
+      }
+
+      if (totalAdded > 0) {
+        toast({
+          title: t`Recipients and fields added`,
+          description: t`Added ${recipientCount} ${plural(recipientCount, {
+            one: 'recipient',
+            other: 'recipients',
+          })} and ${totalAdded} ${plural(totalAdded, { one: 'field', other: 'fields' })}`,
+          duration: 5000,
+        });
+      } else {
+        toast({
+          title: t`Recipients added`,
+          description: t`Added ${recipientCount} ${plural(recipientCount, {
+            one: 'recipient',
+            other: 'recipients',
+          })}. No fields were detected in the document.`,
+          duration: 5000,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to auto-place fields:', error);
+      toast({
+        title: t`Field placement failed`,
+        description: t`Failed to automatically place fields. You can add them manually.`,
+        variant: 'destructive',
+        duration: 5000,
+      });
+    }
+  }, [
+    currentEnvelopeItem,
+    envelope.id,
+    envelope.recipients,
+    editorFields,
+    hasAutoPlacedFields,
+    t,
+    toast,
+  ]);
+
   return (
     <div className="relative flex h-full">
-      <div className="flex w-full flex-col overflow-y-auto">
+      <div className="relative flex w-full flex-col overflow-y-auto">
         {/* Horizontal envelope item selector */}
+        {isDetectingFields && (
+          <>
+            <div className="edge-glow edge-glow-top pointer-events-none fixed left-0 right-0 top-0 z-20 h-32" />
+            <div className="edge-glow edge-glow-right pointer-events-none fixed bottom-0 right-0 top-0 z-20 w-32" />
+            <div className="edge-glow edge-glow-bottom pointer-events-none fixed bottom-0 left-0 right-0 z-20 h-32" />
+            <div className="edge-glow edge-glow-left pointer-events-none fixed bottom-0 left-0 top-0 z-20 w-32" />
+          </>
+        )}
+
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}
@@ -202,6 +369,129 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedRecipientId={editorFields.selectedRecipient?.id ?? null}
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
+
+            <Button
+              className="mt-4 w-full"
+              variant="outline"
+              disabled={isDetectingFields}
+              onClick={async () => {
+                setIsAutoAddingFields(true);
+                setProcessingProgress(null);
+
+                try {
+                  if (!currentEnvelopeItem) {
+                    toast({
+                      title: t`No document selected`,
+                      description: t`No document selected. Please reload the page and try again.`,
+                      variant: 'destructive',
+                    });
+                    return;
+                  }
+
+                  if (!currentEnvelopeItem.documentDataId) {
+                    toast({
+                      title: t`Document data missing`,
+                      description: t`Document data not found. Please try reloading the page.`,
+                      variant: 'destructive',
+                    });
+                    return;
+                  }
+
+                  const { fieldsPerPage, errors } = await detectFormFieldsInDocument({
+                    envelopeId: envelope.id,
+                    onProgress: (current, total) => {
+                      setProcessingProgress({ current, total });
+                    },
+                  });
+
+                  let totalAdded = 0;
+                  for (const [pageNumber, detectedFields] of fieldsPerPage.entries()) {
+                    for (const detected of detectedFields) {
+                      const { ymin, xmin, ymax, xmax } = detected.boundingBox;
+                      const positionX = (xmin / 1000) * 100;
+                      const positionY = (ymin / 1000) * 100;
+                      const width = ((xmax - xmin) / 1000) * 100;
+                      const height = ((ymax - ymin) / 1000) * 100;
+
+                      const fieldType = detected.label as FieldType;
+                      const resolvedRecipientId =
+                        envelope.recipients.find(
+                          (recipient) => recipient.id === detected.recipientId,
+                        )?.id ??
+                        editorFields.selectedRecipient?.id ??
+                        envelope.recipients[0]?.id;
+
+                      if (!resolvedRecipientId) {
+                        console.warn(
+                          'Skipping detected field because no recipient could be resolved',
+                          {
+                            detectedRecipientId: detected.recipientId,
+                          },
+                        );
+                        continue;
+                      }
+
+                      try {
+                        editorFields.addField({
+                          envelopeItemId: currentEnvelopeItem.id,
+                          page: pageNumber,
+                          type: fieldType,
+                          positionX,
+                          positionY,
+                          width,
+                          height,
+                          recipientId: resolvedRecipientId,
+                          fieldMeta: structuredClone(FIELD_META_DEFAULT_VALUES[fieldType]),
+                        });
+                        totalAdded++;
+                      } catch (error) {
+                        console.error(`Failed to add field on page ${pageNumber}:`, error);
+                      }
+                    }
+                  }
+
+                  const successfulPages = fieldsPerPage.size;
+                  const failedPages = errors.size;
+
+                  if (totalAdded > 0) {
+                    let description = t`Added ${totalAdded} fields`;
+                    if (fieldsPerPage.size > 1) {
+                      description = t`Added ${totalAdded} fields across ${successfulPages} pages`;
+                    }
+                    if (failedPages > 0) {
+                      description = t`Added ${totalAdded} fields across ${successfulPages} pages. ${failedPages} pages failed.`;
+                    }
+
+                    toast({
+                      title: t`Fields added`,
+                      description,
+                    });
+                  } else if (failedPages > 0) {
+                    toast({
+                      title: t`Field detection failed`,
+                      description: t`Failed to detect fields on ${failedPages} pages. Please try again.`,
+                      variant: 'destructive',
+                    });
+                  } else {
+                    toast({
+                      title: t`No fields detected`,
+                      description: t`No fields were detected in the document`,
+                    });
+                  }
+                } catch (error) {
+                  toast({
+                    title: t`Processing error`,
+                    description: t`An unexpected error occurred while processing pages.`,
+                    variant: 'destructive',
+                  });
+                } finally {
+                  setIsAutoAddingFields(false);
+                  setProcessingProgress(null);
+                }
+              }}
+            >
+              {isDetectingFields ? <Trans>Processing...</Trans> : <Trans>Auto add fields</Trans>}
+            </Button>
           </section>
 
           {/* Field details section. */}

@@ -27,7 +27,7 @@ if (loggingFilePath) {
 }
 
 export const logger = pino({
-  level: 'info',
+  level: env('LOG_LEVEL') || 'info',
   transport:
     transports.length > 0
       ? {
