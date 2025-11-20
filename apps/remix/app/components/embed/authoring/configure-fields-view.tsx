@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentData, FieldType } from '@prisma/client';
+import type { EnvelopeItem, FieldType } from '@prisma/client';
 import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { ChevronsUpDown } from 'lucide-react';
@@ -40,7 +40,8 @@ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type ConfigureFieldsViewProps = {
   configData: TConfigureEmbedFormSchema;
-  documentData?: DocumentData;
+  presignToken?: string | undefined;
+  envelopeItem?: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
   defaultValues?: Partial<TConfigureFieldsFormSchema>;
   onBack?: (data: TConfigureFieldsFormSchema) => void;
   onSubmit: (data: TConfigureFieldsFormSchema) => void;
@@ -48,7 +49,8 @@ export type ConfigureFieldsViewProps = {
 
 export const ConfigureFieldsView = ({
   configData,
-  documentData,
+  presignToken,
+  envelopeItem,
   defaultValues,
   onBack,
   onSubmit,
@@ -82,16 +84,24 @@ export const ConfigureFieldsView = ({
   }, []);
 
   const normalizedDocumentData = useMemo(() => {
-    if (documentData) {
-      return documentData.data;
+    if (envelopeItem) {
+      return undefined;
     }
 
     if (!configData.documentData) {
-      return null;
+      return undefined;
     }
 
     return base64.encode(configData.documentData.data);
   }, [configData.documentData]);
+
+  const normalizedEnvelopeItem = useMemo(() => {
+    if (envelopeItem) {
+      return envelopeItem;
+    }
+
+    return { id: '', envelopeId: '' };
+  }, [envelopeItem]);
 
   const recipients = useMemo(() => {
     return configData.signers.map<Recipient>((signer, index) => ({
@@ -534,56 +544,50 @@ export const ConfigureFieldsView = ({
             )}
 
             <Form {...form}>
-              {normalizedDocumentData && (
-                <div>
-                  <PDFViewer
-                    overrideData={normalizedDocumentData}
-                    envelopeItem={{
-                      id: '',
-                      envelopeId: '',
-                    }}
-                    token={undefined}
-                    version="signed"
-                  />
+              <div>
+                <PDFViewer
+                  presignToken={presignToken}
+                  overrideData={normalizedDocumentData}
+                  envelopeItem={normalizedEnvelopeItem}
+                  token={undefined}
+                  version="signed"
+                />
 
-                  <ElementVisible
-                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-                  >
-                    {localFields.map((field, index) => {
-                      const recipientIndex = recipients.findIndex(
-                        (r) => r.id === field.recipientId,
-                      );
+                <ElementVisible
+                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+                >
+                  {localFields.map((field, index) => {
+                    const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 
-                      return (
-                        <FieldItem
-                          key={field.formId}
-                          field={field}
-                          minHeight={MIN_HEIGHT_PX}
-                          minWidth={MIN_WIDTH_PX}
-                          defaultHeight={DEFAULT_HEIGHT_PX}
-                          defaultWidth={DEFAULT_WIDTH_PX}
-                          onResize={(node) => onFieldResize(node, index)}
-                          onMove={(node) => onFieldMove(node, index)}
-                          onRemove={() => remove(index)}
-                          onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                          onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
-                          onFocus={() => setLastActiveField(field)}
-                          onBlur={() => setLastActiveField(null)}
-                          onAdvancedSettings={() => {
-                            setCurrentField(field);
-                            setShowAdvancedSettings(true);
-                          }}
-                          recipientIndex={recipientIndex}
-                          active={activeFieldId === field.formId}
-                          onFieldActivate={() => setActiveFieldId(field.formId)}
-                          onFieldDeactivate={() => setActiveFieldId(null)}
-                          disabled={selectedRecipient?.id !== field.recipientId}
-                        />
-                      );
-                    })}
-                  </ElementVisible>
-                </div>
-              )}
+                    return (
+                      <FieldItem
+                        key={field.formId}
+                        field={field}
+                        minHeight={MIN_HEIGHT_PX}
+                        minWidth={MIN_WIDTH_PX}
+                        defaultHeight={DEFAULT_HEIGHT_PX}
+                        defaultWidth={DEFAULT_WIDTH_PX}
+                        onResize={(node) => onFieldResize(node, index)}
+                        onMove={(node) => onFieldMove(node, index)}
+                        onRemove={() => remove(index)}
+                        onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                        onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                        onFocus={() => setLastActiveField(field)}
+                        onBlur={() => setLastActiveField(null)}
+                        onAdvancedSettings={() => {
+                          setCurrentField(field);
+                          setShowAdvancedSettings(true);
+                        }}
+                        recipientIndex={recipientIndex}
+                        active={activeFieldId === field.formId}
+                        onFieldActivate={() => setActiveFieldId(field.formId)}
+                        onFieldDeactivate={() => setActiveFieldId(null)}
+                        disabled={selectedRecipient?.id !== field.recipientId}
+                      />
+                    );
+                  })}
+                </ElementVisible>
+              </div>
             </Form>
           </div>
         </div>
