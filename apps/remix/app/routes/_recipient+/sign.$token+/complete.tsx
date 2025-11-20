@@ -1,10 +1,8 @@
-import { useEffect } from 'react';
-
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
-import { CheckCircle2, Clock8, DownloadIcon } from 'lucide-react';
-import { Link, useRevalidator } from 'react-router';
+import { CheckCircle2, Clock8, DownloadIcon, Loader2 } from 'lucide-react';
+import { Link } from 'react-router';
 import { match } from 'ts-pattern';
 
 import signingCelebration from '@documenso/assets/images/signing-celebration.png';
@@ -18,7 +16,7 @@ import { getRecipientSignatures } from '@documenso/lib/server-only/recipient/get
 import { getUserByEmail } from '@documenso/lib/server-only/user/get-user-by-email';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { env } from '@documenso/lib/utils/env';
-import type { Document } from '@documenso/prisma/types/document-legacy-schema';
+import { trpc } from '@documenso/trpc/react';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import { SigningCard3D } from '@documenso/ui/components/signing-card';
 import { cn } from '@documenso/ui/lib/utils';
@@ -120,6 +118,24 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
     returnToHomePath,
   } = loaderData;
 
+  // Poll signing status every few seconds
+  const { data: signingStatusData } = trpc.envelope.signingStatus.useQuery(
+    {
+      token: recipient?.token || '',
+    },
+    {
+      refetchInterval: 3000,
+      initialData: match(document?.status)
+        .with(DocumentStatus.COMPLETED, () => ({ status: 'COMPLETED' }) as const)
+        .with(DocumentStatus.REJECTED, () => ({ status: 'REJECTED' }) as const)
+        .with(DocumentStatus.PENDING, () => ({ status: 'PENDING' }) as const)
+        .otherwise(() => ({ status: 'PENDING' }) as const),
+    },
+  );
+
+  // Use signing status from query if available, otherwise fall back to document status
+  const signingStatus = signingStatusData?.status ?? 'PENDING';
+
   if (!isDocumentAccessValid) {
     return <DocumentSigningAuthPageView email={recipientEmail} />;
   }
@@ -161,12 +177,20 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
             {recipient.role === RecipientRole.APPROVER && <Trans>Document Approved</Trans>}
           </h2>
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
-            .with({ status: DocumentStatus.COMPLETED }, () => (
+          {match({ status: signingStatus, deletedAt: document.deletedAt })
+            .with({ status: 'COMPLETED' }, () => (
               <div className="text-documenso-700 mt-4 flex items-center text-center">
                 <CheckCircle2 className="mr-2 h-5 w-5" />
                 <span className="text-sm">
                   <Trans>Everyone has signed</Trans>
+                </span>
+              </div>
+            ))
+            .with({ status: 'PROCESSING' }, () => (
+              <div className="mt-4 flex items-center text-center text-orange-600">
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                <span className="text-sm">
+                  <Trans>Processing document</Trans>
                 </span>
               </div>
             ))
@@ -187,11 +211,19 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               </div>
             ))}
 
-          {match({ status: document.status, deletedAt: document.deletedAt })
-            .with({ status: DocumentStatus.COMPLETED }, () => (
+          {match({ status: signingStatus, deletedAt: document.deletedAt })
+            .with({ status: 'COMPLETED' }, () => (
               <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
                 <Trans>
                   Everyone has signed! You will receive an Email copy of the signed document.
+                </Trans>
+              </p>
+            ))
+            .with({ status: 'PROCESSING' }, () => (
+              <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+                <Trans>
+                  All recipients have signed. The document is being processed and you will receive
+                  an Email copy shortly.
                 </Trans>
               </p>
             ))
@@ -218,7 +250,7 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
               className="w-full max-w-none md:flex-1"
             />
 
-            {isDocumentCompleted(document.status) && (
+            {isDocumentCompleted(document) && (
               <EnvelopeDownloadDialog
                 envelopeId={document.envelopeId}
                 envelopeStatus={document.status}
@@ -261,33 +293,6 @@ export default function CompletedSigningPage({ loaderData }: Route.ComponentProp
           )}
         </div>
       </div>
-
-      <PollUntilDocumentCompleted document={document} />
     </div>
   );
 }
-
-export type PollUntilDocumentCompletedProps = {
-  document: Pick<Document, 'id' | 'status' | 'deletedAt'>;
-};
-
-export const PollUntilDocumentCompleted = ({ document }: PollUntilDocumentCompletedProps) => {
-  const { revalidate } = useRevalidator();
-
-  useEffect(() => {
-    if (isDocumentCompleted(document.status)) {
-      return;
-    }
-
-    const interval = setInterval(() => {
-      if (window.document.hasFocus()) {
-        void revalidate();
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [document.status]);
-
-  return <></>;
-};
