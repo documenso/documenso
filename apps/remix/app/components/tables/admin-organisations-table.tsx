@@ -133,7 +133,7 @@ export const AdminOrganisationsTable = ({
               <ExternalLinkIcon className="h-4 w-4" />
             </Link>
           ) : (
-            'None'
+            t`None`
           ),
       },
       {
