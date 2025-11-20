@@ -10,6 +10,11 @@ import {
 } from '@prisma/client';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import {
+  extractPlaceholdersFromPDF,
+  insertFieldsFromPlaceholdersInPDF,
+  removePlaceholdersFromPDF,
+} from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
@@ -34,6 +39,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuthOptions, createRecipientAuthOptions } from '../../utils/document-auth';
+import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-id';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -256,7 +262,7 @@ export const createEnvelope = async ({
       ? await incrementDocumentId().then((v) => v.formattedDocumentId)
       : await incrementTemplateId().then((v) => v.formattedTemplateId);
 
-  return await prisma.$transaction(async (tx) => {
+  const createdEnvelope = await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
         id: prefixedId('envelope'),
@@ -376,8 +382,12 @@ export const createEnvelope = async ({
         recipients: true,
         fields: true,
         folder: true,
-        envelopeItems: true,
         envelopeAttachments: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+        },
       },
     });
 
@@ -413,4 +423,74 @@ export const createEnvelope = async ({
 
     return createdEnvelope;
   });
+
+  for (const envelopeItem of createdEnvelope.envelopeItems) {
+    const buffer = await getFileServerSide(envelopeItem.documentData);
+    const pdfToProcess = Buffer.from(buffer);
+
+    const envelopeOptions: EnvelopeIdOptions = {
+      type: 'envelopeId',
+      id: createdEnvelope.id,
+    };
+
+    const placeholders = await extractPlaceholdersFromPDF(pdfToProcess);
+
+    if (placeholders.length > 0) {
+      const pdfWithoutPlaceholders = await removePlaceholdersFromPDF(pdfToProcess);
+
+      await insertFieldsFromPlaceholdersInPDF(
+        pdfWithoutPlaceholders,
+        userId,
+        teamId,
+        envelopeOptions,
+        requestMetadata,
+        envelopeItem.id,
+        createdEnvelope.recipients,
+      );
+
+      const titleToUse = envelopeItem.title || title;
+      const fileName = titleToUse.endsWith('.pdf') ? titleToUse : `${titleToUse}.pdf`;
+
+      const newDocumentData = await putPdfFileServerSide({
+        name: fileName,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(pdfWithoutPlaceholders),
+      });
+
+      await prisma.envelopeItem.update({
+        where: {
+          id: envelopeItem.id,
+        },
+        data: {
+          documentDataId: newDocumentData.id,
+        },
+      });
+    }
+  }
+
+  const finalEnvelope = await prisma.envelope.findFirst({
+    where: {
+      id: createdEnvelope.id,
+    },
+    include: {
+      documentMeta: true,
+      recipients: true,
+      fields: true,
+      folder: true,
+      envelopeAttachments: true,
+      envelopeItems: {
+        include: {
+          documentData: true,
+        },
+      },
+    },
+  });
+
+  if (!finalEnvelope) {
+    throw new AppError(AppErrorCode.NOT_FOUND, {
+      message: 'Envelope not found',
+    });
+  }
+
+  return finalEnvelope;
 };
