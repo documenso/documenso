@@ -26,6 +26,7 @@ import { redistributeEnvelopeRoute } from './redistribute-envelope';
 import { setEnvelopeFieldsRoute } from './set-envelope-fields';
 import { setEnvelopeRecipientsRoute } from './set-envelope-recipients';
 import { signEnvelopeFieldRoute } from './sign-envelope-field';
+import { signingStatusEnvelopeRoute } from './signing-status-envelope';
 import { updateEnvelopeRoute } from './update-envelope';
 import { updateEnvelopeItemsRoute } from './update-envelope-items';
 import { useEnvelopeRoute } from './use-envelope';
@@ -74,4 +75,5 @@ export const envelopeRouter = router({
   duplicate: duplicateEnvelopeRoute,
   distribute: distributeEnvelopeRoute,
   redistribute: redistributeEnvelopeRoute,
+  signingStatus: signingStatusEnvelopeRoute,
 });

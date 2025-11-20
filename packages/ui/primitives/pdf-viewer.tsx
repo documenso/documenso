@@ -56,6 +56,7 @@ export type PDFViewerProps = {
   className?: string;
   envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
   token: string | undefined;
+  presignToken?: string | undefined;
   version: 'original' | 'signed';
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
@@ -67,6 +68,7 @@ export const PDFViewer = ({
   className,
   envelopeItem,
   token,
+  presignToken,
   version,
   onDocumentLoad,
   onPageClick,
@@ -166,6 +168,7 @@ export const PDFViewer = ({
           type: 'view',
           envelopeItem: envelopeItem,
           token,
+          presignToken,
         });
 
         const bytes = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
