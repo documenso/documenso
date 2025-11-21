@@ -24,7 +24,7 @@ import { expect, test } from '@playwright/test';
 import { DocumentStatus, EnvelopeType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
-import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.js';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedAlignmentTestDocument } from '@documenso/prisma/seed/initial-seed';
