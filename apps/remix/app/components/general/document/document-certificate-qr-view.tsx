@@ -21,7 +21,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 
@@ -149,7 +149,7 @@ export const DocumentCertificateQRView = ({
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewerSuspense
+            <PDFViewerLazy
               key={envelopeItems[0].id}
               envelopeItem={envelopeItems[0]}
               token={token}

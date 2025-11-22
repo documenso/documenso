@@ -21,7 +21,7 @@ import { cn } from '@documenso/ui/lib/utils';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { DocumentPageViewButton } from '~/components/general/document/document-page-view-button';
@@ -193,7 +193,7 @@ export default function DocumentPage({ params }: Route.ComponentProps) {
                 />
               )}
 
-              <PDFViewerSuspense
+              <PDFViewerLazy
                 envelopeItem={envelope.envelopeItems[0]}
                 token={undefined}
                 key={envelope.envelopeItems[0].id}

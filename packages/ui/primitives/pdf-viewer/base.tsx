@@ -13,8 +13,8 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 
-import { cn } from '../lib/utils';
-import { useToast } from './use-toast';
+import { cn } from '../../lib/utils';
+import { useToast } from '../use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 

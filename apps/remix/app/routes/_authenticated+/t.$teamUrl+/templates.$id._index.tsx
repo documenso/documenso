@@ -16,7 +16,7 @@ import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-k
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
@@ -210,7 +210,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 documentMeta={mockedDocumentMeta}
               />
 
-              <PDFViewerSuspense
+              <PDFViewerLazy
                 envelopeItem={envelope.envelopeItems[0]}
                 token={undefined}
                 version="signed"

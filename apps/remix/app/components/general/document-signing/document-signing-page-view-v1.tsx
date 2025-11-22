@@ -30,7 +30,7 @@ import { DocumentReadOnlyFields } from '@documenso/ui/components/document/docume
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
@@ -245,7 +245,7 @@ export const DocumentSigningPageViewV1 = ({
           <div className="flex-1">
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
-                <PDFViewerSuspense
+                <PDFViewerLazy
                   key={document.envelopeItems[0].id}
                   envelopeItem={document.envelopeItems[0]}
                   token={recipient.token}

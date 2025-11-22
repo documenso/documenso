@@ -22,7 +22,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -286,7 +286,7 @@ export const EmbedSignDocumentV1ClientPage = ({
         <div className="embed--DocumentContainer relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
-            <PDFViewerSuspense
+            <PDFViewerLazy
               envelopeItem={envelopeItems[0]}
               token={token}
               version="signed"

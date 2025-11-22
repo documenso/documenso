@@ -23,7 +23,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { FieldSelector } from '@documenso/ui/primitives/field-selector';
 import { Form } from '@documenso/ui/primitives/form/form';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -545,7 +545,7 @@ export const ConfigureFieldsView = ({
 
             <Form {...form}>
               <div>
-                <PDFViewerSuspense
+                <PDFViewerLazy
                   presignToken={presignToken}
                   overrideData={normalizedDocumentData}
                   envelopeItem={normalizedEnvelopeItem}

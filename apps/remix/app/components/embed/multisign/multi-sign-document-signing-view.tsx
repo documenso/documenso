@@ -21,7 +21,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerSuspense } from '@documenso/ui/primitives/pdf-viewer.suspense';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -225,7 +225,7 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewerSuspense
+                  <PDFViewerLazy
                     envelopeItem={document.envelopeItems[0]}
                     token={token}
                     version="signed"
