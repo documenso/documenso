@@ -6,6 +6,11 @@ import { env } from '@documenso/lib/utils/env';
  */
 export const AUTH_SESSION_LIFETIME = 1000 * 60 * 60 * 24 * 30; // 30 days.
 
+/**
+ * How long a request should take to mitigate side channel attacks
+ */
+export const AUTH_MIN_REQUEST_DURATION_MS = 1000;
+
 export type OAuthClientOptions = {
   id: string;
   scope: string[];
