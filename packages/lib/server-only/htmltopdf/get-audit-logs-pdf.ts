@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PUBLIC_WEBAPP_URL, NEXT_PRIVATE_INTERNAL_WEBAPP_URL, USE_INTERNAL_URL_BROWSERLESS } from '../../constants/app';
 import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
 import { env } from '../../utils/env';
 import { encryptSecondaryData } from '../crypto/encrypt';
@@ -48,11 +48,11 @@ export const getAuditLogsPdf = async ({ documentId, language }: GetAuditLogsPdfO
     {
       name: 'language',
       value: lang,
-      url: NEXT_PUBLIC_WEBAPP_URL(),
+      url: USE_INTERNAL_URL_BROWSERLESS() ? NEXT_PUBLIC_WEBAPP_URL() : NEXT_PRIVATE_INTERNAL_WEBAPP_URL(),
     },
   ]);
 
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encryptedId}`, {
+  await page.goto(`${USE_INTERNAL_URL_BROWSERLESS() ? NEXT_PUBLIC_WEBAPP_URL() : NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/__htmltopdf/audit-log?d=${encryptedId}`, {
     waitUntil: 'networkidle',
     timeout: 10_000,
   });
