@@ -226,7 +226,7 @@ export const EnvelopeEditorUploadPage = () => {
     }
 
     if (maximumEnvelopeItemCount <= localFiles.length) {
-      return msg`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`;
+      return msg`{maximumEnvelopeItemCount, plural, one {You cannot upload more than # item per envelope.} other {You cannot upload more than # items per envelope.}}`;
     }
 
     return null;
@@ -240,7 +240,7 @@ export const EnvelopeEditorUploadPage = () => {
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: t`{maximumEnvelopeItemCount, plural, one {You cannot upload more than # item per envelope.} other {You cannot upload more than # items per envelope.}}`,
         duration: 5000,
         variant: 'destructive',
       });

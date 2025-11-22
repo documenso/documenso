@@ -153,7 +153,7 @@ export const EnvelopeDropZoneWrapper = ({
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: t`{maximumEnvelopeItemCount, plural, one {You cannot upload more than # item per envelope.} other {You cannot upload more than # items per envelope.}}`,
         duration: 5000,
         variant: 'destructive',
       });
