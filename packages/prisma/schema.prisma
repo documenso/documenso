@@ -433,6 +433,10 @@ model Envelope {
   @@index([folderId])
   @@index([teamId])
   @@index([userId])
+  @@index([teamId, deletedAt, type, status])
+  @@index([teamId, deletedAt, type, createdAt])
+  @@index([userId, deletedAt, type])
+  @@index([status, deletedAt, type])
 }
 
 model EnvelopeItem {
@@ -585,6 +589,9 @@ model Recipient {
 
   @@index([envelopeId])
   @@index([token])
+  @@index([email])
+  @@index([signedAt])
+  @@index([envelopeId, signedAt])
 }
 
 enum FieldType {
@@ -694,6 +701,8 @@ model Organisation {
 
   organisationAuthenticationPortalId String                           @unique
   organisationAuthenticationPortal   OrganisationAuthenticationPortal @relation(fields: [organisationAuthenticationPortalId], references: [id])
+
+  @@index([name])
 }
 
 model OrganisationMember {
@@ -710,6 +719,7 @@ model OrganisationMember {
   organisationGroupMembers OrganisationGroupMember[]
 
   @@unique([userId, organisationId])
+  @@index([organisationId])
 }
 
 model OrganisationMemberInvite {
@@ -884,6 +894,7 @@ model Team {
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
 
   @@index([organisationId])
+  @@index([organisationId, name])
 }
 
 model TeamEmail {

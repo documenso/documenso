@@ -116,28 +116,28 @@ async function getTeamInsights(
 ): Promise<OrganisationDetailedInsights> {
   const teamsQuery = kyselyPrisma.$kysely
     .selectFrom('Team as t')
-    .leftJoin('Envelope as e', (join) =>
-      join
-        .onRef('t.id', '=', 'e.teamId')
-        .on('e.deletedAt', 'is', null)
-        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
-    )
-    .leftJoin('TeamGroup as tg', 'tg.teamId', 't.id')
-    .leftJoin('OrganisationGroup as og', 'og.id', 'tg.organisationGroupId')
-    .leftJoin('OrganisationGroupMember as ogm', 'ogm.groupId', 'og.id')
-    .leftJoin('OrganisationMember as om', 'om.id', 'ogm.organisationMemberId')
     .where('t.organisationId', '=', organisationId)
-    .select([
-      't.id as id',
-      't.name as name',
-      't.createdAt as createdAt',
-      sql<number>`COUNT(DISTINCT om."userId")`.as('memberCount'),
-      (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
-        : sql<number>`COUNT(DISTINCT e.id)`
-      ).as('documentCount'),
+    .select((eb) => [
+      't.id',
+      't.name',
+      't.createdAt',
+      eb
+        .selectFrom('TeamGroup as tg')
+        .innerJoin('OrganisationGroup as og', 'og.id', 'tg.organisationGroupId')
+        .innerJoin('OrganisationGroupMember as ogm', 'ogm.groupId', 'og.id')
+        .innerJoin('OrganisationMember as om', 'om.id', 'ogm.organisationMemberId')
+        .whereRef('tg.teamId', '=', 't.id')
+        .select(sql<number>`count(distinct om."userId")`.as('count'))
+        .as('memberCount'),
+      eb
+        .selectFrom('Envelope as e')
+        .whereRef('e.teamId', '=', 't.id')
+        .where('e.deletedAt', 'is', null)
+        .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .select(sql<number>`count(e.id)`.as('count'))
+        .as('documentCount'),
     ])
-    .groupBy(['t.id', 't.name', 't.createdAt'])
     .orderBy('documentCount', 'desc')
     .limit(perPage)
     .offset(offset);
@@ -164,48 +164,38 @@ async function getUserInsights(
   perPage: number,
   createdAtFrom: Date | null,
 ): Promise<OrganisationDetailedInsights> {
-  const usersBase = kyselyPrisma.$kysely
+  const usersQuery = kyselyPrisma.$kysely
     .selectFrom('OrganisationMember as om')
     .innerJoin('User as u', 'u.id', 'om.userId')
     .where('om.organisationId', '=', organisationId)
-    .leftJoin('Envelope as e', (join) =>
-      join
-        .onRef('e.userId', '=', 'u.id')
-        .on('e.deletedAt', 'is', null)
-        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
-    )
-    .leftJoin('Team as td', (join) =>
-      join.onRef('td.id', '=', 'e.teamId').on('td.organisationId', '=', organisationId),
-    )
-    .leftJoin('Recipient as r', (join) =>
-      join.onRef('r.email', '=', 'u.email').on('r.signedAt', 'is not', null),
-    )
-    .leftJoin('Envelope as se', (join) =>
-      join
-        .onRef('se.id', '=', 'r.envelopeId')
-        .on('se.deletedAt', 'is', null)
-        .on('se.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
-    )
-    .leftJoin('Team as ts', (join) =>
-      join.onRef('ts.id', '=', 'se.teamId').on('ts.organisationId', '=', organisationId),
-    );
-
-  const usersQuery = usersBase
-    .select([
-      'u.id as id',
-      'u.name as name',
-      'u.email as email',
-      'u.createdAt as createdAt',
-      (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
-        : sql<number>`COUNT(DISTINCT CASE WHEN td.id IS NOT NULL THEN e.id END)`
-      ).as('documentCount'),
-      (createdAtFrom
-        ? sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e.status = 'COMPLETED' AND e."createdAt" >= ${createdAtFrom} THEN e.id END)`
-        : sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND td.id IS NOT NULL AND e.status = 'COMPLETED' THEN e.id END)`
-      ).as('signedDocumentCount'),
+    .select((eb) => [
+      'u.id',
+      'u.name',
+      'u.email',
+      'u.createdAt',
+      eb
+        .selectFrom('Envelope as e')
+        .innerJoin('Team as t', 't.id', 'e.teamId')
+        .whereRef('e.userId', '=', 'u.id')
+        .where('t.organisationId', '=', organisationId)
+        .where('e.deletedAt', 'is', null)
+        .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .select(sql<number>`count(e.id)`.as('count'))
+        .as('documentCount'),
+      eb
+        .selectFrom('Recipient as r')
+        .innerJoin('Envelope as e', 'e.id', 'r.envelopeId')
+        .innerJoin('Team as t', 't.id', 'e.teamId')
+        .whereRef('r.email', '=', 'u.email')
+        .where('r.signedAt', 'is not', null)
+        .where('t.organisationId', '=', organisationId)
+        .where('e.deletedAt', 'is', null)
+        .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+        .$if(!!createdAtFrom, (qb) => qb.where('e.createdAt', '>=', createdAtFrom!))
+        .select(sql<number>`count(e.id)`.as('count'))
+        .as('signedDocumentCount'),
     ])
-    .groupBy(['u.id', 'u.name', 'u.email', 'u.createdAt'])
     .orderBy('u.createdAt', 'desc')
     .limit(perPage)
     .offset(offset);
@@ -292,72 +282,51 @@ async function getOrganisationSummary(
   organisationId: string,
   createdAtFrom: Date | null,
 ): Promise<OrganisationSummary> {
-  const summaryQuery = kyselyPrisma.$kysely
-    .selectFrom('Organisation as o')
-    .where('o.id', '=', organisationId)
-    .select([
-      sql<number>`(SELECT COUNT(DISTINCT t2.id) FROM "Team" AS t2 WHERE t2."organisationId" = o.id)`.as(
-        'totalTeams',
-      ),
-      sql<number>`(SELECT COUNT(DISTINCT om2."userId") FROM "OrganisationMember" AS om2 WHERE om2."organisationId" = o.id)`.as(
-        'totalMembers',
-      ),
-      sql<number>`(
-        SELECT COUNT(DISTINCT e2.id)
-        FROM "Envelope" AS e2
-        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT'
-      )`.as('totalDocuments'),
-      sql<number>`(
-        SELECT COUNT(DISTINCT e2.id)
-        FROM "Envelope" AS e2
-        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status IN ('DRAFT', 'PENDING')
-      )`.as('activeDocuments'),
-      sql<number>`(
-        SELECT COUNT(DISTINCT e2.id)
-        FROM "Envelope" AS e2
-        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status = 'COMPLETED'
-      )`.as('completedDocuments'),
-      (createdAtFrom
-        ? sql<number>`(
-            SELECT COUNT(DISTINCT e2.id)
-            FROM "Envelope" AS e2
-            INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-            WHERE t2."organisationId" = o.id
-              AND e2."deletedAt" IS NULL
-              AND e2.type = 'DOCUMENT'
-              AND e2.status = 'COMPLETED'
-              AND e2."createdAt" >= ${createdAtFrom}
-          )`
-        : sql<number>`(
-            SELECT COUNT(DISTINCT e2.id)
-            FROM "Envelope" AS e2
-            INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-            WHERE t2."organisationId" = o.id
-              AND e2."deletedAt" IS NULL
-              AND e2.type = 'DOCUMENT'
-              AND e2.status = 'COMPLETED'
-          )`
-      ).as('volumeThisPeriod'),
-      sql<number>`(
-        SELECT COUNT(DISTINCT e2.id)
-        FROM "Envelope" AS e2
-        INNER JOIN "Team" AS t2 ON t2.id = e2."teamId"
-        WHERE t2."organisationId" = o.id AND e2."deletedAt" IS NULL AND e2.type = 'DOCUMENT' AND e2.status = 'COMPLETED'
-      )`.as('volumeAllTime'),
-    ]);
+  const teamCountQuery = kyselyPrisma.$kysely
+    .selectFrom('Team')
+    .where('organisationId', '=', organisationId)
+    .select(sql<number>`count(id)`.as('count'))
+    .executeTakeFirst();
 
-  const result = await summaryQuery.executeTakeFirst();
+  const memberCountQuery = kyselyPrisma.$kysely
+    .selectFrom('OrganisationMember')
+    .where('organisationId', '=', organisationId)
+    .select(sql<number>`count(id)`.as('count'))
+    .executeTakeFirst();
+
+  const envelopeStatsQuery = kyselyPrisma.$kysely
+    .selectFrom('Envelope as e')
+    .innerJoin('Team as t', 't.id', 'e.teamId')
+    .where('t.organisationId', '=', organisationId)
+    .where('e.deletedAt', 'is', null)
+    .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+    .select([
+      sql<number>`count(e.id)`.as('totalDocuments'),
+      sql<number>`count(case when e.status in ('DRAFT', 'PENDING') then 1 end)`.as(
+        'activeDocuments',
+      ),
+      sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`.as('completedDocuments'),
+      sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`.as('volumeAllTime'),
+      (createdAtFrom
+        ? sql<number>`count(case when e.status = 'COMPLETED' and e."createdAt" >= ${createdAtFrom} then 1 end)`
+        : sql<number>`count(case when e.status = 'COMPLETED' then 1 end)`
+      ).as('volumeThisPeriod'),
+    ])
+    .executeTakeFirst();
+
+  const [teamCount, memberCount, envelopeStats] = await Promise.all([
+    teamCountQuery,
+    memberCountQuery,
+    envelopeStatsQuery,
+  ]);
 
   return {
-    totalTeams: Number(result?.totalTeams || 0),
-    totalMembers: Number(result?.totalMembers || 0),
-    totalDocuments: Number(result?.totalDocuments || 0),
-    activeDocuments: Number(result?.activeDocuments || 0),
-    completedDocuments: Number(result?.completedDocuments || 0),
-    volumeThisPeriod: Number(result?.volumeThisPeriod || 0),
-    volumeAllTime: Number(result?.volumeAllTime || 0),
+    totalTeams: Number(teamCount?.count || 0),
+    totalMembers: Number(memberCount?.count || 0),
+    totalDocuments: Number(envelopeStats?.totalDocuments || 0),
+    activeDocuments: Number(envelopeStats?.activeDocuments || 0),
+    completedDocuments: Number(envelopeStats?.completedDocuments || 0),
+    volumeThisPeriod: Number(envelopeStats?.volumeThisPeriod || 0),
+    volumeAllTime: Number(envelopeStats?.volumeAllTime || 0),
   };
 }
