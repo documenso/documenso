@@ -2,11 +2,18 @@ import { lingui } from '@lingui/vite-plugin';
 import { reactRouter } from '@react-router/dev/vite';
 import autoprefixer from 'autoprefixer';
 import serverAdapter from 'hono-react-router-adapter/vite';
+import { createRequire } from 'node:module';
 import path from 'node:path';
 import tailwindcss from 'tailwindcss';
-import { defineConfig } from 'vite';
+import { defineConfig, normalizePath } from 'vite';
 import macrosPlugin from 'vite-plugin-babel-macros';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+const require = createRequire(import.meta.url);
+
+const pdfjsDistPath = path.dirname(require.resolve('pdfjs-dist/package.json'));
+const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
 
 /**
  * Note: We load the env variables externally so we can have runtime enviroment variables
@@ -25,6 +32,14 @@ export default defineConfig({
     strictPort: true,
   },
   plugins: [
+    viteStaticCopy({
+      targets: [
+        {
+          src: cMapsDir,
+          dest: 'static',
+        },
+      ],
+    }),
     reactRouter(),
     macrosPlugin(),
     lingui(),
@@ -34,7 +49,7 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
+    noExternal: ['react-dropzone', 'plausible-tracker'],
     external: [
       '@node-rs/bcrypt',
       '@prisma/client',

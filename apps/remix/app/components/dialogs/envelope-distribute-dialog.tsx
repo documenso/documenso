@@ -336,7 +336,7 @@ export const EnvelopeDistributeDialog = ({
                                     <Trans>Message</Trans>{' '}
                                     <span className="text-muted-foreground">(Optional)</span>
                                     <Tooltip>
-                                      <TooltipTrigger>
+                                      <TooltipTrigger type="button">
                                         <InfoIcon className="mx-2 h-4 w-4" />
                                       </TooltipTrigger>
                                       <TooltipContent className="text-muted-foreground p-4">

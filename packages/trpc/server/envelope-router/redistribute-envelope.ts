@@ -1,13 +1,15 @@
 import { resendDocument } from '@documenso/lib/server-only/document/resend-document';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {
   ZRedistributeEnvelopeRequestSchema,
   ZRedistributeEnvelopeResponseSchema,
+  redistributeEnvelopeMeta,
 } from './redistribute-envelope.types';
 
 export const redistributeEnvelopeRoute = authenticatedProcedure
-  // .meta(redistributeEnvelopeMeta)
+  .meta(redistributeEnvelopeMeta)
   .input(ZRedistributeEnvelopeRequestSchema)
   .output(ZRedistributeEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -21,7 +23,7 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
       },
     });
 
-    await resendDocument({
+    const envelope = await resendDocument({
       userId: ctx.user.id,
       teamId,
       id: {
@@ -31,4 +33,18 @@ export const redistributeEnvelopeRoute = authenticatedProcedure
       recipients,
       requestMetadata: ctx.metadata,
     });
+
+    return {
+      success: true,
+      id: envelope.id,
+      recipients: envelope.recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+        token: recipient.token,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        signingUrl: formatSigningLink(recipient.token),
+      })),
+    };
   });

@@ -143,7 +143,7 @@ export function TemplateUseDialog({
     },
   );
 
-  const envelopeItems = response?.envelopeItems ?? [];
+  const envelopeItems = response?.data ?? [];
 
   const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTemplate.useMutation();

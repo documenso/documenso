@@ -5,7 +5,7 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
-import { Link } from 'react-router';
+import { Link, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -27,8 +27,8 @@ import type {
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
-import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
-import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
+import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
+import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
@@ -44,9 +44,10 @@ import { EditorFieldTextForm } from '~/components/forms/editor/editor-field-text
 
 import { EnvelopeEditorFieldDragDrop } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
+import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
 const EnvelopeEditorFieldsPageRenderer = lazy(
-  async () => import('./envelope-editor-fields-page-renderer'),
+  async () => import('~/components/general/envelope-editor/envelope-editor-fields-page-renderer'),
 );
 
 const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
@@ -64,6 +65,8 @@ const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
 };
 
 export const EnvelopeEditorFieldsPage = () => {
+  const [searchParams] = useSearchParams();
+
   const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
@@ -112,16 +115,41 @@ export const EnvelopeEditorFieldsPage = () => {
         <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
         {/* Document View */}
-        <div className="mt-4 flex h-full justify-center p-4">
+        <div className="mt-4 flex flex-col items-center justify-center">
+          {envelope.recipients.length === 0 && (
+            <Alert
+              variant="neutral"
+              className="mb-4 flex max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm border border-border bg-background"
+            >
+              <div className="flex flex-col gap-1">
+                <AlertTitle>
+                  <Trans>Missing Recipients</Trans>
+                </AlertTitle>
+                <AlertDescription>
+                  <Trans>You need at least one recipient to add fields</Trans>
+                </AlertDescription>
+              </div>
+
+              <Button asChild variant="outline">
+                <Link to={`${relativePath.editorPath}`}>
+                  <Trans>Add Recipients</Trans>
+                </Link>
+              </Button>
+            </Alert>
+          )}
+
           {currentEnvelopeItem !== null ? (
-            <PDFViewerKonvaLazy customPageRenderer={EnvelopeEditorFieldsPageRenderer} />
+            <PDFViewerKonvaLazy
+              renderer="editor"
+              customPageRenderer={EnvelopeEditorFieldsPageRenderer}
+            />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
-              <FileTextIcon className="text-muted-foreground h-10 w-10" />
-              <p className="text-foreground mt-1 text-sm">
+              <FileTextIcon className="h-10 w-10 text-muted-foreground" />
+              <p className="mt-1 text-sm text-foreground">
                 <Trans>No documents found</Trans>
               </p>
-              <p className="text-muted-foreground mt-1 text-sm">
+              <p className="mt-1 text-sm text-muted-foreground">
                 <Trans>Please upload a document to continue</Trans>
               </p>
             </div>
@@ -130,37 +158,24 @@ export const EnvelopeEditorFieldsPage = () => {
       </div>
 
       {/* Right Section - Form Fields Panel */}
-      {currentEnvelopeItem && (
-        <div className="bg-background border-border sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l py-4">
+      {currentEnvelopeItem && envelope.recipients.length > 0 && (
+        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-border bg-background py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
               <Trans>Selected Recipient</Trans>
             </h3>
 
-            {envelope.recipients.length === 0 ? (
-              <Alert variant="warning">
-                <AlertDescription className="flex flex-col gap-2">
-                  <Trans>You need at least one recipient to add fields</Trans>
-
-                  <Link to={`${relativePath.editorPath}`} className="text-sm">
-                    <p>
-                      <Trans>Click here to add a recipient</Trans>
-                    </p>
-                  </Link>
-                </AlertDescription>
-              </Alert>
-            ) : (
-              <RecipientSelector
-                selectedRecipient={editorFields.selectedRecipient}
-                onSelectedRecipientChange={(recipient) =>
-                  editorFields.setSelectedRecipient(recipient.id)
-                }
-                recipients={envelope.recipients}
-                className="w-full"
-                align="end"
-              />
-            )}
+            <EnvelopeRecipientSelector
+              selectedRecipient={editorFields.selectedRecipient}
+              onSelectedRecipientChange={(recipient) =>
+                editorFields.setSelectedRecipient(recipient.id)
+              }
+              recipients={envelope.recipients}
+              fields={envelope.fields}
+              className="w-full"
+              align="end"
+            />
 
             {editorFields.selectedRecipient &&
               !canRecipientFieldsBeModified(editorFields.selectedRecipient, envelope.fields) && (
@@ -179,7 +194,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
           {/* Add fields section. */}
           <section className="px-4">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
               <Trans>Add Fields</Trans>
             </h3>
 
@@ -195,7 +210,38 @@ export const EnvelopeEditorFieldsPage = () => {
               <section>
                 <Separator className="my-4" />
 
-                <div className="[&_label]:text-foreground/70 px-4 [&_label]:text-xs">
+                {searchParams.get('devmode') && (
+                  <>
+                    <div className="px-4">
+                      <h3 className="mb-3 text-sm font-semibold text-foreground">
+                        <Trans>Developer Mode</Trans>
+                      </h3>
+
+                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">Pos X:&nbsp;</span>
+                          {selectedField.positionX.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">Pos Y:&nbsp;</span>
+                          {selectedField.positionY.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">Width:&nbsp;</span>
+                          {selectedField.width.toFixed(2)}
+                        </p>
+                        <p>
+                          <span className="min-w-12 text-muted-foreground">Height:&nbsp;</span>
+                          {selectedField.height.toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    <Separator className="my-4" />
+                  </>
+                )}
+
+                <div className="px-4 [&_label]:text-xs [&_label]:text-foreground/70">
                   <h3 className="text-sm font-semibold">
                     {t(FieldSettingsTypeTranslations[selectedField.type])}
                   </h3>

@@ -21,7 +21,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import PDFViewer from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -177,14 +177,14 @@ export const MultiSignDocumentSigningView = ({
   };
 
   return (
-    <div className="bg-background min-h-screen overflow-hidden">
+    <div className="min-h-screen overflow-hidden bg-background">
       <div id="document-field-portal-root" className="relative h-full w-full overflow-y-auto p-8">
         {match({ isLoading, document })
           .with({ isLoading: true }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
               <div className="flex flex-col items-center gap-4">
-                <Loader className="text-primary h-8 w-8 animate-spin" />
-                <p className="text-muted-foreground text-sm">
+                <Loader className="h-8 w-8 animate-spin text-primary" />
+                <p className="text-sm text-muted-foreground">
                   <Trans>Loading document...</Trans>
                 </p>
               </div>
@@ -192,7 +192,7 @@ export const MultiSignDocumentSigningView = ({
           ))
           .with({ isLoading: false, document: undefined }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 <Trans>Failed to load document</Trans>
               </p>
             </div>
@@ -225,8 +225,10 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewer
-                    documentData={document.documentData}
+                  <PDFViewerLazy
+                    envelopeItem={document.envelopeItems[0]}
+                    token={token}
+                    version="signed"
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();
@@ -241,23 +243,23 @@ export const MultiSignDocumentSigningView = ({
                     className="embed--DocumentWidgetContainer group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-0 md:z-auto md:w-[350px] md:px-0"
                     data-expanded={isExpanded || undefined}
                   >
-                    <div className="embed--DocumentWidget border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
+                    <div className="embed--DocumentWidget flex w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:py-6">
                       {/* Header */}
                       <div className="embed--DocumentWidgetHeader">
                         <div className="flex items-center justify-between gap-x-2">
-                          <h3 className="text-foreground text-xl font-semibold md:text-2xl">
+                          <h3 className="text-xl font-semibold text-foreground md:text-2xl">
                             <Trans>Sign document</Trans>
                           </h3>
 
                           <Button variant="outline" className="h-8 w-8 p-0 md:hidden">
                             {isExpanded ? (
                               <LucideChevronDown
-                                className="text-muted-foreground h-5 w-5"
+                                className="h-5 w-5 text-muted-foreground"
                                 onClick={() => setIsExpanded(false)}
                               />
                             ) : (
                               <LucideChevronUp
-                                className="text-muted-foreground h-5 w-5"
+                                className="h-5 w-5 text-muted-foreground"
                                 onClick={() => setIsExpanded(true)}
                               />
                             )}
@@ -266,11 +268,11 @@ export const MultiSignDocumentSigningView = ({
                       </div>
 
                       <div className="embed--DocumentWidgetContent hidden group-data-[expanded]/document-widget:block md:block">
-                        <p className="text-muted-foreground mt-2 text-sm">
+                        <p className="mt-2 text-sm text-muted-foreground">
                           <Trans>Sign the document to complete the process.</Trans>
                         </p>
 
-                        <hr className="border-border mb-8 mt-4" />
+                        <hr className="mb-8 mt-4 border-border" />
                       </div>
 
                       {/* Form */}
@@ -286,7 +288,7 @@ export const MultiSignDocumentSigningView = ({
                                 <Input
                                   type="text"
                                   id="full-name"
-                                  className="bg-background mt-2"
+                                  className="mt-2 bg-background"
                                   disabled={isNameLocked}
                                   value={fullName}
                                   onChange={(e) => !isNameLocked && setFullName(e.target.value)}
@@ -301,7 +303,7 @@ export const MultiSignDocumentSigningView = ({
                                 <Input
                                   type="email"
                                   id="email"
-                                  className="bg-background mt-2"
+                                  className="mt-2 bg-background"
                                   value={email}
                                   disabled
                                 />

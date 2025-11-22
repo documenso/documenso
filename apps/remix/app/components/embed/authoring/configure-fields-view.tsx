@@ -2,8 +2,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentData, FieldType } from '@prisma/client';
+import type { EnvelopeItem, FieldType } from '@prisma/client';
 import { ReadStatus, type Recipient, SendStatus, SigningStatus } from '@prisma/client';
+import { base64 } from '@scure/base';
 import { ChevronsUpDown } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useHotkeys } from 'react-hotkeys-hook';
@@ -12,7 +13,6 @@ import { getBoundingClientRect } from '@documenso/lib/client-only/get-bounding-c
 import { useDocumentElement } from '@documenso/lib/client-only/hooks/use-document-element';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
-import { base64 } from '@documenso/lib/universal/base64';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
 import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
@@ -23,7 +23,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { FieldSelector } from '@documenso/ui/primitives/field-selector';
 import { Form } from '@documenso/ui/primitives/form/form';
-import PDFViewer from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -40,15 +40,17 @@ const DEFAULT_WIDTH_PX = MIN_WIDTH_PX * 2.5;
 
 export type ConfigureFieldsViewProps = {
   configData: TConfigureEmbedFormSchema;
-  documentData?: DocumentData;
+  presignToken?: string | undefined;
+  envelopeItem?: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
   defaultValues?: Partial<TConfigureFieldsFormSchema>;
-  onBack: (data: TConfigureFieldsFormSchema) => void;
+  onBack?: (data: TConfigureFieldsFormSchema) => void;
   onSubmit: (data: TConfigureFieldsFormSchema) => void;
 };
 
 export const ConfigureFieldsView = ({
   configData,
-  documentData,
+  presignToken,
+  envelopeItem,
   defaultValues,
   onBack,
   onSubmit,
@@ -82,23 +84,24 @@ export const ConfigureFieldsView = ({
   }, []);
 
   const normalizedDocumentData = useMemo(() => {
-    if (documentData) {
-      return documentData;
+    if (envelopeItem) {
+      return undefined;
     }
 
     if (!configData.documentData) {
-      return null;
+      return undefined;
     }
 
-    const data = base64.encode(configData.documentData?.data);
-
-    return {
-      id: 'preview',
-      type: 'BYTES_64',
-      data,
-      initialData: data,
-    } satisfies DocumentData;
+    return base64.encode(configData.documentData.data);
   }, [configData.documentData]);
+
+  const normalizedEnvelopeItem = useMemo(() => {
+    if (envelopeItem) {
+      return envelopeItem;
+    }
+
+    return { id: '', envelopeId: '' };
+  }, [envelopeItem]);
 
   const recipients = useMemo(() => {
     return configData.signers.map<Recipient>((signer, index) => ({
@@ -460,12 +463,12 @@ export const ConfigureFieldsView = ({
         {/* Desktop sidebar */}
         {!isMobile && (
           <div className="order-2 col-span-12 md:order-1 md:col-span-4">
-            <div className="bg-widget border-border sticky top-4 max-h-[calc(100vh-2rem)] rounded-lg border p-4 pb-6">
+            <div className="sticky top-4 max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-widget p-4 pb-6">
               <h2 className="mb-1 text-lg font-medium">
                 <Trans>Configure Fields</Trans>
               </h2>
 
-              <p className="text-muted-foreground mb-6 text-sm">
+              <p className="mb-6 text-sm text-muted-foreground">
                 <Trans>Configure the fields you want to place on the document.</Trans>
               </p>
 
@@ -488,15 +491,17 @@ export const ConfigureFieldsView = ({
               </div>
 
               <div className="mt-6 flex gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  className="flex-1"
-                  loading={form.formState.isSubmitting}
-                  onClick={() => onBack(form.getValues())}
-                >
-                  <Trans>Back</Trans>
-                </Button>
+                {onBack && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="flex-1"
+                    loading={form.formState.isSubmitting}
+                    onClick={() => onBack(form.getValues())}
+                  >
+                    <Trans>Back</Trans>
+                  </Button>
+                )}
 
                 <Button
                   className="flex-1"
@@ -517,7 +522,7 @@ export const ConfigureFieldsView = ({
             {selectedField && (
               <div
                 className={cn(
-                  'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
+                  'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size]',
                   selectedRecipientStyles.base,
                   {
                     '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -539,48 +544,50 @@ export const ConfigureFieldsView = ({
             )}
 
             <Form {...form}>
-              {normalizedDocumentData && (
-                <div>
-                  <PDFViewer documentData={normalizedDocumentData} />
+              <div>
+                <PDFViewerLazy
+                  presignToken={presignToken}
+                  overrideData={normalizedDocumentData}
+                  envelopeItem={normalizedEnvelopeItem}
+                  token={undefined}
+                  version="signed"
+                />
 
-                  <ElementVisible
-                    target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
-                  >
-                    {localFields.map((field, index) => {
-                      const recipientIndex = recipients.findIndex(
-                        (r) => r.id === field.recipientId,
-                      );
+                <ElementVisible
+                  target={`${PDF_VIEWER_PAGE_SELECTOR}[data-page-number="${highestPageNumber}"]`}
+                >
+                  {localFields.map((field, index) => {
+                    const recipientIndex = recipients.findIndex((r) => r.id === field.recipientId);
 
-                      return (
-                        <FieldItem
-                          key={field.formId}
-                          field={field}
-                          minHeight={MIN_HEIGHT_PX}
-                          minWidth={MIN_WIDTH_PX}
-                          defaultHeight={DEFAULT_HEIGHT_PX}
-                          defaultWidth={DEFAULT_WIDTH_PX}
-                          onResize={(node) => onFieldResize(node, index)}
-                          onMove={(node) => onFieldMove(node, index)}
-                          onRemove={() => remove(index)}
-                          onDuplicate={() => onFieldCopy(null, { duplicate: true })}
-                          onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
-                          onFocus={() => setLastActiveField(field)}
-                          onBlur={() => setLastActiveField(null)}
-                          onAdvancedSettings={() => {
-                            setCurrentField(field);
-                            setShowAdvancedSettings(true);
-                          }}
-                          recipientIndex={recipientIndex}
-                          active={activeFieldId === field.formId}
-                          onFieldActivate={() => setActiveFieldId(field.formId)}
-                          onFieldDeactivate={() => setActiveFieldId(null)}
-                          disabled={selectedRecipient?.id !== field.recipientId}
-                        />
-                      );
-                    })}
-                  </ElementVisible>
-                </div>
-              )}
+                    return (
+                      <FieldItem
+                        key={field.formId}
+                        field={field}
+                        minHeight={MIN_HEIGHT_PX}
+                        minWidth={MIN_WIDTH_PX}
+                        defaultHeight={DEFAULT_HEIGHT_PX}
+                        defaultWidth={DEFAULT_WIDTH_PX}
+                        onResize={(node) => onFieldResize(node, index)}
+                        onMove={(node) => onFieldMove(node, index)}
+                        onRemove={() => remove(index)}
+                        onDuplicate={() => onFieldCopy(null, { duplicate: true })}
+                        onDuplicateAllPages={() => onFieldCopy(null, { duplicateAll: true })}
+                        onFocus={() => setLastActiveField(field)}
+                        onBlur={() => setLastActiveField(null)}
+                        onAdvancedSettings={() => {
+                          setCurrentField(field);
+                          setShowAdvancedSettings(true);
+                        }}
+                        recipientIndex={recipientIndex}
+                        active={activeFieldId === field.formId}
+                        onFieldActivate={() => setActiveFieldId(field.formId)}
+                        onFieldDeactivate={() => setActiveFieldId(null)}
+                        disabled={selectedRecipient?.id !== field.recipientId}
+                      />
+                    );
+                  })}
+                </ElementVisible>
+              </div>
             </Form>
           </div>
         </div>
@@ -590,14 +597,14 @@ export const ConfigureFieldsView = ({
       {isMobile && (
         <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <SheetTrigger asChild>
-            <div className="bg-widget border-border fixed bottom-6 left-6 right-6 z-50 flex items-center justify-between gap-2 rounded-lg border p-4">
+            <div className="fixed bottom-6 left-6 right-6 z-50 flex items-center justify-between gap-2 rounded-lg border border-border bg-widget p-4">
               <span className="text-lg font-medium">
                 <Trans>Configure Fields</Trans>
               </span>
 
               <button
                 type="button"
-                className="border-border text-muted-foreground inline-flex h-10 w-10 items-center justify-center rounded-lg border"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground"
               >
                 <ChevronsUpDown className="h-6 w-6" />
               </button>
@@ -607,13 +614,13 @@ export const ConfigureFieldsView = ({
           <SheetContent
             position="bottom"
             size="xl"
-            className="bg-widget h-fit max-h-[80vh] overflow-y-auto rounded-t-xl p-4"
+            className="h-fit max-h-[80vh] overflow-y-auto rounded-t-xl bg-widget p-4"
           >
             <h2 className="mb-1 text-lg font-medium">
               <Trans>Configure Fields</Trans>
             </h2>
 
-            <p className="text-muted-foreground mb-6 text-sm">
+            <p className="mb-6 text-sm text-muted-foreground">
               <Trans>Configure the fields you want to place on the document.</Trans>
             </p>
 
@@ -641,15 +648,17 @@ export const ConfigureFieldsView = ({
             </div>
 
             <div className="mt-6 flex gap-2">
-              <Button
-                type="button"
-                variant="ghost"
-                className="flex-1"
-                loading={form.formState.isSubmitting}
-                onClick={() => onBack(form.getValues())}
-              >
-                <Trans>Back</Trans>
-              </Button>
+              {onBack && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="flex-1"
+                  loading={form.formState.isSubmitting}
+                  onClick={() => onBack(form.getValues())}
+                >
+                  <Trans>Back</Trans>
+                </Button>
+              )}
 
               <Button
                 className="flex-1"

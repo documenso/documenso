@@ -30,7 +30,7 @@ import { DocumentReadOnlyFields } from '@documenso/ui/components/document/docume
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { DocumentSigningAttachmentsPopover } from '~/components/general/document-signing/document-signing-attachments-popover';
 import { DocumentSigningAutoSign } from '~/components/general/document-signing/document-signing-auto-sign';
@@ -187,7 +187,7 @@ export const DocumentSigningPageViewV1 = ({
 
         <div className="mt-1.5 flex flex-wrap items-center justify-between gap-y-2 sm:mt-2.5 sm:gap-y-0">
           <div className="max-w-[50ch]">
-            <span className="text-muted-foreground truncate" title={senderName}>
+            <span className="truncate text-muted-foreground" title={senderName}>
               {senderName} {senderEmail}
             </span>{' '}
             <span className="text-muted-foreground">
@@ -245,7 +245,12 @@ export const DocumentSigningPageViewV1 = ({
           <div className="flex-1">
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
-                <PDFViewer key={documentData.id} documentData={documentData} document={document} />
+                <PDFViewerLazy
+                  key={document.envelopeItems[0].id}
+                  envelopeItem={document.envelopeItems[0]}
+                  token={recipient.token}
+                  version="signed"
+                />
               </CardContent>
             </Card>
           </div>
@@ -255,9 +260,9 @@ export const DocumentSigningPageViewV1 = ({
             className="group/document-widget fixed bottom-6 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-4 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
             data-expanded={isExpanded || undefined}
           >
-            <div className="border-border bg-widget flex w-full flex-col rounded-xl border px-4 py-4 md:py-6">
+            <div className="flex w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:py-6">
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-foreground text-xl font-semibold md:text-2xl">
+                <h3 className="text-xl font-semibold text-foreground md:text-2xl">
                   {match(recipient.role)
                     .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
                     .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
@@ -300,25 +305,25 @@ export const DocumentSigningPageViewV1 = ({
                   .with({ isExpanded: true }, () => (
                     <Button
                       variant="outline"
-                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      className="h-8 w-8 bg-background p-0 md:hidden dark:bg-foreground"
                       onClick={() => setIsExpanded(false)}
                     >
-                      <LucideChevronDown className="text-muted-foreground dark:text-background h-5 w-5" />
+                      <LucideChevronDown className="h-5 w-5 text-muted-foreground dark:text-background" />
                     </Button>
                   ))
                   .otherwise(() => (
                     <Button
                       variant="outline"
-                      className="bg-background dark:bg-foreground h-8 w-8 p-0 md:hidden"
+                      className="h-8 w-8 bg-background p-0 md:hidden dark:bg-foreground"
                       onClick={() => setIsExpanded(true)}
                     >
-                      <LucideChevronUp className="text-muted-foreground dark:text-background h-5 w-5" />
+                      <LucideChevronUp className="h-5 w-5 text-muted-foreground dark:text-background" />
                     </Button>
                   ))}
               </div>
 
               <div className="hidden group-data-[expanded]/document-widget:block md:block">
-                <p className="text-muted-foreground mt-2 text-sm">
+                <p className="mt-2 text-sm text-muted-foreground">
                   {match(recipient.role)
                     .with(RecipientRole.VIEWER, () => (
                       <Trans>Please mark as viewed to complete.</Trans>
@@ -335,7 +340,7 @@ export const DocumentSigningPageViewV1 = ({
                     .otherwise(() => null)}
                 </p>
 
-                <hr className="border-border mb-8 mt-4" />
+                <hr className="mb-8 mt-4 border-border" />
               </div>
 
               <div className="-mx-2 hidden px-2 group-data-[expanded]/document-widget:block md:block">

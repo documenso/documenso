@@ -92,6 +92,14 @@ export const findInbox = async ({ userId, page = 1, perPage = 10, orderBy }: Fin
             url: true,
           },
         },
+        envelopeItems: {
+          select: {
+            id: true,
+            envelopeId: true,
+            title: true,
+            order: true,
+          },
+        },
       },
     }),
     prisma.envelope.count({

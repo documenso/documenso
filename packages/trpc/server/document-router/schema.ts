@@ -1,19 +1,6 @@
 import { DocumentVisibility } from '@prisma/client';
 import { z } from 'zod';
 
-/**
- * Required for empty responses since we currently can't 201 requests for our openapi setup.
- *
- * Without this it will throw an error in Speakeasy SDK when it tries to parse an empty response.
- */
-export const ZSuccessResponseSchema = z.object({
-  success: z.literal(true),
-});
-
-export const ZGenericSuccessResponse = {
-  success: true,
-} satisfies z.infer<typeof ZSuccessResponseSchema>;
-
 export const ZDocumentTitleSchema = z
   .string()
   .trim()

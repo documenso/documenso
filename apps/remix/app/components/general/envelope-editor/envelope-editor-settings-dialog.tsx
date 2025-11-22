@@ -174,7 +174,7 @@ export const EnvelopeEditorSettingsDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope } = useCurrentEnvelopeEditor();
+  const { envelope, updateEnvelopeAsync } = useCurrentEnvelopeEditor();
 
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
@@ -186,14 +186,12 @@ export const EnvelopeEditorSettingsDialog = ({
     documentAuth: envelope.authOptions,
   });
 
-  const form = useForm<TAddSettingsFormSchema>({
-    resolver: zodResolver(ZAddSettingsFormSchema),
-    defaultValues: {
-      externalId: envelope.externalId || '', // Todo: String or undefined?
+  const createDefaultValues = () => {
+    return {
+      externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
-
       meta: {
         subject: envelope.documentMeta.subject ?? '',
         message: envelope.documentMeta.message ?? '',
@@ -210,10 +208,13 @@ export const EnvelopeEditorSettingsDialog = ({
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
       },
-    },
-  });
+    };
+  };
 
-  const { mutateAsync: updateEnvelope } = trpc.envelope.update.useMutation();
+  const form = useForm<TAddSettingsFormSchema>({
+    resolver: zodResolver(ZAddSettingsFormSchema),
+    defaultValues: createDefaultValues(),
+  });
 
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
@@ -229,20 +230,29 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const emails = emailData?.data || [];
 
-  // Todo: Envelopes this doesn't make sense (look at previous)
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
-    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+    const {
+      timezone,
+      dateFormat,
+      redirectUrl,
+      language,
+      signatureTypes,
+      distributionMethod,
+      emailId,
+      emailSettings,
+      message,
+      subject,
+      emailReplyTo,
+    } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
       .safeParse(data.globalAccessAuth);
 
     try {
-      await updateEnvelope({
-        envelopeId: envelope.id,
-        envelopeType: envelope.type,
+      await updateEnvelopeAsync({
         data: {
           externalId: data.externalId || null,
           visibility: data.visibility,
@@ -253,10 +263,16 @@ export const EnvelopeEditorSettingsDialog = ({
           timezone,
           dateFormat,
           redirectUrl,
+          emailId,
+          message,
+          subject,
+          emailReplyTo,
+          emailSettings,
+          distributionMethod,
           language: isValidLanguageCode(language) ? language : undefined,
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -297,7 +313,7 @@ export const EnvelopeEditorSettingsDialog = ({
   ]);
 
   useEffect(() => {
-    form.reset();
+    form.reset(createDefaultValues());
     setActiveTab('general');
   }, [open, form]);
 
@@ -323,7 +339,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
       <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
         {/* Sidebar. */}
-        <div className="flex w-80 flex-col border-r bg-gray-50">
+        <div className="bg-accent/20 flex w-80 flex-col border-r">
           <DialogHeader className="p-6 pb-4">
             <DialogTitle>Document Settings</DialogTitle>
           </DialogHeader>

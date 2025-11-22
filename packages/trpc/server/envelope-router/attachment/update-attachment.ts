@@ -1,21 +1,15 @@
 import { updateAttachment } from '@documenso/lib/server-only/envelope-attachment/update-attachment';
 
+import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
   ZUpdateAttachmentRequestSchema,
   ZUpdateAttachmentResponseSchema,
+  updateAttachmentMeta,
 } from './update-attachment.types';
 
 export const updateAttachmentRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/attachment/update',
-      summary: 'Update attachment',
-      description: 'Update an existing attachment',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(updateAttachmentMeta)
   .input(ZUpdateAttachmentRequestSchema)
   .output(ZUpdateAttachmentResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -34,4 +28,6 @@ export const updateAttachmentRoute = authenticatedProcedure
       teamId,
       data,
     });
+
+    return ZGenericSuccessResponse;
   });
