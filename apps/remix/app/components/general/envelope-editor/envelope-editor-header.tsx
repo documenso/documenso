@@ -44,7 +44,7 @@ export default function EnvelopeEditorHeader() {
     <nav className="bg-background border-border w-full border-b px-4 py-3 md:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/">
+          <Link to={relativePath.basePath}>
             <BrandingLogo className="h-6 w-auto" />
           </Link>
           <Separator orientation="vertical" className="h-6" />
