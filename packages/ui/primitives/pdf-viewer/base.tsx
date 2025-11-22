@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -10,26 +10,27 @@ import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
-// import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
-// import 'react-pdf/dist/esm/Page/TextLayer.css';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 
-import { cn } from '../lib/utils';
-import { useToast } from './use-toast';
+import { cn } from '../../lib/utils';
+import { useToast } from '../use-toast';
 
 export type LoadedPDFDocument = PDFDocumentProxy;
 
 /**
  * This imports the worker from the `pdfjs-dist` package.
+ * Wrapped in typeof window check to prevent SSR evaluation.
  */
-pdfjs.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.js',
-  import.meta.url,
-).toString();
+if (typeof window !== 'undefined') {
+  pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+    'pdfjs-dist/legacy/build/pdf.worker.min.mjs',
+    import.meta.url,
+  ).toString();
+}
 
 const pdfViewerOptions = {
-  cMapUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/static/cmaps`,
+  cMapUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/static/cmaps/`,
 };
 
 export type OnPDFViewerPageClick = (_event: {
@@ -44,9 +45,9 @@ export type OnPDFViewerPageClick = (_event: {
 
 const PDFLoader = () => (
   <>
-    <Loader className="text-documenso h-12 w-12 animate-spin" />
+    <Loader className="h-12 w-12 animate-spin text-documenso" />
 
-    <p className="text-muted-foreground mt-4">
+    <p className="mt-4 text-muted-foreground">
       <Trans>Loading document...</Trans>
     </p>
   </>
@@ -61,6 +62,7 @@ export type PDFViewerProps = {
   onDocumentLoad?: (_doc: LoadedPDFDocument) => void;
   onPageClick?: OnPDFViewerPageClick;
   overrideData?: string;
+  customPageRenderer?: React.FunctionComponent;
   [key: string]: unknown;
 } & Omit<React.HTMLAttributes<HTMLDivElement>, 'onPageClick'>;
 
@@ -73,6 +75,7 @@ export const PDFViewer = ({
   onDocumentLoad,
   onPageClick,
   overrideData,
+  customPageRenderer,
   ...props
 }: PDFViewerProps) => {
   const { _ } = useLingui();
@@ -90,6 +93,16 @@ export const PDFViewer = ({
   const [pdfError, setPdfError] = useState(false);
 
   const isLoading = isDocumentBytesLoading || !documentBytes;
+
+  const envelopeItemFile = useMemo(() => {
+    if (!documentBytes) {
+      return null;
+    }
+
+    return {
+      data: documentBytes,
+    };
+  }, [documentBytes]);
 
   const onDocumentLoaded = (doc: LoadedPDFDocument) => {
     setNumPages(doc.numPages);
@@ -203,7 +216,7 @@ export const PDFViewer = ({
       ) : (
         <>
           <PDFDocument
-            file={documentBytes.buffer}
+            file={envelopeItemFile}
             className={cn('w-full overflow-hidden rounded', {
               'h-[80vh] max-h-[60rem]': numPages === 0,
             })}
@@ -215,9 +228,9 @@ export const PDFViewer = ({
             }}
             externalLinkTarget="_blank"
             loading={
-              <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
+              <div className="flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50 dark:bg-background">
                 {pdfError ? (
-                  <div className="text-muted-foreground text-center">
+                  <div className="text-center text-muted-foreground">
                     <p>
                       <Trans>Something went wrong while loading the document.</Trans>
                     </p>
@@ -231,8 +244,8 @@ export const PDFViewer = ({
               </div>
             }
             error={
-              <div className="dark:bg-background flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50">
-                <div className="text-muted-foreground text-center">
+              <div className="flex h-[80vh] max-h-[60rem] flex-col items-center justify-center bg-white/50 dark:bg-background">
+                <div className="text-center text-muted-foreground">
                   <p>
                     <Trans>Something went wrong while loading the document.</Trans>
                   </p>
@@ -242,23 +255,25 @@ export const PDFViewer = ({
                 </div>
               </div>
             }
-            // options={pdfViewerOptions}
+            options={pdfViewerOptions}
           >
             {Array(numPages)
               .fill(null)
               .map((_, i) => (
                 <div key={i} className="last:-mb-2">
-                  <div className="border-border overflow-hidden rounded border will-change-transform">
+                  <div className="overflow-hidden rounded border border-border will-change-transform">
                     <PDFPage
                       pageNumber={i + 1}
                       width={width}
                       renderAnnotationLayer={false}
                       renderTextLayer={false}
                       loading={() => ''}
+                      renderMode={customPageRenderer ? 'custom' : 'canvas'}
+                      customRenderer={customPageRenderer}
                       onClick={(e) => onDocumentPageClick(e, i + 1)}
                     />
                   </div>
-                  <p className="text-muted-foreground/80 my-2 text-center text-[11px]">
+                  <p className="my-2 text-center text-[11px] text-muted-foreground/80">
                     <Trans>
                       Page {i + 1} of {numPages}
                     </Trans>
