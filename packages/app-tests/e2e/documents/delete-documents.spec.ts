@@ -85,10 +85,10 @@ test('[DOCUMENTS]: deleting a completed document should not remove it from recip
   // Open document action menu.
   await page
     .locator('tr', { hasText: 'Document 1 - Completed' })
-    .getByRole('cell', { name: 'Download' })
-    .getByRole('button')
-    .nth(1)
+    .getByTestId('document-table-action-btn')
     .click();
+
+  await page.waitForTimeout(200);
 
   // delete document
   await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -126,7 +126,12 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
   });
 
   // Open document action menu.
-  await page.locator('tr', { hasText: 'Document 1 - Pending' }).getByRole('button').nth(1).click();
+  await page
+    .locator('tr', { hasText: 'Document 1 - Pending' })
+    .getByTestId('document-table-action-btn')
+    .click();
+
+  await page.waitForTimeout(200);
 
   // delete document
   await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -165,6 +170,8 @@ test('[DOCUMENTS]: deleting draft documents should permanently remove it', async
     .getByTestId('document-table-action-btn')
     .click();
 
+  await page.waitForTimeout(200);
+
   // delete document
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await expect(page.getByPlaceholder("Type 'delete' to confirm")).not.toBeVisible();
@@ -194,6 +201,8 @@ test('[DOCUMENTS]: deleting pending documents should permanently remove it', asy
     .locator('tr', { hasText: 'Document 1 - Pending' })
     .getByTestId('document-table-action-btn')
     .click();
+
+  await page.waitForTimeout(200);
 
   // Delete document.
   await page.getByRole('menuitem', { name: 'Delete' }).click();
@@ -226,6 +235,8 @@ test('[DOCUMENTS]: deleting completed documents as an owner should hide it from 
     .locator('tr', { hasText: 'Document 1 - Completed' })
     .getByTestId('document-table-action-btn')
     .click();
+
+  await page.waitForTimeout(200);
 
   // Delete document.
   await page.getByRole('menuitem', { name: 'Delete' }).click();
