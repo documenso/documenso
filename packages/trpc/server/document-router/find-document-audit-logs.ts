@@ -10,32 +10,18 @@ export const findDocumentAuditLogsRoute = authenticatedProcedure
   .input(ZFindDocumentAuditLogsRequestSchema)
   .output(ZFindDocumentAuditLogsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { teamId } = ctx;
-
-    const {
-      page,
-      perPage,
-      documentId,
-      cursor,
-      filterForRecentActivity,
-      orderByColumn,
-      orderByDirection,
-    } = input;
+    const { orderByColumn, orderByDirection, ...auditLogParams } = input;
 
     ctx.logger.info({
       input: {
-        documentId,
+        documentId: input.documentId,
       },
     });
 
     return await findDocumentAuditLogs({
+      ...auditLogParams,
       userId: ctx.user.id,
-      teamId,
-      page,
-      perPage,
-      documentId,
-      cursor,
-      filterForRecentActivity,
+      teamId: ctx.teamId,
       orderBy: orderByColumn ? { column: orderByColumn, direction: orderByDirection } : undefined,
     });
   });
