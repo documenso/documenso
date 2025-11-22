@@ -95,6 +95,8 @@ test('[DOCUMENTS]: deleting a completed document should not remove it from recip
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
 
+  await page.waitForTimeout(2500);
+
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
 
   await apiSignout({ page });
@@ -138,6 +140,8 @@ test('[DOCUMENTS]: deleting a pending document should remove it from recipients'
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
 
+  await page.waitForTimeout(2500);
+
   await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
 
   // signout
@@ -177,6 +181,8 @@ test('[DOCUMENTS]: deleting draft documents should permanently remove it', async
   await expect(page.getByPlaceholder("Type 'delete' to confirm")).not.toBeVisible();
   await page.getByRole('button', { name: 'Delete' }).click();
 
+  await page.waitForTimeout(2500);
+
   await expect(page.getByRole('row', { name: /Document 1 - Draft/ })).not.toBeVisible();
 
   // Check document counts.
@@ -208,6 +214,8 @@ test('[DOCUMENTS]: deleting pending documents should permanently remove it', asy
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
+
+  await page.waitForTimeout(2500);
 
   await expect(page.getByRole('row', { name: /Document 1 - Pending/ })).not.toBeVisible();
 
@@ -242,6 +250,8 @@ test('[DOCUMENTS]: deleting completed documents as an owner should hide it from 
   await page.getByRole('menuitem', { name: 'Delete' }).click();
   await page.getByPlaceholder("Type 'delete' to confirm").fill('delete');
   await page.getByRole('button', { name: 'Delete' }).click();
+
+  await page.waitForTimeout(2500);
 
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
@@ -314,7 +324,8 @@ test('[DOCUMENTS]: deleting documents as a recipient should only hide it for the
   await page.getByRole('menuitem', { name: 'Hide' }).waitFor({ state: 'visible' });
   await page.getByRole('menuitem', { name: 'Hide' }).click({ force: true });
   await page.getByRole('button', { name: 'Hide' }).click({ force: true });
-  await page.waitForTimeout(2000);
+
+  await page.waitForTimeout(2500);
 
   // Check document counts.
   await expect(page.getByRole('row', { name: /Document 1 - Completed/ })).not.toBeVisible();
