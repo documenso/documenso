@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { SubscriptionStatus } from '@prisma/client';
@@ -15,7 +16,7 @@ import { OrganisationBillingInvoicesTable } from '~/components/tables/organisati
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Billing');
+  return appMetaTags(msg`Billing`);
 }
 
 export default function TeamsSettingBillingPage() {

@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
@@ -15,7 +16,7 @@ import { useOptionalCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('API Tokens');
+  return appMetaTags(msg`API Tokens`);
 }
 
 export default function ApiTokensPage() {
@@ -36,6 +37,7 @@ export default function ApiTokensPage() {
               className="text-primary underline"
               href={'https://docs.documenso.com/developers/public-api'}
               target="_blank"
+              rel="noreferrer"
             >
               Documentation
             </a>{' '}

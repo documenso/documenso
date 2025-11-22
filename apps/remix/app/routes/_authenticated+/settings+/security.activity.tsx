@@ -6,7 +6,7 @@ import { SettingsSecurityActivityTable } from '~/components/tables/settings-secu
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Security activity');
+  return appMetaTags(msg`Security activity`);
 }
 
 export default function SettingsSecurityActivity() {

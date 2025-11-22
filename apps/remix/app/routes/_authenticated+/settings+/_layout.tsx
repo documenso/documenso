@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Outlet } from 'react-router';
 
@@ -6,7 +7,7 @@ import { SettingsMobileNav } from '~/components/general/settings-nav-mobile';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Settings');
+  return appMetaTags(msg`Settings`);
 }
 
 export default function SettingsLayout() {

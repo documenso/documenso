@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
 
@@ -14,7 +15,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Branding Preferences');
+  return appMetaTags(msg`Branding Preferences`);
 }
 
 export default function TeamsSettingsPage() {

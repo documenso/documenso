@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { XCircle } from 'lucide-react';
 import { Link } from 'react-router';
@@ -7,7 +8,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Verify Email');
+  return appMetaTags(msg`Verify Email`);
 }
 
 export default function EmailVerificationWithoutTokenPage() {

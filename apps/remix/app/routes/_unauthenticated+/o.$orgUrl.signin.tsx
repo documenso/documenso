@@ -19,7 +19,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/o.$orgUrl.signin';
 
 export function meta() {
-  return appMetaTags('Sign In');
+  return appMetaTags(msg`Sign In`);
 }
 
 export function ErrorBoundary() {

@@ -18,7 +18,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage() {
