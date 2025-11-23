@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-11-20 02:32\n"
+"PO-Revision-Date: 2025-11-21 00:14\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -7584,7 +7584,7 @@ msgstr "Liczba podpisów"
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 #: packages/ui/components/document/document-read-only-fields.tsx
 msgid "Signed"
-msgstr "Podpisał"
+msgstr "Podpisano"
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Signed document (adjective)"
