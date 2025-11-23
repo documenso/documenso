@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { Link } from 'react-router';
 
@@ -6,7 +7,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Reset Password');
+  return appMetaTags(msg`Reset Password`);
 }
 
 export default function ResetPasswordPage() {

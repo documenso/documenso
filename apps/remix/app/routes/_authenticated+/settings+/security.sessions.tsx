@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { useQuery } from '@tanstack/react-query';
@@ -21,7 +22,7 @@ import { SettingsHeader } from '~/components/general/settings-header';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Active Sessions');
+  return appMetaTags(msg`Active Sessions`);
 }
 
 const parser = new UAParser();

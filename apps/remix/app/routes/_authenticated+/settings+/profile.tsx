@@ -15,7 +15,7 @@ import { TeamEmailUsage } from '~/components/general/teams/team-email-usage';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Profile');
+  return appMetaTags(msg`Profile`);
 }
 
 export default function SettingsProfile() {
