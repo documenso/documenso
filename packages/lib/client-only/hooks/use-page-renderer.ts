@@ -75,6 +75,7 @@ export function usePageRenderer(renderFunction: RenderFunction) {
       canvas.style.height = `${Math.floor(scaledViewport.height)}px`;
 
       const renderContext: RenderParameters = {
+        canvas,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         canvasContext: canvas.getContext('2d', { alpha: false }) as CanvasRenderingContext2D,
         viewport: renderViewport,

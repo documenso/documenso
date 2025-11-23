@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3002",
-    "build": "next build && next-sitemap",
+    "build": "next build",
     "start": "next start -p 3002",
     "lint:fix": "next lint --fix",
     "clean": "rimraf .next && rimraf node_modules"
@@ -15,18 +15,18 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
-    "next": "14.2.28",
-    "next-plausible": "^3.12.0",
-    "nextra": "^2.13.4",
-    "nextra-theme-docs": "^2.13.4",
+    "next": "^15",
+    "next-plausible": "^3.12.5",
+    "nextra": "^3",
+    "nextra-theme-docs": "^3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
+    "@types/react": "18.3.27",
     "@types/react-dom": "^18",
-    "next-sitemap": "^4.2.3",
+    "pagefind": "^1.2.0",
     "typescript": "5.6.2"
   }
 }

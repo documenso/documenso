@@ -57,6 +57,9 @@ test.describe('Signing Certificate Tests', () => {
     }
 
     await page.getByRole('button', { name: 'Complete' }).click();
+
+    await page.waitForTimeout(1000);
+
     await page.getByRole('button', { name: 'Sign' }).click({ force: true });
     await page.waitForURL(`/sign/${recipient.token}/complete`);
 

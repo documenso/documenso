@@ -71,7 +71,7 @@ export const getMonthlyActiveUsers = async () => {
         )
         .as('cume_count'),
     ])
-    .where(sql`type = ${UserSecurityAuditLogType.SIGN_IN}::"UserSecurityAuditLogType"`)
+    .where(() => sql`type = ${UserSecurityAuditLogType.SIGN_IN}::"UserSecurityAuditLogType"`)
     .groupBy(({ fn }) => fn('DATE_TRUNC', [sql.lit('MONTH'), 'UserSecurityAuditLog.createdAt']))
     .orderBy('month', 'desc')
     .limit(12);
