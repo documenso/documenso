@@ -1,7 +1,8 @@
+import type { NextConfig } from 'next';
+
 import nextra from 'nextra';
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
+const nextConfig: NextConfig = {
   transpilePackages: [
     '@documenso/assets',
     '@documenso/lib',
