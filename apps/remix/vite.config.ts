@@ -49,7 +49,7 @@ export default defineConfig({
     }),
   ],
   ssr: {
-    noExternal: ['react-dropzone', 'plausible-tracker', 'pdfjs-dist'],
+    noExternal: ['react-dropzone', 'plausible-tracker'],
     external: [
       '@node-rs/bcrypt',
       '@prisma/client',

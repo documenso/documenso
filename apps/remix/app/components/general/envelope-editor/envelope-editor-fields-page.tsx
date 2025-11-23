@@ -47,7 +47,7 @@ import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 import { EnvelopeRecipientSelector } from './envelope-recipient-selector';
 
 const EnvelopeEditorFieldsPageRenderer = lazy(
-  async () => import('./envelope-editor-fields-page-renderer'),
+  async () => import('~/components/general/envelope-editor/envelope-editor-fields-page-renderer'),
 );
 
 const FieldSettingsTypeTranslations: Record<FieldType, MessageDescriptor> = {
@@ -119,7 +119,7 @@ export const EnvelopeEditorFieldsPage = () => {
           {envelope.recipients.length === 0 && (
             <Alert
               variant="neutral"
-              className="border-border bg-background mb-4 flex max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm border"
+              className="mb-4 flex max-w-[800px] flex-row items-center justify-between space-y-0 rounded-sm border border-border bg-background"
             >
               <div className="flex flex-col gap-1">
                 <AlertTitle>
@@ -145,11 +145,11 @@ export const EnvelopeEditorFieldsPage = () => {
             />
           ) : (
             <div className="flex flex-col items-center justify-center py-32">
-              <FileTextIcon className="text-muted-foreground h-10 w-10" />
-              <p className="text-foreground mt-1 text-sm">
+              <FileTextIcon className="h-10 w-10 text-muted-foreground" />
+              <p className="mt-1 text-sm text-foreground">
                 <Trans>No documents found</Trans>
               </p>
-              <p className="text-muted-foreground mt-1 text-sm">
+              <p className="mt-1 text-sm text-muted-foreground">
                 <Trans>Please upload a document to continue</Trans>
               </p>
             </div>
@@ -159,10 +159,10 @@ export const EnvelopeEditorFieldsPage = () => {
 
       {/* Right Section - Form Fields Panel */}
       {currentEnvelopeItem && envelope.recipients.length > 0 && (
-        <div className="bg-background border-border sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l py-4">
+        <div className="sticky top-0 h-full w-80 flex-shrink-0 overflow-y-auto border-l border-border bg-background py-4">
           {/* Recipient selector section. */}
           <section className="px-4">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
               <Trans>Selected Recipient</Trans>
             </h3>
 
@@ -194,7 +194,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
           {/* Add fields section. */}
           <section className="px-4">
-            <h3 className="text-foreground mb-2 text-sm font-semibold">
+            <h3 className="mb-2 text-sm font-semibold text-foreground">
               <Trans>Add Fields</Trans>
             </h3>
 
@@ -213,25 +213,25 @@ export const EnvelopeEditorFieldsPage = () => {
                 {searchParams.get('devmode') && (
                   <>
                     <div className="px-4">
-                      <h3 className="text-foreground mb-3 text-sm font-semibold">
+                      <h3 className="mb-3 text-sm font-semibold text-foreground">
                         <Trans>Developer Mode</Trans>
                       </h3>
 
-                      <div className="bg-muted/50 border-border text-foreground space-y-2 rounded-md border p-3 text-sm">
+                      <div className="space-y-2 rounded-md border border-border bg-muted/50 p-3 text-sm text-foreground">
                         <p>
-                          <span className="text-muted-foreground min-w-12">Pos X:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">Pos X:&nbsp;</span>
                           {selectedField.positionX.toFixed(2)}
                         </p>
                         <p>
-                          <span className="text-muted-foreground min-w-12">Pos Y:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">Pos Y:&nbsp;</span>
                           {selectedField.positionY.toFixed(2)}
                         </p>
                         <p>
-                          <span className="text-muted-foreground min-w-12">Width:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">Width:&nbsp;</span>
                           {selectedField.width.toFixed(2)}
                         </p>
                         <p>
-                          <span className="text-muted-foreground min-w-12">Height:&nbsp;</span>
+                          <span className="min-w-12 text-muted-foreground">Height:&nbsp;</span>
                           {selectedField.height.toFixed(2)}
                         </p>
                       </div>
@@ -241,7 +241,7 @@ export const EnvelopeEditorFieldsPage = () => {
                   </>
                 )}
 
-                <div className="[&_label]:text-foreground/70 px-4 [&_label]:text-xs">
+                <div className="px-4 [&_label]:text-xs [&_label]:text-foreground/70">
                   <h3 className="text-sm font-semibold">
                     {t(FieldSettingsTypeTranslations[selectedField.type])}
                   </h3>
