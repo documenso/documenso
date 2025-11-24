@@ -30,6 +30,7 @@ export const run = async ({
       webhookEndpoint: url,
     };
 
+    // Note: This is duplicated in `resend-webhook-call.ts`.
     const response = await fetch(url, {
       method: 'POST',
       body: JSON.stringify(payloadData),
