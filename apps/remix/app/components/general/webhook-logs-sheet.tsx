@@ -7,7 +7,7 @@ import { createCallable } from 'react-call';
 
 import { toFriendlyWebhookEventName } from '@documenso/lib/universal/webhook/to-friendly-webhook-event-name';
 import { trpc } from '@documenso/trpc/react';
-import type { TFindWebhookLogsResponse } from '@documenso/trpc/server/webhook-router/find-webhook-logs.types';
+import type { TFindWebhookCallsResponse } from '@documenso/trpc/server/webhook-router/find-webhook-calls.types';
 import { CopyTextButton } from '@documenso/ui/components/common/copy-text-button';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -15,7 +15,7 @@ import { Sheet, SheetContent, SheetTitle } from '@documenso/ui/primitives/sheet'
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type WebhookLogsSheetProps = {
-  webhookCall: TFindWebhookLogsResponse['data'][number];
+  webhookCall: TFindWebhookCallsResponse['data'][number];
 };
 
 export const WebhookLogsSheet = createCallable<WebhookLogsSheetProps, string | null>(
