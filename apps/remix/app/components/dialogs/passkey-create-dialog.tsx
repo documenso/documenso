@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans, useLingui } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { startRegistration } from '@simplewebauthn/browser';
 import { KeyRoundIcon } from 'lucide-react';
@@ -54,7 +52,7 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
   const [open, setOpen] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
 
   const form = useForm<TCreatePasskeyFormSchema>({
@@ -83,7 +81,7 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
       });
 
       toast({
-        description: _(msg`Successfully created passkey`),
+        description: t`Successfully created passkey`,
         duration: 5000,
       });
 
@@ -176,7 +174,7 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
                       <Trans>Passkey name</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="eg. Mac" {...field} />
+                      <Input className="bg-background" placeholder={t`eg. Mac`} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -209,7 +207,11 @@ export const PasskeyCreateDialog = ({ trigger, onSuccess, ...props }: PasskeyCre
                     ))
                     .with('TOO_MANY_PASSKEYS', () => (
                       <AlertDescription>
-                        <Trans>You cannot have more than {MAXIMUM_PASSKEYS} passkeys.</Trans>
+                        <Plural
+                          value={MAXIMUM_PASSKEYS}
+                          one="You cannot have more than # passkey."
+                          other="You cannot have more than # passkeys."
+                        />
                       </AlertDescription>
                     ))
                     .with('InvalidStateError', () => (

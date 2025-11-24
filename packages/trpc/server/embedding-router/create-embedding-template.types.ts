@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, FieldType, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -21,30 +21,33 @@ import {
   ZFieldPageYSchema,
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
-
-const ZFieldSchema = z.object({
-  type: z.nativeEnum(FieldType),
-  pageNumber: ZFieldPageNumberSchema,
-  pageX: ZFieldPageXSchema,
-  pageY: ZFieldPageYSchema,
-  width: ZFieldWidthSchema,
-  height: ZFieldHeightSchema,
-  fieldMeta: ZFieldMetaSchema.optional(),
-});
 
 export const ZCreateEmbeddingTemplateRequestSchema = z.object({
   title: ZDocumentTitleSchema,
   documentDataId: z.string(),
   recipients: z.array(
     z.object({
-      email: z.string().email(),
-      name: z.string().optional(),
-      role: z.nativeEnum(RecipientRole).optional(),
+      email: z.union([z.string().length(0), z.string().email()]),
+      name: z.string(),
+      role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
-      fields: z.array(ZFieldSchema).optional(),
+      // We have an any cast so any changes here you need to update it in the embeding document edit page
+      // Search: "map<any>" to find it
+      fields: ZFieldAndMetaSchema.and(
+        z.object({
+          id: z.number().optional(),
+          pageNumber: ZFieldPageNumberSchema,
+          pageX: ZFieldPageXSchema,
+          pageY: ZFieldPageYSchema,
+          width: ZFieldWidthSchema,
+          height: ZFieldHeightSchema,
+        }),
+      )
+        .array()
+        .optional(),
     }),
   ),
   meta: z

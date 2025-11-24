@@ -13,7 +13,7 @@ import { trpc } from '@documenso/trpc/react';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -89,7 +89,10 @@ export const DirectTemplatePageView = ({
     setStep('sign');
   };
 
-  const onSignDirectTemplateSubmit = async (fields: DirectTemplateLocalField[]) => {
+  const onSignDirectTemplateSubmit = async (
+    fields: DirectTemplateLocalField[],
+    nextSigner?: { name: string; email: string },
+  ) => {
     try {
       let directTemplateExternalId = searchParams?.get('externalId') || undefined;
 
@@ -98,6 +101,7 @@ export const DirectTemplatePageView = ({
       }
 
       const { token } = await createDocumentFromDirectTemplate({
+        nextSigner,
         directTemplateToken,
         directTemplateExternalId,
         directRecipientName: fullName,
@@ -147,9 +151,11 @@ export const DirectTemplatePageView = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer
+          <PDFViewerLazy
             key={template.id}
-            documentData={template.templateDocumentData}
+            envelopeItem={template.envelopeItems[0]}
+            token={directTemplateRecipient.token}
+            version="signed"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

@@ -28,8 +28,8 @@ export const ZCreateRecipientSchema = z.object({
   name: z.string().max(255),
   role: z.nativeEnum(RecipientRole),
   signingOrder: z.number().optional(),
-  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
-  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
 });
 
 export const ZUpdateRecipientSchema = z.object({
@@ -38,8 +38,8 @@ export const ZUpdateRecipientSchema = z.object({
   name: z.string().max(255).optional(),
   role: z.nativeEnum(RecipientRole).optional(),
   signingOrder: z.number().optional(),
-  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).optional().default([]),
-  actionAuth: z.array(ZRecipientActionAuthTypesSchema).optional().default([]),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
 });
 
 export const ZCreateDocumentRecipientRequestSchema = z.object({
@@ -164,7 +164,6 @@ export const ZSetTemplateRecipientsResponseSchema = z.object({
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
-  authOptions: ZRecipientActionAuthSchema.optional(),
   accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({

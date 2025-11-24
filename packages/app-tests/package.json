@@ -14,10 +14,14 @@
   "devDependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@playwright/test": "1.52.0",
-    "@types/node": "^20"
+    "@napi-rs/canvas": "^0.1.82",
+    "@playwright/test": "1.56.1",
+    "@types/node": "^20",
+    "@types/pngjs": "^6.0.5",
+    "pixelmatch": "^7.1.0",
+    "pngjs": "^7.0.0"
   },
   "dependencies": {
-    "start-server-and-test": "^2.0.12"
+    "start-server-and-test": "^2.1.3"
   }
 }

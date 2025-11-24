@@ -44,7 +44,7 @@ export const resendDocument = async ({
   recipients,
   teamId,
   requestMetadata,
-}: ResendDocumentOptions): Promise<void> => {
+}: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -103,7 +103,7 @@ export const resendDocument = async ({
   ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
-    return;
+    return envelope;
   }
 
   const { branding, emailLanguage, organisationType, senderEmail, replyToEmail } =
@@ -230,4 +230,6 @@ export const resendDocument = async ({
       );
     }),
   );
+
+  return envelope;
 };

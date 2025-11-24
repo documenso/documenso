@@ -34,6 +34,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AdminOrganisationMemberUpdateDialog } from '~/components/dialogs/admin-organisation-member-update-dialog';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { SettingsHeader } from '~/components/general/settings-header';
 
@@ -71,23 +72,6 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       },
     });
 
-  const { mutateAsync: promoteToOwner, isPending: isPromotingToOwner } =
-    trpc.admin.organisationMember.promoteToOwner.useMutation({
-      onSuccess: () => {
-        toast({
-          title: t`Success`,
-          description: t`Member promoted to owner successfully`,
-        });
-      },
-      onError: () => {
-        toast({
-          title: t`Error`,
-          description: t`We couldn't promote the member to owner. Please try again.`,
-          variant: 'destructive',
-        });
-      },
-    });
-
   const teamsColumns = useMemo(() => {
     return [
       {
@@ -120,23 +104,24 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       },
       {
         header: t`Actions`,
-        cell: ({ row }) => (
-          <div className="flex justify-end space-x-2">
-            <Button
-              variant="outline"
-              disabled={row.original.userId === organisation?.ownerUserId}
-              loading={isPromotingToOwner}
-              onClick={async () =>
-                promoteToOwner({
-                  organisationId,
-                  userId: row.original.userId,
-                })
-              }
-            >
-              <Trans>Promote to owner</Trans>
-            </Button>
-          </div>
-        ),
+        cell: ({ row }) => {
+          const isOwner = row.original.userId === organisation?.ownerUserId;
+
+          return (
+            <div className="flex justify-end space-x-2">
+              <AdminOrganisationMemberUpdateDialog
+                trigger={
+                  <Button variant="outline">
+                    <Trans>Update role</Trans>
+                  </Button>
+                }
+                organisationId={organisationId}
+                organisationMember={row.original}
+                isOwner={isOwner}
+              />
+            </div>
+          );
+        },
       },
     ] satisfies DataTableColumnDef<TGetAdminOrganisationResponse['members'][number]>[];
   }, [organisation]);
@@ -157,8 +142,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
           404: {
             heading: msg`Organisation not found`,
             subHeading: msg`404 Organisation not found`,
-            message: msg`The organisation you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The organisation you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={

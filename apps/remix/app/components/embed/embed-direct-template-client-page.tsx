@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import type { DocumentMeta, Recipient, Signature } from '@prisma/client';
-import { type DocumentData, type Field, FieldType } from '@prisma/client';
+import type { DocumentMeta, EnvelopeItem, Recipient, Signature } from '@prisma/client';
+import { type Field, FieldType } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { DateTime } from 'luxon';
 import { useSearchParams } from 'react-router';
@@ -28,7 +28,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -47,7 +47,7 @@ export type EmbedDirectTemplateClientPageProps = {
   token: string;
   envelopeId: string;
   updatedAt: Date;
-  documentData: DocumentData;
+  envelopeItems: Pick<EnvelopeItem, 'id' | 'envelopeId'>[];
   recipient: Recipient;
   fields: Field[];
   metadata?: DocumentMeta | null;
@@ -59,7 +59,7 @@ export const EmbedDirectTemplateClientPage = ({
   token,
   envelopeId,
   updatedAt,
-  documentData,
+  envelopeItems,
   recipient,
   fields,
   metadata,
@@ -334,8 +334,10 @@ export const EmbedDirectTemplateClientPage = ({
       <div className="relative flex w-full flex-col gap-x-6 gap-y-12 md:flex-row">
         {/* Viewer */}
         <div className="flex-1">
-          <PDFViewer
-            documentData={documentData}
+          <PDFViewerLazy
+            envelopeItem={envelopeItems[0]}
+            token={recipient.token}
+            version="signed"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>
@@ -346,11 +348,11 @@ export const EmbedDirectTemplateClientPage = ({
           className="group/document-widget fixed bottom-8 left-0 z-50 h-fit max-h-[calc(100dvh-2rem)] w-full flex-shrink-0 px-6 md:sticky md:bottom-[unset] md:top-4 md:z-auto md:w-[350px] md:px-0"
           data-expanded={isExpanded || undefined}
         >
-          <div className="border-border bg-widget flex h-fit w-full flex-col rounded-xl border px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
+          <div className="flex h-fit w-full flex-col rounded-xl border border-border bg-widget px-4 py-4 md:min-h-[min(calc(100dvh-2rem),48rem)] md:py-6">
             {/* Header */}
             <div>
               <div className="flex items-center justify-between gap-x-2">
-                <h3 className="text-foreground text-xl font-semibold md:text-2xl">
+                <h3 className="text-xl font-semibold text-foreground md:text-2xl">
                   <Trans>Sign document</Trans>
                 </h3>
 
@@ -360,7 +362,7 @@ export const EmbedDirectTemplateClientPage = ({
                     className="h-8 w-8 p-0 md:hidden"
                     onClick={() => setIsExpanded(false)}
                   >
-                    <LucideChevronDown className="text-muted-foreground h-5 w-5" />
+                    <LucideChevronDown className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : pendingFields.length > 0 ? (
                   <Button
@@ -368,7 +370,7 @@ export const EmbedDirectTemplateClientPage = ({
                     className="h-8 w-8 p-0 md:hidden"
                     onClick={() => setIsExpanded(true)}
                   >
-                    <LucideChevronUp className="text-muted-foreground h-5 w-5" />
+                    <LucideChevronUp className="h-5 w-5 text-muted-foreground" />
                   </Button>
                 ) : (
                   <Button
@@ -386,11 +388,11 @@ export const EmbedDirectTemplateClientPage = ({
             </div>
 
             <div className="hidden group-data-[expanded]/document-widget:block md:block">
-              <p className="text-muted-foreground mt-2 text-sm">
+              <p className="mt-2 text-sm text-muted-foreground">
                 <Trans>Sign the document to complete the process.</Trans>
               </p>
 
-              <hr className="border-border mb-8 mt-4" />
+              <hr className="mb-8 mt-4 border-border" />
             </div>
 
             {/* Form */}
@@ -404,7 +406,7 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="text"
                     id="full-name"
-                    className="bg-background mt-2"
+                    className="mt-2 bg-background"
                     disabled={isNameLocked}
                     value={fullName}
                     onChange={(e) => !isNameLocked && setFullName(e.target.value)}
@@ -419,7 +421,7 @@ export const EmbedDirectTemplateClientPage = ({
                   <Input
                     type="email"
                     id="email"
-                    className="bg-background mt-2"
+                    className="mt-2 bg-background"
                     disabled={isEmailLocked}
                     value={email}
                     onChange={(e) => !isEmailLocked && setEmail(e.target.value.trim())}
@@ -488,7 +490,7 @@ export const EmbedDirectTemplateClientPage = ({
       </div>
 
       {!hidePoweredBy && (
-        <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
+        <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
           <span>Powered by</span>
           <BrandingLogo className="ml-2 inline-block h-[14px]" />
         </div>

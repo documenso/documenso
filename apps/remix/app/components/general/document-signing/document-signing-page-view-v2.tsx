@@ -22,7 +22,9 @@ import { SignFieldNameDialog } from '~/components/dialogs/sign-field-name-dialog
 import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-dialog';
 import { SignFieldSignatureDialog } from '~/components/dialogs/sign-field-signature-dialog';
 import { SignFieldTextDialog } from '~/components/dialogs/sign-field-text-dialog';
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 
+import { BrandingLogo } from '../branding-logo';
 import { DocumentSigningAttachmentsPopover } from '../document-signing/document-signing-attachments-popover';
 import { EnvelopeItemSelector } from '../envelope-editor/envelope-file-selector';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
@@ -32,7 +34,7 @@ import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 const EnvelopeSignerPageRenderer = lazy(
-  async () => import('../envelope-signing/envelope-signer-page-renderer'),
+  async () => import('~/components/general/envelope-signing/envelope-signer-page-renderer'),
 );
 
 export const DocumentSigningPageViewV2 = () => {
@@ -48,6 +50,13 @@ export const DocumentSigningPageViewV2 = () => {
     selectedAssistantRecipientFields,
   } = useRequiredEnvelopeSigningContext();
 
+  const {
+    isEmbed = false,
+    allowDocumentRejection = true,
+    hidePoweredBy = true,
+    onDocumentRejected,
+  } = useEmbedSigningContext() || {};
+
   /**
    * The total remaining fields remaining for the current recipient or selected assistant recipient.
    *
@@ -62,7 +71,7 @@ export const DocumentSigningPageViewV2 = () => {
   }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
 
   return (
-    <div className="dark:bg-background min-h-screen w-screen bg-gray-50">
+    <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />
       <SignFieldNumberDialog.Root />
@@ -77,9 +86,9 @@ export const DocumentSigningPageViewV2 = () => {
       {/* Main Content Area */}
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
-        <div className="bg-background border-border hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4 lg:flex">
+        <div className="embed--DocumentWidgetContainer hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-background py-4 lg:flex">
           <div className="px-4">
-            <h3 className="text-foreground flex items-end justify-between text-sm font-semibold">
+            <h3 className="flex items-end justify-between text-sm font-semibold text-foreground">
               {match(recipient.role)
                 .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
                 .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
@@ -87,7 +96,7 @@ export const DocumentSigningPageViewV2 = () => {
                 .with(RecipientRole.ASSISTANT, () => <Trans>Assist Document</Trans>)
                 .otherwise(() => null)}
 
-              <span className="text-muted-foreground bg-muted/50 ml-2 rounded border px-2 py-0.5 text-xs">
+              <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
                 <Plural
                   value={recipientFieldsRemaining.length}
                   one="1 Field Remaining"
@@ -96,18 +105,18 @@ export const DocumentSigningPageViewV2 = () => {
               </span>
             </h3>
 
-            <div className="bg-muted relative my-4 h-[4px] rounded-md">
+            <div className="relative my-4 h-[4px] rounded-md bg-muted">
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="bg-documenso absolute inset-y-0 left-0"
+                className="absolute inset-y-0 left-0 bg-documenso"
                 style={{
                   width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                 }}
               />
             </div>
 
-            <div className="mt-6 space-y-3">
+            <div className="embed--DocumentWidgetContent mt-6 space-y-3">
               <EnvelopeSignerForm />
             </div>
           </div>
@@ -116,8 +125,8 @@ export const DocumentSigningPageViewV2 = () => {
 
           {/* Quick Actions. */}
           {!isDirectTemplate && (
-            <div className="space-y-3 px-4">
-              <h4 className="text-foreground text-sm font-semibold">
+            <div className="embed--Actions space-y-3 px-4">
+              <h4 className="text-sm font-semibold text-foreground">
                 <Trans>Actions</Trans>
               </h4>
 
@@ -145,15 +154,26 @@ export const DocumentSigningPageViewV2 = () => {
                 }
               />
 
-              {envelope.type === EnvelopeType.DOCUMENT && (
+              {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection && (
                 <DocumentSigningRejectDialog
                   documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
                   token={recipient.token}
+                  onRejected={
+                    onDocumentRejected &&
+                    ((reason) =>
+                      onDocumentRejected({
+                        token: recipient.token,
+                        documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
+                        envelopeId: envelope.id,
+                        recipientId: recipient.id,
+                        reason,
+                      }))
+                  }
                   trigger={
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="hover:text-destructive w-full justify-start"
+                      className="w-full justify-start hover:text-destructive"
                     >
                       <BanIcon className="mr-2 h-4 w-4" />
                       <Trans>Reject Document</Trans>
@@ -164,18 +184,22 @@ export const DocumentSigningPageViewV2 = () => {
             </div>
           )}
 
-          {/* Footer of left sidebar. */}
-          <div className="mt-auto px-4">
-            <Button asChild variant="ghost" className="w-full justify-start">
-              <Link to="/">
-                <ArrowLeftIcon className="mr-2 h-4 w-4" />
-                <Trans>Return</Trans>
-              </Link>
-            </Button>
+          <div className="embed--DocumentWidgetFooter mt-auto">
+            {/* Footer of left sidebar. */}
+            {!isEmbed && (
+              <div className="px-4">
+                <Button asChild variant="ghost" className="w-full justify-start">
+                  <Link to="/">
+                    <ArrowLeftIcon className="mr-2 h-4 w-4" />
+                    <Trans>Return</Trans>
+                  </Link>
+                </Button>
+              </div>
+            )}
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto">
+        <div className="embed--DocumentContainer flex-1 overflow-y-auto">
           <div className="flex flex-col">
             {/* Horizontal envelope item selector */}
             {envelopeItems.length > 1 && (
@@ -202,25 +226,36 @@ export const DocumentSigningPageViewV2 = () => {
             )}
 
             {/* Document View */}
-            <div className="flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
+            <div className="embed--DocumentViewer flex flex-col items-center justify-center p-2 sm:mt-4 sm:p-4">
               {currentEnvelopeItem ? (
                 <PDFViewerKonvaLazy
+                  renderer="signing"
                   key={currentEnvelopeItem.id}
-                  documentDataId={currentEnvelopeItem.documentDataId}
                   customPageRenderer={EnvelopeSignerPageRenderer}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
-                  <p className="text-foreground text-sm">
+                  <p className="text-sm text-foreground">
                     <Trans>No documents found</Trans>
                   </p>
                 </div>
               )}
 
               {/* Mobile widget - Additional padding to allow users to scroll */}
-              <div className="block pb-16 md:hidden">
+              <div className="block pb-28 lg:hidden">
                 <DocumentSigningMobileWidget />
               </div>
+
+              {!hidePoweredBy && (
+                <a
+                  href="https://documenso.com"
+                  target="_blank"
+                  className="fixed bottom-0 right-0 z-40 hidden cursor-pointer rounded-tl bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100 lg:block"
+                >
+                  <span>Powered by</span>
+                  <BrandingLogo className="ml-2 inline-block h-[14px]" />
+                </a>
+              )}
             </div>
           </div>
         </div>

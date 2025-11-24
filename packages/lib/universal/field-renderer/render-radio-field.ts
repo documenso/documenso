@@ -25,7 +25,7 @@ export const renderRadioFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { pageWidth, pageHeight, pageLayer, mode } = options;
+  const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
   const radioMeta: TRadioFieldMeta | null = (field.fieldMeta as TRadioFieldMeta) || null;
   const radioValues = radioMeta?.values || [];
@@ -159,7 +159,7 @@ export const renderRadioFieldElement = (
       y: itemInputY,
       radius: calculateRadioSize(fontSize) / 2,
       stroke: '#374151',
-      strokeWidth: 2,
+      strokeWidth: 1.5,
       fill: 'white',
     });
 
@@ -195,7 +195,9 @@ export const renderRadioFieldElement = (
     fieldGroup.add(text);
   });
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,

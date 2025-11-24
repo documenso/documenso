@@ -25,7 +25,6 @@ import { signPdf } from '@documenso/signing';
 
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
-import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
@@ -62,171 +61,141 @@ export const run = async ({
 }) => {
   const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
 
-  const envelope = await prisma.envelope.findFirstOrThrow({
-    where: {
-      type: EnvelopeType.DOCUMENT,
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
-    },
-    include: {
-      documentMeta: true,
-      recipients: true,
-      envelopeItems: {
-        include: {
-          documentData: true,
-          field: {
-            include: {
-              signature: true,
+  const { envelopeId, envelopeStatus, isRejected } = await io.runTask('seal-document', async () => {
+    const envelope = await prisma.envelope.findFirstOrThrow({
+      where: {
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: mapDocumentIdToSecondaryId(documentId),
+      },
+      include: {
+        documentMeta: true,
+        recipients: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+            field: {
+              include: {
+                signature: true,
+              },
             },
           },
         },
       },
-    },
-  });
-
-  if (envelope.envelopeItems.length === 0) {
-    throw new Error('At least one envelope item required');
-  }
-
-  const settings = await getTeamSettings({
-    userId: envelope.userId,
-    teamId: envelope.teamId,
-  });
-
-  const isComplete =
-    envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
-    envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
-
-  if (!isComplete) {
-    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: 'Document is not complete',
     });
-  }
 
-  // Seems silly but we need to do this in case the job is re-ran
-  // after it has already run through the update task further below.
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const documentStatus = await io.runTask('get-document-status', async () => {
-    return envelope.status;
-  });
+    if (envelope.envelopeItems.length === 0) {
+      throw new Error('At least one envelope item required');
+    }
 
-  // This is the same case as above.
-  let envelopeItems = await io.runTask(
-    'get-document-data-id',
-    // eslint-disable-next-line @typescript-eslint/require-await
-    async () => {
-      // eslint-disable-next-line unused-imports/no-unused-vars
-      return envelope.envelopeItems.map(({ field, ...rest }) => ({
-        ...rest,
-      }));
-    },
-  );
+    const settings = await getTeamSettings({
+      userId: envelope.userId,
+      teamId: envelope.teamId,
+    });
 
-  if (envelopeItems.length < 1) {
-    throw new Error(`Document ${envelope.id} has no envelope items`);
-  }
+    const isComplete =
+      envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
+      envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
 
-  const recipients = await prisma.recipient.findMany({
-    where: {
-      envelopeId: envelope.id,
-      role: {
-        not: RecipientRole.CC,
-      },
-    },
-  });
+    if (!isComplete) {
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Document is not complete',
+      });
+    }
 
-  // Determine if the document has been rejected by checking if any recipient has rejected it
-  const rejectedRecipient = recipients.find(
-    (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
-  );
+    let envelopeItems = envelope.envelopeItems;
 
-  const isRejected = Boolean(rejectedRecipient);
+    if (envelopeItems.length < 1) {
+      throw new Error(`Document ${envelope.id} has no envelope items`);
+    }
 
-  // Get the rejection reason from the rejected recipient
-  const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
-
-  const fields = await prisma.field.findMany({
-    where: {
-      envelopeId: envelope.id,
-    },
-    include: {
-      signature: true,
-    },
-  });
-
-  // Skip the field check if the document is rejected
-  if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Document ${envelope.id} has unsigned required fields`);
-  }
-
-  if (isResealing) {
-    // If we're resealing we want to use the initial data for the document
-    // so we aren't placing fields on top of eachother.
-    envelopeItems = envelopeItems.map((envelopeItem) => ({
-      ...envelopeItem,
-      documentData: {
-        ...envelopeItem.documentData,
-        data: envelopeItem.documentData.initialData,
-      },
-    }));
-  }
-
-  if (!envelope.qrToken) {
-    await prisma.envelope.update({
+    const recipients = await prisma.recipient.findMany({
       where: {
-        id: envelope.id,
-      },
-      data: {
-        qrToken: prefixedId('qr'),
+        envelopeId: envelope.id,
+        role: {
+          not: RecipientRole.CC,
+        },
       },
     });
-  }
 
-  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+    // Determine if the document has been rejected by checking if any recipient has rejected it
+    const rejectedRecipient = recipients.find(
+      (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
+    );
 
-  const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
-    legacyDocumentId,
-    documentMeta: envelope.documentMeta,
-    settings,
-  });
+    const isRejected = Boolean(rejectedRecipient);
 
-  const newDocumentData = await Promise.all(
-    envelopeItems.map(async (envelopeItem) =>
-      io.runTask(`decorate-and-sign-envelope-item-${envelopeItem.id}`, async () => {
-        const envelopeItemFields = envelope.envelopeItems.find(
-          (item) => item.id === envelopeItem.id,
-        )?.field;
+    // Get the rejection reason from the rejected recipient
+    const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
-        if (!envelopeItemFields) {
-          throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
-        }
+    const fields = await prisma.field.findMany({
+      where: {
+        envelopeId: envelope.id,
+      },
+      include: {
+        signature: true,
+      },
+    });
 
-        return decorateAndSignPdf({
-          envelope,
-          envelopeItem,
-          envelopeItemFields,
-          isRejected,
-          rejectionReason,
-          certificateData,
-          auditLogData,
-        });
-      }),
-    ),
-  );
+    // Skip the field check if the document is rejected
+    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
+      throw new Error(`Document ${envelope.id} has unsigned required fields`);
+    }
 
-  const postHog = PostHogServerClient();
+    if (isResealing) {
+      // If we're resealing we want to use the initial data for the document
+      // so we aren't placing fields on top of eachother.
+      envelopeItems = envelopeItems.map((envelopeItem) => ({
+        ...envelopeItem,
+        documentData: {
+          ...envelopeItem.documentData,
+          data: envelopeItem.documentData.initialData,
+        },
+      }));
+    }
 
-  if (postHog) {
-    postHog.capture({
-      distinctId: nanoid(),
-      event: 'App: Document Sealed',
-      properties: {
-        documentId: envelope.id,
+    if (!envelope.qrToken) {
+      await prisma.envelope.update({
+        where: {
+          id: envelope.id,
+        },
+        data: {
+          qrToken: prefixedId('qr'),
+        },
+      });
+    }
+
+    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+    const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
+      legacyDocumentId,
+      documentMeta: envelope.documentMeta,
+      settings,
+    });
+
+    const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
+
+    for (const envelopeItem of envelopeItems) {
+      const envelopeItemFields = envelope.envelopeItems.find(
+        (item) => item.id === envelopeItem.id,
+      )?.field;
+
+      if (!envelopeItemFields) {
+        throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+      }
+
+      const result = await decorateAndSignPdf({
+        envelope,
+        envelopeItem,
+        envelopeItemFields,
         isRejected,
-      },
-    });
-  }
+        rejectionReason,
+        certificateData,
+        auditLogData,
+      });
 
-  await io.runTask('update-document', async () => {
+      newDocumentData.push(result);
+    }
+
     await prisma.$transaction(async (tx) => {
       for (const { oldDocumentDataId, newDocumentDataId } of newDocumentData) {
         const newData = await tx.documentData.findFirstOrThrow({
@@ -268,18 +237,24 @@ export const run = async ({
         }),
       });
     });
+
+    return {
+      envelopeId: envelope.id,
+      envelopeStatus: envelope.status,
+      isRejected,
+    };
   });
 
   await io.runTask('send-completed-email', async () => {
     let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-    if (isResealing && !isDocumentCompleted(envelope.status)) {
+    if (isResealing && !isDocumentCompleted(envelopeStatus)) {
       shouldSendCompletedEmail = sendEmail;
     }
 
     if (shouldSendCompletedEmail) {
       await sendCompletedEmail({
-        id: { type: 'envelopeId', id: envelope.id },
+        id: { type: 'envelopeId', id: envelopeId },
         requestMetadata,
       });
     }
@@ -287,7 +262,7 @@ export const run = async ({
 
   const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: envelope.id,
+      id: envelopeId,
     },
     include: {
       documentMeta: true,

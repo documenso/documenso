@@ -212,7 +212,7 @@ export const EnvelopeEditorRecipientForm = () => {
   );
 
   const hasDocumentBeenSent = recipients.some(
-    (recipient) => recipient.sendStatus === SendStatus.SENT,
+    (recipient) => recipient.role !== RecipientRole.CC && recipient.sendStatus === SendStatus.SENT,
   );
 
   const canRecipientBeModified = (recipientId?: number) => {
@@ -482,30 +482,46 @@ export const EnvelopeEditorRecipientForm = () => {
 
     const { data } = validatedFormValues;
 
+    // Weird edge case where the whole envelope is created via API
+    // with no signing order. If they come to this page it will show an error
+    // since they aren't equal and the recipient is no longer editable.
+    const envelopeRecipients = data.signers.map((recipient) => {
+      if (!canRecipientBeModified(recipient.id)) {
+        return {
+          ...recipient,
+          signingOrder: recipient.signingOrder,
+        };
+      }
+      return recipient;
+    });
+
     const hasSigningOrderChanged = envelope.documentMeta.signingOrder !== data.signingOrder;
     const hasAllowDictateNextSignerChanged =
       envelope.documentMeta.allowDictateNextSigner !== data.allowDictateNextSigner;
 
     const hasSignersChanged =
-      data.signers.length !== recipients.length ||
-      data.signers.some((signer) => {
+      envelopeRecipients.length !== recipients.length ||
+      envelopeRecipients.some((signer) => {
         const recipient = recipients.find((recipient) => recipient.id === signer.id);
 
         if (!recipient) {
           return true;
         }
 
+        const signerActionAuth = signer.actionAuth;
+        const recipientActionAuth = recipient.authOptions?.actionAuth || [];
+
         return (
           signer.email !== recipient.email ||
           signer.name !== recipient.name ||
           signer.role !== recipient.role ||
           signer.signingOrder !== recipient.signingOrder ||
-          !isDeepEqual(signer.actionAuth, recipient.authOptions?.actionAuth)
+          !isDeepEqual(signerActionAuth, recipientActionAuth)
         );
       });
 
     if (hasSignersChanged) {
-      setRecipientsDebounced(validatedFormValues.data.signers);
+      setRecipientsDebounced(envelopeRecipients);
     }
 
     if (hasSigningOrderChanged || hasAllowDictateNextSignerChanged) {

@@ -114,13 +114,13 @@ export default function AdminLayout() {
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
-              pathname?.startsWith('/admin/leaderboard') && 'bg-secondary',
+              pathname?.startsWith('/admin/organisation-insights') && 'bg-secondary',
             )}
             asChild
           >
-            <Link to="/admin/leaderboard">
+            <Link to="/admin/organisation-insights">
               <Trophy className="mr-2 h-5 w-5" />
-              <Trans>Leaderboard</Trans>
+              <Trans>Organisation Insights</Trans>
             </Link>
           </Button>
 
@@ -128,7 +128,7 @@ export default function AdminLayout() {
             variant="ghost"
             className={cn(
               'justify-start md:w-full',
-              pathname?.startsWith('/admin/banner') && 'bg-secondary',
+              pathname?.startsWith('/admin/site-settings') && 'bg-secondary',
             )}
             asChild
           >
