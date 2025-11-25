@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type APIRequestContext, expect, test } from '@playwright/test';
 import type { Team, User } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -165,6 +165,9 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: {
+                  type: 'signature',
+                },
               },
               {
                 type: FieldType.SIGNATURE,
@@ -174,6 +177,9 @@ test.describe('API V2 Envelopes', () => {
                 positionY: 0,
                 width: 0,
                 height: 0,
+                fieldMeta: {
+                  type: 'signature',
+                },
               },
             ],
           },
@@ -561,7 +567,7 @@ test.describe('API V2 Envelopes', () => {
 
   test.describe('Envelope find endpoint', () => {
     const createEnvelope = async (
-      request: ReturnType<typeof test.extend>['request'] extends Promise<infer R> ? R : never,
+      request: APIRequestContext,
       token: string,
       payload: TCreateEnvelopePayload,
     ) => {
@@ -747,10 +753,7 @@ test.describe('API V2 Envelopes', () => {
       expect(envelope?.id).toBeDefined();
       expect(envelope?.type).toBe(EnvelopeType.DOCUMENT);
       expect(envelope?.status).toBe(DocumentStatus.DRAFT);
-      expect(envelope?.documentMeta).toBeDefined();
       expect(envelope?.recipients).toBeDefined();
-      expect(envelope?.fields).toBeDefined();
-      expect(envelope?.envelopeItems).toBeDefined();
       expect(envelope?.user).toBeDefined();
       expect(envelope?.team).toBeDefined();
     });

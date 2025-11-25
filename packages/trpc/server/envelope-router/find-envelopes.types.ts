@@ -1,7 +1,7 @@
 import { DocumentSource, DocumentStatus, EnvelopeType } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZEnvelopeSchema } from '@documenso/lib/types/envelope';
+import { ZEnvelopeManySchema } from '@documenso/lib/types/envelope';
 import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 
 import type { TrpcRouteMeta } from '../trpc';
@@ -39,7 +39,7 @@ export const ZFindEnvelopesRequestSchema = ZFindSearchParamsSchema.extend({
 });
 
 export const ZFindEnvelopesResponseSchema = ZFindResultResponse.extend({
-  data: ZEnvelopeSchema.array(),
+  data: ZEnvelopeManySchema.array(),
 });
 
 export type TFindEnvelopesRequest = z.infer<typeof ZFindEnvelopesRequestSchema>;

@@ -150,18 +150,6 @@ export const findEnvelopes = async ({
         [orderByColumn]: orderByDirection,
       },
       include: {
-        envelopeItems: {
-          select: {
-            envelopeId: true,
-            id: true,
-            title: true,
-            order: true,
-          },
-          orderBy: {
-            order: 'asc',
-          },
-        },
-        documentMeta: true,
         user: {
           select: {
             id: true,
@@ -174,19 +162,10 @@ export const findEnvelopes = async ({
             id: 'asc',
           },
         },
-        fields: true,
         team: {
           select: {
             id: true,
             url: true,
-          },
-        },
-        directLink: {
-          select: {
-            directTemplateRecipientId: true,
-            enabled: true,
-            id: true,
-            token: true,
           },
         },
       },
