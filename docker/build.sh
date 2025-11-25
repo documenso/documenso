@@ -19,6 +19,8 @@ echo "Git SHA: $GIT_SHA"
 # Build with temporary base tag
 docker build -f "$SCRIPT_DIR/Dockerfile" \
     --progress=plain \
+    --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}" \
+    --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}" \
     -t "documenso-base" \
     "$MONOREPO_ROOT"
 
