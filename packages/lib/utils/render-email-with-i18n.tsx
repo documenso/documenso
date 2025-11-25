@@ -1,7 +1,5 @@
-import { I18nProvider } from '@lingui/react';
-
 import type { RenderOptions } from '@documenso/email/render';
-import { render } from '@documenso/email/render';
+import { renderWithI18N } from '@documenso/email/render';
 
 import { getI18nInstance } from '../client-only/providers/i18n-server';
 import {
@@ -26,7 +24,7 @@ export const renderEmailWithI18N = async (
 
     i18n.activate(lang);
 
-    return render(<I18nProvider i18n={i18n}>{component}</I18nProvider>, otherOptions);
+    return renderWithI18N(component, { i18n, ...otherOptions });
   } catch (err) {
     console.error(err);
     throw new Error('Failed to render email');
