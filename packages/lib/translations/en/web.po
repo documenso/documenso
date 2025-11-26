@@ -2788,10 +2788,6 @@ msgstr "Created on {0}"
 msgid "CSV Structure"
 msgstr "CSV Structure"
 
-#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
-msgid "Cumulative MAU (signed in)"
-msgstr "Cumulative MAU (signed in)"
-
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "Current"
