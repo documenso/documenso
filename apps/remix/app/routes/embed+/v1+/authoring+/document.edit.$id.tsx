@@ -75,6 +75,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }));
 
   return {
+    token,
     document: {
       ...document,
       fields,
@@ -86,7 +87,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { document } = useLoaderData<typeof loader>();
+  const { document, token } = useLoaderData<typeof loader>();
 
   const [hasFinishedInit, setHasFinishedInit] = useState(false);
 
@@ -321,7 +322,8 @@ export default function EmbeddingAuthoringDocumentEditPage() {
 
           <ConfigureFieldsView
             configData={configuration!}
-            documentData={document.documentData}
+            presignToken={token}
+            envelopeItem={document.envelopeItems[0]}
             defaultValues={fields ?? undefined}
             onBack={canGoBack ? handleBackToConfig : undefined}
             onSubmit={handleConfigureFieldsSubmit}

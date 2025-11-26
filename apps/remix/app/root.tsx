@@ -1,6 +1,3 @@
-import { useEffect } from 'react';
-
-import Plausible from 'plausible-tracker';
 import {
   Links,
   Meta,
@@ -17,7 +14,7 @@ import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes'
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
-import { createPublicEnv, env } from '@documenso/lib/utils/env';
+import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
@@ -30,11 +27,6 @@ import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
-
-const { trackPageview } = Plausible({
-  domain: 'documenso.com',
-  trackLocalhost: false,
-});
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -91,12 +83,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const { theme } = useLoaderData<typeof loader>() || {};
 
   const location = useLocation();
-
-  useEffect(() => {
-    if (env('NODE_ENV') === 'production') {
-      trackPageview();
-    }
-  }, [location.pathname]);
 
   return (
     <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
