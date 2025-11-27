@@ -275,7 +275,15 @@ The environment variables listed above are a subset of those available for confi
 | `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`      | The secondary encryption key for symmetric encryption and decryption (at least 32 characters).      |
 | `NEXT_PRIVATE_GOOGLE_CLIENT_ID`              | The Google client ID for Google authentication (optional).                                          |
 | `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET`          | The Google client secret for Google authentication (optional).                                      |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_ID`           | The Microsoft client ID for Microsoft authentication (optional).                                    |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET`       | The Microsoft client secret for Microsoft authentication (optional).                                |
+| `NEXT_PRIVATE_OIDC_CLIENT_ID`                | The OIDC client ID for OIDC authentication (optional).                                              |
+| `NEXT_PRIVATE_OIDC_CLIENT_SECRET`            | The OIDC client secret for OIDC authentication (optional).                                          |
+| `NEXT_PRIVATE_OIDC_WELL_KNOWN`               | The well-known URL for the OIDC provider (optional).                                                |
+| `NEXT_PRIVATE_OIDC_PROVIDER_LABEL`           | The label to display for the OIDC provider button (optional).                                       |
+| `NEXT_PRIVATE_OIDC_SKIP_VERIFY`              | Whether to skip email verification for OIDC accounts (optional, default `false`).                   |
 | `NEXT_PUBLIC_WEBAPP_URL`                     | The URL for the web application.                                                                    |
+| `NEXT_PUBLIC_SUPPORT_EMAIL`                  | The support email address displayed to users (default `support@documenso.com`).                     |
 | `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                              |
 | `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                            |
 | `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                    |
@@ -297,6 +305,7 @@ The environment variables listed above are a subset of those available for confi
 | `NEXT_PRIVATE_SMTP_APIKEY_USER`              | The API key user for the SMTP server for the `smtp-api` transport.                                  |
 | `NEXT_PRIVATE_SMTP_APIKEY`                   | The API key for the SMTP server for the `smtp-api` transport.                                       |
 | `NEXT_PRIVATE_SMTP_SECURE`                   | Whether to force the use of TLS for the SMTP server for SMTP transports.                            |
+| `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS`        | Whether to ignore TLS errors for the SMTP server (useful for self-signed certificates).             |
 | `NEXT_PRIVATE_SMTP_FROM_ADDRESS`             | The email address for the "from" address.                                                           |
 | `NEXT_PRIVATE_SMTP_FROM_NAME`                | The sender name for the "from" address.                                                             |
 | `NEXT_PRIVATE_RESEND_API_KEY`                | The API key for Resend.com for the `resend` transport.                                              |
@@ -308,6 +317,37 @@ The environment variables listed above are a subset of those available for confi
 | `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`     | The maximum document upload limit displayed to the user (in MB).                                    |
 | `NEXT_PUBLIC_POSTHOG_KEY`                    | The optional PostHog key for analytics and feature flags.                                           |
 | `NEXT_PUBLIC_DISABLE_SIGNUP`                 | Whether to disable user signups through the /signup page.                                           |
+| `NEXT_PRIVATE_BROWSERLESS_URL`               | The URL for a Browserless.io instance to generate PDFs (optional).                                  |
+| `DOCUMENSO_DISABLE_TELEMETRY`                | Set to `true` to disable anonymous telemetry (see [Telemetry](#telemetry) section below).           |
+
+## Telemetry
+
+Documenso collects anonymous telemetry data to help us understand how the software is being used and improve the product. This telemetry is **enabled by default** for self-hosted instances.
+
+### What We Collect
+
+We collect minimal, privacy-preserving data:
+
+- **App Version**: The version of Documenso you are running
+- **Installation ID**: A unique identifier for your installation (stored in your database)
+- **Node ID**: A unique identifier for each server/container instance (stored in the OS temp directory)
+
+We do **not** collect any personal data, document contents, user information, or usage patterns.
+
+### Events
+
+- **Server Startup**: Captured once when the server starts
+- **Server Heartbeat**: Captured every hour while the server is running
+
+### Disabling Telemetry
+
+To disable telemetry, set the following environment variable:
+
+```bash
+DOCUMENSO_DISABLE_TELEMETRY=true
+```
+
+This will completely disable all telemetry data collection.
 
 ## Run as a Service
 

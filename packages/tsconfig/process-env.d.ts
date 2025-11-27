@@ -72,6 +72,8 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local';
 
+    NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS?: string;
+
     /**
      * Inngest environment variables
      */

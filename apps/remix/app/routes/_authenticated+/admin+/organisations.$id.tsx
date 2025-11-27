@@ -162,7 +162,13 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       <SettingsHeader
         title={t`Manage organisation`}
         subtitle={t`Manage the ${organisation.name} organisation`}
-      />
+      >
+        <Button variant="outline" asChild>
+          <Link to={`/admin/organisation-insights/${organisationId}`}>
+            <Trans>View insights</Trans>
+          </Link>
+        </Button>
+      </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
 

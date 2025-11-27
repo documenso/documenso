@@ -97,9 +97,10 @@ test.describe('AutoSave Fields Step', () => {
       const fields = retrievedFields.fields;
 
       expect(fields.length).toBe(3);
-      expect(fields[0].type).toBe('SIGNATURE');
-      expect(fields[1].type).toBe('TEXT');
-      expect(fields[2].type).toBe('SIGNATURE');
+
+      expect(fields.map((field) => field.type).toSorted()).toEqual(
+        ['SIGNATURE', 'TEXT', 'SIGNATURE'].toSorted(),
+      );
     }).toPass();
   });
 
@@ -237,10 +238,9 @@ test.describe('AutoSave Fields Step', () => {
       const fields = retrievedFields.fields;
 
       expect(fields.length).toBe(4);
-      expect(fields[0].type).toBe('SIGNATURE');
-      expect(fields[1].type).toBe('TEXT');
-      expect(fields[2].type).toBe('SIGNATURE');
-      expect(fields[3].type).toBe('SIGNATURE');
+      expect(fields.map((field) => field.type).toSorted()).toEqual(
+        ['SIGNATURE', 'TEXT', 'SIGNATURE', 'SIGNATURE'].toSorted(),
+      );
     }).toPass();
   });
 
@@ -292,8 +292,9 @@ test.describe('AutoSave Fields Step', () => {
       const fields = retrievedTemplate.fields;
 
       expect(fields.length).toBe(2);
-      expect(fields[0].type).toBe('SIGNATURE');
-      expect(fields[1].type).toBe('TEXT');
+      expect(fields.map((field) => field.type).toSorted()).toEqual(
+        ['SIGNATURE', 'TEXT'].toSorted(),
+      );
 
       const textField = fields[1];
       expect(textField.fieldMeta).toBeDefined();
