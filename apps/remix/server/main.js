@@ -33,13 +33,8 @@ const handler = handle(build, server);
 const port = parseInt(process.env.PORT || '3000', 10);
 const hostname = process.env.HOSTNAME || '0.0.0.0';
 
-serve(
-  {
-    fetch: handler.fetch,
-    port,
-    hostname,
-  },
-  (info) => {
-    console.log(`🚀 Documenso Server listening on http://${info.address}:${info.port}`);
-  },
-);
+serve({
+  fetch: handler.fetch,
+  port,
+  hostname,
+});
