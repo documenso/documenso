@@ -244,14 +244,14 @@ const renderOverviewCard = (options: RenderOverviewCardOptions) => {
     label: i18n._(msg`Created At`),
     text: DateTime.fromJSDate(envelope.createdAt)
       .setLocale(APP_I18N_OPTIONS.defaultLocale)
-      .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)'),
+      .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
     width: columnWidth,
   });
   const lastUpdatedLabel = renderOverviewCardLabels({
     label: i18n._(msg`Last Updated`),
     text: DateTime.fromJSDate(envelope.updatedAt)
       .setLocale(APP_I18N_OPTIONS.defaultLocale)
-      .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)'),
+      .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)'),
     width: columnWidth,
     groupX: columnWidth + columnSpacing,
   });
@@ -482,7 +482,7 @@ const groupRowsIntoPages = (options: GroupRowsIntoPagesOptions) => {
   let currentGroupedRowIndex = 0;
 
   // Group rows into pages.
-  for (const [index, auditLog] of auditLogs.entries()) {
+  for (const auditLog of auditLogs) {
     const row = renderRow({ auditLog, width: contentWidth, i18n });
 
     const rowHeight = row.getClientRect().height;
@@ -547,7 +547,7 @@ const renderPages = (options: RenderPagesOptions) => {
     }
 
     // Add rows to the page
-    for (const [rowIndex, row] of rows.entries()) {
+    for (const row of rows) {
       const yPosition = pageGroup.getClientRect().height + rowPadding;
 
       row.setAttrs({
@@ -687,7 +687,7 @@ const dateFormat: DateTimeFormatOptions = {
 const getAuditLogIndicatorColor = (type: string) =>
   match(type)
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED, () => '#22c55e') // bg-green-500
-    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => '#ef4444f') // bg-red-500
+    .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED, () => '#ef4444') // bg-red-500
     .with(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_SENT, () => '#f97316') // bg-orange-500
     .with(
       P.union(

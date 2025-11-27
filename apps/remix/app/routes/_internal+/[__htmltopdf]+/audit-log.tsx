@@ -145,7 +145,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.createdAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -155,7 +155,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.updatedAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
