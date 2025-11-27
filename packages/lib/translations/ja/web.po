@@ -8,7 +8,7 @@ msgstr ""
 "Language: ja\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-11-17 04:07\n"
+"PO-Revision-Date: 2025-11-27 05:32\n"
 "Last-Translator: \n"
 "Language-Team: Japanese\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -82,7 +82,7 @@ msgstr "{0, plural, other {# 件のドキュメント}}"
 #. placeholder {0}: row.original.eventTriggers.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "{0, plural, one {# Event} other {# Events}}"
-msgstr ""
+msgstr "{0, plural, other {#件のイベント}}"
 
 #. placeholder {0}: assistantFields.filter((field) => field.recipientId === r.id).length
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
@@ -522,7 +522,7 @@ msgstr "<0>メール</0> - 受信者に、署名・承認などのためのド�
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "<0>Events:</0> All"
-msgstr ""
+msgstr "<0>イベント:</0> すべて"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "<0>Full account access:</0> View all your profile information, settings, and activity"
@@ -1239,7 +1239,7 @@ msgstr "挿入されたすべての署名は無効になります"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
-msgstr ""
+msgstr "すべての受信者が署名しました。現在ドキュメントを処理しており、まもなく署名済みドキュメントのコピーがメールで送信されます。"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "All recipients will be notified"
@@ -1685,7 +1685,7 @@ msgstr "このドキュメントを却下してもよろしいですか？この
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "Are you sure you want to remove the <0>{passkeyName}</0> passkey?"
-msgstr ""
+msgstr "<0>{passkeyName}</0> のパスキーを削除してもよろしいですか？"
 
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 msgid "Are you sure you wish to delete this organisation?"
@@ -2134,7 +2134,7 @@ msgstr "中央"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Change Recipient"
-msgstr ""
+msgstr "受信者を変更"
 
 #: apps/remix/app/components/forms/editor/editor-field-text-form.tsx
 msgid "Character limit"
@@ -3093,7 +3093,7 @@ msgstr "アカウントを削除しています..."
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Destination"
-msgstr ""
+msgstr "送信先"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
@@ -3102,7 +3102,7 @@ msgstr "詳細"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Developer Mode"
-msgstr ""
+msgstr "開発者モード"
 
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -3716,7 +3716,7 @@ msgstr "PDF ファイルをここにドラッグ＆ドロップしてくださ�
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Draw signature"
 msgid "Draw"
-msgstr ""
+msgstr "手書き"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
@@ -3777,11 +3777,11 @@ msgstr "同じ値を重複して使用することはできません"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 0"
-msgstr ""
+msgstr "例: 0"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "E.g. 100"
-msgstr ""
+msgstr "例: 100"
 
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
@@ -3806,11 +3806,11 @@ msgstr "Webhook を編集"
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 msgid "eg. Legal"
-msgstr ""
+msgstr "例: 法務"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "eg. Mac"
-msgstr ""
+msgstr "例: Mac"
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Electronic Delivery of Documents"
@@ -4235,7 +4235,7 @@ msgstr "ファイルのアップロード中にエラーが発生しました"
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Event"
-msgstr ""
+msgstr "イベント"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Event Type"
@@ -4256,7 +4256,7 @@ msgstr "全員が署名しました"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Everyone has signed! You will receive an email copy of the signed document."
-msgstr ""
+msgstr "全員が署名しました。署名済みドキュメントのコピーがメールで送信されます。"
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
@@ -4285,7 +4285,7 @@ msgstr "外部 ID"
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Failed"
-msgstr ""
+msgstr "失敗"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
@@ -4837,7 +4837,7 @@ msgstr "重要: これが意味すること"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Inactive"
-msgstr ""
+msgstr "非アクティブ"
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -5208,7 +5208,7 @@ msgstr "生成済みリンク"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Listening to"
-msgstr ""
+msgstr "リッスン対象"
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Load older activity"
@@ -5252,7 +5252,7 @@ msgstr "ログイン"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Logs"
-msgstr ""
+msgstr "ログ"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -5292,7 +5292,7 @@ msgstr "請求を管理"
 
 #: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 msgid "Manage billing and subscriptions for organisations where you have billing management permissions."
-msgstr ""
+msgstr "請求管理の権限を持つ組織について、請求およびサブスクリプションを管理します。"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Manage details for this public template"
@@ -6192,7 +6192,7 @@ msgstr "パスワードを更新しました。"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Past Due"
-msgstr ""
+msgstr "支払い遅延"
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
@@ -6412,7 +6412,7 @@ msgstr "認証アプリを開き、この文書用の6桁のコードを入力�
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 msgid "Please provide a reason for rejecting this document"
-msgstr ""
+msgstr "このドキュメントを却下する理由を入力してください。"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
@@ -6529,7 +6529,7 @@ msgstr "続行"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Processing document"
-msgstr ""
+msgstr "ドキュメントを処理しています"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 #: apps/remix/app/components/general/settings-nav-desktop.tsx
@@ -6885,7 +6885,7 @@ msgstr "返信先メール"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
-msgstr ""
+msgstr "リクエスト"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Requesting Organisation"
@@ -6980,15 +6980,15 @@ msgstr "支払いを解決"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Response"
-msgstr ""
+msgstr "レスポンス"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Response Code"
-msgstr ""
+msgstr "レスポンスコード"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Response Headers"
-msgstr ""
+msgstr "レスポンスヘッダー"
 
 #: packages/ui/components/document/document-share-button.tsx
 msgid "Rest assured, your document is strictly confidential and will never be shared. Only your signing experience will be highlighted. Share your personalized signing card to showcase your signature!"
@@ -7134,7 +7134,7 @@ msgstr "文書タイトルで検索"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search by ID"
-msgstr ""
+msgstr "IDで検索"
 
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 msgid "Search by name or email"
@@ -7207,7 +7207,7 @@ msgstr "続行するプランを選択"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page-renderer.tsx
 msgid "Select a recipient"
-msgstr ""
+msgstr "受信者を選択"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Select a team to view its dashboard"
@@ -7231,7 +7231,7 @@ msgstr "アクセス方法を選択"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
-msgstr ""
+msgstr "イベントタイプを選択"
 
 #: apps/remix/app/components/dialogs/sign-field-dropdown-dialog.tsx
 #: packages/ui/primitives/combobox.tsx
@@ -7337,7 +7337,7 @@ msgstr "トリガーを選択"
 
 #: packages/ui/primitives/multi-select-combobox.tsx
 msgid "Select values..."
-msgstr ""
+msgstr "値を選択…"
 
 #: apps/remix/app/components/forms/editor/editor-field-generic-field-forms.tsx
 msgid "Select vertical align"
@@ -8024,7 +8024,7 @@ msgstr "サブスクリプションが無効です"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Subscription Status"
-msgstr ""
+msgstr "サブスクリプション状況"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
@@ -8098,7 +8098,7 @@ msgstr "概要:"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "support"
-msgstr ""
+msgstr "サポート"
 
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-email-update-dialog.tsx
@@ -8380,7 +8380,7 @@ msgstr "テンプレートを使用すると、受信者やフィールドがあ
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
-msgstr ""
+msgstr "テスト"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
@@ -9263,7 +9263,7 @@ msgstr "タイプ"
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Type signature"
 msgid "Type"
-msgstr ""
+msgstr "入力"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Type a command or search..."
@@ -9271,7 +9271,7 @@ msgstr "コマンドを入力するか検索..."
 
 #: packages/ui/primitives/signature-pad/signature-pad-type.tsx
 msgid "Type your signature"
-msgstr ""
+msgstr "署名を入力してください"
 
 #: apps/remix/app/components/general/document-signing/document-signing-signature-field.tsx
 msgid "Typed signatures are not allowed. Please draw your signature."
@@ -9560,7 +9560,7 @@ msgstr "アップロード"
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Upload signature"
 msgid "Upload"
-msgstr ""
+msgstr "アップロード"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
@@ -9887,7 +9887,7 @@ msgstr "このメールアドレスに関連する文書を表示"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "View insights"
-msgstr ""
+msgstr "インサイトを表示"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "View invites"
@@ -10330,7 +10330,7 @@ msgstr "<0>{email}</0> 宛てに確認メールを送信しました。受信ト
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Webhook"
-msgstr ""
+msgstr "Webhook"
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 msgid "Webhook created"
@@ -10342,7 +10342,7 @@ msgstr "Webhook を削除しました"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Webhook Details"
-msgstr ""
+msgstr "Webhook の詳細"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Webhook not found"
@@ -10350,7 +10350,7 @@ msgstr "Webhook が見つかりません"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Webhook successfully sent"
-msgstr ""
+msgstr "Webhook が正常に送信されました"
 
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Webhook updated"
@@ -10712,7 +10712,7 @@ msgstr "このチームのトークンを作成する権限がありません。
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "You don't manage billing for any organisations."
-msgstr ""
+msgstr "請求を管理している組織はありません。"
 
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "You don't need to sign it anymore."
@@ -10931,7 +10931,7 @@ msgstr "今後、サインイン時には認証アプリのコード入力が必
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "You will receive an email copy of the signed document once everyone has signed."
-msgstr ""
+msgstr "全員の署名が完了すると、署名済みドキュメントのコピーがメールで送信されます。"
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Your Account"
@@ -11208,3 +11208,4 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
