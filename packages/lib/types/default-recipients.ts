@@ -3,9 +3,11 @@ import { z } from 'zod';
 
 export const ZDefaultRecipientSchema = z.object({
   email: z.string().email(),
-  name: z.string(),
+  name: z.string().optional(),
   role: z.nativeEnum(RecipientRole),
 });
+
+export type TDefaultRecipient = z.infer<typeof ZDefaultRecipientSchema>;
 
 export const ZDefaultRecipientsSchema = z.array(ZDefaultRecipientSchema);
 
