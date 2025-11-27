@@ -93,7 +93,9 @@ export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
       {
         header: _(msg`Action`),
         accessorKey: 'type',
-        cell: ({ row }) => <span>{formatDocumentAuditLogAction(_, row.original).description}</span>,
+        cell: ({ row }) => (
+          <span>{formatDocumentAuditLogAction(i18n, row.original).description}</span>
+        ),
       },
       {
         header: 'IP Address',
