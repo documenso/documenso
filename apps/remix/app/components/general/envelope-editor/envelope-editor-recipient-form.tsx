@@ -306,8 +306,14 @@ export const EnvelopeEditorRecipientForm = () => {
     index: number,
     suggestion: RecipientAutoCompleteOption,
   ) => {
-    setValue(`signers.${index}.email`, suggestion.email);
-    setValue(`signers.${index}.name`, suggestion.name || '');
+    setValue(`signers.${index}.email`, suggestion.email, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    setValue(`signers.${index}.name`, suggestion.name || '', {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const onDragEnd = useCallback(
