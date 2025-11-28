@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useLingui } from '@lingui/react/macro';
@@ -7,9 +7,7 @@ import {
   DocumentDistributionMethod,
   DocumentStatus,
   EnvelopeType,
-  type Field,
   FieldType,
-  type Recipient,
   RecipientRole,
 } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -19,8 +17,8 @@ import { useNavigate } from 'react-router';
 import { match } from 'ts-pattern';
 import * as z from 'zod';
 
+import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { cn } from '@documenso/ui/lib/utils';
@@ -52,16 +50,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@documenso/ui/primitives/select';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 import { Textarea } from '@documenso/ui/primitives/textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type EnvelopeDistributeDialogProps = {
-  envelope: Pick<TEnvelope, 'id' | 'userId' | 'teamId' | 'status' | 'type' | 'documentMeta'> & {
-    recipients: Recipient[];
-    fields: Pick<Field, 'type' | 'recipientId'>[];
-  };
   onDistribute?: () => Promise<void>;
   documentRootPath: string;
   trigger?: React.ReactNode;
@@ -86,20 +81,20 @@ export const ZEnvelopeDistributeFormSchema = z.object({
 export type TEnvelopeDistributeFormSchema = z.infer<typeof ZEnvelopeDistributeFormSchema>;
 
 export const EnvelopeDistributeDialog = ({
-  envelope,
   trigger,
   documentRootPath,
   onDistribute,
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
 
-  const recipients = envelope.recipients;
+  const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
 
   const { toast } = useToast();
   const { t } = useLingui();
   const navigate = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const { mutateAsync: distributeEnvelope } = trpcReact.envelope.distribute.useMutation();
 
@@ -189,6 +184,29 @@ export const EnvelopeDistributeDialog = ({
     }
   };
 
+  const handleSync = async () => {
+    if (isSyncing) {
+      return;
+    }
+
+    setIsSyncing(true);
+
+    try {
+      await syncEnvelope();
+    } catch (err) {
+      console.error(err);
+    }
+
+    setIsSyncing(false);
+  };
+
+  useEffect(() => {
+    // Resync the whole envelope if the envelope is mid saving.
+    if (isOpen && (isAutosaving || autosaveError)) {
+      void handleSync();
+    }
+  }, [isOpen]);
+
   if (envelope.status !== DocumentStatus.DRAFT || envelope.type !== EnvelopeType.DOCUMENT) {
     return null;
   }
@@ -208,7 +226,7 @@ export const EnvelopeDistributeDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        {!invalidEnvelopeCode ? (
+        {!invalidEnvelopeCode || isSyncing ? (
           <Form {...form}>
             <form onSubmit={handleSubmit(onFormSubmit)}>
               <fieldset disabled={isSubmitting}>
@@ -236,7 +254,16 @@ export const EnvelopeDistributeDialog = ({
                   })}
                 >
                   <AnimatePresence initial={false} mode="wait">
-                    {distributionMethod === DocumentDistributionMethod.EMAIL && (
+                    {isSyncing ? (
+                      <motion.div
+                        key={'Flushing'}
+                        initial={{ opacity: 0, y: 5 }}
+                        animate={{ opacity: 1, y: 0, transition: { duration: 0.3 } }}
+                        exit={{ opacity: 0, transition: { duration: 0.15 } }}
+                      >
+                        <SpinnerBox spinnerProps={{ size: 'sm' }} className="h-72" />
+                      </motion.div>
+                    ) : distributionMethod === DocumentDistributionMethod.EMAIL ? (
                       <motion.div
                         key={'Emails'}
                         initial={{ opacity: 0, y: 5 }}
@@ -339,7 +366,7 @@ export const EnvelopeDistributeDialog = ({
                                       <TooltipTrigger type="button">
                                         <InfoIcon className="mx-2 h-4 w-4" />
                                       </TooltipTrigger>
-                                      <TooltipContent className="text-muted-foreground p-4">
+                                      <TooltipContent className="p-4 text-muted-foreground">
                                         <DocumentSendEmailMessageHelper />
                                       </TooltipContent>
                                     </Tooltip>
@@ -347,7 +374,7 @@ export const EnvelopeDistributeDialog = ({
 
                                   <FormControl>
                                     <Textarea
-                                      className="bg-background mt-2 h-16 resize-none"
+                                      className="mt-2 h-16 resize-none bg-background"
                                       {...field}
                                       maxLength={5000}
                                     />
@@ -359,9 +386,7 @@ export const EnvelopeDistributeDialog = ({
                           </fieldset>
                         </Form>
                       </motion.div>
-                    )}
-
-                    {distributionMethod === DocumentDistributionMethod.NONE && (
+                    ) : distributionMethod === DocumentDistributionMethod.NONE ? (
                       <motion.div
                         key={'Links'}
                         initial={{ opacity: 0, y: 5 }}
@@ -369,7 +394,7 @@ export const EnvelopeDistributeDialog = ({
                         exit={{ opacity: 0, transition: { duration: 0.15 } }}
                         className="min-h-60 rounded-lg border"
                       >
-                        <div className="text-muted-foreground py-24 text-center text-sm">
+                        <div className="py-24 text-center text-sm text-muted-foreground">
                           <p>
                             <Trans>We won't send anything to notify recipients.</Trans>
                           </p>
@@ -382,7 +407,7 @@ export const EnvelopeDistributeDialog = ({
                           </p>
                         </div>
                       </motion.div>
-                    )}
+                    ) : null}
                   </AnimatePresence>
                 </div>
 
@@ -393,7 +418,7 @@ export const EnvelopeDistributeDialog = ({
                     </Button>
                   </DialogClose>
 
-                  <Button loading={isSubmitting} type="submit">
+                  <Button loading={isSubmitting} disabled={isSyncing} type="submit">
                     {distributionMethod === DocumentDistributionMethod.EMAIL ? (
                       <Trans>Send</Trans>
                     ) : (
