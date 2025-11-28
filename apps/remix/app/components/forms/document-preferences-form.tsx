@@ -567,7 +567,7 @@ export const DocumentPreferencesForm = ({
                         teamId={canInherit ? optionalTeam?.id : undefined}
                       />
 
-                      {recipients.map((recipient: TDefaultRecipients[number], index: number) => (
+                      {recipients.map((recipient, index) => (
                         <div key={recipient.email} className="flex items-center gap-2">
                           <span className="flex-1 truncate text-sm">
                             {recipient.name
