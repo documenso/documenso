@@ -3,6 +3,7 @@ import {
   ORGANISATION_USER_ACCOUNT_TYPE,
 } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { handleDocumentOwnershipOnDeletion } from '@documenso/lib/server-only/document/handle-document-ownership-on-deletion';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 
@@ -32,11 +33,38 @@ export const deleteOrganisationRoute = authenticatedProcedure
         userId: user.id,
         roles: ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP['DELETE_ORGANISATION'],
       }),
+      select: {
+        id: true,
+        owner: {
+          select: {
+            id: true,
+          },
+        },
+        teams: {
+          select: {
+            id: true,
+            documents: {
+              select: {
+                id: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     if (!organisation) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'You are not authorized to delete this organisation',
+      });
+    }
+
+    const documentIds = organisation.teams.flatMap((team) => team.documents.map((doc) => doc.id));
+
+    if (documentIds && documentIds.length > 0) {
+      await handleDocumentOwnershipOnDeletion({
+        documentIds,
+        organisationOwnerId: organisation.owner.id,
       });
     }
 
