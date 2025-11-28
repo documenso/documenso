@@ -1,18 +1,19 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
+import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
+import type { Webhook } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
+import { ZEditWebhookRequestSchema } from '@documenso/trpc/server/webhook-router/schema';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
   DialogFooter,
@@ -34,64 +35,51 @@ import { PasswordInput } from '@documenso/ui/primitives/password-input';
 import { Switch } from '@documenso/ui/primitives/switch';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useCurrentTeam } from '~/providers/team';
-
 import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
 
-const ZCreateWebhookFormSchema = ZCreateWebhookRequestSchema;
+const ZEditWebhookFormSchema = ZEditWebhookRequestSchema.omit({ id: true });
 
-type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
+type TEditWebhookFormSchema = z.infer<typeof ZEditWebhookFormSchema>;
 
-export type WebhookCreateDialogProps = {
+export type WebhookEditDialogProps = {
   trigger?: React.ReactNode;
+  webhook: Webhook;
 } & Omit<DialogPrimitive.DialogProps, 'children'>;
 
-export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogProps) => {
-  const { _ } = useLingui();
+export const WebhookEditDialog = ({ trigger, webhook, ...props }: WebhookEditDialogProps) => {
+  const { t } = useLingui();
   const { toast } = useToast();
-
-  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
 
-  const form = useForm<TCreateWebhookFormSchema>({
-    resolver: zodResolver(ZCreateWebhookFormSchema),
+  const { mutateAsync: updateWebhook } = trpc.webhook.editWebhook.useMutation();
+
+  const form = useForm<TEditWebhookFormSchema>({
+    resolver: zodResolver(ZEditWebhookFormSchema),
     values: {
-      webhookUrl: '',
-      eventTriggers: [],
-      secret: '',
-      enabled: true,
+      webhookUrl: webhook?.webhookUrl ?? '',
+      eventTriggers: webhook?.eventTriggers ?? [],
+      secret: webhook?.secret ?? '',
+      enabled: webhook?.enabled ?? true,
     },
   });
 
-  const { mutateAsync: createWebhook } = trpc.webhook.createWebhook.useMutation();
-
-  const onSubmit = async ({
-    enabled,
-    eventTriggers,
-    secret,
-    webhookUrl,
-  }: TCreateWebhookFormSchema) => {
+  const onSubmit = async (data: TEditWebhookFormSchema) => {
     try {
-      await createWebhook({
-        enabled,
-        eventTriggers,
-        secret,
-        webhookUrl,
+      await updateWebhook({
+        id: webhook.id,
+        ...data,
       });
-
-      setOpen(false);
 
       toast({
-        title: _(msg`Webhook created`),
-        description: _(msg`The webhook was successfully created.`),
+        title: t`Webhook updated`,
+        description: t`The webhook has been updated successfully.`,
+        duration: 5000,
       });
-
-      form.reset();
     } catch (err) {
       toast({
-        title: _(msg`Error`),
-        description: _(msg`An error occurred while creating the webhook. Please try again.`),
+        title: t`Failed to update webhook`,
+        description: t`We encountered an error while updating the webhook. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -104,27 +92,21 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
       {...props}
     >
       <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
-        {trigger ?? (
-          <Button className="flex-shrink-0">
-            <Trans>Create Webhook</Trans>
-          </Button>
-        )}
+        {trigger}
       </DialogTrigger>
 
       <DialogContent className="max-w-lg" position="center">
         <DialogHeader>
           <DialogTitle>
-            <Trans>Create webhook</Trans>
+            <Trans>Edit webhook</Trans>
           </DialogTitle>
-          <DialogDescription>
-            <Trans>On this page, you can create a new webhook.</Trans>
-          </DialogDescription>
+          <DialogDescription>{webhook.id}</DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <fieldset
-              className="flex h-full flex-col space-y-4"
+              className="flex h-full flex-col gap-y-6"
               disabled={form.formState.isSubmitting}
             >
               <div className="flex flex-col-reverse gap-4 md:flex-row">
@@ -133,9 +115,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                   name="webhookUrl"
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel required>
-                        <Trans>Webhook URL</Trans>
-                      </FormLabel>
+                      <FormLabel required>Webhook URL</FormLabel>
                       <FormControl>
                         <Input className="bg-background" {...field} />
                       </FormControl>
@@ -205,9 +185,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                 name="secret"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      <Trans>Secret</Trans>
-                    </FormLabel>
+                    <FormLabel>Secret</FormLabel>
                     <FormControl>
                       <PasswordInput
                         className="bg-background"
@@ -219,9 +197,8 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     <FormDescription>
                       <Trans>
                         A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso
+                        has been sent by Documenso.
                       </Trans>
-                      .
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -229,12 +206,14 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
               />
 
               <DialogFooter>
-                <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  <Trans>Cancel</Trans>
-                </Button>
+                <DialogClose asChild>
+                  <Button variant="secondary">
+                    <Trans>Close</Trans>
+                  </Button>
+                </DialogClose>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  <Trans>Create</Trans>
+                  <Trans>Update</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

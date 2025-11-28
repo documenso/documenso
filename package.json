@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.0.14",
+  "version": "2.1.0",
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@documenso/remix",
@@ -20,7 +20,7 @@
     "commitlint": "commitlint --edit",
     "clean": "turbo run clean && rimraf node_modules",
     "d": "npm run dx && npm run translate:compile && npm run dev",
-    "dx": "npm i && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
+    "dx": "npm ci && npm run dx:up && npm run prisma:migrate-dev && npm run prisma:seed",
     "dx:up": "docker compose -f docker/development/compose.yml up -d",
     "dx:down": "docker compose -f docker/development/compose.yml down",
     "ci": "turbo run build --filter=@documenso/remix && turbo run test:e2e",
@@ -89,6 +89,7 @@
     "@lingui/core": "^5.6.0",
     "inngest-cli": "^1.13.7",
     "luxon": "^3.7.2",
+    "posthog-node": "4.18.0",
     "react": "^18",
     "typescript": "5.6.2",
     "zod": "^3.25.76"
