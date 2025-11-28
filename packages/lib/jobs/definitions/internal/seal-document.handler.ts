@@ -7,7 +7,7 @@ import {
   rotateDegrees,
   translate,
 } from '@cantoo/pdf-lib';
-import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Field } from '@prisma/client';
+import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentStatus,
   EnvelopeType,
@@ -20,13 +20,14 @@ import path from 'node:path';
 import { groupBy } from 'remeda';
 import { match } from 'ts-pattern';
 
+import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
+import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
+import { PDF_SIZE_A4_72PPI } from '../../../constants/pdf';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
-import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
-import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
@@ -48,7 +49,7 @@ import { putPdfFileServerSide } from '../../../universal/upload/put-file.server'
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
-import { mapDocumentIdToSecondaryId, mapSecondaryIdToDocumentId } from '../../../utils/envelope';
+import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -68,8 +69,19 @@ export const run = async ({
         secondaryId: mapDocumentIdToSecondaryId(documentId),
       },
       include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
         documentMeta: true,
         recipients: true,
+        fields: {
+          include: {
+            signature: true,
+          },
+        },
         envelopeItems: {
           include: {
             documentData: true,
@@ -102,23 +114,20 @@ export const run = async ({
       });
     }
 
-    let envelopeItems = envelope.envelopeItems;
+    let { envelopeItems } = envelope;
+
+    const fields = envelope.fields;
 
     if (envelopeItems.length < 1) {
       throw new Error(`Document ${envelope.id} has no envelope items`);
     }
 
-    const recipients = await prisma.recipient.findMany({
-      where: {
-        envelopeId: envelope.id,
-        role: {
-          not: RecipientRole.CC,
-        },
-      },
-    });
+    const recipientsWithoutCCers = envelope.recipients.filter(
+      (recipient) => recipient.role !== RecipientRole.CC,
+    );
 
     // Determine if the document has been rejected by checking if any recipient has rejected it
-    const rejectedRecipient = recipients.find(
+    const rejectedRecipient = recipientsWithoutCCers.find(
       (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
     );
 
@@ -126,15 +135,6 @@ export const run = async ({
 
     // Get the rejection reason from the rejected recipient
     const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
-
-    const fields = await prisma.field.findMany({
-      where: {
-        envelopeId: envelope.id,
-      },
-      include: {
-        signature: true,
-      },
-    });
 
     // Skip the field check if the document is rejected
     if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
@@ -164,13 +164,32 @@ export const run = async ({
       });
     }
 
-    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+    let certificateDoc: PDFDocument | null = null;
+    let auditLogDoc: PDFDocument | null = null;
 
-    const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
-      legacyDocumentId,
-      documentMeta: envelope.documentMeta,
-      settings,
-    });
+    if (settings.includeSigningCertificate || settings.includeAuditLog) {
+      const certificatePayload = {
+        envelope,
+        recipients: envelope.recipients, // Need to use the recipients from envelope which contains ALL recipients.
+        fields,
+        language: envelope.documentMeta.language,
+        envelopeOwner: {
+          email: envelope.user.email,
+          name: envelope.user.name || '',
+        },
+        envelopeItems: envelopeItems.map((item) => item.title),
+        pageWidth: PDF_SIZE_A4_72PPI.width,
+        pageHeight: PDF_SIZE_A4_72PPI.height,
+      };
+
+      const [createdCertificatePdf, createdAuditLogPdf] = await Promise.all([
+        settings.includeSigningCertificate ? generateCertificatePdf(certificatePayload) : null,
+        settings.includeAuditLog ? generateAuditLogPdf(certificatePayload) : null,
+      ]);
+
+      certificateDoc = createdCertificatePdf;
+      auditLogDoc = createdAuditLogPdf;
+    }
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
@@ -189,8 +208,8 @@ export const run = async ({
         envelopeItemFields,
         isRejected,
         rejectionReason,
-        certificateData,
-        auditLogData,
+        certificateDoc,
+        auditLogDoc,
       });
 
       newDocumentData.push(result);
@@ -286,8 +305,8 @@ type DecorateAndSignPdfOptions = {
   envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
-  certificateData: Buffer | null;
-  auditLogData: Buffer | null;
+  certificateDoc: PDFDocument | null;
+  auditLogDoc: PDFDocument | null;
 };
 
 /**
@@ -299,8 +318,8 @@ const decorateAndSignPdf = async ({
   envelopeItemFields,
   isRejected,
   rejectionReason,
-  certificateData,
-  auditLogData,
+  certificateDoc,
+  auditLogDoc,
 }: DecorateAndSignPdfOptions) => {
   const pdfData = await getFileServerSide(envelopeItem.documentData);
 
@@ -316,9 +335,7 @@ const decorateAndSignPdf = async ({
     await addRejectionStampToPdf(pdfDoc, rejectionReason);
   }
 
-  if (certificateData) {
-    const certificateDoc = await PDFDocument.load(certificateData);
-
+  if (certificateDoc) {
     const certificatePages = await pdfDoc.copyPages(
       certificateDoc,
       certificateDoc.getPageIndices(),
@@ -329,9 +346,7 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  if (auditLogData) {
-    const auditLogDoc = await PDFDocument.load(auditLogData);
-
+  if (auditLogDoc) {
     const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
 
     auditLogPages.forEach((page) => {
@@ -454,49 +469,5 @@ const decorateAndSignPdf = async ({
   return {
     oldDocumentDataId: envelopeItem.documentData.id,
     newDocumentDataId: newDocumentData.id,
-  };
-};
-
-export const getCertificateAndAuditLogData = async ({
-  legacyDocumentId,
-  documentMeta,
-  settings,
-}: {
-  legacyDocumentId: number;
-  documentMeta: DocumentMeta;
-  settings: { includeSigningCertificate: boolean; includeAuditLog: boolean };
-}) => {
-  const getCertificateDataPromise = settings.includeSigningCertificate
-    ? getCertificatePdf({
-        documentId: legacyDocumentId,
-        language: documentMeta.language,
-      }).catch((e) => {
-        console.log('Failed to get certificate PDF');
-        console.error(e);
-
-        return null;
-      })
-    : null;
-
-  const getAuditLogDataPromise = settings.includeAuditLog
-    ? getAuditLogsPdf({
-        documentId: legacyDocumentId,
-        language: documentMeta.language,
-      }).catch((e) => {
-        console.log('Failed to get audit logs PDF');
-        console.error(e);
-
-        return null;
-      })
-    : null;
-
-  const [certificateData, auditLogData] = await Promise.all([
-    getCertificateDataPromise,
-    getAuditLogDataPromise,
-  ]);
-
-  return {
-    certificateData,
-    auditLogData,
   };
 };
