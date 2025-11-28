@@ -41,7 +41,9 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const token = url.searchParams.get('token') || '';
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token }).catch(() => null);
+  const result = await verifyEmbeddingPresignToken({ token, scope: `documentId:${id}` }).catch(
+    () => null,
+  );
 
   if (!result) {
     throw new Error('Invalid token');
