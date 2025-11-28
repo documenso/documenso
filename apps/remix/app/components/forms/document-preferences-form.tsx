@@ -3,7 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType } from '@prisma/client';
+import { DocumentVisibility, OrganisationType, RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -16,7 +16,10 @@ import {
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
+import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaTimezoneSchema,
@@ -45,6 +48,10 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
+import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
+
 /**
  * Can't infer this from the schema since we need to keep the schema inside the component to allow
  * it to be dynamic.
@@ -58,6 +65,7 @@ export type TDocumentPreferencesFormSchema = {
   includeSigningCertificate: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
+  defaultRecipients: TDefaultRecipients | null;
 };
 
 type SettingsSubset = Pick<
@@ -72,6 +80,7 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
+  | 'defaultRecipients'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -88,6 +97,7 @@ export const DocumentPreferencesForm = ({
   const { t } = useLingui();
   const { user, organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
+  const optionalTeam = useOptionalCurrentTeam();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
   const isPersonalOrganisation = currentOrganisation.type === OrganisationType.PERSONAL;
@@ -105,6 +115,7 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    defaultRecipients: ZDefaultRecipientsSchema.nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -120,6 +131,9 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
+      defaultRecipients: settings.defaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : null,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -507,6 +521,91 @@ export const DocumentPreferencesForm = ({
                 </FormDescription>
               </FormItem>
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="defaultRecipients"
+            render={({ field }) => {
+              const recipients = field.value ?? [];
+
+              return (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Default Recipients</Trans>
+                  </FormLabel>
+
+                  {canInherit && (
+                    <Select
+                      value={field.value === null ? '-1' : '0'}
+                      onValueChange={(value) => field.onChange(value === '-1' ? null : [])}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                        <SelectItem value={'0'}>
+                          <Trans>Override organisation settings</Trans>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {field.value !== null && (
+                    <div className="space-y-4">
+                      <DefaultRecipientsMultiSelectCombobox
+                        listValues={recipients}
+                        onChange={field.onChange}
+                        organisationId={
+                          !canInherit && !isPersonalOrganisation
+                            ? currentOrganisation.id
+                            : undefined
+                        }
+                        teamId={canInherit ? optionalTeam?.id : undefined}
+                      />
+
+                      {recipients.map((recipient: TDefaultRecipients[number], index: number) => (
+                        <div key={recipient.email} className="flex items-center gap-2">
+                          <span className="flex-1 truncate text-sm">
+                            {recipient.name
+                              ? `${recipient.name} (${recipient.email})`
+                              : recipient.email}
+                          </span>
+                          <Select
+                            value={recipient.role}
+                            onValueChange={(role: RecipientRole) => {
+                              field.onChange(
+                                recipients.map((recipient, idx) =>
+                                  idx === index ? { ...recipient, role } : recipient,
+                                ),
+                              );
+                            }}
+                          >
+                            <SelectTrigger className="w-32">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {Object.values(RecipientRole).map((role) => (
+                                <SelectItem key={role} value={role}>
+                                  {t(RECIPIENT_ROLES_DESCRIPTION[role].roleName)}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  <FormDescription>
+                    <Trans>Recipients that will be automatically added to new documents.</Trans>
+                  </FormDescription>
+                </FormItem>
+              );
+            }}
           />
 
           <div className="flex flex-row justify-end space-x-4">
