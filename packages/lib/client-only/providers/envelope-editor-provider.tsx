@@ -76,8 +76,10 @@ interface EnvelopeEditorProviderProps {
 
 const EnvelopeEditorContext = createContext<EnvelopeEditorProviderValue | null>(null);
 
+export const useOptionalEnvelopeEditor = () => useContext(EnvelopeEditorContext);
+
 export const useCurrentEnvelopeEditor = () => {
-  const context = useContext(EnvelopeEditorContext);
+  const context = useOptionalEnvelopeEditor();
 
   if (!context) {
     throw new Error('useCurrentEnvelopeEditor must be used within a EnvelopeEditorProvider');

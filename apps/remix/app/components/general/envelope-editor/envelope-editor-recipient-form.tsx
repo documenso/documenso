@@ -14,7 +14,7 @@ import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { isDeepEqual, prop, sortBy } from 'remeda';
+import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -111,38 +111,72 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const recipientSuggestions = recipientSuggestionsData?.results || [];
 
-  const defaultRecipients = [
-    {
-      formId: initialId,
-      name: '',
-      email: '',
-      role: RecipientRole.SIGNER,
-      signingOrder: 1,
-      actionAuth: [],
-    },
-  ];
+  type TSignerForm = TEnvelopeRecipientsForm['signers'][number];
+
+  const defaultRecipients = useMemo<TSignerForm[]>(
+    () => [
+      {
+        formId: initialId,
+        id: undefined,
+        name: '',
+        email: '',
+        role: RecipientRole.SIGNER,
+        signingOrder: 1,
+        actionAuth: [],
+      },
+    ],
+    [initialId],
+  );
+
+  const sortSigners = useCallback((signers: TSignerForm[]) => {
+    return [...signers].sort((a, b) => {
+      const signingOrderDiff = (a.signingOrder ?? 0) - (b.signingOrder ?? 0);
+
+      if (signingOrderDiff !== 0) {
+        return signingOrderDiff;
+      }
+
+      if (a.id && b.id) {
+        return a.id - b.id;
+      }
+
+      if (a.id) {
+        return -1;
+      }
+
+      if (b.id) {
+        return 1;
+      }
+
+      return a.formId.localeCompare(b.formId);
+    });
+  }, []);
+
+  const mapEnvelopeRecipientsToFormSigners = useCallback(() => {
+    if (recipients.length === 0) {
+      return defaultRecipients;
+    }
+
+    const mappedRecipients = recipients.map(
+      (recipient, index): TSignerForm => ({
+        id: recipient.id,
+        formId: String(recipient.id),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder ?? index + 1,
+        actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? [],
+      }),
+    );
+
+    return sortSigners(mappedRecipients);
+  }, [recipients, defaultRecipients, sortSigners]);
 
   const form = useForm<TEnvelopeRecipientsForm>({
     resolver: zodResolver(ZEnvelopeRecipientsForm),
-    mode: 'onChange', // Used for autosave purposes, maybe can try onBlur instead?
+    mode: 'onChange',
     defaultValues: {
-      signers:
-        recipients.length > 0
-          ? sortBy(
-              recipients.map((recipient, index) => ({
-                id: recipient.id,
-                formId: String(recipient.id),
-                name: recipient.name,
-                email: recipient.email,
-                role: recipient.role,
-                signingOrder: recipient.signingOrder ?? index + 1,
-                actionAuth:
-                  ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
-              })),
-              [prop('signingOrder'), 'asc'],
-              [prop('id'), 'asc'],
-            )
-          : defaultRecipients,
+      signers: mapEnvelopeRecipientsToFormSigners(),
       signingOrder: envelope.documentMeta.signingOrder,
       allowDictateNextSigner: envelope.documentMeta.allowDictateNextSigner,
     },
@@ -453,6 +487,33 @@ export const EnvelopeEditorRecipientForm = () => {
     void form.trigger();
   }, [form]);
 
+  useEffect(() => {
+    const expectedSigners = mapEnvelopeRecipientsToFormSigners();
+    const currentSigners = form.getValues('signers');
+    const hasSignersChanged = !isDeepEqual<TSignerForm[]>(expectedSigners, currentSigners);
+
+    const hasSigningOrderChanged =
+      form.getValues('signingOrder') !== envelope.documentMeta.signingOrder;
+
+    const hasAllowDictateNextSignerChanged =
+      form.getValues('allowDictateNextSigner') !== envelope.documentMeta.allowDictateNextSigner;
+
+    if (!hasSignersChanged && !hasSigningOrderChanged && !hasAllowDictateNextSignerChanged) {
+      return;
+    }
+
+    form.reset({
+      signers: expectedSigners,
+      signingOrder: envelope.documentMeta.signingOrder,
+      allowDictateNextSigner: envelope.documentMeta.allowDictateNextSigner,
+    });
+  }, [
+    form,
+    envelope.documentMeta.signingOrder,
+    envelope.documentMeta.allowDictateNextSigner,
+    mapEnvelopeRecipientsToFormSigners,
+  ]);
+
   // Dupecode/Inefficient: Done because native isValid won't work for our usecase.
   useEffect(() => {
     if (isFirstRender.current) {
@@ -570,7 +631,7 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
+            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
               {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -634,7 +695,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-muted-foreground ml-1 cursor-help">
+                          <span className="ml-1 cursor-help text-muted-foreground">
                             <HelpCircleIcon className="h-3.5 w-3.5" />
                           </span>
                         </TooltipTrigger>
@@ -679,7 +740,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-muted-foreground ml-1 cursor-help">
+                            <span className="ml-1 cursor-help text-muted-foreground">
                               <HelpCircleIcon className="h-3.5 w-3.5" />
                             </span>
                           </TooltipTrigger>
@@ -732,7 +793,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'bg-widget-foreground pointer-events-none rounded-md pt-2':
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
                                 snapshot.isDragging,
                             })}
                           >
