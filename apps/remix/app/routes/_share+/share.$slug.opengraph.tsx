@@ -1,9 +1,9 @@
 import satori from 'satori';
-import sharp from 'sharp';
 import { P, match } from 'ts-pattern';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { getRecipientOrSenderByShareLinkSlug } from '@documenso/lib/server-only/document/get-recipient-or-sender-by-share-link-slug';
+import { convertSVGToPNG } from '@documenso/lib/utils/image-helpers';
 
 import type { Route } from './+types/share.$slug.opengraph';
 
@@ -181,8 +181,7 @@ export const loader = async ({ params }: Route.LoaderArgs) => {
     },
   );
 
-  // Convert SVG to PNG using sharp
-  const pngBuffer = await sharp(Buffer.from(svg)).toFormat('png').toBuffer();
+  const pngBuffer = await convertSVGToPNG(svg);
 
   return new Response(pngBuffer, {
     headers: {
