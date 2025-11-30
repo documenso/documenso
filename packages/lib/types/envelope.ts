@@ -63,7 +63,10 @@ export const ZEnvelopeSchema = EnvelopeSchema.pick({
     id: true,
     title: true,
     order: true,
-  }).array(),
+    documentDataId: true,
+  })
+    .partial({ documentDataId: true })
+    .array(),
   directLink: TemplateDirectLinkSchema.pick({
     directTemplateRecipientId: true,
     enabled: true,

@@ -174,18 +174,12 @@ export default function EnvelopeEditorFieldsPageRenderer() {
    * Initialize the Konva page canvas and all fields and interactions.
    */
   const createPageCanvas = (currentStage: Konva.Stage, currentPageLayer: Konva.Layer) => {
-    // Initialize snap guides layer
-    // snapGuideLayer.current = initializeSnapGuides(stage.current);
-
-    // Add transformer for resizing and rotating.
     interactiveTransformer.current = createInteractiveTransformer(currentStage, currentPageLayer);
 
-    // Render the fields.
     for (const field of localPageFields) {
       renderFieldOnLayer(field);
     }
 
-    // Handle stage click to deselect.
     currentStage.on('mousedown', (e) => {
       removePendingField();
 
@@ -270,7 +264,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     let y2: number;
 
     currentStage.on('mousedown touchstart', (e) => {
-      // do nothing if we mousedown on any shape
       if (e.target !== currentStage) {
         return;
       }
@@ -296,7 +289,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     });
 
     currentStage.on('mousemove touchmove', () => {
-      // do nothing if we didn't start selection
       if (!selectionRectangle.visible()) {
         return;
       }
@@ -321,7 +313,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     });
 
     currentStage.on('mouseup touchend', () => {
-      // do nothing if we didn't start selection
       if (!selectionRectangle.visible()) {
         return;
       }
@@ -375,34 +366,25 @@ export default function EnvelopeEditorFieldsPageRenderer() {
         return;
       }
 
-      // If empty area clicked, remove all selections
       if (e.target === stage.current) {
         setSelectedFields([]);
         return;
       }
 
-      // Do nothing if field not clicked, or if field is not editable
       if (!e.target.hasName('field-group') || e.target.draggable() === false) {
         return;
       }
 
-      // do we pressed shift or ctrl?
       const metaPressed = e.evt.shiftKey || e.evt.ctrlKey || e.evt.metaKey;
       const isSelected = transformer.nodes().indexOf(e.target) >= 0;
 
       if (!metaPressed && !isSelected) {
-        // if no key pressed and the node is not selected
-        // select just one
         setSelectedFields([e.target]);
       } else if (metaPressed && isSelected) {
-        // if we pressed keys and node was selected
-        // we need to remove it from selection:
-        const nodes = transformer.nodes().slice(); // use slice to have new copy of array
-        // remove node from array
+        const nodes = transformer.nodes().slice();
         nodes.splice(nodes.indexOf(e.target), 1);
         setSelectedFields(nodes);
       } else if (metaPressed && !isSelected) {
-        // add the node into selection
         const nodes = transformer.nodes().concat([e.target]);
         setSelectedFields(nodes);
       }
@@ -429,12 +411,10 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       }
     });
 
-    // If it exists, rerender.
     localPageFields.forEach((field) => {
       renderFieldOnLayer(field);
     });
 
-    // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
 
     pageLayer.current.batchDraw();

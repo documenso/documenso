@@ -72,7 +72,6 @@ export const OrganisationEmailCreateDialog = ({
   const { mutateAsync: createOrganisationEmail, isPending } =
     trpc.enterprise.organisation.email.create.useMutation();
 
-  // Reset state when dialog closes
   useEffect(() => {
     if (!open) {
       form.reset();

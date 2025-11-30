@@ -15,6 +15,7 @@ import {
 import { nanoid } from '../../universal/id';
 import { createRecipientAuthOptions } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToTemplateId } from '../../utils/envelope';
+import { sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
 export type SetTemplateRecipientsOptions = {
@@ -88,6 +89,7 @@ export const setTemplateRecipients = async ({
 
     return {
       ...recipient,
+      name: sanitizeRecipientName(recipient.name),
       email: recipient.email.toLowerCase(),
     };
   });

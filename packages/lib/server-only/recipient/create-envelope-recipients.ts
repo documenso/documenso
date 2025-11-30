@@ -12,10 +12,10 @@ import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
-import { mapRecipientToLegacyRecipient } from '../../utils/recipients';
+import { mapRecipientToLegacyRecipient, sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface CreateEnvelopeRecipientsOptions {
+export type CreateEnvelopeRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
@@ -28,7 +28,7 @@ export interface CreateEnvelopeRecipientsOptions {
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
   requestMetadata: ApiRequestMetadata;
-}
+};
 
 export const createEnvelopeRecipients = async ({
   userId,
@@ -85,6 +85,7 @@ export const createEnvelopeRecipients = async ({
 
   const normalizedRecipients = recipientsToCreate.map((recipient) => ({
     ...recipient,
+    name: sanitizeRecipientName(recipient.name),
     email: recipient.email.toLowerCase(),
   }));
 

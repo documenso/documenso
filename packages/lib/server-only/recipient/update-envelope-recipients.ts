@@ -18,10 +18,10 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractLegacyIds } from '../../universal/id';
 import { type EnvelopeIdOptions } from '../../utils/envelope';
 import { mapFieldToLegacyField } from '../../utils/fields';
-import { canRecipientBeModified } from '../../utils/recipients';
+import { canRecipientBeModified, sanitizeRecipientName } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 
-export interface UpdateEnvelopeRecipientsOptions {
+export type UpdateEnvelopeRecipientsOptions = {
   userId: number;
   teamId: number;
   id: EnvelopeIdOptions;
@@ -35,7 +35,7 @@ export interface UpdateEnvelopeRecipientsOptions {
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
   requestMetadata: ApiRequestMetadata;
-}
+};
 
 export const updateEnvelopeRecipients = async ({
   userId,
@@ -108,9 +108,18 @@ export const updateEnvelopeRecipients = async ({
       });
     }
 
+    const sanitizedUpdateData = {
+      ...recipient,
+      ...(recipient.name !== undefined
+        ? {
+            name: sanitizeRecipientName(recipient.name),
+          }
+        : {}),
+    };
+
     return {
       originalRecipient,
-      updateData: recipient,
+      updateData: sanitizedUpdateData,
     };
   });
 
