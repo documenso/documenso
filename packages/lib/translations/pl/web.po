@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-11-27 05:32\n"
+"PO-Revision-Date: 2025-11-27 18:05\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -944,7 +944,7 @@ msgstr "Akcje"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.members.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._index.tsx
 msgid "Active"
-msgstr "Aktywny"
+msgstr "Aktywne"
 
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -1239,7 +1239,7 @@ msgstr "Wszystkie wstawione podpisy zostaną unieważnione"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
-msgstr "Wszyscy odbiorcy podpisali. Dokument jest przetwarzany i wkrótce otrzymasz jego kopię e‑mailem."
+msgstr "Wszyscy odbiorcy podpisali dokument. Dokument jest przetwarzany i wkrótce otrzymasz jego kopię."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "All recipients will be notified"
@@ -2817,6 +2817,10 @@ msgstr "Utworzono {0}"
 msgid "CSV Structure"
 msgstr "Struktura CSV"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "Cumulative MAU (signed in)"
+msgstr "Łączna liczba MAU (zalogowani)"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "Obecna"
@@ -3098,7 +3102,7 @@ msgstr "Szczegóły"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Developer Mode"
-msgstr "Tryb deweloperski"
+msgstr "Tryb programisty"
 
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
@@ -3712,7 +3716,7 @@ msgstr "Przeciągnij i upuść plik PDF"
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Draw signature"
 msgid "Draw"
-msgstr "Rysuj"
+msgstr "Rysowany"
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drop your document here"
@@ -4252,7 +4256,7 @@ msgstr "Wszyscy podpisali"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "Everyone has signed! You will receive an email copy of the signed document."
-msgstr "Wszyscy podpisali! Otrzymasz kopię podpisanego dokumentu e‑mailem."
+msgstr "Wszyscy podpisali! Otrzymasz wiadomość z podpisanym dokumentem."
 
 #: apps/remix/app/components/dialogs/passkey-create-dialog.tsx
 msgid "Exceeded timeout"
@@ -4833,7 +4837,7 @@ msgstr "Uwaga: Co to oznacza"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Inactive"
-msgstr "Nieaktywne"
+msgstr "Nieaktywna"
 
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/app-nav-mobile.tsx
@@ -5204,7 +5208,7 @@ msgstr "Wygenerowane linki"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Listening to"
-msgstr "Nasłuchuje"
+msgstr "Nasłuchiwanie"
 
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Load older activity"
@@ -5248,7 +5252,7 @@ msgstr "Zaloguj się"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 msgid "Logs"
-msgstr "Dzienniki"
+msgstr "Logi"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -5288,7 +5292,7 @@ msgstr "Zarządzaj płatnościami"
 
 #: apps/remix/app/routes/_authenticated+/settings+/billing.tsx
 msgid "Manage billing and subscriptions for organisations where you have billing management permissions."
-msgstr "Zarządzaj rozliczeniami i subskrypcjami dla organizacji, w których masz uprawnienia do zarządzania rozliczeniami."
+msgstr "Zarządzaj płatnościami i subskrypcjami organizacji, w których masz uprawnienia do zarządzania płatnościami."
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "Manage details for this public template"
@@ -6188,7 +6192,7 @@ msgstr "Hasło zostało zaktualizowane!"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "Past Due"
-msgstr "Po terminie"
+msgstr "Przeterminowana"
 
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
 #: apps/remix/app/components/general/organisations/organisation-billing-banner.tsx
@@ -6408,7 +6412,7 @@ msgstr "Otwórz aplikację uwierzytelniającą i wpisz 6-cyfrowy kod dla tego do
 
 #: apps/remix/app/components/general/document-signing/document-signing-reject-dialog.tsx
 msgid "Please provide a reason for rejecting this document"
-msgstr "Podaj powód odrzucenia tego dokumentu"
+msgstr "Podaj powód odrzucenia dokumentu"
 
 #: apps/remix/app/components/forms/2fa/disable-authenticator-app-dialog.tsx
 msgid "Please provide a token from the authenticator, or a backup code. If you do not have a backup code available, please contact support."
@@ -7130,7 +7134,7 @@ msgstr "Szukaj tytułu dokumentu"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Search by ID"
-msgstr "Szukaj po ID"
+msgstr "Szukaj identyfikatora"
 
 #: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 msgid "Search by name or email"
@@ -7227,7 +7231,7 @@ msgstr "Wybierz metody dostępu"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
-msgstr "Wybierz typ zdarzenia"
+msgstr "Wybierz rodzaj zdarzenia"
 
 #: apps/remix/app/components/dialogs/sign-field-dropdown-dialog.tsx
 #: packages/ui/primitives/combobox.tsx
@@ -8376,7 +8380,7 @@ msgstr "Szablony umożliwiają szybkie generowanie dokumentów z wcześniej wype
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
-msgstr "Test"
+msgstr "Testuj"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Test Webhook"
@@ -9253,13 +9257,13 @@ msgstr "Weryfikacja dwuetapowa"
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Type"
-msgstr "Typ"
+msgstr "Rodzaj"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Type signature"
 msgid "Type"
-msgstr "Wpisz"
+msgstr "Pisany"
 
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Type a command or search..."
@@ -9556,7 +9560,7 @@ msgstr "Przesłany"
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
 msgctxt "Upload signature"
 msgid "Upload"
-msgstr "Prześlij"
+msgstr "Przesłany"
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Upload a CSV file to create multiple documents from this template. Each row represents one document with its recipient details."
@@ -10346,7 +10350,7 @@ msgstr "Webhook nie został znaleziony"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Webhook successfully sent"
-msgstr "Webhook został pomyślnie wysłany"
+msgstr "Webhook został wysłany"
 
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 msgid "Webhook updated"
@@ -10708,7 +10712,7 @@ msgstr "Nie masz uprawnień do utworzenia tokena dla tego zespołu"
 
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgid "You don't manage billing for any organisations."
-msgstr "Nie zarządzasz rozliczeniami dla żadnej organizacji."
+msgstr "Nie zarządzasz płatnościami żadnej organizacji."
 
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "You don't need to sign it anymore."
@@ -10927,7 +10931,7 @@ msgstr "Kod z aplikacji uwierzytelniającej będzie wymagany podczas logowania."
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "You will receive an email copy of the signed document once everyone has signed."
-msgstr "Otrzymasz kopię podpisanego dokumentu e‑mailem, gdy wszyscy go podpiszą."
+msgstr "Otrzymasz kopię dokumentu, gdy wszyscy go podpiszą."
 
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
 msgid "Your Account"
