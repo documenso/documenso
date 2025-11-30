@@ -2817,6 +2817,10 @@ msgstr "作成日 {0}"
 msgid "CSV Structure"
 msgstr "CSV 構造"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "Cumulative MAU (signed in)"
+msgstr "累積 MAU（サインイン済み）"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "現在"
