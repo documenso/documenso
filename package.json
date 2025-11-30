@@ -7,6 +7,7 @@
   ],
   "version": "2.1.0",
   "scripts": {
+    "postinstall": "patch-package",
     "build": "turbo run build",
     "dev": "turbo run dev --filter=@documenso/remix",
     "dev:remix": "turbo run dev --filter=@documenso/remix",
@@ -60,9 +61,11 @@
     "dotenv-cli": "^11.0.0",
     "eslint": "^8.57.0",
     "husky": "^9.1.7",
+    "kysely": "0.28.8",
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
     "nodemailer": "^7.0.10",
+    "patch-package": "^8.0.1",
     "pdfjs-dist": "5.4.296",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",
@@ -83,6 +86,7 @@
     "zod-prisma-types": "3.3.5"
   },
   "dependencies": {
+    "@ai-sdk/google-vertex": "3.0.81",
     "@documenso/pdf-sign": "^0.1.0",
     "@documenso/prisma": "*",
     "@lingui/conf": "^5.6.0",
