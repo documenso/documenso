@@ -554,16 +554,12 @@ export const DocumentPreferencesForm = ({
                     </Select>
                   )}
 
-                  {field.value !== null && (
+                  {(field.value !== null || !canInherit) && (
                     <div className="space-y-4">
                       <DefaultRecipientsMultiSelectCombobox
                         listValues={recipients}
                         onChange={field.onChange}
-                        organisationId={
-                          !canInherit && !isPersonalOrganisation
-                            ? currentOrganisation.id
-                            : undefined
-                        }
+                        organisationId={!canInherit ? currentOrganisation.id : undefined}
                         teamId={canInherit ? optionalTeam?.id : undefined}
                       />
 
