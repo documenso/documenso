@@ -1,5 +1,7 @@
 import { useState } from 'react';
 
+import { useLingui } from '@lingui/react/macro';
+
 import { cn } from '../../lib/utils';
 
 export type SignaturePadTypeProps = {
@@ -9,6 +11,7 @@ export type SignaturePadTypeProps = {
 };
 
 export const SignaturePadType = ({ className, value, onChange }: SignaturePadTypeProps) => {
+  const { t } = useLingui();
   // Colors don't actually work for text.
   const [selectedColor, setSelectedColor] = useState('black');
 
@@ -16,7 +19,7 @@ export const SignaturePadType = ({ className, value, onChange }: SignaturePadTyp
     <div className={cn('flex h-full w-full items-center justify-center', className)}>
       <input
         data-testid="signature-pad-type-input"
-        placeholder="Type your signature"
+        placeholder={t`Type your signature`}
         className="font-signature w-full bg-transparent px-4 text-center text-7xl text-black placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white"
         // style={{ color: selectedColor }}
         value={value}

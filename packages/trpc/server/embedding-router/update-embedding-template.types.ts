@@ -21,7 +21,7 @@ import {
   ZFieldPageYSchema,
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
 
@@ -44,11 +44,25 @@ export const ZUpdateEmbeddingTemplateRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: z.string().email(),
-      name: z.string().optional(),
-      role: z.nativeEnum(RecipientRole).optional(),
+      email: z.union([z.string().length(0), z.string().email()]),
+      name: z.string(),
+      role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
-      fields: z.array(ZFieldSchema).optional(),
+      // We have an any cast so any changes here you need to update it in the embeding document edit page
+      // Search: "map<any>" to find it
+      fields: ZFieldAndMetaSchema.and(
+        z.object({
+          id: z.number().optional(),
+          pageNumber: ZFieldPageNumberSchema,
+          pageX: ZFieldPageXSchema,
+          pageY: ZFieldPageYSchema,
+          width: ZFieldWidthSchema,
+          height: ZFieldHeightSchema,
+          envelopeItemId: z.string(),
+        }),
+      )
+        .array()
+        .optional(),
     }),
   ),
   meta: z

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { msg } from '@lingui/core/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import { useSearchParams } from 'react-router';
@@ -48,6 +48,7 @@ export function DocumentSigningRejectDialog({
   onRejected,
   trigger,
 }: DocumentSigningRejectDialogProps) {
+  const { t } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -141,7 +142,7 @@ export function DocumentSigningRejectDialog({
                     <Textarea
                       {...field}
                       rows={4}
-                      placeholder="Please provide a reason for rejecting this document"
+                      placeholder={t`Please provide a reason for rejecting this document`}
                       disabled={form.formState.isSubmitting}
                     />
                   </FormControl>

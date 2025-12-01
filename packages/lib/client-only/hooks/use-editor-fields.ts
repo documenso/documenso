@@ -170,10 +170,15 @@ export const useEditorFields = ({
   );
 
   const setFieldId = (formId: string, id: number) => {
-    const index = localFields.findIndex((field) => field.formId === formId);
+    const { fields } = form.getValues();
+
+    const index = fields.findIndex((field) => field.formId === formId);
 
     if (index !== -1) {
-      form.setValue(`fields.${index}.id`, id);
+      update(index, {
+        ...fields[index],
+        id,
+      });
     }
   };
 

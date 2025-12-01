@@ -1,3 +1,6 @@
+> 🚨 🚨 🚨
+> Documenso 2.0.0 is live on Product Hunt 🎉 <a href="https://documen.so/launch" target="_blank" rel="noopener noreferrer" style="text-decoration: underline;">Join us to celebrate the best Documenso yet 🪩</a>
+
 <img src="https://github.com/documenso/documenso/assets/13398220/a643571f-0239-46a6-a73e-6bef38d1228b" alt="Documenso Logo">
 
 <p align="center" style="margin-top: 20px">
@@ -171,9 +174,11 @@ git clone https://github.com/<your-username>/documenso
 
 5. Create the database schema by running `npm run prisma:migrate-dev`
 
-6. Run `npm run dev` in the root directory to start
+6. Run `npm run translate:compile` in the root directory to compile lingui
 
-7. Register a new user at http://localhost:3000/signup
+7. Run `npm run dev` in the root directory to start
+
+8. Register a new user at http://localhost:3000/signup
 
 ---
 
