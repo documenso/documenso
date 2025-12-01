@@ -1,6 +1,10 @@
+import { Trans } from '@lingui/react/macro';
+import { Link } from 'react-router';
+
 import { getOrganisationDetailedInsights } from '@documenso/lib/server-only/admin/get-organisation-detailed-insights';
 import type { DateRange } from '@documenso/lib/types/search-params';
 import { getAdminOrganisation } from '@documenso/trpc/server/admin-router/get-admin-organisation';
+import { Button } from '@documenso/ui/primitives/button';
 
 import { OrganisationInsightsTable } from '~/components/tables/organisation-insights-table';
 
@@ -38,12 +42,17 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 }
 
 export default function OrganisationInsights({ loaderData }: Route.ComponentProps) {
-  const { insights, page, perPage, dateRange, view, organisationName } = loaderData;
+  const { insights, page, perPage, dateRange, view, organisationName, organisationId } = loaderData;
 
   return (
     <div>
       <div className="flex items-center justify-between">
         <h2 className="text-4xl font-semibold">{organisationName}</h2>
+        <Button variant="outline" asChild>
+          <Link to={`/admin/organisations/${organisationId}`}>
+            <Trans>Manage organisation</Trans>
+          </Link>
+        </Button>
       </div>
       <div className="mt-8">
         <OrganisationInsightsTable

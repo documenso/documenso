@@ -33,25 +33,32 @@ export async function getSigningVolume({
 
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .leftJoin('Team as t', 'o.id', 't.organisationId')
-    .leftJoin('Envelope as e', (join) =>
-      join
-        .onRef('t.id', '=', 'e.teamId')
-        .on('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('e.deletedAt', 'is', null)
-        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
-    )
     .where((eb) =>
-      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
+      eb.or([
+        eb('o.name', 'ilike', `%${search}%`),
+        eb.exists(
+          eb
+            .selectFrom('Team as t')
+            .whereRef('t.organisationId', '=', 'o.id')
+            .where('t.name', 'ilike', `%${search}%`),
+        ),
+      ]),
     )
-    .select([
+    .select((eb) => [
       'o.id as id',
       'o.createdAt as createdAt',
       'o.customerId as customerId',
       sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT e.id)`.as('signingVolume'),
-    ])
-    .groupBy(['o.id', 'o.name', 'o.customerId']);
+      eb
+        .selectFrom('Envelope as e')
+        .innerJoin('Team as t', 't.id', 'e.teamId')
+        .whereRef('t.organisationId', '=', 'o.id')
+        .where('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .where('e.deletedAt', 'is', null)
+        .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+        .select(sql<number>`count(e.id)`.as('count'))
+        .as('signingVolume'),
+    ]);
 
   switch (sortBy) {
     case 'name':
@@ -71,11 +78,18 @@ export async function getSigningVolume({
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .leftJoin('Team as t', 'o.id', 't.organisationId')
     .where((eb) =>
-      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
+      eb.or([
+        eb('o.name', 'ilike', `%${search}%`),
+        eb.exists(
+          eb
+            .selectFrom('Team as t')
+            .whereRef('t.organisationId', '=', 'o.id')
+            .where('t.name', 'ilike', `%${search}%`),
+        ),
+      ]),
     )
-    .select(() => [sql<number>`COUNT(DISTINCT o.id)`.as('count')]);
+    .select(({ fn }) => [fn.countAll().as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 
@@ -104,64 +118,77 @@ export async function getOrganisationInsights({
   const offset = Math.max(page - 1, 0) * perPage;
 
   const now = new Date();
-  let dateCondition = sql`1=1`;
+  let dateCondition = sql<boolean>`1=1`;
 
   if (startDate && endDate) {
-    dateCondition = sql`e."createdAt" >= ${startDate} AND e."createdAt" <= ${endDate}`;
+    dateCondition = sql<boolean>`e."createdAt" >= ${startDate} AND e."createdAt" <= ${endDate}`;
   } else {
     switch (dateRange) {
       case 'last30days': {
         const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-        dateCondition = sql`e."createdAt" >= ${thirtyDaysAgo}`;
+        dateCondition = sql<boolean>`e."createdAt" >= ${thirtyDaysAgo}`;
         break;
       }
       case 'last90days': {
         const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
-        dateCondition = sql`e."createdAt" >= ${ninetyDaysAgo}`;
+        dateCondition = sql<boolean>`e."createdAt" >= ${ninetyDaysAgo}`;
         break;
       }
       case 'lastYear': {
         const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        dateCondition = sql`e."createdAt" >= ${oneYearAgo}`;
+        dateCondition = sql<boolean>`e."createdAt" >= ${oneYearAgo}`;
         break;
       }
       case 'allTime':
       default:
-        dateCondition = sql`1=1`;
+        dateCondition = sql<boolean>`1=1`;
         break;
     }
   }
 
   let findQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .leftJoin('Team as t', 'o.id', 't.organisationId')
-    .leftJoin('Envelope as e', (join) =>
-      join
-        .onRef('t.id', '=', 'e.teamId')
-        .on('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
-        .on('e.deletedAt', 'is', null)
-        .on('e.type', '=', sql.lit(EnvelopeType.DOCUMENT)),
-    )
-    .leftJoin('OrganisationMember as om', 'o.id', 'om.organisationId')
     .leftJoin('Subscription as s', 'o.id', 's.organisationId')
     .where((eb) =>
-      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
+      eb.or([
+        eb('o.name', 'ilike', `%${search}%`),
+        eb.exists(
+          eb
+            .selectFrom('Team as t')
+            .whereRef('t.organisationId', '=', 'o.id')
+            .where('t.name', 'ilike', `%${search}%`),
+        ),
+      ]),
     )
-    .select([
+    .select((eb) => [
       'o.id as id',
       'o.createdAt as createdAt',
       'o.customerId as customerId',
       sql<string>`COALESCE(o.name, 'Unknown')`.as('name'),
-      sql<number>`COUNT(DISTINCT CASE WHEN e.id IS NOT NULL AND ${dateCondition} THEN e.id END)`.as(
-        'signingVolume',
-      ),
-      sql<number>`GREATEST(COUNT(DISTINCT t.id), 1)`.as('teamCount'),
-      sql<number>`COUNT(DISTINCT om."userId")`.as('memberCount'),
       sql<string>`CASE WHEN s.status IS NOT NULL THEN s.status ELSE NULL END`.as(
         'subscriptionStatus',
       ),
-    ])
-    .groupBy(['o.id', 'o.name', 'o.customerId', 's.status']);
+      eb
+        .selectFrom('Team as t')
+        .whereRef('t.organisationId', '=', 'o.id')
+        .select(sql<number>`count(t.id)`.as('count'))
+        .as('teamCount'),
+      eb
+        .selectFrom('OrganisationMember as om')
+        .whereRef('om.organisationId', '=', 'o.id')
+        .select(sql<number>`count(om.id)`.as('count'))
+        .as('memberCount'),
+      eb
+        .selectFrom('Envelope as e')
+        .innerJoin('Team as t', 't.id', 'e.teamId')
+        .whereRef('t.organisationId', '=', 'o.id')
+        .where('e.status', '=', sql.lit(DocumentStatus.COMPLETED))
+        .where('e.deletedAt', 'is', null)
+        .where('e.type', '=', sql.lit(EnvelopeType.DOCUMENT))
+        .where(dateCondition)
+        .select(sql<number>`count(e.id)`.as('count'))
+        .as('signingVolume'),
+    ]);
 
   switch (sortBy) {
     case 'name':
@@ -181,11 +208,18 @@ export async function getOrganisationInsights({
 
   const countQuery = kyselyPrisma.$kysely
     .selectFrom('Organisation as o')
-    .leftJoin('Team as t', 'o.id', 't.organisationId')
     .where((eb) =>
-      eb.or([eb('o.name', 'ilike', `%${search}%`), eb('t.name', 'ilike', `%${search}%`)]),
+      eb.or([
+        eb('o.name', 'ilike', `%${search}%`),
+        eb.exists(
+          eb
+            .selectFrom('Team as t')
+            .whereRef('t.organisationId', '=', 'o.id')
+            .where('t.name', 'ilike', `%${search}%`),
+        ),
+      ]),
     )
-    .select(() => [sql<number>`COUNT(DISTINCT o.id)`.as('count')]);
+    .select(({ fn }) => [fn.countAll().as('count')]);
 
   const [results, [{ count }]] = await Promise.all([findQuery.execute(), countQuery.execute()]);
 

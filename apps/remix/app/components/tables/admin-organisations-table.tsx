@@ -113,7 +113,11 @@ export const AdminOrganisationsTable = ({
                 isPaid ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
               }`}
             >
-              {isPaid ? t`Paid` : t`Free`}
+              {isPaid ? (
+                <Trans context="Subscription status">Paid</Trans>
+              ) : (
+                <Trans context="Subscription status">Free</Trans>
+              )}
             </div>
           );
         },
@@ -131,7 +135,7 @@ export const AdminOrganisationsTable = ({
               <ExternalLinkIcon className="h-4 w-4" />
             </Link>
           ) : (
-            'None'
+            <Trans>None</Trans>
           ),
       },
       {

@@ -44,7 +44,7 @@ export async function loader({ request }: Route.LoaderArgs) {
   const typedOrganisations: OrganisationOverview[] = organisations.map((item) => ({
     id: String(item.id),
     name: item.name || '',
-    signingVolume: item.signingVolume,
+    signingVolume: item.signingVolume || 0,
     createdAt: item.createdAt || new Date(),
     customerId: item.customerId || '',
     subscriptionStatus: item.subscriptionStatus,

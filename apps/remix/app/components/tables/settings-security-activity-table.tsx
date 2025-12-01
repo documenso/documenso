@@ -104,7 +104,7 @@ export const SettingsSecurityActivityTable = () => {
         },
       },
       {
-        header: 'IP Address',
+        header: _(msg`IP Address`),
         accessorKey: 'ipAddress',
         cell: ({ row }) => row.original.ipAddress ?? 'N/A',
       },

@@ -57,17 +57,24 @@ export const EnvelopeSignerCompleteDialog = () => {
       return;
     }
 
-    if (nextField.envelopeItemId !== currentEnvelopeItem?.id) {
+    const isEnvelopeItemSwitch = nextField.envelopeItemId !== currentEnvelopeItem?.id;
+
+    if (isEnvelopeItemSwitch) {
       setCurrentEnvelopeItem(nextField.envelopeItemId);
     }
 
-    const fieldTooltip = document.querySelector(`#field-tooltip`);
-
-    if (fieldTooltip) {
-      fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-
     setShowPendingFieldTooltip(true);
+
+    setTimeout(
+      () => {
+        const fieldTooltip = document.querySelector(`#field-tooltip`);
+
+        if (fieldTooltip) {
+          fieldTooltip.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      },
+      isEnvelopeItemSwitch ? 150 : 50,
+    );
   };
 
   const handleOnCompleteClick = async (
