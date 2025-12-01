@@ -3,7 +3,7 @@ import sharp from 'sharp';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { prisma } from '@documenso/prisma';
 
-import type { Route } from './+types/branding.logo.team.$teamId';
+import type { Route } from './+types/branding.logo.organisation.$orgId';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const organisationId = params.orgId;
@@ -69,7 +69,7 @@ export async function loader({ params }: Route.LoaderArgs) {
     })
     .toBuffer();
 
-  return new Response(img, {
+  return new Response(Buffer.from(img), {
     headers: {
       'Content-Type': 'image/png',
       'Content-Length': img.length.toString(),

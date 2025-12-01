@@ -21,6 +21,8 @@ export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   columnVisibility?: VisibilityState;
   data: TData[];
+  onRowClick?: (row: TData) => void;
+  rowClassName?: string;
   perPage?: number;
   currentPage?: number;
   totalPages?: number;
@@ -52,6 +54,8 @@ export function DataTable<TData, TValue>({
   hasFilters,
   onClearFilters,
   onPaginationChange,
+  onRowClick,
+  rowClassName,
   children,
   emptyState,
 }: DataTableProps<TData, TValue>) {
@@ -116,7 +120,12 @@ export function DataTable<TData, TValue>({
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id} data-state={row.getIsSelected() && 'selected'}>
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                  className={rowClassName}
+                  onClick={() => onRowClick?.(row.original)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}

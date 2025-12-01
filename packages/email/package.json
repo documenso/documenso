@@ -13,36 +13,36 @@
   ],
   "scripts": {
     "dev": "email dev --port 3002 --dir templates",
-    "clean": "rimraf node_modules",
-    "worker:test": "tsup worker/index.ts --format esm"
+    "clean": "rimraf node_modules"
   },
   "dependencies": {
     "@documenso/tailwind-config": "*",
-    "@documenso/nodemailer-resend": "2.0.0",
-    "@react-email/body": "0.0.4",
-    "@react-email/button": "0.0.11",
-    "@react-email/column": "0.0.8",
-    "@react-email/container": "0.0.10",
-    "@react-email/font": "0.0.4",
-    "@react-email/head": "0.0.6",
-    "@react-email/heading": "0.0.9",
-    "@react-email/hr": "0.0.6",
-    "@react-email/html": "0.0.6",
-    "@react-email/img": "0.0.6",
-    "@react-email/link": "0.0.6",
-    "@react-email/preview": "0.0.7",
-    "@react-email/render": "0.0.9",
-    "@react-email/row": "0.0.6",
-    "@react-email/section": "0.0.10",
-    "@react-email/tailwind": "0.0.9",
-    "@react-email/text": "0.0.6",
-    "nodemailer": "^6.10.1",
-    "react-email": "1.9.5",
-    "resend": "2.0.0"
+    "@documenso/nodemailer-resend": "4.0.0",
+    "@react-email/body": "0.2.0",
+    "@react-email/button": "0.2.0",
+    "@react-email/code-block": "0.2.0",
+    "@react-email/code-inline": "0.0.5",
+    "@react-email/column": "0.0.13",
+    "@react-email/container": "0.0.15",
+    "@react-email/font": "0.0.9",
+    "@react-email/head": "0.0.12",
+    "@react-email/heading": "0.0.15",
+    "@react-email/hr": "0.0.11",
+    "@react-email/html": "0.0.11",
+    "@react-email/img": "0.0.11",
+    "@react-email/link": "0.0.12",
+    "@react-email/preview": "0.0.13",
+    "@react-email/render": "0.0.17",
+    "@react-email/row": "0.0.12",
+    "@react-email/section": "0.0.16",
+    "@react-email/tailwind": "^2.0.1",
+    "@react-email/text": "0.1.5",
+    "nodemailer": "^7.0.10",
+    "react-email": "^5.0.4",
+    "resend": "^6.5.2"
   },
   "devDependencies": {
     "@documenso/tsconfig": "*",
-    "@types/nodemailer": "^6.4.14",
-    "tsup": "^7.1.0"
+    "@types/nodemailer": "^6.4.21"
   }
 }
