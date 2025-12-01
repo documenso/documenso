@@ -95,6 +95,11 @@ export const ZDocumentMetaDistributionMethodSchema = z
   .nativeEnum(DocumentDistributionMethod)
   .describe('The distribution method to use when sending the document to the recipients.');
 
+export const ZDocumentMetaExternalIdSchema = z
+  .string()
+  .max(255)
+  .describe('A custom external ID you can use to identify the document.');
+
 export const ZDocumentMetaTypedSignatureEnabledSchema = z
   .boolean()
   .describe('Whether to allow recipients to sign using a typed signature.');
