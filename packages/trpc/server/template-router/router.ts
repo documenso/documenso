@@ -497,6 +497,7 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
+        externalId: override?.externalId,
         override,
         attachments,
       });
