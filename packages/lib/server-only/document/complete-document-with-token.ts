@@ -283,15 +283,13 @@ export const completeDocumentWithToken = async ({
     });
   });
 
-  if (recipientEmail) {
-    await jobs.triggerJob({
-      name: 'send.recipient.signed.email',
-      payload: {
-        documentId: legacyDocumentId,
-        recipientId: recipient.id,
-      },
-    });
-  }
+  await jobs.triggerJob({
+    name: 'send.recipient.signed.email',
+    payload: {
+      documentId: legacyDocumentId,
+      recipientId: recipient.id,
+    },
+  });
 
   const pendingRecipients = await prisma.recipient.findMany({
     select: {
