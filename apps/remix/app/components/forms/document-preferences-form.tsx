@@ -3,7 +3,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType, RecipientRole } from '@prisma/client';
+import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -16,7 +16,6 @@ import {
   SUPPORTED_LANGUAGE_CODES,
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
-import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
 import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
 import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
@@ -25,9 +24,12 @@ import {
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
+import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
@@ -326,7 +328,7 @@ export const DocumentPreferencesForm = ({
                     }))}
                     selectedValues={field.value}
                     onChange={field.onChange}
-                    className="bg-background w-full"
+                    className="w-full bg-background"
                     enableSearch={false}
                     emptySelectionPlaceholder={
                       canInherit ? t`Inherit from organisation` : t`Select signature types`
@@ -392,7 +394,7 @@ export const DocumentPreferencesForm = ({
                   </FormControl>
 
                   <div className="pt-2">
-                    <div className="text-muted-foreground text-xs font-medium">
+                    <div className="text-xs font-medium text-muted-foreground">
                       <Trans>Preview</Trans>
                     </div>
 
@@ -563,36 +565,43 @@ export const DocumentPreferencesForm = ({
                         teamId={canInherit ? optionalTeam?.id : undefined}
                       />
 
-                      {recipients.map((recipient, index) => (
-                        <div key={recipient.email} className="flex items-center gap-2">
-                          <span className="flex-1 truncate text-sm">
-                            {recipient.name
-                              ? `${recipient.name} (${recipient.email})`
-                              : recipient.email}
-                          </span>
-                          <Select
-                            value={recipient.role}
-                            onValueChange={(role: RecipientRole) => {
-                              field.onChange(
-                                recipients.map((recipient, idx) =>
-                                  idx === index ? { ...recipient, role } : recipient,
-                                ),
-                              );
-                            }}
+                      {recipients.map((recipient, index) => {
+                        return (
+                          <div
+                            key={recipient.email}
+                            className="flex items-center justify-between gap-3 rounded-lg border p-3"
                           >
-                            <SelectTrigger className="w-32">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {Object.values(RecipientRole).map((role) => (
-                                <SelectItem key={role} value={role}>
-                                  {t(RECIPIENT_ROLES_DESCRIPTION[role].roleName)}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      ))}
+                            <AvatarWithText
+                              avatarFallback={recipientAbbreviation(recipient)}
+                              primaryText={
+                                <span className="text-sm font-medium">
+                                  {recipient.name || recipient.email}
+                                </span>
+                              }
+                              secondaryText={
+                                recipient.name ? (
+                                  <span className="text-xs text-muted-foreground">
+                                    {recipient.email}
+                                  </span>
+                                ) : undefined
+                              }
+                              className="flex-1"
+                            />
+                            <div className="flex items-center gap-2">
+                              <RecipientRoleSelect
+                                value={recipient.role}
+                                onValueChange={(role: RecipientRole) => {
+                                  field.onChange(
+                                    recipients.map((recipient, idx) =>
+                                      idx === index ? { ...recipient, role } : recipient,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 
