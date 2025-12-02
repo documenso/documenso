@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import { Link, redirect } from 'react-router';
+import { Link, redirect, useSearchParams } from 'react-router';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import {
@@ -12,6 +12,7 @@ import {
 } from '@documenso/lib/constants/auth';
 import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
+import { Alert, AlertDescription } from '@documenso/ui/primitives/alert';
 
 import { SignInForm } from '~/components/forms/signin';
 import { appMetaTags } from '~/utils/meta';
@@ -57,7 +58,11 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
     returnTo,
   } = loaderData;
 
+  const [searchParams] = useSearchParams();
   const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
+
+  const errorParam = searchParams.get('error');
+  const isSignupDomainNotAllowed = errorParam === 'SIGNUP_DOMAIN_NOT_ALLOWED';
 
   useEffect(() => {
     const hash = window.location.hash.slice(1);
@@ -69,12 +74,22 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <div className="border-border dark:bg-background z-10 rounded-xl border bg-neutral-100 p-6">
+      <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
+        {isSignupDomainNotAllowed && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>
+              <Trans>
+                Signups are restricted to specific email domains. Your email domain is not allowed.
+              </Trans>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <h1 className="text-2xl font-semibold">
           <Trans>Sign in to your account</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>Welcome back, we are lucky to have you.</Trans>
         </p>
         <hr className="-mx-6 my-4" />
@@ -88,7 +103,7 @@ export default function SignIn({ loaderData }: Route.ComponentProps) {
         />
 
         {!isEmbeddedRedirect && env('NEXT_PUBLIC_DISABLE_SIGNUP') !== 'true' && (
-          <p className="text-muted-foreground mt-6 text-center text-sm">
+          <p className="mt-6 text-center text-sm text-muted-foreground">
             <Trans>
               Don't have an account?{' '}
               <Link

@@ -4,6 +4,7 @@ import {
   IS_GOOGLE_SSO_ENABLED,
   IS_MICROSOFT_SSO_ENABLED,
   IS_OIDC_SSO_ENABLED,
+  getAllowedSignupDomains,
 } from '@documenso/lib/constants/auth';
 import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
@@ -24,6 +25,7 @@ export function loader({ request }: Route.LoaderArgs) {
   const isGoogleSSOEnabled = IS_GOOGLE_SSO_ENABLED;
   const isMicrosoftSSOEnabled = IS_MICROSOFT_SSO_ENABLED;
   const isOIDCSSOEnabled = IS_OIDC_SSO_ENABLED;
+  const allowedSignupDomains = getAllowedSignupDomains();
 
   if (NEXT_PUBLIC_DISABLE_SIGNUP === 'true') {
     throw redirect('/signin');
@@ -38,11 +40,18 @@ export function loader({ request }: Route.LoaderArgs) {
     isMicrosoftSSOEnabled,
     isOIDCSSOEnabled,
     returnTo,
+    allowedSignupDomains,
   };
 }
 
 export default function SignUp({ loaderData }: Route.ComponentProps) {
-  const { isGoogleSSOEnabled, isMicrosoftSSOEnabled, isOIDCSSOEnabled, returnTo } = loaderData;
+  const {
+    isGoogleSSOEnabled,
+    isMicrosoftSSOEnabled,
+    isOIDCSSOEnabled,
+    returnTo,
+    allowedSignupDomains,
+  } = loaderData;
 
   return (
     <SignUpForm
@@ -51,6 +60,7 @@ export default function SignUp({ loaderData }: Route.ComponentProps) {
       isMicrosoftSSOEnabled={isMicrosoftSSOEnabled}
       isOIDCSSOEnabled={isOIDCSSOEnabled}
       returnTo={returnTo}
+      allowedSignupDomains={allowedSignupDomains}
     />
   );
 }
