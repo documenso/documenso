@@ -1,5 +1,7 @@
 import { useCallback, useState } from 'react';
 
+import type { I18n } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import type { Field, Recipient } from '@prisma/client';
@@ -39,10 +41,12 @@ export const EnvelopeRecipientSelector = ({
   fields,
   align = 'start',
 }: EnvelopeRecipientSelectorProps) => {
+  const { i18n } = useLingui();
+
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => extractRecipientLabel(recipient, recipients),
+    (recipient: Recipient) => extractRecipientLabel(recipient, recipients, i18n),
     [recipients],
   );
 
@@ -106,7 +110,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   fields,
   placeholder,
 }: EnvelopeRecipientSelectorCommandProps) => {
-  const { t } = useLingui();
+  const { t, i18n } = useLingui();
 
   const recipientsByRole = useCallback(() => {
     const recipientsByRole: Record<RecipientRole, Recipient[]> = {
@@ -156,7 +160,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 
   const getRecipientLabel = useCallback(
-    (recipient: Recipient) => extractRecipientLabel(recipient, recipients),
+    (recipient: Recipient) => extractRecipientLabel(recipient, recipients, i18n),
     [recipients],
   );
 
@@ -251,7 +255,7 @@ export const EnvelopeRecipientSelectorCommand = ({
   );
 };
 
-const extractRecipientLabel = (recipient: Recipient, recipients: Recipient[]) => {
+const extractRecipientLabel = (recipient: Recipient, recipients: Recipient[], i18n: I18n) => {
   if (recipient.name && recipient.email) {
     return `${recipient.name} (${recipient.email})`;
   }
@@ -267,5 +271,5 @@ const extractRecipientLabel = (recipient: Recipient, recipients: Recipient[]) =>
   // Since objects are basically pointers we can use `indexOf` rather than `findIndex`
   const index = recipients.indexOf(recipient);
 
-  return `Recipient ${index + 1}`;
+  return i18n._(msg`Recipient ${index + 1}`);
 };

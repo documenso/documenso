@@ -162,8 +162,7 @@ export const EnvelopeDistributeDialog = ({
       });
 
       return (
-        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) &&
-        !recipient.email
+        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) && !recipient.email
       );
     });
   }, [recipientsWithIndex, envelope.authOptions]);
@@ -476,7 +475,7 @@ export const EnvelopeDistributeDialog = ({
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingSignatureFields.map((recipient) => (
                         <li key={recipient.id}>
-                          {recipient.email || recipient.name || `Recipient ${recipient.index + 1}`}
+                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
                         </li>
                       ))}
                     </ul>
@@ -489,7 +488,7 @@ export const EnvelopeDistributeDialog = ({
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingRequiredEmail.map((recipient) => (
                         <li key={recipient.id}>
-                          {recipient.email || recipient.name || `Recipient ${recipient.index + 1}`}
+                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
                         </li>
                       ))}
                     </ul>
