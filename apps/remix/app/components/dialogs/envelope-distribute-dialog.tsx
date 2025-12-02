@@ -161,7 +161,10 @@ export const EnvelopeDistributeDialog = ({
         recipientAuth: recipient.authOptions,
       });
 
-      return auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired;
+      return (
+        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) &&
+        !recipient.email
+      );
     });
   }, [recipientsWithIndex, envelope.authOptions]);
 
