@@ -249,7 +249,7 @@ export const completeDocumentWithToken = async ({
               },
               {
                 type: RECIPIENT_DIFF_TYPE.EMAIL,
-                from: recipientEmail,
+                from: recipient.email,
                 to: recipientEmail,
               },
             ],
