@@ -12,7 +12,6 @@ import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
   ZDocumentMetaDrawSignatureEnabledSchema,
-  ZDocumentMetaExternalIdSchema,
   ZDocumentMetaLanguageSchema,
   ZDocumentMetaMessageSchema,
   ZDocumentMetaRedirectUrlSchema,
@@ -30,6 +29,7 @@ import {
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
@@ -97,6 +97,7 @@ export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   templateId: z.number(),
+  externalId: ZDocumentExternalIdSchema.optional(),
   recipients: z
     .array(
       z.object({
@@ -153,7 +154,6 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
       emailSettings: ZDocumentEmailSettingsSchema.optional(),
       language: ZDocumentMetaLanguageSchema.optional(),
-      externalId: ZDocumentMetaExternalIdSchema.optional(),
       typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
       uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
       drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
