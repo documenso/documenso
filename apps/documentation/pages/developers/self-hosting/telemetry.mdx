@@ -1,0 +1,85 @@
+# Telemetry
+
+Documenso collects anonymous telemetry data from self-hosted instances to help us understand how the software is being used and make improvements to the product. This telemetry is enabled by default, but you can easily disable it if you prefer.
+
+## What We Collect
+
+We collect minimal, privacy-preserving information that helps us understand the health and adoption of self-hosted installations:
+
+- **App Version**: The version of Documenso you are running. This helps us understand which versions are in use and prioritize support for older versions.
+
+- **Installation ID**: A unique identifier for your installation. This is stored in your database and helps us count distinct installations without knowing who you are.
+
+- **Node ID**: A unique identifier for each server or container instance. This is stored in your operating system's temporary directory and helps us understand deployment patterns (for example, how many instances are running in a cluster).
+
+### What We Don't Collect
+
+We do **not** collect any of the following:
+
+- Personal information about you or your users
+- Document contents or file names
+- User email addresses or names
+- Usage patterns or feature usage statistics
+- Server logs or error messages
+- Any data that could identify your organization or users
+
+## Why We Collect Telemetry
+
+The telemetry data we collect serves several important purposes:
+
+1. **Product Improvement**: Understanding which versions are in use helps us prioritize bug fixes and security updates for the versions that matter most.
+
+2. **Support Planning**: Knowing how many installations exist and their deployment patterns helps us plan support resources and documentation.
+
+3. **Feature Development**: Understanding deployment patterns (like cluster sizes) helps us make better architectural decisions for future features.
+
+4. **Community Health**: Tracking adoption helps us understand the growth of the self-hosted community and allocate resources accordingly.
+
+All of this is done anonymously and in aggregate. We cannot identify you, your organization, or your users from the telemetry data we collect.
+
+## Events We Track
+
+We track two simple events:
+
+- **Server Startup**: Captured once when your server starts. This tells us when installations are first set up or restarted.
+
+- **Server Heartbeat**: Captured every hour while your server is running. This helps us understand how many active installations exist and their uptime patterns.
+
+## How to Disable Telemetry
+
+If you prefer not to send telemetry data, you can disable it by setting an environment variable.
+
+### Using Environment Variables
+
+Add the following to your environment configuration:
+
+```bash
+DOCUMENSO_DISABLE_TELEMETRY=true
+```
+
+### Docker
+
+If you're using Docker, you can set this in your `docker-compose.yml`:
+
+```yaml
+services:
+  app:
+    environment:
+      - DOCUMENSO_DISABLE_TELEMETRY=true
+```
+
+Or pass it when running a container:
+
+```bash
+docker run -e DOCUMENSO_DISABLE_TELEMETRY=true ...
+```
+
+### After Disabling
+
+Once you set `DOCUMENSO_DISABLE_TELEMETRY=true` and restart your server, no telemetry data will be sent. The telemetry client will not initialize, and no network requests will be made to our telemetry servers.
+
+Note: If you previously had telemetry enabled, the installation ID stored in your database will remain, but it will no longer be used or sent anywhere.
+
+## Questions or Concerns
+
+If you have questions about our telemetry practices or concerns about privacy, please reach out to us. We're committed to transparency and respect your choice to disable telemetry if you prefer.

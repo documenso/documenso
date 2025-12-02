@@ -29,6 +29,7 @@ import {
   ZTemplateSchema,
 } from '@documenso/lib/types/template';
 import { LegacyTemplateDirectLinkSchema } from '@documenso/prisma/types/template-legacy-schema';
+import { ZDocumentExternalIdSchema } from '@documenso/trpc/server/document-router/schema';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import { ZSignFieldWithTokenMutationSchema } from '../field-router/schema';
@@ -96,6 +97,7 @@ export const ZCreateDocumentFromDirectTemplateRequestSchema = z.object({
 
 export const ZCreateDocumentFromTemplateRequestSchema = z.object({
   templateId: z.number(),
+  externalId: ZDocumentExternalIdSchema.optional(),
   recipients: z
     .array(
       z.object({
@@ -133,10 +135,40 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       'The ID of the folder to create the document in. If not provided, the document will be created in the root folder.',
     )
     .optional(),
+
   prefillFields: z
     .array(ZFieldMetaPrefillFieldsSchema)
     .describe(
       'The fields to prefill on the document before sending it out. Useful when you want to create a document from an existing template and pre-fill the fields with specific values.',
+    )
+    .optional(),
+
+  override: z
+    .object({
+      title: z.string().min(1).max(255).optional(),
+      subject: ZDocumentMetaSubjectSchema.optional(),
+      message: ZDocumentMetaMessageSchema.optional(),
+      timezone: ZDocumentMetaTimezoneSchema.optional(),
+      dateFormat: ZDocumentMetaDateFormatSchema.optional(),
+      redirectUrl: ZDocumentMetaRedirectUrlSchema.optional(),
+      distributionMethod: ZDocumentMetaDistributionMethodSchema.optional(),
+      emailSettings: ZDocumentEmailSettingsSchema.optional(),
+      language: ZDocumentMetaLanguageSchema.optional(),
+      typedSignatureEnabled: ZDocumentMetaTypedSignatureEnabledSchema.optional(),
+      uploadSignatureEnabled: ZDocumentMetaUploadSignatureEnabledSchema.optional(),
+      drawSignatureEnabled: ZDocumentMetaDrawSignatureEnabledSchema.optional(),
+      allowDictateNextSigner: z.boolean().optional(),
+    })
+    .describe('Override values from the template for the created document.')
+    .optional(),
+
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
     )
     .optional(),
 });
