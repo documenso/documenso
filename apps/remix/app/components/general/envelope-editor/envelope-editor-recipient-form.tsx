@@ -8,7 +8,6 @@ import {
   type SensorAPI,
 } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
@@ -26,6 +25,7 @@ import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
@@ -65,10 +65,7 @@ const ZEnvelopeRecipientsForm = z.object({
     z.object({
       formId: z.string().min(1),
       id: z.number().optional(),
-      email: z
-        .string()
-        .email({ message: msg`Invalid email`.id })
-        .min(1),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
@@ -201,12 +198,13 @@ export const EnvelopeEditorRecipientForm = () => {
     keyName: 'nativeId',
   });
 
-  const emptySigners = useCallback(
-    () => form.getValues('signers').filter((signer) => signer.email === ''),
-    [form],
+  const emptySignerIndex = watchedSigners.findIndex(
+    (signer) =>
+      !signer.name &&
+      !signer.email &&
+      envelope.fields.filter((field) => field.recipientId === signer.id).length === 0,
   );
 
-  const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
   const isUserAlreadyARecipient = watchedSigners.some(
     (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
   );
@@ -460,21 +458,7 @@ export const EnvelopeEditorRecipientForm = () => {
       return;
     }
 
-    const formValueSigners = formValues.signers || [];
-
-    // Remove the last signer if it's empty.
-    const nonEmptyRecipients = formValueSigners.filter((signer, i) => {
-      if (i === formValueSigners.length - 1 && signer.email === '') {
-        return false;
-      }
-
-      return true;
-    });
-
-    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse({
-      ...formValues,
-      signers: nonEmptyRecipients,
-    });
+    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse(formValues);
 
     if (!validatedFormValues.success) {
       return;
@@ -570,7 +554,7 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
+            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
               {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -618,9 +602,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             });
                           }
                         }}
-                        disabled={
-                          isSubmitting || hasDocumentBeenSent || emptySigners().length !== 0
-                        }
+                        disabled={isSubmitting || hasDocumentBeenSent}
                       />
                     </FormControl>
 
@@ -634,7 +616,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-muted-foreground ml-1 cursor-help">
+                          <span className="ml-1 cursor-help text-muted-foreground">
                             <HelpCircleIcon className="h-3.5 w-3.5" />
                           </span>
                         </TooltipTrigger>
@@ -679,7 +661,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-muted-foreground ml-1 cursor-help">
+                            <span className="ml-1 cursor-help text-muted-foreground">
                               <HelpCircleIcon className="h-3.5 w-3.5" />
                             </span>
                           </TooltipTrigger>
@@ -732,7 +714,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'bg-widget-foreground pointer-events-none rounded-md pt-2':
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
                                 snapshot.isDragging,
                             })}
                           >
@@ -806,7 +788,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                       })}
                                     >
                                       {!showAdvancedSettings && index === 0 && (
-                                        <FormLabel required>
+                                        <FormLabel>
                                           <Trans>Email</Trans>
                                         </FormLabel>
                                       )}

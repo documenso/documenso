@@ -41,6 +41,11 @@ export const EnvelopeRecipientSelector = ({
 }: EnvelopeRecipientSelectorProps) => {
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
+  const getRecipientLabel = useCallback(
+    (recipient: Recipient) => extractRecipientLabel(recipient, recipients),
+    [recipients],
+  );
+
   return (
     <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
       <PopoverTrigger asChild>
@@ -49,7 +54,7 @@ export const EnvelopeRecipientSelector = ({
           variant="outline"
           role="combobox"
           className={cn(
-            'bg-background text-muted-foreground hover:text-foreground justify-between font-normal',
+            'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
             getRecipientColorStyles(
               Math.max(
                 recipients.findIndex((r) => r.id === selectedRecipient?.id),
@@ -59,14 +64,10 @@ export const EnvelopeRecipientSelector = ({
             className,
           )}
         >
-          {selectedRecipient?.email && (
+          {selectedRecipient && (
             <span className="flex-1 truncate text-left">
-              {selectedRecipient?.name} ({selectedRecipient?.email})
+              {getRecipientLabel(selectedRecipient)}
             </span>
-          )}
-
-          {!selectedRecipient?.email && (
-            <span className="flex-1 truncate text-left">{selectedRecipient?.email}</span>
           )}
 
           <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -154,6 +155,11 @@ export const EnvelopeRecipientSelectorCommand = ({
     [fields, recipients],
   );
 
+  const getRecipientLabel = useCallback(
+    (recipient: Recipient) => extractRecipientLabel(recipient, recipients),
+    [recipients],
+  );
+
   return (
     <Command
       value={selectedRecipient ? selectedRecipient.id.toString() : undefined}
@@ -162,21 +168,21 @@ export const EnvelopeRecipientSelectorCommand = ({
       <CommandInput placeholder={placeholder} />
 
       <CommandEmpty>
-        <span className="text-muted-foreground inline-block px-4">
+        <span className="inline-block px-4 text-muted-foreground">
           <Trans>No recipient matching this description was found.</Trans>
         </span>
       </CommandEmpty>
 
       {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
         <CommandGroup key={roleIndex}>
-          <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+          <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
             {t(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
           </div>
 
           {roleRecipients.length === 0 && (
             <div
               key={`${role}-empty`}
-              className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+              className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
             >
               <Trans>No recipients with this role</Trans>
             </div>
@@ -205,18 +211,12 @@ export const EnvelopeRecipientSelectorCommand = ({
               }}
             >
               <span
-                className={cn('text-foreground/70 truncate', {
+                className={cn('truncate text-foreground/70', {
                   'text-foreground/80': recipient.id === selectedRecipient?.id,
                   'opacity-50': isRecipientDisabled(recipient.id),
                 })}
               >
-                {recipient.name && (
-                  <span title={`${recipient.name} (${recipient.email})`}>
-                    {recipient.name} ({recipient.email})
-                  </span>
-                )}
-
-                {!recipient.name && <span title={recipient.email}>{recipient.email}</span>}
+                {getRecipientLabel(recipient)}
               </span>
 
               <div className="ml-auto flex items-center justify-center">
@@ -234,7 +234,7 @@ export const EnvelopeRecipientSelectorCommand = ({
                       <Info className="z-50 ml-2 h-4 w-4" />
                     </TooltipTrigger>
 
-                    <TooltipContent className="text-muted-foreground max-w-xs">
+                    <TooltipContent className="max-w-xs text-muted-foreground">
                       <Trans>
                         This document has already been sent to this recipient. You can no longer
                         edit this recipient.
@@ -249,4 +249,23 @@ export const EnvelopeRecipientSelectorCommand = ({
       ))}
     </Command>
   );
+};
+
+const extractRecipientLabel = (recipient: Recipient, recipients: Recipient[]) => {
+  if (recipient.name && recipient.email) {
+    return `${recipient.name} (${recipient.email})`;
+  }
+
+  if (recipient.name) {
+    return recipient.name;
+  }
+
+  if (recipient.email) {
+    return recipient.email;
+  }
+
+  // Since objects are basically pointers we can use `indexOf` rather than `findIndex`
+  const index = recipients.indexOf(recipient);
+
+  return `Recipient ${index + 1}`;
 };
