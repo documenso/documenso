@@ -10,25 +10,19 @@ export const findEnvelopeAuditLogsMeta: TrpcRouteMeta = {
     method: 'GET',
     path: '/envelope/{envelopeId}/audit-log',
     summary: 'Get envelope audit logs',
-    description:
-      'Returns paginated audit logs for an envelope given an ID. Accepts both envelope IDs (string) and legacy document IDs (number).',
+    description: 'Returns paginated audit logs for an envelope given an ID.',
     tags: ['Envelope'],
   },
 };
 
 export const ZFindEnvelopeAuditLogsRequestSchema = ZFindSearchParamsSchema.extend({
-  envelopeId: z
-    .string()
-    .describe('Envelope ID (e.g., envelope_xxx) or legacy document ID (e.g., 12345)'),
-  cursor: z.string().optional(),
-  filterForRecentActivity: z.boolean().optional(),
+  envelopeId: z.string().describe('Envelope ID (e.g., envelope_xxx) or legacy document ID'),
   orderByColumn: z.enum(['createdAt', 'type']).optional(),
   orderByDirection: z.enum(['asc', 'desc']).default('desc'),
 });
 
 export const ZFindEnvelopeAuditLogsResponseSchema = ZFindResultResponse.extend({
   data: ZDocumentAuditLogSchema.array(),
-  nextCursor: z.string().optional(),
 });
 
 export type TFindEnvelopeAuditLogsRequest = z.infer<typeof ZFindEnvelopeAuditLogsRequestSchema>;
