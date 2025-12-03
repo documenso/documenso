@@ -20,10 +20,14 @@ export const SignaturePadType = ({ className, value, onChange }: SignaturePadTyp
       <input
         data-testid="signature-pad-type-input"
         placeholder={t`Type your signature`}
-        className="font-signature w-full bg-transparent px-4 text-center text-7xl text-black placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white"
+        className="w-full bg-transparent px-4 text-center font-signature text-7xl text-black placeholder:text-4xl focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 dark:text-white"
         // style={{ color: selectedColor }}
         value={value}
         onChange={(event) => onChange(event.target.value.trimStart())}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
       />
 
       {/* <SignaturePadColorPicker selectedColor={selectedColor} setSelectedColor={setSelectedColor} /> */}
