@@ -225,7 +225,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       name: fullName,
       email: email,
     };
-  }, [email, fullName, isDirectTemplate]);
+  }, [email, fullName, isDirectTemplate, recipient.email, recipient.name, recipient.fields]);
 
   return (
     <DocumentSigningCompleteDialog
