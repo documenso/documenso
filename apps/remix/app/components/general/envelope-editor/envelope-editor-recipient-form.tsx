@@ -12,8 +12,9 @@ import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, HelpCircleIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useSearchParams } from 'react-router';
 import { isDeepEqual, prop, sortBy } from 'remeda';
 import { z } from 'zod';
 
@@ -22,6 +23,7 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
@@ -60,6 +62,9 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-detection-dialog';
+import { useCurrentTeam } from '~/providers/team';
+
 const ZEnvelopeRecipientsForm = z.object({
   signers: z.array(
     z.object({
@@ -85,13 +90,35 @@ export const EnvelopeEditorRecipientForm = () => {
   const { envelope, setRecipientsDebounced, updateEnvelope } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
+  const team = useCurrentTeam();
 
   const { t } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { user } = useSession();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+
+  // AI recipient detection dialog state
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(() => searchParams.get('ai') === 'true');
+
+  const onAiDialogOpenChange = (open: boolean) => {
+    setIsAiDialogOpen(open);
+
+    if (!open && searchParams.get('ai') === 'true') {
+      setSearchParams(
+        (prev) => {
+          const newParams = new URLSearchParams(prev);
+
+          newParams.delete('ai');
+
+          return newParams;
+        },
+        { replace: true },
+      );
+    }
+  };
 
   const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
 
@@ -241,6 +268,71 @@ export const EnvelopeEditorRecipientForm = () => {
       role: RecipientRole.SIGNER,
       actionAuth: [],
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+    });
+  };
+
+  const onAiDetectionComplete = (detectedRecipients: TDetectedRecipientSchema[]) => {
+    const currentSigners = form.getValues('signers');
+
+    let nextSigningOrder =
+      currentSigners.length > 0
+        ? Math.max(...currentSigners.map((s) => s.signingOrder ?? 0)) + 1
+        : 1;
+
+    // If the only signer is the default empty signer lets just replace it with the detected recipients
+    if (currentSigners.length === 1 && !currentSigners[0].name && !currentSigners[0].email) {
+      form.setValue(
+        'signers',
+        detectedRecipients.map((recipient, index) => ({
+          formId: nanoid(12),
+          name: recipient.name,
+          email: recipient.email,
+          role: recipient.role,
+          actionAuth: [],
+          signingOrder: index + 1,
+        })),
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        },
+      );
+
+      return;
+    }
+
+    for (const recipient of detectedRecipients) {
+      const emailExists = currentSigners.some(
+        (s) => s.email.toLowerCase() === recipient.email.toLowerCase(),
+      );
+
+      const nameExists = currentSigners.some(
+        (s) => s.name.toLowerCase() === recipient.name.toLowerCase(),
+      );
+
+      if ((emailExists && recipient.email) || (nameExists && recipient.name)) {
+        continue;
+      }
+
+      currentSigners.push({
+        formId: nanoid(12),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+        actionAuth: [],
+        signingOrder: nextSigningOrder,
+      });
+
+      nextSigningOrder += 1;
+    }
+
+    form.setValue('signers', normalizeSigningOrders(currentSigners), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    toast({
+      title: t`Recipients added`,
+      description: t`${detectedRecipients.length} recipient(s) have been added from AI detection.`,
     });
   };
 
@@ -549,6 +641,26 @@ export const EnvelopeEditorRecipientForm = () => {
         </div>
 
         <div className="flex flex-row items-center space-x-2">
+          {team.preferences.aiFeaturesEnabled && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  disabled={isSubmitting}
+                  onClick={() => setIsAiDialogOpen(true)}
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+
+              <TooltipContent>
+                <Trans>Detect recipients with AI</Trans>
+              </TooltipContent>
+            </Tooltip>
+          )}
+
           <Button
             variant="outline"
             className="flex flex-row items-center"
@@ -576,7 +688,7 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
+            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
               {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -640,7 +752,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-muted-foreground ml-1 cursor-help">
+                          <span className="ml-1 cursor-help text-muted-foreground">
                             <HelpCircleIcon className="h-3.5 w-3.5" />
                           </span>
                         </TooltipTrigger>
@@ -685,7 +797,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-muted-foreground ml-1 cursor-help">
+                            <span className="ml-1 cursor-help text-muted-foreground">
                               <HelpCircleIcon className="h-3.5 w-3.5" />
                             </span>
                           </TooltipTrigger>
@@ -722,7 +834,7 @@ export const EnvelopeEditorRecipientForm = () => {
                   >
                     {signers.map((signer, index) => (
                       <Draggable
-                        key={`${signer.id}-${signer.signingOrder}`}
+                        key={`${signer.nativeId}-${signer.signingOrder}`}
                         draggableId={signer['nativeId']}
                         index={index}
                         isDragDisabled={
@@ -738,7 +850,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'bg-widget-foreground pointer-events-none rounded-md pt-2':
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
                                 snapshot.isDragging,
                             })}
                           >
@@ -997,6 +1109,14 @@ export const EnvelopeEditorRecipientForm = () => {
           open={showSigningOrderConfirmation}
           onOpenChange={setShowSigningOrderConfirmation}
           onConfirm={handleSigningOrderDisable}
+        />
+
+        <AiRecipientDetectionDialog
+          open={isAiDialogOpen}
+          onOpenChange={onAiDialogOpenChange}
+          onComplete={onAiDetectionComplete}
+          envelopeId={envelope.id}
+          teamId={envelope.teamId}
         />
       </CardContent>
     </Card>

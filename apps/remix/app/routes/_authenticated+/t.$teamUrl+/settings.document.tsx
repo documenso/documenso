@@ -1,6 +1,8 @@
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
+import { useLoaderData } from 'react-router';
 
+import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { trpc } from '@documenso/trpc/react';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -17,7 +19,17 @@ export function meta() {
   return appMetaTags('Document Preferences');
 }
 
+export const loader = () => {
+  return {
+    isAiFeaturesConfigured: IS_AI_FEATURES_CONFIGURED(),
+  };
+};
+
 export default function TeamsSettingsPage() {
+  const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
+
+  console.log('isAiFeaturesConfigured', isAiFeaturesConfigured);
+
   const team = useCurrentTeam();
 
   const { t } = useLingui();
@@ -40,6 +52,7 @@ export default function TeamsSettingsPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        aiFeaturesEnabled,
       } = data;
 
       await updateTeamSettings({
@@ -52,6 +65,7 @@ export default function TeamsSettingsPage() {
           includeSenderDetails,
           includeSigningCertificate,
           includeAuditLog,
+          aiFeaturesEnabled,
           ...(signatureTypes.length === 0
             ? {
                 typedSignatureEnabled: null,
@@ -82,7 +96,7 @@ export default function TeamsSettingsPage() {
   if (isLoadingTeam || !teamWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -97,6 +111,7 @@ export default function TeamsSettingsPage() {
       <section>
         <DocumentPreferencesForm
           canInherit={true}
+          isAiFeaturesConfigured={isAiFeaturesConfigured}
           settings={teamWithSettings.teamSettings}
           onFormSubmit={onDocumentPreferencesSubmit}
         />
