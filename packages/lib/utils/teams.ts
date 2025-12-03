@@ -184,6 +184,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     documentLanguage: null,
     documentTimezone: null,
     documentDateFormat: null,
+    delegateDocumentOwnership: null,
 
     includeSenderDetails: null,
     includeSigningCertificate: null,
