@@ -1,5 +1,6 @@
 import { type ReactNode, useState } from 'react';
 
+import { plural } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
@@ -153,7 +154,10 @@ export const EnvelopeDropZoneWrapper = ({
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });
