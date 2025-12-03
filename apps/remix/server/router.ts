@@ -12,6 +12,7 @@ import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
+import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
@@ -135,6 +136,8 @@ app.use(`${API_V2_BETA_URL}/*`, async (c) =>
 
 // Start telemetry client for anonymous usage tracking.
 // Can be disabled by setting DOCUMENSO_DISABLE_TELEMETRY=true
-void TelemetryClient.start();
+if (env('NODE_ENV') !== 'development') {
+  void TelemetryClient.start();
+}
 
 export default app;

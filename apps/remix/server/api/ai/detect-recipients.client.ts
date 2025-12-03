@@ -86,11 +86,13 @@ export const detectRecipients = async ({
 
     try {
       const parsed = ZApiErrorResponseSchema.parse(JSON.parse(text));
+
       throw new AiApiError(parsed.error, response.status);
     } catch (e) {
       if (e instanceof AiApiError) {
         throw e;
       }
+
       throw new AiApiError('Failed to detect recipients', response.status);
     }
   }

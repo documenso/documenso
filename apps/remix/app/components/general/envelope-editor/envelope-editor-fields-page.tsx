@@ -2,8 +2,9 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
-import { Trans, useLingui } from '@lingui/react/macro';
-import { FieldType, RecipientRole } from '@prisma/client';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon, SparklesIcon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
@@ -33,7 +34,6 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
-import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -77,7 +77,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
-  const { t } = useLingui();
+  const { _ } = useLingui();
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
 
@@ -230,26 +230,22 @@ export const EnvelopeEditorFieldsPage = () => {
             />
 
             {team.preferences.aiFeaturesEnabled && (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 w-full"
-                  onClick={() => setIsAiFieldDialogOpen(true)}
-                >
-                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
-                  <Trans>Detect with AI</Trans>
-                </Button>
-
-                <AiFieldDetectionDialog
-                  open={isAiFieldDialogOpen}
-                  onOpenChange={setIsAiFieldDialogOpen}
-                  onComplete={onFieldDetectionComplete}
-                  envelopeId={envelope.id}
-                  teamId={envelope.teamId}
-                />
-              </>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="mt-4 w-full"
+                onClick={() => setIsAiFieldDialogOpen(true)}
+                disabled={envelope.status !== DocumentStatus.DRAFT}
+                title={
+                  envelope.status !== DocumentStatus.DRAFT
+                    ? _(msg`You can only detect fields in draft envelopes`)
+                    : undefined
+                }
+              >
+                <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+                <Trans>Detect with AI</Trans>
+              </Button>
             )}
           </section>
 
@@ -292,7 +288,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
                 <div className="px-4 [&_label]:text-xs [&_label]:text-foreground/70">
                   <h3 className="text-sm font-semibold">
-                    {t(FieldSettingsTypeTranslations[selectedField.type])}
+                    {_(FieldSettingsTypeTranslations[selectedField.type])}
                   </h3>
 
                   {match(selectedField.type)

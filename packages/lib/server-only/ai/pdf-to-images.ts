@@ -1,4 +1,5 @@
 import { createCanvas } from '@napi-rs/canvas';
+import pMap from 'p-map';
 import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf.mjs';
 
 export type PdfToImagesOptions = {
@@ -10,8 +11,9 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
 
   const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
 
-  return await Promise.all(
-    Array.from({ length: pdf.numPages }, async (_, index) => {
+  return await pMap(
+    Array.from({ length: pdf.numPages }),
+    async (_, index) => {
       const pageNumber = index + 1;
       const page = await pdf.getPage(pageNumber);
 
@@ -32,6 +34,7 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
         height: Math.floor(viewport.height),
         mimeType: 'image/jpeg',
       };
-    }),
+    },
+    { concurrency: 10 },
   );
 };

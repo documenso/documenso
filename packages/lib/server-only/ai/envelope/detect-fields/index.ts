@@ -1,11 +1,12 @@
 import { createCanvas, loadImage } from '@napi-rs/canvas';
-import { type Field, RecipientRole } from '@prisma/client';
+import { DocumentStatus, type Field, RecipientRole } from '@prisma/client';
 import { generateObject } from 'ai';
 import pMap from 'p-map';
 import sharp from 'sharp';
 
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../../../errors/app-error';
 import { getFileServerSide } from '../../../../universal/upload/get-file.server';
 import { getEnvelopeById } from '../../../envelope/get-envelope-by-id';
 import { createEnvelopeRecipients } from '../../../recipient/create-envelope-recipients';
@@ -48,6 +49,12 @@ export const detectFieldsFromEnvelope = async ({
     teamId,
     type: null,
   });
+
+  if (envelope.status !== DocumentStatus.DRAFT) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Cannot detect fields for a non-draft envelope',
+    });
+  }
 
   // Extract recipients for field assignment context
   const recipients: RecipientContext[] = envelope.recipients.map((r) => ({

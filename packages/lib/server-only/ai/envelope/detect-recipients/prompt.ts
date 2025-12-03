@@ -5,6 +5,7 @@ TASK: Extract recipient information from this document.
 RECIPIENT TYPES:
 - SIGNER: People who must sign the document (look for signature lines, "Signed by:", "Signature:", "X____")
 - APPROVER: People who must review/approve before signing (look for "Approved by:", "Reviewed by:", "Approval:")
+- VIEWER: People who need to view the document (look for "Viewed by:", "View:", "Viewer:")
 - CC: People who receive a copy for information only (look for "CC:", "Copy to:", "For information:")
 
 EXTRACTION RULES:

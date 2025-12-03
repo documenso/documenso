@@ -79,6 +79,7 @@ type SettingsSubset = Pick<
 export type DocumentPreferencesFormProps = {
   settings: SettingsSubset;
   canInherit: boolean;
+  isAiFeaturesConfigured?: boolean;
   onFormSubmit: (data: TDocumentPreferencesFormSchema) => Promise<void>;
 };
 
@@ -86,6 +87,7 @@ export const DocumentPreferencesForm = ({
   settings,
   onFormSubmit,
   canInherit,
+  isAiFeaturesConfigured = false,
 }: DocumentPreferencesFormProps) => {
   const { t } = useLingui();
   const { user, organisations } = useSession();
@@ -513,55 +515,58 @@ export const DocumentPreferencesForm = ({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="aiFeaturesEnabled"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>AI Features</Trans>
-                </FormLabel>
+          {isAiFeaturesConfigured && (
+            <FormField
+              control={form.control}
+              name="aiFeaturesEnabled"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>AI Features</Trans>
+                  </FormLabel>
 
-                <FormControl>
-                  <Select
-                    {...field}
-                    value={field.value === null ? '-1' : field.value.toString()}
-                    onValueChange={(value) =>
-                      field.onChange(value === 'true' ? true : value === 'false' ? false : null)
-                    }
-                  >
-                    <SelectTrigger className="bg-background text-muted-foreground">
-                      <SelectValue />
-                    </SelectTrigger>
+                  <FormControl>
+                    <Select
+                      {...field}
+                      value={field.value === null ? '-1' : field.value.toString()}
+                      onValueChange={(value) =>
+                        field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                      }
+                    >
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
 
-                    <SelectContent>
-                      <SelectItem value="true">
-                        <Trans>Enabled</Trans>
-                      </SelectItem>
-
-                      <SelectItem value="false">
-                        <Trans>Disabled</Trans>
-                      </SelectItem>
-
-                      {canInherit && (
-                        <SelectItem value={'-1'}>
-                          <Trans>Inherit from organisation</Trans>
+                      <SelectContent>
+                        <SelectItem value="true">
+                          <Trans>Enabled</Trans>
                         </SelectItem>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </FormControl>
 
-                <FormDescription>
-                  <Trans>
-                    Enable AI-powered features such as automatic recipient detection. When enabled,
-                    document content will be sent to AI providers. We only use providers that do not
-                    retain data for training and prefer European regions where available.
-                  </Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
+                        <SelectItem value="false">
+                          <Trans>Disabled</Trans>
+                        </SelectItem>
+
+                        {canInherit && (
+                          <SelectItem value={'-1'}>
+                            <Trans>Inherit from organisation</Trans>
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <FormDescription>
+                    <Trans>
+                      Enable AI-powered features such as automatic recipient detection. When
+                      enabled, document content will be sent to AI providers. We only use providers
+                      that do not retain data for training and prefer European regions where
+                      available.
+                    </Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>

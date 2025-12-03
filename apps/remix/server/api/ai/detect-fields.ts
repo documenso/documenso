@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import { streamText } from 'hono/streaming';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { detectFieldsFromEnvelope } from '@documenso/lib/server-only/ai/envelope/detect-fields';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
@@ -42,14 +43,17 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
       }
 
       // Check if AI features are enabled for the team
-      const aiFeaturesEnabled =
-        team.teamSettings.aiFeaturesEnabled ??
-        team.organisation.organisationGlobalSettings.aiFeaturesEnabled ??
-        false;
+      const { aiFeaturesEnabled } = team.derivedSettings;
 
       if (!aiFeaturesEnabled) {
         throw new AppError(AppErrorCode.UNAUTHORIZED, {
           message: 'AI features are not enabled for this team',
+        });
+      }
+
+      if (!IS_AI_FEATURES_CONFIGURED()) {
+        throw new AppError(AppErrorCode.INVALID_REQUEST, {
+          message: 'AI features are not configured. Please contact support to enable AI features.',
         });
       }
 
@@ -135,15 +139,9 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
       });
 
       if (error instanceof AppError) {
-        if (error.code === AppErrorCode.UNAUTHORIZED) {
-          return c.json({ error: error.message }, 401);
-        }
+        const { status, body } = AppError.toRestAPIError(error);
 
-        if (error.code === AppErrorCode.NOT_FOUND) {
-          return c.json({ error: error.message }, 404);
-        }
-
-        return c.json({ error: error.message }, 400);
+        return c.json(body, status);
       }
 
       return c.json({ error: 'Failed to detect fields' }, 500);

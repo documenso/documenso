@@ -1,7 +1,9 @@
+import { DocumentStatus } from '@prisma/client';
 import type { ImagePart, ModelMessage } from 'ai';
 import { generateObject } from 'ai';
 import { chunk } from 'remeda';
 
+import { AppError, AppErrorCode } from '../../../../errors/app-error';
 import { getFileServerSide } from '../../../../universal/upload/get-file.server';
 import { getEnvelopeById } from '../../../envelope/get-envelope-by-id';
 import { vertex } from '../../google';
@@ -47,6 +49,12 @@ export const detectRecipientsFromEnvelope = async ({
     teamId,
     type: null,
   });
+
+  if (envelope.status === DocumentStatus.COMPLETED) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Cannot detect recipients for a completed envelope',
+    });
+  }
 
   let allRecipients: TDetectedRecipientSchema[] = [];
 
