@@ -101,13 +101,12 @@ export const EnvelopeEditorRecipientForm = () => {
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
 
   // AI recipient detection dialog state
-  const showAiDialog = searchParams.get('ai') === 'true';
-  const [isAiDialogOpen, setIsAiDialogOpen] = useState(showAiDialog);
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(() => searchParams.get('ai') === 'true');
 
   const onAiDialogOpenChange = (open: boolean) => {
     setIsAiDialogOpen(open);
 
-    if (!open && showAiDialog) {
+    if (!open && searchParams.get('ai') === 'true') {
       setSearchParams(
         (prev) => {
           const newParams = new URLSearchParams(prev);
@@ -555,8 +554,6 @@ export const EnvelopeEditorRecipientForm = () => {
 
     const formValueSigners = formValues.signers || [];
 
-    console.log('formValueSigners', formValueSigners);
-
     // Remove the last signer if it's empty.
     const nonEmptyRecipients = formValueSigners.filter((signer, i) => {
       if (i === formValueSigners.length - 1 && signer.email === '') {
@@ -589,8 +586,6 @@ export const EnvelopeEditorRecipientForm = () => {
       }
       return recipient;
     });
-
-    console.log('envelopeRecipients', envelopeRecipients);
 
     const hasSigningOrderChanged = envelope.documentMeta.signingOrder !== data.signingOrder;
     const hasAllowDictateNextSignerChanged =
