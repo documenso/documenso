@@ -152,30 +152,30 @@ export default function EnvelopeEditor() {
     envelopeEditorSteps.find((step) => step.id === currentStep) || envelopeEditorSteps[0];
 
   return (
-    <div className="dark:bg-background h-screen w-screen bg-gray-50">
+    <div className="h-screen w-screen bg-gray-50 dark:bg-background">
       <EnvelopeEditorHeader />
 
       {/* Main Content Area */}
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
-        <div className="bg-background border-border flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4">
+        <div className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-background py-4">
           {/* Left section step selector. */}
           <div className="px-4">
-            <h3 className="text-foreground flex items-end justify-between text-sm font-semibold">
+            <h3 className="flex items-end justify-between text-sm font-semibold text-foreground">
               {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
-              <span className="text-muted-foreground bg-muted/50 ml-2 rounded border px-2 py-0.5 text-xs">
+              <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
                 <Trans context="The step counter">
                   Step {currentStepData.order}/{envelopeEditorSteps.length}
                 </Trans>
               </span>
             </h3>
 
-            <div className="bg-muted relative my-4 h-[4px] rounded-md">
+            <div className="relative my-4 h-[4px] rounded-md bg-muted">
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="bg-documenso absolute inset-y-0 left-0"
+                className="absolute inset-y-0 left-0 bg-documenso"
                 style={{
                   width: `${(100 / envelopeEditorSteps.length) * (currentStepData.order ?? 0)}%`,
                 }}
@@ -219,7 +219,7 @@ export default function EnvelopeEditor() {
                         >
                           {t(step.title)}
                         </div>
-                        <div className="text-muted-foreground text-xs">{t(step.description)}</div>
+                        <div className="text-xs text-muted-foreground">{t(step.description)}</div>
                       </div>
                     </div>
                   </div>
@@ -232,7 +232,7 @@ export default function EnvelopeEditor() {
 
           {/* Quick Actions. */}
           <div className="space-y-3 px-4">
-            <h4 className="text-foreground text-sm font-semibold">
+            <h4 className="text-sm font-semibold text-foreground">
               <Trans>Quick Actions</Trans>
             </h4>
             <EnvelopeEditorSettingsDialog
@@ -246,10 +246,6 @@ export default function EnvelopeEditor() {
 
             {isDocument && (
               <EnvelopeDistributeDialog
-                envelope={{
-                  ...envelope,
-                  fields: editorFields.localFields,
-                }}
                 documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">

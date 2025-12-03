@@ -459,6 +459,7 @@ export const templateRouter = router({
         customDocumentDataId,
         folderId,
         prefillFields,
+        externalId,
         override,
         attachments,
       } = input;
@@ -497,6 +498,7 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
+        externalId,
         override,
         attachments,
       });
