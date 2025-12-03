@@ -51,6 +51,7 @@ export default defineConfig({
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker'],
     external: [
+      '@napi-rs/canvas',
       '@node-rs/bcrypt',
       '@prisma/client',
       '@documenso/tailwind-config',
@@ -64,6 +65,7 @@ export default defineConfig({
     include: ['prop-types', 'file-selector', 'attr-accept'],
     exclude: [
       'node_modules',
+      '@napi-rs/canvas',
       '@node-rs/bcrypt',
       '@documenso/pdf-sign',
       'sharp',
@@ -94,6 +96,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       external: [
+        '@napi-rs/canvas',
         '@node-rs/bcrypt',
         '@documenso/pdf-sign',
         '@aws-sdk/cloudfront-signer',

@@ -108,7 +108,9 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
           ? formatDocumentsPath(team.url)
           : formatTemplatesPath(team.url);
 
-      await navigate(`${pathPrefix}/${id}/edit`);
+      const aiQueryParam = team.preferences.aiFeaturesEnabled ? '?ai=true' : '';
+
+      await navigate(`${pathPrefix}/${id}/edit${aiQueryParam}`);
 
       toast({
         title: type === EnvelopeType.DOCUMENT ? t`Document uploaded` : t`Template uploaded`,

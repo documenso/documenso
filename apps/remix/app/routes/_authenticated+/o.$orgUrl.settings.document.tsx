@@ -48,6 +48,7 @@ export default function OrganisationSettingsDocumentPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        aiFeaturesEnabled,
       } = data;
 
       if (
@@ -56,7 +57,8 @@ export default function OrganisationSettingsDocumentPage() {
         documentDateFormat === null ||
         includeSenderDetails === null ||
         includeSigningCertificate === null ||
-        includeAuditLog === null
+        includeAuditLog === null ||
+        aiFeaturesEnabled === null
       ) {
         throw new Error('Should not be possible.');
       }
@@ -74,6 +76,7 @@ export default function OrganisationSettingsDocumentPage() {
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+          aiFeaturesEnabled,
         },
       });
 
@@ -93,7 +96,7 @@ export default function OrganisationSettingsDocumentPage() {
   if (isLoadingOrganisation || !organisationWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }

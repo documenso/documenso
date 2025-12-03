@@ -58,6 +58,7 @@ export type TDocumentPreferencesFormSchema = {
   includeSigningCertificate: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
+  aiFeaturesEnabled: boolean | null;
 };
 
 type SettingsSubset = Pick<
@@ -72,6 +73,7 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
+  | 'aiFeaturesEnabled'
 >;
 
 export type DocumentPreferencesFormProps = {
@@ -105,6 +107,7 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    aiFeaturesEnabled: z.boolean().nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -120,6 +123,7 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
+      aiFeaturesEnabled: settings.aiFeaturesEnabled,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -312,7 +316,7 @@ export const DocumentPreferencesForm = ({
                     }))}
                     selectedValues={field.value}
                     onChange={field.onChange}
-                    className="bg-background w-full"
+                    className="w-full bg-background"
                     enableSearch={false}
                     emptySelectionPlaceholder={
                       canInherit ? t`Inherit from organisation` : t`Select signature types`
@@ -378,7 +382,7 @@ export const DocumentPreferencesForm = ({
                   </FormControl>
 
                   <div className="pt-2">
-                    <div className="text-muted-foreground text-xs font-medium">
+                    <div className="text-xs font-medium text-muted-foreground">
                       <Trans>Preview</Trans>
                     </div>
 
@@ -503,6 +507,56 @@ export const DocumentPreferencesForm = ({
                     Controls whether the audit logs will be included in the document when it is
                     downloaded. The audit logs can still be downloaded from the logs page
                     separately.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="aiFeaturesEnabled"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>AI Features</Trans>
+                </FormLabel>
+
+                <FormControl>
+                  <Select
+                    {...field}
+                    value={field.value === null ? '-1' : field.value.toString()}
+                    onValueChange={(value) =>
+                      field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                    }
+                  >
+                    <SelectTrigger className="bg-background text-muted-foreground">
+                      <SelectValue />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      <SelectItem value="true">
+                        <Trans>Enabled</Trans>
+                      </SelectItem>
+
+                      <SelectItem value="false">
+                        <Trans>Disabled</Trans>
+                      </SelectItem>
+
+                      {canInherit && (
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </FormControl>
+
+                <FormDescription>
+                  <Trans>
+                    Enable AI-powered features such as automatic recipient detection. When enabled,
+                    document content will be sent to AI providers. We only use providers that do not
+                    retain data for training and prefer European regions where available.
                   </Trans>
                 </FormDescription>
               </FormItem>

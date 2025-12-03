@@ -15,6 +15,7 @@ import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { logger } from '@documenso/lib/utils/logger';
 import { openApiDocument } from '@documenso/trpc/server/open-api';
 
+import { aiRoute } from './api/ai/route';
 import { downloadRoute } from './api/download/download';
 import { filesRoute } from './api/files/files';
 import { type AppContext, appContext } from './context';
@@ -38,6 +39,21 @@ const app = new Hono<HonoEnv>();
 const rateLimitMiddleware = rateLimiter({
   windowMs: 60 * 1000, // 1 minute
   limit: 100, // 100 requests per window
+  keyGenerator: (c) => {
+    try {
+      return getIpAddress(c.req.raw);
+    } catch (error) {
+      return 'unknown';
+    }
+  },
+  message: {
+    error: 'Too many requests, please try again later.',
+  },
+});
+
+const aiRateLimitMiddleware = rateLimiter({
+  windowMs: 60 * 1000, // 1 minute
+  limit: 3, // 3 requests per window
   keyGenerator: (c) => {
     try {
       return getIpAddress(c.req.raw);
@@ -84,6 +100,10 @@ app.route('/api/auth', auth);
 
 // Files route.
 app.route('/api/files', filesRoute);
+
+// AI route.
+app.use('/api/ai/*', aiRateLimitMiddleware);
+app.route('/api/ai', aiRoute);
 
 // API servers.
 app.use(`/api/v1/*`, cors());
