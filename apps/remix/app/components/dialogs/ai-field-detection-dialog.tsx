@@ -74,7 +74,7 @@ export const AiFieldDetectionDialog = ({
   const [context, setContext] = useState('');
   const [progress, setProgress] = useState<DetectFieldsProgressEvent | null>(null);
 
-  const handleDetect = useCallback(async () => {
+  const onDetectClick = useCallback(async () => {
     setState('PROCESSING');
     setMessageIndex(0);
     setError(null);
@@ -119,22 +119,33 @@ export const AiFieldDetectionDialog = ({
     }
   }, [envelopeId, teamId, context]);
 
-  const handleAddFields = useCallback(() => {
+  const onAddFields = () => {
     onComplete(detectedFields);
     onOpenChange(false);
     setState('PROMPT');
     setDetectedFields([]);
     setContext('');
-  }, [detectedFields, onComplete, onOpenChange]);
+  };
 
-  const handleClose = useCallback(() => {
+  const onClose = () => {
     onOpenChange(false);
     setState('PROMPT');
     setDetectedFields([]);
     setError(null);
     setContext('');
     setProgress(null);
-  }, [onOpenChange]);
+  };
+
+  // Group fields by type for summary display
+  const fieldCountsByType = useMemo(() => {
+    const counts: Record<string, number> = {};
+
+    for (const field of detectedFields) {
+      counts[field.type] = (counts[field.type] || 0) + 1;
+    }
+
+    return Object.entries(counts).sort(([, a], [, b]) => b - a);
+  }, [detectedFields]);
 
   useEffect(() => {
     if (state !== 'PROCESSING') {
@@ -148,22 +159,9 @@ export const AiFieldDetectionDialog = ({
     return () => clearInterval(interval);
   }, [state]);
 
-  const canClose = state !== 'PROCESSING';
-
-  // Group fields by type for summary display
-  const fieldCountsByType = useMemo(() => {
-    const counts: Record<string, number> = {};
-
-    for (const field of detectedFields) {
-      counts[field.type] = (counts[field.type] || 0) + 1;
-    }
-
-    return Object.entries(counts).sort(([, a], [, b]) => b - a);
-  }, [detectedFields]);
-
   return (
-    <Dialog open={open} onOpenChange={canClose ? handleClose : undefined}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={open}>
+      <DialogContent className="sm:max-w-lg" hideClose={true}>
         {state === 'PROMPT' && (
           <>
             <DialogHeader>
@@ -209,10 +207,10 @@ export const AiFieldDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Skip</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Detect</Trans>
               </Button>
             </DialogFooter>
@@ -233,7 +231,7 @@ export const AiFieldDetectionDialog = ({
               <p className="mt-8 text-muted-foreground">{_(PROCESSING_MESSAGES[messageIndex])}</p>
 
               {progress && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground/60">
                   <Trans>
                     Page {progress.pagesProcessed} of {progress.totalPages} -{' '}
                     {progress.fieldsDetected} field(s) found
@@ -297,12 +295,12 @@ export const AiFieldDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Cancel</Trans>
               </Button>
 
               {detectedFields.length > 0 && (
-                <Button type="button" onClick={handleAddFields}>
+                <Button type="button" onClick={onAddFields}>
                   <CheckIcon className="-ml-1 mr-2 h-4 w-4" />
                   <Trans>Add fields</Trans>
                 </Button>
@@ -328,10 +326,10 @@ export const AiFieldDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Close</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Try again</Trans>
               </Button>
             </DialogFooter>
@@ -355,10 +353,10 @@ export const AiFieldDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Close</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Try again</Trans>
               </Button>
             </DialogFooter>

@@ -59,7 +59,7 @@ export const AiRecipientDetectionDialog = ({
   const [error, setError] = useState<string | null>(null);
   const [progress, setProgress] = useState<DetectRecipientsProgressEvent | null>(null);
 
-  const handleDetect = useCallback(async () => {
+  const onDetectClick = useCallback(async () => {
     setState('PROCESSING');
     setMessageIndex(0);
     setError(null);
@@ -103,24 +103,24 @@ export const AiRecipientDetectionDialog = ({
     }
   }, [envelopeId, teamId]);
 
-  const handleRemoveRecipient = useCallback((index: number) => {
+  const handleRemoveRecipient = (index: number) => {
     setDetectedRecipients((prev) => prev.filter((_, i) => i !== index));
-  }, []);
+  };
 
-  const handleAddRecipients = useCallback(() => {
+  const onAddRecipients = () => {
     onComplete(detectedRecipients);
     onOpenChange(false);
     setState('PROMPT');
     setDetectedRecipients([]);
-  }, [detectedRecipients, onComplete, onOpenChange]);
+  };
 
-  const handleClose = useCallback(() => {
+  const onClose = () => {
     onOpenChange(false);
     setState('PROMPT');
     setDetectedRecipients([]);
     setError(null);
     setProgress(null);
-  }, [onOpenChange]);
+  };
 
   useEffect(() => {
     if (state !== 'PROCESSING') {
@@ -134,11 +134,9 @@ export const AiRecipientDetectionDialog = ({
     return () => clearInterval(interval);
   }, [state]);
 
-  const canClose = state !== 'PROCESSING';
-
   return (
-    <Dialog open={open} onOpenChange={canClose ? handleClose : undefined}>
-      <DialogContent className="sm:max-w-lg">
+    <Dialog open={open}>
+      <DialogContent className="sm:max-w-lg" hideClose={true}>
         {state === 'PROMPT' && (
           <>
             <DialogHeader>
@@ -167,10 +165,10 @@ export const AiRecipientDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Skip</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Detect</Trans>
               </Button>
             </DialogFooter>
@@ -191,9 +189,9 @@ export const AiRecipientDetectionDialog = ({
               <p className="mt-8 text-muted-foreground">{_(PROCESSING_MESSAGES[messageIndex])}</p>
 
               {progress && (
-                <p className="mt-2 text-xs text-muted-foreground">
+                <p className="mt-2 text-xs text-muted-foreground/60">
                   <Trans>
-                    Page {progress.pagesProcessed} of {progress.totalPages} ·{' '}
+                    Page {progress.pagesProcessed} of {progress.totalPages} -{' '}
                     {progress.recipientsDetected} recipient(s) found
                   </Trans>
                 </p>
@@ -288,12 +286,12 @@ export const AiRecipientDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Cancel</Trans>
               </Button>
 
               {detectedRecipients.length > 0 && (
-                <Button type="button" onClick={handleAddRecipients}>
+                <Button type="button" onClick={onAddRecipients}>
                   <CheckIcon className="-ml-1 mr-2 h-4 w-4" />
                   <Trans>Add recipients</Trans>
                 </Button>
@@ -319,10 +317,11 @@ export const AiRecipientDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Close</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Try again</Trans>
               </Button>
             </DialogFooter>
@@ -346,10 +345,10 @@ export const AiRecipientDetectionDialog = ({
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="ghost" onClick={handleClose}>
+              <Button type="button" variant="ghost" onClick={onClose}>
                 <Trans>Close</Trans>
               </Button>
-              <Button type="button" onClick={handleDetect}>
+              <Button type="button" onClick={onDetectClick}>
                 <Trans>Try again</Trans>
               </Button>
             </DialogFooter>
