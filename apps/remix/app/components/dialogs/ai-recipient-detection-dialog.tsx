@@ -269,6 +269,7 @@ export const AiRecipientDetectionDialog = ({
                         />
 
                         <button
+                          type="button"
                           className="h-8 w-8 p-0 text-muted-foreground/80 hover:text-destructive focus-visible:border-destructive focus-visible:ring-destructive"
                           onClick={() => handleRemoveRecipient(index)}
                         >

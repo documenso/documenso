@@ -34,6 +34,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
+import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
 import { EditorFieldDropdownForm } from '~/components/forms/editor/editor-field-dropdown-form';
@@ -230,22 +231,32 @@ export const EnvelopeEditorFieldsPage = () => {
             />
 
             {team.preferences.aiFeaturesEnabled && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                className="mt-4 w-full"
-                onClick={() => setIsAiFieldDialogOpen(true)}
-                disabled={envelope.status !== DocumentStatus.DRAFT}
-                title={
-                  envelope.status !== DocumentStatus.DRAFT
-                    ? _(msg`You can only detect fields in draft envelopes`)
-                    : undefined
-                }
-              >
-                <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
-                <Trans>Detect with AI</Trans>
-              </Button>
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={() => setIsAiFieldDialogOpen(true)}
+                  disabled={envelope.status !== DocumentStatus.DRAFT}
+                  title={
+                    envelope.status !== DocumentStatus.DRAFT
+                      ? _(msg`You can only detect fields in draft envelopes`)
+                      : undefined
+                  }
+                >
+                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+                  <Trans>Detect with AI</Trans>
+                </Button>
+
+                <AiFieldDetectionDialog
+                  open={isAiFieldDialogOpen}
+                  onOpenChange={setIsAiFieldDialogOpen}
+                  onComplete={onFieldDetectionComplete}
+                  envelopeId={envelope.id}
+                  teamId={envelope.teamId}
+                />
+              </>
             )}
           </section>
 
