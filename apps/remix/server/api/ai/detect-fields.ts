@@ -116,6 +116,10 @@ export const detectFieldsRoute = new Hono<HonoEnv>().post(
             clearInterval(interval);
           }
 
+          // The logger below it stringifies the error, using `console.error`
+          // to attempt to get a stack trace
+          console.error(error);
+
           logger.error({
             event: 'ai.detect-fields.error',
             error,
