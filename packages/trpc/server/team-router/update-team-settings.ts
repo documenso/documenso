@@ -51,6 +51,9 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       emailReplyTo,
       // emailReplyToName,
       emailDocumentSettings,
+
+      // Default recipients settings.
+      defaultRecipients,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -160,6 +163,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             // emailReplyToName,
             emailDocumentSettings:
               emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+            defaultRecipients: defaultRecipients === null ? Prisma.DbNull : defaultRecipients,
           },
         },
       },
