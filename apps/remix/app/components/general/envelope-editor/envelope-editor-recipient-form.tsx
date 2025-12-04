@@ -960,7 +960,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                       <FormControl>
                                         <RecipientAutoCompleteInput
                                           type="text"
-                                          placeholder={t`Name`}
+                                          placeholder={t`Recipient ${index + 1}`}
                                           {...field}
                                           disabled={
                                             snapshot.isDragging ||

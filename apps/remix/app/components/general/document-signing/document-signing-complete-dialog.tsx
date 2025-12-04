@@ -63,6 +63,7 @@ export type DocumentSigningCompleteDialogProps = {
   };
   buttonSize?: 'sm' | 'lg';
   position?: 'start' | 'end' | 'center';
+  disableNameInput?: boolean;
 };
 
 const ZNextSignerFormSchema = z.object({
@@ -93,6 +94,7 @@ export const DocumentSigningCompleteDialog = ({
   defaultNextSigner,
   buttonSize = 'lg',
   position,
+  disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
   const { t } = useLingui();
 
@@ -274,7 +276,7 @@ export const DocumentSigningCompleteDialog = ({
                                 {...field}
                                 className="mt-2"
                                 placeholder={t`Enter your name`}
-                                disabled={isNameLocked}
+                                disabled={isNameLocked || disableNameInput}
                               />
                             </FormControl>
 

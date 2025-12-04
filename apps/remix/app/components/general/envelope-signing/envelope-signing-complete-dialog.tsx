@@ -241,6 +241,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       allowDictateNextSigner={Boolean(
         nextRecipient && envelope.documentMeta.allowDictateNextSigner,
       )}
+      disableNameInput={!isDirectTemplate && recipient.name !== ''}
       defaultNextSigner={
         nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
       }

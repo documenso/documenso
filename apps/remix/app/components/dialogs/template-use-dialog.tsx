@@ -101,12 +101,29 @@ export function TemplateUseDialog({
 
   const [open, setOpen] = useState(false);
 
-  const form = useForm<TAddRecipientsForNewDocumentSchema>({
-    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
-    defaultValues: {
+  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
+    {
+      envelopeId,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+      ...SKIP_QUERY_BATCH_META,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open,
+    },
+  );
+
+  const envelopeItems = response?.data ?? [];
+
+  const generateDefaultFormValues = () => {
+    return {
       distributeDocument: false,
       useCustomDocument: false,
-      customDocumentData: [],
+      customDocumentData: envelopeItems.map((item) => ({
+        title: item.title,
+        data: undefined,
+        envelopeItemId: item.id,
+      })),
       recipients: recipients
         .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
         .map((recipient) => {
@@ -125,26 +142,18 @@ export function TemplateUseDialog({
             signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
-    },
+    };
+  };
+
+  const form = useForm<TAddRecipientsForNewDocumentSchema>({
+    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
+    defaultValues: generateDefaultFormValues(),
   });
 
   const { replace, fields: localCustomDocumentData } = useFieldArray({
     control: form.control,
     name: 'customDocumentData',
   });
-
-  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
-    {
-      envelopeId,
-    },
-    {
-      placeholderData: (previousData) => previousData,
-      ...SKIP_QUERY_BATCH_META,
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    },
-  );
-
-  const envelopeItems = response?.data ?? [];
 
   const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTemplate.useMutation();
@@ -215,8 +224,8 @@ export function TemplateUseDialog({
   });
 
   useEffect(() => {
-    if (!open) {
-      form.reset();
+    if (open) {
+      form.reset(generateDefaultFormValues());
     }
   }, [open, form]);
 
@@ -323,7 +332,7 @@ export function TemplateUseDialog({
                             <Input
                               {...field}
                               aria-label="Name"
-                              placeholder={recipients[index].name || _(msg`Name`)}
+                              placeholder={recipients[index].name || _(msg`Recipient ${index + 1}`)}
                             />
                           </FormControl>
                           <FormMessage />
