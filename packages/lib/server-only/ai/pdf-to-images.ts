@@ -9,9 +9,9 @@ export type PdfToImagesOptions = {
 export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOptions = {}) => {
   const { scale = 2 } = options;
 
-  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise;
+  const pdf = await pdfjsLib.getDocument(pdfBytes).promise;
 
-  return await pMap(
+  const images = await pMap(
     Array.from({ length: pdf.numPages }),
     async (_, index) => {
       const pageNumber = index + 1;
@@ -20,10 +20,13 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
       const viewport = page.getViewport({ scale });
 
       const canvas = createCanvas(viewport.width, viewport.height);
+      const canvasContext = canvas.getContext('2d');
 
       await page.render({
         // @ts-expect-error napi-rs/canvas satifies the requirements
         canvas,
+        // @ts-expect-error napi-rs/canvas satifies the requirements
+        canvasContext,
         viewport,
       }).promise;
 
@@ -37,4 +40,8 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
     },
     { concurrency: 10 },
   );
+
+  void pdf.destroy();
+
+  return images;
 };
