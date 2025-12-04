@@ -64,7 +64,7 @@
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
     "nodemailer": "^7.0.10",
-    "pdfjs-dist": "5.4.296",
+    "pdfjs-dist": "5.4.449",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",
     "playwright": "1.56.1",
@@ -99,7 +99,7 @@
     "zod": "^3.25.76"
   },
   "overrides": {
-    "pdfjs-dist": "5.4.296",
+    "pdfjs-dist": "5.4.449",
     "typescript": "5.6.2",
     "zod": "^3.25.76"
   }

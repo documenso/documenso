@@ -14,7 +14,7 @@
   "devDependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@napi-rs/canvas": "^0.1.82",
+    "@napi-rs/canvas": "^0.1.83",
     "@playwright/test": "1.56.1",
     "@types/node": "^20",
     "@types/pngjs": "^6.0.5",

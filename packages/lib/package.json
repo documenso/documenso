@@ -28,7 +28,7 @@
     "@lingui/core": "^5.6.0",
     "@lingui/macro": "^5.6.0",
     "@lingui/react": "^5.6.0",
-    "@napi-rs/canvas": "^0.1.82",
+    "@napi-rs/canvas": "^0.1.83",
     "@noble/ciphers": "0.6.0",
     "@noble/hashes": "1.8.0",
     "@node-rs/bcrypt": "^1.10.7",
