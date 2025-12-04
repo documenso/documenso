@@ -1,5 +1,5 @@
 diff --git a/node_modules/@napi-rs/canvas/index.js b/node_modules/@napi-rs/canvas/index.js
-index 7545c4e..4714952 100644
+index 7545c4e..94ecbc2 100644
 --- a/node_modules/@napi-rs/canvas/index.js
 +++ b/node_modules/@napi-rs/canvas/index.js
 @@ -6,7 +6,7 @@ const {
@@ -11,7 +11,7 @@ index 7545c4e..4714952 100644
    ImageData,
    Image,
    FontKey,
-@@ -23,6 +23,26 @@ const { DOMPoint, DOMMatrix, DOMRect } = require('./geometry')
+@@ -23,6 +23,38 @@ const { DOMPoint, DOMMatrix, DOMRect } = require('./geometry')
  
  const loadImage = require('./load-image')
  
@@ -35,10 +35,22 @@ index 7545c4e..4714952 100644
 +  }
 +}
 +
++// Export Path2D to globalThis so that libraries like pdfjs-dist that use
++// globalThis.Path2D will get the correct class. This is critical for
++// webpack bundling scenarios where module identity can be lost.
++// See: https://github.com/Brooooooklyn/canvas/issues/1126
++if (typeof globalThis !== 'undefined') {
++  // Only set if not already set, or if it's not our NativePath2D
++  // This ensures we don't overwrite a working globalThis.Path2D
++  if (!globalThis.Path2D || !(new globalThis.Path2D() instanceof NativePath2D)) {
++    globalThis.Path2D = Path2D
++  }
++}
++
  const SvgExportFlag = {
    ConvertTextToPaths: 0x01,
    NoPrettyXML: 0x02,
-@@ -122,6 +142,117 @@ CanvasRenderingContext2D.prototype.drawImage = function drawImage(image, ...args
+@@ -122,6 +154,173 @@ CanvasRenderingContext2D.prototype.drawImage = function drawImage(image, ...args
    return _drawImage.apply(this, [image, ...args])
  }
  
@@ -48,35 +60,91 @@ index 7545c4e..4714952 100644
 +// isPointInPath, and isPointInStroke methods.
 +// See: https://github.com/Brooooooklyn/canvas/issues/1126
 +
-+/**
-+ * Check if an object looks like a Path2D instance by checking for characteristic methods
-+ * that are unique to Path2D (not present on CanvasRenderingContext2D's path methods)
-+ */
-+function isPath2DLike(obj) {
-+  return (
-+    obj &&
-+    typeof obj === 'object' &&
-+    typeof obj.addPath === 'function' &&
-+    typeof obj.closePath === 'function' &&
-+    typeof obj.moveTo === 'function' &&
-+    typeof obj.lineTo === 'function' &&
-+    // These methods are unique to Path2D in this library
-+    typeof obj.toSVGString === 'function'
-+  )
-+}
++// Debug flag - set NAPI_CANVAS_DEBUG=1 to enable debug logging
++const DEBUG_PATH2D = process.env.NAPI_CANVAS_DEBUG === '1'
 +
 +/**
-+ * Ensure an object that looks like Path2D has the correct prototype chain
-+ * so that N-API can recognize it properly
++ * Convert a Path2D-like object to a proper NativePath2D instance.
++ *
++ * N-API class instances have internal native data that cannot be fixed by
++ * Object.setPrototypeOf(). We must create a completely new NativePath2D
++ * from the SVG string representation to get a valid native object.
++ *
++ * See: https://github.com/Brooooooklyn/canvas/issues/1126
 + */
 +function ensurePath2D(obj) {
++  // Already a valid native Path2D - return as-is
 +  if (obj instanceof NativePath2D) {
++    if (DEBUG_PATH2D) console.log('[napi-canvas] Path2D is already NativePath2D')
 +    return obj
 +  }
-+  if (isPath2DLike(obj)) {
-+    // Fix the prototype chain so N-API recognizes it
-+    Object.setPrototypeOf(obj, NativePath2D.prototype)
++
++  if (DEBUG_PATH2D) {
++    console.log('[napi-canvas] ensurePath2D called with:', {
++      type: typeof obj,
++      constructor: obj?.constructor?.name,
++      hasToSVGString: typeof obj?.toSVGString === 'function',
++      hasAddPath: typeof obj?.addPath === 'function',
++      prototype: Object.getPrototypeOf(obj)?.constructor?.name,
++    })
 +  }
++
++  // Try to convert using toSVGString if available (works for @napi-rs/canvas Path2D from different module instances)
++  if (obj && typeof obj === 'object' && typeof obj.toSVGString === 'function') {
++    try {
++      const svgString = obj.toSVGString()
++      if (DEBUG_PATH2D) console.log('[napi-canvas] toSVGString result:', svgString?.substring?.(0, 100))
++
++      // Handle empty paths - create an empty NativePath2D
++      if (svgString === '' || svgString === 'M0 0') {
++        return new NativePath2D()
++      }
++
++      if (typeof svgString === 'string' && svgString.length > 0) {
++        const newPath = new NativePath2D(svgString)
++        if (DEBUG_PATH2D) console.log('[napi-canvas] Successfully created NativePath2D from SVG string')
++        return newPath
++      }
++    } catch (e) {
++      if (DEBUG_PATH2D) console.log('[napi-canvas] toSVGString conversion failed:', e.message)
++    }
++  }
++
++  // Check constructor name - @napi-rs/canvas internally names the class "Path"
++  const constructorName = obj?.constructor?.name
++  if (constructorName === 'Path' || constructorName === 'Path2D') {
++    if (DEBUG_PATH2D) console.log('[napi-canvas] Detected Path/Path2D constructor, attempting prototype fix')
++
++    // Try prototype chain fix as a fallback
++    // This might work in some edge cases where the object has native data but wrong prototype
++    try {
++      Object.setPrototypeOf(obj, NativePath2D.prototype)
++      return obj
++    } catch (e) {
++      if (DEBUG_PATH2D) console.log('[napi-canvas] Prototype fix failed:', e.message)
++    }
++  }
++
++  // Last resort for objects that look like Path2D but can't be converted
++  // Try creating an empty path if the object exists but has no conversion method
++  if (obj && typeof obj === 'object') {
++    // Check if it has Path2D-like methods (addPath, moveTo, lineTo, etc.)
++    const hasPathMethods = typeof obj.addPath === 'function' &&
++                          typeof obj.moveTo === 'function' &&
++                          typeof obj.lineTo === 'function'
++
++    if (hasPathMethods) {
++      if (DEBUG_PATH2D) console.log('[napi-canvas] Object has Path2D methods but no toSVGString - cannot convert')
++      // We can't convert this, but let's give a clear error message
++      console.warn(
++        '[@napi-rs/canvas] Received a Path2D-like object that cannot be converted. ' +
++        'This usually happens with webpack bundling. ' +
++        'Ensure you are using the Path2D exported from @napi-rs/canvas. ' +
++        'Object constructor:', constructorName
++      )
++    }
++  }
++
 +  return obj
 +}
 +
