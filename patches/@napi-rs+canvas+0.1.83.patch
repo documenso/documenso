@@ -1,0 +1,158 @@
+diff --git a/node_modules/@napi-rs/canvas/index.js b/node_modules/@napi-rs/canvas/index.js
+index 7545c4e..4714952 100644
+--- a/node_modules/@napi-rs/canvas/index.js
++++ b/node_modules/@napi-rs/canvas/index.js
+@@ -6,7 +6,7 @@ const {
+   CanvasRenderingContext2D,
+   CanvasElement,
+   SVGCanvas,
+-  Path: Path2D,
++  Path: NativePath2D,
+   ImageData,
+   Image,
+   FontKey,
+@@ -23,6 +23,26 @@ const { DOMPoint, DOMMatrix, DOMRect } = require('./geometry')
+ 
+ const loadImage = require('./load-image')
+ 
++// Wrapper for Path2D to handle webpack bundling issues
++// When a Path2D-like object from a bundled environment is passed to the constructor,
++// we need to ensure it's properly recognized by the native binding.
++// See: https://github.com/Brooooooklyn/canvas/issues/1126
++class Path2D extends NativePath2D {
++  constructor(path) {
++    // If path is a Path2D-like object but not recognized as NativePath2D,
++    // convert it to SVG string first, then create a new path from that
++    if (path && typeof path === 'object' && !(path instanceof NativePath2D)) {
++      // Check if it looks like a Path2D by checking for toSVGString method
++      if (typeof path.toSVGString === 'function') {
++        // Convert to SVG string and create from that
++        super(path.toSVGString())
++        return
++      }
++    }
++    super(path)
++  }
++}
++
+ const SvgExportFlag = {
+   ConvertTextToPaths: 0x01,
+   NoPrettyXML: 0x02,
+@@ -122,6 +142,117 @@ CanvasRenderingContext2D.prototype.drawImage = function drawImage(image, ...args
+   return _drawImage.apply(this, [image, ...args])
+ }
+ 
++// Workaround for webpack bundling issue with Path2D
++// When webpack bundles the code, the instanceof check for Path2D can fail
++// because the prototype chain gets modified. This affects fill, stroke, clip,
++// isPointInPath, and isPointInStroke methods.
++// See: https://github.com/Brooooooklyn/canvas/issues/1126
++
++/**
++ * Check if an object looks like a Path2D instance by checking for characteristic methods
++ * that are unique to Path2D (not present on CanvasRenderingContext2D's path methods)
++ */
++function isPath2DLike(obj) {
++  return (
++    obj &&
++    typeof obj === 'object' &&
++    typeof obj.addPath === 'function' &&
++    typeof obj.closePath === 'function' &&
++    typeof obj.moveTo === 'function' &&
++    typeof obj.lineTo === 'function' &&
++    // These methods are unique to Path2D in this library
++    typeof obj.toSVGString === 'function'
++  )
++}
++
++/**
++ * Ensure an object that looks like Path2D has the correct prototype chain
++ * so that N-API can recognize it properly
++ */
++function ensurePath2D(obj) {
++  if (obj instanceof NativePath2D) {
++    return obj
++  }
++  if (isPath2DLike(obj)) {
++    // Fix the prototype chain so N-API recognizes it
++    Object.setPrototypeOf(obj, NativePath2D.prototype)
++  }
++  return obj
++}
++
++// Store original methods
++const _fill = CanvasRenderingContext2D.prototype.fill
++const _stroke = CanvasRenderingContext2D.prototype.stroke
++const _clip = CanvasRenderingContext2D.prototype.clip
++const _isPointInPath = CanvasRenderingContext2D.prototype.isPointInPath
++const _isPointInStroke = CanvasRenderingContext2D.prototype.isPointInStroke
++
++// Override fill to handle Path2D-like objects from bundled environments
++CanvasRenderingContext2D.prototype.fill = function fill(pathOrRule, rule) {
++  if (pathOrRule && typeof pathOrRule === 'object' && typeof pathOrRule !== 'string') {
++    pathOrRule = ensurePath2D(pathOrRule)
++  }
++  if (arguments.length === 0) {
++    return _fill.call(this)
++  } else if (arguments.length === 1) {
++    return _fill.call(this, pathOrRule)
++  } else {
++    return _fill.call(this, pathOrRule, rule)
++  }
++}
++
++// Override stroke to handle Path2D-like objects from bundled environments
++CanvasRenderingContext2D.prototype.stroke = function stroke(path) {
++  if (path && typeof path === 'object') {
++    path = ensurePath2D(path)
++  }
++  if (arguments.length === 0) {
++    return _stroke.call(this)
++  } else {
++    return _stroke.call(this, path)
++  }
++}
++
++// Override clip to handle Path2D-like objects from bundled environments
++CanvasRenderingContext2D.prototype.clip = function clip(pathOrRule, rule) {
++  if (pathOrRule && typeof pathOrRule === 'object' && typeof pathOrRule !== 'string') {
++    pathOrRule = ensurePath2D(pathOrRule)
++  }
++  if (arguments.length === 0) {
++    return _clip.call(this)
++  } else if (arguments.length === 1) {
++    return _clip.call(this, pathOrRule)
++  } else {
++    return _clip.call(this, pathOrRule, rule)
++  }
++}
++
++// Override isPointInPath to handle Path2D-like objects from bundled environments
++CanvasRenderingContext2D.prototype.isPointInPath = function isPointInPath(pathOrX, xOrY, yOrRule, rule) {
++  if (pathOrX && typeof pathOrX === 'object' && typeof pathOrX !== 'string') {
++    pathOrX = ensurePath2D(pathOrX)
++  }
++  if (arguments.length === 2) {
++    return _isPointInPath.call(this, pathOrX, xOrY)
++  } else if (arguments.length === 3) {
++    return _isPointInPath.call(this, pathOrX, xOrY, yOrRule)
++  } else {
++    return _isPointInPath.call(this, pathOrX, xOrY, yOrRule, rule)
++  }
++}
++
++// Override isPointInStroke to handle Path2D-like objects from bundled environments
++CanvasRenderingContext2D.prototype.isPointInStroke = function isPointInStroke(pathOrX, xOrY, y) {
++  if (pathOrX && typeof pathOrX === 'object' && typeof pathOrX !== 'string') {
++    pathOrX = ensurePath2D(pathOrX)
++  }
++  if (arguments.length === 2) {
++    return _isPointInStroke.call(this, pathOrX, xOrY)
++  } else {
++    return _isPointInStroke.call(this, pathOrX, xOrY, y)
++  }
++}
++
+ function createCanvas(width, height, flag) {
+   const isSvgBackend = typeof flag !== 'undefined'
+   return isSvgBackend ? new SVGCanvas(width, height, flag) : new CanvasElement(width, height)
