@@ -53,21 +53,21 @@ export default defineConfig({
     },
 
     /* Disable animations via cookie for more stable tests */
-    // storageState: {
-    //   cookies: [
-    //     {
-    //       name: '__disable_animations',
-    //       value: 'true',
-    //       domain: 'localhost',
-    //       path: '/',
-    //       expires: -1,
-    //       httpOnly: false,
-    //       secure: false,
-    //       sameSite: 'Lax' as const,
-    //     },
-    //   ],
-    //   origins: [],
-    // },
+    storageState: {
+      cookies: [
+        {
+          name: '__disable_animations',
+          value: 'true',
+          domain: 'localhost',
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax' as const,
+        },
+      ],
+      origins: [],
+    },
   },
 
   timeout: 60_000,
