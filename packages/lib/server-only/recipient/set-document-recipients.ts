@@ -297,7 +297,7 @@ export const setDocumentRecipients = async ({
     // Send emails to deleted recipients.
     await Promise.all(
       removedRecipients.map(async (recipient) => {
-        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
+        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled || recipient.role === RecipientRole.CC) {
           return;
         }
 
