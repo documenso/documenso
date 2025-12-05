@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: ['main', 'feat/rr7']
+    branches: ['main']
   pull_request:
     branches: ['main']
 jobs:
@@ -27,9 +27,6 @@ jobs:
 
       - name: Seed the database
         run: npm run prisma:seed
-
-      - name: Build app
-        run: npm run build
 
       - name: Install playwright browsers
         run: npx playwright install --with-deps
