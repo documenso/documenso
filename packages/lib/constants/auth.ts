@@ -69,3 +69,40 @@ export const getCookieDomain = () => {
 
   return url.hostname;
 };
+
+/**
+ * Get allowed signup domains from env var.
+ * Returns empty array if not set (meaning all domains allowed).
+ */
+export const getAllowedSignupDomains = (): string[] => {
+  const domains = env('NEXT_PUBLIC_ALLOWED_SIGNUP_DOMAINS');
+
+  if (!domains) {
+    return [];
+  }
+
+  return domains
+    .split(',')
+    .map((d) => d.trim().toLowerCase())
+    .filter(Boolean);
+};
+
+/**
+ * Check if email domain is allowed for signup.
+ * Returns true if no domain restriction is configured.
+ */
+export const isEmailDomainAllowedForSignup = (email: string): boolean => {
+  const allowedDomains = getAllowedSignupDomains();
+
+  if (allowedDomains.length === 0) {
+    return true;
+  }
+
+  const emailDomain = email.toLowerCase().split('@').pop();
+
+  if (!emailDomain) {
+    return false;
+  }
+
+  return allowedDomains.includes(emailDomain);
+};
