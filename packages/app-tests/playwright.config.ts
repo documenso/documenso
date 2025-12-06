@@ -10,7 +10,10 @@ function calculateWorkers() {
   const usable = Math.max(total - 2, 1);
 
   // 1 worker per 2 cores, minimum 1
-  return Math.max(Math.floor(usable / 2), 1);
+  const workers = Math.max(Math.floor(usable / 2), 1);
+
+  // Max 6 workers
+  return Math.min(workers, 6);
 }
 
 const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
