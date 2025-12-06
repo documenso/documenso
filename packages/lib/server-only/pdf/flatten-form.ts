@@ -14,7 +14,7 @@ import {
 } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 
 export const removeOptionalContentGroups = (document: PDFDocument) => {
   const context = document.context;
@@ -29,7 +29,7 @@ export const flattenForm = async (document: PDFDocument) => {
 
   const form = document.getForm();
 
-  const fontNoto = await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
+  const fontNoto = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
     async (res) => res.arrayBuffer(),
   );
 
