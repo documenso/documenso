@@ -28,8 +28,6 @@ export const loader = () => {
 export default function TeamsSettingsPage() {
   const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
 
-  console.log('isAiFeaturesConfigured', isAiFeaturesConfigured);
-
   const team = useCurrentTeam();
 
   const { t } = useLingui();
