@@ -132,7 +132,12 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeFieldSetMutationQuery = trpc.envelope.field.set.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ data: fields }) => {
+      setEnvelope((prev) => ({
+        ...prev,
+        fields,
+      }));
+
       setAutosaveError(false);
     },
     onError: (err) => {
@@ -154,7 +159,17 @@ export const EnvelopeEditorProvider = ({
       setEnvelope((prev) => ({
         ...prev,
         recipients,
+        fields: prev.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
       }));
+
+      // Reset the local fields to ensure deleted recipient fields are removed.
+      editorFields.resetForm(
+        envelope.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
+      );
 
       setAutosaveError(false);
     },
@@ -265,7 +280,7 @@ export const EnvelopeEditorProvider = ({
   );
 
   /**
-   * Fetch and sycn the envelope back into the editor.
+   * Fetch and sync the envelope back into the editor.
    *
    * Overrides everything.
    */

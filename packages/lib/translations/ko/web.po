@@ -2817,6 +2817,10 @@ msgstr "{0}에 생성됨"
 msgid "CSV Structure"
 msgstr "CSV 구조"
 
+#: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
+msgid "Cumulative MAU (signed in)"
+msgstr "누적 MAU(로그인 기준)"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 msgid "Current"
 msgstr "현재"

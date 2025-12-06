@@ -1,4 +1,4 @@
-import { DocumentSigningOrder, FieldType, RecipientRole } from '@prisma/client';
+import { DocumentSigningOrder, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
@@ -21,21 +21,10 @@ import {
   ZFieldPageYSchema,
   ZFieldWidthSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
-
-const ZFieldSchema = z.object({
-  id: z.number().optional(),
-  type: z.nativeEnum(FieldType),
-  pageNumber: ZFieldPageNumberSchema,
-  pageX: ZFieldPageXSchema,
-  pageY: ZFieldPageYSchema,
-  width: ZFieldWidthSchema,
-  height: ZFieldHeightSchema,
-  fieldMeta: ZFieldMetaSchema.optional(),
-  envelopeItemId: z.string(),
-});
 
 export const ZUpdateEmbeddingTemplateRequestSchema = z.object({
   templateId: z.number(),
@@ -44,7 +33,7 @@ export const ZUpdateEmbeddingTemplateRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: z.union([z.string().length(0), z.string().email()]),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
