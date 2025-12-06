@@ -24,8 +24,8 @@ import {
   ZDocumentTitleSchema,
   ZDocumentVisibilitySchema,
 } from '../document-router/schema';
-import { ZCreateRecipientSchema } from '../recipient-router/schema';
 import type { TrpcRouteMeta } from '../trpc';
+import { ZCreateEnvelopeRecipientSchema } from './envelope-recipients/create-envelope-recipients.types';
 
 export const createEnvelopeMeta: TrpcRouteMeta = {
   openapi: {
@@ -54,7 +54,7 @@ export const ZCreateEnvelopePayloadSchema = z.object({
     .optional(),
   recipients: z
     .array(
-      ZCreateRecipientSchema.extend({
+      ZCreateEnvelopeRecipientSchema.extend({
         fields: ZEnvelopeFieldAndMetaSchema.and(
           z.object({
             identifier: z

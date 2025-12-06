@@ -19,6 +19,7 @@ import * as z from 'zod';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { extractDocumentAuthMethods } from '@documenso/lib/utils/document-auth';
 import { trpc, trpc as trpcReact } from '@documenso/trpc/react';
 import { DocumentSendEmailMessageHelper } from '@documenso/ui/components/document/document-send-email-message-helper';
 import { cn } from '@documenso/ui/lib/utils';
@@ -129,17 +130,42 @@ export const EnvelopeDistributeDialog = ({
 
   const distributionMethod = watch('meta.distributionMethod');
 
+  const recipientsWithIndex = useMemo(
+    () =>
+      envelope.recipients.map((recipient, index) => ({
+        ...recipient,
+        index,
+      })),
+    [envelope.recipients],
+  );
+
   const recipientsMissingSignatureFields = useMemo(
     () =>
-      envelope.recipients.filter(
+      recipientsWithIndex.filter(
         (recipient) =>
           recipient.role === RecipientRole.SIGNER &&
           !envelope.fields.some(
             (field) => field.type === FieldType.SIGNATURE && field.recipientId === recipient.id,
           ),
       ),
-    [envelope.recipients, envelope.fields],
+    [recipientsWithIndex, envelope.fields],
   );
+
+  /**
+   * List of recipients who must have an email due to having auth enabled.
+   */
+  const recipientsMissingRequiredEmail = useMemo(() => {
+    return recipientsWithIndex.filter((recipient) => {
+      const auth = extractDocumentAuthMethods({
+        documentAuth: envelope.authOptions,
+        recipientAuth: recipient.authOptions,
+      });
+
+      return (
+        (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) && !recipient.email
+      );
+    });
+  }, [recipientsWithIndex, envelope.authOptions]);
 
   const invalidEnvelopeCode = useMemo(() => {
     if (recipientsMissingSignatureFields.length > 0) {
@@ -150,8 +176,12 @@ export const EnvelopeDistributeDialog = ({
       return 'MISSING_RECIPIENTS';
     }
 
+    if (recipientsMissingRequiredEmail.length > 0) {
+      return 'MISSING_REQUIRED_EMAIL';
+    }
+
     return null;
-  }, [envelope.recipients, envelope.fields, recipientsMissingSignatureFields]);
+  }, [envelope.recipients, recipientsMissingRequiredEmail, recipientsMissingSignatureFields]);
 
   const onFormSubmit = async ({ meta }: TEnvelopeDistributeFormSchema) => {
     try {
@@ -444,7 +474,22 @@ export const EnvelopeDistributeDialog = ({
 
                     <ul className="ml-2 mt-1 list-inside list-disc">
                       {recipientsMissingSignatureFields.map((recipient) => (
-                        <li key={recipient.id}>{recipient.email}</li>
+                        <li key={recipient.id}>
+                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
+                        </li>
+                      ))}
+                    </ul>
+                  </AlertDescription>
+                ))
+                .with('MISSING_REQUIRED_EMAIL', () => (
+                  <AlertDescription>
+                    <Trans>The following recipients require an email address:</Trans>
+
+                    <ul className="ml-2 mt-1 list-inside list-disc">
+                      {recipientsMissingRequiredEmail.map((recipient) => (
+                        <li key={recipient.id}>
+                          {recipient.email || recipient.name || t`Recipient ${recipient.index + 1}`}
+                        </li>
                       ))}
                     </ul>
                   </AlertDescription>
