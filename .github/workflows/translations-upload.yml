@@ -27,9 +27,6 @@ jobs:
       - name: Extract translations
         run: npm run translate:extract
 
-      - name: Install GitHub CLI
-        uses: cli/cli@v4
-
       - name: Commit changes and push to reserved branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
