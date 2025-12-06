@@ -299,6 +299,7 @@ export const setDocumentRecipients = async ({
       removedRecipients.map(async (recipient) => {
         if (
           recipient.sendStatus !== SendStatus.SENT ||
+          recipient.role === RecipientRole.CC ||
           !isRecipientRemovedEmailEnabled ||
           !isRecipientEmailValidForSending(recipient)
         ) {
