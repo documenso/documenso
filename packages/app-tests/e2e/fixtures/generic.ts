@@ -14,9 +14,8 @@ export const expectToastTextToBeVisible = async (page: Page, text: string) => {
 };
 
 export const openDropdownMenu = async (page: Page, dropdownButton: Locator) => {
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(500); // Initial timeout incase table remounts which will close the dropdown.
   await dropdownButton.focus();
-  // await page.waitForTimeout(500);
   await page.keyboard.press('Enter');
 
   await page.waitForTimeout(500);
@@ -24,9 +23,7 @@ export const openDropdownMenu = async (page: Page, dropdownButton: Locator) => {
   await page.waitForTimeout(500);
 
   await dropdownButton.focus();
-  // await page.waitForTimeout(500);
   await page.keyboard.press('Enter');
-  // await page.waitForTimeout(500);
 
   await expect(page.getByRole('menuitem').first()).toBeVisible();
 };
