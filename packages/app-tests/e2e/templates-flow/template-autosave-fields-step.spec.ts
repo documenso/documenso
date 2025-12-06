@@ -296,7 +296,13 @@ test.describe('AutoSave Fields Step', () => {
         ['SIGNATURE', 'TEXT'].toSorted(),
       );
 
-      const textField = fields[1];
+      const textField = fields.find((field) => field.type === 'TEXT');
+      expect(textField).toBeDefined();
+
+      if (!textField) {
+        throw new Error('No text field');
+      }
+
       expect(textField.fieldMeta).toBeDefined();
 
       if (

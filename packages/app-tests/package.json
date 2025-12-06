@@ -7,7 +7,7 @@
   "scripts": {
     "test:dev": "NODE_OPTIONS=--experimental-require-module playwright test",
     "test-ui:dev": "NODE_OPTIONS=--experimental-require-module playwright test --ui",
-    "test:e2e": "NODE_OPTIONS=--experimental-require-module NODE_ENV=test start-server-and-test \"npm run start -w @documenso/remix\" http://localhost:3000 \"playwright test $E2E_TEST_PATH\""
+    "test:e2e": "NODE_OPTIONS=--experimental-require-module NODE_ENV=test NEXT_PRIVATE_LOGGER_FILE_PATH=./logs.json start-server-and-test \"npm run start -w @documenso/remix\" http://localhost:3000 \"playwright test $E2E_TEST_PATH\""
   },
   "keywords": [],
   "author": "",
