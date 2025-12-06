@@ -150,8 +150,8 @@ export const MultiSignDocumentSigningView = ({
       onDocumentError?.();
 
       toast({
-        title: 'Error',
-        description: 'Failed to complete the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`Failed to complete the document. Please try again.`),
         variant: 'destructive',
       });
     } finally {

@@ -15,6 +15,7 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
+    "@ai-sdk/google-vertex": "3.0.81",
     "@aws-sdk/client-s3": "^3.936.0",
     "@aws-sdk/client-sesv2": "^3.936.0",
     "@aws-sdk/cloudfront-signer": "^3.935.0",
@@ -27,6 +28,7 @@
     "@lingui/core": "^5.6.0",
     "@lingui/macro": "^5.6.0",
     "@lingui/react": "^5.6.0",
+    "@napi-rs/canvas": "^0.1.83",
     "@noble/ciphers": "0.6.0",
     "@noble/hashes": "1.8.0",
     "@node-rs/bcrypt": "^1.10.7",
@@ -35,6 +37,7 @@
     "@sindresorhus/slugify": "^3.0.0",
     "@team-plain/typescript-sdk": "^5.11.0",
     "@vvo/tzdb": "^6.196.0",
+    "ai": "^5.0.104",
     "csv-parse": "^6.1.0",
     "inngest": "^3.45.1",
     "jose": "^6.1.2",
@@ -43,6 +46,7 @@
     "luxon": "^3.7.2",
     "nanoid": "^5.1.6",
     "oslo": "^0.17.0",
+    "p-map": "^7.0.4",
     "pg": "^8.16.3",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",

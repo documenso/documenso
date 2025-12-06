@@ -15,7 +15,7 @@
     "@documenso/tailwind-config": "*",
     "@documenso/trpc": "*",
     "@documenso/ui": "*",
-    "next": "^15",
+    "next": "^15.5.7",
     "next-plausible": "^3.12.5",
     "nextra": "^3",
     "nextra-theme-docs": "^3",

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
@@ -226,7 +226,12 @@ export const EnvelopeEditorUploadPage = () => {
     }
 
     if (maximumEnvelopeItemCount <= localFiles.length) {
-      return msg`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`;
+      return msg({
+        message: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
+      });
     }
 
     return null;
@@ -240,7 +245,10 @@ export const EnvelopeEditorUploadPage = () => {
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });

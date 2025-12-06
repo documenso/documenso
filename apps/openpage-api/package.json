@@ -12,7 +12,7 @@
   "dependencies": {
     "@documenso/prisma": "*",
     "luxon": "^3.7.2",
-    "next": "^15"
+    "next": "^15.5.7"
   },
   "devDependencies": {
     "@types/node": "^20",

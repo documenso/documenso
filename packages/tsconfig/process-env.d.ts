@@ -86,5 +86,12 @@ declare namespace NodeJS {
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
     POSTGRES_URL_NON_POOLING?: string;
+
+    /**
+     * Google Vertex AI environment variables
+     */
+    GOOGLE_VERTEX_PROJECT_ID?: string;
+    GOOGLE_VERTEX_LOCATION?: string;
+    GOOGLE_VERTEX_API_KEY?: string;
   }
 }
