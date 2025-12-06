@@ -201,7 +201,7 @@ export const SignInForm = ({
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
         description: _(errorMessage),
         duration: 10000,
         variant: 'destructive',

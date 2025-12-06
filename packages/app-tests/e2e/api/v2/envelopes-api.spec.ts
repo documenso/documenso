@@ -147,6 +147,9 @@ test.describe('API V2 Envelopes', () => {
         externalId: 'externalId',
         visibility: DocumentVisibility.MANAGER_AND_ABOVE,
         globalAccessAuth: ['ACCOUNT'],
+        // Ignore this error in the test since it doesn't actually exist in the PDF:
+        // - Error setting value for field hello: PDFDocument has no form field with the name "hello"
+        // We want to check if the form value is set in the DB.
         formValues: {
           hello: 'world',
         },
@@ -264,8 +267,6 @@ test.describe('API V2 Envelopes', () => {
           envelopeAttachments: true,
         },
       });
-
-      console.log(userB.email);
 
       expect(envelope.envelopeItems.length).toBe(2);
       expect(envelope.envelopeItems[0].title).toBe('field-meta.pdf');
