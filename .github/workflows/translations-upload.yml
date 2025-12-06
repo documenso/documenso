@@ -44,7 +44,7 @@ jobs:
           git checkout -B "$BRANCH" origin/main
 
           # Stage translation output
-          git add -A
+          git add packages/lib/translations
 
           # If no changes, exit early
           if git diff --staged --quiet; then
