@@ -1,3 +1,6 @@
+/**
+ * @deprecated We use Konva to generate the certificate PDF now.
+ */
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
