@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react';
 
-import { useLingui } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
@@ -70,21 +70,31 @@ export const DocumentVisibilityTooltip = () => {
 
       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
         <h2>
-          <strong>Document visibility</strong>
+          <strong>
+            <Trans>Document visibility</Trans>
+          </strong>
         </h2>
 
-        <p>The visibility of the document to the recipient.</p>
+        <p>
+          <Trans>The visibility of the document to the recipient.</Trans>
+        </p>
 
         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
           <li>
-            <strong>Everyone</strong> - Everyone can access and view the document
+            <Trans>
+              <strong>Everyone</strong> - Everyone can access and view the document
+            </Trans>
           </li>
           <li>
-            <strong>Managers and above</strong> - Only managers and above can access and view the
-            document
+            <Trans>
+              <strong>Managers and above</strong> - Only managers and above can access and view the
+              document
+            </Trans>
           </li>
           <li>
-            <strong>Admins only</strong> - Only admins can access and view the document
+            <Trans>
+              <strong>Admins only</strong> - Only admins can access and view the document
+            </Trans>
           </li>
         </ul>
       </TooltipContent>

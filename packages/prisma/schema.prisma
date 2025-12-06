@@ -834,6 +834,9 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean @default(false)
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
@@ -865,6 +868,9 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean?
 }
 
 model Team {

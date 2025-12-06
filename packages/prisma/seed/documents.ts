@@ -588,6 +588,9 @@ export const seedPendingDocumentWithFullFields = async ({
     where: {
       envelopeId: document.id,
     },
+    orderBy: {
+      signingOrder: 'asc',
+    },
     include: {
       fields: true,
     },
