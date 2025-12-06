@@ -1,6 +1,6 @@
 import { getTeamSettings } from '@documenso/lib/server-only/team/get-team-settings';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
-import { loadLogo } from '@documenso/lib/utils/image-helpers';
+import { loadLogo } from '@documenso/lib/utils/images/logo';
 
 import type { Route } from './+types/branding.logo.team.$teamId';
 

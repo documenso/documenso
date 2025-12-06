@@ -4,7 +4,7 @@ import { ORGANISATION_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/organi
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '../../constants/teams';
 import { AppError } from '../../errors/app-error';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
-import { optimiseAvatar } from '../../utils/image-helpers';
+import { optimiseAvatar } from '../../utils/images/avatar';
 import { buildOrganisationWhereQuery } from '../../utils/organisations';
 import { buildTeamWhereQuery } from '../../utils/teams';
 

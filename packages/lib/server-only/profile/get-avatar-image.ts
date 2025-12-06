@@ -1,6 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
-import { loadAvatar } from '../../utils/image-helpers';
+import { loadAvatar } from '../../utils/images/avatar';
 
 export type GetAvatarImageOptions = {
   id: string;

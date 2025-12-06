@@ -1,5 +1,5 @@
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
-import { loadLogo } from '@documenso/lib/utils/image-helpers';
+import { loadLogo } from '@documenso/lib/utils/images/logo';
 import { prisma } from '@documenso/prisma';
 
 import type { Route } from './+types/branding.logo.organisation.$orgId';
