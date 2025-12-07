@@ -15,7 +15,7 @@ msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
-msgstr ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
+msgstr "Documentos .PDF aceitos (máx. {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
