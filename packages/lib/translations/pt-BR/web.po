@@ -7701,12 +7701,12 @@ msgstr "Assinado"
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role actioned"
 msgid "Signed"
-msgstr "Signed"
+msgstr "Assinado"
 
 #: apps/remix/app/components/dialogs/envelope-download-dialog.tsx
 msgctxt "Signed document (adjective)"
 msgid "Signed"
-msgstr "Signed"
+msgstr "Assinado"
 
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-header.tsx
 msgid "Signer"
@@ -7715,7 +7715,7 @@ msgstr "Signatário"
 #: packages/lib/constants/recipient-roles.ts
 msgctxt "Recipient role name"
 msgid "Signer"
-msgstr "Signer"
+msgstr "Signatário"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Signer Events"
