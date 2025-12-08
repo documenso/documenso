@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { CheckIcon, ShieldCheckIcon, UserIcon, XIcon } from 'lucide-react';
 
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -190,10 +190,19 @@ export const AiRecipientDetectionDialog = ({
 
               {progress && (
                 <p className="mt-2 text-xs text-muted-foreground/60">
-                  <Trans>
-                    Page {progress.pagesProcessed} of {progress.totalPages} -{' '}
-                    {progress.recipientsDetected} recipient(s) found
-                  </Trans>
+                  <Plural
+                    value={progress.recipientsDetected}
+                    one={
+                      <Trans>
+                        Page {progress.pagesProcessed} of {progress.totalPages} - # recipient found
+                      </Trans>
+                    }
+                    other={
+                      <Trans>
+                        Page {progress.pagesProcessed} of {progress.totalPages} - # recipients found
+                      </Trans>
+                    }
+                  />
                 </p>
               )}
 
@@ -237,9 +246,11 @@ export const AiRecipientDetectionDialog = ({
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    <Trans>
-                      We found {detectedRecipients.length} recipient(s) in your document.
-                    </Trans>
+                    <Plural
+                      value={detectedRecipients.length}
+                      one="We found # recipient in your document."
+                      other="We found # recipients in your document."
+                    />
                   </p>
 
                   <ul className="mt-4 divide-y rounded-lg border">

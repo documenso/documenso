@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Plural, Trans } from '@lingui/react/macro';
 import { CheckIcon, FormInputIcon, ShieldCheckIcon } from 'lucide-react';
 
 import type { NormalizedFieldWithContext } from '@documenso/lib/server-only/ai/envelope/detect-fields/types';
@@ -232,10 +232,19 @@ export const AiFieldDetectionDialog = ({
 
               {progress && (
                 <p className="mt-2 text-xs text-muted-foreground/60">
-                  <Trans>
-                    Page {progress.pagesProcessed} of {progress.totalPages} -{' '}
-                    {progress.fieldsDetected} field(s) found
-                  </Trans>
+                  <Plural
+                    value={progress.fieldsDetected}
+                    one={
+                      <Trans>
+                        Page {progress.pagesProcessed} of {progress.totalPages} - # field found
+                      </Trans>
+                    }
+                    other={
+                      <Trans>
+                        Page {progress.pagesProcessed} of {progress.totalPages} - # fields found
+                      </Trans>
+                    }
+                  />
                 </p>
               )}
 
@@ -279,7 +288,11 @@ export const AiFieldDetectionDialog = ({
               ) : (
                 <>
                   <p className="text-sm text-muted-foreground">
-                    <Trans>We found {detectedFields.length} field(s) in your document.</Trans>
+                    <Plural
+                      value={detectedFields.length}
+                      one="We found # field in your document."
+                      other="We found # fields in your document."
+                    />
                   </p>
 
                   <ul className="mt-4 divide-y rounded-lg border">
