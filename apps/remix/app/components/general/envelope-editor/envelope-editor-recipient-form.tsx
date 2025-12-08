@@ -8,6 +8,7 @@ import {
   type SensorAPI,
 } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
@@ -329,8 +330,14 @@ export const EnvelopeEditorRecipientForm = () => {
     });
 
     toast({
-      title: t`Recipients added`,
-      description: t`${detectedRecipients.length} recipient(s) have been added from AI detection.`,
+      title: plural(detectedRecipients.length, {
+        one: `Recipient added`,
+        other: `Recipients added`,
+      }),
+      description: plural(detectedRecipients.length, {
+        one: `# recipient have been added from AI detection.`,
+        other: `# recipients have been added from AI detection.`,
+      }),
     });
   };
 
