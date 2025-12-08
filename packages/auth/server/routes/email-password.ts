@@ -183,7 +183,7 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const userSessionIds = await prisma.session
       .findMany({
         where: {
-          userId: user.id,
+          userId: user.id satisfies number, // Incase we pass undefined somehow.
           id: {
             not: session.id,
           },
@@ -255,39 +255,31 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const requestMetadata = c.get('requestMetadata');
 
-    // Look up user ID before password reset for session invalidation
-    const passwordResetToken = await prisma.passwordResetToken.findFirst({
-      where: { token },
-      select: { userId: true },
-    });
-
-    await resetPassword({
+    const { userId } = await resetPassword({
       token,
       password,
       requestMetadata,
     });
 
     // Invalidate all sessions after successful password reset
-    if (passwordResetToken) {
-      const userSessionIds = await prisma.session
-        .findMany({
-          where: {
-            userId: passwordResetToken.userId,
-          },
-          select: {
-            id: true,
-          },
-        })
-        .then((sessions) => sessions.map((session) => session.id));
+    const userSessionIds = await prisma.session
+      .findMany({
+        where: {
+          userId: userId satisfies number, // Incase we pass undefined somehow.
+        },
+        select: {
+          id: true,
+        },
+      })
+      .then((sessions) => sessions.map((session) => session.id));
 
-      if (userSessionIds.length > 0) {
-        await invalidateSessions({
-          userId: passwordResetToken.userId,
-          sessionIds: userSessionIds,
-          metadata: requestMetadata,
-          isRevoke: true,
-        });
-      }
+    if (userSessionIds.length > 0) {
+      await invalidateSessions({
+        userId,
+        sessionIds: userSessionIds,
+        metadata: requestMetadata,
+        isRevoke: true,
+      });
     }
 
     return c.text('OK', 201);
