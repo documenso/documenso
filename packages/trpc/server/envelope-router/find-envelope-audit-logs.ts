@@ -18,7 +18,13 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
   .input(ZFindEnvelopeAuditLogsRequestSchema)
   .output(ZFindEnvelopeAuditLogsResponseSchema)
   .query(async ({ input, ctx }) => {
-    const { envelopeId, page = 1, perPage = 50 } = input;
+    const {
+      envelopeId,
+      page = 1,
+      perPage = 50,
+      orderByColumn = 'createdAt',
+      orderByDirection = 'desc',
+    } = input;
 
     ctx.logger.info({
       input: {
@@ -56,6 +62,9 @@ export const findEnvelopeAuditLogsRoute = authenticatedProcedure
         where: { envelopeId: envelope.id },
         skip: Math.max(page - 1, 0) * perPage,
         take: perPage,
+        orderBy: {
+          [orderByColumn]: orderByDirection,
+        },
       }),
       prisma.documentAuditLog.count({
         where: { envelopeId: envelope.id },

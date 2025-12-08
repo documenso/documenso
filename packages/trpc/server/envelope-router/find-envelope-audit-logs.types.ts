@@ -19,6 +19,8 @@ export const ZFindEnvelopeAuditLogsRequestSchema = ZFindSearchParamsSchema.omit(
   query: true,
 }).extend({
   envelopeId: z.string().describe('Envelope ID'),
+  orderByColumn: z.enum(['createdAt']).optional(),
+  orderByDirection: z.enum(['asc', 'desc']).optional(),
 });
 
 export const ZFindEnvelopeAuditLogsResponseSchema = ZFindResultResponse.extend({
