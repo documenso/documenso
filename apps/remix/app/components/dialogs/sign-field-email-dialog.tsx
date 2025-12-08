@@ -24,25 +24,30 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z.string().min(1, { message: msg`Email is required`.id }),
+  email: z
+    .string()
+    .email()
+    .min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;
 
-export type SignFieldEmailDialogProps = Record<string, never>;
+export type SignFieldEmailDialogProps = {
+  placeholderEmail: string | null;
+};
 
 export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, string | null>(
-  ({ call }) => {
+  ({ call, placeholderEmail }) => {
     const form = useForm<TSignFieldEmailFormSchema>({
       resolver: zodResolver(ZSignFieldEmailFormSchema),
       defaultValues: {
-        email: '',
+        email: placeholderEmail || '',
       },
     });
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
             <DialogTitle>
               <Trans>Sign Email</Trans>

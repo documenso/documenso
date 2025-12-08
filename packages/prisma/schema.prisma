@@ -134,8 +134,8 @@ model Passkey {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @default(now())
   lastUsedAt           DateTime?
-  credentialId         Bytes
-  credentialPublicKey  Bytes
+  credentialId         Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
+  credentialPublicKey  Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
   counter              BigInt
   credentialDeviceType String
   credentialBackedUp   Boolean
@@ -258,8 +258,9 @@ model SubscriptionClaim {
   name   String
   locked Boolean @default(false)
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
@@ -273,8 +274,9 @@ model OrganisationClaim {
   originalSubscriptionClaimId String?
   organisation                Organisation?
 
-  teamCount   Int
-  memberCount Int
+  teamCount         Int
+  memberCount       Int
+  envelopeItemCount Int
 
   flags Json /// [ClaimFlags] @zod.custom.use(ZClaimFlagsSchema)
 }
@@ -317,6 +319,9 @@ model Session {
   updatedAt DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
 }
 
 enum DocumentStatus {
@@ -422,6 +427,15 @@ model Envelope {
 
   documentMetaId String       @unique
   documentMeta   DocumentMeta @relation(fields: [documentMetaId], references: [id])
+
+  envelopeAttachments EnvelopeAttachment[]
+
+  @@index([type])
+  @@index([status])
+  @@index([userId])
+  @@index([teamId])
+  @@index([folderId])
+  @@index([createdAt])
 }
 
 model EnvelopeItem {
@@ -440,6 +454,7 @@ model EnvelopeItem {
   field Field[]
 
   @@unique([documentDataId])
+  @@index([envelopeId])
 }
 
 model DocumentAuditLog {
@@ -508,6 +523,24 @@ model DocumentMeta {
   envelope Envelope?
 }
 
+/// @zod.import(["import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';"])
+model EnvelopeAttachment {
+  id String @id @default(cuid())
+
+  type  String /// [EnvelopeAttachmentType] @zod.custom.use(ZEnvelopeAttachmentTypeSchema)
+  label String
+
+  data String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  envelopeId String
+  envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
+}
+
 enum ReadStatus {
   NOT_OPENED
   OPENED
@@ -553,8 +586,10 @@ model Recipient {
   fields            Field[]
   signatures        Signature[]
 
-  @@index([envelopeId])
   @@index([token])
+  @@index([email])
+  @@index([envelopeId])
+  @@index([signedAt])
 }
 
 enum FieldType {
@@ -593,6 +628,7 @@ model Field {
   fieldMeta      Json? /// [FieldMeta] @zod.custom.use(ZFieldMetaNotOptionalSchema)
 
   @@index([envelopeId])
+  @@index([envelopeItemId])
   @@index([recipientId])
 }
 
@@ -663,6 +699,9 @@ model Organisation {
 
   organisationAuthenticationPortalId String                           @unique
   organisationAuthenticationPortal   OrganisationAuthenticationPortal @relation(fields: [organisationAuthenticationPortalId], references: [id])
+
+  @@index([name])
+  @@index([ownerUserId])
 }
 
 model OrganisationMember {
@@ -679,6 +718,7 @@ model OrganisationMember {
   organisationGroupMembers OrganisationGroupMember[]
 
   @@unique([userId, organisationId])
+  @@index([organisationId])
 }
 
 model OrganisationMemberInvite {
@@ -708,6 +748,8 @@ model OrganisationGroup {
   organisationGroupMembers OrganisationGroupMember[]
 
   teamGroups TeamGroup[]
+
+  @@index([organisationId])
 }
 
 model OrganisationGroupMember {
@@ -720,6 +762,8 @@ model OrganisationGroupMember {
   organisationMemberId String
 
   @@unique([organisationMemberId, groupId])
+  @@index([groupId])
+  @@index([organisationMemberId])
 }
 
 model TeamGroup {
@@ -734,6 +778,8 @@ model TeamGroup {
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, organisationGroupId])
+  @@index([teamId])
+  @@index([organisationGroupId])
 }
 
 enum OrganisationGroupType {
@@ -788,6 +834,9 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean @default(false)
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
@@ -819,6 +868,9 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean?
 }
 
 model Team {
@@ -845,6 +897,9 @@ model Team {
 
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
+
+  @@index([name])
+  @@index([organisationId])
 }
 
 model TeamEmail {

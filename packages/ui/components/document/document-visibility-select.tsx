@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 
+import { Trans, useLingui } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
@@ -27,6 +28,8 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     { currentTeamMemberRole, isTeamSettings = false, disabled, canUpdateVisibility, ...props },
     ref,
   ) => {
+    const { t } = useLingui();
+
     const isAdmin = currentTeamMemberRole === TeamMemberRole.ADMIN;
     const isManager = currentTeamMemberRole === TeamMemberRole.MANAGER;
     const canEdit = isTeamSettings || canUpdateVisibility;
@@ -34,7 +37,7 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     return (
       <Select {...props} disabled={!canEdit || disabled}>
         <SelectTrigger ref={ref} className="bg-background text-muted-foreground">
-          <SelectValue data-testid="documentVisibilitySelectValue" placeholder="Everyone" />
+          <SelectValue data-testid="documentVisibilitySelectValue" placeholder={t`Everyone`} />
         </SelectTrigger>
 
         <SelectContent position="popper">
@@ -67,21 +70,31 @@ export const DocumentVisibilityTooltip = () => {
 
       <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
         <h2>
-          <strong>Document visibility</strong>
+          <strong>
+            <Trans>Document visibility</Trans>
+          </strong>
         </h2>
 
-        <p>The visibility of the document to the recipient.</p>
+        <p>
+          <Trans>The visibility of the document to the recipient.</Trans>
+        </p>
 
         <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
           <li>
-            <strong>Everyone</strong> - Everyone can access and view the document
+            <Trans>
+              <strong>Everyone</strong> - Everyone can access and view the document
+            </Trans>
           </li>
           <li>
-            <strong>Managers and above</strong> - Only managers and above can access and view the
-            document
+            <Trans>
+              <strong>Managers and above</strong> - Only managers and above can access and view the
+              document
+            </Trans>
           </li>
           <li>
-            <strong>Admins only</strong> - Only admins can access and view the document
+            <Trans>
+              <strong>Admins only</strong> - Only admins can access and view the document
+            </Trans>
           </li>
         </ul>
       </TooltipContent>

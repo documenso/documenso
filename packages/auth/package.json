@@ -12,14 +12,14 @@
   "dependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@hono/standard-validator": "^0.1.2",
+    "@hono/standard-validator": "^0.2.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
-    "arctic": "^3.1.0",
-    "hono": "4.7.0",
-    "luxon": "^3.5.0",
-    "nanoid": "^5.1.5",
-    "ts-pattern": "^5.0.5",
-    "zod": "3.24.1"
+    "arctic": "^3.7.0",
+    "hono": "4.10.6",
+    "luxon": "^3.7.2",
+    "nanoid": "^5.1.6",
+    "ts-pattern": "^5.9.0",
+    "zod": "^3.25.76"
   }
 }

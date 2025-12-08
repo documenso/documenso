@@ -13,6 +13,7 @@ export const ZFindSubscriptionClaimsResponseSchema = ZFindResultResponse.extend(
     name: true,
     teamCount: true,
     memberCount: true,
+    envelopeItemCount: true,
     locked: true,
     flags: true,
   }).array(),

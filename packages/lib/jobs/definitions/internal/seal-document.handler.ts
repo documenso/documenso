@@ -1,4 +1,12 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import {
+  PDFDocument,
+  RotationTypes,
+  popGraphicsState,
+  pushGraphicsState,
+  radiansToDegrees,
+  rotateDegrees,
+  translate,
+} from '@cantoo/pdf-lib';
 import type { DocumentData, DocumentMeta, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentStatus,
@@ -9,18 +17,20 @@ import {
 } from '@prisma/client';
 import { nanoid } from 'nanoid';
 import path from 'node:path';
+import { groupBy } from 'remeda';
+import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
-import PostHogServerClient from '../../../server-only/feature-flags/get-post-hog-server-client';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
+import { getPageSize } from '../../../server-only/pdf/get-page-size';
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
 import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf-v2';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
@@ -51,171 +61,141 @@ export const run = async ({
 }) => {
   const { documentId, sendEmail = true, isResealing = false, requestMetadata } = payload;
 
-  const envelope = await prisma.envelope.findFirstOrThrow({
-    where: {
-      type: EnvelopeType.DOCUMENT,
-      secondaryId: mapDocumentIdToSecondaryId(documentId),
-    },
-    include: {
-      documentMeta: true,
-      recipients: true,
-      envelopeItems: {
-        include: {
-          documentData: true,
-          field: {
-            include: {
-              signature: true,
+  const { envelopeId, envelopeStatus, isRejected } = await io.runTask('seal-document', async () => {
+    const envelope = await prisma.envelope.findFirstOrThrow({
+      where: {
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: mapDocumentIdToSecondaryId(documentId),
+      },
+      include: {
+        documentMeta: true,
+        recipients: true,
+        envelopeItems: {
+          include: {
+            documentData: true,
+            field: {
+              include: {
+                signature: true,
+              },
             },
           },
         },
       },
-    },
-  });
-
-  if (envelope.envelopeItems.length === 0) {
-    throw new Error('At least one envelope item required');
-  }
-
-  const settings = await getTeamSettings({
-    userId: envelope.userId,
-    teamId: envelope.teamId,
-  });
-
-  const isComplete =
-    envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
-    envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
-
-  if (!isComplete) {
-    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: 'Document is not complete',
     });
-  }
 
-  // Seems silly but we need to do this in case the job is re-ran
-  // after it has already run through the update task further below.
-  // eslint-disable-next-line @typescript-eslint/require-await
-  const documentStatus = await io.runTask('get-document-status', async () => {
-    return envelope.status;
-  });
+    if (envelope.envelopeItems.length === 0) {
+      throw new Error('At least one envelope item required');
+    }
 
-  // This is the same case as above.
-  let envelopeItems = await io.runTask(
-    'get-document-data-id',
-    // eslint-disable-next-line @typescript-eslint/require-await
-    async () => {
-      // eslint-disable-next-line unused-imports/no-unused-vars
-      return envelope.envelopeItems.map(({ field, ...rest }) => ({
-        ...rest,
-      }));
-    },
-  );
+    const settings = await getTeamSettings({
+      userId: envelope.userId,
+      teamId: envelope.teamId,
+    });
 
-  if (envelopeItems.length < 1) {
-    throw new Error(`Document ${envelope.id} has no envelope items`);
-  }
+    const isComplete =
+      envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
+      envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
 
-  const recipients = await prisma.recipient.findMany({
-    where: {
-      envelopeId: envelope.id,
-      role: {
-        not: RecipientRole.CC,
-      },
-    },
-  });
+    if (!isComplete) {
+      throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+        message: 'Document is not complete',
+      });
+    }
 
-  // Determine if the document has been rejected by checking if any recipient has rejected it
-  const rejectedRecipient = recipients.find(
-    (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
-  );
+    let envelopeItems = envelope.envelopeItems;
 
-  const isRejected = Boolean(rejectedRecipient);
+    if (envelopeItems.length < 1) {
+      throw new Error(`Document ${envelope.id} has no envelope items`);
+    }
 
-  // Get the rejection reason from the rejected recipient
-  const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
-
-  const fields = await prisma.field.findMany({
-    where: {
-      envelopeId: envelope.id,
-    },
-    include: {
-      signature: true,
-    },
-  });
-
-  // Skip the field check if the document is rejected
-  if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
-    throw new Error(`Document ${envelope.id} has unsigned required fields`);
-  }
-
-  if (isResealing) {
-    // If we're resealing we want to use the initial data for the document
-    // so we aren't placing fields on top of eachother.
-    envelopeItems = envelopeItems.map((envelopeItem) => ({
-      ...envelopeItem,
-      documentData: {
-        ...envelopeItem.documentData,
-        data: envelopeItem.documentData.initialData,
-      },
-    }));
-  }
-
-  if (!envelope.qrToken) {
-    await prisma.envelope.update({
+    const recipients = await prisma.recipient.findMany({
       where: {
-        id: envelope.id,
-      },
-      data: {
-        qrToken: prefixedId('qr'),
+        envelopeId: envelope.id,
+        role: {
+          not: RecipientRole.CC,
+        },
       },
     });
-  }
 
-  const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+    // Determine if the document has been rejected by checking if any recipient has rejected it
+    const rejectedRecipient = recipients.find(
+      (recipient) => recipient.signingStatus === SigningStatus.REJECTED,
+    );
 
-  const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
-    legacyDocumentId,
-    documentMeta: envelope.documentMeta,
-    settings,
-  });
+    const isRejected = Boolean(rejectedRecipient);
 
-  const newDocumentData = await Promise.all(
-    envelopeItems.map(async (envelopeItem) =>
-      io.runTask('decorate-and-sign-pdf', async () => {
-        const envelopeItemFields = envelope.envelopeItems.find(
-          (item) => item.id === envelopeItem.id,
-        )?.field;
+    // Get the rejection reason from the rejected recipient
+    const rejectionReason = rejectedRecipient?.rejectionReason ?? '';
 
-        if (!envelopeItemFields) {
-          throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
-        }
+    const fields = await prisma.field.findMany({
+      where: {
+        envelopeId: envelope.id,
+      },
+      include: {
+        signature: true,
+      },
+    });
 
-        return decorateAndSignPdf({
-          envelope,
-          envelopeItem,
-          envelopeItemFields,
-          isRejected,
-          rejectionReason,
-          certificateData,
-          auditLogData,
-        });
-      }),
-    ),
-  );
+    // Skip the field check if the document is rejected
+    if (!isRejected && fieldsContainUnsignedRequiredField(fields)) {
+      throw new Error(`Document ${envelope.id} has unsigned required fields`);
+    }
 
-  const postHog = PostHogServerClient();
+    if (isResealing) {
+      // If we're resealing we want to use the initial data for the document
+      // so we aren't placing fields on top of eachother.
+      envelopeItems = envelopeItems.map((envelopeItem) => ({
+        ...envelopeItem,
+        documentData: {
+          ...envelopeItem.documentData,
+          data: envelopeItem.documentData.initialData,
+        },
+      }));
+    }
 
-  if (postHog) {
-    postHog.capture({
-      distinctId: nanoid(),
-      event: 'App: Document Sealed',
-      properties: {
-        documentId: envelope.id,
+    if (!envelope.qrToken) {
+      await prisma.envelope.update({
+        where: {
+          id: envelope.id,
+        },
+        data: {
+          qrToken: prefixedId('qr'),
+        },
+      });
+    }
+
+    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
+
+    const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
+      legacyDocumentId,
+      documentMeta: envelope.documentMeta,
+      settings,
+    });
+
+    const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
+
+    for (const envelopeItem of envelopeItems) {
+      const envelopeItemFields = envelope.envelopeItems.find(
+        (item) => item.id === envelopeItem.id,
+      )?.field;
+
+      if (!envelopeItemFields) {
+        throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
+      }
+
+      const result = await decorateAndSignPdf({
+        envelope,
+        envelopeItem,
+        envelopeItemFields,
         isRejected,
-      },
-    });
-  }
+        rejectionReason,
+        certificateData,
+        auditLogData,
+      });
 
-  await io.runTask('update-document', async () => {
+      newDocumentData.push(result);
+    }
+
     await prisma.$transaction(async (tx) => {
       for (const { oldDocumentDataId, newDocumentDataId } of newDocumentData) {
         const newData = await tx.documentData.findFirstOrThrow({
@@ -257,18 +237,24 @@ export const run = async ({
         }),
       });
     });
+
+    return {
+      envelopeId: envelope.id,
+      envelopeStatus: envelope.status,
+      isRejected,
+    };
   });
 
   await io.runTask('send-completed-email', async () => {
     let shouldSendCompletedEmail = sendEmail && !isResealing && !isRejected;
 
-    if (isResealing && !isDocumentCompleted(envelope.status)) {
+    if (isResealing && !isDocumentCompleted(envelopeStatus)) {
       shouldSendCompletedEmail = sendEmail;
     }
 
     if (shouldSendCompletedEmail) {
       await sendCompletedEmail({
-        id: { type: 'envelopeId', id: envelope.id },
+        id: { type: 'envelopeId', id: envelopeId },
         requestMetadata,
       });
     }
@@ -276,7 +262,7 @@ export const run = async ({
 
   const updatedEnvelope = await prisma.envelope.findFirstOrThrow({
     where: {
-      id: envelope.id,
+      id: envelopeId,
     },
     include: {
       documentMeta: true,
@@ -353,14 +339,95 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  for (const field of envelopeItemFields) {
-    if (field.inserted) {
-      if (envelope.internalVersion === 2) {
-        await insertFieldInPDFV2(pdfDoc, field);
-      } else if (envelope.useLegacyFieldInsertion) {
-        await legacy_insertFieldInPDF(pdfDoc, field);
-      } else {
-        await insertFieldInPDFV1(pdfDoc, field);
+  // Handle V1 and legacy insertions.
+  if (envelope.internalVersion === 1) {
+    for (const field of envelopeItemFields) {
+      if (field.inserted) {
+        if (envelope.useLegacyFieldInsertion) {
+          await legacy_insertFieldInPDF(pdfDoc, field);
+        } else {
+          await insertFieldInPDFV1(pdfDoc, field);
+        }
+      }
+    }
+  }
+
+  // Handle V2 envelope insertions.
+  if (envelope.internalVersion === 2) {
+    const fieldsGroupedByPage = groupBy(envelopeItemFields, (field) => field.page);
+
+    for (const [pageNumber, fields] of Object.entries(fieldsGroupedByPage)) {
+      const page = pdfDoc.getPage(Number(pageNumber) - 1);
+      const pageRotation = page.getRotation();
+
+      let { width: pageWidth, height: pageHeight } = getPageSize(page);
+
+      let pageRotationInDegrees = match(pageRotation.type)
+        .with(RotationTypes.Degrees, () => pageRotation.angle)
+        .with(RotationTypes.Radians, () => radiansToDegrees(pageRotation.angle))
+        .exhaustive();
+
+      // Round to the closest multiple of 90 degrees.
+      pageRotationInDegrees = Math.round(pageRotationInDegrees / 90) * 90;
+
+      // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
+      // However when we load the PDF in the backend, the rotation is applied.
+      // To account for this, we swap the width and height for pages that are rotated by 90/270
+      // degrees. This is so we can calculate the virtual position the field was placed if it
+      // was correctly oriented in the frontend.
+      if (pageRotationInDegrees === 90 || pageRotationInDegrees === 270) {
+        [pageWidth, pageHeight] = [pageHeight, pageWidth];
+      }
+
+      // Rotate the page to the orientation that the react-pdf renders on the frontend.
+      // Note: These transformations are undone at the end of the function.
+      // If you change this if statement, update the if statement at the end as well
+      if (pageRotationInDegrees !== 0) {
+        let translateX = 0;
+        let translateY = 0;
+
+        switch (pageRotationInDegrees) {
+          case 90:
+            translateX = pageHeight;
+            translateY = 0;
+            break;
+          case 180:
+            translateX = pageWidth;
+            translateY = pageHeight;
+            break;
+          case 270:
+            translateX = 0;
+            translateY = pageWidth;
+            break;
+          case 0:
+          default:
+            translateX = 0;
+            translateY = 0;
+        }
+
+        page.pushOperators(pushGraphicsState());
+        page.pushOperators(translate(translateX, translateY), rotateDegrees(pageRotationInDegrees));
+      }
+
+      const renderedPdfOverlay = await insertFieldInPDFV2({
+        pageWidth,
+        pageHeight,
+        fields,
+      });
+
+      const [embeddedPage] = await pdfDoc.embedPdf(renderedPdfOverlay);
+
+      // Draw the SVG on the page
+      page.drawPage(embeddedPage, {
+        x: 0,
+        y: 0,
+        width: pageWidth,
+        height: pageHeight,
+      });
+
+      // Remove the transformations applied to the page if any were applied.
+      if (pageRotationInDegrees !== 0) {
+        page.pushOperators(popGraphicsState());
       }
     }
   }

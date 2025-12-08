@@ -91,6 +91,12 @@ export type CreateDocumentFromTemplateOptions = {
     envelopeItemId?: string;
   }[];
 
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: 'link';
+  }>;
+
   /**
    * Values that will override the predefined values in the template.
    */
@@ -203,6 +209,7 @@ const getUpdatedFieldMeta = (field: Field, prefillField?: TFieldMetaPrefillField
         type: 'radio',
         label: field.label,
         values: newValues,
+        direction: radioMeta.direction ?? 'vertical',
       };
 
       return meta;
@@ -295,6 +302,7 @@ export const createDocumentFromTemplate = async ({
   requestMetadata,
   folderId,
   prefillFields,
+  attachments,
 }: CreateDocumentFromTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -388,8 +396,6 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
-  const firstEnvelopeItemId = template.envelopeItems[0].id;
-
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -400,10 +406,14 @@ export const createDocumentFromTemplate = async ({
     template.envelopeItems.map(async (item, i) => {
       let documentDataIdToDuplicate = item.documentDataId;
 
-      const foundCustomDocumentData = customDocumentData.find(
-        (customDocumentDataItem) =>
-          customDocumentDataItem.envelopeItemId || firstEnvelopeItemId === item.id,
-      );
+      const foundCustomDocumentData = customDocumentData.find((customDocumentDataItem) => {
+        // Handle empty envelopeItemId for backwards compatibility reasons.
+        if (customDocumentDataItem.documentDataId && !customDocumentDataItem.envelopeItemId) {
+          return true;
+        }
+
+        return customDocumentDataItem.envelopeItemId === item.id;
+      });
 
       if (foundCustomDocumentData) {
         documentDataIdToDuplicate = foundCustomDocumentData.documentDataId;
@@ -666,6 +676,33 @@ export const createDocumentFromTemplate = async ({
         },
       }),
     });
+
+    const templateAttachments = await tx.envelopeAttachment.findMany({
+      where: {
+        envelopeId: template.id,
+      },
+    });
+
+    const attachmentsToCreate = [
+      ...templateAttachments.map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type,
+        label: attachment.label,
+        data: attachment.data,
+      })),
+      ...(attachments || []).map((attachment) => ({
+        envelopeId: envelope.id,
+        type: attachment.type || 'link',
+        label: attachment.label,
+        data: attachment.data,
+      })),
+    ];
+
+    if (attachmentsToCreate.length > 0) {
+      await tx.envelopeAttachment.createMany({
+        data: attachmentsToCreate,
+      });
+    }
 
     const createdEnvelope = await tx.envelope.findFirst({
       where: {

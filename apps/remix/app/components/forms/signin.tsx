@@ -70,6 +70,7 @@ export type SignInFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
   oidcProviderLabel?: string;
   returnTo?: string;
@@ -79,6 +80,7 @@ export const SignInForm = ({
   className,
   initialEmail,
   isGoogleSSOEnabled,
+  isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
   oidcProviderLabel,
   returnTo,
@@ -90,10 +92,13 @@ export const SignInForm = ({
 
   const [isTwoFactorAuthenticationDialogOpen, setIsTwoFactorAuthenticationDialogOpen] =
     useState(false);
+  const [isEmbeddedRedirect, setIsEmbeddedRedirect] = useState(false);
 
   const [twoFactorAuthenticationMethod, setTwoFactorAuthenticationMethod] = useState<
     'totp' | 'backup'
   >('totp');
+
+  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
   const [isPasskeyLoading, setIsPasskeyLoading] = useState(false);
 
@@ -196,7 +201,7 @@ export const SignInForm = ({
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
         description: _(errorMessage),
         duration: 10000,
         variant: 'destructive',
@@ -271,6 +276,22 @@ export const SignInForm = ({
     }
   };
 
+  const onSignInWithMicrosoftClick = async () => {
+    try {
+      await authClient.microsoft.signIn({
+        redirectPath,
+      });
+    } catch (err) {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you In. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+  };
+
   const onSignInWithOIDCClick = async () => {
     try {
       await authClient.oidc.signIn({
@@ -297,6 +318,8 @@ export const SignInForm = ({
     if (email) {
       form.setValue('email', email);
     }
+
+    setIsEmbeddedRedirect(params.get('embedded') === 'true');
   }, [form]);
 
   return (
@@ -363,42 +386,64 @@ export const SignInForm = ({
             {isSubmitting ? <Trans>Signing in...</Trans> : <Trans>Sign In</Trans>}
           </Button>
 
-          {(isGoogleSSOEnabled || isOIDCSSOEnabled) && (
-            <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-              <div className="bg-border h-px flex-1" />
-              <span className="text-muted-foreground bg-transparent">
-                <Trans>Or continue with</Trans>
-              </span>
-              <div className="bg-border h-px flex-1" />
-            </div>
-          )}
+          {!isEmbeddedRedirect && (
+            <>
+              {hasSocialAuthEnabled && (
+                <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
+                  <div className="bg-border h-px flex-1" />
+                  <span className="text-muted-foreground bg-transparent">
+                    <Trans>Or continue with</Trans>
+                  </span>
+                  <div className="bg-border h-px flex-1" />
+                </div>
+              )}
 
-          {isGoogleSSOEnabled && (
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              className="bg-background text-muted-foreground border"
-              disabled={isSubmitting}
-              onClick={onSignInWithGoogleClick}
-            >
-              <FcGoogle className="mr-2 h-5 w-5" />
-              Google
-            </Button>
-          )}
+              {isGoogleSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="bg-background text-muted-foreground border"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithGoogleClick}
+                >
+                  <FcGoogle className="mr-2 h-5 w-5" />
+                  Google
+                </Button>
+              )}
 
-          {isOIDCSSOEnabled && (
-            <Button
-              type="button"
-              size="lg"
-              variant="outline"
-              className="bg-background text-muted-foreground border"
-              disabled={isSubmitting}
-              onClick={onSignInWithOIDCClick}
-            >
-              <FaIdCardClip className="mr-2 h-5 w-5" />
-              {oidcProviderLabel || 'OIDC'}
-            </Button>
+              {isMicrosoftSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="bg-background text-muted-foreground border"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithMicrosoftClick}
+                >
+                  <img
+                    className="mr-2 h-4 w-4"
+                    alt="Microsoft Logo"
+                    src={'/static/microsoft.svg'}
+                  />
+                  Microsoft
+                </Button>
+              )}
+
+              {isOIDCSSOEnabled && (
+                <Button
+                  type="button"
+                  size="lg"
+                  variant="outline"
+                  className="bg-background text-muted-foreground border"
+                  disabled={isSubmitting}
+                  onClick={onSignInWithOIDCClick}
+                >
+                  <FaIdCardClip className="mr-2 h-5 w-5" />
+                  {oidcProviderLabel || 'OIDC'}
+                </Button>
+              )}
+            </>
           )}
 
           <Button

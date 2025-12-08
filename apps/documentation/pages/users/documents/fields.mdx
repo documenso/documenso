@@ -11,120 +11,76 @@ Learn about the different fields you can add to your documents in Documenso and 
 
 The signature field collects the signer's signature. It's required for each recipient with the "Signer" role.
 
-### Document Editor View
-
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
-
 ![The signature field in the Documenso document editor](/document-signing/signature-field-document-editor-view.webp)
 
-### Document Signing View
+The signature field settings include:
 
-The recipient will see the signature field when they open the document to sign.
-
-The recipient must click on the signature field to open the signing view, where they can sign using their mouse, touchpad, or touchscreen.
-
-![The signature field in the Documenso document signing view](/document-signing/signature-field-document-signing-view.webp)
-
-The image below shows the signature field signed by the recipient.
-
-![The signature field signed by the user in the Documenso document signing view](/document-signing/signed-signature-field.webp)
-
-After signing, the recipient can click the "Complete" button to complete the signing process.
+- **Font size** - The typed signature font size. You can disable typed signatures in the document settings.
 
 ## Email Field
 
-The email field is used to collect the signer's email address.
-
-### Document Editor View
-
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
+The email field is used to collect the signer's email address. This will be the email address you entered when you created the recipients.
 
 ![The email field in the Documenso document editor](/document-signing/email-field-document-editor-view.webp)
 
-### Document Signing View
+The email field settings include:
 
-When the recipient opens the document to sign, they will see the email field.
-
-The recipient must click on the email field to automatically sign the field with the email associated with their account.
-
-![The email field in the Documenso document signing view](/document-signing/email-field-document-signing-view.webp)
-
-The image below shows the email field signed by the recipient.
-
-![The email field signed by the user in the Documenso document signing view](/document-signing/signed-email-field.webp)
-
-After entering their email address, the recipient can click the "Complete" button to complete the signing process.
+- **Font Size** - The font size of the email address.
+- **Text Align** - The horizontal text alignment of the email address.
 
 ## Name Field
 
 The name field is used to collect the signer's name.
 
-### Document Editor View
-
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
-
 ![The name field in the Documenso document editor](/document-signing/name-field-document-editor-view.webp)
 
-### Document Signing View
+The name field settings include:
 
-When the recipient opens the document to sign, they will see the name field.
+- **Font Size** - The font size of the name.
+- **Text Align** - The horizontal text alignment of the name.
 
-The recipient must click on the name field, which will automatically sign the field with the name associated with their account.
+## Initials Field
 
-![The name field in the Documenso document signing view](/document-signing/name-field-document-signing-view.webp)
+The initials field is used to collect the signer's initials. This is generally the first and last name initials.
 
-The image below shows the name field signed by the recipient.
+![The initials field in the Documenso document editor](/document-signing/initials-field-document-editor-view.webp)
 
-![The name field signed by the user in the Documenso document signing view](/document-signing/name-field-signed.webp)
+The initials field settings include:
 
-After entering their name, the recipient can click the "Complete" button to complete the signing process.
+- **Font Size** - The font size of the initials.
+- **Text Align** - The horizontal text alignment of the initials.
 
 ## Date Field
 
-The date field is used to collect the date of the signature.
-
-### Document Editor View
-
-The field doesn't have any additional settings. You just need to place it on the document where you want the signer to sign.
+The date field is used to collect the date of the signature. You can change the date format in the document settings.
 
 ![The date field in the Documenso document editor](/document-signing/date-field-document-editor-view.webp)
 
-### Document Signing View
+The date field settings include:
 
-When the recipient opens the document to sign, they will see the date field.
-
-The recipient must click on the date field to automatically sign the field with the current date and time.
-
-![The date field in the Documenso document signing view](/document-signing/date-field-document-signing-view.webp)
-
-The image below shows the date field signed by the recipient.
-
-![The date field signed by the user in the Documenso document signing view](/document-signing/date-field-signed.webp)
-
-After entering the date, the recipient can click the "Complete" button to complete the signing process.
+- **Font Size** - The font size of the date.
+- **Text Align** - The horizontal text alignment of the date.
 
 ## Text Field
 
 The text field is used to collect text input from the signer.
 
-### Document Editor View
-
 Place the text field on the document where you want the signer to enter text. The text field comes with additional settings that can be configured.
 
 ![The text field in the Documenso document editor](/document-signing/text-field-document-editor-view.webp)
 
-To open the settings, click on the text field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
-
-![The text field settings in the Documenso document editor](/document-signing/text-field-advanced-settings-document-editor-view.webp)
-
 The text field settings include:
 
-- **Label** - The label displayed in the field.
-- **Placeholder** - The placeholder text displayed in the field.
-- **Text** - The default text displayed in the field.
+- **Label** - The label displayed in the field when the user opens the document to sign
+- **Placeholder** - The placeholder text displayed in the field. The signer will see this prior to signing.
+- **Text** - The text which will be prefilled into the field. The signer can change this text unless the field is read-only.
 - **Character limit** - The maximum number of characters allowed in the field.
 - **Required** - Whether the field is required or not.
 - **Read only** - Whether the field is read-only or not.
+- **Text Align** - The horizontal text alignment of the text in the field.
+- **Vertical Align** - The vertical text alignment of the text in the field.
+- **Line height** - The line height of the text in the field. Useful for multi-line text fields.
+- **Letter spacing** - The spacing between each character in the text in the field.
 
 It also comes with a couple of rules:
 
@@ -133,60 +89,11 @@ It also comes with a couple of rules:
 - The signer must fill out a required field.
 - The text field characters count can't exceed the character limit.
 - The signer can't modify a read-only field.
-- The field auto-signs if there is a default text value.
-
-Let's look at the following example.
-
-![A text field with the settings configured by the user in the Documenso document editor](/document-signing/text-field-with-filled-advanced-settings.webp)
-
-The field is configured as follows:
-
-- Label: "Address"
-- Placeholder: "Your office address"
-- Default Text: "Signing Street 1, 241245"
-- Character Limit: 35
-- Required: False
-- Read Only: False
-
-Since the field has a label set, the label is displayed instead of the default text field value - "Add text".
-
-### Document Signing View
-
-What the recipient sees when they open the document to sign depends on the settings configured by the sender.
-
-In this case, the recipient sees the text field signed with the default value.
-
-![Text field with the default value signed by the user in the Documenso document signing view](/document-signing/text-field-autosigned.webp)
-
-The recipient can modify the text field value since the field is not read-only. To change the value, the recipient must click the field to un-sign it.
-
-Once it's unsigned, the field uses the label set by the sender.
-
-![Unsigned text field in the Documenso document signing view](/document-signing/text-field-unsigned.webp)
-
-To sign the field with a different value, the recipient needs to click on the field and enter the new value.
-
-![Text field with the text input in the Documenso document signing view](/document-signing/text-field-input-modal.webp)
-
-Since the text field has a character limit, the recipient must enter a value that doesn't exceed the limit. Otherwise, an error message will appear, and the field will not be signed.
-
-The image below illustrates the text field signed with a new value.
-
-![Text field signed with a new value](/document-signing/text-field-new-value-signed.webp)
-
-After signing the field, the recipient can click the "Complete" button to complete the signing process.
+- The field will be inserted automatically into the document if there is a default text value.
 
 ## Number Field
 
 The number field is used for collecting a number input from the signer.
-
-### Document Editor View
-
-Place the number field on the document where you want the signer to enter a number. The number field comes with additional settings that can be configured.
-
-![The number field in the Documenso document editor](/document-signing/number-field-document-editor.webp)
-
-To open the settings, click on the number field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
 
 ![The number field in the Documenso document editor](/document-signing/number-field-document-editor-view.webp)
 
@@ -194,10 +101,14 @@ The number field settings include:
 
 - **Label** - The label displayed is the field.
 - **Placeholder** - The placeholder text displayed in the field.
-- **Value** - The default number displayed in the field.
+- **Value** - The value which will be prefilled into the field. The signer can change this value unless the field is read-only.
 - **Number format** - The format of the number.
 - **Required** - Whether the field is required or not.
 - **Read only** - Whether the field is read-only or not.
+- **Text Align** - The horizontal text alignment of the number in the field.
+- **Vertical Align** - The vertical text alignment of the number in the field.
+- **Line height** - The line height of the number in the field. Useful for multi-line number fields.
+- **Letter spacing** - The spacing between each character in the number in the field.
 - **Validation** - The validation rules for the field.
 
 It also comes with a couple of rules:
@@ -210,66 +121,18 @@ It also comes with a couple of rules:
 - If the default number and a min value are set, the default number must be greater than the min value.
 - The value must match the number format if a number format is set.
 
-In this example, the number field is configured as follows:
-
-- Label: "Quantity"
-- Placeholder: "Enter the preferred quantity"
-- Default Value: 12
-- Number Format: "123,456,789.00"
-- Required: False
-- Read Only: False
-- Validation:
-- Min value: 5, Max value: 50
-
-![A number field with the label configured by the user in the Documenso document editor](/document-signing/number-field-label.webp)
-
-Since the field has a label set, the label is displayed instead of the default number field value - "Add number".
-
-### Document Signing View
-
-What the recipient sees when they open the document to sign depends on the settings configured by the sender.
-
-The recipient sees the number field signed with the default value in this case.
-
-![Number field with the default value signed by the user in the Documenso document signing view](/document-signing/number-field-autosigned.webp)
-
-Since the number field is not read-only, the recipient can modify its value. To change the value, the recipient must click the field to un-sign it.
-
-Once it's unsigned, the field uses the label set by the sender.
-
-![Unsigned number field in the Documenso document signing view](/document-signing/number-field-unsigned.webp)
-
-To sign the field with a different value, the recipient needs to click on the field and enter the new value.
-
-![Number field with the number input in the Documenso document signing view](/document-signing/number-field-input-modal.webp)
-
-Since the number field has a validation rule set, the recipient must enter a value that meets the rules. In this example, the value needs to be between 5 and 50. Otherwise, an error message will appear, and the field will not be signed.
-
-The image below illustrates the text field signed with a new value.
-
-![Number field signed with a new value](/document-signing/number-field-signed-with-another-value.webp)
-
-After signing the field, the recipient can click the "Complete" button to complete the signing process.
-
 ## Radio Field
 
 The radio field is used to collect a single choice from the signer.
 
-### Document Editor View
-
-Place the radio field on the document where you want the signer to select a choice. The radio field comes with additional settings that can be configured.
-
 ![The radio field in the Documenso document editor](/document-signing/radio-field-document-editor-view.webp)
-
-To open the settings, click on the radio field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
-
-![The radio field advanced settings in the Documenso document editor](/document-signing/radio-field-advanced-settings-document-editor-view.webp)
 
 The radio field settings include:
 
 - **Required** - Whether the field is required or not.
 - **Read only** - Whether the field is read-only or not.
 - **Values** - The list of choices for the field.
+- **Direction** - The direction of the radio field. Can be "Vertical" or "Horizontal".
 
 It also comes with a couple of rules:
 
@@ -282,57 +145,22 @@ It also comes with a couple of rules:
 - It should contain at least one option.
 - The field can't have more than one option selected.
 
-In this example, the radio field is configured as follows:
-
-- Required: False
-- Read Only: False
-- Options:
-  - Option 1
-  - Option 2
-  - Empty value
-  - Empty value
-  - Option 3
-
-![The radio field with the settings configured by the user in the Documenso document editor](/document-signing/radio-field-options-document-editor-view.webp)
-
-Since the field contains radio options, it displays them instead of the default radio field value, "Radio".
-
-### Document Signing View
-
-What the recipient sees when they open the document to sign depends on the settings configured by the sender.
-
-In this case, the recipient sees the radio field unsigned because the sender didn't select a value.
-
-![Radio field with no value selected in the Documenso document signing view](/document-signing/radio-field-unsigned.webp)
-
-The recipient can select one of the options by clicking on the radio button next to the option.
-
-![Radio field with the value selected by the user in the Documenso document signing view](/document-signing/radio-field-signed.webp)
-
-After signing the field, the recipient can click the "Complete" button to complete the signing process.
-
 ## Checkbox Field
 
 The checkbox field is used to collect multiple choices from the signer.
 
-### Document Editor View
-
 Place the checkbox field on the document where you want the signer to select choices. The checkbox field comes with additional settings that can be configured.
 
-![The checkbox field in the Documenso document editor](/document-signing/checkbox-document-editor-view.webp)
-
-To open the settings, click on the checkbox field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
-
-![The checkbox field settings in the Documenso document editor](/document-signing/checkbox-advanced-settings.webp)
+![The checkbox field in the Documenso document editor](/document-signing/checkbox-field-document-editor-view.webp)
 
 The checkbox field settings include the following:
 
-- **Validation** - The validation rules for the field.
-  - **Rule** - The rule specifies "At least", "At most", and "Exactly".
-  - **Number** - The number of choices that must be selected.
 - **Required** - Whether the field is required or not.
 - **Read only** - Whether the field is read-only or not.
 - **Options** - The list of choices for the field.
+- **Direction** - The direction of the checkbox field. Can be "Vertical" or "Horizontal".
+- **Validation Rule** - The rule specifies "At least", "At most", and "Exactly".
+- **Validation Number** - The number of choices that must be selected.
 
 It also comes with a couple of rules:
 
@@ -344,67 +172,20 @@ It also comes with a couple of rules:
 - The signer can't modify the field if it's read-only.
 - It should contain at least one option.
 
-In this example, the checkbox field is configured as follows:
-
-- No validation rules
-- Required: True
-- Read Only: False
-- Options:
-  - Option 1
-  - Empty value (checked)
-  - Option 2
-  - Option 3 (checked)
-  - Empty value
-
-![The checkbox field with the settings configured by the user in the Documenso document editor](/document-signing/checkbox-advanced-settings-document-editor-view.webp)
-
-Since the field contains checkbox options, it displays them instead of the default checkbox field value, "Checkbox".
-
-### Document Signing View
-
-What the recipient sees when they open the document to sign depends on the settings configured by the sender.
-
-In this case, the recipient sees the checkbox field signed with the values selected by the sender.
-
-![Checkbox field with the values selected by the user in the Documenso document signing view](/document-signing/checkbox-field-document-signing-view.webp)
-
-Since the field is required, the recipient can either sign with the values selected by the sender or modify the values.
-
-The values can be modified in 2 ways:
-
-- Click on the options you want to select or deselect.
-- Hover over the field and click the "X" button to clear all the selected values.
-
-The image below illustrates the checkbox field with the values cleared by the recipient. Since the field is required, it has a red border instead of the yellow one (non-required fields).
-
-![Checkbox field the values cleared by the user in the Documenso document signing view](/document-signing/checkbox-field-unsigned.webp)
-
-Then, the recipient can select values other than the ones chosen by the sender.
-
-![Checkbox field with the values selected by the user in the Documenso document signing view](/document-signing/checkbox-field-custom-sign.webp)
-
-After signing the field, the recipient can click the "Complete" button to complete the signing process.
-
 ## Dropdown/Select Field
 
 The dropdown/select field collects a single choice from a list of options.
 
-### Document Editor View
-
 Place the dropdown/select field on the document where you want the signer to select a choice. The dropdown/select field comes with additional settings that can be configured.
 
-![The dropdown/select field in the Documenso document editor](/document-signing/select-field-sliders.webp)
-
-To open the settings, click on the dropdown/select field and then on the "Sliders" icon. That opens the settings panel on the right side of the screen.
-
-![The dropdown/select field settings in the Documenso document editor](/document-signing/select-field-advanced-settings-panel.webp)
+{/* ![The dropdown/select field in the Documenso document editor](/document-signing/dropdown-field-document-editor-view.webp) */}
 
 The dropdown/select field settings include:
 
 - **Required** - Whether the field is required or not.
 - **Read only** - Whether the field is read-only or not.
 - **Options** - The list of choices for the field.
-- **Default** value - The default value selected in the field.
+- **Default Value** - The default value selected in the field.
 
 It also comes with a couple of rules:
 
@@ -416,31 +197,3 @@ It also comes with a couple of rules:
 - The field can't be signed with a value not in the options list.
 - The signer can't modify the field if it's read-only.
 - It should contain at least one option.
-
-In this example, the dropdown/select field is configured as follows:
-
-- Required: False
-- Read Only: False
-- Default Value: None
-- Options:
-  - Document
-  - Template
-  - Other
-
-### Document Signing View
-
-What the recipient sees when they open the document to sign depends on the settings configured by the sender.
-
-In this case, the recipient sees the dropdown/select field with the default label, "-- Select ---" since the sender has not set a default value.
-
-![Dropdown/select field  in the Documenso document signing view](/document-signing/select-field-unsigned.webp)
-
-The recipient can modify the dropdown/select field value since the field is not read-only. To change the value, the recipient must click on the field for the dropdown list to appear.
-
-![Dropdown/select field with the dropdown list in the Documenso document signing view](/document-signing/select-field-unsigned-dropdown.webp)
-
-The recipient can select one of the options from the list. The image below illustrates the dropdown/select field signed with a new value.
-
-![Dropdown/select field signed with a value](/document-signing/select-field-signed.webp)
-
-After signing the field, the recipient can click the "Complete" button to complete the signing process.
