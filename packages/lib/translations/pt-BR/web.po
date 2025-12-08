@@ -7662,6 +7662,11 @@ msgstr "Assine suas iniciais no campo"
 msgid "Signature"
 msgstr "Assinatura"
 
+#: packages/lib/constants/recipient-roles.ts
+msgctxt "Recipient role action verb"
+msgid "Sign"
+msgstr "Assinar"
+
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 msgid "Signature ID"
 msgstr "ID da Assinatura"
