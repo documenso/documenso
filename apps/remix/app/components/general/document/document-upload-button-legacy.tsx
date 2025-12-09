@@ -110,14 +110,14 @@ export const DocumentUploadButtonLegacy = ({ className }: DocumentUploadButtonLe
       console.error(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => msg`You cannot upload encrypted PDFs`)
+        .with('INVALID_DOCUMENT_FILE', () => msg`You cannot upload encrypted PDFs.`)
         .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => msg`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => msg`You have reached the limit of the number of files per envelope`,
+          () => msg`You have reached the limit of the number of files per envelope.`,
         )
         .otherwise(() => msg`An error occurred while uploading your document.`);
 
