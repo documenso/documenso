@@ -92,9 +92,23 @@ export const run = async ({
       teamId: envelope.teamId,
     });
 
+    // Ensure all CC recipients are marked as signed
+    await prisma.recipient.updateMany({
+      where: {
+        envelopeId: envelope.id,
+        role: RecipientRole.CC,
+      },
+      data: {
+        signingStatus: SigningStatus.SIGNED,
+      },
+    });
+
     const isComplete =
       envelope.recipients.some((recipient) => recipient.signingStatus === SigningStatus.REJECTED) ||
-      envelope.recipients.every((recipient) => recipient.signingStatus === SigningStatus.SIGNED);
+      envelope.recipients.every(
+        (recipient) =>
+          recipient.signingStatus === SigningStatus.SIGNED || recipient.role === RecipientRole.CC,
+      );
 
     if (!isComplete) {
       throw new AppError(AppErrorCode.UNKNOWN_ERROR, {

@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { DocumentStatus, FieldType, RecipientRole } from '@prisma/client';
 import { FileTextIcon, SparklesIcon } from 'lucide-react';
-import { Link, useSearchParams } from 'react-router';
+import { Link, useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual } from 'remeda';
 import { match } from 'ts-pattern';
 
@@ -34,6 +34,7 @@ import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/al
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
 
+import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiFieldDetectionDialog } from '~/components/dialogs/ai-field-detection-dialog';
 import { EditorFieldCheckboxForm } from '~/components/forms/editor/editor-field-checkbox-form';
 import { EditorFieldDateForm } from '~/components/forms/editor/editor-field-date-form';
@@ -81,6 +82,8 @@ export const EnvelopeEditorFieldsPage = () => {
   const { _ } = useLingui();
 
   const [isAiFieldDialogOpen, setIsAiFieldDialogOpen] = useState(false);
+  const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
+  const { revalidate } = useRevalidator();
 
   const selectedField = useMemo(
     () => structuredClone(editorFields.selectedField),
@@ -134,6 +137,22 @@ export const EnvelopeEditorFieldsPage = () => {
 
     editorFields.setSelectedRecipient(firstSelectableRecipient?.id ?? null);
   }, []);
+
+  const onDetectClick = () => {
+    if (!team.preferences.aiFeaturesEnabled) {
+      setIsAiEnableDialogOpen(true);
+      return;
+    }
+
+    setIsAiFieldDialogOpen(true);
+  };
+
+  const onAiFeaturesEnabled = () => {
+    void revalidate().then(() => {
+      setIsAiEnableDialogOpen(false);
+      setIsAiFieldDialogOpen(true);
+    });
+  };
 
   return (
     <div className="relative flex h-full">
@@ -230,34 +249,36 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
 
-            {team.preferences.aiFeaturesEnabled && (
-              <>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="mt-4 w-full"
-                  onClick={() => setIsAiFieldDialogOpen(true)}
-                  disabled={envelope.status !== DocumentStatus.DRAFT}
-                  title={
-                    envelope.status !== DocumentStatus.DRAFT
-                      ? _(msg`You can only detect fields in draft envelopes`)
-                      : undefined
-                  }
-                >
-                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
-                  <Trans>Detect with AI</Trans>
-                </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="mt-4 w-full"
+              onClick={onDetectClick}
+              disabled={envelope.status !== DocumentStatus.DRAFT}
+              title={
+                envelope.status !== DocumentStatus.DRAFT
+                  ? _(msg`You can only detect fields in draft envelopes`)
+                  : undefined
+              }
+            >
+              <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+              <Trans>Detect with AI</Trans>
+            </Button>
 
-                <AiFieldDetectionDialog
-                  open={isAiFieldDialogOpen}
-                  onOpenChange={setIsAiFieldDialogOpen}
-                  onComplete={onFieldDetectionComplete}
-                  envelopeId={envelope.id}
-                  teamId={envelope.teamId}
-                />
-              </>
-            )}
+            <AiFieldDetectionDialog
+              open={isAiFieldDialogOpen}
+              onOpenChange={setIsAiFieldDialogOpen}
+              onComplete={onFieldDetectionComplete}
+              envelopeId={envelope.id}
+              teamId={envelope.teamId}
+            />
+
+            <AiFeaturesEnableDialog
+              open={isAiEnableDialogOpen}
+              onOpenChange={setIsAiEnableDialogOpen}
+              onEnabled={onAiFeaturesEnabled}
+            />
           </section>
 
           {/* Field details section. */}

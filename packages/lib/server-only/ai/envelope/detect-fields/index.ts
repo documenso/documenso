@@ -2,12 +2,12 @@ import { createCanvas, loadImage } from '@napi-rs/canvas';
 import { DocumentStatus, type Field, RecipientRole } from '@prisma/client';
 import { generateObject } from 'ai';
 import pMap from 'p-map';
-import sharp from 'sharp';
 
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../../../errors/app-error';
 import { getFileServerSide } from '../../../../universal/upload/get-file.server';
+import { resizeImageToGeminiImage } from '../../../../utils/images/resize-image-to-gemini-image';
 import { getEnvelopeById } from '../../../envelope/get-envelope-by-id';
 import { createEnvelopeRecipients } from '../../../recipient/create-envelope-recipients';
 import { vertex } from '../../google';
@@ -238,21 +238,6 @@ const maskFieldsOnImage = async ({ image, width, height, fields }: MaskFieldsOnI
   return canvas.encode('jpeg');
 };
 
-const TARGET_SIZE = 1000;
-
-type ResizeImageOptions = {
-  image: Buffer;
-  size?: number;
-};
-
-/**
- * Resize image to 1000x1000 using fill strategy.
- * Scales to cover the target area and crops any overflow.
- */
-const resizeImageToSquare = async ({ image, size = TARGET_SIZE }: ResizeImageOptions) => {
-  return await sharp(image).resize(size, size, { fit: 'fill' }).toBuffer();
-};
-
 type DetectFieldsFromPageOptions = {
   image: Buffer;
   pageNumber: number;
@@ -267,7 +252,7 @@ const detectFieldsFromPage = async ({
   context,
 }: DetectFieldsFromPageOptions) => {
   // Resize to 1000x1000 for consistent coordinate mapping
-  const resizedImage = await resizeImageToSquare({ image });
+  const resizedImage = await resizeImageToGeminiImage({ image });
 
   // Build messages array
   const messages: Parameters<typeof generateObject>[0]['messages'] = [
