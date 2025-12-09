@@ -364,6 +364,25 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 test('[TEAMS]: can create a template inside a template folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
+  const organisationClaim = await prisma.organisationClaim.findFirstOrThrow({
+    where: {
+      organisation: {
+        id: team.organisationId,
+      },
+    },
+  });
+
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisationClaim.id,
+    },
+    data: {
+      flags: {
+        allowLegacyEnvelopes: true,
+      },
+    },
+  });
+
   const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
