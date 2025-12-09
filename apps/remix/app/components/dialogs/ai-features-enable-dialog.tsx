@@ -40,9 +40,9 @@ export const AiFeaturesEnableDialog = ({
 
   const [error, setError] = useState<string | null>(null);
 
-  const { mutateAsync: updateTeamSettings, isLoading: isUpdatingTeamSettings } =
+  const { mutateAsync: updateTeamSettings, isPending: isUpdatingTeamSettings } =
     trpc.team.settings.update.useMutation();
-  const { mutateAsync: updateOrganisationSettings, isLoading: isUpdatingOrganisationSettings } =
+  const { mutateAsync: updateOrganisationSettings, isPending: isUpdatingOrganisationSettings } =
     trpc.organisation.settings.update.useMutation();
 
   const isSubmitting = isUpdatingTeamSettings || isUpdatingOrganisationSettings;
