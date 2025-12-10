@@ -58,6 +58,12 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     userId: user.id,
   });
 
+  // envelope.user is the document owner (delegated owner if delegation occurred, otherwise the creator)
+  const createdBy = {
+    name: envelope.user.name,
+    email: envelope.user.email,
+  };
+
   return {
     // Only return necessary data
     document: {
@@ -74,16 +80,18 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       documentMeta: envelope.documentMeta,
     },
     recipients: envelope.recipients,
+    createdBy,
     documentRootPath,
+    userId: user.id,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, recipients, documentRootPath } = loaderData;
+  const { document, recipients, createdBy, documentRootPath, userId } = loaderData;
 
   const { _, i18n } = useLingui();
 
-  const documentInformation: { description: MessageDescriptor; value: string }[] = [
+  const baseDocumentInformation: { description: MessageDescriptor; value: string }[] = [
     {
       description: msg`Document title`,
       value: document.title,
@@ -98,10 +106,11 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
     {
       description: msg`Created by`,
-      value: document.user.name
-        ? `${document.user.name} (${document.user.email})`
-        : document.user.email,
+      value: createdBy.name ? `${createdBy.name} (${createdBy.email})` : createdBy.email,
     },
+  ];
+
+  const remainingDocumentInformation: { description: MessageDescriptor; value: string }[] = [
     {
       description: msg`Date created`,
       value: DateTime.fromJSDate(document.createdAt)
@@ -119,6 +128,8 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       value: document.documentMeta?.timezone ?? 'N/A',
     },
   ];
+
+  const documentInformation = [...baseDocumentInformation, ...remainingDocumentInformation];
 
   const formatRecipientText = (recipient: Recipient) => {
     let text = recipient.email;
@@ -171,15 +182,15 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       <section className="mt-6">
         <Card className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2" degrees={45} gradient>
           {documentInformation.map((info, i) => (
-            <div className="text-foreground text-sm" key={i}>
+            <div className="text-sm text-foreground" key={i}>
               <h3 className="font-semibold">{_(info.description)}</h3>
-              <p className="text-muted-foreground truncate">{info.value}</p>
+              <p className="truncate text-muted-foreground">{info.value}</p>
             </div>
           ))}
 
-          <div className="text-foreground text-sm">
+          <div className="text-sm text-foreground">
             <h3 className="font-semibold">Recipients</h3>
-            <ul className="text-muted-foreground list-inside list-disc">
+            <ul className="list-inside list-disc text-muted-foreground">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>
                   <span>{formatRecipientText(recipient)}</span>
@@ -191,7 +202,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       </section>
 
       <section className="mt-6">
-        <DocumentLogsTable documentId={document.id} />
+        <DocumentLogsTable documentId={document.id} userId={userId} />
       </section>
     </div>
   );
