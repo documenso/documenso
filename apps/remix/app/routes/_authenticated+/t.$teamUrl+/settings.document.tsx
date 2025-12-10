@@ -40,6 +40,7 @@ export default function TeamsSettingsPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        delegateDocumentOwnership,
       } = data;
 
       await updateTeamSettings({
@@ -63,6 +64,7 @@ export default function TeamsSettingsPage() {
                 uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
               }),
+          delegateDocumentOwnership: delegateDocumentOwnership,
         },
       });
 
@@ -82,7 +84,7 @@ export default function TeamsSettingsPage() {
   if (isLoadingTeam || !teamWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }

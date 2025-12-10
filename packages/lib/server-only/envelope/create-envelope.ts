@@ -81,6 +81,7 @@ export type CreateEnvelopeOptions = {
     globalActionAuth?: TDocumentActionAuthTypes[];
     recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
+    delegatedDocumentOwner?: string;
   };
   attachments?: Array<{
     label: string;
@@ -114,6 +115,7 @@ export const createEnvelope = async ({
     publicTitle,
     publicDescription,
     visibility: visibilityOverride,
+    delegatedDocumentOwner,
   } = data;
 
   const team = await prisma.team.findFirst({
@@ -256,6 +258,41 @@ export const createEnvelope = async ({
       ? await incrementDocumentId().then((v) => v.formattedDocumentId)
       : await incrementTemplateId().then((v) => v.formattedTemplateId);
 
+  const getValidatedDelegatedOwner = async () => {
+    if (
+      !settings.delegateDocumentOwnership ||
+      requestMetadata.source === 'app' ||
+      !delegatedDocumentOwner
+    ) {
+      return null;
+    }
+
+    const user = await prisma.user.findFirst({
+      where: {
+        email: delegatedDocumentOwner,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
+    const isTeamMember = await prisma.team.findFirst({
+      where: buildTeamWhereQuery({ teamId, userId: user.id }),
+    });
+
+    if (!isTeamMember) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
+    }
+
+    return user;
+  };
+
+  const validatedDelegatedOwner = await getValidatedDelegatedOwner();
+  const finalDocumentOwnerId = validatedDelegatedOwner?.id ?? userId;
+
   return await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
       data: {
@@ -285,7 +322,7 @@ export const createEnvelope = async ({
             })),
           },
         },
-        userId,
+        userId: finalDocumentOwnerId,
         teamId,
         authOptions,
         visibility,
@@ -393,6 +430,9 @@ export const createEnvelope = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
           envelopeId: envelope.id,
+          user: {
+            id: finalDocumentOwnerId,
+          },
           metadata: requestMetadata,
           data: {
             title,
@@ -402,6 +442,27 @@ export const createEnvelope = async ({
           },
         }),
       });
+
+      // Create audit log for delegated owner if validation passed
+      if (validatedDelegatedOwner) {
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED,
+            envelopeId: envelope.id,
+            user: {
+              id: userId,
+            },
+            metadata: requestMetadata,
+            data: {
+              originalOwnerUserId: userId,
+              delegatedOwnerUserId: validatedDelegatedOwner.id,
+              delegatedOwnerName: validatedDelegatedOwner.name,
+              delegatedOwnerEmail: validatedDelegatedOwner.email,
+              teamName: team.name,
+            },
+          }),
+        });
+      }
 
       await triggerWebhook({
         event: WebhookTriggerEvents.DOCUMENT_CREATED,

@@ -36,6 +36,7 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      delegateDocumentOwnership,
 
       // Branding related settings.
       brandingEnabled,
@@ -137,6 +138,8 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
+            delegateDocumentOwnership:
+              delegateDocumentOwnership === null ? undefined : delegateDocumentOwnership,
 
             // Branding related settings.
             brandingEnabled,

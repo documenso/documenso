@@ -39,6 +39,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      delegateDocumentOwnership,
 
       // Branding related settings.
       brandingEnabled,
@@ -147,6 +148,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
+            delegateDocumentOwnership,
 
             // Branding related settings.
             brandingEnabled,
