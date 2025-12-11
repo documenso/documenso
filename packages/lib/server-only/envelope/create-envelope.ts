@@ -274,7 +274,9 @@ export const createEnvelope = async ({
     });
 
     if (!user) {
-      return null;
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
     }
 
     const isTeamMember = await prisma.team.findFirst({

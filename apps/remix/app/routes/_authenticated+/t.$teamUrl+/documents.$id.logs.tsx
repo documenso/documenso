@@ -58,12 +58,6 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     userId: user.id,
   });
 
-  // envelope.user is the document owner (delegated owner if delegation occurred, otherwise the creator)
-  const createdBy = {
-    name: envelope.user.name,
-    email: envelope.user.email,
-  };
-
   return {
     // Only return necessary data
     document: {
@@ -80,14 +74,13 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       documentMeta: envelope.documentMeta,
     },
     recipients: envelope.recipients,
-    createdBy,
     documentRootPath,
     userId: user.id,
   };
 }
 
 export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) {
-  const { document, recipients, createdBy, documentRootPath, userId } = loaderData;
+  const { document, recipients, documentRootPath, userId } = loaderData;
 
   const { _, i18n } = useLingui();
 
@@ -106,7 +99,9 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
     },
     {
       description: msg`Created by`,
-      value: createdBy.name ? `${createdBy.name} (${createdBy.email})` : createdBy.email,
+      value: document.user.name
+        ? `${document.user.name} (${document.user.email})`
+        : document.user.email,
     },
     {
       description: msg`Date created`,
