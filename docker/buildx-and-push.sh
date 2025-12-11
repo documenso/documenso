@@ -25,6 +25,8 @@ docker buildx build \
     -f "$SCRIPT_DIR/Dockerfile" \
     --platform=$PLATFORM \
     --progress=plain \
+    --build-arg NEXT_PRIVATE_TELEMETRY_KEY="${NEXT_PRIVATE_TELEMETRY_KEY:-}" \
+    --build-arg NEXT_PRIVATE_TELEMETRY_HOST="${NEXT_PRIVATE_TELEMETRY_HOST:-}" \
     -t "documenso/documenso:latest" \
     -t "documenso/documenso:$GIT_SHA" \
     -t "documenso/documenso:$APP_VERSION" \

@@ -24,7 +24,10 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z.string().min(1, { message: msg`Email is required`.id }),
+  email: z
+    .string()
+    .email()
+    .min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;

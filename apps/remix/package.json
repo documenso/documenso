@@ -56,7 +56,7 @@
     "nanoid": "^5.1.6",
     "papaparse": "^5.5.3",
     "posthog-js": "^1.297.2",
-    "posthog-node": "^4.18.0",
+    "posthog-node": "4.18.0",
     "react": "^18",
     "react-call": "^1.8.1",
     "react-dom": "^18",
@@ -70,7 +70,6 @@
     "remeda": "^2.32.0",
     "remix-themes": "^2.0.4",
     "satori": "^0.18.3",
-    "sharp": "0.34.5",
     "tailwindcss": "^3.4.18",
     "ts-pattern": "^5.9.0",
     "ua-parser-js": "^1.0.41",
@@ -86,6 +85,7 @@
     "@react-router/remix-routes-option-adapter": "^7.9.6",
     "@rollup/plugin-babel": "^6.1.0",
     "@rollup/plugin-commonjs": "^28.0.9",
+    "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
     "@simplewebauthn/types": "^9.0.1",
@@ -107,5 +107,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.0.14"
+  "version": "2.2.6"
 }
