@@ -13,7 +13,7 @@ jobs:
   e2e_tests:
     name: 'E2E Tests'
     timeout-minutes: 60
-    runs-on: warp-ubuntu-2204-x64-8x
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
