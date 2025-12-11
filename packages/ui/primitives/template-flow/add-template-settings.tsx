@@ -96,7 +96,7 @@ export const AddTemplateSettingsFormPartial = ({
   onSubmit,
   onAutoSave,
 }: AddTemplateSettingsFormProps) => {
-  const { t, i18n } = useLingui();
+  const { t } = useLingui();
 
   const organisation = useCurrentOrganisation();
 
@@ -262,7 +262,7 @@ export const AddTemplateSettingsFormPartial = ({
                       <SelectContent>
                         {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                           <SelectItem key={code} value={code}>
-                            {language.full}
+                            {t(language.full)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -391,7 +391,7 @@ export const AddTemplateSettingsFormPartial = ({
                         {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
                           ({ value, description }) => (
                             <SelectItem key={value} value={value}>
-                              {i18n._(description)}
+                              {t(description)}
                             </SelectItem>
                           ),
                         )}
