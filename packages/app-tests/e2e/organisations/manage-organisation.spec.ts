@@ -6,7 +6,11 @@ import { seedOrganisationMembers } from '@documenso/prisma/seed/organisations';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin, apiSignout } from '../fixtures/authentication';
-import { expectTextToBeVisible, expectTextToNotBeVisible } from '../fixtures/generic';
+import {
+  expectTextToBeVisible,
+  expectTextToNotBeVisible,
+  openDropdownMenu,
+} from '../fixtures/generic';
 
 test('[ORGANISATIONS]: create and delete organisation', async ({ page }) => {
   const { user, organisation } = await seedUser({
@@ -399,7 +403,9 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await expect(page.getByText('Team members have been added').first()).toBeVisible();
 
   // Update CUSTOM_GROUP_B
-  await page.getByRole('row', { name: 'CUSTOM_GROUP_B' }).getByRole('button').click();
+  const updateBtn = page.getByRole('row', { name: 'CUSTOM_GROUP_B' }).getByRole('button');
+  await openDropdownMenu(page, updateBtn);
+  await expect(page.getByRole('menuitem', { name: 'Update role' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Update role' }).click();
   await page.getByRole('combobox').click();
   await page.getByRole('option', { name: 'Team Admin' }).click();
@@ -409,7 +415,9 @@ test('[ORGANISATIONS]: manage groups and members', async ({ page }) => {
   await page.reload();
 
   // Delete CUSTOM_GROUP_B
-  await page.getByRole('row', { name: 'CUSTOM_GROUP_B' }).getByRole('button').click();
+  const deleteBtn = page.getByRole('row', { name: 'CUSTOM_GROUP_B' }).getByRole('button');
+  await openDropdownMenu(page, deleteBtn);
+  await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Delete' }).click();
   await expectTextToBeVisible(page, 'You have successfully removed this group from the team.');
@@ -477,7 +485,9 @@ test('[ORGANISATIONS]: member invites', async ({ page }) => {
   await expect(page.getByText(user2.email)).toBeVisible();
   await expect(page.getByText(user3.email)).toBeVisible();
 
-  await page.getByRole('row', { name: user3.email }).getByRole('button').click();
+  const inviteActionBtn = page.getByRole('row', { name: user3.email }).getByRole('button');
+  await openDropdownMenu(page, inviteActionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Remove' }).click();
   await expect(page.getByText('Invitation has been deleted').first()).toBeVisible();
   await expect(page.getByText(user3.email)).not.toBeVisible();
@@ -508,7 +518,9 @@ test('[ORGANISATIONS]: member invites', async ({ page }) => {
   await expect(page.getByText(user.email)).toBeVisible();
   await expect(page.getByText(user2.email)).toBeVisible();
 
-  await page.getByRole('row', { name: user2.email }).getByRole('button').click();
+  const memberActionBtn = page.getByRole('row', { name: user2.email }).getByRole('button');
+  await openDropdownMenu(page, memberActionBtn);
+  await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Remove' }).click();
   await expect(page.getByText('You have successfully removed').first()).toBeVisible();
@@ -522,7 +534,9 @@ test('[ORGANISATIONS]: member invites', async ({ page }) => {
   await expect(page.getByText(user.email)).toBeVisible();
   await expect(page.getByText(user2.email)).toBeVisible();
 
-  await page.getByRole('row', { name: user2.email }).getByRole('button').click();
+  const orgMemberBtn = page.getByRole('row', { name: user2.email }).getByRole('button');
+  await openDropdownMenu(page, orgMemberBtn);
+  await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Delete' }).click();
   await expect(page.getByText('You have successfully removed this user').first()).toBeVisible();

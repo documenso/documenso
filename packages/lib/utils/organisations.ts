@@ -136,5 +136,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
     emailReplyTo: null,
     // emailReplyToName: null,
     emailDocumentSettings: DEFAULT_DOCUMENT_EMAIL_SETTINGS,
+
+    aiFeaturesEnabled: false,
   };
 };

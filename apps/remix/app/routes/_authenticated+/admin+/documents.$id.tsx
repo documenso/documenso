@@ -1,7 +1,7 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { EnvelopeType, SigningStatus } from '@prisma/client';
+import { EnvelopeType, RecipientRole, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
@@ -86,7 +86,7 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
         )}
       </div>
 
-      <div className="text-muted-foreground mt-4 text-sm">
+      <div className="mt-4 text-sm text-muted-foreground">
         <div>
           <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
         </div>
@@ -112,7 +112,8 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
                 disabled={envelope.recipients.some(
                   (recipient) =>
                     recipient.signingStatus !== SigningStatus.SIGNED &&
-                    recipient.signingStatus !== SigningStatus.REJECTED,
+                    recipient.signingStatus !== SigningStatus.REJECTED &&
+                    recipient.role !== RecipientRole.CC,
                 )}
                 onClick={() => resealDocument({ id: envelope.id })}
               >

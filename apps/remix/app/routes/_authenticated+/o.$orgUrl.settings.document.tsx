@@ -1,8 +1,10 @@
 import { useLingui } from '@lingui/react/macro';
 import { Loader } from 'lucide-react';
+import { useLoaderData } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { IS_AI_FEATURES_CONFIGURED } from '@documenso/lib/constants/app';
 import { DocumentSignatureType } from '@documenso/lib/constants/document';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
@@ -19,9 +21,16 @@ export function meta() {
   return appMetaTags('Document Preferences');
 }
 
-export default function OrganisationSettingsDocumentPage() {
-  const { organisations } = useSession();
+export const loader = () => {
+  return {
+    isAiFeaturesConfigured: IS_AI_FEATURES_CONFIGURED(),
+  };
+};
 
+export default function OrganisationSettingsDocumentPage() {
+  const { isAiFeaturesConfigured } = useLoaderData<typeof loader>();
+
+  const { organisations } = useSession();
   const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
@@ -49,6 +58,7 @@ export default function OrganisationSettingsDocumentPage() {
         includeAuditLog,
         signatureTypes,
         delegateDocumentOwnership,
+        aiFeaturesEnabled,
       } = data;
 
       if (
@@ -57,7 +67,8 @@ export default function OrganisationSettingsDocumentPage() {
         documentDateFormat === null ||
         includeSenderDetails === null ||
         includeSigningCertificate === null ||
-        includeAuditLog === null
+        includeAuditLog === null ||
+        aiFeaturesEnabled === null
       ) {
         throw new Error('Should not be possible.');
       }
@@ -76,6 +87,7 @@ export default function OrganisationSettingsDocumentPage() {
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           delegateDocumentOwnership: delegateDocumentOwnership,
+          aiFeaturesEnabled,
         },
       });
 
@@ -112,6 +124,7 @@ export default function OrganisationSettingsDocumentPage() {
       <section>
         <DocumentPreferencesForm
           canInherit={false}
+          isAiFeaturesConfigured={isAiFeaturesConfigured}
           settings={organisationWithSettings.organisationGlobalSettings}
           onFormSubmit={onDocumentPreferencesFormSubmit}
         />
