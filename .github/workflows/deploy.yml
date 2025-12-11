@@ -1,24 +1,76 @@
-name: Deploy to Production
+name: Deploy
 
 on:
-  push:
-    tags:
-      - '*'
+  issue_comment:
+    types:
+      - created
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    if: >
+      startsWith(github.event.comment.body, '/deploy')
+
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: read
 
     steps:
-      - name: Checkout code
+      - name: 'get env name'
+        shell: bash
+        run: |
+          comment='${{ github.event.comment.body }}'
+          # convert to array
+          comment=($comment)
+          env_name=""
+          # iterate over array element in the comment
+          for i in "${comment[@]}"; do
+             if [[ "${i}" == --* ]]; then
+                echo "command_arg=${i#--}" >> $GITHUB_ENV
+              elif [[ "${i}" == /* ]]; then
+                echo "command: ${i}"
+              else
+                env_name=${i}
+              fi
+          done
+          echo "requested_env_name=${env_name}" >> $GITHUB_ENV
+
+      - name: set head sha from pr
+        shell: bash
+        run: |
+          resp=$(curl -sSf \
+            --url ${{ github.event.issue.pull_request.url }} \
+            --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' \
+            --header 'content-type: application/json')
+          head_ref=$(jq -r '.head.ref' <<< "$resp")
+          echo "head_ref=$head_ref" >> $GITHUB_ENV
+
+      - name: Checkout
         uses: actions/checkout@v4
         with:
-          ref: main
-          fetch-depth: 0
-          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{env.head_ref}}
 
-      - name: Push to release branch
+      - name: set version
+        shell: bash
         run: |
-          git checkout release || git checkout -b release
-          git merge --ff-only main
-          git push origin release
+          git fetch --tags
+          version=$(git describe --tags --abbrev=0 2>/dev/null || echo "$(date +'%Y.%m.%d')-manual-${{ github.run_number }}")
+          echo "version=$version" >> $GITHUB_ENV
+
+      - name: 'trigger deploy in k8s repo'
+        env:
+          GH_TOKEN: ${{ secrets.DEPLOY_TRIGERRER_TOKEN }}
+        run: |
+          set -eux
+          env=${requested_env_name}
+
+          gh workflow run deploy.yml \
+            --repo=${{ github.repository_owner }}/k8s --ref=main \
+            -f app=documenso \
+            -f app_version="${version}" \
+            -f env=$env
