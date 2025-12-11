@@ -688,8 +688,6 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
 export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.object({
   type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED),
   data: z.object({
-    originalOwnerUserId: z.number(),
-    delegatedOwnerUserId: z.number(),
     delegatedOwnerName: z.string().nullable(),
     delegatedOwnerEmail: z.string(),
     teamName: z.string(),

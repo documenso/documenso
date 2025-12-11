@@ -91,7 +91,7 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
 
   const { _, i18n } = useLingui();
 
-  const baseDocumentInformation: { description: MessageDescriptor; value: string }[] = [
+  const documentInformation: { description: MessageDescriptor; value: string }[] = [
     {
       description: msg`Document title`,
       value: document.title,
@@ -108,9 +108,6 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       description: msg`Created by`,
       value: createdBy.name ? `${createdBy.name} (${createdBy.email})` : createdBy.email,
     },
-  ];
-
-  const remainingDocumentInformation: { description: MessageDescriptor; value: string }[] = [
     {
       description: msg`Date created`,
       value: DateTime.fromJSDate(document.createdAt)
@@ -128,8 +125,6 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
       value: document.documentMeta?.timezone ?? 'N/A',
     },
   ];
-
-  const documentInformation = [...baseDocumentInformation, ...remainingDocumentInformation];
 
   const formatRecipientText = (recipient: Recipient) => {
     let text = recipient.email;

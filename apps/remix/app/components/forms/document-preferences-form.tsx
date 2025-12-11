@@ -107,7 +107,7 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
-    delegateDocumentOwnership: z.boolean().nullish(),
+    delegateDocumentOwnership: z.boolean().nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({

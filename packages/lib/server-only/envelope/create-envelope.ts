@@ -454,8 +454,6 @@ export const createEnvelope = async ({
             },
             metadata: requestMetadata,
             data: {
-              originalOwnerUserId: userId,
-              delegatedOwnerUserId: validatedDelegatedOwner.id,
               delegatedOwnerName: validatedDelegatedOwner.name,
               delegatedOwnerEmail: validatedDelegatedOwner.email,
               teamName: team.name,
