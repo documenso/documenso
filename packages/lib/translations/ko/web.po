@@ -101,6 +101,11 @@ msgstr "{0, plural, other {#개의 필드}}"
 msgid "{0, plural, one {# folder} other {# folders}}"
 msgstr "{0, plural, other {폴더 #개}}"
 
+#. placeholder {0}: detectedRecipients.length
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "{0, plural, one {# recipient have been added from AI detection.} other {# recipients have been added from AI detection.}}"
+msgstr ""
+
 #. placeholder {0}: template.recipients.length
 #: apps/remix/app/routes/_recipient+/d.$token+/_index.tsx
 msgid "{0, plural, one {# recipient} other {# recipients}}"
@@ -151,10 +156,43 @@ msgstr "{0, plural, other {#개의 일치하는 필드}}"
 msgid "{0, plural, one {1 Recipient} other {# Recipients}}"
 msgstr "{0, plural, other {#명 수신자}}"
 
+#. placeholder {0}: progress.fieldsDetected
+#. placeholder {1}: progress.pagesProcessed
+#. placeholder {2}: progress.totalPages
+#. placeholder {3}: progress.pagesProcessed
+#. placeholder {4}: progress.totalPages
+#: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
+msgid "{0, plural, one {Page {1} of {2} - # field found} other {Page {3} of {4} - # fields found}}"
+msgstr ""
+
+#. placeholder {0}: progress.recipientsDetected
+#. placeholder {1}: progress.pagesProcessed
+#. placeholder {2}: progress.totalPages
+#. placeholder {3}: progress.pagesProcessed
+#. placeholder {4}: progress.totalPages
+#: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
+msgid "{0, plural, one {Page {1} of {2} - # recipient found} other {Page {3} of {4} - # recipients found}}"
+msgstr ""
+
+#. placeholder {0}: detectedRecipients.length
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "{0, plural, one {Recipient added} other {Recipients added}}"
+msgstr ""
+
 #. placeholder {0}: pendingRecipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
 msgstr "{0, plural, other {#명의 수신자 대기 중}}"
+
+#. placeholder {0}: detectedFields.length
+#: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
+msgid "{0, plural, one {We found # field in your document.} other {We found # fields in your document.}}"
+msgstr ""
+
+#. placeholder {0}: detectedRecipients.length
+#: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
+msgid "{0, plural, one {We found # recipient in your document.} other {We found # recipients in your document.}}"
+msgstr ""
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
@@ -199,11 +237,6 @@ msgstr "이번 달 남은 문서 {1}개 중 {0}개."
 #: packages/lib/server-only/document/resend-document.ts
 msgid "{0} on behalf of \"{1}\" has invited you to {recipientActionVerb} the document \"{2}\"."
 msgstr "{0}이(가) \"{1}\"을(를) 대신하여 \"{2}\" 문서에 대해 귀하께 {recipientActionVerb}하도록 초대했습니다."
-
-#. placeholder {0}: detectedRecipients.length
-#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
-msgid "{0} recipient(s) have been added from AI detection."
-msgstr ""
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
@@ -1288,6 +1321,10 @@ msgstr "제출이 완료되면 문서가 자동으로 생성되어 문서 페이
 msgid "AI Features"
 msgstr ""
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "AI features are disabled for your team. Please ask your team owner or organisation owner to enable them."
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-status.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "All"
@@ -2368,6 +2405,7 @@ msgstr "클라이언트 시크릿"
 msgid "Client secret is required"
 msgstr "클라이언트 시크릿은 필수입니다."
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
@@ -2380,7 +2418,6 @@ msgstr "클라이언트 시크릿은 필수입니다."
 #: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -4184,6 +4221,15 @@ msgstr "계정 활성화"
 msgid "Enable Account"
 msgstr "계정 활성화"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Enable AI detection"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Enable AI features"
+msgstr ""
+
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable AI-powered features such as automatic recipient detection. When enabled, document content will be sent to AI providers. We only use providers that do not retain data for training and prefer European regions where available."
 msgstr ""
@@ -5865,10 +5911,6 @@ msgstr "만료되지 않음"
 msgid "New Password"
 msgstr "새 비밀번호"
 
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
-msgid "New Template"
-msgstr "새 템플릿"
-
 #: apps/remix/app/components/dialogs/team-group-create-dialog.tsx
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
@@ -6329,20 +6371,6 @@ msgstr "소유권이 {organisationMemberName}에게 이전되었습니다."
 msgid "Page {0} of {1}"
 msgstr "페이지 {0}/{1}"
 
-#. placeholder {0}: progress.pagesProcessed
-#. placeholder {1}: progress.totalPages
-#. placeholder {2}: progress.fieldsDetected
-#: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
-msgid "Page {0} of {1} - {2} field(s) found"
-msgstr ""
-
-#. placeholder {0}: progress.pagesProcessed
-#. placeholder {1}: progress.totalPages
-#. placeholder {2}: progress.recipientsDetected
-#: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
-msgid "Page {0} of {1} - {2} recipient(s) found"
-msgstr ""
-
 #. placeholder {0}: i + 1
 #: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
 #: packages/ui/primitives/pdf-viewer/base.tsx
@@ -6688,10 +6716,6 @@ msgstr "다른 도메인을 시도해 주세요."
 msgid "Please try again and make sure you enter the correct email address."
 msgstr "이메일 주소를 올바르게 입력했는지 확인한 후 다시 시도해 주세요."
 
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
-msgid "Please try again later."
-msgstr "나중에 다시 시도해 주세요."
-
 #: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
 #: packages/ui/components/pdf-viewer/pdf-viewer-konva.tsx
 #: packages/ui/primitives/pdf-viewer/base.tsx
@@ -6968,10 +6992,6 @@ msgstr "수신자가 업데이트되었습니다"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 msgid "Recipients"
 msgstr "수신자"
-
-#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
-msgid "Recipients added"
-msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Recipients metrics"
@@ -8089,7 +8109,6 @@ msgstr "일부 서명자에게 서명 필드가 할당되지 않았습니다. �
 #: apps/remix/app/components/dialogs/team-email-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-inherit-member-disable-dialog.tsx
 #: apps/remix/app/components/dialogs/team-inherit-member-enable-dialog.tsx
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
 #: apps/remix/app/components/dialogs/template-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
@@ -8580,7 +8599,6 @@ msgstr "이 조직 그룹이 현재 할당된 팀"
 msgid "Template"
 msgstr "템플릿"
 
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
 #: packages/ui/primitives/document-upload-button.tsx
 msgid "Template (Legacy)"
 msgstr "템플릿(레거시)"
@@ -8593,7 +8611,7 @@ msgstr "템플릿이 생성되었습니다"
 msgid "Template deleted"
 msgstr "템플릿이 삭제되었습니다"
 
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
 msgid "Template document uploaded"
 msgstr "템플릿 문서가 업로드되었습니다"
 
@@ -8654,10 +8672,6 @@ msgstr "템플릿이 업로드되었습니다."
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Templates"
 msgstr "템플릿"
-
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
-msgid "Templates allow you to quickly generate documents with pre-filled recipients and fields."
-msgstr "템플릿을 사용하면 미리 설정된 수신자와 필드로 문서를 빠르게 생성할 수 있습니다."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
@@ -9540,6 +9554,10 @@ msgstr "트리거"
 msgid "Try again"
 msgstr ""
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Turn on AI detection to automatically find recipients and fields in your documents. AI providers do not retain your data for training."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/settings+/security._index.tsx
 msgid "Two factor authentication"
 msgstr "2단계 인증"
@@ -10334,6 +10352,10 @@ msgstr "현재 이 패스키를 업데이트할 수 없습니다. 나중에 다�
 msgid "We couldn't create a Stripe customer. Please try again."
 msgstr "Stripe 고객을 생성하지 못했습니다. 다시 시도해 주세요."
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "We couldn't enable AI features right now. Please try again."
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "We couldn't update the group. Please try again."
 msgstr "그룹을 업데이트하지 못했습니다. 다시 시도해 주세요."
@@ -10533,16 +10555,6 @@ msgstr "팀 이메일을 업데이트하는 중 알 수 없는 오류가 발생�
 #: apps/remix/app/components/forms/profile.tsx
 msgid "We encountered an unknown error while attempting update your profile. Please try again later."
 msgstr "프로필을 업데이트하는 중 알 수 없는 오류가 발생했습니다. 잠시 후 다시 시도해 주세요."
-
-#. placeholder {0}: detectedFields.length
-#: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
-msgid "We found {0} field(s) in your document."
-msgstr ""
-
-#. placeholder {0}: detectedRecipients.length
-#: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
-msgid "We found {0} recipient(s) in your document."
-msgstr ""
 
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 msgid "We have sent a confirmation email for verification."
@@ -11279,6 +11291,10 @@ msgstr "앞으로 로그인할 때 인증 앱의 코드를 입력해야 합니�
 msgid "You will receive an email copy of the signed document once everyone has signed."
 msgstr "모두 서명하면 서명된 문서의 사본이 이메일로 전송됩니다."
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "You're an admin. You can enable AI features for this team right away. Everyone on the team will see AI detection once enabled."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "You've made too many detection requests. Please wait a minute before trying again."
@@ -11337,6 +11353,10 @@ msgstr "현재 요금제의 결제가 연체되었습니다."
 msgid "Your direct signing templates"
 msgstr "직접 서명 템플릿"
 
+#: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
+msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 #: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
 msgid "Your document failed to upload."
@@ -11372,7 +11392,7 @@ msgstr "문서가 성공적으로 복제되었습니다."
 msgid "Your document has been uploaded successfully."
 msgstr "문서가 성공적으로 업로드되었습니다."
 
-#: apps/remix/app/components/dialogs/template-create-dialog.tsx
+#: apps/remix/app/components/general/document/document-upload-button-legacy.tsx
 msgid "Your document has been uploaded successfully. You will be redirected to the template page."
 msgstr "문서가 성공적으로 업로드되었습니다. 템플릿 페이지로 이동합니다."
 
