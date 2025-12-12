@@ -530,6 +530,13 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Envelope item deleted`,
       identified: msg`${prefix} deleted an envelope item with title ${data.envelopeItemTitle}`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Document ownership delegated`,
+        context: `Audit log format`,
+      }),
+      identified: msg`The document ownership was delegated to ${data.delegatedOwnerName || data.delegatedOwnerEmail} on behalf of ${data.teamName}`,
+    }))
     .exhaustive();
 
   return {
