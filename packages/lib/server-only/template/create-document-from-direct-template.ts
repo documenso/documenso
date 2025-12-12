@@ -205,6 +205,11 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
+
+  const matchingTemplateRecipient = nonDirectTemplateRecipients.find(
+    (recipient) => recipient.email.toLowerCase() === directRecipientEmail.toLowerCase(),
+  );
+
   const derivedDocumentMeta = extractDerivedDocumentMeta(
     settings,
     directTemplateEnvelope.documentMeta,
@@ -422,7 +427,13 @@ export const createDocumentFromDirectTemplate = async ({
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
-    Object.values(nonDirectTemplateRecipients).forEach((templateRecipient) => {
+    const recipientsForFields = matchingTemplateRecipient
+      ? nonDirectTemplateRecipients.filter(
+          (recipient) => recipient.id !== matchingTemplateRecipient.id,
+        )
+      : nonDirectTemplateRecipients;
+
+    Object.values(recipientsForFields).forEach((templateRecipient) => {
       const recipient = createdEnvelope.recipients.find(
         (recipient) => recipient.email === templateRecipient.email,
       );
@@ -456,9 +467,27 @@ export const createDocumentFromDirectTemplate = async ({
       })),
     });
 
-    // Create the direct recipient and their non signature fields.
-    const createdDirectRecipient = await tx.recipient.create({
-      data: {
+    // Find existing recipient if email matches
+    const existingRecipient = createdEnvelope.recipients.find(
+      (recipient) => recipient.email.toLowerCase() === directRecipientEmail.toLowerCase(),
+    );
+
+    // Use upsert to either update existing recipient or create new one
+    const createdDirectRecipient = await tx.recipient.upsert({
+      where: {
+        id: existingRecipient?.id ?? -1,
+      },
+      update: {
+        name: directRecipientName || existingRecipient?.name,
+        authOptions: createRecipientAuthOptions({
+          accessAuth: directTemplateRecipientAuthOptions.accessAuth,
+          actionAuth: directTemplateRecipientAuthOptions.actionAuth,
+        }),
+        signingStatus: SigningStatus.SIGNED,
+        sendStatus: SendStatus.SENT,
+        signedAt: initialRequestTime,
+      },
+      create: {
         envelopeId: createdEnvelope.id,
         email: directRecipientEmail,
         name: directRecipientName,
@@ -475,12 +504,8 @@ export const createDocumentFromDirectTemplate = async ({
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
-              let inserted = true;
-
-              // Custom logic for V2 to only insert if values exist.
-              if (directTemplateEnvelope.internalVersion === 2) {
-                inserted = customText !== '';
-              }
+              const inserted =
+                directTemplateEnvelope.internalVersion === 2 ? customText !== '' : true;
 
               return {
                 envelopeId: createdEnvelope.id,
@@ -503,6 +528,63 @@ export const createDocumentFromDirectTemplate = async ({
         fields: true,
       },
     });
+
+    // If updating existing recipient, create their fields separately
+    if (existingRecipient && matchingTemplateRecipient) {
+      // Create fields for the matching template recipient (their original fields)
+      if (matchingTemplateRecipient.fields.length > 0) {
+        const matchingRecipientFieldsToCreate = matchingTemplateRecipient.fields.map((field) => ({
+          envelopeId: createdEnvelope.id,
+          envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[field.envelopeItemId],
+          recipientId: createdDirectRecipient.id,
+          type: field.type,
+          page: field.page,
+          positionX: field.positionX,
+          positionY: field.positionY,
+          width: field.width,
+          height: field.height,
+          customText: '',
+          inserted: false,
+          fieldMeta: field.fieldMeta,
+        }));
+
+        await tx.field.createMany({
+          data: matchingRecipientFieldsToCreate.map((field) => ({
+            ...field,
+            fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+          })),
+        });
+      }
+
+      // Create the direct template recipient's non-signature fields for the matching recipient
+      if (directTemplateNonSignatureFields.length > 0) {
+        const directRecipientNonSignatureFieldsToCreate = directTemplateNonSignatureFields.map(
+          ({ templateField, customText }) => {
+            const inserted =
+              directTemplateEnvelope.internalVersion === 2 ? customText !== '' : true;
+
+            return {
+              envelopeId: createdEnvelope.id,
+              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
+              recipientId: createdDirectRecipient.id,
+              type: templateField.type,
+              page: templateField.page,
+              positionX: templateField.positionX,
+              positionY: templateField.positionY,
+              width: templateField.width,
+              height: templateField.height,
+              customText: customText ?? '',
+              inserted,
+              fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+            };
+          },
+        );
+
+        await tx.field.createMany({
+          data: directRecipientNonSignatureFieldsToCreate,
+        });
+      }
+    }
 
     // Create any direct recipient signature fields.
     // Note: It's done like this because we can't nest things in createMany.
