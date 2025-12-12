@@ -67,7 +67,7 @@ export const DocumentFlowFormContainerContent = ({
 }: DocumentFlowFormContainerContentProps) => {
   return (
     <div
-      className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col overflow-hidden px-2', className)}
+      className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col px-2', className)}
       {...props}
     >
       <div className="flex flex-1 flex-col">{children}</div>
