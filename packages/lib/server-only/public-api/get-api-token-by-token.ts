@@ -61,7 +61,10 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
 
   // This will never happen but we need to narrow types
   if (!user) {
-    throw new Error('Invalid token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid token',
+      statusCode: 401,
+    });
   }
 
   return {
