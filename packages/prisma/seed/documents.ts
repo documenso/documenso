@@ -67,7 +67,7 @@ export const seedBlankDocument = async (
   teamId: number,
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {} } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -87,7 +87,7 @@ export const seedBlankDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
-      internalVersion: 1,
+      internalVersion,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -287,7 +287,7 @@ export const seedDraftDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {} } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -307,7 +307,7 @@ export const seedDraftDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
-      internalVersion: 1,
+      internalVersion,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -372,6 +372,7 @@ export const seedDraftDocument = async (
 type CreateDocumentOptions = {
   key?: string | number;
   createDocumentOptions?: Partial<Prisma.EnvelopeUncheckedCreateInput>;
+  internalVersion?: number;
 };
 
 export const seedPendingDocument = async (
@@ -380,7 +381,7 @@ export const seedPendingDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {} } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -400,7 +401,7 @@ export const seedPendingDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
-      internalVersion: 1,
+      internalVersion,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
@@ -620,7 +621,7 @@ export const seedCompletedDocument = async (
   recipients: (User | string)[],
   options: CreateDocumentOptions = {},
 ) => {
-  const { key, createDocumentOptions = {} } = options;
+  const { key, createDocumentOptions = {}, internalVersion = 1 } = options;
 
   const documentData = await prisma.documentData.create({
     data: {
@@ -640,7 +641,7 @@ export const seedCompletedDocument = async (
     data: {
       id: prefixedId('envelope'),
       secondaryId: documentId.formattedDocumentId,
-      internalVersion: 1,
+      internalVersion,
       type: EnvelopeType.DOCUMENT,
       documentMetaId: documentMeta.id,
       source: DocumentSource.DOCUMENT,
