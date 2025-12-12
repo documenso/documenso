@@ -3,7 +3,7 @@ import {
   ORGANISATION_USER_ACCOUNT_TYPE,
 } from '@documenso/lib/constants/organisations';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { handleDocumentOwnershipOnDeletion } from '@documenso/lib/server-only/document/handle-document-ownership-on-deletion';
+import { orphanEnvelopes } from '@documenso/lib/server-only/envelope/orphan-envelopes';
 import { buildOrganisationWhereQuery } from '@documenso/lib/utils/organisations';
 import { prisma } from '@documenso/prisma';
 
@@ -43,11 +43,6 @@ export const deleteOrganisationRoute = authenticatedProcedure
         teams: {
           select: {
             id: true,
-            documents: {
-              select: {
-                id: true,
-              },
-            },
           },
         },
       },
@@ -59,14 +54,8 @@ export const deleteOrganisationRoute = authenticatedProcedure
       });
     }
 
-    const documentIds = organisation.teams.flatMap((team) => team.documents.map((doc) => doc.id));
-
-    if (documentIds && documentIds.length > 0) {
-      await handleDocumentOwnershipOnDeletion({
-        documentIds,
-        organisationOwnerId: organisation.owner.id,
-      });
-    }
+    // Orphan all envelopes to get rid of foreign key constraints.
+    await Promise.all(organisation.teams.map(async (team) => orphanEnvelopes({ teamId: team.id })));
 
     await prisma.$transaction(async (tx) => {
       await tx.account.deleteMany({
