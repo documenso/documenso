@@ -123,14 +123,14 @@ export const EnvelopeDropZoneWrapper = ({
       const error = AppError.parseError(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs`)
+        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
         .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope`,
+          () => t`You have reached the limit of the number of files per envelope.`,
         )
         .otherwise(() => t`An error occurred during upload.`);
 

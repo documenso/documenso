@@ -112,7 +112,7 @@ export default function OrganisationSettingsDocumentPage() {
 
   const settingsHeaderText = t`Document Preferences`;
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general document preferences`
+    ? t`Here you can set your general document preferences.`
     : t`Here you can set document preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (

@@ -131,7 +131,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
       const errorMessage = match(error.code)
         .with(
           AppErrorCode.UNAUTHORIZED,
-          () => msg`You do not have permission to create a token for this team`,
+          () => msg`You do not have permission to create a token for this team.`,
         )
         .otherwise(() => msg`Something went wrong. Please try again later.`);
 
