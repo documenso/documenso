@@ -12,6 +12,7 @@ import { z } from 'zod';
 
 export const ZDeleteTeamRequestSchema = z.object({
   teamId: z.number(),
+  transferTeamId: z.number().optional(),
 });
 
 export const ZDeleteTeamResponseSchema = z.void();
