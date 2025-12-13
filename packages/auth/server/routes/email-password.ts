@@ -28,6 +28,7 @@ import { invalidateSessions } from '../lib/session/session';
 import { getCsrfCookie } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
 import { getSession } from '../lib/utils/get-session';
+import { minimumDurationMiddleware } from '../lib/utils/minimum-duration';
 import type { HonoAuthContext } from '../types/context';
 import {
   ZForgotPasswordSchema,
@@ -40,6 +41,10 @@ import {
 } from '../types/email-password';
 
 export const emailPasswordRoute = new Hono<HonoAuthContext>()
+  /**
+   * Middleware to mitigate side-channel attacks.
+   */
+  .use(minimumDurationMiddleware)
   /**
    * Authorize endpoint.
    */
