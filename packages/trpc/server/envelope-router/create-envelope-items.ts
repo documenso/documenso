@@ -87,7 +87,7 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
     // For each file, stream to s3 and create the document data.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide({ file });
 
         return {
           title: file.name,

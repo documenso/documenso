@@ -47,9 +47,11 @@ export const createDocumentRoute = authenticatedProcedure
     }
 
     const { id: documentDataId } = await putNormalizedPdfFileServerSide({
-      name: file.name,
-      type: 'application/pdf',
-      arrayBuffer: async () => Promise.resolve(pdf),
+      file: {
+        name: file.name,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(pdf),
+      },
     });
 
     ctx.logger.info({

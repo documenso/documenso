@@ -79,7 +79,7 @@ export const useEnvelopeRoute = authenticatedProcedure
     // Process uploaded files and create document data for them
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide({ file });
 
         return {
           name: file.name,

@@ -1,6 +1,7 @@
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion/convert-to-pdf';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
@@ -59,17 +60,13 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
-      throw new AppError('INVALID_DOCUMENT_FILE', {
-        message: 'You cannot upload non-PDF files',
-        statusCode: 400,
-      });
-    }
-
-    // For each file, stream to s3 and create the document data.
+    // For each file, convert to PDF if needed, then store.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        let pdf = Buffer.from(await file.arrayBuffer());
+        // Convert to PDF if needed (DOCX, images, etc)
+        const { pdfBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
+
+        let pdf = pdfBuffer;
 
         if (formValues) {
           // eslint-disable-next-line require-atomic-updates
@@ -80,9 +77,12 @@ export const createEnvelopeRoute = authenticatedProcedure
         }
 
         const { id: documentDataId } = await putNormalizedPdfFileServerSide({
-          name: file.name,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(pdf),
+          file: {
+            name: file.name,
+            type: 'application/pdf',
+            arrayBuffer: async () => Promise.resolve(pdf),
+          },
+          originalMimeType,
         });
 
         return {

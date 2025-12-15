@@ -486,11 +486,12 @@ enum DocumentSigningOrder {
 }
 
 model DocumentData {
-  id           String           @id @default(cuid())
-  type         DocumentDataType
-  data         String
-  initialData  String
-  envelopeItem EnvelopeItem?
+  id               String           @id @default(cuid())
+  type             DocumentDataType
+  data             String
+  initialData      String
+  originalMimeType String?
+  envelopeItem     EnvelopeItem?
 }
 
 enum DocumentDistributionMethod {

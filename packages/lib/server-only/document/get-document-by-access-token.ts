@@ -44,6 +44,7 @@ export const getDocumentByAccessToken = async ({ token }: GetDocumentByAccessTok
               type: true,
               data: true,
               initialData: true,
+              originalMimeType: true,
             },
           },
         },

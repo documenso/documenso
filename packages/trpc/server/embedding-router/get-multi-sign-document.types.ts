@@ -18,6 +18,7 @@ export const ZGetMultiSignDocumentResponseSchema = ZDocumentLiteSchema.extend({
     id: true,
     data: true,
     initialData: true,
+    originalMimeType: true,
   }),
   documentMeta: DocumentMetaSchema.pick({
     signingOrder: true,

@@ -19,6 +19,7 @@ export const ZGetEnvelopeItemsResponseSchema = z.object({
         id: true,
         data: true,
         initialData: true,
+        originalMimeType: true,
       }),
     })
     .array(),

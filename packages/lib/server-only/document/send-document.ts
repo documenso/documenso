@@ -82,6 +82,7 @@ export const sendDocument = async ({
               id: true,
               data: true,
               initialData: true,
+              originalMimeType: true,
             },
           },
         },
