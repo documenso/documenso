@@ -238,7 +238,7 @@ export const createDocumentFromDirectTemplate = async ({
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName === signedFieldValue?.value;
+        directRecipientName = signedFieldValue?.value;
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
