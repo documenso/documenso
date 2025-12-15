@@ -106,7 +106,7 @@ export const DocumentSigningMobileWidget = () => {
                   <motion.div
                     layout="size"
                     layoutId="document-signing-mobile-widget-progress-bar"
-                    className="bg-documenso absolute inset-y-0 left-0"
+                    className="bg-primary absolute inset-y-0 left-0"
                     style={{
                       width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                     }}
