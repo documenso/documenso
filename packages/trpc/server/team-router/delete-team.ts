@@ -32,7 +32,11 @@ export const deleteTeamRoute = authenticatedProcedure
     });
 
     const transferTeam = transferTeamId
-      ? await getTeamById({ userId: user.id, teamId: transferTeamId }).catch(() => undefined)
+      ? await getTeamById({ userId: user.id, teamId: transferTeamId }).catch(() => {
+          throw new AppError(AppErrorCode.INVALID_REQUEST, {
+            message: 'Invalid transfer team ID',
+          });
+        })
       : undefined;
 
     if (transferTeam) {
