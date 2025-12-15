@@ -40,7 +40,6 @@ export const orphanEnvelopes = async ({ teamId }: OrphanEnvelopesOptions) => {
     data: {
       userId: serviceAccount.id,
       teamId: serviceAccount.ownedOrganisations[0].teams[0].id,
-      deletedAt: new Date(),
     },
   });
 
