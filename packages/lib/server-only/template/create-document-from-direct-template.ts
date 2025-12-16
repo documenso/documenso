@@ -185,7 +185,7 @@ export const createDocumentFromDirectTemplate = async ({
       documentAuth: directTemplateEnvelope.authOptions,
     });
 
-  const directRecipientName = user?.name || initialDirectRecipientName;
+  let directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
