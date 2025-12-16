@@ -205,7 +205,6 @@ export const createDocumentFromDirectTemplate = async ({
   const nonDirectTemplateRecipients = directTemplateEnvelope.recipients.filter(
     (recipient) => recipient.id !== directTemplateRecipient.id,
   );
-
   const derivedDocumentMeta = extractDerivedDocumentMeta(
     settings,
     directTemplateEnvelope.documentMeta,
@@ -423,7 +422,7 @@ export const createDocumentFromDirectTemplate = async ({
 
     let nonDirectRecipientFieldsToCreate: Omit<Field, 'id' | 'secondaryId' | 'templateId'>[] = [];
 
-    nonDirectTemplateRecipients.forEach((templateRecipient) => {
+    Object.values(nonDirectTemplateRecipients).forEach((templateRecipient) => {
       const recipient = createdEnvelope.recipients.find(
         (recipient) => recipient.email === templateRecipient.email,
       );
@@ -457,8 +456,7 @@ export const createDocumentFromDirectTemplate = async ({
       })),
     });
 
-    // Always create a new recipient for the direct template signer
-    // (same email can appear multiple times as different recipients)
+    // Create the direct recipient and their non signature fields.
     const createdDirectRecipient = await tx.recipient.create({
       data: {
         envelopeId: createdEnvelope.id,
@@ -477,8 +475,12 @@ export const createDocumentFromDirectTemplate = async ({
         fields: {
           createMany: {
             data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
-              const inserted =
-                directTemplateEnvelope.internalVersion === 2 ? customText !== '' : true;
+              let inserted = true;
+
+              // Custom logic for V2 to only insert if values exist.
+              if (directTemplateEnvelope.internalVersion === 2) {
+                inserted = customText !== '';
+              }
 
               return {
                 envelopeId: createdEnvelope.id,
