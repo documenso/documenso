@@ -44,10 +44,12 @@ export type PdfToImagesOptions = {
 export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOptions = {}) => {
   const { scale = 2 } = options;
 
-  const pdf = await pdfjsLib.getDocument({
+  const task = await pdfjsLib.getDocument({
     data: pdfBytes,
     CanvasFactory: SkiaCanvasFactory,
-  }).promise;
+  });
+
+  const pdf = await task.promise;
 
   const images = await pMap(
     Array.from({ length: pdf.numPages }),
@@ -68,18 +70,23 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
         viewport,
       }).promise;
 
-      return {
+      const result = {
         pageNumber,
         image: await canvas.toBuffer('jpeg'),
         width: Math.floor(viewport.width),
         height: Math.floor(viewport.height),
         mimeType: 'image/jpeg',
       };
+
+      void page.cleanup();
+
+      return result;
     },
     { concurrency: 10 },
   );
 
-  void pdf.destroy();
+  void pdf.destroy().catch((e) => console.error(e));
+  void task.destroy().catch((e) => console.error(e));
 
   return images;
 };
