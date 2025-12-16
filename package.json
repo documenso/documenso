@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.2.6",
+  "version": "2.2.7",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
