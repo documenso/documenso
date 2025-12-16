@@ -353,8 +353,10 @@ export const EnvelopeDistributeDialog = ({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>
-                                    <Trans>Reply To Email</Trans>{' '}
-                                    <span className="text-muted-foreground">(Optional)</span>
+                                    <Trans>
+                                      Reply To Email{' '}
+                                      <span className="text-muted-foreground">(Optional)</span>
+                                    </Trans>
                                   </FormLabel>
 
                                   <FormControl>
@@ -372,8 +374,10 @@ export const EnvelopeDistributeDialog = ({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel>
-                                    <Trans>Subject</Trans>{' '}
-                                    <span className="text-muted-foreground">(Optional)</span>
+                                    <Trans>
+                                      Subject{' '}
+                                      <span className="text-muted-foreground">(Optional)</span>
+                                    </Trans>
                                   </FormLabel>
 
                                   <FormControl>
@@ -390,8 +394,10 @@ export const EnvelopeDistributeDialog = ({
                               render={({ field }) => (
                                 <FormItem>
                                   <FormLabel className="flex flex-row items-center">
-                                    <Trans>Message</Trans>{' '}
-                                    <span className="text-muted-foreground">(Optional)</span>
+                                    <Trans>
+                                      Message{' '}
+                                      <span className="text-muted-foreground">(Optional)</span>
+                                    </Trans>
                                     <Tooltip>
                                       <TooltipTrigger type="button">
                                         <InfoIcon className="mx-2 h-4 w-4" />

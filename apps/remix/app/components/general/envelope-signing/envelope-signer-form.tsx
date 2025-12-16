@@ -41,7 +41,7 @@ export default function EnvelopeSignerForm() {
 
   if (recipient.role === RecipientRole.ASSISTANT) {
     return (
-      <fieldset className="embed--DocumentWidgetForm dark:bg-background border-border rounded-2xl sm:border sm:p-3">
+      <fieldset className="embed--DocumentWidgetForm rounded-2xl border-border sm:border sm:p-3 dark:bg-background">
         <RadioGroup
           className="gap-0 space-y-2 shadow-none sm:space-y-3"
           value={selectedAssistantRecipient?.id?.toString()}
@@ -54,7 +54,7 @@ export default function EnvelopeSignerForm() {
             .map((r) => (
               <div
                 key={r.id}
-                className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
+                className="relative flex flex-col gap-4 rounded-lg border border-border bg-widget p-4"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -69,15 +69,15 @@ export default function EnvelopeSignerForm() {
                         {r.name}
 
                         {r.id === recipient.id && (
-                          <span className="text-muted-foreground ml-2">
+                          <span className="ml-2 text-muted-foreground">
                             <Trans>(You)</Trans>
                           </span>
                         )}
                       </Label>
-                      <p className="text-muted-foreground text-xs">{r.email}</p>
+                      <p className="text-xs text-muted-foreground">{r.email}</p>
                     </div>
                   </div>
-                  <div className="text-muted-foreground text-xs leading-[inherit]">
+                  <div className="text-xs leading-[inherit] text-muted-foreground">
                     <Plural
                       value={assistantFields.filter((field) => field.recipientId === r.id).length}
                       one="# field"
@@ -103,7 +103,7 @@ export default function EnvelopeSignerForm() {
           <Input
             type="text"
             id="full-name"
-            className="bg-background mt-2"
+            className="mt-2 bg-background"
             value={fullName}
             disabled={isNameLocked}
             onChange={(e) => !isNameLocked && setFullName(e.target.value.trimStart())}
@@ -119,6 +119,7 @@ export default function EnvelopeSignerForm() {
             <SignaturePadDialog
               className="mt-2"
               disabled={isSubmitting}
+              fullName={fullName}
               value={signature ?? ''}
               onChange={(v) => setSignature(v ?? '')}
               typedSignatureEnabled={envelope.documentMeta.typedSignatureEnabled}

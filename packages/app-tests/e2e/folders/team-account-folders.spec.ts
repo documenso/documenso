@@ -364,6 +364,25 @@ test('[TEAMS]: can create a template subfolder inside a template folder', async 
 test('[TEAMS]: can create a template inside a template folder', async ({ page }) => {
   const { team, teamOwner } = await seedTeamDocuments();
 
+  const organisationClaim = await prisma.organisationClaim.findFirstOrThrow({
+    where: {
+      organisation: {
+        id: team.organisationId,
+      },
+    },
+  });
+
+  await prisma.organisationClaim.update({
+    where: {
+      id: organisationClaim.id,
+    },
+    data: {
+      flags: {
+        allowLegacyEnvelopes: true,
+      },
+    },
+  });
+
   const folder = await seedBlankFolder(teamOwner, team.id, {
     createFolderOptions: {
       name: 'Team Client Templates',
@@ -380,16 +399,15 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
 
   await expect(page.getByText('Team Client Templates')).toBeVisible();
 
-  await page.getByRole('button', { name: 'Template (Legacy)' }).click();
+  // Upload document.
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page.getByRole('button', { name: 'Template (Legacy)' }).click(),
+  ]);
 
-  await page.getByText('Upload Template Document').click();
-
-  await page.locator('input[type="file"]').nth(0).waitFor({ state: 'attached' });
-
-  await page
-    .locator('input[type="file"]')
-    .nth(0)
-    .setInputFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
+  await fileChooser.setFiles(
+    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
+  );
 
   await page.waitForTimeout(3000);
 
