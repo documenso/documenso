@@ -14,10 +14,10 @@ import {
 import { SignaturePad } from '@documenso/ui/primitives/signature-pad';
 
 import { DocumentSigningDisclosure } from '../general/document-signing/document-signing-disclosure';
-import { useDocumentSigningContext } from '../general/document-signing/document-signing-provider';
 
 export type SignFieldSignatureDialogProps = {
   initialSignature?: string;
+  fullName?: string;
   typedSignatureEnabled?: boolean;
   uploadSignatureEnabled?: boolean;
   drawSignatureEnabled?: boolean;
@@ -29,12 +29,12 @@ export const SignFieldSignatureDialog = createCallable<
 >(
   ({
     call,
+    fullName,
     typedSignatureEnabled,
     uploadSignatureEnabled,
     drawSignatureEnabled,
     initialSignature,
   }) => {
-    const { fullName } = useDocumentSigningContext() || {};
     const [localSignature, setLocalSignature] = useState(initialSignature);
 
     return (
