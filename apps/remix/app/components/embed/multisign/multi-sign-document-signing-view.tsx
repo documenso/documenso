@@ -319,6 +319,7 @@ export const MultiSignDocumentSigningView = ({
                                     className="mt-2"
                                     disabled={isSubmitting}
                                     disableAnimation
+                                    fullName={fullName}
                                     value={signature ?? ''}
                                     onChange={(v) => setSignature(v ?? '')}
                                     typedSignatureEnabled={
