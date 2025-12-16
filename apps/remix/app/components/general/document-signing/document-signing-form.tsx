@@ -280,6 +280,7 @@ export const DocumentSigningForm = ({
                       <SignaturePadDialog
                         className="mt-2"
                         disabled={isSubmitting}
+                        fullName={fullName}
                         value={signature ?? ''}
                         onChange={(v) => setSignature(v ?? '')}
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}

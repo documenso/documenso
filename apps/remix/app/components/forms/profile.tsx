@@ -110,7 +110,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
             <Label htmlFor="email" className="text-muted-foreground">
               <Trans>Email</Trans>
             </Label>
-            <Input id="email" type="email" className="bg-muted mt-2" value={user.email} disabled />
+            <Input id="email" type="email" className="mt-2 bg-muted" value={user.email} disabled />
           </div>
 
           <FormField
@@ -124,6 +124,7 @@ export const ProfileForm = ({ className }: ProfileFormProps) => {
                 <FormControl>
                   <SignaturePadDialog
                     disabled={isSubmitting}
+                    fullName={user.name ?? ''}
                     value={value}
                     onChange={(v) => onChange(v ?? '')}
                   />
