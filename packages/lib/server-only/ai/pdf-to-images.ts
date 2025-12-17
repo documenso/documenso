@@ -9,7 +9,10 @@ globalThis.Image = Image;
 
 class SkiaCanvasFactory {
   _createCanvas(width: number, height: number) {
-    return new Canvas(width, height);
+    const canvas = new Canvas(width, height);
+    canvas.gpu = false;
+
+    return canvas;
   }
 
   create(width: number, height: number) {
@@ -60,6 +63,8 @@ export const pdfToImages = async (pdfBytes: Uint8Array, options: PdfToImagesOpti
       const viewport = page.getViewport({ scale });
 
       const canvas = new Canvas(viewport.width, viewport.height);
+      canvas.gpu = false;
+
       const canvasContext = canvas.getContext('2d');
 
       await page.render({
