@@ -1,5 +1,7 @@
-import Konva from 'konva';
+// sort-imports-ignore
 import 'konva/skia-backend';
+
+import Konva from 'konva';
 import path from 'node:path';
 import type { Canvas } from 'skia-canvas';
 import { FontLibrary } from 'skia-canvas';
@@ -21,21 +23,19 @@ export const insertFieldInPDFV2 = async ({
 }: InsertFieldInPDFV2Options) => {
   const fontPath = path.join(process.cwd(), 'public/fonts');
 
-  FontLibrary.use([
-    path.join(fontPath, 'caveat.ttf'),
-    path.join(fontPath, 'noto-sans.ttf'),
-    path.join(fontPath, 'noto-sans-japanese.ttf'),
-    path.join(fontPath, 'noto-sans-chinese.ttf'),
-    path.join(fontPath, 'noto-sans-korean.ttf'),
-  ]);
+  FontLibrary.use({
+    ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
+    ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],
+    ['Noto Sans Japanese']: [path.join(fontPath, 'noto-sans-japanese.ttf')],
+    ['Noto Sans Chinese']: [path.join(fontPath, 'noto-sans-chinese.ttf')],
+    ['Noto Sans Korean']: [path.join(fontPath, 'noto-sans-korean.ttf')],
+  });
 
   const stage = new Konva.Stage({ width: pageWidth, height: pageHeight });
   const layer = new Konva.Layer();
 
-  const insertedFields = fields.filter((field) => field.inserted);
-
   // Render the fields onto the layer.
-  for (const field of insertedFields) {
+  for (const field of fields) {
     renderField({
       scale: 1,
       field: {

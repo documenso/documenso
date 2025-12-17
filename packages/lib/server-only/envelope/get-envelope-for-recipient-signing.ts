@@ -2,7 +2,6 @@ import { DocumentSigningOrder, DocumentStatus, EnvelopeType, SigningStatus } fro
 import { z } from 'zod';
 
 import { prisma } from '@documenso/prisma';
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import DocumentMetaSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentMetaSchema';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 import EnvelopeSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeSchema';
@@ -12,7 +11,7 @@ import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
-import { ZFieldSchema } from '../../types/field';
+import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -64,28 +63,21 @@ export const ZEnvelopeForSigningResponse = z.object({
       rejectionReason: true,
     })
       .extend({
-        fields: ZFieldSchema.omit({
-          documentId: true,
-          templateId: true,
+        fields: ZEnvelopeFieldSchema.extend({
+          signature: SignatureSchema.pick({
+            signatureImageAsBase64: true,
+            typedSignature: true,
+          }).nullish(),
         }).array(),
       })
       .array(),
 
     envelopeItems: EnvelopeItemSchema.pick({
+      envelopeId: true,
       id: true,
       title: true,
-      documentDataId: true,
       order: true,
-    })
-      .extend({
-        documentData: DocumentDataSchema.pick({
-          type: true,
-          id: true,
-          data: true,
-          initialData: true,
-        }),
-      })
-      .array(),
+    }).array(),
 
     team: TeamSchema.pick({
       id: true,
@@ -117,6 +109,7 @@ export const ZEnvelopeForSigningResponse = z.object({
     signingOrder: true,
     rejectionReason: true,
   }).extend({
+    directToken: z.string().nullish(),
     fields: ZFieldSchema.omit({
       documentId: true,
       templateId: true,
@@ -199,11 +192,7 @@ export const getEnvelopeForRecipientSigning = async ({
           signingOrder: 'asc',
         },
       },
-      envelopeItems: {
-        include: {
-          documentData: true,
-        },
-      },
+      envelopeItems: true,
       team: {
         select: {
           id: true,

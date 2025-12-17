@@ -4,8 +4,10 @@ import {
   PDFDict,
   type PDFDocument,
   PDFName,
+  PDFNumber,
   PDFRadioGroup,
   PDFRef,
+  PDFStream,
   drawObject,
   popGraphicsState,
   pushGraphicsState,
@@ -14,7 +16,7 @@ import {
 } from '@cantoo/pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
 
 export const removeOptionalContentGroups = (document: PDFDocument) => {
   const context = document.context;
@@ -29,7 +31,7 @@ export const flattenForm = async (document: PDFDocument) => {
 
   const form = document.getForm();
 
-  const fontNoto = await fetch(`${NEXT_PUBLIC_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
+  const fontNoto = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
     async (res) => res.arrayBuffer(),
   );
 
@@ -103,6 +105,36 @@ const getAppearanceRefForWidget = (field: PDFField, widget: PDFWidgetAnnotation)
   }
 };
 
+/**
+ * Ensures that an appearance stream has the required dictionary entries to be
+ * used as a Form XObject. Some PDFs have appearance streams that are missing
+ * the /Subtype /Form entry, which causes Adobe Reader to fail to render them.
+ *
+ * Per PDF spec, a Form XObject stream requires:
+ * - /Subtype /Form (required)
+ * - /BBox (required, but should already exist for appearance streams)
+ * - /FormType 1 (optional, defaults to 1)
+ */
+const normalizeAppearanceStream = (document: PDFDocument, appearanceRef: PDFRef) => {
+  const appearanceStream = document.context.lookup(appearanceRef);
+
+  if (!(appearanceStream instanceof PDFStream)) {
+    return;
+  }
+
+  const dict = appearanceStream.dict;
+
+  // Ensure /Subtype /Form is set (required for XObject Form)
+  if (!dict.has(PDFName.of('Subtype'))) {
+    dict.set(PDFName.of('Subtype'), PDFName.of('Form'));
+  }
+
+  // Ensure /FormType is set (optional, but good practice)
+  if (!dict.has(PDFName.of('FormType'))) {
+    dict.set(PDFName.of('FormType'), PDFNumber.of(1));
+  }
+};
+
 const flattenWidget = (document: PDFDocument, field: PDFField, widget: PDFWidgetAnnotation) => {
   try {
     const page = getPageForWidget(document, widget);
@@ -116,6 +148,9 @@ const flattenWidget = (document: PDFDocument, field: PDFField, widget: PDFWidget
     if (!appearanceRef) {
       return;
     }
+
+    // Ensure the appearance stream has required XObject Form dictionary entries
+    normalizeAppearanceStream(document, appearanceRef);
 
     const xObjectKey = page.node.newXObject('FlatWidget', appearanceRef);
 

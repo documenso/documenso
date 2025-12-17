@@ -10,6 +10,7 @@ import { deleteDocumentRoute } from './delete-document';
 import { distributeDocumentRoute } from './distribute-document';
 import { downloadDocumentRoute } from './download-document';
 import { downloadDocumentAuditLogsRoute } from './download-document-audit-logs';
+import { downloadDocumentBetaRoute } from './download-document-beta';
 import { downloadDocumentCertificateRoute } from './download-document-certificate';
 import { duplicateDocumentRoute } from './duplicate-document';
 import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
@@ -37,8 +38,10 @@ export const documentRouter = router({
   search: searchDocumentRoute,
   share: shareDocumentRoute,
 
-  // Temporary v2 beta routes to be removed once V2 is fully released.
   download: downloadDocumentRoute,
+
+  // Deprecated endpoints which need to be removed in the future.
+  downloadBeta: downloadDocumentBetaRoute,
   createDocumentTemporary: createDocumentTemporaryRoute,
 
   // Internal document routes for custom frontend requests.

@@ -67,7 +67,7 @@ export const DocumentFlowFormContainerContent = ({
 }: DocumentFlowFormContainerContentProps) => {
   return (
     <div
-      className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col overflow-hidden px-2', className)}
+      className={cn('custom-scrollbar -mx-2 flex flex-1 flex-col px-2', className)}
       {...props}
     >
       <div className="flex flex-1 flex-col">{children}</div>
@@ -112,7 +112,7 @@ export const DocumentFlowFormContainerStep = ({
         <motion.div
           layout="size"
           layoutId="document-flow-container-step"
-          className="bg-documenso absolute inset-y-0 left-0"
+          className="bg-primary absolute inset-y-0 left-0"
           style={{
             width: `${(100 / maxStep) * step}%`,
           }}
@@ -161,7 +161,7 @@ export const DocumentFlowFormContainerActions = ({
 
       <Button
         type="button"
-        className="bg-documenso flex-1"
+        className="bg-primary flex-1"
         size="lg"
         disabled={disabled || disableNextStep || loading || !canGoNext}
         loading={loading}

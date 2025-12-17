@@ -120,7 +120,9 @@ export default function OrganisationSettingsTeamsPage() {
         </div>
 
         <Button asChild>
-          <Link to={`/o/${organisation.url}/settings`}>Manage Organisation</Link>
+          <Link to={`/o/${organisation.url}/settings`}>
+            <Trans>Manage Organisation</Trans>
+          </Link>
         </Button>
       </div>
 
@@ -178,7 +180,9 @@ const TeamDropdownMenu = ({ team }: { team: TGetOrganisationSessionResponse[0]['
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
           <MoreVerticalIcon className="h-4 w-4" />
-          <span className="sr-only">Open menu</span>
+          <span className="sr-only">
+            <Trans>Open menu</Trans>
+          </span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>

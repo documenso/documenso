@@ -13,6 +13,7 @@ import { prop, sortBy } from 'remeda';
 import { isBase64Image } from '@documenso/lib/constants/signatures';
 import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import type { EnvelopeForSigningResponse } from '@documenso/lib/server-only/envelope/get-envelope-for-recipient-signing';
+import type { TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import {
   isFieldUnsignedAndRequired,
   isRequiredField,
@@ -51,7 +52,11 @@ export type EnvelopeSigningContextValue = {
   setSelectedAssistantRecipientId: (_value: number | null) => void;
   selectedAssistantRecipient: EnvelopeForSigningResponse['envelope']['recipients'][number] | null;
 
-  signField: (_fieldId: number, _value: TSignEnvelopeFieldValue) => Promise<void>;
+  signField: (
+    _fieldId: number,
+    _value: TSignEnvelopeFieldValue,
+    authOptions?: TRecipientActionAuth,
+  ) => Promise<Pick<Field, 'id' | 'inserted'>>;
 };
 
 const EnvelopeSigningContext = createContext<EnvelopeSigningContextValue | null>(null);
@@ -284,21 +289,26 @@ export const EnvelopeSigningProvider = ({
       : null;
   }, [envelope.documentMeta?.signingOrder, envelope.recipients, recipient.id]);
 
-  const signField = async (fieldId: number, fieldValue: TSignEnvelopeFieldValue) => {
-    console.log('insertField', fieldId, fieldValue);
-
+  const signField = async (
+    fieldId: number,
+    fieldValue: TSignEnvelopeFieldValue,
+    authOptions?: TRecipientActionAuth,
+  ) => {
     // Set the field locally for direct templates.
     if (isDirectTemplate) {
-      handleDirectTemplateFieldInsertion(fieldId, fieldValue);
-      return;
+      const signedField = handleDirectTemplateFieldInsertion(fieldId, fieldValue);
+
+      return signedField;
     }
 
-    await signEnvelopeField({
+    const { signedField } = await signEnvelopeField({
       token: envelopeData.recipient.token,
       fieldId,
       fieldValue,
-      authOptions: undefined,
+      authOptions,
     });
+
+    return signedField;
   };
 
   const handleDirectTemplateFieldInsertion = (
@@ -356,6 +366,8 @@ export const EnvelopeSigningProvider = ({
         fields: prev.recipient.fields.map((field) => (field.id === fieldId ? updatedField : field)),
       },
     }));
+
+    return updatedField;
   };
 
   return (
