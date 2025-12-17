@@ -286,7 +286,7 @@ const detectFieldsFromPage = async ({
   });
 
   const result = await generateObject({
-    model: vertex('gemini-3-pro-preview'),
+    model: vertex('gemini-3-flash-preview'),
     system: SYSTEM_PROMPT,
     schema: ZSubmitDetectedFieldsInputSchema,
     messages,
