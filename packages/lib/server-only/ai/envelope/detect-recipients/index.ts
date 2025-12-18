@@ -207,7 +207,7 @@ const detectRecipientsFromImages = async ({
     });
 
     const result = await generateObject({
-      model: vertex('gemini-2.5-flash'),
+      model: vertex('gemini-3-flash-preview'),
       system: SYSTEM_PROMPT,
       schema: ZDetectedRecipientsSchema,
       messages,
