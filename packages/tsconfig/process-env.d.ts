@@ -98,6 +98,10 @@ declare namespace NodeJS {
      */
     GOOGLE_VERTEX_PROJECT_ID?: string;
     GOOGLE_VERTEX_LOCATION?: string;
-    GOOGLE_VERTEX_API_KEY?: string;
+    /**
+     * Service account credentials for Vertex AI (required for AI features)
+     */
+    GOOGLE_CLIENT_EMAIL?: string;
+    GOOGLE_PRIVATE_KEY?: string;
   }
 }
