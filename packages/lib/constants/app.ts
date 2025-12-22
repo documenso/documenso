@@ -20,9 +20,7 @@ export const USE_INTERNAL_URL_BROWSERLESS = () =>
   env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
 
 export const IS_AI_FEATURES_CONFIGURED = () =>
-  !!env('GOOGLE_VERTEX_PROJECT_ID') &&
-  !!env('GOOGLE_CLIENT_EMAIL') &&
-  !!env('GOOGLE_PRIVATE_KEY');
+  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
 
 // Global webhook configuration for SuiteOp
 export const GLOBAL_WEBHOOK_URL =
