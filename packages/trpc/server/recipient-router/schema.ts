@@ -164,12 +164,17 @@ export const ZSetTemplateRecipientsResponseSchema = z.object({
 export const ZCompleteDocumentWithTokenMutationSchema = z.object({
   token: z.string(),
   documentId: z.number(),
-  authOptions: ZRecipientActionAuthSchema.optional(),
   accessAuthOptions: ZRecipientAccessAuthSchema.optional(),
   nextSigner: z
     .object({
       email: z.string().email().max(254),
       name: z.string().min(1).max(255),
+    })
+    .optional(),
+  recipientOverride: z
+    .object({
+      email: z.string().trim().toLowerCase().email().max(254).optional(),
+      name: z.string().max(255).optional(),
     })
     .optional(),
 });

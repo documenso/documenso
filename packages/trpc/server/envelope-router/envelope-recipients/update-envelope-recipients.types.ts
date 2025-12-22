@@ -1,8 +1,12 @@
+import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZRecipientLiteSchema } from '@documenso/lib/types/recipient';
+import {
+  ZRecipientAccessAuthTypesSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
+import { ZRecipientEmailSchema, ZRecipientLiteSchema } from '@documenso/lib/types/recipient';
 
-import { ZUpdateRecipientSchema } from '../../recipient-router/schema';
 import type { TrpcRouteMeta } from '../../trpc';
 
 export const updateEnvelopeRecipientsMeta: TrpcRouteMeta = {
@@ -15,9 +19,19 @@ export const updateEnvelopeRecipientsMeta: TrpcRouteMeta = {
   },
 };
 
+export const ZUpdateEnvelopeRecipientSchema = z.object({
+  id: z.number().describe('The ID of the recipient to update.'),
+  email: ZRecipientEmailSchema.optional(),
+  name: z.string().max(255).optional(),
+  role: z.nativeEnum(RecipientRole).optional(),
+  signingOrder: z.number().optional(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
+});
+
 export const ZUpdateEnvelopeRecipientsRequestSchema = z.object({
   envelopeId: z.string(),
-  data: ZUpdateRecipientSchema.array(),
+  data: ZUpdateEnvelopeRecipientSchema.array(),
 });
 
 export const ZUpdateEnvelopeRecipientsResponseSchema = z.object({

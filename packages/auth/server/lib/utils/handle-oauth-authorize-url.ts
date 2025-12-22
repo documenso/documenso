@@ -27,13 +27,13 @@ type HandleOAuthAuthorizeUrlOptions = {
   /**
    * Optional prompt to pass to the authorization endpoint.
    */
-  prompt?: 'login' | 'consent' | 'select_account';
+  prompt?: 'none' | 'login' | 'consent' | 'select_account';
 };
 
 const oauthCookieMaxAge = 60 * 10; // 10 minutes.
 
 export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOptions) => {
-  const { c, clientOptions, redirectPath, prompt = 'login' } = options;
+  const { c, clientOptions, redirectPath } = options;
 
   if (!clientOptions.clientId || !clientOptions.clientSecret) {
     throw new AppError(AppErrorCode.NOT_SETUP);
@@ -63,7 +63,11 @@ export const handleOAuthAuthorizeUrl = async (options: HandleOAuthAuthorizeUrlOp
   );
 
   // Pass the prompt to the authorization endpoint.
-  url.searchParams.append('prompt', prompt);
+  if (process.env.NEXT_PRIVATE_OIDC_PROMPT !== '') {
+    const prompt = process.env.NEXT_PRIVATE_OIDC_PROMPT ?? 'login';
+
+    url.searchParams.append('prompt', prompt);
+  }
 
   setCookie(c, `${clientOptions.id}_oauth_state`, state, {
     ...sessionCookieOptions,

@@ -8,7 +8,7 @@ import {
   ZFieldPageNumberSchema,
   ZFieldSchema,
 } from '@documenso/lib/types/field';
-import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
+import { ZEnvelopeFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
 import type { TrpcRouteMeta } from '../../trpc';
 
@@ -22,7 +22,7 @@ export const updateEnvelopeFieldsMeta: TrpcRouteMeta = {
   },
 };
 
-const ZUpdateFieldSchema = ZFieldAndMetaSchema.and(
+const ZUpdateFieldSchema = ZEnvelopeFieldAndMetaSchema.and(
   z.object({
     id: z.number().describe('The ID of the field to update.'),
     envelopeItemId: z

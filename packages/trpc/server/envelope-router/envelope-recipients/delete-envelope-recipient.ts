@@ -1,5 +1,6 @@
 import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
 
+import { ZGenericSuccessResponse } from '../../schema';
 import { authenticatedProcedure } from '../../trpc';
 import {
   ZDeleteEnvelopeRecipientRequestSchema,
@@ -27,4 +28,6 @@ export const deleteEnvelopeRecipientRoute = authenticatedProcedure
       recipientId,
       requestMetadata: metadata,
     });
+
+    return ZGenericSuccessResponse;
   });

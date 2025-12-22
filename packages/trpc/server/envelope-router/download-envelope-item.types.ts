@@ -5,7 +5,7 @@ import type { TrpcRouteMeta } from '../trpc';
 export const downloadEnvelopeItemMeta: TrpcRouteMeta = {
   openapi: {
     method: 'GET',
-    path: '/envelopeItem/{envelopeItemId}/download',
+    path: '/envelope/item/{envelopeItemId}/download',
     summary: 'Download an envelope item',
     description: 'Download an envelope item by its ID',
     tags: ['Envelope Items'],

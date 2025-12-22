@@ -26,7 +26,7 @@ export const renderCheckboxFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { pageWidth, pageHeight, pageLayer, mode } = options;
+  const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -210,7 +210,9 @@ export const renderCheckboxFieldElement = (
     fieldGroup.add(text);
   });
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,

@@ -1,6 +1,7 @@
 import * as React from 'react';
 
 import type { MessageDescriptor } from '@lingui/core';
+import { t } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AnimatePresence } from 'framer-motion';
@@ -43,7 +44,7 @@ type MultiSelectComboboxProps<T = OptionValue> = {
  * - Clear all button
  */
 export function MultiSelectCombobox<T = OptionValue>({
-  emptySelectionPlaceholder = 'Select values...',
+  emptySelectionPlaceholder = t`Select values...`,
   enableClearAllButton,
   enableSearch = true,
   className,

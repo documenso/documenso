@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
 import type { z } from 'zod';
@@ -149,7 +148,7 @@ export const OrganisationEmailCreateDialog = ({
                       <Trans>Display Name</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Support" />
+                      <Input {...field} placeholder={t`Support`} />
                     </FormControl>
                     <FormMessage />
                     <FormDescription>
@@ -175,7 +174,7 @@ export const OrganisationEmailCreateDialog = ({
                           onChange={(e) => {
                             field.onChange(e.target.value + '@' + emailDomain.domain);
                           }}
-                          placeholder="support"
+                          placeholder={t`support`}
                         />
                         <div className="bg-muted text-muted-foreground absolute bottom-0 right-0 top-0 flex items-center rounded-r-md border px-3 py-2 text-sm">
                           @{emailDomain.domain}

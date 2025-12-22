@@ -3,6 +3,7 @@ import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
+import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateEnvelopeRequestSchema,
@@ -58,10 +59,31 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
+    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message: 'You cannot upload non-PDF files',
+        statusCode: 400,
+      });
+    }
+
     // For each file, stream to s3 and create the document data.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        let pdf = Buffer.from(await file.arrayBuffer());
+
+        if (formValues) {
+          // eslint-disable-next-line require-atomic-updates
+          pdf = await insertFormValuesInPdf({
+            pdf,
+            formValues,
+          });
+        }
+
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(pdf),
+        });
 
         return {
           title: file.name,

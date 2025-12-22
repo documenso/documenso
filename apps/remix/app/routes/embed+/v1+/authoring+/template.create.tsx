@@ -155,6 +155,7 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
       <ConfigureDocumentProvider isTemplate={true} features={features ?? {}}>
         <Stepper currentStep={currentStep} setCurrentStep={setCurrentStep}>
           <ConfigureDocumentView
+            type="template"
             defaultValues={configuration ?? undefined}
             onSubmit={handleConfigurePageViewSubmit}
           />

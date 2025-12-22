@@ -115,7 +115,9 @@ export default function RejectedSigningPage({ loaderData }: Route.ComponentProps
 
         {user && (
           <Button className="mt-6" asChild>
-            <Link to={`/`}>Return Home</Link>
+            <Link to={`/`}>
+              <Trans>Return Home</Trans>
+            </Link>
           </Button>
         )}
       </div>

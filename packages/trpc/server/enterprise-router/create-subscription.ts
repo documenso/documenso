@@ -71,7 +71,7 @@ export const createSubscriptionRoute = authenticatedProcedure
     }
 
     const returnUrl = isPersonalLayoutMode
-      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing`
+      ? `${NEXT_PUBLIC_WEBAPP_URL()}/settings/billing-personal`
       : `${NEXT_PUBLIC_WEBAPP_URL()}/o/${organisation.url}/settings/billing`;
 
     const redirectUrl = await createCheckoutSession({

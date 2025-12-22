@@ -28,9 +28,13 @@ import {
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
-import { seedBlankTemplate } from '@documenso/prisma/seed/templates';
+import { seedBlankTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type {
+  TUseEnvelopePayload,
+  TUseEnvelopeResponse,
+} from '@documenso/trpc/server/envelope-router/use-envelope.types';
 
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 
@@ -3074,6 +3078,82 @@ test.describe('Document API V2', () => {
       });
     });
 
+    test.describe('Envelope use endpoint', () => {
+      test('should block unauthorized access to envelope use endpoint', async ({ request }) => {
+        const doc = await seedTemplate({
+          title: 'Team template 1',
+          userId: userA.id,
+          teamId: teamA.id,
+          internalVersion: 2,
+        });
+
+        const payload: TUseEnvelopePayload = {
+          envelopeId: doc.id,
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+
+        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/use`, {
+          headers: { Authorization: `Bearer ${tokenB}` },
+          multipart: formData,
+        });
+
+        expect(res.ok()).toBeFalsy();
+        expect(res.status()).toBe(404);
+      });
+
+      test('should allow authorized access to envelope use endpoint', async ({ request }) => {
+        const doc = await seedTemplate({
+          title: 'Team template 1',
+          userId: userA.id,
+          teamId: teamA.id,
+          internalVersion: 2,
+        });
+
+        const payload: TUseEnvelopePayload = {
+          envelopeId: doc.id,
+          distributeDocument: true,
+          recipients: [
+            {
+              id: doc.recipients[0].id,
+              email: doc.recipients[0].email,
+              name: 'New Name',
+            },
+          ],
+        };
+
+        const formData = new FormData();
+        formData.append('payload', JSON.stringify(payload));
+
+        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/use`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+          multipart: formData,
+        });
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data: TUseEnvelopeResponse = await res.json();
+
+        const createdEnvelope = await prisma.envelope.findFirst({
+          where: {
+            id: data.id,
+          },
+          include: {
+            recipients: true,
+          },
+        });
+
+        expect(createdEnvelope).toBeDefined();
+        expect(createdEnvelope?.recipients.length).toBe(1);
+        expect(createdEnvelope?.recipients[0].email).toBe(doc.recipients[0].email);
+        expect(createdEnvelope?.recipients[0].name).toBe('New Name');
+        expect(createdEnvelope?.recipients[0].token).toBe(data.recipients[0].token);
+        expect(createdEnvelope?.recipients[0].token).not.toBe(doc.recipients[0].token);
+      });
+    });
+
     test.describe('Envelope distribute endpoint', () => {
       test('should block unauthorized access to envelope distribute endpoint', async ({
         request,
@@ -3925,8 +4005,12 @@ test.describe('Document API V2', () => {
 
         // 3 Files because seed creates one automatically.
         expect(envelopeItems.length).toBe(3);
-        expect(envelopeItems[1].title).toBe('field-meta-1.pdf');
-        expect(envelopeItems[2].title).toBe('field-meta-2.pdf');
+
+        const isFieldMeta1 = envelopeItems.find((item) => item.title === 'field-meta-1.pdf');
+        const isFieldMeta2 = envelopeItems.find((item) => item.title === 'field-meta-2.pdf');
+
+        expect(isFieldMeta1).toBeDefined();
+        expect(isFieldMeta2).toBeDefined();
       });
     });
 
@@ -4227,6 +4311,63 @@ test.describe('Document API V2', () => {
 
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
+      });
+    });
+
+    test.describe('Envelope audit logs endpoint', () => {
+      test('should block unauthorized access to envelope audit logs endpoint', async ({
+        request,
+      }) => {
+        const doc = await seedBlankDocument(userA, teamA.id);
+
+        const res = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/${doc.id}/audit-log`,
+          {
+            headers: { Authorization: `Bearer ${tokenB}` },
+          },
+        );
+
+        expect(res.ok()).toBeFalsy();
+        expect(res.status()).toBe(404);
+      });
+
+      test('should allow authorized access to envelope audit logs endpoint', async ({
+        request,
+      }) => {
+        const doc = await seedBlankDocument(userA, teamA.id);
+
+        // Add a recipient which will trigger an audit log.
+        await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/recipient/create-many`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+          data: {
+            envelopeId: doc.id,
+            data: [
+              {
+                name: 'Test',
+                email: 'test@example.com',
+                role: RecipientRole.SIGNER,
+              },
+            ],
+          },
+        });
+
+        const res = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/${doc.id}/audit-log`,
+          {
+            headers: { Authorization: `Bearer ${tokenA}` },
+          },
+        );
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data = await res.json();
+
+        expect(Array.isArray(data.data)).toBe(true);
+        expect(data.count).toEqual(1);
+        expect(data.data[0].type).toEqual('RECIPIENT_CREATED');
+        expect(data.currentPage).toBeGreaterThanOrEqual(1);
+        expect(data.perPage).toBeGreaterThanOrEqual(1);
       });
     });
   });

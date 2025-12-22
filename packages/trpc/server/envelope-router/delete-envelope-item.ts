@@ -5,6 +5,7 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDeleteEnvelopeItemRequestSchema,
@@ -100,4 +101,6 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
         },
       },
     });
+
+    return ZGenericSuccessResponse;
   });

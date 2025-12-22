@@ -318,7 +318,9 @@ export const SignaturePadDraw = ({
             onClick={onUndoClick}
           >
             <Undo2 className="h-4 w-4" />
-            <span className="sr-only">Undo</span>
+            <span className="sr-only">
+              <Trans>Undo</Trans>
+            </span>
           </button>
         </div>
       )}

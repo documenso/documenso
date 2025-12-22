@@ -59,8 +59,7 @@ export default function UserPage({ params }: { params: { id: number } }) {
           404: {
             heading: msg`User not found`,
             subHeading: msg`404 User not found`,
-            message: msg`The user you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The user you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={

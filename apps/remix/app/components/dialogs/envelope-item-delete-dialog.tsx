@@ -117,7 +117,7 @@ export const EnvelopeItemDeleteDialog = ({
 
             <DialogDescription className="mt-4">
               <Trans>
-                You cannot delete this item because the document has been sent to recipients
+                You cannot delete this item because the document has been sent to recipients.
               </Trans>
             </DialogDescription>
           </DialogHeader>

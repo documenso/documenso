@@ -36,14 +36,14 @@ export const loader = async ({ request }: Route.LoaderArgs) => {
   }
 
   return {
-    hasValidToken: !!result,
     token,
+    hasValidToken: !!result,
     allowEmbedAuthoringWhiteLabel,
   };
 };
 
 export default function AuthoringLayout() {
-  const { hasValidToken, token, allowEmbedAuthoringWhiteLabel } = useLoaderData<typeof loader>();
+  const { token, hasValidToken, allowEmbedAuthoringWhiteLabel } = useLoaderData<typeof loader>();
 
   useLayoutEffect(() => {
     try {

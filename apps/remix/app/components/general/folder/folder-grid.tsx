@@ -6,7 +6,6 @@ import { FolderIcon, HomeIcon } from 'lucide-react';
 import { Link } from 'react-router';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { IS_ENVELOPES_ENABLED } from '@documenso/lib/constants/app';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
@@ -16,12 +15,11 @@ import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
 import { FolderDeleteDialog } from '~/components/dialogs/folder-delete-dialog';
 import { FolderMoveDialog } from '~/components/dialogs/folder-move-dialog';
 import { FolderUpdateDialog } from '~/components/dialogs/folder-update-dialog';
-import { TemplateCreateDialog } from '~/components/dialogs/template-create-dialog';
-import { DocumentUploadButton } from '~/components/general/document/document-upload-button';
+import { DocumentUploadButtonLegacy } from '~/components/general/document/document-upload-button-legacy';
 import { FolderCard, FolderCardEmpty } from '~/components/general/folder/folder-card';
 import { useCurrentTeam } from '~/providers/team';
 
-import { EnvelopeUploadButton } from '../document/envelope-upload-button';
+import { EnvelopeUploadButton } from '../envelope/envelope-upload-button';
 
 export type FolderGridProps = {
   type: FolderType;
@@ -71,7 +69,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
     <div>
       <div className="mb-4 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
         <div
-          className="text-muted-foreground hover:text-muted-foreground/80 flex flex-1 items-center text-sm font-medium"
+          className="flex flex-1 items-center text-sm font-medium text-muted-foreground hover:text-muted-foreground/80"
           data-testid="folder-grid-breadcrumbs"
         >
           <Link to={formatRootPath()} className="flex items-center">
@@ -99,14 +97,11 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
         </div>
 
         <div className="flex gap-4 sm:flex-row sm:justify-end">
-          {(IS_ENVELOPES_ENABLED || organisation.organisationClaim.flags.allowEnvelopes) && (
-            <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
-          )}
+          <EnvelopeUploadButton type={type} folderId={parentId || undefined} />
 
-          {type === FolderType.DOCUMENT ? (
-            <DocumentUploadButton />
-          ) : (
-            <TemplateCreateDialog folderId={parentId ?? undefined} />
+          {/* If you delete this, delete the component as well. */}
+          {organisation.organisationClaim.flags.allowLegacyEnvelopes && (
+            <DocumentUploadButtonLegacy type={type} />
           )}
 
           <FolderCreateDialog type={type} />
@@ -116,7 +111,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
       {isPending ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <div key={index} className="border-border bg-card h-full rounded-lg border px-4 py-5">
+            <div key={index} className="h-full rounded-lg border border-border bg-card px-4 py-5">
               <div className="flex items-center gap-3">
                 <Skeleton className="h-8 w-8 rounded" />
                 <div className="flex w-full items-center justify-between">
@@ -197,7 +192,7 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
             {foldersData.folders.length > 12 && (
               <div className="mt-2 flex items-center justify-center">
                 <Link
-                  className="text-muted-foreground hover:text-foreground text-sm font-medium"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                   to={formatViewAllFoldersPath()}
                 >
                   View all folders

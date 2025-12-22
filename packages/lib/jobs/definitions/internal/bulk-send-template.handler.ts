@@ -49,7 +49,8 @@ export const run = async ({
     throw new Error('Template not found');
   }
 
-  const rows = parse(csvContent, { columns: true, skip_empty_lines: true });
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const rows = parse<any>(csvContent, { columns: true, skip_empty_lines: true });
 
   if (rows.length > 100) {
     throw new Error('Maximum 100 rows allowed per upload');

@@ -233,7 +233,19 @@ export const EnvelopeEditorSettingsDialog = ({
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
-    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+    const {
+      timezone,
+      dateFormat,
+      redirectUrl,
+      language,
+      signatureTypes,
+      distributionMethod,
+      emailId,
+      emailSettings,
+      message,
+      subject,
+      emailReplyTo,
+    } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
@@ -251,10 +263,16 @@ export const EnvelopeEditorSettingsDialog = ({
           timezone,
           dateFormat,
           redirectUrl,
+          emailId,
+          message,
+          subject,
+          emailReplyTo,
+          emailSettings,
+          distributionMethod,
           language: isValidLanguageCode(language) ? language : undefined,
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -669,8 +687,10 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -708,8 +728,9 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />

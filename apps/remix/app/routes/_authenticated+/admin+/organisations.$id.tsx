@@ -142,8 +142,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
           404: {
             heading: msg`Organisation not found`,
             subHeading: msg`404 Organisation not found`,
-            message: msg`The organisation you are looking for may have been removed, renamed or may have never
-                    existed.`,
+            message: msg`The organisation you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -163,7 +162,13 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
       <SettingsHeader
         title={t`Manage organisation`}
         subtitle={t`Manage the ${organisation.name} organisation`}
-      />
+      >
+        <Button variant="outline" asChild>
+          <Link to={`/admin/organisation-insights/${organisationId}`}>
+            <Trans>View insights</Trans>
+          </Link>
+        </Button>
+      </SettingsHeader>
 
       <GenericOrganisationAdminForm organisation={organisation} />
 

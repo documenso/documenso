@@ -77,6 +77,7 @@ export const renderField = ({
     scale,
   };
 
+  // If the generic text field element array changes, update the `GenericTextFieldTypeMetas` type
   return match(field.type)
     .with(
       FieldType.INITIALS,

@@ -1,8 +1,9 @@
 import type { WebhookTriggerEvents } from '@prisma/client';
 
-import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../../constants/app';
-import { sign } from '../../crypto/sign';
+import { GLOBAL_WEBHOOK_URL } from '../../../constants/app';
+import { jobs } from '../../../jobs/client';
 import { getAllWebhooksByEventTrigger } from '../get-all-webhooks-by-event-trigger';
+import { triggerGlobalWebhook } from './global-webhook';
 
 export type TriggerWebhookOptions = {
   event: WebhookTriggerEvents;
@@ -13,33 +14,35 @@ export type TriggerWebhookOptions = {
 
 export const triggerWebhook = async ({ event, data, userId, teamId }: TriggerWebhookOptions) => {
   try {
-    const body = {
-      event,
-      data,
-      userId,
-      teamId,
-    };
-
     const registeredWebhooks = await getAllWebhooksByEventTrigger({ event, userId, teamId });
 
-    // Always call the webhook handler even if there are no user webhooks
-    // This ensures the global webhook is triggered
-    const signature = sign(body);
+    // Trigger user-configured webhooks via job queue
+    if (registeredWebhooks.length > 0) {
+      await Promise.allSettled(
+        registeredWebhooks.map(async (webhook) => {
+          await jobs.triggerJob({
+            name: 'internal.execute-webhook',
+            payload: {
+              event,
+              webhookId: webhook.id,
+              data,
+            },
+          });
+        }),
+      );
+    }
 
-    await Promise.race([
-      fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}/api/webhook/trigger`, {
-        method: 'POST',
-        headers: {
-          'content-type': 'application/json',
-          'x-webhook-signature': signature,
-        },
-        body: JSON.stringify(body),
-      }),
-      new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), 500);
-      }),
-    ]).catch(() => null);
+    // Trigger global webhook for specific events (DOCUMENT_SIGNED, DOCUMENT_COMPLETED)
+    const shouldTriggerGlobalWebhook = event === 'DOCUMENT_SIGNED' || event === 'DOCUMENT_COMPLETED';
+
+    if (shouldTriggerGlobalWebhook && GLOBAL_WEBHOOK_URL) {
+      // Fire and forget - don't block on global webhook
+      triggerGlobalWebhook({ event, data, userId, teamId }).catch((err) => {
+        console.error('[Global Webhook] Error:', err);
+      });
+    }
   } catch (err) {
+    console.error(err);
     throw new Error(`Failed to trigger webhook`);
   }
 };

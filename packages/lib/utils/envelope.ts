@@ -1,5 +1,11 @@
 import type { Envelope, Recipient } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -156,8 +162,9 @@ export const canEnvelopeItemsBeModified = (
   if (
     recipients.some(
       (recipient) =>
-        recipient.signingStatus === SigningStatus.SIGNED ||
-        recipient.sendStatus === SendStatus.SENT,
+        recipient.role !== RecipientRole.CC &&
+        (recipient.signingStatus === SigningStatus.SIGNED ||
+          recipient.sendStatus === SendStatus.SENT),
     )
   ) {
     return false;

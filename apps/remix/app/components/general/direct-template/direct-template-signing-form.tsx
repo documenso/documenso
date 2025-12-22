@@ -417,6 +417,7 @@ export const DirectTemplateSigningForm = ({
               <SignaturePadDialog
                 className="mt-2"
                 disabled={isSubmitting}
+                fullName={fullName}
                 value={signature ?? ''}
                 onChange={(value) => setSignature(value)}
                 typedSignatureEnabled={template.templateMeta?.typedSignatureEnabled}
@@ -433,7 +434,7 @@ export const DirectTemplateSigningForm = ({
 
         <div className="mt-4 flex gap-x-4">
           <Button
-            className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+            className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
             size="lg"
             variant="secondary"
             disabled={isSubmitting}

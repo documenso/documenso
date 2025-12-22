@@ -1,8 +1,7 @@
 import { useEffect } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { DocumentDistributionMethod, type Field, type Recipient } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
@@ -306,7 +305,7 @@ export const AddTemplateSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Document visibility
+                      <Trans>Document visibility</Trans>
                       <DocumentVisibilityTooltip />
                     </FormLabel>
 
@@ -425,7 +424,7 @@ export const AddTemplateSettingsFormPartial = ({
                         void handleAutoSave();
                       }}
                       className="bg-background w-full"
-                      emptySelectionPlaceholder="Select signature types"
+                      emptySelectionPlaceholder={t`Select signature types`}
                     />
                   </FormControl>
 
@@ -519,8 +518,10 @@ export const AddTemplateSettingsFormPartial = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -558,8 +559,9 @@ export const AddTemplateSettingsFormPartial = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />

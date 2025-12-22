@@ -14,9 +14,9 @@
   "dependencies": {
     "@documenso/pdf-sign": "^0.1.0",
     "@documenso/tsconfig": "*",
-    "ts-pattern": "^5.0.5"
+    "ts-pattern": "^5.9.0"
   },
   "devDependencies": {
-    "vitest": "^3.1.4"
+    "vitest": "^3.2.4"
   }
 }

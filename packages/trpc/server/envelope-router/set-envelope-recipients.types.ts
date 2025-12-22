@@ -2,7 +2,7 @@ import { EnvelopeType, RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
 import { ZRecipientActionAuthTypesSchema } from '@documenso/lib/types/document-auth';
-import { ZRecipientLiteSchema } from '@documenso/lib/types/recipient';
+import { ZRecipientEmailSchema, ZRecipientLiteSchema } from '@documenso/lib/types/recipient';
 
 export const ZSetEnvelopeRecipientsRequestSchema = z.object({
   envelopeId: z.string(),
@@ -10,7 +10,7 @@ export const ZSetEnvelopeRecipientsRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: z.string().toLowerCase().email().min(1).max(254),
+      email: ZRecipientEmailSchema,
       name: z.string().max(255),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),

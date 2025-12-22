@@ -42,7 +42,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { ZCreateOrganisationFormSchema } from '../dialogs/organisation-create-dialog';
 
-const MotionCard = motion(Card);
+const MotionCard = motion.create(Card);
 
 export type BillingPlansProps = {
   plans: InternalClaimPlans;
@@ -101,7 +101,7 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
               <CardContent className="flex h-full flex-col p-6">
                 <CardTitle>{price.product.name}</CardTitle>
 
-                <div className="text-muted-foreground mt-2 text-lg font-medium">
+                <div className="mt-2 text-lg font-medium text-muted-foreground">
                   {price.friendlyPrice + ' '}
                   <span className="text-xs">
                     {interval === 'monthlyPrice' ? (
@@ -112,12 +112,12 @@ export const BillingPlans = ({ plans }: BillingPlansProps) => {
                   </span>
                 </div>
 
-                <div className="text-muted-foreground mt-1.5 text-sm">
+                <div className="mt-1.5 text-sm text-muted-foreground">
                   {price.product.description}
                 </div>
 
                 {price.product.features && price.product.features.length > 0 && (
-                  <div className="text-muted-foreground mt-4">
+                  <div className="mt-4 text-muted-foreground">
                     <div className="text-sm font-medium">Includes:</div>
 
                     <ul className="mt-1 divide-y text-sm">
@@ -261,7 +261,7 @@ const BillingDialog = ({
                     <Building2Icon className="h-4 w-4" />
                     <Trans>Update current organisation</Trans>
                   </Label>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     <Trans>
                       Upgrade <strong>{organisation.name}</strong> to {planName}
                     </Trans>
@@ -276,7 +276,7 @@ const BillingDialog = ({
                     <PlusIcon className="h-4 w-4" />
                     <Trans>Create separate organisation</Trans>
                   </Label>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="text-sm text-muted-foreground">
                     <Trans>
                       Create a new organisation with {planName} plan. Keep your current organisation
                       on it's current plan

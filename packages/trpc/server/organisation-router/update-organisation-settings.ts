@@ -48,6 +48,9 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       emailReplyTo,
       // emailReplyToName,
       emailDocumentSettings,
+
+      // AI features settings.
+      aiFeaturesEnabled,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -149,6 +152,9 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             emailReplyTo,
             // emailReplyToName,
             emailDocumentSettings,
+
+            // AI features settings.
+            aiFeaturesEnabled,
           },
         },
       },

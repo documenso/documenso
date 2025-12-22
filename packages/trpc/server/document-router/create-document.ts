@@ -3,6 +3,7 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
@@ -22,9 +23,34 @@ export const createDocumentRoute = authenticatedProcedure
 
     const { payload, file } = input;
 
-    const { title, timezone, folderId, attachments } = payload;
+    const {
+      title,
+      externalId,
+      visibility,
+      globalAccessAuth,
+      globalActionAuth,
+      recipients,
+      meta,
+      folderId,
+      formValues,
+      attachments,
+    } = payload;
 
-    const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+    let pdf = Buffer.from(await file.arrayBuffer());
+
+    if (formValues) {
+      // eslint-disable-next-line require-atomic-updates
+      pdf = await insertFormValuesInPdf({
+        pdf,
+        formValues,
+      });
+    }
+
+    const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+      name: file.name,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(pdf),
+    });
 
     ctx.logger.info({
       input: {
@@ -48,7 +74,20 @@ export const createDocumentRoute = authenticatedProcedure
       data: {
         type: EnvelopeType.DOCUMENT,
         title,
-        userTimezone: timezone,
+        externalId,
+        visibility,
+        globalAccessAuth,
+        globalActionAuth,
+        recipients: (recipients || []).map((recipient) => ({
+          ...recipient,
+          fields: (recipient.fields || []).map((field) => ({
+            ...field,
+            page: field.pageNumber,
+            positionX: field.pageX,
+            positionY: field.pageY,
+            documentDataId,
+          })),
+        })),
         folderId,
         envelopeItems: [
           {
@@ -58,7 +97,10 @@ export const createDocumentRoute = authenticatedProcedure
         ],
       },
       attachments,
-      normalizePdf: true,
+      meta: {
+        ...meta,
+        emailSettings: meta?.emailSettings ?? undefined,
+      },
       requestMetadata: ctx.metadata,
     });
 

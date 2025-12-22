@@ -126,7 +126,7 @@ export const EnvelopeDownloadDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4 overflow-hidden">
           {isLoadingEnvelopeItems ? (
             <>
               {Array.from({ length: 1 }).map((_, index) => (
@@ -159,7 +159,9 @@ export const EnvelopeDownloadDialog = ({
 
                 <div className="min-w-0 flex-1">
                   {/* Todo: Envelopes - Fix overflow */}
-                  <h4 className="text-foreground truncate text-sm font-medium">{item.title}</h4>
+                  <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
+                    {item.title}
+                  </h4>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     <Trans>PDF Document</Trans>
                   </p>
@@ -176,7 +178,7 @@ export const EnvelopeDownloadDialog = ({
                     {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
                       <DownloadIcon className="mr-2 h-4 w-4" />
                     )}
-                    <Trans>Original</Trans>
+                    <Trans context="Original document (adjective)">Original</Trans>
                   </Button>
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
@@ -190,7 +192,7 @@ export const EnvelopeDownloadDialog = ({
                       {!isDownloadingState[generateDownloadKey(item.id, 'signed')] && (
                         <DownloadIcon className="mr-2 h-4 w-4" />
                       )}
-                      <Trans>Signed</Trans>
+                      <Trans context="Signed document (adjective)">Signed</Trans>
                     </Button>
                   )}
                 </div>

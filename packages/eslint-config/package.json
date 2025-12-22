@@ -7,14 +7,14 @@
     "clean": "rimraf node_modules"
   },
   "dependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
     "eslint": "^8.57.0",
-    "eslint-config-next": "^14.2.28",
-    "eslint-config-turbo": "^1.12.5",
-    "eslint-plugin-package-json": "^0.31.0",
+    "eslint-config-next": "^15",
+    "eslint-config-turbo": "^1.13.4",
+    "eslint-plugin-package-json": "^0.85.0",
     "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-unused-imports": "^4.1.4",
+    "eslint-plugin-unused-imports": "^4.3.0",
     "typescript": "5.6.2"
   }
 }

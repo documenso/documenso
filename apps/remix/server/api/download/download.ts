@@ -21,7 +21,7 @@ export const downloadRoute = new Hono<HonoEnv>()
    * Requires API key authentication via Authorization header.
    */
   .get(
-    '/envelopeItem/:envelopeItemId/download',
+    '/envelope/item/:envelopeItemId/download',
     sValidator('param', ZDownloadEnvelopeItemRequestParamsSchema),
     async (c) => {
       const logger = c.get('logger');

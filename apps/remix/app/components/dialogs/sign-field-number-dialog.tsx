@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { createCallable } from 'react-call';
@@ -28,48 +27,70 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 
-const createNumberFieldSchema = (fieldMeta: TNumberFieldMeta) => {
-  let schema = z.coerce.number({
-    invalid_type_error: msg`Please enter a valid number`.id,
-  });
-
-  const { numberFormat, minValue, maxValue } = fieldMeta;
-
-  if (typeof minValue === 'number') {
-    schema = schema.min(minValue);
-  }
-
-  if (typeof maxValue === 'number') {
-    schema = schema.max(maxValue);
-  }
-
-  if (numberFormat) {
-    const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
-
-    if (!foundRegex) {
-      return schema;
-    }
-
-    return schema.refine(
-      (value) => {
-        return foundRegex.test(value.toString());
-      },
-      {
-        message: msg`Number needs to be formatted as ${numberFormat}`.id,
-      },
-    );
-  }
-
-  return schema;
-};
-
 export type SignFieldNumberDialogProps = {
   fieldMeta: TNumberFieldMeta;
 };
 
-export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, number | null>(
+export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, string | null>(
   ({ call, fieldMeta }) => {
     const { t } = useLingui();
+
+    // Needs to be inside dialog for translation purposes.
+    const createNumberFieldSchema = (fieldMeta: TNumberFieldMeta) => {
+      const { numberFormat, minValue, maxValue } = fieldMeta;
+
+      if (numberFormat) {
+        const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
+
+        if (foundRegex) {
+          return z.string().refine(
+            (value) => {
+              return foundRegex.test(value.toString());
+            },
+            {
+              message: t`Number needs to be formatted as ${numberFormat}`,
+            },
+          );
+        }
+      }
+
+      // Not gong to work with min/max numbers + number format
+      // Since currently doesn't work in V1 going to ignore for now.
+      return z.string().superRefine((value, ctx) => {
+        const isValidNumber = /^[0-9,.]+$/.test(value.toString());
+
+        if (!isValidNumber) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: t`Please enter a valid number`,
+          });
+
+          return;
+        }
+
+        if (typeof minValue === 'number' && parseFloat(value) < minValue) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_small,
+            minimum: minValue,
+            inclusive: true,
+            type: 'number',
+          });
+
+          return;
+        }
+
+        if (typeof maxValue === 'number' && parseFloat(value) > maxValue) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.too_big,
+            maximum: maxValue,
+            inclusive: true,
+            type: 'number',
+          });
+
+          return;
+        }
+      });
+    };
 
     const ZSignFieldNumberFormSchema = z.object({
       number: createNumberFieldSchema(fieldMeta),

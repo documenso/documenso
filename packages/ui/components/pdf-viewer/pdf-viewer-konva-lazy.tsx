@@ -17,7 +17,7 @@ const EnvelopePdfViewer = lazy(async () => import('./pdf-viewer-konva'));
 
 export const PDFViewerKonvaLazy = (props: PDFViewerProps) => {
   return (
-    <Suspense fallback={<div>Loading client component...</div>}>
+    <Suspense fallback={<div>Loading...</div>}>
       <EnvelopePdfViewer {...props} />
     </Suspense>
   );

@@ -7,6 +7,7 @@ import {
 } from '@documenso/ui/primitives/document-flow/field-items-advanced-settings/constants';
 
 import type { FieldTestData } from './field-alignment-pdf';
+import { signatureBase64Demo } from './field-alignment-pdf';
 
 const columnWidth = 20.1;
 const fullColumnWidth = 75.8;
@@ -37,7 +38,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     page: 2,
     ...calculatePosition(0, 0),
     customText: '',
-    signature: 'My Signature',
+    signature: signatureBase64Demo,
   },
   {
     type: FieldType.SIGNATURE,
@@ -47,7 +48,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     page: 2,
     ...calculatePosition(1, 0),
     customText: '',
-    signature: 'My Signature',
+    signature: signatureBase64Demo,
   },
   {
     type: FieldType.SIGNATURE,
@@ -67,7 +68,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     page: 2,
     ...calculatePosition(3, 0),
     customText: '',
-    signature: 'My Signature',
+    signature: 'My Signature super overflow maybe',
   },
 
   /**
@@ -80,7 +81,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(0, 0, 'full'),
-    customText: '123456789',
+    customText: 'Hello world, this is some random text that I have written here',
   },
   {
     type: FieldType.TEXT,
@@ -89,7 +90,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(1, 0),
-    customText: '123456789123456789123456789123456789',
+    customText: 'Some text that should overflow correctly',
   },
   {
     type: FieldType.TEXT,
@@ -109,7 +110,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(3, 0),
-    customText: '123456789',
+    customText: 'Input should have a placeholder text when clicked',
   },
   {
     type: FieldType.TEXT,
@@ -119,7 +120,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(3, 1),
-    customText: '123456789',
+    customText: 'Should have a label during editing and signing',
   },
   {
     type: FieldType.TEXT,
@@ -129,7 +130,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(3, 2),
-    customText: '123456789',
+    customText: '',
   },
   {
     type: FieldType.TEXT,
@@ -139,20 +140,19 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 3,
     ...calculatePosition(4, 0),
-    customText: '123456789',
+    customText: 'This is a required field',
   },
   {
     type: FieldType.TEXT,
     fieldMeta: {
       type: 'text',
       readOnly: true,
-      text: 'Readonly Value',
+      text: 'Some Readonly Value',
     },
     page: 3,
     ...calculatePosition(4, 1),
-    customText: 'Readonly Value',
+    customText: '',
   },
-
   /**
    * PAGE 4 NUMBER
    */
@@ -220,7 +220,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     type: FieldType.NUMBER,
     fieldMeta: {
       type: 'number',
-      value: '123',
+      value: '123456789',
     },
     page: 4,
     ...calculatePosition(3, 2),
@@ -241,10 +241,11 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       type: 'number',
       readOnly: true,
+      value: '123456789',
     },
     page: 4,
     ...calculatePosition(4, 1),
-    customText: '123456789',
+    customText: '',
   },
 
   /**
@@ -272,8 +273,8 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
       type: 'radio',
       values: [
         { id: 1, checked: false, value: 'Option 1' },
-        { id: 2, checked: true, value: 'Option 2' },
-        { id: 3, checked: false, value: 'Option 3' },
+        { id: 2, checked: false, value: 'Option 2' },
+        { id: 3, checked: true, value: 'Option 3' },
       ],
     },
     page: 5,
@@ -285,6 +286,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       direction: 'vertical',
       type: 'radio',
+      required: true,
       values: [
         { id: 1, checked: false, value: 'Option 1' },
         { id: 2, checked: false, value: 'Option 2' },
@@ -293,17 +295,18 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 5,
     ...calculatePosition(2, 0),
-    customText: '',
+    customText: '2',
   },
   {
     type: FieldType.RADIO,
     fieldMeta: {
       direction: 'vertical',
       type: 'radio',
+      readOnly: true,
       values: [
         { id: 1, checked: false, value: 'Option 1' },
         { id: 2, checked: false, value: 'Option 2' },
-        { id: 3, checked: false, value: 'Option 3' },
+        { id: 3, checked: true, value: 'Option 3' },
       ],
     },
     page: 5,
@@ -338,7 +341,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
       values: [
         { id: 1, checked: false, value: 'Option 1' },
         { id: 2, checked: true, value: 'Option 2' },
-        { id: 2, checked: true, value: 'Option 3' },
+        { id: 3, checked: false, value: 'Option 3' },
       ],
     },
     page: 6,
@@ -358,7 +361,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 6,
     ...calculatePosition(2, 0),
-    customText: '',
+    customText: toCheckboxCustomText([2]),
   },
   {
     type: FieldType.CHECKBOX,
@@ -368,7 +371,7 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
       readOnly: true,
       values: [
         { id: 1, checked: false, value: 'Option 1' },
-        { id: 2, checked: false, value: 'Option 2' },
+        { id: 2, checked: true, value: 'Option 2' },
       ],
     },
     page: 6,
@@ -445,11 +448,11 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     fieldMeta: {
       values: [{ value: 'Option 1' }, { value: 'Option 2' }],
       type: 'dropdown',
-      defaultValue: 'Option 1',
+      defaultValue: 'Option 2',
     },
     page: 7,
     ...calculatePosition(1, 0),
-    customText: 'Option 1',
+    customText: 'Option 2',
   },
   {
     type: FieldType.DROPDOWN,
@@ -460,13 +463,14 @@ export const FIELD_META_TEST_FIELDS: FieldTestData[] = [
     },
     page: 7,
     ...calculatePosition(2, 0),
-    customText: 'Option 1',
+    customText: 'Option 3',
   },
   {
     type: FieldType.DROPDOWN,
     fieldMeta: {
       values: [{ value: 'Option 1' }, { value: 'Option 2' }, { value: 'Option 3' }],
       type: 'dropdown',
+      defaultValue: 'Option 1',
       readOnly: true,
     },
     page: 7,

@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../schema';
 import type { TrpcRouteMeta } from '../trpc';
 
 export const deleteEnvelopeItemMeta: TrpcRouteMeta = {
@@ -17,7 +18,7 @@ export const ZDeleteEnvelopeItemRequestSchema = z.object({
   envelopeItemId: z.string(),
 });
 
-export const ZDeleteEnvelopeItemResponseSchema = z.void();
+export const ZDeleteEnvelopeItemResponseSchema = ZSuccessResponseSchema;
 
 export type TDeleteEnvelopeItemRequest = z.infer<typeof ZDeleteEnvelopeItemRequestSchema>;
 export type TDeleteEnvelopeItemResponse = z.infer<typeof ZDeleteEnvelopeItemResponseSchema>;

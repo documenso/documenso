@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../../schema';
 import type { TrpcRouteMeta } from '../../trpc';
 
 export const updateAttachmentMeta: TrpcRouteMeta = {
@@ -20,7 +21,7 @@ export const ZUpdateAttachmentRequestSchema = z.object({
   }),
 });
 
-export const ZUpdateAttachmentResponseSchema = z.void();
+export const ZUpdateAttachmentResponseSchema = ZSuccessResponseSchema;
 
 export type TUpdateAttachmentRequest = z.infer<typeof ZUpdateAttachmentRequestSchema>;
 export type TUpdateAttachmentResponse = z.infer<typeof ZUpdateAttachmentResponseSchema>;

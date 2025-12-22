@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useHydrated } from '../lib/use-hydrated';
 
-export const ClientOnly = async ({ children }: { children: React.ReactNode }) => {
-  const [mounted, setMounted] = useState(false);
+type ClientOnlyProps = {
+  children: () => React.ReactNode;
+  fallback?: React.ReactNode;
+};
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return mounted ? children : null;
+export const ClientOnly = ({ children, fallback = null }: ClientOnlyProps) => {
+  return useHydrated() ? <>{children()}</> : <>{fallback}</>;
 };

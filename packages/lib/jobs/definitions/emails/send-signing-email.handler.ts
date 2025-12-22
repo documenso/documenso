@@ -12,6 +12,7 @@ import {
 
 import { mailer } from '@documenso/email/mailer';
 import DocumentInviteEmailTemplate from '@documenso/email/templates/document-invite';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
@@ -177,31 +178,33 @@ export const run = async ({
     includeSenderDetails: settings.includeSenderDetails,
   });
 
-  await io.runTask('send-signing-email', async () => {
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(template, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(template, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
+  if (isRecipientEmailValidForSending(recipient)) {
+    await io.runTask('send-signing-email', async () => {
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(template, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(template, {
+          lang: emailLanguage,
+          branding,
+          plainText: true,
+        }),
+      ]);
 
-    await mailer.sendMail({
-      to: {
-        name: recipient.name,
-        address: recipient.email,
-      },
-      from: senderEmail,
-      replyTo: replyToEmail,
-      subject: renderCustomEmailTemplate(
-        documentMeta?.subject || emailSubject,
-        customEmailTemplate,
-      ),
-      html,
-      text,
+      await mailer.sendMail({
+        to: {
+          name: recipient.name,
+          address: recipient.email,
+        },
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: renderCustomEmailTemplate(
+          documentMeta?.subject || emailSubject,
+          customEmailTemplate,
+        ),
+        html,
+        text,
+      });
     });
-  });
+  }
 
   await io.runTask('update-recipient', async () => {
     await prisma.recipient.update({

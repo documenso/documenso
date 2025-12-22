@@ -64,6 +64,7 @@ export const seedOrganisationMembers = async ({
       organisationId,
       organisationGroups,
       organisationMemberRole: member.organisationRole,
+      bypassEmail: true,
     });
   }
 

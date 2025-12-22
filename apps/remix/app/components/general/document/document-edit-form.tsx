@@ -27,7 +27,7 @@ import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -440,7 +440,7 @@ export const DocumentEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewer
+          <PDFViewerLazy
             key={document.envelopeItems[0].id}
             envelopeItem={document.envelopeItems[0]}
             token={undefined}

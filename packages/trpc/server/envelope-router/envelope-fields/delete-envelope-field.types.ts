@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../../schema';
 import type { TrpcRouteMeta } from '../../trpc';
 
 export const deleteEnvelopeFieldMeta: TrpcRouteMeta = {
@@ -16,7 +17,7 @@ export const ZDeleteEnvelopeFieldRequestSchema = z.object({
   fieldId: z.number(),
 });
 
-export const ZDeleteEnvelopeFieldResponseSchema = z.void();
+export const ZDeleteEnvelopeFieldResponseSchema = ZSuccessResponseSchema;
 
 export type TDeleteEnvelopeFieldRequest = z.infer<typeof ZDeleteEnvelopeFieldRequestSchema>;
 export type TDeleteEnvelopeFieldResponse = z.infer<typeof ZDeleteEnvelopeFieldResponseSchema>;

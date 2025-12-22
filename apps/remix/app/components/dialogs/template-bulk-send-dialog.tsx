@@ -103,8 +103,8 @@ export const TemplateBulkSendDialog = ({
       console.error(err);
 
       toast({
-        title: 'Error',
-        description: 'Failed to upload CSV. Please check the file format and try again.',
+        title: _(msg`Error`),
+        description: _(msg`Failed to upload CSV. Please check the file format and try again.`),
         variant: 'destructive',
       });
     }

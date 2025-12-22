@@ -6,6 +6,7 @@ import { sendDocument } from '@documenso/lib/server-only/document/send-document'
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { formatSigningLink } from '@documenso/lib/utils/recipients';
 
 import { authenticatedProcedure } from '../trpc';
 import {
@@ -26,7 +27,7 @@ export const useEnvelopeRoute = authenticatedProcedure
     const {
       envelopeId,
       externalId,
-      recipients,
+      recipients = [],
       distributeDocument,
       customDocumentData = [],
       folderId,
@@ -166,5 +167,14 @@ export const useEnvelopeRoute = authenticatedProcedure
 
     return {
       id: createdEnvelope.id,
+      recipients: createdEnvelope.recipients.map((recipient) => ({
+        id: recipient.id,
+        name: recipient.name,
+        email: recipient.email,
+        token: recipient.token,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        signingUrl: formatSigningLink(recipient.token),
+      })),
     };
   });

@@ -28,7 +28,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
-import { canRecipientBeModified } from '../../utils/recipients';
+import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -294,10 +294,15 @@ export const setDocumentRecipients = async ({
       envelope.documentMeta,
     ).recipientRemoved;
 
-    // Send emails to deleted recipients.
+    // Send emails to deleted recipients who have emails.
     await Promise.all(
       removedRecipients.map(async (recipient) => {
-        if (recipient.sendStatus !== SendStatus.SENT || !isRecipientRemovedEmailEnabled) {
+        if (
+          recipient.sendStatus !== SendStatus.SENT ||
+          recipient.role === RecipientRole.CC ||
+          !isRecipientRemovedEmailEnabled ||
+          !isRecipientEmailValidForSending(recipient)
+        ) {
           return;
         }
 

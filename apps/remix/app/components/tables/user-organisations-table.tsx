@@ -56,7 +56,14 @@ export const UserOrganisationsTable = () => {
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
                 <span className="text-foreground/80 font-semibold">
-                  {isPersonalLayoutMode ? _(msg`Personal`) : row.original.name}
+                  {isPersonalLayoutMode
+                    ? _(
+                        msg({
+                          message: `Personal`,
+                          context: `Personal organisation (adjective)`,
+                        }),
+                      )
+                    : row.original.name}
                 </span>
               }
               secondaryText={

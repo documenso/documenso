@@ -85,4 +85,8 @@ export const resetPassword = async ({ token, password, requestMetadata }: ResetP
       },
     });
   });
+
+  return {
+    userId: foundToken.userId,
+  };
 };

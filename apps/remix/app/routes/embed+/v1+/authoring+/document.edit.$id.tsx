@@ -27,7 +27,7 @@ import { ConfigureFieldsView } from '~/components/embed/authoring/configure-fiel
 import type { TConfigureFieldsFormSchema } from '~/components/embed/authoring/configure-fields-view.types';
 import {
   type TBaseEmbedAuthoringSchema,
-  ZBaseEmbedAuthoringSchema,
+  ZBaseEmbedAuthoringEditSchema,
 } from '~/types/embed-authoring-base-schema';
 
 import type { Route } from './+types/document.edit.$id';
@@ -41,7 +41,9 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   const token = url.searchParams.get('token') || '';
 
   // We also know that the token is valid, but we need the userId + teamId
-  const result = await verifyEmbeddingPresignToken({ token }).catch(() => null);
+  const result = await verifyEmbeddingPresignToken({ token, scope: `documentId:${id}` }).catch(
+    () => null,
+  );
 
   if (!result) {
     throw new Error('Invalid token');
@@ -75,6 +77,7 @@ export const loader = async ({ request, params }: Route.LoaderArgs) => {
   }));
 
   return {
+    token,
     document: {
       ...document,
       fields,
@@ -86,7 +89,9 @@ export default function EmbeddingAuthoringDocumentEditPage() {
   const { _ } = useLingui();
   const { toast } = useToast();
 
-  const { document } = useLoaderData<typeof loader>();
+  const { document, token } = useLoaderData<typeof loader>();
+
+  const [hasFinishedInit, setHasFinishedInit] = useState(false);
 
   const signatureTypes = useMemo(() => {
     const types: string[] = [];
@@ -159,6 +164,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
   const [features, setFeatures] = useState<TBaseEmbedAuthoringSchema['features'] | null>(null);
   const [externalId, setExternalId] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
+  const [canGoBack, setCanGoBack] = useState(true);
 
   const { mutateAsync: updateEmbeddingDocument } =
     trpc.embeddingPresign.updateEmbeddingDocument.useMutation();
@@ -177,6 +183,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
         fields: fieldData.fields.filter((field) => signerEmails.includes(field.signerEmail)),
       };
     });
+
     setCurrentStep(2);
   };
 
@@ -275,7 +282,7 @@ export default function EmbeddingAuthoringDocumentEditPage() {
     try {
       const hash = window.location.hash.slice(1);
 
-      const result = ZBaseEmbedAuthoringSchema.safeParse(
+      const result = ZBaseEmbedAuthoringEditSchema.safeParse(
         JSON.parse(decodeURIComponent(atob(hash))),
       );
 
@@ -285,14 +292,25 @@ export default function EmbeddingAuthoringDocumentEditPage() {
 
       setFeatures(result.data.features);
 
+      if (result.data.onlyEditFields) {
+        setCurrentStep(2);
+        setCanGoBack(false);
+      }
+
       // Extract externalId from the parsed data if available
       if (result.data.externalId) {
         setExternalId(result.data.externalId);
       }
+
+      setHasFinishedInit(true);
     } catch (err) {
       console.error('Error parsing embedding params:', err);
     }
   }, []);
+
+  if (!hasFinishedInit) {
+    return null;
+  }
 
   return (
     <div className="relative mx-auto flex min-h-[100dvh] max-w-screen-lg p-6">
@@ -306,9 +324,10 @@ export default function EmbeddingAuthoringDocumentEditPage() {
 
           <ConfigureFieldsView
             configData={configuration!}
-            documentData={document.documentData}
+            presignToken={token}
+            envelopeItem={document.envelopeItems[0]}
             defaultValues={fields ?? undefined}
-            onBack={handleBackToConfig}
+            onBack={canGoBack ? handleBackToConfig : undefined}
             onSubmit={handleConfigureFieldsSubmit}
           />
         </Stepper>

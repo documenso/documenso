@@ -19,5 +19,6 @@ export const downloadDocumentRoute = authenticatedProcedure
       },
     });
 
+    // This endpoint is purely for V2 API, which is implemented in the Hono remix server.
     throw new Error('NOT_IMPLEMENTED');
   });

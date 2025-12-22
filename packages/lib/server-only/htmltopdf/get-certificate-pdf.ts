@@ -1,7 +1,11 @@
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
-import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
+import {
+  NEXT_PRIVATE_INTERNAL_WEBAPP_URL,
+  NEXT_PUBLIC_WEBAPP_URL,
+  USE_INTERNAL_URL_BROWSERLESS,
+} from '../../constants/app';
 import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
 import { env } from '../../utils/env';
 import { encryptSecondaryData } from '../crypto/encrypt';
@@ -48,14 +52,19 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
     {
       name: 'lang',
       value: lang,
-      url: NEXT_PUBLIC_WEBAPP_URL(),
+      url: USE_INTERNAL_URL_BROWSERLESS()
+        ? NEXT_PUBLIC_WEBAPP_URL()
+        : NEXT_PRIVATE_INTERNAL_WEBAPP_URL(),
     },
   ]);
 
-  await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`, {
-    waitUntil: 'networkidle',
-    timeout: 10_000,
-  });
+  await page.goto(
+    `${USE_INTERNAL_URL_BROWSERLESS() ? NEXT_PUBLIC_WEBAPP_URL() : NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`,
+    {
+      waitUntil: 'networkidle',
+      timeout: 10_000,
+    },
+  );
 
   // !: This is a workaround to ensure the page is loaded correctly.
   // !: It's not clear why but suddenly browserless cdp connections would

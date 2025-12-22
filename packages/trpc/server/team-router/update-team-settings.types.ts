@@ -38,6 +38,9 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     emailReplyTo: z.string().email().nullish(),
     // emailReplyToName: z.string().nullish(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.nullish(),
+
+    // AI features settings.
+    aiFeaturesEnabled: z.boolean().nullish(),
   }),
 });
 

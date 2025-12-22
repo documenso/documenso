@@ -110,7 +110,7 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
     data: {
       id: prefixedId('envelope'),
       secondaryId: templateId.formattedTemplateId,
-      internalVersion: 1,
+      internalVersion: options.internalVersion ?? 1,
       type: EnvelopeType.TEMPLATE,
       title,
       envelopeItems: {
@@ -143,6 +143,7 @@ export const seedTemplate = async (options: SeedTemplateOptions) => {
           documentData: true,
         },
       },
+      recipients: true,
     },
   });
 };

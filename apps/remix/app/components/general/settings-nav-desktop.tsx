@@ -16,7 +16,7 @@ import { Link } from 'react-router';
 
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
-import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { canExecuteOrganisationAction, isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
@@ -28,6 +28,10 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
   const { organisations } = useSession();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
+
+  const hasManageableBillingOrgs = organisations.some((org) =>
+    canExecuteOrganisationAction('MANAGE_BILLING', org.currentOrganisationRole),
+  );
 
   return (
     <div className={cn('flex flex-col gap-y-2', className)} {...props}>
@@ -127,21 +131,6 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
               <Trans>Webhooks</Trans>
             </Button>
           </Link>
-
-          {IS_BILLING_ENABLED() && (
-            <Link to="/settings/billing">
-              <Button
-                variant="ghost"
-                className={cn(
-                  'w-full justify-start',
-                  pathname?.startsWith('/settings/billing') && 'bg-secondary',
-                )}
-              >
-                <CreditCardIcon className="mr-2 h-5 w-5" />
-                <Trans>Billing</Trans>
-              </Button>
-            </Link>
-          )}
         </>
       )}
 
@@ -157,6 +146,21 @@ export const SettingsDesktopNav = ({ className, ...props }: SettingsDesktopNavPr
           <Trans>Organisations</Trans>
         </Button>
       </Link>
+
+      {IS_BILLING_ENABLED() && hasManageableBillingOrgs && (
+        <Link to={isPersonalLayoutMode ? '/settings/billing-personal' : `/settings/billing`}>
+          <Button
+            variant="ghost"
+            className={cn(
+              'w-full justify-start',
+              pathname?.startsWith('/settings/billing') && 'bg-secondary',
+            )}
+          >
+            <CreditCardIcon className="mr-2 h-5 w-5" />
+            <Trans>Billing</Trans>
+          </Button>
+        </Link>
+      )}
 
       <Link to="/settings/security">
         <Button

@@ -6,6 +6,7 @@ import { deleteDocument } from '@documenso/lib/server-only/document/delete-docum
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDeleteEnvelopeRequestSchema,
@@ -65,4 +66,6 @@ export const deleteEnvelopeRoute = authenticatedProcedure
         }),
       )
       .exhaustive();
+
+    return ZGenericSuccessResponse;
   });

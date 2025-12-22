@@ -32,6 +32,7 @@ export type JobDefinition<Name extends string = string, Schema = any> = {
   name: string;
   version: string;
   enabled?: boolean;
+  optimizeParallelism?: boolean;
   trigger: {
     name: Name;
     schema?: z.ZodType<Schema>;

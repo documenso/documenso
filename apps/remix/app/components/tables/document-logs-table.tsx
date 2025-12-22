@@ -96,11 +96,11 @@ export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
         cell: ({ row }) => <span>{formatDocumentAuditLogAction(_, row.original).description}</span>,
       },
       {
-        header: 'IP Address',
+        header: _(msg`IP Address`),
         accessorKey: 'ipAddress',
       },
       {
-        header: 'Browser',
+        header: _(msg`Browser`),
         cell: ({ row }) => {
           if (!row.original.userAgent) {
             return 'N/A';

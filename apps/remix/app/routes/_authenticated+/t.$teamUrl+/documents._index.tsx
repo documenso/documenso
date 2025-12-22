@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
 import { useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
@@ -18,9 +19,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/av
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
-import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { PeriodSelector } from '~/components/general/period-selector';
 import { DocumentsTable } from '~/components/tables/documents-table';
@@ -108,9 +109,8 @@ export default function DocumentsPage() {
     }
   }, [data?.stats]);
 
-  // Todo: Envelopes - Change the dropzone wrapper to create to V2 documents after we're ready.
   return (
-    <DocumentDropZoneWrapper>
+    <EnvelopeDropZoneWrapper type={EnvelopeType.DOCUMENT}>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
         <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />
 
@@ -210,6 +210,6 @@ export default function DocumentsPage() {
           />
         )}
       </div>
-    </DocumentDropZoneWrapper>
+    </EnvelopeDropZoneWrapper>
   );
 }

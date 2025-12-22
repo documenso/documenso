@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { TeamEmail } from '@prisma/client';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { useForm } from 'react-hook-form';
@@ -50,7 +48,7 @@ export const TeamEmailUpdateDialog = ({
 }: TeamEmailUpdateDialogProps) => {
   const [open, setOpen] = useState(false);
 
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
@@ -73,8 +71,8 @@ export const TeamEmailUpdateDialog = ({
       });
 
       toast({
-        title: _(msg`Success`),
-        description: _(msg`Team email was updated.`),
+        title: t`Success`,
+        description: t`Team email was updated.`,
         duration: 5000,
       });
 
@@ -83,10 +81,8 @@ export const TeamEmailUpdateDialog = ({
       setOpen(false);
     } catch (err) {
       toast({
-        title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting update the team email. Please try again later.`,
-        ),
+        title: t`An unknown error occurred`,
+        description: t`We encountered an unknown error while attempting update the team email. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -138,7 +134,7 @@ export const TeamEmailUpdateDialog = ({
                       <Trans>Name</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="eg. Legal" {...field} />
+                      <Input className="bg-background" placeholder={t`eg. Legal`} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

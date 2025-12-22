@@ -1,4 +1,5 @@
 import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
 import { useParams, useSearchParams } from 'react-router';
 
@@ -8,8 +9,8 @@ import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/t
 import { trpc } from '@documenso/trpc/react';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
 
+import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
-import { TemplateDropZoneWrapper } from '~/components/general/template/template-drop-zone-wrapper';
 import { TemplatesTable } from '~/components/tables/templates-table';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
@@ -37,7 +38,7 @@ export default function TemplatesPage() {
   });
 
   return (
-    <TemplateDropZoneWrapper>
+    <EnvelopeDropZoneWrapper type={EnvelopeType.TEMPLATE}>
       <div className="mx-auto max-w-screen-xl px-4 md:px-8">
         <FolderGrid type={FolderType.TEMPLATE} parentId={folderId ?? null} />
 
@@ -85,6 +86,6 @@ export default function TemplatesPage() {
           </div>
         </div>
       </div>
-    </TemplateDropZoneWrapper>
+    </EnvelopeDropZoneWrapper>
   );
 }

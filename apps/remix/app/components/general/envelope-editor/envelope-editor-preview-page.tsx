@@ -2,7 +2,7 @@ import { lazy, useEffect, useMemo, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
-import { FieldType } from '@prisma/client';
+import { FieldType, SigningStatus } from '@prisma/client';
 import { FileTextIcon } from 'lucide-react';
 import { match } from 'ts-pattern';
 
@@ -23,7 +23,9 @@ import { Separator } from '@documenso/ui/primitives/separator';
 
 import { EnvelopeRendererFileSelector } from './envelope-file-selector';
 
-const EnvelopeGenericPageRenderer = lazy(async () => import('./envelope-generic-page-renderer'));
+const EnvelopeGenericPageRenderer = lazy(
+  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+);
 
 // Todo: Envelopes - Dynamically import faker
 export const EnvelopeEditorPreviewPage = () => {
@@ -201,7 +203,10 @@ export const EnvelopeEditorPreviewPage = () => {
       envelope={envelope}
       token={undefined}
       fields={fieldsWithPlaceholders}
-      recipients={envelope.recipients}
+      recipients={envelope.recipients.map((recipient) => ({
+        ...recipient,
+        signingStatus: SigningStatus.SIGNED,
+      }))}
       overrideSettings={{
         mode: 'export',
       }}
@@ -229,11 +234,11 @@ export const EnvelopeEditorPreviewPage = () => {
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">
-                <FileTextIcon className="text-muted-foreground h-10 w-10" />
-                <p className="text-foreground mt-1 text-sm">
+                <FileTextIcon className="h-10 w-10 text-muted-foreground" />
+                <p className="mt-1 text-sm text-foreground">
                   <Trans>No documents found</Trans>
                 </p>
-                <p className="text-muted-foreground mt-1 text-sm">
+                <p className="mt-1 text-sm text-muted-foreground">
                   <Trans>Please upload a document to continue</Trans>
                 </p>
               </div>

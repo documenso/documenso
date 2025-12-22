@@ -4,7 +4,7 @@ import { useConfig } from 'nextra-theme-docs';
 const themeConfig: DocsThemeConfig = {
   logo: <span>SuiteOp</span>,
   head: function useHead() {
-    const config = useConfig<{ title?: string; description?: string }>();
+    const config = useConfig();
 
     const title = `${config.frontMatter.title} | SuiteOp Docs` || 'SuiteOp Docs';
     const description = config.frontMatter.description || 'The official SuiteOp documentation';
@@ -12,6 +12,7 @@ const themeConfig: DocsThemeConfig = {
     return (
       <>
         <meta httpEquiv="Content-Language" content="en" />
+        <title>{title}</title>
         <meta name="title" content={title} />
         <meta name="og:title" content={title} />
         <meta name="description" content={description} />
@@ -46,7 +47,7 @@ const themeConfig: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
   footer: {
-    text: (
+    content: (
       <span>
         {new Date().getFullYear()} ©{' '}
         <a href="https://suiteop.com" target="_blank">
@@ -56,12 +57,9 @@ const themeConfig: DocsThemeConfig = {
       </span>
     ),
   },
-  primaryHue: 248,
-  primarySaturation: 99,
-  useNextSeoProps() {
-    return {
-      titleTemplate: '%s | SuiteOp Docs',
-    };
+  color: {
+    hue: 248,
+    saturation: 99,
   },
 };
 

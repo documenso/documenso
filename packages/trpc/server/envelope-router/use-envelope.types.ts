@@ -16,9 +16,11 @@ import {
 } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
+import { ZRecipientWithSigningUrlSchema } from './schema';
 
 export const useEnvelopeMeta: TrpcRouteMeta = {
   openapi: {
@@ -39,12 +41,13 @@ export const ZUseEnvelopePayloadSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email().max(254),
+        email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
         signingOrder: z.number().optional(),
       }),
     )
-    .describe('The information of the recipients to create the document with.'),
+    .describe('The information of the recipients to create the document with.')
+    .optional(),
   distributeDocument: z
     .boolean()
     .describe('Whether to create the document as pending and distribute it to recipients.')
@@ -114,6 +117,7 @@ export const ZUseEnvelopeRequestSchema = zodFormData({
 
 export const ZUseEnvelopeResponseSchema = z.object({
   id: z.string().describe('The ID of the created envelope.'),
+  recipients: ZRecipientWithSigningUrlSchema.array(),
 });
 
 export type TUseEnvelopePayload = z.infer<typeof ZUseEnvelopePayloadSchema>;

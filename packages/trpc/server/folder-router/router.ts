@@ -7,6 +7,7 @@ import { getFolderBreadcrumbs } from '@documenso/lib/server-only/folder/get-fold
 import { getFolderById } from '@documenso/lib/server-only/folder/get-folder-by-id';
 import { updateFolder } from '@documenso/lib/server-only/folder/update-folder';
 
+import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, router } from '../trpc';
 import {
   ZCreateFolderRequestSchema,
@@ -16,10 +17,8 @@ import {
   ZFindFoldersInternalResponseSchema,
   ZFindFoldersRequestSchema,
   ZFindFoldersResponseSchema,
-  ZGenericSuccessResponse,
   ZGetFoldersResponseSchema,
   ZGetFoldersSchema,
-  ZSuccessResponseSchema,
   ZUpdateFolderRequestSchema,
   ZUpdateFolderResponseSchema,
 } from './schema';

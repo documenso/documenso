@@ -45,7 +45,7 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
 
       toast({
         title: _(msg`Document deleted`),
-        description: 'The Document has been deleted successfully.',
+        description: _(msg`The Document has been deleted successfully.`),
         duration: 5000,
       });
 
@@ -54,8 +54,9 @@ export const AdminDocumentDeleteDialog = ({ envelopeId }: AdminDocumentDeleteDia
       toast({
         title: _(msg`An unknown error occurred`),
         variant: 'destructive',
-        description:
-          'We encountered an unknown error while attempting to delete your document. Please try again later.',
+        description: _(
+          msg`We encountered an unknown error while attempting to delete your document. Please try again later.`,
+        ),
       });
     }
   };

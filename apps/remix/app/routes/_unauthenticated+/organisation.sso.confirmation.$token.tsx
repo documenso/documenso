@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle, Building2, Database, Eye, Settings, UserCircle2 } from 'lucide-react';
 import { data, isRouteErrorResponse } from 'react-router';
@@ -125,6 +126,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Route.ComponentProps) {
   const { token, type, user, organisation } = loaderData;
 
+  const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -136,12 +138,12 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
         await navigate('/');
 
         toast({
-          title: 'Account link declined',
+          title: _(msg`Account link declined`),
         });
       },
       onError: (error) => {
         toast({
-          title: 'Error declining account link',
+          title: _(msg`Error declining account link`),
           description: error.message,
         });
       },
@@ -153,12 +155,12 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
         await navigate(formatOrganisationLoginPath(organisation.url));
 
         toast({
-          title: 'Account linked successfully',
+          title: _(msg`Account linked successfully`),
         });
       },
       onError: (error) => {
         toast({
-          title: 'Error linking account',
+          title: _(msg`Error linking account`),
           description: error.message,
         });
       },

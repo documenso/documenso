@@ -102,7 +102,7 @@ export const extractFieldInsertionValues = ({
       }
 
       const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
-      const errors = validateNumberField(fieldValue.value.toString(), numberFieldParsedMeta, true);
+      const errors = validateNumberField(fieldValue.value, numberFieldParsedMeta, true);
 
       if (errors.length > 0) {
         throw new AppError(AppErrorCode.INVALID_BODY, {
@@ -111,7 +111,7 @@ export const extractFieldInsertionValues = ({
       }
 
       return {
-        customText: fieldValue.value.toString(),
+        customText: fieldValue.value,
         inserted: true,
       };
     })

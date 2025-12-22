@@ -66,14 +66,13 @@ export const ConfigureDocumentRecipients = ({
   });
 
   const onAddSigner = useCallback(() => {
-    const signerNumber = signers.length + 1;
     const recipientSigningOrder =
       signers.length > 0 ? (signers[signers.length - 1]?.signingOrder || 0) + 1 : 1;
 
     appendSigner({
       formId: nanoid(8),
-      name: isTemplate ? `Recipient ${signerNumber}` : '',
-      email: isTemplate ? `recipient.${signerNumber}@document.com` : '',
+      name: '',
+      email: '',
       role: RecipientRole.SIGNER,
       signingOrder:
         signingOrder === DocumentSigningOrder.SEQUENTIAL ? recipientSigningOrder : undefined,

@@ -11,7 +11,7 @@ import UserSchema from '@documenso/prisma/generated/zod/modelSchema/UserSchema';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import type { TDocumentAuthMethods } from '../../types/document-auth';
-import { ZFieldSchema } from '../../types/field';
+import { ZEnvelopeFieldSchema, ZFieldSchema } from '../../types/field';
 import { ZRecipientLiteSchema } from '../../types/recipient';
 import { isRecipientAuthorized } from '../document/is-recipient-authorized';
 import { getTeamSettings } from '../team/get-team-settings';
@@ -63,9 +63,11 @@ export const ZEnvelopeForSigningResponse = z.object({
       rejectionReason: true,
     })
       .extend({
-        fields: ZFieldSchema.omit({
-          documentId: true,
-          templateId: true,
+        fields: ZEnvelopeFieldSchema.extend({
+          signature: SignatureSchema.pick({
+            signatureImageAsBase64: true,
+            typedSignature: true,
+          }).nullish(),
         }).array(),
       })
       .array(),

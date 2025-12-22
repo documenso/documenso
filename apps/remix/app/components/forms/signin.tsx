@@ -201,7 +201,7 @@ export const SignInForm = ({
         .otherwise(() => handleFallbackErrorMessages(error.code));
 
       toast({
-        title: 'Something went wrong',
+        title: _(msg`Something went wrong`),
         description: _(errorMessage),
         duration: 10000,
         variant: 'destructive',
@@ -244,11 +244,11 @@ export const SignInForm = ({
       const errorMessage = match(error.code)
         .with(
           AuthenticationErrorCode.InvalidCredentials,
-          () => msg`The email or password provided is incorrect`,
+          () => msg`The email or password provided is incorrect.`,
         )
         .with(
           AuthenticationErrorCode.InvalidTwoFactorCode,
-          () => msg`The two-factor authentication code provided is incorrect`,
+          () => msg`The two-factor authentication code provided is incorrect.`,
         )
         .otherwise(() => handleFallbackErrorMessages(error.code));
 

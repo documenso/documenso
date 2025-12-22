@@ -21,6 +21,7 @@ import {
   SKIP_QUERY_BATCH_META,
 } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -65,7 +66,7 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number(),
-      email: z.string().email(),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       signingOrder: z.number().optional(),
     }),
@@ -100,12 +101,29 @@ export function TemplateUseDialog({
 
   const [open, setOpen] = useState(false);
 
-  const form = useForm<TAddRecipientsForNewDocumentSchema>({
-    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
-    defaultValues: {
+  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
+    {
+      envelopeId,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+      ...SKIP_QUERY_BATCH_META,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open,
+    },
+  );
+
+  const envelopeItems = response?.data ?? [];
+
+  const generateDefaultFormValues = () => {
+    return {
       distributeDocument: false,
       useCustomDocument: false,
-      customDocumentData: [],
+      customDocumentData: envelopeItems.map((item) => ({
+        title: item.title,
+        data: undefined,
+        envelopeItemId: item.id,
+      })),
       recipients: recipients
         .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
         .map((recipient) => {
@@ -124,26 +142,18 @@ export function TemplateUseDialog({
             signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
-    },
+    };
+  };
+
+  const form = useForm<TAddRecipientsForNewDocumentSchema>({
+    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
+    defaultValues: generateDefaultFormValues(),
   });
 
   const { replace, fields: localCustomDocumentData } = useFieldArray({
     control: form.control,
     name: 'customDocumentData',
   });
-
-  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
-    {
-      envelopeId,
-    },
-    {
-      placeholderData: (previousData) => previousData,
-      ...SKIP_QUERY_BATCH_META,
-      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
-    },
-  );
-
-  const envelopeItems = response?.data ?? [];
 
   const { mutateAsync: createDocumentFromTemplate } =
     trpc.template.createDocumentFromTemplate.useMutation();
@@ -214,8 +224,8 @@ export function TemplateUseDialog({
   });
 
   useEffect(() => {
-    if (!open) {
-      form.reset();
+    if (open) {
+      form.reset(generateDefaultFormValues());
     }
   }, [open, form]);
 
@@ -322,7 +332,7 @@ export function TemplateUseDialog({
                             <Input
                               {...field}
                               aria-label="Name"
-                              placeholder={recipients[index].name || _(msg`Name`)}
+                              placeholder={recipients[index].name || _(msg`Recipient ${index + 1}`)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -349,7 +359,7 @@ export function TemplateUseDialog({
 
                             {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
                               <label
-                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
                               >
                                 <Trans>Send document</Trans>
@@ -358,7 +368,7 @@ export function TemplateUseDialog({
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
 
-                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
                                         The document will be immediately sent to recipients if this
@@ -378,7 +388,7 @@ export function TemplateUseDialog({
 
                             {documentDistributionMethod === DocumentDistributionMethod.NONE && (
                               <label
-                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
                               >
                                 <Trans>Create as pending</Trans>
@@ -386,7 +396,7 @@ export function TemplateUseDialog({
                                   <TooltipTrigger type="button">
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
-                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
                                         Create the document as pending and ready to sign.
@@ -432,7 +442,7 @@ export function TemplateUseDialog({
                           }}
                         />
                         <label
-                          className="text-muted-foreground ml-2 flex items-center text-sm"
+                          className="ml-2 flex items-center text-sm text-muted-foreground"
                           htmlFor="useCustomDocument"
                         >
                           <Trans>Upload custom document</Trans>
@@ -440,7 +450,7 @@ export function TemplateUseDialog({
                             <TooltipTrigger type="button">
                               <InfoIcon className="mx-1 h-4 w-4" />
                             </TooltipTrigger>
-                            <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                            <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                               <p>
                                 <Trans>
                                   Upload a custom document to use instead of the template's default
@@ -470,19 +480,19 @@ export function TemplateUseDialog({
                               <FormControl>
                                 <div
                                   key={item.id}
-                                  className="border-border bg-card hover:bg-accent/10 flex items-center gap-4 rounded-lg border p-4 transition-colors"
+                                  className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/10"
                                 >
                                   <div className="flex-shrink-0">
-                                    <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-lg">
-                                      <FileTextIcon className="text-primary h-5 w-5" />
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                      <FileTextIcon className="h-5 w-5 text-primary" />
                                     </div>
                                   </div>
 
                                   <div className="min-w-0 flex-1">
-                                    <h4 className="text-foreground truncate text-sm font-medium">
+                                    <h4 className="truncate text-sm font-medium text-foreground">
                                       {item.title}
                                     </h4>
-                                    <p className="text-muted-foreground mt-0.5 text-xs">
+                                    <p className="mt-0.5 text-xs text-muted-foreground">
                                       {field.value ? (
                                         <div>
                                           <Trans>

@@ -1,8 +1,15 @@
+import { RecipientRole } from '@prisma/client';
 import { z } from 'zod';
 
-import { ZEnvelopeRecipientLiteSchema } from '@documenso/lib/types/recipient';
+import {
+  ZRecipientAccessAuthTypesSchema,
+  ZRecipientActionAuthTypesSchema,
+} from '@documenso/lib/types/document-auth';
+import {
+  ZEnvelopeRecipientLiteSchema,
+  ZRecipientEmailSchema,
+} from '@documenso/lib/types/recipient';
 
-import { ZCreateRecipientSchema } from '../../recipient-router/schema';
 import type { TrpcRouteMeta } from '../../trpc';
 
 export const createEnvelopeRecipientsMeta: TrpcRouteMeta = {
@@ -15,9 +22,18 @@ export const createEnvelopeRecipientsMeta: TrpcRouteMeta = {
   },
 };
 
+export const ZCreateEnvelopeRecipientSchema = z.object({
+  email: ZRecipientEmailSchema,
+  name: z.string().max(255),
+  role: z.nativeEnum(RecipientRole),
+  signingOrder: z.number().optional(),
+  accessAuth: z.array(ZRecipientAccessAuthTypesSchema).default([]).optional(),
+  actionAuth: z.array(ZRecipientActionAuthTypesSchema).default([]).optional(),
+});
+
 export const ZCreateEnvelopeRecipientsRequestSchema = z.object({
   envelopeId: z.string(),
-  data: ZCreateRecipientSchema.array(),
+  data: ZCreateEnvelopeRecipientSchema.array(),
 });
 
 export const ZCreateEnvelopeRecipientsResponseSchema = z.object({
