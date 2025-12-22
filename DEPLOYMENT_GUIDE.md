@@ -519,6 +519,68 @@ NEXT_PRIVATE_GLOBAL_WEBHOOK_URL=https://events.suiteop.com/jkhgcu4kx5sec3
 
 ---
 
+#### AI Features Configuration (Optional)
+
+The AI features enable automatic recipient detection and field placement using Google Vertex AI (Gemini models).
+
+**Note:** This is a SuiteOp fork modification. The upstream Documenso uses `GOOGLE_VERTEX_API_KEY` which doesn't work with Vertex AI's OAuth requirements. We use service account credentials instead.
+
+**Required for AI features:**
+```bash
+GOOGLE_VERTEX_PROJECT_ID=suiteop-sign-ai
+GOOGLE_VERTEX_LOCATION=global
+GOOGLE_CLIENT_EMAIL=suiteop-sign-ai@suiteop-sign-ai.iam.gserviceaccount.com
+GOOGLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nMIIE...\n-----END PRIVATE KEY-----\n"
+```
+
+**Setting up Google Cloud:**
+
+1. Create a GCP project:
+   ```bash
+   gcloud projects create suiteop-sign-ai --name="SuiteOp Sign AI"
+   ```
+
+2. Link billing account:
+   ```bash
+   gcloud billing projects link suiteop-sign-ai --billing-account=YOUR_BILLING_ACCOUNT_ID
+   ```
+
+3. Enable Vertex AI API:
+   ```bash
+   gcloud services enable aiplatform.googleapis.com --project=suiteop-sign-ai
+   ```
+
+4. Create service account:
+   ```bash
+   gcloud iam service-accounts create suiteop-sign-ai \
+     --display-name="SuiteOp Sign AI Service Account" \
+     --project=suiteop-sign-ai
+   ```
+
+5. Grant permissions:
+   ```bash
+   gcloud projects add-iam-policy-binding suiteop-sign-ai \
+     --member="serviceAccount:suiteop-sign-ai@suiteop-sign-ai.iam.gserviceaccount.com" \
+     --role="roles/aiplatform.user"
+   ```
+
+6. Create and download key:
+   ```bash
+   gcloud iam service-accounts keys create service-account-key.json \
+     --iam-account=suiteop-sign-ai@suiteop-sign-ai.iam.gserviceaccount.com \
+     --project=suiteop-sign-ai
+   ```
+
+7. Extract values from the JSON file:
+   - `GOOGLE_CLIENT_EMAIL`: The `client_email` field
+   - `GOOGLE_PRIVATE_KEY`: The `private_key` field (keep the `\n` characters)
+
+**Important:** When setting `GOOGLE_PRIVATE_KEY` in Render.com, paste the key with `\n` characters (not actual newlines). The application will convert them.
+
+**To disable AI features:** Simply don't set these environment variables.
+
+---
+
 ### Optional Variables
 
 #### Storage Configuration (S3-Compatible)
