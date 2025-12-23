@@ -12,14 +12,17 @@ import {
 } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 import {
+  DocumentStatus,
   DocumentVisibility,
   EnvelopeType,
   FieldType,
+  FolderType,
   Prisma,
   ReadStatus,
   RecipientRole,
   SendStatus,
   SigningStatus,
+  TeamMemberRole,
 } from '@documenso/prisma/client';
 import {
   seedBlankDocument,
@@ -28,9 +31,11 @@ import {
   seedPendingDocument,
 } from '@documenso/prisma/seed/documents';
 import { seedBlankFolder } from '@documenso/prisma/seed/folders';
+import { seedTeamMember } from '@documenso/prisma/seed/teams';
 import { seedBlankTemplate, seedTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type { TFindEnvelopesResponse } from '@documenso/trpc/server/envelope-router/find-envelopes.types';
 import type {
   TUseEnvelopePayload,
   TUseEnvelopeResponse,
@@ -3277,6 +3282,278 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeFalsy();
         // Team not found
         expect(res.status()).toBe(404);
+      });
+    });
+
+    test.describe('Envelope find endpoint', () => {
+      test('should block unauthorized access to envelope find endpoint', async ({ request }) => {
+        await seedBlankDocument(userA, teamA.id);
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope`, {
+          headers: { Authorization: `Bearer ${tokenB}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data = (await res.json()) as TFindEnvelopesResponse;
+        expect(data.data.every((doc) => doc.userId !== userA.id)).toBe(true);
+      });
+
+      test('should allow authorized access to envelope find endpoint', async ({ request }) => {
+        await seedBlankDocument(userA, teamA.id);
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data = (await res.json()) as TFindEnvelopesResponse;
+        expect(data.data.length).toBeGreaterThan(0);
+        expect(data.data.some((doc) => doc.userId === userA.id)).toBe(true);
+      });
+
+      test('should respect team document visibility for ADMIN role', async ({ request }) => {
+        const adminMember = await seedTeamMember({
+          teamId: teamA.id,
+          role: TeamMemberRole.ADMIN,
+        });
+
+        const { token: adminToken } = await createApiToken({
+          userId: adminMember.id,
+          teamId: teamA.id,
+          tokenName: 'adminMember',
+          expiresIn: null,
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.ADMIN,
+            title: 'Admin Only Document',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+            title: 'Manager and Above Document',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.EVERYONE,
+            title: 'Everyone Document',
+          },
+        });
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope`, {
+          headers: { Authorization: `Bearer ${adminToken}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        const data = (await res.json()) as TFindEnvelopesResponse;
+
+        const titles = data.data.map((doc) => doc.title);
+        expect(titles).toContain('Admin Only Document');
+        expect(titles).toContain('Manager and Above Document');
+        expect(titles).toContain('Everyone Document');
+      });
+
+      test('should respect team document visibility for MANAGER role', async ({ request }) => {
+        const managerMember = await seedTeamMember({
+          teamId: teamA.id,
+          role: TeamMemberRole.MANAGER,
+        });
+
+        const { token: managerToken } = await createApiToken({
+          userId: managerMember.id,
+          teamId: teamA.id,
+          tokenName: 'managerMember',
+          expiresIn: null,
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.ADMIN,
+            title: 'Admin Only Document',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+            title: 'Manager and Above Document',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            visibility: DocumentVisibility.EVERYONE,
+            title: 'Everyone Document',
+          },
+        });
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope`, {
+          headers: { Authorization: `Bearer ${managerToken}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        const data = (await res.json()) as TFindEnvelopesResponse;
+
+        const titles = data.data.map((doc) => doc.title);
+        expect(titles).not.toContain('Admin Only Document');
+        expect(titles).toContain('Manager and Above Document');
+        expect(titles).toContain('Everyone Document');
+      });
+
+      test('should filter envelopes by folderId with authorization', async ({ request }) => {
+        const folder = await prisma.folder.create({
+          data: {
+            userId: userA.id,
+            teamId: teamA.id,
+            name: 'Test Folder',
+            type: FolderType.DOCUMENT,
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            folderId: folder.id,
+            title: 'Document in Folder',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            title: 'Document Not in Folder',
+          },
+        });
+
+        const resWithFolder = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope?folderId=${folder.id}`,
+          {
+            headers: { Authorization: `Bearer ${tokenA}` },
+          },
+        );
+
+        expect(resWithFolder.ok()).toBeTruthy();
+        const dataWithFolder = (await resWithFolder.json()) as TFindEnvelopesResponse;
+        expect(dataWithFolder.data.every((doc) => doc.folderId === folder.id)).toBe(true);
+        expect(dataWithFolder.data.some((doc) => doc.title === 'Document in Folder')).toBe(true);
+
+        const resUnauthorized = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope?folderId=${folder.id}`,
+          {
+            headers: { Authorization: `Bearer ${tokenB}` },
+          },
+        );
+
+        expect(resUnauthorized.ok()).toBeTruthy();
+        const dataUnauthorized = (await resUnauthorized.json()) as TFindEnvelopesResponse;
+        expect(
+          dataUnauthorized.data.every(
+            (doc) => doc.folderId !== folder.id || doc.userId !== userA.id,
+          ),
+        ).toBe(true);
+      });
+
+      test('should filter envelopes by type with authorization', async ({ request }) => {
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            type: EnvelopeType.DOCUMENT,
+            title: 'UserA Document',
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            type: EnvelopeType.TEMPLATE,
+            title: 'UserA Template',
+          },
+        });
+
+        await seedBlankDocument(userB, teamB.id, {
+          createDocumentOptions: {
+            type: EnvelopeType.DOCUMENT,
+            title: 'UserB Document',
+          },
+        });
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope?type=DOCUMENT`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        const data = (await res.json()) as TFindEnvelopesResponse;
+        expect(data.data.every((doc) => doc.type === EnvelopeType.DOCUMENT)).toBe(true);
+        expect(data.data.every((doc) => doc.userId === userA.id)).toBe(true);
+        expect(data.data.some((doc) => doc.title === 'UserA Document')).toBe(true);
+        expect(data.data.every((doc) => doc.title !== 'UserB Document')).toBe(true);
+      });
+
+      test('should filter envelopes by status with authorization', async ({ request }) => {
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            title: 'Draft Document',
+            status: DocumentStatus.DRAFT,
+          },
+        });
+
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            title: 'Completed Document',
+            status: DocumentStatus.COMPLETED,
+          },
+        });
+
+        await seedBlankDocument(userB, teamB.id, {
+          createDocumentOptions: {
+            title: 'UserB Draft',
+            status: DocumentStatus.DRAFT,
+          },
+        });
+
+        const res = await request.get(`${WEBAPP_BASE_URL}/api/v2-beta/envelope?status=DRAFT`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+        });
+
+        expect(res.ok()).toBeTruthy();
+        const data = (await res.json()) as TFindEnvelopesResponse;
+        expect(data.data.every((doc) => doc.status === DocumentStatus.DRAFT)).toBe(true);
+        expect(data.data.every((doc) => doc.userId === userA.id)).toBe(true);
+        expect(data.data.some((doc) => doc.title === 'Draft Document')).toBe(true);
+        expect(data.data.every((doc) => doc.title !== 'UserB Draft')).toBe(true);
+        expect(data.data.every((doc) => doc.title !== 'Completed Document')).toBe(true);
+      });
+
+      test('should search envelopes by query with authorization', async ({ request }) => {
+        await seedBlankDocument(userA, teamA.id, {
+          createDocumentOptions: {
+            title: 'Unique Searchable Title UserA',
+          },
+        });
+
+        await seedBlankDocument(userB, teamB.id, {
+          createDocumentOptions: {
+            title: 'Unique Searchable Title UserB',
+          },
+        });
+
+        const res = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope?query=Unique%20Searchable`,
+          {
+            headers: { Authorization: `Bearer ${tokenA}` },
+          },
+        );
+
+        expect(res.ok()).toBeTruthy();
+        const data = (await res.json()) as TFindEnvelopesResponse;
+        expect(data.data.every((doc) => doc.userId === userA.id)).toBe(true);
+        expect(data.data.some((doc) => doc.title.includes('UserA'))).toBe(true);
+        expect(data.data.every((doc) => !doc.title.includes('UserB'))).toBe(true);
       });
     });
 
