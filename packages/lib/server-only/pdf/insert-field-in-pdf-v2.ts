@@ -1,5 +1,5 @@
 // sort-imports-ignore
-import 'konva/skia-backend';
+import '../konva/skia-backend';
 
 import Konva from 'konva';
 import path from 'node:path';
@@ -23,6 +23,7 @@ export const insertFieldInPDFV2 = async ({
 }: InsertFieldInPDFV2Options) => {
   const fontPath = path.join(process.cwd(), 'public/fonts');
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   FontLibrary.use({
     ['Caveat']: [path.join(fontPath, 'caveat.ttf')],
     ['Noto Sans']: [path.join(fontPath, 'noto-sans.ttf')],

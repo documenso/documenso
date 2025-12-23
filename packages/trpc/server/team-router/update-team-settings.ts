@@ -39,6 +39,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
+      delegateDocumentOwnership,
 
       // Branding related settings.
       brandingEnabled,
@@ -51,6 +52,9 @@ export const updateTeamSettingsRoute = authenticatedProcedure
       emailReplyTo,
       // emailReplyToName,
       emailDocumentSettings,
+
+      // AI features settings.
+      aiFeaturesEnabled,
     } = data;
 
     if (Object.values(data).length === 0) {
@@ -147,6 +151,7 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
+            delegateDocumentOwnership,
 
             // Branding related settings.
             brandingEnabled,
@@ -160,6 +165,9 @@ export const updateTeamSettingsRoute = authenticatedProcedure
             // emailReplyToName,
             emailDocumentSettings:
               emailDocumentSettings === null ? Prisma.DbNull : emailDocumentSettings,
+
+            // AI features settings.
+            aiFeaturesEnabled,
           },
         },
       },

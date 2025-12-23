@@ -818,6 +818,7 @@ model OrganisationGlobalSettings {
   includeAuditLog           Boolean            @default(false)
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
+  delegateDocumentOwnership Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -834,6 +835,9 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean @default(false)
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
@@ -841,10 +845,11 @@ model TeamGlobalSettings {
   id   String @id
   team Team?
 
-  documentVisibility DocumentVisibility?
-  documentLanguage   String?
-  documentTimezone   String?
-  documentDateFormat String?
+  documentVisibility        DocumentVisibility?
+  documentLanguage          String?
+  documentTimezone          String?
+  documentDateFormat        String?
+  delegateDocumentOwnership Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
@@ -865,6 +870,9 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean?
 }
 
 model Team {

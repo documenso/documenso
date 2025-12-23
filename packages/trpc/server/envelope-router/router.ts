@@ -19,6 +19,7 @@ import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envel
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
 import { updateEnvelopeRecipientsRoute } from './envelope-recipients/update-envelope-recipients';
 import { findEnvelopesRoute } from './find-envelopes';
+import { findEnvelopeAuditLogsRoute } from './find-envelope-audit-logs';
 import { getEnvelopeRoute } from './get-envelope';
 import { getEnvelopeItemsRoute } from './get-envelope-items';
 import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
@@ -67,6 +68,9 @@ export const envelopeRouter = router({
     sign: signEnvelopeFieldRoute,
   },
   find: findEnvelopesRoute,
+  auditLog: {
+    find: findEnvelopeAuditLogsRoute,
+  },
   get: getEnvelopeRoute,
   create: createEnvelopeRoute,
   use: useEnvelopeRoute,

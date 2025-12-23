@@ -1,5 +1,5 @@
-import DocumentPage, { meta } from '../../o.$orgUrl.settings.document';
+import DocumentPage, { loader, meta } from '../../o.$orgUrl.settings.document';
 
-export { meta };
+export { meta, loader };
 
 export default DocumentPage;
