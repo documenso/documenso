@@ -6,66 +6,61 @@ import { getWebhooksByTeamId } from '@documenso/lib/server-only/webhooks/get-web
 import { triggerTestWebhook } from '@documenso/lib/server-only/webhooks/trigger-test-webhook';
 
 import { authenticatedProcedure, router } from '../trpc';
+import { findWebhookCallsRoute } from './find-webhook-calls';
+import { resendWebhookCallRoute } from './resend-webhook-call';
 import {
   ZCreateWebhookRequestSchema,
   ZDeleteWebhookRequestSchema,
   ZEditWebhookRequestSchema,
-  ZGetTeamWebhooksRequestSchema,
   ZGetWebhookByIdRequestSchema,
   ZTriggerTestWebhookRequestSchema,
 } from './schema';
 
 export const webhookRouter = router({
-  getTeamWebhooks: authenticatedProcedure
-    .input(ZGetTeamWebhooksRequestSchema)
-    .query(async ({ ctx, input }) => {
-      const { teamId } = input;
+  calls: {
+    find: findWebhookCallsRoute,
+    resend: resendWebhookCallRoute,
+  },
 
-      ctx.logger.info({
-        input: {
-          teamId,
-        },
-      });
+  getTeamWebhooks: authenticatedProcedure.query(async ({ ctx }) => {
+    ctx.logger.info({
+      input: {
+        teamId: ctx.teamId,
+      },
+    });
 
-      return await getWebhooksByTeamId(teamId, ctx.user.id);
-    }),
+    return await getWebhooksByTeamId(ctx.teamId, ctx.user.id);
+  }),
 
   getWebhookById: authenticatedProcedure
     .input(ZGetWebhookByIdRequestSchema)
     .query(async ({ input, ctx }) => {
-      const { id, teamId } = input;
+      const { id } = input;
 
       ctx.logger.info({
         input: {
           id,
-          teamId,
         },
       });
 
       return await getWebhookById({
         id,
         userId: ctx.user.id,
-        teamId,
+        teamId: ctx.teamId,
       });
     }),
 
   createWebhook: authenticatedProcedure
     .input(ZCreateWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { enabled, eventTriggers, secret, webhookUrl, teamId } = input;
-
-      ctx.logger.info({
-        input: {
-          teamId,
-        },
-      });
+      const { enabled, eventTriggers, secret, webhookUrl } = input;
 
       return await createWebhook({
         enabled,
         secret,
         webhookUrl,
         eventTriggers,
-        teamId,
+        teamId: ctx.teamId,
         userId: ctx.user.id,
       });
     }),
@@ -73,18 +68,17 @@ export const webhookRouter = router({
   deleteWebhook: authenticatedProcedure
     .input(ZDeleteWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { id, teamId } = input;
+      const { id } = input;
 
       ctx.logger.info({
         input: {
           id,
-          teamId,
         },
       });
 
       return await deleteWebhookById({
         id,
-        teamId,
+        teamId: ctx.teamId,
         userId: ctx.user.id,
       });
     }),
@@ -92,12 +86,11 @@ export const webhookRouter = router({
   editWebhook: authenticatedProcedure
     .input(ZEditWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { id, teamId, ...data } = input;
+      const { id, ...data } = input;
 
       ctx.logger.info({
         input: {
           id,
-          teamId,
         },
       });
 
@@ -105,20 +98,19 @@ export const webhookRouter = router({
         id,
         data,
         userId: ctx.user.id,
-        teamId,
+        teamId: ctx.teamId,
       });
     }),
 
   testWebhook: authenticatedProcedure
     .input(ZTriggerTestWebhookRequestSchema)
     .mutation(async ({ input, ctx }) => {
-      const { id, event, teamId } = input;
+      const { id, event } = input;
 
       ctx.logger.info({
         input: {
           id,
           event,
-          teamId,
         },
       });
 
@@ -126,7 +118,7 @@ export const webhookRouter = router({
         id,
         event,
         userId: ctx.user.id,
-        teamId,
+        teamId: ctx.teamId,
       });
     }),
 });

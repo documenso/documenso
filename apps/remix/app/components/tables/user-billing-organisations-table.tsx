@@ -28,19 +28,19 @@ export const UserBillingOrganisationsTable = () => {
   const getSubscriptionStatusDisplay = (status: SubscriptionStatus | undefined) => {
     return match(status)
       .with(SubscriptionStatus.ACTIVE, () => ({
-        label: t`Active`,
+        label: t({ message: `Active`, context: `Subscription status` }),
         variant: 'default' as const,
       }))
       .with(SubscriptionStatus.PAST_DUE, () => ({
-        label: t`Past Due`,
+        label: t({ message: `Past Due`, context: `Subscription status` }),
         variant: 'warning' as const,
       }))
       .with(SubscriptionStatus.INACTIVE, () => ({
-        label: t`Inactive`,
+        label: t({ message: `Inactive`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }))
       .otherwise(() => ({
-        label: t`Free`,
+        label: t({ message: `Free`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }));
   };

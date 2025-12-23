@@ -687,8 +687,10 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -726,8 +728,9 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />

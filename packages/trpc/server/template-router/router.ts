@@ -463,8 +463,11 @@ export const templateRouter = router({
         recipients,
         distributeDocument,
         customDocumentDataId,
-        prefillFields,
         folderId,
+        prefillFields,
+        externalId,
+        override,
+        attachments,
       } = input;
 
       ctx.logger.info({
@@ -501,6 +504,9 @@ export const templateRouter = router({
         requestMetadata: ctx.metadata,
         folderId,
         prefillFields,
+        externalId,
+        override,
+        attachments,
       });
 
       if (distributeDocument) {

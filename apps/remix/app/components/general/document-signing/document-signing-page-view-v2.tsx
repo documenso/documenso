@@ -34,7 +34,7 @@ import { DocumentSigningRejectDialog } from './document-signing-reject-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 const EnvelopeSignerPageRenderer = lazy(
-  async () => import('../envelope-signing/envelope-signer-page-renderer'),
+  async () => import('~/components/general/envelope-signing/envelope-signer-page-renderer'),
 );
 
 export const DocumentSigningPageViewV2 = () => {
@@ -71,7 +71,7 @@ export const DocumentSigningPageViewV2 = () => {
   }, [recipientFieldsRemaining, selectedAssistantRecipientFields, currentEnvelopeItem]);
 
   return (
-    <div className="dark:bg-background min-h-screen w-screen bg-gray-50">
+    <div className="min-h-screen w-screen bg-gray-50 dark:bg-background">
       <SignFieldEmailDialog.Root />
       <SignFieldTextDialog.Root />
       <SignFieldNumberDialog.Root />
@@ -86,9 +86,9 @@ export const DocumentSigningPageViewV2 = () => {
       {/* Main Content Area */}
       <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
-        <div className="embed--DocumentWidgetContainer bg-background border-border hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r py-4 lg:flex">
+        <div className="embed--DocumentWidgetContainer hidden w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-background py-4 lg:flex">
           <div className="px-4">
-            <h3 className="text-foreground flex items-end justify-between text-sm font-semibold">
+            <h3 className="flex items-end justify-between text-sm font-semibold text-foreground">
               {match(recipient.role)
                 .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
                 .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
@@ -96,7 +96,7 @@ export const DocumentSigningPageViewV2 = () => {
                 .with(RecipientRole.ASSISTANT, () => <Trans>Assist Document</Trans>)
                 .otherwise(() => null)}
 
-              <span className="text-muted-foreground bg-muted/50 ml-2 rounded border px-2 py-0.5 text-xs">
+              <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
                 <Plural
                   value={recipientFieldsRemaining.length}
                   one="1 Field Remaining"
@@ -105,11 +105,11 @@ export const DocumentSigningPageViewV2 = () => {
               </span>
             </h3>
 
-            <div className="bg-muted relative my-4 h-[4px] rounded-md">
+            <div className="relative my-4 h-[4px] rounded-md bg-muted">
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="bg-documenso absolute inset-y-0 left-0"
+                className="absolute inset-y-0 left-0 bg-primary"
                 style={{
                   width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                 }}
@@ -126,7 +126,7 @@ export const DocumentSigningPageViewV2 = () => {
           {/* Quick Actions. */}
           {!isDirectTemplate && (
             <div className="embed--Actions space-y-3 px-4">
-              <h4 className="text-foreground text-sm font-semibold">
+              <h4 className="text-sm font-semibold text-foreground">
                 <Trans>Actions</Trans>
               </h4>
 
@@ -173,7 +173,7 @@ export const DocumentSigningPageViewV2 = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="hover:text-destructive w-full justify-start"
+                      className="w-full justify-start hover:text-destructive"
                     >
                       <BanIcon className="mr-2 h-4 w-4" />
                       <Trans>Reject Document</Trans>
@@ -235,7 +235,7 @@ export const DocumentSigningPageViewV2 = () => {
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center py-32">
-                  <p className="text-foreground text-sm">
+                  <p className="text-sm text-foreground">
                     <Trans>No documents found</Trans>
                   </p>
                 </div>
@@ -250,7 +250,7 @@ export const DocumentSigningPageViewV2 = () => {
                 <a
                   href="https://documenso.com"
                   target="_blank"
-                  className="bg-primary text-primary-foreground fixed bottom-0 right-0 z-40 hidden cursor-pointer rounded-tl px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100 lg:block"
+                  className="fixed bottom-0 right-0 z-40 hidden cursor-pointer rounded-tl bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100 lg:block"
                 >
                   <span>Powered by</span>
                   <BrandingLogo className="ml-2 inline-block h-[14px]" />

@@ -430,9 +430,12 @@ model Envelope {
 
   envelopeAttachments EnvelopeAttachment[]
 
-  @@index([folderId])
-  @@index([teamId])
+  @@index([type])
+  @@index([status])
   @@index([userId])
+  @@index([teamId])
+  @@index([folderId])
+  @@index([createdAt])
 }
 
 model EnvelopeItem {
@@ -583,8 +586,10 @@ model Recipient {
   fields            Field[]
   signatures        Signature[]
 
-  @@index([envelopeId])
   @@index([token])
+  @@index([email])
+  @@index([envelopeId])
+  @@index([signedAt])
 }
 
 enum FieldType {
@@ -694,6 +699,9 @@ model Organisation {
 
   organisationAuthenticationPortalId String                           @unique
   organisationAuthenticationPortal   OrganisationAuthenticationPortal @relation(fields: [organisationAuthenticationPortalId], references: [id])
+
+  @@index([name])
+  @@index([ownerUserId])
 }
 
 model OrganisationMember {
@@ -710,6 +718,7 @@ model OrganisationMember {
   organisationGroupMembers OrganisationGroupMember[]
 
   @@unique([userId, organisationId])
+  @@index([organisationId])
 }
 
 model OrganisationMemberInvite {
@@ -809,6 +818,7 @@ model OrganisationGlobalSettings {
   includeAuditLog           Boolean            @default(false)
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
+  delegateDocumentOwnership Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
@@ -825,6 +835,9 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean @default(false)
 }
 
 /// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
@@ -832,10 +845,11 @@ model TeamGlobalSettings {
   id   String @id
   team Team?
 
-  documentVisibility DocumentVisibility?
-  documentLanguage   String?
-  documentTimezone   String?
-  documentDateFormat String?
+  documentVisibility        DocumentVisibility?
+  documentLanguage          String?
+  documentTimezone          String?
+  documentDateFormat        String?
+  delegateDocumentOwnership Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
@@ -856,6 +870,9 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean?
 }
 
 model Team {
@@ -883,6 +900,7 @@ model Team {
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
 
+  @@index([name])
   @@index([organisationId])
 }
 

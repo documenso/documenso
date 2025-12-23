@@ -98,7 +98,9 @@ export default function WaitingForTurnToSignPage({ loaderData }: Route.Component
             </Button>
           ) : (
             <Button variant="link" asChild>
-              <Link to="/">Return Home</Link>
+              <Link to="/">
+                <Trans>Return Home</Trans>
+              </Link>
             </Button>
           )}
         </div>

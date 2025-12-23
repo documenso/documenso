@@ -1,10 +1,12 @@
 import { expect, test } from '@playwright/test';
 
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { prisma } from '@documenso/prisma';
 import { seedDirectTemplate } from '@documenso/prisma/seed/templates';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { expectToastTextToBeVisible } from '../fixtures/generic';
 
 test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   const { user, team } = await seedUser();
@@ -44,6 +46,9 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
     .fill('public-direct-template-description');
   await page.getByRole('button', { name: 'Update' }).click();
 
+  // Wait for toast
+  await expectToastTextToBeVisible(page, 'Template has been updated');
+
   // Check that public profile is disabled.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${publicProfileUrl}`);
   await expect(page.locator('body')).toContainText('404 Profile not found');
@@ -51,7 +56,21 @@ test('[PUBLIC_PROFILE]: create team profile', async ({ page }) => {
   // Go back to public profile page.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/t/${team.url}/settings/public-profile`);
   await page.getByRole('switch').click();
-  await page.waitForTimeout(1000);
+
+  // Expect profile to be enabled via db.
+  await expect
+    .poll(
+      async () => {
+        const profile = await prisma.teamProfile.findFirst({
+          where: { teamId: team.id },
+        });
+        return profile?.enabled;
+      },
+      {
+        timeout: 1000,
+      },
+    )
+    .toBeTruthy();
 
   // Assert values.
   await page.goto(`${NEXT_PUBLIC_WEBAPP_URL()}/p/${publicProfileUrl}`);

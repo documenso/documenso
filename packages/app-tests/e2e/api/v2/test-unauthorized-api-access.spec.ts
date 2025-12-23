@@ -3103,7 +3103,7 @@ test.describe('Document API V2', () => {
         expect(res.status()).toBe(404);
       });
 
-      test('should allow authorized access to envelope use endpoint', async ({ page, request }) => {
+      test('should allow authorized access to envelope use endpoint', async ({ request }) => {
         const doc = await seedTemplate({
           title: 'Team template 1',
           userId: userA.id,
@@ -4311,6 +4311,63 @@ test.describe('Document API V2', () => {
 
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
+      });
+    });
+
+    test.describe('Envelope audit logs endpoint', () => {
+      test('should block unauthorized access to envelope audit logs endpoint', async ({
+        request,
+      }) => {
+        const doc = await seedBlankDocument(userA, teamA.id);
+
+        const res = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/${doc.id}/audit-log`,
+          {
+            headers: { Authorization: `Bearer ${tokenB}` },
+          },
+        );
+
+        expect(res.ok()).toBeFalsy();
+        expect(res.status()).toBe(404);
+      });
+
+      test('should allow authorized access to envelope audit logs endpoint', async ({
+        request,
+      }) => {
+        const doc = await seedBlankDocument(userA, teamA.id);
+
+        // Add a recipient which will trigger an audit log.
+        await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/recipient/create-many`, {
+          headers: { Authorization: `Bearer ${tokenA}` },
+          data: {
+            envelopeId: doc.id,
+            data: [
+              {
+                name: 'Test',
+                email: 'test@example.com',
+                role: RecipientRole.SIGNER,
+              },
+            ],
+          },
+        });
+
+        const res = await request.get(
+          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/${doc.id}/audit-log`,
+          {
+            headers: { Authorization: `Bearer ${tokenA}` },
+          },
+        );
+
+        expect(res.ok()).toBeTruthy();
+        expect(res.status()).toBe(200);
+
+        const data = await res.json();
+
+        expect(Array.isArray(data.data)).toBe(true);
+        expect(data.count).toEqual(1);
+        expect(data.data[0].type).toEqual('RECIPIENT_CREATED');
+        expect(data.currentPage).toBeGreaterThanOrEqual(1);
+        expect(data.perPage).toBeGreaterThanOrEqual(1);
       });
     });
   });
