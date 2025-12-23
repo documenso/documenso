@@ -83,10 +83,21 @@ export default defineConfig({
       testMatch: /e2e\/api\/.*\.spec\.ts/,
       workers: 10, // Limited by DB connections before it gets flakey.
     },
-    // Run UI Tests
+    // License tests that share a single license file - must run serially
+    {
+      name: 'license',
+      testMatch: /e2e\/license\/.*\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1920, height: 1200 },
+      },
+      workers: 1, // Must run serially since they share a license file
+    },
+    // Run UI Tests (excluding license tests which have their own project)
     {
       name: 'ui',
       testMatch: /e2e\/(?!api\/).*\.spec\.ts/,
+      testIgnore: /e2e\/license\/.*\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1200 },
