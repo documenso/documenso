@@ -18,7 +18,9 @@ export const ZGetTemplatesByIdsRequestSchema = z.object({
   templateIds: z.array(z.number()).min(1),
 });
 
-export const ZGetTemplatesByIdsResponseSchema = z.array(ZTemplateManySchema);
+export const ZGetTemplatesByIdsResponseSchema = z.object({
+  data: z.array(ZTemplateManySchema),
+});
 
 export type TGetTemplatesByIdsRequest = z.infer<typeof ZGetTemplatesByIdsRequestSchema>;
 export type TGetTemplatesByIdsResponse = z.infer<typeof ZGetTemplatesByIdsResponseSchema>;

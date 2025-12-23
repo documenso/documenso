@@ -1,10 +1,7 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import {
-  mapSecondaryIdToTemplateId,
-  mapTemplateIdToSecondaryId,
-} from '@documenso/lib/utils/envelope';
+import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { mapFieldToLegacyField } from '@documenso/lib/utils/fields';
 import { mapRecipientToLegacyRecipient } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
@@ -30,32 +27,27 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
       },
     });
 
-    const { envelopeWhereInput } = await getEnvelopeWhereInput({
-      id: {
+    const { envelopeWhereInput } = await getMultipleEnvelopeWhereInput({
+      ids: {
         type: 'templateId',
-        id: templateIds[0],
+        ids: templateIds,
       },
       userId: user.id,
       teamId,
       type: EnvelopeType.TEMPLATE,
     });
 
-    const envelopeOrInput = envelopeWhereInput.OR!;
-
-    const secondaryIds = templateIds.map((templateId) => mapTemplateIdToSecondaryId(templateId));
-
     const envelopes = await prisma.envelope.findMany({
-      where: {
-        type: EnvelopeType.TEMPLATE,
-        secondaryId: {
-          in: secondaryIds,
-        },
-        OR: envelopeOrInput,
-      },
+      where: envelopeWhereInput,
       include: {
         recipients: {
           orderBy: {
             id: 'asc',
+          },
+        },
+        envelopeItems: {
+          select: {
+            documentData: true,
           },
         },
         fields: true,
@@ -80,8 +72,10 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
       },
     });
 
-    return envelopes.map((envelope) => {
+    const templates = envelopes.map((envelope) => {
       const legacyTemplateId = mapSecondaryIdToTemplateId(envelope.secondaryId);
+
+      const firstTemplateDocumentData = envelope.envelopeItems[0].documentData;
 
       return {
         id: legacyTemplateId,
@@ -121,7 +115,11 @@ export const getTemplatesByIdsRoute = authenticatedProcedure
               enabled: envelope.directLink.enabled,
             }
           : null,
-        templateDocumentDataId: '', // Backwards compatibility.
+        templateDocumentDataId: firstTemplateDocumentData.id, // Backwards compatibility.
       };
     });
+
+    return {
+      data: templates,
+    };
   });

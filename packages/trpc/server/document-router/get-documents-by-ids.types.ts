@@ -18,7 +18,9 @@ export const ZGetDocumentsByIdsRequestSchema = z.object({
   documentIds: z.array(z.number()).min(1),
 });
 
-export const ZGetDocumentsByIdsResponseSchema = z.array(ZDocumentManySchema);
+export const ZGetDocumentsByIdsResponseSchema = z.object({
+  data: z.array(ZDocumentManySchema),
+});
 
 export type TGetDocumentsByIdsRequest = z.infer<typeof ZGetDocumentsByIdsRequestSchema>;
 export type TGetDocumentsByIdsResponse = z.infer<typeof ZGetDocumentsByIdsResponseSchema>;

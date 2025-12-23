@@ -1,8 +1,7 @@
 import { EnvelopeType } from '@prisma/client';
 
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import { getMultipleEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelopes-by-ids';
 import { mapEnvelopesToDocumentMany } from '@documenso/lib/utils/document';
-import { mapDocumentIdToSecondaryId } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -26,28 +25,18 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
       },
     });
 
-    const { envelopeWhereInput } = await getEnvelopeWhereInput({
-      id: {
+    const { envelopeWhereInput } = await getMultipleEnvelopeWhereInput({
+      ids: {
         type: 'documentId',
-        id: documentIds[0],
+        ids: documentIds,
       },
       userId: user.id,
       teamId,
       type: EnvelopeType.DOCUMENT,
     });
 
-    const envelopeOrInput = envelopeWhereInput.OR!;
-
-    const secondaryIds = documentIds.map((documentId) => mapDocumentIdToSecondaryId(documentId));
-
     const envelopes = await prisma.envelope.findMany({
-      where: {
-        type: EnvelopeType.DOCUMENT,
-        secondaryId: {
-          in: secondaryIds,
-        },
-        OR: envelopeOrInput,
-      },
+      where: envelopeWhereInput,
       include: {
         user: {
           select: {
@@ -70,5 +59,7 @@ export const getDocumentsByIdsRoute = authenticatedProcedure
       },
     });
 
-    return envelopes.map((envelope) => mapEnvelopesToDocumentMany(envelope));
+    return {
+      data: envelopes.map((envelope) => mapEnvelopesToDocumentMany(envelope)),
+    };
   });
