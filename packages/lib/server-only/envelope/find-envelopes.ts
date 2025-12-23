@@ -100,7 +100,6 @@ export const findEnvelopes = async ({
 
   const whereClause: Prisma.EnvelopeWhereInput = {
     AND: [
-      searchFilter,
       {
         OR: [
           {
@@ -114,8 +113,10 @@ export const findEnvelopes = async ({
         ],
       },
       {
+        folderId: folderId ?? null,
         deletedAt: null,
       },
+      searchFilter,
     ],
   };
 
@@ -133,12 +134,6 @@ export const findEnvelopes = async ({
 
   if (status) {
     whereClause.status = status;
-  }
-
-  if (folderId !== undefined) {
-    whereClause.folderId = folderId;
-  } else {
-    whereClause.folderId = null;
   }
 
   const [data, count] = await Promise.all([
