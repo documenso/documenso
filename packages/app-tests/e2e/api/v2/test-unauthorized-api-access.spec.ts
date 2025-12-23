@@ -3017,7 +3017,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data).toEqual([]);
       });
 
@@ -3038,7 +3038,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data.length).toBe(2);
         expect(data.map((d: { id: string }) => d.id).sort()).toEqual([doc1.id, doc2.id].sort());
       });
@@ -3062,7 +3062,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data.length).toBe(1);
         expect(data[0].id).toBe(docA.id);
       });
@@ -3087,7 +3087,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data).toEqual([]);
       });
 
@@ -3111,7 +3111,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data.length).toBe(2);
       });
 
@@ -3135,7 +3135,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data).toEqual([]);
       });
 
@@ -3159,7 +3159,7 @@ test.describe('Document API V2', () => {
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
 
-        const data = await res.json();
+        const { data } = await res.json();
         expect(data.length).toBe(2);
       });
 
@@ -3244,7 +3244,7 @@ test.describe('Document API V2', () => {
 
         const data = await res.json();
 
-        const items = data.result.data.json;
+        const items = data.result.data.json.data;
 
         expect(items.length).toBe(2);
         expect(items.map((d: { id: string }) => d.id).sort()).toEqual([doc1.id, doc2.id].sort());
