@@ -30,6 +30,7 @@ import { mapEnvelopeToTemplateLite } from '@documenso/lib/utils/templates';
 
 import { ZGenericSuccessResponse, ZSuccessResponseSchema } from '../schema';
 import { authenticatedProcedure, maybeAuthenticatedProcedure, router } from '../trpc';
+import { getTemplatesByIdsRoute } from './get-templates-by-ids';
 import {
   ZBulkSendTemplateMutationSchema,
   ZCreateDocumentFromDirectTemplateRequestSchema,
@@ -153,6 +154,11 @@ export const templateRouter = router({
         teamId,
       });
     }),
+
+  /**
+   * @public
+   */
+  getMany: getTemplatesByIdsRoute,
 
   /**
    * Wait until RR7 so we can passthrough documents.

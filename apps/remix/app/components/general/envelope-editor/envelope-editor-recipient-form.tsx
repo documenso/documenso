@@ -14,7 +14,7 @@ import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@
 import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
-import { useSearchParams } from 'react-router';
+import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual, prop, sortBy } from 'remeda';
 import { z } from 'zod';
 
@@ -63,6 +63,7 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
 import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-detection-dialog';
 import { useCurrentTeam } from '~/providers/team';
 
@@ -97,11 +98,19 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+  const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
 
   // AI recipient detection dialog state
   const [isAiDialogOpen, setIsAiDialogOpen] = useState(() => searchParams.get('ai') === 'true');
+  const { revalidate } = useRevalidator();
 
   const onAiDialogOpenChange = (open: boolean) => {
+    if (open && !team.preferences.aiFeaturesEnabled) {
+      setIsAiEnableDialogOpen(true);
+      setIsAiDialogOpen(false);
+      return;
+    }
+
     setIsAiDialogOpen(open);
 
     if (!open && searchParams.get('ai') === 'true') {
@@ -116,6 +125,22 @@ export const EnvelopeEditorRecipientForm = () => {
         { replace: true },
       );
     }
+  };
+
+  const onDetectRecipientsClick = () => {
+    if (!team.preferences.aiFeaturesEnabled) {
+      setIsAiEnableDialogOpen(true);
+      return;
+    }
+
+    setIsAiDialogOpen(true);
+  };
+
+  const onAiFeaturesEnabled = () => {
+    void revalidate().then(() => {
+      setIsAiEnableDialogOpen(false);
+      setIsAiDialogOpen(true);
+    });
   };
 
   const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
@@ -636,25 +661,27 @@ export const EnvelopeEditorRecipientForm = () => {
         </div>
 
         <div className="flex flex-row items-center space-x-2">
-          {team.preferences.aiFeaturesEnabled && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  type="button"
-                  size="sm"
-                  disabled={isSubmitting}
-                  onClick={() => setIsAiDialogOpen(true)}
-                >
-                  <SparklesIcon className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                type="button"
+                size="sm"
+                disabled={isSubmitting}
+                onClick={onDetectRecipientsClick}
+              >
+                <SparklesIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
 
-              <TooltipContent>
+            <TooltipContent>
+              {team.preferences.aiFeaturesEnabled ? (
                 <Trans>Detect recipients with AI</Trans>
-              </TooltipContent>
-            </Tooltip>
-          )}
+              ) : (
+                <Trans>Enable AI detection</Trans>
+              )}
+            </TooltipContent>
+          </Tooltip>
 
           <Button
             variant="outline"
@@ -1110,6 +1137,12 @@ export const EnvelopeEditorRecipientForm = () => {
           onComplete={onAiDetectionComplete}
           envelopeId={envelope.id}
           teamId={envelope.teamId}
+        />
+
+        <AiFeaturesEnableDialog
+          open={isAiEnableDialogOpen}
+          onOpenChange={setIsAiEnableDialogOpen}
+          onEnabled={onAiFeaturesEnabled}
         />
       </CardContent>
     </Card>
