@@ -1,3 +1,5 @@
+import { Trans } from '@lingui/react/macro';
+import { AlertTriangleIcon } from 'lucide-react';
 import {
   Links,
   Meta,
@@ -7,13 +9,13 @@ import {
   data,
   isRouteErrorResponse,
   useLoaderData,
-  useLocation,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
+import { getLicense } from '@documenso/lib/server-only/license/get-license';
 import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
@@ -46,6 +48,9 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const { getTheme } = await themeSessionResolver(request);
 
+  // Do not return whole object to frontend since it contains the key.
+  const licenseData = await getLicense();
+
   const cookieHeader = request.headers.get('cookie') ?? '';
 
   let lang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
@@ -67,6 +72,10 @@ export async function loader({ request }: Route.LoaderArgs) {
       lang,
       theme: getTheme(),
       disableAnimations,
+      license: {
+        status: licenseData?.license?.status,
+        unauthorizedFlagUsage: licenseData?.unauthorizedFlagUsage,
+      },
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -87,8 +96,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   const { theme } = useLoaderData<typeof loader>() || {};
 
-  const location = useLocation();
-
   return (
     <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
       <LayoutContent>{children}</LayoutContent>
@@ -97,7 +104,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, disableAnimations, ...data } =
+  const { publicEnv, session, lang, disableAnimations, license, ...data } =
     useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
@@ -129,6 +136,17 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <script>0</script>
       </head>
       <body>
+        {license.status === 'EXPIRED' && license.unauthorizedFlagUsage && (
+          <div className="bg-destructive text-destructive-foreground">
+            <div className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium">
+              <div className="flex items-center">
+                <AlertTriangleIcon className="mr-2 h-4 w-4" />
+                <Trans>This is an expired license instance of Documenso</Trans>
+              </div>
+            </div>
+          </div>
+        )}
+
         <SessionProvider initialSession={session}>
           <TooltipProvider>
             <TrpcProvider>

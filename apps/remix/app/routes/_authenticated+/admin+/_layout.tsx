@@ -11,25 +11,35 @@ import {
 import { Link, Outlet, redirect, useLocation } from 'react-router';
 
 import { getSession } from '@documenso/auth/server/lib/utils/get-session';
+import { getLicense } from '@documenso/lib/server-only/license/get-license';
 import { isAdmin } from '@documenso/lib/utils/is-admin';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 
+import { AdminLicenseStatusBanner } from '~/components/general/admin-license-status-banner';
+
 import type { Route } from './+types/_layout';
 
 export async function loader({ request }: Route.LoaderArgs) {
-  const { user } = await getSession(request);
+  const [{ user }, license] = await Promise.all([getSession(request), getLicense()]);
 
   if (!user || !isAdmin(user)) {
     throw redirect('/');
   }
+
+  return {
+    license,
+  };
 }
 
-export default function AdminLayout() {
+export default function AdminLayout({ loaderData }: Route.ComponentProps) {
+  const { license } = loaderData;
   const { pathname } = useLocation();
 
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
+      <AdminLicenseStatusBanner license={license} />
+
       <h1 className="text-4xl font-semibold">
         <Trans>Admin Panel</Trans>
       </h1>
