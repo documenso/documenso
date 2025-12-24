@@ -40,6 +40,7 @@ export type CertificateRecipient = {
   authLevel: string;
   logs: {
     emailed: BaseAuditLog | null;
+    sent: BaseAuditLog | null;
     opened: BaseAuditLog | null;
     completed: BaseAuditLog | null;
     rejected: BaseAuditLog | null;
@@ -406,7 +407,11 @@ const renderColumnThree = (options: RenderColumnOptions) => {
         ? DateTime.fromJSDate(recipient.logs.emailed.createdAt)
             .setLocale(APP_I18N_OPTIONS.defaultLocale)
             .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
-        : i18n._(msg`Unknown`),
+        : recipient.logs.sent
+          ? DateTime.fromJSDate(recipient.logs.sent.createdAt)
+              .setLocale(APP_I18N_OPTIONS.defaultLocale)
+              .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')
+          : i18n._(msg`Unknown`),
     },
     {
       label: i18n._(msg`Viewed`),
