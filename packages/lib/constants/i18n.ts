@@ -30,6 +30,8 @@ export type I18nLocaleData = {
   locales: string[];
 };
 
+export const LANG = 'lang';
+
 export const APP_I18N_OPTIONS = {
   supportedLangs: SUPPORTED_LANGUAGE_CODES,
   sourceLang: 'en',

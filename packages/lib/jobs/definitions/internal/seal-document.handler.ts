@@ -25,8 +25,10 @@ import { signPdf } from '@documenso/signing';
 
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
-import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
-import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
+import {
+  getAuditLogPdfViaPlaywright,
+  getCertificatePdfViaPlaywright,
+} from '../../../server-only/htmltopdf/get-pdf-via-playwright';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
@@ -48,7 +50,7 @@ import { putPdfFileServerSide } from '../../../universal/upload/put-file.server'
 import { fieldsContainUnsignedRequiredField } from '../../../utils/advanced-fields-helpers';
 import { isDocumentCompleted } from '../../../utils/document';
 import { createDocumentAuditLogData } from '../../../utils/document-audit-logs';
-import { mapDocumentIdToSecondaryId, mapSecondaryIdToDocumentId } from '../../../utils/envelope';
+import { mapDocumentIdToSecondaryId } from '../../../utils/envelope';
 import type { JobRunIO } from '../../client/_internal/job';
 import type { TSealDocumentJobDefinition } from './seal-document';
 
@@ -178,11 +180,8 @@ export const run = async ({
       });
     }
 
-    const legacyDocumentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
-
-    const { certificateData, auditLogData } = await getCertificateAndAuditLogData({
-      legacyDocumentId,
-      documentMeta: envelope.documentMeta,
+    const [certificateDoc, auditLogDoc] = await getCertificateAndAuditLogData({
+      envelope,
       settings,
     });
 
@@ -203,8 +202,8 @@ export const run = async ({
         envelopeItemFields,
         isRejected,
         rejectionReason,
-        certificateData,
-        auditLogData,
+        certificateDoc,
+        auditLogDoc,
       });
 
       newDocumentData.push(result);
@@ -300,8 +299,8 @@ type DecorateAndSignPdfOptions = {
   envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
-  certificateData: Buffer | null;
-  auditLogData: Buffer | null;
+  certificateDoc: PDFDocument | null;
+  auditLogDoc: PDFDocument | null;
 };
 
 /**
@@ -313,8 +312,8 @@ const decorateAndSignPdf = async ({
   envelopeItemFields,
   isRejected,
   rejectionReason,
-  certificateData,
-  auditLogData,
+  certificateDoc,
+  auditLogDoc,
 }: DecorateAndSignPdfOptions) => {
   const pdfData = await getFileServerSide(envelopeItem.documentData);
 
@@ -330,9 +329,7 @@ const decorateAndSignPdf = async ({
     await addRejectionStampToPdf(pdfDoc, rejectionReason);
   }
 
-  if (certificateData) {
-    const certificateDoc = await PDFDocument.load(certificateData);
-
+  if (certificateDoc) {
     const certificatePages = await pdfDoc.copyPages(
       certificateDoc,
       certificateDoc.getPageIndices(),
@@ -343,9 +340,7 @@ const decorateAndSignPdf = async ({
     });
   }
 
-  if (auditLogData) {
-    const auditLogDoc = await PDFDocument.load(auditLogData);
-
+  if (auditLogDoc) {
     const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
 
     auditLogPages.forEach((page) => {
@@ -472,19 +467,16 @@ const decorateAndSignPdf = async ({
 };
 
 export const getCertificateAndAuditLogData = async ({
-  legacyDocumentId,
-  documentMeta,
   settings,
+  ...payload
 }: {
-  legacyDocumentId: number;
-  documentMeta: DocumentMeta;
+  envelope: Envelope & {
+    documentMeta: DocumentMeta;
+  };
   settings: { includeSigningCertificate: boolean; includeAuditLog: boolean };
 }) => {
   const getCertificateDataPromise = settings.includeSigningCertificate
-    ? getCertificatePdf({
-        documentId: legacyDocumentId,
-        language: documentMeta.language,
-      }).catch((e) => {
+    ? getCertificatePdfViaPlaywright(payload).catch((e) => {
         console.log('Failed to get certificate PDF');
         console.error(e);
 
@@ -493,10 +485,7 @@ export const getCertificateAndAuditLogData = async ({
     : null;
 
   const getAuditLogDataPromise = settings.includeAuditLog
-    ? getAuditLogsPdf({
-        documentId: legacyDocumentId,
-        language: documentMeta.language,
-      }).catch((e) => {
+    ? getAuditLogPdfViaPlaywright(payload).catch((e) => {
         console.log('Failed to get audit logs PDF');
         console.error(e);
 
@@ -504,13 +493,5 @@ export const getCertificateAndAuditLogData = async ({
       })
     : null;
 
-  const [certificateData, auditLogData] = await Promise.all([
-    getCertificateDataPromise,
-    getAuditLogDataPromise,
-  ]);
-
-  return {
-    certificateData,
-    auditLogData,
-  };
+  return await Promise.all([getCertificateDataPromise, getAuditLogDataPromise]);
 };
