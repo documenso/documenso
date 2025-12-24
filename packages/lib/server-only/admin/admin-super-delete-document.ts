@@ -14,6 +14,7 @@ import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { RequestMetadata } from '../../universal/extract-request-metadata';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
@@ -64,14 +65,18 @@ export const adminSuperDeleteDocument = async ({
     envelope.documentMeta,
   ).documentDeleted;
 
+  const recipientsToNotify = envelope.recipients.filter((recipient) =>
+    isRecipientEmailValidForSending(recipient),
+  );
+
   // if the document is pending, send cancellation emails to all recipients
   if (
     status === DocumentStatus.PENDING &&
-    envelope.recipients.length > 0 &&
+    recipientsToNotify.length > 0 &&
     isDocumentDeletedEmailEnabled
   ) {
     await Promise.all(
-      envelope.recipients.map(async (recipient) => {
+      recipientsToNotify.map(async (recipient) => {
         if (recipient.sendStatus !== SendStatus.SENT) {
           return;
         }

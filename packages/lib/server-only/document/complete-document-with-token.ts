@@ -2,6 +2,7 @@ import {
   DocumentSigningOrder,
   DocumentStatus,
   EnvelopeType,
+  FieldType,
   RecipientRole,
   SendStatus,
   SigningStatus,
@@ -43,6 +44,14 @@ export type CompleteDocumentWithTokenOptions = {
     email: string;
     name: string;
   };
+  /**
+   * Override the recipient information. This will only work if the recipient
+   * does not have a name or email set.
+   */
+  recipientOverride?: {
+    email?: string;
+    name?: string;
+  };
 };
 
 export const completeDocumentWithToken = async ({
@@ -52,6 +61,7 @@ export const completeDocumentWithToken = async ({
   accessAuthOptions,
   requestMetadata,
   nextSigner,
+  recipientOverride,
 }: CompleteDocumentWithTokenOptions) => {
   const envelope = await prisma.envelope.findFirstOrThrow({
     where: {
@@ -116,6 +126,35 @@ export const completeDocumentWithToken = async ({
     throw new Error(`Recipient ${recipient.id} has unsigned fields`);
   }
 
+  let recipientName = recipient.name;
+  let recipientEmail = recipient.email;
+
+  // Only trim the name if it's been derived.
+  if (!recipientName) {
+    recipientName = (
+      recipientOverride?.name ||
+      fields.find((field) => field.type === FieldType.NAME)?.customText ||
+      ''
+    ).trim();
+  }
+
+  // Only trim the email if it's been derived.
+  if (!recipient.email) {
+    recipientEmail = (
+      recipientOverride?.email ||
+      fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+      ''
+    )
+      .trim()
+      .toLowerCase();
+  }
+
+  if (!recipientEmail) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'Recipient email is required',
+    });
+  }
+
   // Check ACCESS AUTH 2FA validation during document completion
   const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
     documentAuth: envelope.authOptions,
@@ -126,6 +165,12 @@ export const completeDocumentWithToken = async ({
     if (!accessAuthOptions) {
       throw new AppError(AppErrorCode.UNAUTHORIZED, {
         message: 'Access authentication required',
+      });
+    }
+
+    if (!recipient.email.trim()) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
       });
     }
 
@@ -176,8 +221,42 @@ export const completeDocumentWithToken = async ({
       data: {
         signingStatus: SigningStatus.SIGNED,
         signedAt: new Date(),
+        name: recipientName,
+        email: recipientEmail,
       },
     });
+
+    if (recipientEmail !== recipient.email || recipientName !== recipient.name) {
+      await tx.documentAuditLog.create({
+        data: createDocumentAuditLogData({
+          type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
+          envelopeId: envelope.id,
+          user: {
+            name: recipientName,
+            email: recipientEmail,
+          },
+          requestMetadata,
+          data: {
+            recipientEmail: recipient.email,
+            recipientName: recipient.name,
+            recipientId: recipient.id,
+            recipientRole: recipient.role,
+            changes: [
+              {
+                type: RECIPIENT_DIFF_TYPE.NAME,
+                from: recipient.name,
+                to: recipientName,
+              },
+              {
+                type: RECIPIENT_DIFF_TYPE.EMAIL,
+                from: recipient.email,
+                to: recipientEmail,
+              },
+            ],
+          },
+        }),
+      });
+    }
 
     const authOptions = extractDocumentAuthMethods({
       documentAuth: envelope.authOptions,
@@ -189,13 +268,13 @@ export const completeDocumentWithToken = async ({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED,
         envelopeId: envelope.id,
         user: {
-          name: recipient.name,
-          email: recipient.email,
+          name: recipientName,
+          email: recipientEmail,
         },
         requestMetadata,
         data: {
-          recipientEmail: recipient.email,
-          recipientName: recipient.name,
+          recipientEmail: recipientEmail,
+          recipientName: recipientName,
           recipientId: recipient.id,
           recipientRole: recipient.role,
           actionAuth: authOptions.derivedRecipientActionAuth,
@@ -247,8 +326,8 @@ export const completeDocumentWithToken = async ({
               type: DOCUMENT_AUDIT_LOG_TYPE.RECIPIENT_UPDATED,
               envelopeId: envelope.id,
               user: {
-                name: recipient.name,
-                email: recipient.email,
+                name: recipientName,
+                email: recipientEmail,
               },
               requestMetadata,
               data: {

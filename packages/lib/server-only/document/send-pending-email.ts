@@ -12,6 +12,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 
@@ -68,6 +69,11 @@ export const sendPendingEmail = async ({ id, recipientId }: SendPendingEmailOpti
   const [recipient] = envelope.recipients;
 
   const { email, name } = recipient;
+
+  // Skip sending email if recipient has no email address
+  if (!isRecipientEmailValidForSending(recipient)) {
+    return;
+  }
 
   const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 

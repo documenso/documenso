@@ -137,12 +137,12 @@ export const TemplateBulkSendDialog = ({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-4">
-            <div className="bg-muted/70 rounded-lg border p-4">
+            <div className="rounded-lg border bg-muted/70 p-4">
               <h3 className="text-sm font-medium">
                 <Trans>CSV Structure</Trans>
               </h3>
 
-              <p className="text-muted-foreground mt-1 text-sm">
+              <p className="mt-1 text-sm text-muted-foreground">
                 <Trans>
                   For each recipient, provide their email (required) and name (optional) in separate
                   columns. Download the template CSV below for the correct format.
@@ -153,7 +153,7 @@ export const TemplateBulkSendDialog = ({
                 <Trans>Current recipients:</Trans>
               </p>
 
-              <ul className="text-muted-foreground mt-2 list-inside list-disc text-sm">
+              <ul className="mt-2 list-inside list-disc text-sm text-muted-foreground">
                 {recipients.map((recipient, index) => (
                   <li key={index}>
                     {recipient.name ? `${recipient.name} (${recipient.email})` : recipient.email}
@@ -167,7 +167,7 @@ export const TemplateBulkSendDialog = ({
                 <Trans>Download Template CSV</Trans>
               </Button>
 
-              <p className="text-muted-foreground text-xs">
+              <p className="text-xs text-muted-foreground">
                 <Trans>Pre-formatted CSV template with example data.</Trans>
               </p>
             </div>
@@ -200,14 +200,14 @@ export const TemplateBulkSendDialog = ({
                     ) : (
                       <div className="flex h-10 items-center rounded-md border px-3">
                         <div className="flex flex-1 items-center gap-2">
-                          <FileIcon className="text-muted-foreground h-4 w-4" />
+                          <FileIcon className="h-4 w-4 text-muted-foreground" />
                           <span className="flex-1 truncate text-sm">{value.name}</span>
                         </div>
 
                         <Button
                           type="button"
                           variant="link"
-                          className="text-destructive hover:text-destructive p-0 text-xs"
+                          className="p-0 text-xs text-destructive hover:text-destructive"
                           onClick={() => onChange(null)}
                           disabled={form.formState.isSubmitting}
                         >
@@ -220,9 +220,9 @@ export const TemplateBulkSendDialog = ({
                     )}
                   </FormControl>
 
-                  {error && <p className="text-destructive text-sm">{error.message}</p>}
+                  {error && <p className="text-sm text-destructive">{error.message}</p>}
 
-                  <p className="text-muted-foreground text-xs">
+                  <p className="text-xs text-muted-foreground">
                     <Trans>
                       Maximum file size: 4MB. Maximum 100 rows per upload. Blank values will use
                       template defaults.
@@ -247,7 +247,7 @@ export const TemplateBulkSendDialog = ({
 
                       <label
                         htmlFor="send-immediately"
-                        className="text-muted-foreground ml-2 flex items-center text-sm"
+                        className="ml-2 flex items-center text-sm text-muted-foreground"
                       >
                         <Trans>Send documents to recipients immediately</Trans>
                       </label>

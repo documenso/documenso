@@ -70,7 +70,6 @@
     "remeda": "^2.32.0",
     "remix-themes": "^2.0.4",
     "satori": "^0.18.3",
-    "sharp": "0.34.5",
     "tailwindcss": "^3.4.18",
     "ts-pattern": "^5.9.0",
     "ua-parser-js": "^1.0.41",
@@ -108,5 +107,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.2.4"
+  "version": "2.3.1"
 }
