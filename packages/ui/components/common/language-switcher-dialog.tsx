@@ -2,7 +2,7 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { CheckIcon } from 'lucide-react';
 
-import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
+import { LANG, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { cn } from '@documenso/ui/lib/utils';
 import {
@@ -28,7 +28,7 @@ export const LanguageSwitcherDialog = ({ open, setOpen }: LanguageSwitcherDialog
 
     const formData = new FormData();
 
-    formData.append('lang', lang);
+    formData.append(LANG, lang);
 
     await fetch('/api/locale', {
       method: 'post',

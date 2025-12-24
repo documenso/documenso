@@ -1,12 +1,12 @@
 import type { ActionFunctionArgs } from 'react-router';
 
-import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { APP_I18N_OPTIONS, LANG } from '@documenso/lib/constants/i18n';
 
 import { langCookie } from '~/storage/lang-cookie.server';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const lang = formData.get('lang') || '';
+  const lang = formData.get(LANG) || '';
 
   if (!APP_I18N_OPTIONS.supportedLangs.find((l) => l === lang)) {
     throw new Response('Unsupported language', { status: 400 });

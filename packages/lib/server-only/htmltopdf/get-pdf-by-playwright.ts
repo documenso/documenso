@@ -1,3 +1,5 @@
+import { PDFDocument } from '@cantoo/pdf-lib';
+import type { DocumentMeta, Envelope } from '@prisma/client';
 import { DateTime } from 'luxon';
 import type { Browser } from 'playwright';
 
@@ -6,19 +8,29 @@ import {
   NEXT_PUBLIC_WEBAPP_URL,
   USE_INTERNAL_URL_BROWSERLESS,
 } from '../../constants/app';
-import { type SupportedLanguageCodes, isValidLanguageCode } from '../../constants/i18n';
+import { LANG, ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import { env } from '../../utils/env';
+import { mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { encryptSecondaryData } from '../crypto/encrypt';
 
-export type GetCertificatePdfOptions = {
-  documentId: number;
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  language?: SupportedLanguageCodes | (string & {});
+export type GetPdfPayload = {
+  envelope: Envelope & {
+    documentMeta: DocumentMeta;
+  };
 };
 
-export const getCertificatePdf = async ({ documentId, language }: GetCertificatePdfOptions) => {
+export const getCertificatePdfByPlaywright = async (payload: GetPdfPayload) => {
+  return await getPdf('certificate', payload);
+};
+
+export const getAuditLogPdfByPlaywright = async (payload: GetPdfPayload) => {
+  return await getPdf('audit-log', payload);
+};
+
+const getPdf = async (name: 'audit-log' | 'certificate', { envelope }: GetPdfPayload) => {
   const { chromium } = await import('playwright');
 
+  const documentId = mapSecondaryIdToDocumentId(envelope.secondaryId);
   const encryptedId = encryptSecondaryData({
     data: documentId.toString(),
     expiresAt: DateTime.now().plus({ minutes: 5 }).toJSDate().valueOf(),
@@ -46,25 +58,24 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   const page = await browserContext.newPage();
 
-  const lang = isValidLanguageCode(language) ? language : 'en';
+  const lang = ZSupportedLanguageCodeSchema.parse(envelope.documentMeta.language);
+
+  const baseUrl = USE_INTERNAL_URL_BROWSERLESS()
+    ? NEXT_PUBLIC_WEBAPP_URL()
+    : NEXT_PRIVATE_INTERNAL_WEBAPP_URL();
 
   await page.context().addCookies([
     {
-      name: 'lang',
+      name: LANG,
       value: lang,
-      url: USE_INTERNAL_URL_BROWSERLESS()
-        ? NEXT_PUBLIC_WEBAPP_URL()
-        : NEXT_PRIVATE_INTERNAL_WEBAPP_URL(),
+      url: baseUrl,
     },
   ]);
 
-  await page.goto(
-    `${USE_INTERNAL_URL_BROWSERLESS() ? NEXT_PUBLIC_WEBAPP_URL() : NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/__htmltopdf/certificate?d=${encryptedId}`,
-    {
-      waitUntil: 'networkidle',
-      timeout: 10_000,
-    },
-  );
+  await page.goto(`${baseUrl}/__htmltopdf/${name}?d=${encryptedId}`, {
+    waitUntil: 'networkidle',
+    timeout: 10_000,
+  });
 
   // !: This is a workaround to ensure the page is loaded correctly.
   // !: It's not clear why but suddenly browserless cdp connections would
@@ -88,5 +99,5 @@ export const getCertificatePdf = async ({ documentId, language }: GetCertificate
 
   void browser.close();
 
-  return result;
+  return await PDFDocument.load(result);
 };

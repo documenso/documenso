@@ -11,7 +11,7 @@ import { Theme, useTheme } from 'remix-themes';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
 import { useSession } from '@documenso/lib/client-only/providers/session';
-import { SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
+import { LANG, SUPPORTED_LANGUAGES } from '@documenso/lib/constants/i18n';
 import {
   DOCUMENTS_PAGE_SHORTCUT,
   SETTINGS_PAGE_SHORTCUT,
@@ -341,7 +341,7 @@ const LanguageCommands = () => {
 
       const formData = new FormData();
 
-      formData.append('lang', lang);
+      formData.append(LANG, lang);
 
       const response = await fetch('/api/locale', {
         method: 'post',
