@@ -5,6 +5,7 @@ import { Hono } from 'hono';
 import { DateTime } from 'luxon';
 import { z } from 'zod';
 
+import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { EMAIL_VERIFICATION_STATE } from '@documenso/lib/constants/email';
 import { AppError } from '@documenso/lib/errors/app-error';
 import { jobsClient } from '@documenso/lib/jobs/client';
@@ -89,7 +90,11 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const is2faEnabled = isTwoFactorAuthenticationEnabled({ user });
 
     if (is2faEnabled) {
-      const isValid = await validateTwoFactorAuthentication({ backupCode, totpCode, user });
+      const isValid = await validateTwoFactorAuthentication({
+        backupCode,
+        totpCode,
+        user,
+      });
 
       if (!isValid) {
         await prisma.userSecurityAuditLog.create({
@@ -143,12 +148,19 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    */
   .post('/signup', sValidator('json', ZSignUpSchema), async (c) => {
     if (env('NEXT_PUBLIC_DISABLE_SIGNUP') === 'true') {
-      throw new AppError('SIGNUP_DISABLED', {
+      throw new AppError(AuthenticationErrorCode.SignupDisabled, {
         message: 'Signups are disabled.',
       });
     }
 
     const { name, email, password, signature } = c.req.valid('json');
+
+    if (!isEmailDomainAllowedForSignup(email)) {
+      throw new AppError(AuthenticationErrorCode.SignupDomainNotAllowed, {
+        message: 'Signups are restricted to specific email domains.',
+        statusCode: 400,
+      });
+    }
 
     const user = await createUser({ name, email, password, signature }).catch((err) => {
       console.error(err);
@@ -209,7 +221,9 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
    * Verify email endpoint.
    */
   .post('/verify-email', sValidator('json', ZVerifyEmailSchema), async (c) => {
-    const { state, userId } = await verifyEmail({ token: c.req.valid('json').token });
+    const { state, userId } = await verifyEmail({
+      token: c.req.valid('json').token,
+    });
 
     // If email is verified, automatically authenticate user.
     if (state === EMAIL_VERIFICATION_STATE.VERIFIED && userId !== null) {
