@@ -15,6 +15,36 @@ const require = createRequire(import.meta.url);
 const pdfjsDistPath = path.dirname(require.resolve('pdfjs-dist/package.json'));
 const cMapsDir = normalizePath(path.join(pdfjsDistPath, 'cmaps'));
 
+const isVercel = process.env.VERCEL === '1';
+
+const getPlugins = () => {
+  const plugins = [
+    viteStaticCopy({
+      targets: [
+        {
+          src: cMapsDir,
+          dest: 'static',
+        },
+      ],
+    }),
+    reactRouter(),
+    macrosPlugin(),
+    lingui(),
+    tsconfigPaths(),
+  ];
+
+  // Only use Hono adapter for non-Vercel builds (Docker, local dev)
+  if (!isVercel) {
+    plugins.push(
+      serverAdapter({
+        entry: 'server/router.ts',
+      }),
+    );
+  }
+
+  return plugins;
+};
+
 /**
  * Note: We load the env variables externally so we can have runtime enviroment variables
  * for docker.
@@ -31,23 +61,7 @@ export default defineConfig({
     port: parseInt(process.env.PORT || '3000', 10),
     strictPort: true,
   },
-  plugins: [
-    viteStaticCopy({
-      targets: [
-        {
-          src: cMapsDir,
-          dest: 'static',
-        },
-      ],
-    }),
-    reactRouter(),
-    macrosPlugin(),
-    lingui(),
-    tsconfigPaths(),
-    serverAdapter({
-      entry: 'server/router.ts',
-    }),
-  ],
+  plugins: getPlugins(),
   ssr: {
     noExternal: ['react-dropzone', 'plausible-tracker'],
     external: [
