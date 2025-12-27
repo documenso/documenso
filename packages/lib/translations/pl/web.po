@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-12-15 02:39\n"
+"PO-Revision-Date: 2025-12-23 14:04\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -3111,7 +3111,7 @@ msgstr "Domyślna wartość"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Delegate Document Ownership"
-msgstr ""
+msgstr "Zmień właściciela dokumentu"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
@@ -3679,7 +3679,7 @@ msgstr "Otwarto dokument"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Document ownership delegated"
-msgstr ""
+msgstr "Zmieniono właściciela dokumentu"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
@@ -4290,7 +4290,7 @@ msgstr "Włącz logowanie SSO"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable team API tokens to delegate document ownership to another team member."
-msgstr ""
+msgstr "Włącz tokeny API zespołu, aby zmienić właściciela dokumentu na innego użytkownika zespołu."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -5632,7 +5632,7 @@ msgstr "Zarządzaj organizacją"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage Organisation"
-msgstr ""
+msgstr "Zarządzaj organizacją"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
@@ -7216,7 +7216,7 @@ msgstr "Odpowiedz na adres"
 #: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Reply To Email <0>(Optional)</0>"
-msgstr "Odpowiedź na e-mail <0>(opcjonalnie)</0>"
+msgstr "Odpowiedz na wiadomość <0>(opcjonalnie)</0>"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 msgid "Request"
@@ -7356,7 +7356,7 @@ msgstr "Wróć"
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
-msgstr ""
+msgstr "Powrót do strony głównej"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
@@ -8865,7 +8865,7 @@ msgstr "Właściciel dokumentu został poinformowany o Twojej decyzji. Może si�
 #. placeholder {1}: data.teamName
 #: packages/lib/utils/document-audit-logs.ts
 msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr ""
+msgstr "Zmieniono właściciela dokumentu na {0} z zespołu {1}"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -10988,12 +10988,12 @@ msgstr "Aktualizujesz adres <0>{0}</0>"
 
 #: apps/remix/app/components/dialogs/team-member-update-dialog.tsx
 msgid "You are currently updating <0>{memberName}</0>."
-msgstr "Aktualizujesz adres <0>{memberName}</0>."
+msgstr "Aktualizujesz użytkownika <0>{memberName}</0>."
 
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-member-update-dialog.tsx
 msgid "You are currently updating <0>{organisationMemberName}</0>."
-msgstr "Aktualnie aktualizujesz <0>{organisationMemberName}</0>."
+msgstr "Aktualizujesz użytkownika <0>{organisationMemberName}</0>."
 
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
 msgid "You are currently updating the <0>{passkeyName}</0> passkey."
@@ -11654,3 +11654,4 @@ msgstr "Twój kod weryfikacyjny:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
