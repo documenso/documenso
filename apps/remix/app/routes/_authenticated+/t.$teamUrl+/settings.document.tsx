@@ -50,6 +50,7 @@ export default function TeamsSettingsPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        delegateDocumentOwnership,
         aiFeaturesEnabled,
       } = data;
 
@@ -75,6 +76,7 @@ export default function TeamsSettingsPage() {
                 uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
                 drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
               }),
+          delegateDocumentOwnership: delegateDocumentOwnership,
         },
       });
 

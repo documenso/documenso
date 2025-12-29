@@ -33,6 +33,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       folderId,
       meta,
       attachments,
+      delegatedDocumentOwner,
     } = payload;
 
     ctx.logger.info({
@@ -144,6 +145,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         recipients: recipientsToCreate,
         folderId,
         envelopeItems,
+        delegatedDocumentOwner,
       },
       attachments,
       meta,

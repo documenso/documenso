@@ -126,7 +126,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       console.error(err);
 
       const errorMessage = match(error.code)
-        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs`)
+        .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
         .with(
           'UNSUPPORTED_FILE_TYPE',
           () => t`This file type is not supported. Please upload a PDF, DOCX, JPEG, or PNG file.`,
@@ -146,7 +146,7 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
         )
         .with(
           'ENVELOPE_ITEM_LIMIT_EXCEEDED',
-          () => t`You have reached the limit of the number of files per envelope`,
+          () => t`You have reached the limit of the number of files per envelope.`,
         )
         .otherwise(() => t`An error occurred while uploading your document.`);
 

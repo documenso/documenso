@@ -57,6 +57,7 @@ export default function OrganisationSettingsDocumentPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        delegateDocumentOwnership,
         aiFeaturesEnabled,
       } = data;
 
@@ -85,6 +86,7 @@ export default function OrganisationSettingsDocumentPage() {
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
+          delegateDocumentOwnership: delegateDocumentOwnership,
           aiFeaturesEnabled,
         },
       });
@@ -112,7 +114,7 @@ export default function OrganisationSettingsDocumentPage() {
 
   const settingsHeaderText = t`Document Preferences`;
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general document preferences`
+    ? t`Here you can set your general document preferences.`
     : t`Here you can set document preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (

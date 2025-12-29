@@ -121,7 +121,7 @@ export const OrganisationEmailDomainRecordContent = ({ records }: { records: Dom
             <Trans>
               Once you update your DNS records, it may take up to 48 hours for it to be propogated.
               Once the DNS propagation is complete you will need to come back and press the "Sync"
-              domains button
+              domains button.
             </Trans>
           </AlertDescription>
         </Alert>
