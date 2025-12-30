@@ -8,12 +8,11 @@ import type { ApiToken } from '@prisma/client';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { match } from 'ts-pattern';
-import type { z } from 'zod';
+import { z } from 'zod';
 
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { trpc } from '@documenso/trpc/react';
-import { ZCreateApiTokenRequestSchema } from '@documenso/trpc/server/api-token-router/create-api-token.types';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -47,10 +46,22 @@ export const EXPIRATION_DATES = {
   ONE_YEAR: msg`12 months`,
 } as const;
 
-const ZCreateTokenFormSchema = ZCreateApiTokenRequestSchema.pick({
-  tokenName: true,
-  expirationDate: true,
-});
+const ZCreateTokenFormSchema = z
+  .object({
+    tokenName: z.string().min(3, { message: 'The token name should be 3 characters or longer' }),
+    expirationDate: z.string().nullable(),
+    noExpirationDate: z.boolean(),
+  })
+  .refine(
+    (data) => {
+      // Either expiration date is selected OR never expire is enabled
+      return data.noExpirationDate || (data.expirationDate && data.expirationDate.length > 0);
+    },
+    {
+      message: 'Please select an expiration date or enable the "Never expire" option',
+      path: ['expirationDate'], // Show error on the expirationDate field
+    },
+  );
 
 type TCreateTokenFormSchema = z.infer<typeof ZCreateTokenFormSchema>;
 
@@ -73,7 +84,6 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
   const { toast } = useToast();
 
   const [newlyCreatedToken, setNewlyCreatedToken] = useState<NewlyCreatedToken | null>();
-  const [noExpirationDate, setNoExpirationDate] = useState(false);
 
   const { mutateAsync: createTokenMutation } = trpc.apiToken.create.useMutation({
     onSuccess(data) {
@@ -85,7 +95,8 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     resolver: zodResolver(ZCreateTokenFormSchema),
     defaultValues: {
       tokenName: '',
-      expirationDate: '',
+      expirationDate: null,
+      noExpirationDate: false,
     },
   });
 
@@ -110,7 +121,11 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
     }
   };
 
-  const onSubmit = async ({ tokenName, expirationDate }: TCreateTokenFormSchema) => {
+  const onSubmit = async ({
+    tokenName,
+    expirationDate,
+    noExpirationDate,
+  }: TCreateTokenFormSchema) => {
     try {
       await createTokenMutation({
         teamId: team.id,
@@ -191,7 +206,12 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
 
                     <div className="flex items-center gap-x-4">
                       <FormControl className="flex-1">
-                        <Select onValueChange={field.onChange} disabled={noExpirationDate}>
+                        <Select
+                          key={`${field.value}-${form.formState.submitCount}`}
+                          onValueChange={field.onChange}
+                          value={field.value || undefined}
+                          disabled={form.watch('noExpirationDate')}
+                        >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder={_(msg`Choose...`)} />
                           </SelectTrigger>
@@ -212,14 +232,22 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
               />
 
               <div>
-                <FormLabel className="text-muted-foreground mt-2">
+                <FormLabel className="mt-2 text-muted-foreground">
                   <Trans>Never expire</Trans>
                 </FormLabel>
                 <div className="block md:py-1.5">
                   <Switch
-                    className="bg-background mt-2"
-                    checked={noExpirationDate}
-                    onCheckedChange={setNoExpirationDate}
+                    className="mt-2 bg-background"
+                    checked={form.watch('noExpirationDate')}
+                    onCheckedChange={(checked) => {
+                      form.setValue('noExpirationDate', checked);
+                      // When "never expire" is enabled, set expirationDate to null and trigger validation
+                      if (checked) {
+                        form.setValue('expirationDate', null);
+                      }
+                      // Trigger validation to clear/show errors
+                      void form.trigger('expirationDate');
+                    }}
                   />
                 </div>
               </div>
@@ -254,14 +282,14 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
             >
               <Card gradient>
                 <CardContent className="p-4">
-                  <p className="text-muted-foreground mt-2 text-sm">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     <Trans>
                       Your token was created successfully! Make sure to copy it because you won't be
                       able to see it again!
                     </Trans>
                   </p>
 
-                  <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
+                  <p className="my-4 rounded-md bg-muted-foreground/10 px-2.5 py-1 font-mono text-sm">
                     {newlyCreatedToken.token}
                   </p>
 
