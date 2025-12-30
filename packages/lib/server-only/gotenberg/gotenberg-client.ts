@@ -1,4 +1,4 @@
-import { getGotenbergUrl } from '../../constants/upload';
+import { getGotenbergTimeout, getGotenbergUrl } from '../../constants/upload';
 import { AppError } from '../../errors/app-error';
 
 export type ConvertFileToPdfOptions = {
@@ -6,8 +6,6 @@ export type ConvertFileToPdfOptions = {
   filename: string;
   mimeType: string;
 };
-
-const CONVERSION_TIMEOUT_MS = 30_000;
 
 export const convertFileToPdfViaGotenberg = async ({
   file,
@@ -29,7 +27,7 @@ export const convertFileToPdfViaGotenberg = async ({
   formData.append('files', blob, filename);
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), CONVERSION_TIMEOUT_MS);
+  const timeoutId = setTimeout(() => controller.abort(), getGotenbergTimeout());
 
   try {
     const response = await fetch(`${gotenbergUrl}/forms/libreoffice/convert`, {

@@ -490,6 +490,7 @@ model DocumentData {
   type             DocumentDataType
   data             String
   initialData      String
+  originalData     String?
   originalMimeType String?
   envelopeItem     EnvelopeItem?
 }

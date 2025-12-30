@@ -46,6 +46,7 @@ export const putPdfFileServerSide = async (file: File) => {
 
 type PutNormalizedPdfOptions = {
   file: File;
+  originalData?: string;
   originalMimeType?: string;
 };
 
@@ -54,6 +55,7 @@ type PutNormalizedPdfOptions = {
  */
 export const putNormalizedPdfFileServerSide = async ({
   file,
+  originalData,
   originalMimeType,
 }: PutNormalizedPdfOptions) => {
   const buffer = Buffer.from(await file.arrayBuffer());
@@ -71,6 +73,7 @@ export const putNormalizedPdfFileServerSide = async ({
   return await createDocumentData({
     type: documentData.type,
     data: documentData.data,
+    originalData,
     originalMimeType,
   });
 };

@@ -2,7 +2,10 @@ import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
 import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion/convert-to-pdf';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import {
+  putFileServerSide,
+  putNormalizedPdfFileServerSide,
+} from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -61,11 +64,9 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    // For each file, convert to PDF if needed, then store.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        // Convert to PDF if needed (DOCX, images, etc)
-        const { pdfBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
+        const { pdfBuffer, originalBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
 
         let pdf = pdfBuffer;
 
@@ -77,12 +78,23 @@ export const createEnvelopeRoute = authenticatedProcedure
           });
         }
 
+        let originalData: string | undefined;
+        if (originalBuffer) {
+          const stored = await putFileServerSide({
+            name: `original-${file.name}`,
+            type: originalMimeType,
+            arrayBuffer: async () => Promise.resolve(originalBuffer),
+          });
+          originalData = stored.data;
+        }
+
         const { id: documentDataId } = await putNormalizedPdfFileServerSide({
           file: {
             name: file.name,
             type: 'application/pdf',
             arrayBuffer: async () => Promise.resolve(pdf),
           },
+          originalData,
           originalMimeType,
         });
 

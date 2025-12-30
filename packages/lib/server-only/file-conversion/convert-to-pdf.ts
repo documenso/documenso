@@ -10,6 +10,7 @@ type FileInput = {
 
 export type ConvertToPdfResult = {
   pdfBuffer: Buffer;
+  originalBuffer: Buffer | null;
   originalMimeType: string;
 };
 
@@ -24,16 +25,16 @@ export const convertToPdfIfNeeded = async (file: FileInput): Promise<ConvertToPd
     });
   }
 
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
   if (originalMimeType === 'application/pdf') {
-    const arrayBuffer = await file.arrayBuffer();
     return {
-      pdfBuffer: Buffer.from(arrayBuffer),
+      pdfBuffer: buffer,
+      originalBuffer: null,
       originalMimeType,
     };
   }
-
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = Buffer.from(arrayBuffer);
 
   const pdfBuffer = await convertFileToPdfViaGotenberg({
     file: buffer,
@@ -43,6 +44,7 @@ export const convertToPdfIfNeeded = async (file: FileInput): Promise<ConvertToPd
 
   return {
     pdfBuffer,
+    originalBuffer: buffer,
     originalMimeType,
   };
 };
