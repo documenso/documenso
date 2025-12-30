@@ -3937,16 +3937,16 @@ msgid "Drafted Documents"
 msgstr "임시 저장된 문서"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "여기에 PDF를 끌어다 놓으세요."
+msgid "Drag & drop PDF, DOCX, or images here."
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "드래그 앤 드롭 또는 클릭하여 업로드"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "여기에 PDF 파일을 드래그 앤 드롭하세요."
+msgid "Drag and drop your document here"
+msgstr ""
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -4563,6 +4563,14 @@ msgstr "실패"
 msgid "Failed to complete the document. Please try again."
 msgstr "문서를 완료하지 못했습니다. 다시 시도해 주세요."
 
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "Failed to convert file. Please try uploading a PDF instead."
+msgstr ""
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Failed to convert the file to PDF. Please try again or upload a PDF file instead."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "폴더를 삭제하지 못했습니다."
@@ -4706,6 +4714,14 @@ msgstr "필드가 업데이트되었습니다."
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "파일 크기는 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB를 초과할 수 없습니다"
+
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "File conversion is not available. Please upload a PDF file."
+msgstr ""
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "File conversion is temporarily unavailable. Please upload a PDF file instead."
+msgstr ""
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
@@ -6210,10 +6226,6 @@ msgstr "매니저 등급 이상만 문서에 접근하고 열람할 수 있습�
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Only one file can be uploaded at a time"
 msgstr "한 번에 하나의 파일만 업로드할 수 있습니다"
-
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Only PDF files are allowed"
-msgstr "PDF 파일만 허용됩니다"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/generic-error-layout.tsx
@@ -8466,6 +8478,10 @@ msgstr "지원"
 msgid "Support ticket created"
 msgstr "지원 티켓이 생성되었습니다"
 
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "Supported formats: PDF, Word documents, JPEG, and PNG images"
+msgstr ""
+
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
 msgstr "동기화"
@@ -9313,6 +9329,14 @@ msgstr "현재 이 봉투를 다시 보낼 수 없습니다. 다시 시도해 �
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "이 필드는 수정하거나 삭제할 수 없습니다. 이 템플릿의 다이렉트 링크를 공유하거나 공개 프로필에 추가하면, 누구든지 링크에 접근해 이름과 이메일을 입력하고 본인에게 할당된 필드를 작성할 수 있습니다."
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type is not supported. Please upload a PDF, DOCX, JPEG, or PNG file."
+msgstr ""
+
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "This file type is not supported. Please upload a PDF, Word document, or image."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."

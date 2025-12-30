@@ -3932,16 +3932,16 @@ msgid "Drafted Documents"
 msgstr "Drafted Documents"
 
 #: packages/ui/primitives/document-dropzone.tsx
-msgid "Drag & drop your PDF here."
-msgstr "Drag & drop your PDF here."
+msgid "Drag & drop PDF, DOCX, or images here."
+msgstr "Drag & drop PDF, DOCX, or images here."
 
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid "Drag and drop or click to upload"
 msgstr "Drag and drop or click to upload"
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Drag and drop your PDF file here"
-msgstr "Drag and drop your PDF file here"
+msgid "Drag and drop your document here"
+msgstr "Drag and drop your document here"
 
 #: packages/lib/constants/document.ts
 #: packages/ui/primitives/signature-pad/signature-pad.tsx
@@ -4558,6 +4558,14 @@ msgstr "Failed"
 msgid "Failed to complete the document. Please try again."
 msgstr "Failed to complete the document. Please try again."
 
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "Failed to convert file. Please try uploading a PDF instead."
+msgstr "Failed to convert file. Please try uploading a PDF instead."
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "Failed to convert the file to PDF. Please try again or upload a PDF file instead."
+msgstr "Failed to convert the file to PDF. Please try again or upload a PDF file instead."
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Failed to create folder"
 msgstr "Failed to create folder"
@@ -4701,6 +4709,14 @@ msgstr "Fields updated"
 #: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
 msgid "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
 msgstr "File cannot be larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
+
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "File conversion is not available. Please upload a PDF file."
+msgstr "File conversion is not available. Please upload a PDF file."
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "File conversion is temporarily unavailable. Please upload a PDF file instead."
+msgstr "File conversion is temporarily unavailable. Please upload a PDF file instead."
 
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "File is larger than {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB"
@@ -6205,10 +6221,6 @@ msgstr "Only managers and above can access and view the document"
 #: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
 msgid "Only one file can be uploaded at a time"
 msgstr "Only one file can be uploaded at a time"
-
-#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
-msgid "Only PDF files are allowed"
-msgstr "Only PDF files are allowed"
 
 #: apps/remix/app/components/general/generic-error-layout.tsx
 #: apps/remix/app/components/general/generic-error-layout.tsx
@@ -8461,6 +8473,10 @@ msgstr "Support"
 msgid "Support ticket created"
 msgstr "Support ticket created"
 
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "Supported formats: PDF, Word documents, JPEG, and PNG images"
+msgstr "Supported formats: PDF, Word documents, JPEG, and PNG images"
+
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 msgid "Sync"
 msgstr "Sync"
@@ -9308,6 +9324,14 @@ msgstr "This envelope could not be resent at this time. Please try again."
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
 msgid "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
 msgstr "This field cannot be modified or deleted. When you share this template's direct link or add it to your public profile, anyone who accesses it can input their name and email, and fill in the fields assigned to them."
+
+#: apps/remix/app/components/general/envelope/envelope-upload-button.tsx
+msgid "This file type is not supported. Please upload a PDF, DOCX, JPEG, or PNG file."
+msgstr "This file type is not supported. Please upload a PDF, DOCX, JPEG, or PNG file."
+
+#: apps/remix/app/components/general/envelope/envelope-drop-zone-wrapper.tsx
+msgid "This file type is not supported. Please upload a PDF, Word document, or image."
+msgstr "This file type is not supported. Please upload a PDF, Word document, or image."
 
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 msgid "This folder contains multiple items. Deleting it will remove all subfolders and move all nested documents and templates to the root folder."
