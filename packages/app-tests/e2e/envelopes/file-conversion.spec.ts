@@ -157,10 +157,11 @@ test.describe('File Conversion', () => {
 
       if (!createEnvelopeRequest.ok()) {
         const errorBody = await createEnvelopeRequest.json();
-        if (
-          errorBody.code === 'CONVERSION_SERVICE_UNAVAILABLE' ||
-          errorBody.code === 'CONVERSION_FAILED'
-        ) {
+        const errorCode =
+          errorBody.code === 'INTERNAL_SERVER_ERROR'
+            ? errorBody.data?.code || errorBody.data?.appError?.code
+            : errorBody.code;
+        if (errorCode === 'CONVERSION_SERVICE_UNAVAILABLE' || errorCode === 'CONVERSION_FAILED') {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
         }
@@ -267,10 +268,11 @@ test.describe('File Conversion', () => {
 
       if (!createEnvelopeRequest.ok()) {
         const errorBody = await createEnvelopeRequest.json();
-        if (
-          errorBody.code === 'CONVERSION_SERVICE_UNAVAILABLE' ||
-          errorBody.code === 'CONVERSION_FAILED'
-        ) {
+        const errorCode =
+          errorBody.code === 'INTERNAL_SERVER_ERROR'
+            ? errorBody.data?.code || errorBody.data?.appError?.code
+            : errorBody.code;
+        if (errorCode === 'CONVERSION_SERVICE_UNAVAILABLE' || errorCode === 'CONVERSION_FAILED') {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
         }
@@ -384,10 +386,11 @@ test.describe('File Conversion', () => {
 
       if (!createEnvelopeRequest.ok()) {
         const errorBody = await createEnvelopeRequest.json();
-        if (
-          errorBody.code === 'CONVERSION_SERVICE_UNAVAILABLE' ||
-          errorBody.code === 'CONVERSION_FAILED'
-        ) {
+        const errorCode =
+          errorBody.code === 'INTERNAL_SERVER_ERROR'
+            ? errorBody.data?.code || errorBody.data?.appError?.code
+            : errorBody.code;
+        if (errorCode === 'CONVERSION_SERVICE_UNAVAILABLE' || errorCode === 'CONVERSION_FAILED') {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
         }
