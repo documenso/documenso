@@ -698,7 +698,7 @@ test.describe('File Conversion', () => {
         await page.waitForURL(/\/documents\/.*\/edit/, { timeout: 15000 });
       } catch {
         // Check if error toast appeared (Gotenberg unavailable)
-        const errorToast = page.locator('[data-sonner-toast][data-type="error"]');
+        const errorToast = page.locator('li.destructive');
         if (await errorToast.isVisible()) {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
@@ -819,7 +819,7 @@ test.describe('File Conversion', () => {
       try {
         await page.waitForURL(/\/documents\/.*\/edit/, { timeout: 15000 });
       } catch {
-        const errorToast = page.locator('[data-sonner-toast][data-type="error"]');
+        const errorToast = page.locator('li.destructive');
         if (await errorToast.isVisible()) {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
@@ -932,7 +932,7 @@ test.describe('File Conversion', () => {
       try {
         await page.waitForURL(/\/documents\/.*\/edit/, { timeout: 15000 });
       } catch {
-        const errorToast = page.locator('[data-sonner-toast][data-type="error"]');
+        const errorToast = page.locator('li.destructive');
         if (await errorToast.isVisible()) {
           test.skip(true, 'Gotenberg conversion service is not available');
           return;
@@ -1140,7 +1140,7 @@ test.describe('File Conversion', () => {
 
       // Wait for either navigation (success) or error toast (Gotenberg down)
       const navigationPromise = page.waitForURL(/\/documents\/.*\/edit/, { timeout: 15000 });
-      const toastPromise = page.waitForSelector('[data-sonner-toast][data-type="error"]', {
+      const toastPromise = page.waitForSelector('li.destructive', {
         timeout: 15000,
       });
 
@@ -1156,7 +1156,7 @@ test.describe('File Conversion', () => {
 
       if (result === 'toast') {
         // Error toast appeared - Gotenberg is unavailable
-        const errorToast = page.locator('[data-sonner-toast][data-type="error"]');
+        const errorToast = page.locator('li.destructive');
         await expect(errorToast).toBeVisible();
       } else {
         throw new Error('Neither navigation nor error toast occurred');
