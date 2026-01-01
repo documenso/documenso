@@ -36,7 +36,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
       typedSignatureEnabled,
       uploadSignatureEnabled,
       drawSignatureEnabled,
-      delegateDocumentOwnership,
 
       // Branding related settings.
       brandingEnabled,
@@ -100,10 +99,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
     const derivedDrawSignatureEnabled =
       drawSignatureEnabled ?? organisation.organisationGlobalSettings.drawSignatureEnabled;
 
-    const derivedDelegateDocumentOwnership =
-      delegateDocumentOwnership ??
-      organisation.organisationGlobalSettings.delegateDocumentOwnership;
-
     if (
       derivedTypedSignatureEnabled === false &&
       derivedUploadSignatureEnabled === false &&
@@ -145,7 +140,6 @@ export const updateOrganisationSettingsRoute = authenticatedProcedure
             typedSignatureEnabled,
             uploadSignatureEnabled,
             drawSignatureEnabled,
-            delegateDocumentOwnership: derivedDelegateDocumentOwnership,
 
             // Branding related settings.
             brandingEnabled,

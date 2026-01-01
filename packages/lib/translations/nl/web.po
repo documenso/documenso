@@ -3109,10 +3109,6 @@ msgstr "Standaardtijdzone"
 msgid "Default Value"
 msgstr "Standaardwaarde"
 
-#: apps/remix/app/components/forms/document-preferences-form.tsx
-msgid "Delegate Document Ownership"
-msgstr ""
-
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
 msgstr "verwijderen"
@@ -3676,11 +3672,6 @@ msgctxt "Audit log format"
 msgid "Document opened"
 msgstr "Document geopend"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
-msgid "Document ownership delegated"
-msgstr ""
-
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
 msgstr "Document in behandeling"
@@ -4022,7 +4013,6 @@ msgstr "Bijv. 100"
 #: apps/remix/app/components/general/document/document-page-view-button.tsx
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/components/general/teams/team-email-dropdown.tsx
-#: apps/remix/app/components/tables/admin-dashboard-users-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-button.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/settings-security-passkey-table-actions.tsx
@@ -4287,10 +4277,6 @@ msgstr "Ondertekeningsvolgorde inschakelen"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Enable SSO portal"
 msgstr "SSO-portaal inschakelen"
-
-#: apps/remix/app/components/forms/document-preferences-form.tsx
-msgid "Enable team API tokens to delegate document ownership to another team member."
-msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -5176,7 +5162,6 @@ msgstr "Authenticatiemethode overnemen"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Inherit from organisation"
@@ -5569,7 +5554,6 @@ msgid "Looking for signature fields"
 msgstr "Zoeken naar handtekeningvelden"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
-#: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Manage"
@@ -5629,10 +5613,6 @@ msgstr "Gekoppelde accounts beheren"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Manage organisation"
 msgstr "Organisatie beheren"
-
-#: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
-msgid "Manage Organisation"
-msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
@@ -5977,7 +5957,6 @@ msgid "Next Recipient Name"
 msgstr "Naam volgende ontvanger"
 
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -7352,11 +7331,6 @@ msgstr "Opnieuw proberen"
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Return"
 msgstr "Terugkeren"
-
-#: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
-#: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
-msgid "Return Home"
-msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
@@ -8860,12 +8834,6 @@ msgstr "De documenteigenaar is op de hoogte gebracht van deze weigering. Er is o
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 msgid "The document owner has been notified of your decision. They may contact you with further instructions if necessary."
 msgstr "De documenteigenaar is op de hoogte gebracht van je beslissing. Indien nodig kan diegene contact met je opnemen met verdere instructies."
-
-#. placeholder {0}: data.delegatedOwnerName || data.delegatedOwnerEmail
-#. placeholder {1}: data.teamName
-#: packages/lib/utils/document-audit-logs.ts
-msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr ""
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -10874,7 +10842,6 @@ msgstr "Jaarlijks"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
-#: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Yes"
 msgstr "Ja"
 
@@ -11654,3 +11621,4 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

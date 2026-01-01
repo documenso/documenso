@@ -17,6 +17,5 @@
   },
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "prisma.pinToPrisma6": true
+  }
 }

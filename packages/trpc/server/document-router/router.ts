@@ -19,7 +19,6 @@ import { findDocumentsInternalRoute } from './find-documents-internal';
 import { findInboxRoute } from './find-inbox';
 import { getDocumentRoute } from './get-document';
 import { getDocumentByTokenRoute } from './get-document-by-token';
-import { getDocumentsByIdsRoute } from './get-documents-by-ids';
 import { getInboxCountRoute } from './get-inbox-count';
 import { redistributeDocumentRoute } from './redistribute-document';
 import { searchDocumentRoute } from './search-document';
@@ -28,7 +27,6 @@ import { updateDocumentRoute } from './update-document';
 
 export const documentRouter = router({
   get: getDocumentRoute,
-  getMany: getDocumentsByIdsRoute,
   find: findDocumentsRoute,
   create: createDocumentRoute,
   update: updateDocumentRoute,

@@ -58,7 +58,6 @@ export type TDocumentPreferencesFormSchema = {
   includeSigningCertificate: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
-  delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
 };
 
@@ -74,7 +73,6 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
-  | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
 >;
 
@@ -111,7 +109,6 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
-    delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
   });
 
@@ -128,7 +125,6 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
-      delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
@@ -513,52 +509,6 @@ export const DocumentPreferencesForm = ({
                     Controls whether the audit logs will be included in the document when it is
                     downloaded. The audit logs can still be downloaded from the logs page
                     separately.
-                  </Trans>
-                </FormDescription>
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="delegateDocumentOwnership"
-            render={({ field }) => (
-              <FormItem className="flex-1">
-                <FormLabel>
-                  <Trans>Delegate Document Ownership</Trans>
-                </FormLabel>
-
-                <Select
-                  {...field}
-                  value={field.value === null ? '-1' : field.value.toString()}
-                  onValueChange={(value) =>
-                    field.onChange(value === 'true' ? true : value === 'false' ? false : null)
-                  }
-                >
-                  <SelectTrigger className="bg-background text-muted-foreground">
-                    <SelectValue />
-                  </SelectTrigger>
-
-                  <SelectContent>
-                    <SelectItem value="true">
-                      <Trans>Yes</Trans>
-                    </SelectItem>
-
-                    <SelectItem value="false">
-                      <Trans>No</Trans>
-                    </SelectItem>
-
-                    {canInherit && (
-                      <SelectItem value={'-1'}>
-                        <Trans>Inherit from organisation</Trans>
-                      </SelectItem>
-                    )}
-                  </SelectContent>
-                </Select>
-
-                <FormDescription>
-                  <Trans>
-                    Enable team API tokens to delegate document ownership to another team member.
                   </Trans>
                 </FormDescription>
               </FormItem>

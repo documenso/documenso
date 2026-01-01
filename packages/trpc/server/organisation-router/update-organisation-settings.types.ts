@@ -22,7 +22,6 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     typedSignatureEnabled: z.boolean().optional(),
     uploadSignatureEnabled: z.boolean().optional(),
     drawSignatureEnabled: z.boolean().optional(),
-    delegateDocumentOwnership: z.boolean().nullish(),
 
     // Branding related settings.
     brandingEnabled: z.boolean().optional(),
