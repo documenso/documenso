@@ -38,7 +38,7 @@ export default function EnvelopeEditorHeader() {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/">
-            <BrandingLogo className="h-6 w-auto" />
+            <BrandingLogo className="h-10 w-auto md:h-12" />
           </Link>
           <Separator orientation="vertical" className="h-6" />
 

@@ -433,7 +433,7 @@ const BillingPlanForm = ({
 
       <div className="mt-6 text-center">
         <Link
-          to="https://documenso.com/pricing"
+          to="https://justx.com.br/pricing"
           className="text-primary hover:text-primary/80 flex items-center justify-center gap-1 text-sm hover:underline"
           target="_blank"
         >

@@ -36,7 +36,7 @@ export const StackAvatar = ({ first, zIndex, fallbackText = '', type }: StackAva
       classes = 'bg-water text-water-700';
       break;
     case RecipientStatusType.COMPLETED:
-      classes = 'bg-documenso-200 text-documenso-800';
+      classes = 'bg-justx-200 text-justx-800';
       break;
     case RecipientStatusType.REJECTED:
       classes = 'bg-red-200 text-red-800';

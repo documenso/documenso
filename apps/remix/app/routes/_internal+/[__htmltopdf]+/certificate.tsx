@@ -32,7 +32,7 @@ import {
   TableRow,
 } from '@documenso/ui/primitives/table';
 
-import { BrandingLogo } from '~/components/general/branding-logo';
+import certificateLogo from '@documenso/assets/certificate-logo.png';
 
 import type { Route } from './+types/certificate';
 
@@ -397,11 +397,15 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
             />
           </div>
 
-          <div className="flex items-end justify-end gap-x-4">
-            <p className="flex-shrink-0 text-sm font-medium print:text-xs">
+          <div className="flex items-center justify-end gap-x-4">
+            <p className="flex-shrink-0 text-lg font-semibold print:text-base">
               {_(msg`Signing certificate provided by`)}:
             </p>
-            <BrandingLogo className="max-h-6 print:max-h-4" />
+            <img
+              src={certificateLogo}
+              alt="JustX Logo"
+              className="h-24 w-auto print:h-20"
+            />
           </div>
         </div>
       )}

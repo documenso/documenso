@@ -32,7 +32,7 @@ export const EnvelopeSignerHeader = () => {
     <nav className="embed--DocumentWidgetHeader bg-background border-border max-w-screen flex flex-row justify-between border-b px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
-        <Link to="/" className="flex-shrink-0">
+        <Link to="/" className="flex-shrink-0 flex items-center gap-2">
           {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
             <img
               src={`/api/branding/logo/team/${envelope.teamId}`}
@@ -41,8 +41,9 @@ export const EnvelopeSignerHeader = () => {
             />
           ) : (
             <>
-              <BrandingLogo className="hidden h-6 w-auto md:block" />
-              <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+              <BrandingLogo className="hidden h-10 w-auto md:block text-foreground" />
+              <BrandingLogoIcon className="h-10 w-auto md:hidden" />
+              <span className="text-xl font-semibold hidden md:inline">JustX</span>
             </>
           )}
         </Link>

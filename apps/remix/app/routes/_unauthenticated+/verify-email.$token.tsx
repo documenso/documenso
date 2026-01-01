@@ -70,7 +70,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   if (isLoading || state === null) {
     return (
       <div className="relative">
-        <Loader className="text-documenso h-8 w-8 animate-spin" />
+        <Loader className="text-justx h-8 w-8 animate-spin" />
       </div>
     );
   }

@@ -11,7 +11,7 @@ describe('updateSigningPlaceholder', () => {
       /SubFilter /adbe.pkcs7.detached
       /ByteRange [ 0 /********** /********** /********** ]
       /Contents <0000000000000000000000000000000000000000000000000000000>
-      /Reason (Signed by Documenso)
+      /Reason (Signed by JustX)
       /M (D:20210101000000Z)
       >>
       endobj
@@ -48,7 +48,7 @@ describe('updateSigningPlaceholder', () => {
       /SubFilter /adbe.pkcs7.detached
       /ByteRange [ 0 /********** /********** /********** ]
       /Contents <0000000000000000000000000000000000000000000000000000000>
-      /Reason (Signed by Documenso)
+      /Reason (Signed by JustX)
       /M (D:20210101000000Z)
       >>
       endobj
@@ -59,7 +59,7 @@ describe('updateSigningPlaceholder', () => {
       /SubFilter /adbe.pkcs7.detached
       /ByteRange [ 0 /********** /********** /********** ]
       /Contents <0000000000000000000000000000000000000000000000000000000>
-      /Reason (Signed by Documenso)
+      /Reason (Signed by JustX)
       /M (D:20210101000000Z)
       >>
       endobj

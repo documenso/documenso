@@ -49,7 +49,7 @@ export const TemplateDocumentSelfSigned = ({
             <Link
               href={signUpUrl}
               target="_blank"
-              className="text-documenso-700 hover:text-documenso-600 whitespace-nowrap"
+              className="text-justx-700 hover:text-justx-600 whitespace-nowrap"
             >
               free account
             </Link>{' '}

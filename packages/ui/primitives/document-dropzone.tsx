@@ -130,29 +130,29 @@ export const DocumentDropzone = ({
             // Non Disabled State
             <div className="flex">
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="border-muted-foreground/20 group-hover:border-justx/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
                 variants={DocumentDropzoneCardLeftVariants}
               >
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-full rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-5/6 rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-full rounded-[2px]" />
               </motion.div>
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="border-muted-foreground/20 group-hover:border-justx/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
                 variants={DocumentDropzoneCardCenterVariants}
               >
                 <Plus
                   strokeWidth="2px"
-                  className="text-muted-foreground/20 group-hover:text-documenso h-12 w-12"
+                  className="text-muted-foreground/20 group-hover:text-justx h-12 w-12"
                 />
               </motion.div>
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="border-muted-foreground/20 group-hover:border-justx/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
                 variants={DocumentDropzoneCardRightVariants}
               >
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-full rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-5/6 rounded-[2px]" />
+                <div className="bg-muted-foreground/20 group-hover:bg-justx h-2 w-full rounded-[2px]" />
               </motion.div>
             </div>
           )}

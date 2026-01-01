@@ -183,7 +183,7 @@ export const DocumentSigningFieldContainer = ({
                   'bg-foreground/5 border-border border': !field.inserted,
                 },
                 {
-                  'bg-documenso-200 border-primary border': field.inserted,
+                  'bg-justx-200 border-primary border': field.inserted,
                 },
               )}
             >

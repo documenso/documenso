@@ -67,7 +67,7 @@ module.exports = {
           foreground: 'hsl(var(--widget-foreground))',
         },
         justx: {
-          DEFAULT: '#000000',
+          DEFAULT: '#221E1D',
           50: '#ffffff',
           100: '#f5f5f5',
           200: '#e5e5e5',
@@ -78,7 +78,7 @@ module.exports = {
           700: '#404040',
           800: '#262626',
           900: '#171717',
-          950: '#000000',
+          950: '#221E1D',
         },
         'justx-green': {
           DEFAULT: '#65cf72',

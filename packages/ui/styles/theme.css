@@ -6,22 +6,22 @@
   :root,
   .dark-mode-disabled {
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 12 8% 12%;
 
     --muted: 0 0% 96.1%;
     --muted-foreground: 0 0% 45%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 12 8% 12%;
 
     --card: 0 0% 100%;
     --card-border: 0 0% 90%;
     --card-border-tint: 128 52% 60%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 12 8% 12%;
 
     --field-card: 0 0% 98%;
     --field-card-border: 0 0% 85%;
-    --field-card-foreground: 0 0% 0%;
+    --field-card-foreground: 12 8% 12%;
 
     --widget: 0 0% 97%;
     --widget-foreground: 0 0% 95%;
@@ -29,19 +29,19 @@
     --border: 0 0% 90%;
     --input: 0 0% 90%;
 
-    --primary: 0 0% 0%;
+    --primary: 12 8% 12%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: 12 8% 12%;
 
     --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 0%;
+    --accent-foreground: 12 8% 12%;
 
     --destructive: 0 100% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --ring: 0 0% 0%;
+    --ring: 12 8% 12%;
 
     --radius: 0.5rem;
 
@@ -135,26 +135,26 @@
     --new-warning-950: 38, 100%, 7%;
 
     /* Surface */
-    --new-surface-black: 0, 0%, 0%;
+    --new-surface-black: 0, 0%, 5%;
     --new-surface-white: 0, 0%, 91%;
   }
 
   .dark:not(.dark-mode-disabled) {
-    --background: 0 0% 0%;
+    --background: 12 8% 12%;
     --foreground: 0 0% 100%;
 
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 70%;
 
-    --popover: 0 0% 0%;
+    --popover: 12 8% 12%;
     --popover-foreground: 0 0% 100%;
 
-    --card: 0 0% 5%;
+    --card: 12 8% 15%;
     --card-border: 0 0% 20%;
     --card-border-tint: 128 52% 60%;
     --card-foreground: 0 0% 100%;
 
-    --widget: 0 0% 5%;
+    --widget: 12 8% 15%;
     --widget-foreground: 0 0% 10%;
 
     --border: 0 0% 20%;
@@ -163,7 +163,7 @@
     --field-border: 0 0% 30%;
 
     --primary: 0 0% 100%;
-    --primary-foreground: 0 0% 0%;
+    --primary-foreground: 12 8% 12%;
 
     --secondary: 0 0% 20%;
     --secondary-foreground: 0 0% 100%;

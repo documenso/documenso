@@ -123,7 +123,7 @@ export const DocumentSigningMobileWidget = () => {
               {!hidePoweredBy && (
                 <div className="bg-primary text-primary-foreground mt-2 inline-block rounded px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100 lg:hidden">
                   <span>Powered by</span>
-                  <BrandingLogo className="ml-2 inline-block h-[14px]" />
+                  <BrandingLogo className="ml-2 inline-block h-5" />
                 </div>
               )}
             </div>

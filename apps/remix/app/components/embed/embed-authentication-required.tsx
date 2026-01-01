@@ -25,7 +25,7 @@ export const EmbedAuthenticationRequired = ({
   return (
     <div className="flex min-h-[100dvh] w-full items-center justify-center">
       <div className="flex w-full max-w-md flex-col">
-        <BrandingLogo className="h-8" />
+        <BrandingLogo className="h-12 md:h-16" />
 
         <Alert className="mt-8" variant="warning">
           <AlertDescription>

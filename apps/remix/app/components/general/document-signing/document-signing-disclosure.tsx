@@ -23,7 +23,7 @@ export const DocumentSigningDisclosure = ({
         <Trans>
           Read the full{' '}
           <Link
-            className="text-documenso-700 underline"
+            className="text-justx-700 underline"
             to="/articles/signature-disclosure"
             target="_blank"
           >

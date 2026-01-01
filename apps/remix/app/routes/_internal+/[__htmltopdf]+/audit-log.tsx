@@ -190,7 +190,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
 
       <div className="my-8 flex-row-reverse">
         <div className="flex items-end justify-end gap-x-4">
-          <BrandingLogo className="max-h-6 print:max-h-4" />
+          <BrandingLogo className="max-h-10 print:max-h-6" />
         </div>
       </div>
     </div>

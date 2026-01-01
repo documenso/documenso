@@ -38,7 +38,7 @@ export const RecipientRemovedFromDocumentTemplate = ({
               ) : (
                 <Img
                   src={getAssetUrl('/static/logo.png')}
-                  alt="Documenso Logo"
+                  alt="JustX Logo"
                   className="mb-4 h-6"
                 />
               )}
