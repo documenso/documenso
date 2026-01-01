@@ -654,9 +654,12 @@ test.describe('File Conversion', () => {
       }
 
       const errorBody = await createEnvelopeRequest.json();
+      const errorCode =
+        errorBody.code === 'INTERNAL_SERVER_ERROR'
+          ? errorBody.data?.code || errorBody.data?.appError?.code
+          : errorBody.code;
       expect(
-        errorBody.code === 'CONVERSION_SERVICE_UNAVAILABLE' ||
-          errorBody.code === 'CONVERSION_FAILED',
+        errorCode === 'CONVERSION_SERVICE_UNAVAILABLE' || errorCode === 'CONVERSION_FAILED',
       ).toBeTruthy();
     });
   });
