@@ -92,6 +92,7 @@ export const DocumentShareButton = ({
     }
 
     setIsOpen(false);
+    onDialogClose?.();
   };
 
   const onTweetClick = async () => {
@@ -121,6 +122,7 @@ export const DocumentShareButton = ({
     );
 
     setIsOpen(false);
+    onDialogClose?.();
   };
 
   const triggerContent = trigger?.({
