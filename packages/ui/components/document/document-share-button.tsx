@@ -133,7 +133,14 @@ export const DocumentShareButton = ({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       {triggerContent ? (
-        <div onClick={() => setIsOpen(true)}>{triggerContent}</div>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(true);
+          }}
+        >
+          {triggerContent}
+        </div>
       ) : (
         <DialogTrigger onClick={(e) => e.stopPropagation()} asChild>
           <Button
