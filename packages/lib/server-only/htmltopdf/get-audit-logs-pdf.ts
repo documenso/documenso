@@ -33,7 +33,9 @@ export const getAuditLogsPdf = async ({ documentId, language }: GetAuditLogsPdfO
     // !: Previously we would have to keep the playwright version in sync with the browserless version to avoid errors.
     browser = await chromium.connectOverCDP(browserlessUrl);
   } else {
-    browser = await chromium.launch();
+    browser = await chromium.launch({
+      executablePath: env('PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH') || undefined,
+    });
   }
 
   if (!browser) {
