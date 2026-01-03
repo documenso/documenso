@@ -59,12 +59,8 @@ export const EnvelopeRecipientSelector = ({
           role="combobox"
           className={cn(
             'justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
-            getRecipientColorStyles(
-              Math.max(
-                recipients.findIndex((r) => r.id === selectedRecipient?.id),
-                0,
-              ),
-            ).comboxBoxTrigger,
+            getRecipientColorStyles(recipients.findIndex((r) => r.id === selectedRecipient?.id))
+              .comboBoxTrigger,
             className,
           )}
         >
@@ -197,12 +193,8 @@ export const EnvelopeRecipientSelectorCommand = ({
               key={recipient.id}
               className={cn(
                 'px-2 last:mb-1 [&:not(:first-child)]:mt-1',
-                getRecipientColorStyles(
-                  Math.max(
-                    recipients.findIndex((r) => r.id === recipient.id),
-                    0,
-                  ),
-                ).comboxBoxItem,
+                getRecipientColorStyles(recipients.findIndex((r) => r.id === recipient.id))
+                  .comboBoxItem,
                 {
                   'text-muted-foreground': recipient.sendStatus === SendStatus.SENT,
                   'cursor-not-allowed': isRecipientDisabled(recipient.id),
