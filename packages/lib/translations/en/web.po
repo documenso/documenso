@@ -239,6 +239,7 @@ msgid "{0} Teams"
 msgstr "{0} Teams"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "{browserInfo} on {os}"
 msgstr "{browserInfo} on {os}"
 
@@ -470,6 +471,7 @@ msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} has invited you to {action} {documentName}"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "{userAgent}"
 msgstr "{userAgent}"
 
@@ -950,6 +952,7 @@ msgid "Account"
 msgstr "Account"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Account Authentication"
 msgstr "Account Authentication"
 
@@ -987,6 +990,7 @@ msgid "Account Linking Request"
 msgstr "Account Linking Request"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Account Re-Authentication"
 msgstr "Account Re-Authentication"
 
@@ -1934,6 +1938,7 @@ msgid "Attempts sealing the document again, useful for after a code change has o
 msgstr "Attempts sealing the document again, useful for after a code change has occurred to resolve an erroneous document."
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Audit Log"
 msgstr "Audit Log"
 
@@ -1942,6 +1947,7 @@ msgid "Audit Logs"
 msgstr "Audit Logs"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Authentication Level"
 msgstr "Authentication Level"
 
@@ -2962,6 +2968,7 @@ msgstr "Created"
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Created At"
 msgstr "Created At"
 
@@ -3254,6 +3261,7 @@ msgstr "Delete your account and all its contents, including completed documents.
 
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Deleted"
 msgstr "Deleted"
 
@@ -3267,6 +3275,7 @@ msgstr "Destination"
 
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Details"
 msgstr "Details"
 
@@ -3323,6 +3332,7 @@ msgstr "Developer Mode"
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Device"
 msgstr "Device"
 
@@ -4085,6 +4095,8 @@ msgstr "Electronic Signature Disclosure"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/constants/document.ts
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -4114,10 +4126,6 @@ msgstr "Email already confirmed"
 #: apps/remix/app/components/dialogs/organisation-email-create-dialog.tsx
 msgid "Email already exists"
 msgstr "Email already exists"
-
-#: apps/remix/app/components/general/direct-template/direct-template-configure-form.tsx
-msgid "Email cannot already exist in the template"
-msgstr "Email cannot already exist in the template"
 
 #: apps/remix/app/routes/_unauthenticated+/verify-email.$token.tsx
 msgid "Email Confirmed!"
@@ -4304,6 +4312,10 @@ msgstr "Enabling the account results in the user being able to use the account a
 msgid "Enclosed Document"
 msgstr "Enclosed Document"
 
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+msgid "Enclosed Documents"
+msgstr "Enclosed Documents"
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
 msgstr "Enter a name for your new folder. Folders help you organise your items."
@@ -4379,6 +4391,7 @@ msgid "Envelope Duplicated"
 msgstr "Envelope Duplicated"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Envelope ID"
 msgstr "Envelope ID"
 
@@ -5076,6 +5089,7 @@ msgid "I am required to receive a copy of this document"
 msgstr "I am required to receive a copy of this document"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "I am the owner of this document"
 msgstr "I am the owner of this document"
 
@@ -5303,6 +5317,8 @@ msgstr "Invoice"
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 #: apps/remix/app/routes/_authenticated+/settings+/security.sessions.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "IP Address"
 msgstr "IP Address"
 
@@ -5415,6 +5431,7 @@ msgid "Last updated"
 msgstr "Last updated"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Last Updated"
 msgstr "Last Updated"
 
@@ -5876,6 +5893,7 @@ msgid "My Folder"
 msgstr "My Folder"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "N/A"
 msgstr "N/A"
 
@@ -6402,6 +6420,7 @@ msgstr "Override organisation settings"
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Owner"
 msgstr "Owner"
 
@@ -6452,6 +6471,7 @@ msgid "Passkey name"
 msgstr "Passkey name"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Passkey Re-Authentication"
 msgstr "Passkey Re-Authentication"
 
@@ -6478,6 +6498,7 @@ msgid "Password"
 msgstr "Password"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Password Re-Authentication"
 msgstr "Password Re-Authentication"
 
@@ -6948,6 +6969,7 @@ msgid "Ready"
 msgstr "Ready"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Reason"
 msgstr "Reason"
 
@@ -7034,6 +7056,7 @@ msgstr "Recipient updated"
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Recipients"
 msgstr "Recipients"
 
@@ -7111,6 +7134,7 @@ msgstr "Reject Document"
 #: apps/remix/app/components/general/stack-avatars-with-tooltip.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/constants/document.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Rejected"
 msgstr "Rejected"
 
@@ -7782,6 +7806,7 @@ msgstr "Sending..."
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Sent"
 msgstr "Sent"
 
@@ -8012,6 +8037,7 @@ msgstr "Sign your initials into the field"
 #: apps/remix/app/components/general/envelope-signing/envelope-signer-form.tsx
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
@@ -8020,6 +8046,7 @@ msgid "Signature"
 msgstr "Signature"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signature ID"
 msgstr "Signature ID"
 
@@ -8045,6 +8072,7 @@ msgstr "Signatures Collected"
 
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 #: packages/ui/components/document/document-read-only-fields.tsx
 #: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
 msgid "Signed"
@@ -8070,6 +8098,7 @@ msgid "Signer"
 msgstr "Signer"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signer Events"
 msgstr "Signer Events"
 
@@ -8084,10 +8113,12 @@ msgid "Signing"
 msgstr "Signing"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signing Certificate"
 msgstr "Signing Certificate"
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Signing certificate provided by"
 msgstr "Signing certificate provided by"
 
@@ -8295,6 +8326,7 @@ msgstr "Stats"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Status"
 msgstr "Status"
 
@@ -9437,6 +9469,7 @@ msgstr "Time zone"
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 #: packages/ui/primitives/document-flow/add-settings.tsx
 #: packages/ui/primitives/template-flow/add-template-settings.tsx
 msgid "Time Zone"
@@ -9628,6 +9661,7 @@ msgstr "Two factor authentication recovery codes are used to access your account
 
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Two-Factor Authentication"
 msgstr "Two-Factor Authentication"
 
@@ -9644,6 +9678,7 @@ msgid "Two-factor authentication has been disabled for your account. You will no
 msgstr "Two-factor authentication has been disabled for your account. You will no longer be required to enter a code from your authenticator app when signing in."
 
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/generate-certificate-pdf.ts
 msgid "Two-Factor Re-Authentication"
 msgstr "Two-Factor Re-Authentication"
 
@@ -9777,6 +9812,10 @@ msgstr "Undo"
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Unknown"
 msgstr "Unknown"
 
@@ -10079,10 +10118,12 @@ msgstr "Use your passkey for authentication"
 
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "User"
 msgstr "User"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "User Agent"
 msgstr "User Agent"
 
@@ -10326,6 +10367,7 @@ msgstr "View the DNS records for this email domain"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
+#: packages/lib/server-only/pdf/render-certificate.ts
 msgid "Viewed"
 msgstr "Viewed"
 
