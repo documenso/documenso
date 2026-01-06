@@ -95,7 +95,7 @@ export const DocumentLogsTable = ({ documentId, userId }: DocumentLogsTableProps
         header: _(msg`Action`),
         accessorKey: 'type',
         cell: ({ row }) => (
-          <span>{formatDocumentAuditLogAction(_, row.original, userId).description}</span>
+          <span>{formatDocumentAuditLogAction(i18n, row.original, userId).description}</span>
         ),
       },
       {
