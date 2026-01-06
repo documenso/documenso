@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { ZSupportedLanguageCodeSchema } from '@documenso/lib/constants/i18n';
+
 import { ZBaseEmbedDataSchema } from './embed-base-schemas';
 
 export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
@@ -15,4 +17,5 @@ export const ZSignDocumentEmbedDataSchema = ZBaseEmbedDataSchema.extend({
   lockName: z.boolean().optional().default(false),
   allowDocumentRejection: z.boolean().optional(),
   showOtherRecipientsCompletedFields: z.boolean().optional(),
+  language: ZSupportedLanguageCodeSchema.optional(),
 });
