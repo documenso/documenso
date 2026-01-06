@@ -239,7 +239,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         Controls the language for the document, including the language to be used
                         for email notifications, and the final certificate that is generated and
                         attached to the document.
@@ -337,7 +337,7 @@ export const AddTemplateSettingsFormPartial = ({
                         <InfoIcon className="mx-2 h-4 w-4" />
                       </TooltipTrigger>
 
-                      <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                      <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                         <h2>
                           <strong>
                             <Trans>Document Distribution Method</Trans>
@@ -423,7 +423,7 @@ export const AddTemplateSettingsFormPartial = ({
                         field.onChange(value);
                         void handleAutoSave();
                       }}
-                      className="bg-background w-full"
+                      className="w-full bg-background"
                       emptySelectionPlaceholder={t`Select signature types`}
                     />
                   </FormControl>
@@ -463,11 +463,11 @@ export const AddTemplateSettingsFormPartial = ({
             {distributionMethod === DocumentDistributionMethod.EMAIL && (
               <Accordion type="multiple">
                 <AccordionItem value="email-options" className="border-none">
-                  <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                  <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                     <Trans>Email Options</Trans>
                   </AccordionTrigger>
 
-                  <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed [&>div]:pb-0">
+                  <AccordionContent className="-mx-1 px-1 pt-4 text-sm leading-relaxed text-muted-foreground [&>div]:pb-0">
                     <div className="flex flex-col space-y-6">
                       {organisation.organisationClaim.flags.emailDomains && (
                         <FormField
@@ -566,7 +566,7 @@ export const AddTemplateSettingsFormPartial = ({
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
-                                <TooltipContent className="text-muted-foreground p-4">
+                                <TooltipContent className="p-4 text-muted-foreground">
                                   <DocumentSendEmailMessageHelper />
                                 </TooltipContent>
                               </Tooltip>
@@ -574,7 +574,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                             <FormControl>
                               <Textarea
-                                className="bg-background h-16 resize-none"
+                                className="h-16 resize-none bg-background"
                                 {...field}
                                 maxLength={5000}
                                 onBlur={handleAutoSave}
@@ -603,11 +603,11 @@ export const AddTemplateSettingsFormPartial = ({
 
             <Accordion type="multiple">
               <AccordionItem value="advanced-options" className="border-none">
-                <AccordionTrigger className="text-foreground rounded border px-3 py-2 text-left hover:bg-neutral-200/30 hover:no-underline">
+                <AccordionTrigger className="rounded border px-3 py-2 text-left text-foreground hover:bg-neutral-200/30 hover:no-underline">
                   <Trans>Advanced Options</Trans>
                 </AccordionTrigger>
 
-                <AccordionContent className="text-muted-foreground -mx-1 px-1 pt-4 text-sm leading-relaxed">
+                <AccordionContent className="-mx-1 px-1 pt-4 text-sm leading-relaxed text-muted-foreground">
                   <div className="flex flex-col space-y-6">
                     <FormField
                       control={form.control}
@@ -621,7 +621,7 @@ export const AddTemplateSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add an external ID to the template. This can be used to identify
                                   in external systems.
@@ -691,7 +691,7 @@ export const AddTemplateSettingsFormPartial = ({
 
                           <FormControl>
                             <Combobox
-                              className="bg-background time-zone-field"
+                              className="time-zone-field bg-background"
                               options={TIME_ZONES}
                               {...field}
                               onChange={(value) => {
@@ -718,7 +718,7 @@ export const AddTemplateSettingsFormPartial = ({
                                 <InfoIcon className="mx-2 h-4 w-4" />
                               </TooltipTrigger>
 
-                              <TooltipContent className="text-muted-foreground max-w-xs">
+                              <TooltipContent className="max-w-xs text-muted-foreground">
                                 <Trans>
                                   Add a URL to redirect the user to once the document is signed
                                 </Trans>
