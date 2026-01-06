@@ -143,6 +143,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
   };
 
   const certificatePages = await renderCertificate(payload);
+
   return await mergeFilesIntoPdf(certificatePages);
 };
 

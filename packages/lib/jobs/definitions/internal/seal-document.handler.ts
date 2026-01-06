@@ -25,9 +25,12 @@ import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
+import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
 import { PDF_SIZE_A4_72PPI } from '../../../constants/pdf';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
+import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
+import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
 import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
 import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
 import { flattenForm } from '../../../server-only/pdf/flatten-form';
@@ -196,9 +199,29 @@ export const run = async ({
         pageHeight: PDF_SIZE_A4_72PPI.height,
       };
 
+      // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
+      // This is a temporary toggle while we validate the Konva-based approach.
+      const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
+
+      const makeCertificatePdf = async () =>
+        usePlaywrightPdf
+          ? getCertificatePdf({
+              documentId,
+              language: envelope.documentMeta.language,
+            }).then(async (buffer) => PDFDocument.load(buffer))
+          : generateCertificatePdf(certificatePayload);
+
+      const makeAuditLogPdf = async () =>
+        usePlaywrightPdf
+          ? getAuditLogsPdf({
+              documentId,
+              language: envelope.documentMeta.language,
+            }).then(async (buffer) => PDFDocument.load(buffer))
+          : generateAuditLogPdf(certificatePayload);
+
       const [createdCertificatePdf, createdAuditLogPdf] = await Promise.all([
-        settings.includeSigningCertificate ? generateCertificatePdf(certificatePayload) : null,
-        settings.includeAuditLog ? generateAuditLogPdf(certificatePayload) : null,
+        settings.includeSigningCertificate ? makeCertificatePdf() : null,
+        settings.includeAuditLog ? makeAuditLogPdf() : null,
       ]);
 
       certificateDoc = createdCertificatePdf;
