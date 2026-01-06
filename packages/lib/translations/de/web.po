@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2025-12-15 02:39\n"
+"PO-Revision-Date: 2026-01-06 04:17\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -3118,7 +3118,7 @@ msgstr "Standardwert"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Delegate Document Ownership"
-msgstr ""
+msgstr "Dokumenteigentum delegieren"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 msgid "delete"
@@ -3689,7 +3689,7 @@ msgstr "Dokument geöffnet"
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "Document ownership delegated"
-msgstr ""
+msgstr "Dokumenteigentum delegiert"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
@@ -4298,7 +4298,7 @@ msgstr "SSO-Portal aktivieren"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Enable team API tokens to delegate document ownership to another team member."
-msgstr ""
+msgstr "Team-API-Tokens aktivieren, um das Dokumenteigentum an ein anderes Teammitglied zu delegieren."
 
 #: apps/remix/app/components/dialogs/webhook-create-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-edit-dialog.tsx
@@ -4319,7 +4319,7 @@ msgstr "Beigefügte Dokument"
 
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
-msgstr ""
+msgstr "Beigefügte Dokumente"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
@@ -5649,7 +5649,7 @@ msgstr "Organisation verwalten"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Manage Organisation"
-msgstr ""
+msgstr "Organisation verwalten"
 
 #: apps/remix/app/routes/_authenticated+/admin+/organisations._index.tsx
 msgid "Manage organisations"
@@ -7380,7 +7380,7 @@ msgstr "Zurück"
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 #: apps/remix/app/routes/_recipient+/sign.$token+/waiting.tsx
 msgid "Return Home"
-msgstr ""
+msgstr "Zur Startseite zurückkehren"
 
 #: apps/remix/app/routes/_unauthenticated+/o.$orgUrl.signin.tsx
 msgid "Return to Documenso sign in page here"
@@ -8897,7 +8897,7 @@ msgstr "Der Dokumenteneigentümer wurde über Ihre Entscheidung informiert. Er k
 #. placeholder {1}: data.teamName
 #: packages/lib/utils/document-audit-logs.ts
 msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr ""
+msgstr "Das Dokumenteigentum wurde im Namen von {1} an {0} delegiert"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -11696,3 +11696,4 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
