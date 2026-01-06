@@ -24,7 +24,7 @@ export const EnvelopeSignerCompleteDialog = () => {
 
   const { t } = useLingui();
   const { toast } = useToast();
-  const { revalidate } = useRevalidator();
+  const revalidator = useRevalidator();
 
   const [searchParams] = useSearchParams();
 
@@ -105,14 +105,19 @@ export const EnvelopeSignerCompleteDialog = () => {
           envelopeId: envelope.id,
         });
 
-        await revalidate();
-
+        // In embedded flows the parent might not trigger navigation, so force a refresh
+        // to ensure loaders rerun and the UI updates (or redirects to /complete).
+        //
+        // `navigate(0)` can be flaky depending on the router/embed host. A hard reload is deterministic.
+        revalidator.revalidate();
+        window.location.reload();
         return;
       }
 
       if (envelope.documentMeta.redirectUrl) {
         window.location.href = envelope.documentMeta.redirectUrl;
       } else {
+        revalidator.revalidate();
         await navigate(`/sign/${recipient.token}/complete`);
       }
     } catch (err) {
