@@ -5,14 +5,22 @@ description: Learn how to get the coordinates of a field in a document.
 
 ## Field Coordinates
 
-Field coordinates represent the position of a field in a document. They are returned in the `pageX` and `pageY` properties of the field.
+Field coordinates represent the position of a field in a document. They are returned in the `pageX`, `pageY`, `width` and `height` properties of the field.
 
 To enable field coordinates, you can use the `devmode` query parameter.
 
 ```bash
-https://app.documenso.com/documents/<document-id>/edit?devmode=true
+# Legacy editor
+
+https://app.documenso.com/t/<team-url>/documents/<envelope-id>/legacy_editor?devmode=true
 ```
 
-You should then see the coordinates on top of each field.
+![Field Coordinates Legacy Editor](/developer-mode/field-coordinates-legacy-editor.webp)
 
-![Field Coordinates](/developer-mode/field-coordinates.webp)
+```bash
+# New editor
+
+https://app.documenso.com/t/<team-url>/documents/<envelope-id>/edit?step=addFields&devmode=true
+```
+
+![Field Coordinates New Editor](/developer-mode/field-coordinates-new-editor.webp)

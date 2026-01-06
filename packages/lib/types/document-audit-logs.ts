@@ -759,3 +759,5 @@ export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
   TDocumentAuditLog,
   { type: T }
 >;
+
+export type TDocumentAuditLogBaseSchema = z.infer<typeof ZDocumentAuditLogBaseSchema>;
