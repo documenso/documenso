@@ -42,8 +42,8 @@ import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
 
-export function loader() {
-  const licenseData = LicenseClient.getInstance()?.cachedLicense || null;
+export async function loader() {
+  const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
 
   return {
     licenseFlags: licenseData?.license?.flags,

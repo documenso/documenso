@@ -22,7 +22,11 @@ const LICENSE_SERVER_URL =
 export class LicenseClient {
   private static instance: LicenseClient | null = null;
 
-  public cachedLicense: TCachedLicense | null = null;
+  /**
+   * We cache the license in memory incase there is permission issues with
+   * retrieving the license from the local file system.
+   */
+  private cachedLicense: TCachedLicense | null = null;
 
   private constructor() {}
 
@@ -54,6 +58,16 @@ export class LicenseClient {
    */
   public static getInstance(): LicenseClient | null {
     return LicenseClient.instance;
+  }
+
+  public async getCachedLicense(): Promise<TCachedLicense | null> {
+    if (this.cachedLicense) {
+      return this.cachedLicense;
+    }
+
+    const localLicenseFile = await this.loadFromFile();
+
+    return localLicenseFile;
   }
 
   /**

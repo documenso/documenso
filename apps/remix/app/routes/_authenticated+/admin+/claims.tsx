@@ -13,8 +13,8 @@ import { AdminClaimsTable } from '~/components/tables/admin-claims-table';
 
 import type { Route } from './+types/claims';
 
-export function loader() {
-  const licenseData = LicenseClient.getInstance()?.cachedLicense || null;
+export async function loader() {
+  const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
 
   return {
     licenseFlags: licenseData?.license?.flags,

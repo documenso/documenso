@@ -23,14 +23,14 @@ import type { Route } from './+types/_layout';
 export async function loader({ request }: Route.LoaderArgs) {
   const { user } = await getSession(request);
 
-  const license = LicenseClient.getInstance()?.cachedLicense || null;
+  const license = await LicenseClient.getInstance()?.getCachedLicense();
 
   if (!user || !isAdmin(user)) {
     throw redirect('/');
   }
 
   return {
-    license,
+    license: license || null,
   };
 }
 

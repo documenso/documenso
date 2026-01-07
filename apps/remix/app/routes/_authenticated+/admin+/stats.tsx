@@ -44,6 +44,7 @@ export async function loader() {
     signerConversionMonthly,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
+    licenseData,
   ] = await Promise.all([
     getUsersCount(),
     getOrganisationsWithSubscriptionsCount(),
@@ -52,9 +53,8 @@ export async function loader() {
     getSignerConversionMonthly(),
     getUserWithSignedDocumentMonthlyGrowth(),
     getMonthlyActiveUsers(),
+    LicenseClient.getInstance()?.getCachedLicense(),
   ]);
-
-  const licenseData = LicenseClient.getInstance()?.cachedLicense || null;
 
   return {
     usersCount,
@@ -64,7 +64,7 @@ export async function loader() {
     signerConversionMonthly,
     monthlyUsersWithDocuments,
     monthlyActiveUsers,
-    licenseData,
+    licenseData: licenseData || null,
   };
 }
 
