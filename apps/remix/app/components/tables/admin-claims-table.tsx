@@ -6,6 +6,7 @@ import { EditIcon, MoreHorizontalIcon, Trash2Icon } from 'lucide-react';
 import { Link, useSearchParams } from 'react-router';
 
 import { useUpdateSearchParams } from '@documenso/lib/client-only/hooks/use-update-search-params';
+import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { ZUrlSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
@@ -27,7 +28,11 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { ClaimDeleteDialog } from '../dialogs/claim-delete-dialog';
 import { ClaimUpdateDialog } from '../dialogs/claim-update-dialog';
 
-export const AdminClaimsTable = () => {
+type AdminClaimsTableProps = {
+  licenseFlags?: TLicenseClaim;
+};
+
+export const AdminClaimsTable = ({ licenseFlags }: AdminClaimsTableProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -97,11 +102,11 @@ export const AdminClaimsTable = () => {
           );
 
           if (flags.length === 0) {
-            return <p className="text-muted-foreground text-xs">{t`None`}</p>;
+            return <p className="text-xs text-muted-foreground">{t`None`}</p>;
           }
 
           return (
-            <ul className="text-muted-foreground list-disc space-y-1 text-xs">
+            <ul className="list-disc space-y-1 text-xs text-muted-foreground">
               {flags.map(({ key, label }) => (
                 <li key={key}>{label}</li>
               ))}
@@ -114,7 +119,7 @@ export const AdminClaimsTable = () => {
         cell: ({ row }) => (
           <DropdownMenu>
             <DropdownMenuTrigger>
-              <MoreHorizontalIcon className="text-muted-foreground h-5 w-5" />
+              <MoreHorizontalIcon className="h-5 w-5 text-muted-foreground" />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -124,6 +129,7 @@ export const AdminClaimsTable = () => {
 
               <ClaimUpdateDialog
                 claim={row.original}
+                licenseFlags={licenseFlags}
                 trigger={
                   <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
                     <div>

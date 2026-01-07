@@ -5,15 +5,16 @@ import { cn } from '@documenso/ui/lib/utils';
 export type CardMetricProps = {
   icon?: LucideIcon;
   title: string;
-  value: string | number;
+  value?: string | number;
   className?: string;
+  children?: React.ReactNode;
 };
 
-export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricProps) => {
+export const CardMetric = ({ icon: Icon, title, value, className, children }: CardMetricProps) => {
   return (
     <div
       className={cn(
-        'border-border bg-background hover:shadow-border/80 h-32 max-h-32 max-w-full overflow-hidden rounded-lg border shadow shadow-transparent duration-200',
+        'h-32 max-h-32 max-w-full overflow-hidden rounded-lg border border-border bg-background shadow shadow-transparent duration-200 hover:shadow-border/80',
         className,
       )}
     >
@@ -21,7 +22,7 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
         <div className="flex items-start">
           {Icon && (
             <div className="mr-2 h-4 w-4">
-              <Icon className="text-muted-foreground h-4 w-4" />
+              <Icon className="h-4 w-4 text-muted-foreground" />
             </div>
           )}
 
@@ -30,9 +31,11 @@ export const CardMetric = ({ icon: Icon, title, value, className }: CardMetricPr
           </h3>
         </div>
 
-        <p className="text-foreground mt-auto text-4xl font-semibold leading-8">
-          {typeof value === 'number' ? value.toLocaleString('en-US') : value}
-        </p>
+        {children || (
+          <p className="mt-auto text-4xl font-semibold leading-8 text-foreground">
+            {typeof value === 'number' ? value.toLocaleString('en-US') : value}
+          </p>
+        )}
       </div>
     </div>
   );
