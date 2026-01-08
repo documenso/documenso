@@ -40,6 +40,15 @@ services:
     entrypoint: sh
     command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
 
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: gotenberg
+    ports:
+      - 3001:3000
+    command:
+      - 'gotenberg'
+      - '--api-timeout=30s'
+
 volumes:
   minio:
   documenso_database:

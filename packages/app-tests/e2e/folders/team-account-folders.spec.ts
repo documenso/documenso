@@ -405,9 +405,12 @@ test('[TEAMS]: can create a template inside a template folder', async ({ page })
     page.getByRole('button', { name: 'Template (Legacy)' }).click(),
   ]);
 
-  await fileChooser.setFiles(
-    path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'),
-  );
+  await page.getByText('Upload Template Document').click();
+
+  await page
+    .locator('input[type="file"]')
+    .first()
+    .setInputFiles(path.join(__dirname, '../../../assets/documenso-supporter-pledge.pdf'));
 
   await page.waitForTimeout(3000);
 

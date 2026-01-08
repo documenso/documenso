@@ -197,7 +197,7 @@ export const templateRouter = router({
         attachments,
       } = payload;
 
-      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide(file);
+      const { id: templateDocumentDataId } = await putNormalizedPdfFileServerSide({ file });
 
       ctx.logger.info({
         input: {
