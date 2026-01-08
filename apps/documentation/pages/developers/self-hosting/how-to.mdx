@@ -148,6 +148,7 @@ This method avoids file permission issues by creating the certificate directly i
 
    # Generate certificate inside container using environment variable
    docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
+     mkdir -p /app/certs && \
      openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
        -keyout /tmp/private.key \
        -out /tmp/certificate.crt \

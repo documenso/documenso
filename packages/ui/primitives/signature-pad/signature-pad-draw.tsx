@@ -294,7 +294,7 @@ export const SignaturePadDraw = ({
       <div className="absolute bottom-3 right-3 flex gap-2">
         <button
           type="button"
-          className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
+          className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           onClick={() => onClearClick()}
         >
           <Trans>Clear Signature</Trans>
@@ -303,7 +303,7 @@ export const SignaturePadDraw = ({
 
       {isSignatureValid === false && (
         <div className="absolute bottom-4 left-4 flex gap-2">
-          <span className="text-destructive text-xs">
+          <span className="text-xs text-destructive">
             <Trans>Signature is too small</Trans>
           </span>
         </div>
@@ -314,7 +314,7 @@ export const SignaturePadDraw = ({
           <button
             type="button"
             title="undo"
-            className="focus-visible:ring-ring ring-offset-background text-muted-foreground/60 hover:text-muted-foreground rounded-full p-0 text-[0.688rem] focus-visible:outline-none focus-visible:ring-2"
+            className="rounded-full p-0 text-[0.688rem] text-muted-foreground/60 ring-offset-background hover:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             onClick={onUndoClick}
           >
             <Undo2 className="h-4 w-4" />

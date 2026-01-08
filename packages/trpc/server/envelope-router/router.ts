@@ -18,8 +18,8 @@ import { createEnvelopeRecipientsRoute } from './envelope-recipients/create-enve
 import { deleteEnvelopeRecipientRoute } from './envelope-recipients/delete-envelope-recipient';
 import { getEnvelopeRecipientRoute } from './envelope-recipients/get-envelope-recipient';
 import { updateEnvelopeRecipientsRoute } from './envelope-recipients/update-envelope-recipients';
-import { findEnvelopesRoute } from './find-envelopes';
 import { findEnvelopeAuditLogsRoute } from './find-envelope-audit-logs';
+import { findEnvelopesRoute } from './find-envelopes';
 import { getEnvelopeRoute } from './get-envelope';
 import { getEnvelopeItemsRoute } from './get-envelope-items';
 import { getEnvelopeItemsByTokenRoute } from './get-envelope-items-by-token';
