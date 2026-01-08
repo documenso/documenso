@@ -29,7 +29,6 @@ import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import type { TSignEnvelopeFieldValue } from '@documenso/trpc/server/envelope-router/sign-envelope-field.types';
 import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
 import { EnvelopeFieldToolTip } from '@documenso/ui/components/field/envelope-field-tooltip';
-import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
@@ -142,13 +141,11 @@ export default function EnvelopeSignerPageRenderer() {
 
     const fieldToRender = ZFullFieldSchema.parse(unparsedField);
 
-    let color: TRecipientColor = 'green';
-
-    if (fieldToRender.fieldMeta?.readOnly) {
-      color = 'readOnly';
-    } else if (showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender)) {
-      color = 'orange';
-    }
+    const color = fieldToRender.fieldMeta?.readOnly
+      ? 'readOnly'
+      : showPendingFieldTooltip && isFieldUnsignedAndRequired(fieldToRender)
+        ? 'orange'
+        : 'green';
 
     const { fieldGroup } = renderField({
       scale,
