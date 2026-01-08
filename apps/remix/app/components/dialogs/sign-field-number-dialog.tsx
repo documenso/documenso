@@ -11,7 +11,6 @@ import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -22,7 +21,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
@@ -107,13 +105,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              <Trans>Sign Number Field</Trans>
-            </DialogTitle>
-
-            <DialogDescription className="mt-4">
-              <Trans>Insert a value into the number field</Trans>
-            </DialogDescription>
+            <DialogTitle>{fieldMeta.label || <Trans>Enter Value</Trans>}</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -127,8 +119,6 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
                   name="number"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      {fieldMeta.label && <FormLabel>{fieldMeta.label}</FormLabel>}
-
                       <FormControl>
                         <Input
                           placeholder={fieldMeta.placeholder ?? t`Enter your number here`}
@@ -150,7 +140,7 @@ export const SignFieldNumberDialog = createCallable<SignFieldNumberDialogProps, 
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>
