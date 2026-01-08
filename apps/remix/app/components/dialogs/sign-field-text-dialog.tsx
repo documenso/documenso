@@ -12,7 +12,6 @@ import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -22,7 +21,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Textarea } from '@documenso/ui/primitives/textarea';
@@ -52,13 +50,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              <Trans>Sign Text Field</Trans>
-            </DialogTitle>
-
-            <DialogDescription className="mt-4">
-              <Trans>Insert a value into the text field</Trans>
-            </DialogDescription>
+            <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
           </DialogHeader>
 
           <Form {...form}>
@@ -72,8 +64,6 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                   name="text"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      {fieldMeta?.label && <FormLabel>{fieldMeta?.label}</FormLabel>}
-
                       <FormControl>
                         <Textarea
                           id="custom-text"
@@ -89,7 +79,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                       {fieldMeta?.characterLimit !== undefined &&
                         fieldMeta?.characterLimit > 0 &&
                         !fieldState.error && (
-                          <div className="text-muted-foreground text-sm">
+                          <div className="text-sm text-muted-foreground">
                             <Plural
                               value={fieldMeta?.characterLimit - (field.value?.length ?? 0)}
                               one="# character remaining"
@@ -107,7 +97,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>
