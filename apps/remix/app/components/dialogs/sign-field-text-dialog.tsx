@@ -12,6 +12,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -50,7 +51,11 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{fieldMeta?.label || <Trans>Enter Value</Trans>}</DialogTitle>
+            <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
+
+            <DialogDescription className="mt-4">
+              <Trans>Please enter a value</Trans>
+            </DialogDescription>
           </DialogHeader>
 
           <Form {...form}>
