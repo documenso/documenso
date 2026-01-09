@@ -82,9 +82,7 @@ export const SignFieldCheckboxDialog = createCallable<
     <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
       <DialogContent position="center">
         <DialogHeader>
-          <DialogTitle>
-            <Trans>Sign Checkbox Field</Trans>
-          </DialogTitle>
+          <DialogTitle>{fieldMeta.label || <Trans>Select Options</Trans>}</DialogTitle>
 
           <DialogDescription
             className={cn('mt-4', {
@@ -143,7 +141,7 @@ export const SignFieldCheckboxDialog = createCallable<
                             <div className="flex items-center">
                               <Checkbox
                                 id={`checkbox-value-${index}`}
-                                className="data-[state=checked]:bg-primary border-foreground/30 h-5 w-5"
+                                className="h-5 w-5 border-foreground/30 data-[state=checked]:bg-primary"
                                 checked={field.value.checked}
                                 onCheckedChange={(checked) => {
                                   field.onChange({
@@ -154,7 +152,7 @@ export const SignFieldCheckboxDialog = createCallable<
                               />
 
                               <label
-                                className="text-muted-foreground ml-2 w-full text-sm"
+                                className="ml-2 w-full text-sm text-muted-foreground"
                                 htmlFor={`checkbox-value-${index}`}
                               >
                                 {value.value}
@@ -174,7 +172,7 @@ export const SignFieldCheckboxDialog = createCallable<
                 </Button>
 
                 <Button type="submit">
-                  <Trans>Sign</Trans>
+                  <Trans>Confirm</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>
