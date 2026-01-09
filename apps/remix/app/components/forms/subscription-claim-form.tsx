@@ -161,7 +161,7 @@ export const SubscriptionClaimForm = ({
                             className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
                             htmlFor={`flag-${key}`}
                           >
-                            {label}
+                            {t(label)}
                           </label>
                         </div>
                       </FormControl>
