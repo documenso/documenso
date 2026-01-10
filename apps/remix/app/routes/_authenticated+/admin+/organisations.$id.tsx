@@ -190,7 +190,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
               <span>
-                {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
+                {t(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found
               </span>
             ) : (
               <span>No subscription found</span>
@@ -601,7 +601,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                           className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
                           htmlFor={`flag-${key}`}
                         >
-                          {label}
+                          {t(label)}
                         </label>
                       </div>
                     </FormControl>
