@@ -39,7 +39,7 @@ export const RecipientActionAuthSelect = ({
       .filter((auth) => auth !== RecipientActionAuth.ACCOUNT)
       .map((authType) => ({
         value: authType,
-        label: DOCUMENT_AUTH_TYPES[authType].value,
+        label: _(DOCUMENT_AUTH_TYPES[authType].value),
       })),
   ];
 
