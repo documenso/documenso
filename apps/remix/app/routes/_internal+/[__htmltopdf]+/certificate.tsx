@@ -1,5 +1,6 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { EnvelopeType, FieldType, SigningStatus } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { redirect } from 'react-router';
@@ -290,7 +291,9 @@ export default function SigningCertificate({ loaderData }: Route.ComponentProps)
                           </p>
                         </>
                       ) : (
-                        <p className="text-muted-foreground">N/A</p>
+                        <p className="text-muted-foreground">
+                          <Trans>N/A</Trans>
+                        </p>
                       )}
 
                       <p className="mt-2 text-sm text-muted-foreground print:text-xs">
