@@ -2,20 +2,25 @@ name: documenso-production
 
 services:
   database:
+    container_name: documenso-db
     image: postgres:15
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:?err}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
-      - POSTGRES_DB=${POSTGRES_DB:?err}
+      - POSTGRES_USER=${DOCUMENSO_DB_USER:-${POSTGRES_USER:-justx}}
+      - POSTGRES_PASSWORD=${DOCUMENSO_DB_PASSWORD:-changeme}
+      - POSTGRES_DB=${DOCUMENSO_DB_NAME:-${POSTGRES_DB:-documenso}}
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      test: ['CMD-SHELL', 'pg_isready -U ${DOCUMENSO_DB_USER:-${POSTGRES_USER:-justx}}']
       interval: 10s
       timeout: 5s
       retries: 5
     volumes:
       - database:/var/lib/postgresql/data
+    networks:
+      - justx-network
+    restart: unless-stopped
 
   documenso:
+    container_name: documenso
     image: documenso/documenso:latest
     depends_on:
       database:
@@ -28,7 +33,7 @@ services:
       - NEXT_PRIVATE_GOOGLE_CLIENT_ID=${NEXT_PRIVATE_GOOGLE_CLIENT_ID}
       - NEXT_PRIVATE_GOOGLE_CLIENT_SECRET=${NEXT_PRIVATE_GOOGLE_CLIENT_SECRET}
       - NEXT_PUBLIC_WEBAPP_URL=${NEXT_PUBLIC_WEBAPP_URL:?err}
-      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-http://localhost:$PORT}
+      - NEXT_PRIVATE_INTERNAL_WEBAPP_URL=${NEXT_PRIVATE_INTERNAL_WEBAPP_URL:-http://documenso:${PORT:-3000}}
       - NEXT_PRIVATE_DATABASE_URL=${NEXT_PRIVATE_DATABASE_URL:?err}
       - NEXT_PRIVATE_DIRECT_DATABASE_URL=${NEXT_PRIVATE_DIRECT_DATABASE_URL:-${NEXT_PRIVATE_DATABASE_URL}}
       - NEXT_PUBLIC_UPLOAD_TRANSPORT=${NEXT_PUBLIC_UPLOAD_TRANSPORT:-database}
@@ -63,9 +68,21 @@ services:
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
       - NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS=${NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS}
     ports:
-      - ${PORT:-3000}:${PORT:-3000}
+      - "127.0.0.1:3000:${PORT:-3000}"
     volumes:
-      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+      - documenso_cert:/opt/documenso
+    networks:
+      - justx-network
+    restart: unless-stopped
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
 
 volumes:
   database:
+  documenso_cert:
+
+networks:
+  justx-network:
+    external: true
+    name: justx_justx-network

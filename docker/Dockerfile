@@ -79,6 +79,10 @@ COPY --from=builder /app/out/full/ .
 # Finally copy the turbo.json file so that we can run turbo commands
 COPY turbo.json turbo.json
 
+RUN npm install
+
+RUN npm install postcss --save-dev || true
+
 RUN npm install -g "turbo@^1.9.3"
 
 RUN turbo run build --filter=@documenso/remix...
