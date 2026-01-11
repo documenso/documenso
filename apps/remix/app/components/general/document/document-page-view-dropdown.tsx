@@ -51,6 +51,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const recipient = envelope.recipients.find((recipient) => recipient.email === user.email);
 
@@ -67,9 +68,9 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
   const nonSignedRecipients = envelope.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger>
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="end" forceMount>
@@ -148,6 +149,7 @@ export const DocumentPageViewDropdown = ({ envelope }: DocumentPageViewDropdownP
         <DocumentShareButton
           documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
           token={isOwner ? undefined : recipient?.token}
+          onDialogClose={() => setDropdownOpen(false)}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               <div className="flex items-center">
