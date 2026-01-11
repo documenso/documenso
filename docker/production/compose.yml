@@ -66,11 +66,13 @@ services:
       - NEXT_PUBLIC_DISABLE_SIGNUP=${NEXT_PUBLIC_DISABLE_SIGNUP}
       - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=${NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH:-/opt/documenso/cert.p12}
       - NEXT_PRIVATE_SIGNING_PASSPHRASE=${NEXT_PRIVATE_SIGNING_PASSPHRASE}
+      - NEXT_PRIVATE_BROWSERLESS_URL=${NEXT_PRIVATE_BROWSERLESS_URL}
       - NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS=${NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS}
     ports:
       - "127.0.0.1:3000:${PORT:-3000}"
     volumes:
       - documenso_cert:/opt/documenso
+      - ../start.sh:/app/apps/remix/start.sh:ro
     networks:
       - justx-network
     restart: unless-stopped
