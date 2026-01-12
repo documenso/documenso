@@ -340,9 +340,11 @@ export const EnvelopeEditorSettingsDialog = ({
 
       <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
         {/* Sidebar. */}
-        <div className="bg-accent/20 flex w-80 flex-col border-r">
+        <div className="flex w-80 flex-col border-r bg-accent/20">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle>Document Settings</DialogTitle>
+            <DialogTitle>
+              <Trans>Document Settings</Trans>
+            </DialogTitle>
           </DialogHeader>
 
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
@@ -391,7 +393,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                                   <Trans>
                                     Controls the language for the document, including the language
                                     to be used for email notifications, and the final certificate
@@ -442,7 +444,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 }))}
                                 selectedValues={field.value}
                                 onChange={field.onChange}
-                                className="bg-background w-full"
+                                className="w-full bg-background"
                                 emptySelectionPlaceholder="Select signature types"
                               />
                             </FormControl>
@@ -519,7 +521,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                <TooltipContent className="max-w-xs text-muted-foreground">
                                   <Trans>
                                     Add an external ID to the document. This can be used to identify
                                     the document in external systems.
@@ -549,7 +551,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                <TooltipContent className="max-w-xs text-muted-foreground">
                                   <Trans>
                                     Add a URL to redirect the user to once the document is signed
                                   </Trans>
@@ -577,7 +579,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                                   <h2>
                                     <strong>
                                       <Trans>Document Distribution Method</Trans>
@@ -688,8 +690,10 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -727,20 +731,21 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
-                                <TooltipContent className="text-muted-foreground p-4">
+                                <TooltipContent className="p-4 text-muted-foreground">
                                   <DocumentSendEmailMessageHelper />
                                 </TooltipContent>
                               </Tooltip>
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="bg-background h-16 resize-none" {...field} />
+                              <Textarea className="h-16 resize-none bg-background" {...field} />
                             </FormControl>
 
                             <FormMessage />
