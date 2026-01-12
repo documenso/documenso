@@ -27,6 +27,7 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     typedSignatureEnabled: z.boolean().nullish(),
     uploadSignatureEnabled: z.boolean().nullish(),
     drawSignatureEnabled: z.boolean().nullish(),
+    delegateDocumentOwnership: z.boolean().nullish(),
 
     // Branding related settings.
     brandingEnabled: z.boolean().nullish(),
@@ -42,6 +43,8 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
 
     // Default recipients settings.
     defaultRecipients: ZDefaultRecipientsSchema.nullish(),
+    // AI features settings.
+    aiFeaturesEnabled: z.boolean().nullish(),
   }),
 });
 

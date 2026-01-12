@@ -18,3 +18,15 @@ export const SUPPORT_EMAIL = env('NEXT_PUBLIC_SUPPORT_EMAIL') ?? 'support@docume
 
 export const USE_INTERNAL_URL_BROWSERLESS = () =>
   env('NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS') === 'true';
+
+export const IS_AI_FEATURES_CONFIGURED = () =>
+  !!env('GOOGLE_VERTEX_PROJECT_ID') && !!env('GOOGLE_VERTEX_API_KEY');
+
+/**
+ * Temporary flag to toggle between Playwright-based and Konva-based PDF generation
+ * for audit logs during sealing.
+ *
+ * @deprecated This is a temporary flag and will be removed once Konva-based generation is stable.
+ */
+export const NEXT_PRIVATE_USE_PLAYWRIGHT_PDF = () =>
+  env('NEXT_PRIVATE_USE_PLAYWRIGHT_PDF') === 'true';

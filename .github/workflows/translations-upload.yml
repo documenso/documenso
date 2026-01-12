@@ -17,6 +17,7 @@ jobs:
     environment: Translations
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -26,12 +27,54 @@ jobs:
       - name: Extract translations
         run: npm run translate:extract
 
-      - name: Check and commit any files created
+      - name: Commit changes and push to reserved branch
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
+
+          BRANCH="chore/extract-translations"
+
           git config --global user.name 'github-actions'
           git config --global user.email 'github-actions@documenso.com'
+
+          git fetch origin
+
+          # Create branch locally (always reset to main)
+          git checkout -B "$BRANCH" origin/main
+
+          # Stage translation output
           git add packages/lib/translations
-          git diff --staged --quiet --exit-code || (git commit -m "chore: extract translations" && git push)
+
+          # If no changes, exit early
+          if git diff --staged --quiet; then
+            echo "No translation changes found."
+            exit 0
+          fi
+
+          # Commit fresh snapshot
+          git commit -m "chore: extract translations"
+
+          # Force push reserved branch
+          git push origin "$BRANCH" --force
+
+          # Does a PR already exist?
+          EXISTING_PR=$(gh pr list \
+            --state open \
+            --head "$BRANCH" \
+            --json number \
+            --jq '.[0].number // empty')
+
+          if [ -z "$EXISTING_PR" ]; then
+            echo "No existing PR — creating new one."
+            gh pr create \
+              --title "chore: extract translations" \
+              --body "Automated translation extraction" \
+              --base main \
+              --head "$BRANCH"
+          else
+            echo "PR #$EXISTING_PR already exists — not creating a new one."
+          fi
 
       - name: Compile translations
         id: compile_translations

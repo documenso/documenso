@@ -24,6 +24,7 @@ import { env } from '@documenso/lib/utils/env';
 import { prisma } from '@documenso/prisma';
 
 import { AuthenticationErrorCode } from '../lib/errors/error-codes';
+import { invalidateSessions } from '../lib/session/session';
 import { getCsrfCookie } from '../lib/session/session-cookies';
 import { onAuthorize } from '../lib/utils/authorizer';
 import { getSession } from '../lib/utils/get-session';
@@ -170,14 +171,37 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
     const { password, currentPassword } = c.req.valid('json');
     const requestMetadata = c.get('requestMetadata');
 
-    const session = await getSession(c);
+    const { session, user } = await getSession(c);
 
     await updatePassword({
-      userId: session.user.id,
+      userId: user.id,
       password,
       currentPassword,
       requestMetadata,
     });
+
+    const userSessionIds = await prisma.session
+      .findMany({
+        where: {
+          userId: user.id satisfies number, // Incase we pass undefined somehow.
+          id: {
+            not: session.id,
+          },
+        },
+        select: {
+          id: true,
+        },
+      })
+      .then((sessions) => sessions.map((s) => s.id));
+
+    if (userSessionIds.length > 0) {
+      await invalidateSessions({
+        userId: user.id,
+        sessionIds: userSessionIds,
+        metadata: requestMetadata,
+        isRevoke: true,
+      });
+    }
 
     return c.text('OK', 201);
   })
@@ -231,11 +255,32 @@ export const emailPasswordRoute = new Hono<HonoAuthContext>()
 
     const requestMetadata = c.get('requestMetadata');
 
-    await resetPassword({
+    const { userId } = await resetPassword({
       token,
       password,
       requestMetadata,
     });
+
+    // Invalidate all sessions after successful password reset
+    const userSessionIds = await prisma.session
+      .findMany({
+        where: {
+          userId: userId satisfies number, // Incase we pass undefined somehow.
+        },
+        select: {
+          id: true,
+        },
+      })
+      .then((sessions) => sessions.map((session) => session.id));
+
+    if (userSessionIds.length > 0) {
+      await invalidateSessions({
+        userId,
+        sessionIds: userSessionIds,
+        metadata: requestMetadata,
+        isRevoke: true,
+      });
+    }
 
     return c.text('OK', 201);
   })

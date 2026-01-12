@@ -8,12 +8,13 @@ import {
   type SensorAPI,
 } from '@hello-pangea/dnd';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
+import { plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, EnvelopeType, RecipientRole, SendStatus } from '@prisma/client';
 import { motion } from 'framer-motion';
-import { GripVerticalIcon, HelpCircleIcon, PlusIcon, TrashIcon } from 'lucide-react';
+import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useRevalidator, useSearchParams } from 'react-router';
 import { isDeepEqual, prop, sortBy } from 'remeda';
 import { z } from 'zod';
 
@@ -22,10 +23,12 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { nanoid } from '@documenso/lib/universal/id';
 import { canRecipientBeModified as utilCanRecipientBeModified } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
@@ -60,15 +63,16 @@ import { Input } from '@documenso/ui/primitives/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
+import { AiFeaturesEnableDialog } from '~/components/dialogs/ai-features-enable-dialog';
+import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-detection-dialog';
+import { useCurrentTeam } from '~/providers/team';
+
 const ZEnvelopeRecipientsForm = z.object({
   signers: z.array(
     z.object({
       formId: z.string().min(1),
       id: z.number().optional(),
-      email: z
-        .string()
-        .email({ message: msg`Invalid email`.id })
-        .min(1),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),
@@ -85,13 +89,59 @@ export const EnvelopeEditorRecipientForm = () => {
   const { envelope, setRecipientsDebounced, updateEnvelope } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
+  const team = useCurrentTeam();
 
   const { t } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
   const { user } = useSession();
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
+  const [isAiEnableDialogOpen, setIsAiEnableDialogOpen] = useState(false);
+
+  // AI recipient detection dialog state
+  const [isAiDialogOpen, setIsAiDialogOpen] = useState(() => searchParams.get('ai') === 'true');
+  const { revalidate } = useRevalidator();
+
+  const onAiDialogOpenChange = (open: boolean) => {
+    if (open && !team.preferences.aiFeaturesEnabled) {
+      setIsAiEnableDialogOpen(true);
+      setIsAiDialogOpen(false);
+      return;
+    }
+
+    setIsAiDialogOpen(open);
+
+    if (!open && searchParams.get('ai') === 'true') {
+      setSearchParams(
+        (prev) => {
+          const newParams = new URLSearchParams(prev);
+
+          newParams.delete('ai');
+
+          return newParams;
+        },
+        { replace: true },
+      );
+    }
+  };
+
+  const onDetectRecipientsClick = () => {
+    if (!team.preferences.aiFeaturesEnabled) {
+      setIsAiEnableDialogOpen(true);
+      return;
+    }
+
+    setIsAiDialogOpen(true);
+  };
+
+  const onAiFeaturesEnabled = () => {
+    void revalidate().then(() => {
+      setIsAiEnableDialogOpen(false);
+      setIsAiDialogOpen(true);
+    });
+  };
 
   const debouncedRecipientSearchQuery = useDebouncedValue(recipientSearchQuery, 500);
 
@@ -201,12 +251,13 @@ export const EnvelopeEditorRecipientForm = () => {
     keyName: 'nativeId',
   });
 
-  const emptySigners = useCallback(
-    () => form.getValues('signers').filter((signer) => signer.email === ''),
-    [form],
+  const emptySignerIndex = watchedSigners.findIndex(
+    (signer) =>
+      !signer.name &&
+      !signer.email &&
+      envelope.fields.filter((field) => field.recipientId === signer.id).length === 0,
   );
 
-  const emptySignerIndex = watchedSigners.findIndex((signer) => !signer.name && !signer.email);
   const isUserAlreadyARecipient = watchedSigners.some(
     (signer) => signer.email.toLowerCase() === user?.email?.toLowerCase(),
   );
@@ -241,6 +292,77 @@ export const EnvelopeEditorRecipientForm = () => {
       role: RecipientRole.SIGNER,
       actionAuth: [],
       signingOrder: signers.length > 0 ? (signers[signers.length - 1]?.signingOrder ?? 0) + 1 : 1,
+    });
+  };
+
+  const onAiDetectionComplete = (detectedRecipients: TDetectedRecipientSchema[]) => {
+    const currentSigners = form.getValues('signers');
+
+    let nextSigningOrder =
+      currentSigners.length > 0
+        ? Math.max(...currentSigners.map((s) => s.signingOrder ?? 0)) + 1
+        : 1;
+
+    // If the only signer is the default empty signer lets just replace it with the detected recipients
+    if (currentSigners.length === 1 && !currentSigners[0].name && !currentSigners[0].email) {
+      form.setValue(
+        'signers',
+        detectedRecipients.map((recipient, index) => ({
+          formId: nanoid(12),
+          name: recipient.name,
+          email: recipient.email,
+          role: recipient.role,
+          actionAuth: [],
+          signingOrder: index + 1,
+        })),
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        },
+      );
+
+      return;
+    }
+
+    for (const recipient of detectedRecipients) {
+      const emailExists = currentSigners.some(
+        (s) => s.email.toLowerCase() === recipient.email.toLowerCase(),
+      );
+
+      const nameExists = currentSigners.some(
+        (s) => s.name.toLowerCase() === recipient.name.toLowerCase(),
+      );
+
+      if ((emailExists && recipient.email) || (nameExists && recipient.name)) {
+        continue;
+      }
+
+      currentSigners.push({
+        formId: nanoid(12),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+        actionAuth: [],
+        signingOrder: nextSigningOrder,
+      });
+
+      nextSigningOrder += 1;
+    }
+
+    form.setValue('signers', normalizeSigningOrders(currentSigners), {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+
+    toast({
+      title: plural(detectedRecipients.length, {
+        one: `Recipient added`,
+        other: `Recipients added`,
+      }),
+      description: plural(detectedRecipients.length, {
+        one: `# recipient have been added from AI detection.`,
+        other: `# recipients have been added from AI detection.`,
+      }),
     });
   };
 
@@ -306,8 +428,14 @@ export const EnvelopeEditorRecipientForm = () => {
     index: number,
     suggestion: RecipientAutoCompleteOption,
   ) => {
-    setValue(`signers.${index}.email`, suggestion.email);
-    setValue(`signers.${index}.name`, suggestion.name || '');
+    setValue(`signers.${index}.email`, suggestion.email, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+    setValue(`signers.${index}.name`, suggestion.name || '', {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
   };
 
   const onDragEnd = useCallback(
@@ -460,21 +588,7 @@ export const EnvelopeEditorRecipientForm = () => {
       return;
     }
 
-    const formValueSigners = formValues.signers || [];
-
-    // Remove the last signer if it's empty.
-    const nonEmptyRecipients = formValueSigners.filter((signer, i) => {
-      if (i === formValueSigners.length - 1 && signer.email === '') {
-        return false;
-      }
-
-      return true;
-    });
-
-    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse({
-      ...formValues,
-      signers: nonEmptyRecipients,
-    });
+    const validatedFormValues = ZEnvelopeRecipientsForm.safeParse(formValues);
 
     if (!validatedFormValues.success) {
       return;
@@ -543,6 +657,28 @@ export const EnvelopeEditorRecipientForm = () => {
         </div>
 
         <div className="flex flex-row items-center space-x-2">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant="outline"
+                type="button"
+                size="sm"
+                disabled={isSubmitting}
+                onClick={onDetectRecipientsClick}
+              >
+                <SparklesIcon className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+
+            <TooltipContent>
+              {team.preferences.aiFeaturesEnabled ? (
+                <Trans>Detect recipients with AI</Trans>
+              ) : (
+                <Trans>Enable AI detection</Trans>
+              )}
+            </TooltipContent>
+          </Tooltip>
+
           <Button
             variant="outline"
             className="flex flex-row items-center"
@@ -570,7 +706,7 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="bg-accent/50 -mt-2 mb-2 space-y-4 rounded-md p-4">
+            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
               {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -618,9 +754,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             });
                           }
                         }}
-                        disabled={
-                          isSubmitting || hasDocumentBeenSent || emptySigners().length !== 0
-                        }
+                        disabled={isSubmitting || hasDocumentBeenSent}
                       />
                     </FormControl>
 
@@ -634,7 +768,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                       <Tooltip>
                         <TooltipTrigger asChild>
-                          <span className="text-muted-foreground ml-1 cursor-help">
+                          <span className="ml-1 cursor-help text-muted-foreground">
                             <HelpCircleIcon className="h-3.5 w-3.5" />
                           </span>
                         </TooltipTrigger>
@@ -679,7 +813,7 @@ export const EnvelopeEditorRecipientForm = () => {
 
                         <Tooltip>
                           <TooltipTrigger asChild>
-                            <span className="text-muted-foreground ml-1 cursor-help">
+                            <span className="ml-1 cursor-help text-muted-foreground">
                               <HelpCircleIcon className="h-3.5 w-3.5" />
                             </span>
                           </TooltipTrigger>
@@ -716,7 +850,7 @@ export const EnvelopeEditorRecipientForm = () => {
                   >
                     {signers.map((signer, index) => (
                       <Draggable
-                        key={`${signer.id}-${signer.signingOrder}`}
+                        key={`${signer.nativeId}-${signer.signingOrder}`}
                         draggableId={signer['nativeId']}
                         index={index}
                         isDragDisabled={
@@ -732,7 +866,7 @@ export const EnvelopeEditorRecipientForm = () => {
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             className={cn('py-1', {
-                              'bg-widget-foreground pointer-events-none rounded-md pt-2':
+                              'pointer-events-none rounded-md bg-widget-foreground pt-2':
                                 snapshot.isDragging,
                             })}
                           >
@@ -806,7 +940,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                       })}
                                     >
                                       {!showAdvancedSettings && index === 0 && (
-                                        <FormLabel required>
+                                        <FormLabel>
                                           <Trans>Email</Trans>
                                         </FormLabel>
                                       )}
@@ -860,7 +994,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                       <FormControl>
                                         <RecipientAutoCompleteInput
                                           type="text"
-                                          placeholder={t`Name`}
+                                          placeholder={t`Recipient ${index + 1}`}
                                           {...field}
                                           disabled={
                                             snapshot.isDragging ||
@@ -991,6 +1125,20 @@ export const EnvelopeEditorRecipientForm = () => {
           open={showSigningOrderConfirmation}
           onOpenChange={setShowSigningOrderConfirmation}
           onConfirm={handleSigningOrderDisable}
+        />
+
+        <AiRecipientDetectionDialog
+          open={isAiDialogOpen}
+          onOpenChange={onAiDialogOpenChange}
+          onComplete={onAiDetectionComplete}
+          envelopeId={envelope.id}
+          teamId={envelope.teamId}
+        />
+
+        <AiFeaturesEnableDialog
+          open={isAiEnableDialogOpen}
+          onOpenChange={setIsAiEnableDialogOpen}
+          onEnabled={onAiFeaturesEnabled}
         />
       </CardContent>
     </Card>

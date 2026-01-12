@@ -68,6 +68,8 @@ export type TDocumentPreferencesFormSchema = {
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
   defaultRecipients: TDefaultRecipients | null;
+  delegateDocumentOwnership: boolean | null;
+  aiFeaturesEnabled: boolean | null;
 };
 
 type SettingsSubset = Pick<
@@ -83,11 +85,14 @@ type SettingsSubset = Pick<
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
   | 'defaultRecipients'
+  | 'delegateDocumentOwnership'
+  | 'aiFeaturesEnabled'
 >;
 
 export type DocumentPreferencesFormProps = {
   settings: SettingsSubset;
   canInherit: boolean;
+  isAiFeaturesConfigured?: boolean;
   onFormSubmit: (data: TDocumentPreferencesFormSchema) => Promise<void>;
 };
 
@@ -95,6 +100,7 @@ export const DocumentPreferencesForm = ({
   settings,
   onFormSubmit,
   canInherit,
+  isAiFeaturesConfigured = false,
 }: DocumentPreferencesFormProps) => {
   const { t } = useLingui();
   const { user, organisations } = useSession();
@@ -118,6 +124,8 @@ export const DocumentPreferencesForm = ({
       message: msg`At least one signature type must be enabled`.id,
     }),
     defaultRecipients: ZDefaultRecipientsSchema.nullable(),
+    delegateDocumentOwnership: z.boolean().nullable(),
+    aiFeaturesEnabled: z.boolean().nullable(),
   });
 
   const form = useForm<TDocumentPreferencesFormSchema>({
@@ -136,6 +144,8 @@ export const DocumentPreferencesForm = ({
       defaultRecipients: settings.defaultRecipients
         ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
         : null,
+      delegateDocumentOwnership: settings.delegateDocumentOwnership,
+      aiFeaturesEnabled: settings.aiFeaturesEnabled,
     },
     resolver: zodResolver(ZDocumentPreferencesFormSchema),
   });
@@ -612,6 +622,105 @@ export const DocumentPreferencesForm = ({
               );
             }}
           />
+
+          <FormField
+            control={form.control}
+            name="delegateDocumentOwnership"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>
+                  <Trans>Delegate Document Ownership</Trans>
+                </FormLabel>
+
+                <Select
+                  {...field}
+                  value={field.value === null ? '-1' : field.value.toString()}
+                  onValueChange={(value) =>
+                    field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                  }
+                >
+                  <SelectTrigger className="bg-background text-muted-foreground">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    <SelectItem value="true">
+                      <Trans>Yes</Trans>
+                    </SelectItem>
+
+                    <SelectItem value="false">
+                      <Trans>No</Trans>
+                    </SelectItem>
+
+                    {canInherit && (
+                      <SelectItem value={'-1'}>
+                        <Trans>Inherit from organisation</Trans>
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+
+                <FormDescription>
+                  <Trans>
+                    Enable team API tokens to delegate document ownership to another team member.
+                  </Trans>
+                </FormDescription>
+              </FormItem>
+            )}
+          />
+
+          {isAiFeaturesConfigured && (
+            <FormField
+              control={form.control}
+              name="aiFeaturesEnabled"
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>AI Features</Trans>
+                  </FormLabel>
+
+                  <FormControl>
+                    <Select
+                      {...field}
+                      value={field.value === null ? '-1' : field.value.toString()}
+                      onValueChange={(value) =>
+                        field.onChange(value === 'true' ? true : value === 'false' ? false : null)
+                      }
+                    >
+                      <SelectTrigger className="bg-background text-muted-foreground">
+                        <SelectValue />
+                      </SelectTrigger>
+
+                      <SelectContent>
+                        <SelectItem value="true">
+                          <Trans>Enabled</Trans>
+                        </SelectItem>
+
+                        <SelectItem value="false">
+                          <Trans>Disabled</Trans>
+                        </SelectItem>
+
+                        {canInherit && (
+                          <SelectItem value={'-1'}>
+                            <Trans>Inherit from organisation</Trans>
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+
+                  <FormDescription>
+                    <Trans>
+                      Enable AI-powered features such as automatic recipient detection. When
+                      enabled, document content will be sent to AI providers. We only use providers
+                      that do not retain data for training and prefer European regions where
+                      available.
+                    </Trans>
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          )}
 
           <div className="flex flex-row justify-end space-x-4">
             <Button type="submit" loading={form.formState.isSubmitting}>
