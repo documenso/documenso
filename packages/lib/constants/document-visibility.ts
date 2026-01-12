@@ -1,5 +1,5 @@
-import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 
 import { DocumentVisibility } from '@documenso/lib/types/document-visibility';
 

@@ -1,5 +1,5 @@
-import { msg } from '@lingui/core/macro';
 import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 
 import type { TDocumentAuth } from '../types/document-auth';
 import { DocumentAuth } from '../types/document-auth';
