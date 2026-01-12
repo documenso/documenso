@@ -14,7 +14,7 @@ export enum STRIPE_PLAN_TYPE {
 export const FREE_TIER_DOCUMENT_QUOTA = 5;
 
 export const SUBSCRIPTION_STATUS_MAP: Record<SubscriptionStatus, MessageDescriptor> = {
-  [SubscriptionStatus.ACTIVE]: msg`Active`,
-  [SubscriptionStatus.INACTIVE]: msg`Inactive`,
-  [SubscriptionStatus.PAST_DUE]: msg`Past Due`,
+  [SubscriptionStatus.ACTIVE]: msg({ message: 'Active', context: 'Subscription status' }),
+  [SubscriptionStatus.INACTIVE]: msg({ message: 'Inactive', context: 'Subscription status' }),
+  [SubscriptionStatus.PAST_DUE]: msg({ message: 'Past Due', context: 'Subscription status' }),
 };
