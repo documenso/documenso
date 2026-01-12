@@ -341,7 +341,9 @@ export const EnvelopeEditorSettingsDialog = ({
         {/* Sidebar. */}
         <div className="flex w-80 flex-col border-r bg-accent/20">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle>Document Settings</DialogTitle>
+            <DialogTitle>
+              <Trans>Document Settings</Trans>
+            </DialogTitle>
           </DialogHeader>
 
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
