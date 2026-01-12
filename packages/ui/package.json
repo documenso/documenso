@@ -73,7 +73,7 @@
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.66.1",
-    "react-pdf": "^10.2.0",
+    "react-pdf": "^10.3.0",
     "react-rnd": "^10.5.2",
     "remeda": "^2.32.0",
     "tailwind-merge": "^1.14.0",
