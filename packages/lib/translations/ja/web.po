@@ -11821,3 +11821,63 @@ msgstr "ユーザー"
 #: packages/lib/constants/roles.ts
 msgid "Admin"
 msgstr "管理者"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "ドイツ語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "英語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "スペイン語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "フランス語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "イタリア語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "日本語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "韓国語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "オランダ語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "ポーランド語"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "ポルトガル語（ブラジル）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "ポルトガル語（ポルトガル）"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "中国語"

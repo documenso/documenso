@@ -11973,3 +11973,63 @@ msgstr "Sei un amministratore. Puoi abilitare le funzionalità IA per questo tea
 #: apps/remix/app/components/dialogs/ai-features-enable-dialog.tsx
 msgid "Your document content will be sent securely to our AI provider solely for detection and will not be stored or used for training."
 msgstr "Il contenuto del tuo documento verrà inviato in modo sicuro al nostro fornitore di IA esclusivamente per il rilevamento e non verrà archiviato o utilizzato per l'addestramento."
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "German"
+msgstr "Tedesco"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "English"
+msgstr "Inglese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Spanish"
+msgstr "Spagnolo"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "French"
+msgstr "Francese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Italian"
+msgstr "Italiano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Japanese"
+msgstr "Giapponese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Korean"
+msgstr "Coreano"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Dutch"
+msgstr "Olandese"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Polish"
+msgstr "Polacco"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Brazil)"
+msgstr "Portoghese (Brasile)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Portuguese (Portugal)"
+msgstr "Portoghese (Portogallo)"
+
+#: packages/lib/constants/i18n.ts
+msgctxt "Language name"
+msgid "Chinese"
+msgstr "Cinese"

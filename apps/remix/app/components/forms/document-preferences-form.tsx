@@ -217,7 +217,7 @@ export const DocumentPreferencesForm = ({
                     <SelectContent>
                       {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
                         <SelectItem key={code} value={code}>
-                          {language.nativeName || language.name}
+                          {language.nativeName || t(language.name)}
                         </SelectItem>
                       ))}
 

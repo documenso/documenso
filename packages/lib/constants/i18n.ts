@@ -1,3 +1,5 @@
+import type { MessageDescriptor } from '@lingui/core';
+import { msg } from '@lingui/core/macro';
 import { z } from 'zod';
 
 /**
@@ -46,8 +48,8 @@ export const APP_I18N_OPTIONS = {
 } as const;
 
 type LanguageMetadata = {
-  /** English name of the language */
-  name: string;
+  /** Translatable name of the language */
+  name: MessageDescriptor;
   /** Native name of the language */
   nativeName?: string;
 };
@@ -57,18 +59,24 @@ type LanguageMetadata = {
  * Keys must match SUPPORTED_LANGUAGE_CODES.
  */
 export const SUPPORTED_LANGUAGES: Record<SupportedLanguageCodes, LanguageMetadata> = {
-  de: { name: 'German', nativeName: 'Deutsch' },
-  en: { name: 'English', nativeName: 'English' },
-  es: { name: 'Spanish', nativeName: 'Español' },
-  fr: { name: 'French', nativeName: 'Français' },
-  it: { name: 'Italian', nativeName: 'Italiano' },
-  ja: { name: 'Japanese', nativeName: '日本語' },
-  ko: { name: 'Korean', nativeName: '한국어' },
-  nl: { name: 'Dutch', nativeName: 'Nederlands' },
-  pl: { name: 'Polish', nativeName: 'Polski' },
-  'pt-BR': { name: 'Português (Brasil)' },
-  'pt-PT': { name: 'Português (Portugal)' },
-  zh: { name: 'Chinese', nativeName: '中文' },
+  de: { name: msg({ message: 'German', context: 'Language name' }), nativeName: 'Deutsch' },
+  en: { name: msg({ message: 'English', context: 'Language name' }), nativeName: 'English' },
+  es: { name: msg({ message: 'Spanish', context: 'Language name' }), nativeName: 'Español' },
+  fr: { name: msg({ message: 'French', context: 'Language name' }), nativeName: 'Français' },
+  it: { name: msg({ message: 'Italian', context: 'Language name' }), nativeName: 'Italiano' },
+  ja: { name: msg({ message: 'Japanese', context: 'Language name' }), nativeName: '日本語' },
+  ko: { name: msg({ message: 'Korean', context: 'Language name' }), nativeName: '한국어' },
+  nl: { name: msg({ message: 'Dutch', context: 'Language name' }), nativeName: 'Nederlands' },
+  pl: { name: msg({ message: 'Polish', context: 'Language name' }), nativeName: 'Polski' },
+  'pt-BR': {
+    name: msg({ message: 'Portuguese (Brazil)', context: 'Language name' }),
+    nativeName: 'Português (Brasil)',
+  },
+  'pt-PT': {
+    name: msg({ message: 'Portuguese (Portugal)', context: 'Language name' }),
+    nativeName: 'Português (Portugal)',
+  },
+  zh: { name: msg({ message: 'Chinese', context: 'Language name' }), nativeName: '中文' },
 };
 
 /**
