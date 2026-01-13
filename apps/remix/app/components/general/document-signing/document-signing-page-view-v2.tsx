@@ -52,7 +52,7 @@ export const DocumentSigningPageViewV2 = () => {
 
   const {
     isEmbed = false,
-    allowDocumentRejection = true,
+    allowDocumentRejection = false,
     hidePoweredBy = true,
     onDocumentRejected,
   } = useEmbedSigningContext() || {};
