@@ -19,6 +19,7 @@ import { prisma } from '@documenso/prisma';
 import { DEFAULT_DOCUMENT_DATE_FORMAT } from '../../constants/date-formats';
 import type { SupportedLanguageCodes } from '../../constants/i18n';
 import { AppError, AppErrorCode } from '../../errors/app-error';
+import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
@@ -396,6 +397,30 @@ export const createDocumentFromTemplate = async ({
     };
   });
 
+  const defaultRecipients = settings.defaultRecipients
+    ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+    : [];
+
+  const defaultRecipientsFinal: FinalRecipient[] = defaultRecipients.map((recipient) => {
+    const authOptions = ZRecipientAuthOptionsSchema.parse({});
+
+    return {
+      templateRecipientId: -1,
+      fields: [],
+      name: recipient.name || recipient.email,
+      email: recipient.email,
+      role: recipient.role,
+      signingOrder: null,
+      authOptions: createRecipientAuthOptions({
+        accessAuth: authOptions.accessAuth,
+        actionAuth: authOptions.actionAuth,
+      }),
+      token: nanoid(),
+    };
+  });
+
+  const allFinalRecipients = [...finalRecipients, ...defaultRecipientsFinal];
+
   // Key = original envelope item ID
   // Value = duplicated envelope item ID.
   const oldEnvelopeItemToNewEnvelopeItemIdMap: Record<string, string> = {};
@@ -515,7 +540,7 @@ export const createDocumentFromTemplate = async ({
         documentMetaId: documentMeta.id,
         recipients: {
           createMany: {
-            data: finalRecipients.map((recipient) => {
+            data: allFinalRecipients.map((recipient) => {
               const authOptions = ZRecipientAuthOptionsSchema.parse(recipient?.authOptions);
 
               return {
@@ -596,7 +621,7 @@ export const createDocumentFromTemplate = async ({
       }
     }
 
-    Object.values(finalRecipients).forEach(({ token, fields }) => {
+    Object.values(allFinalRecipients).forEach(({ token, fields }) => {
       const recipient = envelope.recipients.find((recipient) => recipient.token === token);
 
       if (!recipient) {
