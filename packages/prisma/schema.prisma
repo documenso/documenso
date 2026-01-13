@@ -472,6 +472,8 @@ model DocumentAuditLog {
   ipAddress String?
 
   envelope Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 enum DocumentDataType {
