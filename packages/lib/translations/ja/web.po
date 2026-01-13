@@ -1291,6 +1291,7 @@ msgid "Admin Panel"
 msgstr "管理画面"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 msgid "Admins only"
 msgstr "管理者のみ"
 
@@ -2578,6 +2579,7 @@ msgid "Configure the team roles for each member"
 msgstr "メンバーごとにチームロールを設定します"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Confirm"
 msgstr "確認"
@@ -3734,6 +3736,7 @@ msgctxt "Audit log format"
 msgid "Document sent"
 msgstr "ドキュメントが送信されました"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Document Settings"
 msgstr "ドキュメント設定"
@@ -4321,6 +4324,14 @@ msgstr "同封文書"
 msgid "Enclosed Documents"
 msgstr "同封された文書"
 
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Enter"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
 msgstr "新しいフォルダ名を入力してください。フォルダを使うとアイテムを整理できます。"
@@ -4328,6 +4339,26 @@ msgstr "新しいフォルダ名を入力してください。フォルダを使
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
 msgstr "クレーム名を入力"
+
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+msgid "Enter Email"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+msgid "Enter Initials"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+msgid "Enter Name"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+msgid "Enter Number"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Enter Text"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Enter the domain you want to use for sending emails (without http:// or www)"
@@ -4523,6 +4554,7 @@ msgid "Event Type"
 msgstr "イベントタイプ"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 #: packages/ui/components/document/document-visibility-select.tsx
 msgid "Everyone"
 msgstr "全員"
@@ -5222,14 +5254,6 @@ msgstr "イニシャルは必須です"
 msgid "Initials Settings"
 msgstr "イニシャルの設定"
 
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
-msgid "Insert a value into the number field"
-msgstr "数値フィールドに値を入力してください"
-
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
-msgid "Insert a value into the text field"
-msgstr "テキストフィールドに値を入力してください"
-
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Inserted"
 msgstr "挿入済み"
@@ -5738,6 +5762,7 @@ msgid "Manager"
 msgstr "マネージャー"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 msgid "Managers and above"
 msgstr "マネージャー以上"
 
@@ -6132,6 +6157,10 @@ msgstr "大丈夫です。メールアドレスを入力していただければ
 #: packages/lib/constants/document.ts
 msgid "None"
 msgstr "なし"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
@@ -6696,6 +6725,10 @@ msgstr "詳しくはサイトのオーナーにお問い合わせください。
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr "トークンの用途が分かる名前を入力してください。後から識別しやすくなります。"
 
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+msgid "Please enter a number"
+msgstr ""
+
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
@@ -6705,6 +6738,22 @@ msgstr "有効な名前を入力してください。"
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a valid number"
 msgstr "有効な数値を入力してください"
+
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Please enter a value"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+msgid "Please enter your email address"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+msgid "Please enter your full name"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+msgid "Please enter your initials"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 msgid "Please mark as viewed to complete"
@@ -7250,6 +7299,22 @@ msgstr "リクエスト"
 msgid "Requesting Organisation"
 msgstr "要求元の組織"
 
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -7662,6 +7727,10 @@ msgstr "このチームに追加するメンバーを選択"
 msgid "Select Option"
 msgstr "オプションを選択"
 
+#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
+msgid "Select Options"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "パスキーを選択"
@@ -7884,13 +7953,7 @@ msgstr "詳細設定を表示"
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
 msgstr "オーディエンスがすぐに署名を開始できるよう、公開プロフィールにテンプレートを表示します"
 
-#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
@@ -7924,10 +7987,6 @@ msgstr "{0} として署名 <0>({1})</0>"
 msgid "Sign as<0>{0} <1>({1})</1></0>"
 msgstr "<0>{0} <1>({1})</1></0>として署名"
 
-#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
-msgid "Sign Checkbox Field"
-msgstr "署名用チェックボックスフィールド"
-
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -7943,10 +8002,6 @@ msgstr "文書に署名"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
 msgstr "ドキュメントに署名"
-
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-msgid "Sign Email"
-msgstr "署名用メールアドレス"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
@@ -7970,18 +8025,6 @@ msgstr "サインイン"
 msgid "Sign in to your account"
 msgstr "アカウントにサインイン"
 
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-msgid "Sign Initials"
-msgstr "署名用イニシャル"
-
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-msgid "Sign Name"
-msgstr "署名用氏名"
-
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
-msgid "Sign Number Field"
-msgstr "署名用数値フィールド"
-
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -7991,10 +8034,6 @@ msgstr "サインアウト"
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
 msgid "Sign Signature Field"
 msgstr "署名用署名フィールド"
-
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
-msgid "Sign Text Field"
-msgstr "署名用テキストフィールド"
 
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
@@ -8017,18 +8056,6 @@ msgstr "Microsoftでサインアップ"
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with OIDC"
 msgstr "OIDC でサインアップ"
-
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-msgid "Sign your email into the field"
-msgstr "メールアドレスをフィールドに入力してください"
-
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-msgid "Sign your full name into the field"
-msgstr "氏名をフィールドに入力してください"
-
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-msgid "Sign your initials into the field"
-msgstr "イニシャルをフィールドに入力してください"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
@@ -11696,4 +11723,3 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
