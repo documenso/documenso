@@ -50,6 +50,7 @@ export default function TeamsSettingsPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
       } = data;
@@ -64,6 +65,7 @@ export default function TeamsSettingsPage() {
           includeSenderDetails,
           includeSigningCertificate,
           includeAuditLog,
+          defaultRecipients,
           aiFeaturesEnabled,
           ...(signatureTypes.length === 0
             ? {

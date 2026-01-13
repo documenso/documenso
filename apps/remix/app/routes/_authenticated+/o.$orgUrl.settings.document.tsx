@@ -57,6 +57,7 @@ export default function OrganisationSettingsDocumentPage() {
         includeSigningCertificate,
         includeAuditLog,
         signatureTypes,
+        defaultRecipients,
         delegateDocumentOwnership,
         aiFeaturesEnabled,
       } = data;
@@ -83,6 +84,7 @@ export default function OrganisationSettingsDocumentPage() {
           includeSenderDetails,
           includeSigningCertificate,
           includeAuditLog,
+          defaultRecipients,
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
           drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
