@@ -8,7 +8,7 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-06 04:17\n"
+"PO-Revision-Date: 2026-01-13 02:39\n"
 "Last-Translator: \n"
 "Language-Team: German\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -4330,7 +4330,7 @@ msgstr "Beigefügte Dokumente"
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter"
-msgstr ""
+msgstr "Eingeben"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
@@ -4342,23 +4342,23 @@ msgstr "Anspruchsname eingeben"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Enter Email"
-msgstr ""
+msgstr "E-Mail eingeben"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Enter Initials"
-msgstr ""
+msgstr "Initialen eingeben"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Enter Name"
-msgstr ""
+msgstr "Namen eingeben"
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Enter Number"
-msgstr ""
+msgstr "Nummer eingeben"
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter Text"
-msgstr ""
+msgstr "Text eingeben"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Enter the domain you want to use for sending emails (without http:// or www)"
@@ -6160,7 +6160,7 @@ msgstr "Keine"
 
 #: packages/lib/constants/document-auth.ts
 msgid "None (Overrides global settings)"
-msgstr ""
+msgstr "Keine (überschreibt globale Einstellungen)"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
@@ -6727,7 +6727,7 @@ msgstr "Bitte geben Sie einen aussagekräftigen Namen für Ihr Token ein. Dies w
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a number"
-msgstr ""
+msgstr "Bitte gib eine Zahl ein"
 
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/forms/signup.tsx
@@ -6741,19 +6741,19 @@ msgstr "Bitte geben Sie eine gültige Nummer ein."
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Please enter a value"
-msgstr ""
+msgstr "Bitte gib einen Wert ein"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Please enter your email address"
-msgstr ""
+msgstr "Bitte gib deine E-Mail-Adresse ein"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Please enter your full name"
-msgstr ""
+msgstr "Bitte gib deinen vollständigen Namen ein"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Please enter your initials"
-msgstr ""
+msgstr "Bitte geben Sie Ihre Initialen ein"
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 msgid "Please mark as viewed to complete"
@@ -7301,19 +7301,19 @@ msgstr "Anfragende Organisation"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require 2FA"
-msgstr ""
+msgstr "2FA erforderlich"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require account"
-msgstr ""
+msgstr "Konto erforderlich"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require passkey"
-msgstr ""
+msgstr "Passkey erforderlich"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require password"
-msgstr ""
+msgstr "Passwort erforderlich"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -7729,7 +7729,7 @@ msgstr "Option auswählen"
 
 #: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 msgid "Select Options"
-msgstr ""
+msgstr "Optionen auswählen"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
@@ -11723,3 +11723,4 @@ msgstr "Ihr Verifizierungscode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-06 04:17\n"
+"PO-Revision-Date: 2026-01-13 02:39\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -4322,7 +4322,7 @@ msgstr "Załączony dokument"
 
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Enclosed Documents"
-msgstr "Załączone dokumenty"
+msgstr "Załączniki"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
@@ -4330,7 +4330,7 @@ msgstr "Załączone dokumenty"
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter"
-msgstr ""
+msgstr "Wpisz lub wprowadź wartość"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
@@ -4342,23 +4342,23 @@ msgstr "Wpisz nazwę"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Enter Email"
-msgstr ""
+msgstr "Wpisz adres e-mail"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Enter Initials"
-msgstr ""
+msgstr "Wpisz inicjały"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Enter Name"
-msgstr ""
+msgstr "Wpisz imię i nazwisko"
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Enter Number"
-msgstr ""
+msgstr "Wpisz liczbę"
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter Text"
-msgstr ""
+msgstr "Wpisz tekst"
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Enter the domain you want to use for sending emails (without http:// or www)"
@@ -6160,7 +6160,7 @@ msgstr "Brak"
 
 #: packages/lib/constants/document-auth.ts
 msgid "None (Overrides global settings)"
-msgstr ""
+msgstr "Brak (odziedzicz metodę uwierzytelniania)"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
@@ -6727,7 +6727,7 @@ msgstr "Wpisz nazwę tokena. Pomoże to później w jego identyfikacji."
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a number"
-msgstr ""
+msgstr "Wpisz liczbę"
 
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/forms/signup.tsx
@@ -6741,19 +6741,19 @@ msgstr "Wpisz prawidłową liczbę"
 
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Please enter a value"
-msgstr ""
+msgstr "Wpisz wartość"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Please enter your email address"
-msgstr ""
+msgstr "Wpisz swój adres e-mail"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Please enter your full name"
-msgstr ""
+msgstr "Wpisz swoje pełne imię i nazwisko"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Please enter your initials"
-msgstr ""
+msgstr "Wprowadź swoje inicjały"
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 msgid "Please mark as viewed to complete"
@@ -7301,19 +7301,19 @@ msgstr "Wnioskująca organizacja"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require 2FA"
-msgstr ""
+msgstr "Wymagana weryfikacja dwuetapowa"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require account"
-msgstr ""
+msgstr "Wymagane konto"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require passkey"
-msgstr ""
+msgstr "Wymagany klucz dostępu"
 
 #: packages/lib/constants/document-auth.ts
 msgid "Require password"
-msgstr ""
+msgstr "Wymagane hasło"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
@@ -7729,7 +7729,7 @@ msgstr "Wybierz opcję"
 
 #: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 msgid "Select Options"
-msgstr ""
+msgstr "Wybierz opcje"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
@@ -11723,3 +11723,4 @@ msgstr "Twój kod weryfikacyjny:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
