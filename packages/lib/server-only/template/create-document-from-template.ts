@@ -22,6 +22,7 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TDocumentFormValues } from '../../types/document-form-values';
 import type {
   TCheckboxFieldMeta,
   TDropdownFieldMeta,
@@ -55,6 +56,7 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -117,6 +119,8 @@ export type CreateDocumentFromTemplateOptions = {
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
   };
+
+  formValues?: TDocumentFormValues;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -303,6 +307,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -431,9 +436,17 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const buffer = await getFileServerSide(documentDataToDuplicate);
+      let buffer = await getFileServerSide(documentDataToDuplicate);
 
       const titleToUse = item.title || finalEnvelopeTitle;
+
+      if (formValues) {
+        // eslint-disable-next-line require-atomic-updates
+        buffer = await insertFormValuesInPdf({
+          pdf: Buffer.from(buffer),
+          formValues,
+        });
+      }
 
       const duplicatedFile = await putPdfFileServerSide({
         name: titleToUse,
