@@ -458,7 +458,7 @@ export const createDocumentFromTemplate = async ({
         data: {
           type: duplicatedFile.type,
           data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
+          initialData: documentDataToDuplicate.data,
         },
       });
 
