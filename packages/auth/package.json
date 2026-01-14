@@ -15,6 +15,7 @@
     "@hono/standard-validator": "^0.2.0",
     "@oslojs/crypto": "^1.0.1",
     "@oslojs/encoding": "^1.1.0",
+    "@simplewebauthn/server": "^13.2.2",
     "arctic": "^3.7.0",
     "hono": "4.10.6",
     "luxon": "^3.7.2",
