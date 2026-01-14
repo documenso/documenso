@@ -23,6 +23,7 @@ import { ZDefaultRecipientsSchema } from '../../types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { ZRecipientAuthOptionsSchema } from '../../types/document-auth';
 import type { TDocumentEmailSettings } from '../../types/document-email';
+import type { TDocumentFormValues } from '../../types/document-form-values';
 import type {
   TCheckboxFieldMeta,
   TDropdownFieldMeta,
@@ -43,7 +44,7 @@ import {
 } from '../../types/webhook-payload';
 import type { ApiRequestMetadata } from '../../universal/extract-request-metadata';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { extractDerivedDocumentMeta } from '../../utils/document';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import {
@@ -56,6 +57,7 @@ import { mapSecondaryIdToTemplateId } from '../../utils/envelope';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { incrementDocumentId } from '../envelope/increment-id';
+import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
@@ -118,6 +120,8 @@ export type CreateDocumentFromTemplateOptions = {
     uploadSignatureEnabled?: boolean;
     drawSignatureEnabled?: boolean;
   };
+
+  formValues?: TDocumentFormValues;
   requestMetadata: ApiRequestMetadata;
 };
 
@@ -304,6 +308,7 @@ export const createDocumentFromTemplate = async ({
   folderId,
   prefillFields,
   attachments,
+  formValues,
 }: CreateDocumentFromTemplateOptions) => {
   const { envelopeWhereInput } = await getEnvelopeWhereInput({
     id,
@@ -456,11 +461,19 @@ export const createDocumentFromTemplate = async ({
         });
       }
 
-      const buffer = await getFileServerSide(documentDataToDuplicate);
+      let buffer = await getFileServerSide(documentDataToDuplicate);
 
       const titleToUse = item.title || finalEnvelopeTitle;
 
-      const duplicatedFile = await putPdfFileServerSide({
+      if (formValues) {
+        // eslint-disable-next-line require-atomic-updates
+        buffer = await insertFormValuesInPdf({
+          pdf: Buffer.from(buffer),
+          formValues,
+        });
+      }
+
+      const duplicatedFile = await putNormalizedPdfFileServerSide({
         name: titleToUse,
         type: 'application/pdf',
         arrayBuffer: async () => Promise.resolve(buffer),
@@ -470,7 +483,7 @@ export const createDocumentFromTemplate = async ({
         data: {
           type: duplicatedFile.type,
           data: duplicatedFile.data,
-          initialData: duplicatedFile.initialData,
+          initialData: documentDataToDuplicate.data,
         },
       });
 
