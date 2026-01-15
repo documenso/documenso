@@ -11,6 +11,7 @@ import {
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
@@ -184,7 +185,9 @@ export const createEnvelope = async ({
 
         const buffer = await getFileServerSide(documentData);
 
-        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer), {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
 
         const titleToUse = item.title || title;
 
@@ -345,8 +348,22 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
+    const defaultRecipients = settings.defaultRecipients
+      ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+      : [];
+
+    const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map(
+      (recipient) => ({
+        email: recipient.email,
+        name: recipient.name,
+        role: recipient.role,
+      }),
+    );
+
+    const allRecipients = [...(data.recipients || []), ...mappedDefaultRecipients];
+
     await Promise.all(
-      (data.recipients || []).map(async (recipient) => {
+      allRecipients.map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],

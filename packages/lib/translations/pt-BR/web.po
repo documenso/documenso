@@ -1286,6 +1286,7 @@ msgid "Admin Panel"
 msgstr "Painel de Administração"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 msgid "Admins only"
 msgstr "Apenas administradores"
 
@@ -2573,6 +2574,7 @@ msgid "Configure the team roles for each member"
 msgstr "Configure as funções da equipe para cada membro"
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Confirm"
 msgstr "Confirmar"
@@ -3729,6 +3731,7 @@ msgctxt "Audit log format"
 msgid "Document sent"
 msgstr "Documento enviado"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Document Settings"
 msgstr "Configurações do Documento"
@@ -4316,6 +4319,14 @@ msgstr "Documento Anexo"
 msgid "Enclosed Documents"
 msgstr "Documentos anexos"
 
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Enter"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
 msgstr "Digite um nome para sua nova pasta. As pastas ajudam você a organizar seus itens."
@@ -4323,6 +4334,26 @@ msgstr "Digite um nome para sua nova pasta. As pastas ajudam você a organizar s
 #: apps/remix/app/components/forms/subscription-claim-form.tsx
 msgid "Enter claim name"
 msgstr "Digite o nome do plano"
+
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+msgid "Enter Email"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+msgid "Enter Initials"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+msgid "Enter Name"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+msgid "Enter Number"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Enter Text"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-email-domain-create-dialog.tsx
 msgid "Enter the domain you want to use for sending emails (without http:// or www)"
@@ -4518,6 +4549,7 @@ msgid "Event Type"
 msgstr "Tipo de Evento"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 #: packages/ui/components/document/document-visibility-select.tsx
 msgid "Everyone"
 msgstr "Todos"
@@ -5217,14 +5249,6 @@ msgstr "Iniciais são obrigatórias"
 msgid "Initials Settings"
 msgstr "Configurações de Iniciais"
 
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
-msgid "Insert a value into the number field"
-msgstr "Insira um valor no campo numérico"
-
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
-msgid "Insert a value into the text field"
-msgstr "Insira um valor no campo de texto"
-
 #: apps/remix/app/components/tables/admin-document-recipient-item-table.tsx
 msgid "Inserted"
 msgstr "Inserido"
@@ -5733,6 +5757,7 @@ msgid "Manager"
 msgstr "Gerente"
 
 #: apps/remix/app/components/dialogs/folder-update-dialog.tsx
+#: packages/lib/constants/document-visibility.ts
 msgid "Managers and above"
 msgstr "Gerentes e acima"
 
@@ -6127,6 +6152,10 @@ msgstr "Não se preocupe, acontece! Digite seu e-mail e enviaremos um link espec
 #: packages/lib/constants/document.ts
 msgid "None"
 msgstr "Nenhum"
+
+#: packages/lib/constants/document-auth.ts
+msgid "None (Overrides global settings)"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.edit.tsx
@@ -6691,6 +6720,10 @@ msgstr "Por favor, entre em contato com o proprietário do site para mais assist
 msgid "Please enter a meaningful name for your token. This will help you identify it later."
 msgstr "Por favor, insira um nome significativo para seu token. Isso ajudará você a identificá-lo mais tarde."
 
+#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
+msgid "Please enter a number"
+msgstr ""
+
 #: apps/remix/app/components/forms/profile.tsx
 #: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/claim-account.tsx
@@ -6700,6 +6733,22 @@ msgstr "Por favor, insira um nome válido."
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Please enter a valid number"
 msgstr "Por favor, insira um número válido"
+
+#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
+msgid "Please enter a value"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
+msgid "Please enter your email address"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
+msgid "Please enter your full name"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
+msgid "Please enter your initials"
+msgstr ""
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 msgid "Please mark as viewed to complete"
@@ -7245,6 +7294,22 @@ msgstr "Solicitação"
 msgid "Requesting Organisation"
 msgstr "Organização Solicitante"
 
+#: packages/lib/constants/document-auth.ts
+msgid "Require 2FA"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require account"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require passkey"
+msgstr ""
+
+#: packages/lib/constants/document-auth.ts
+msgid "Require password"
+msgstr ""
+
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/checkbox-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/dropdown-field.tsx
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
@@ -7657,6 +7722,10 @@ msgstr "Selecione membros para adicionar a esta equipe"
 msgid "Select Option"
 msgstr "Selecionar Opção"
 
+#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
+msgid "Select Options"
+msgstr ""
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "Selecionar passkey"
@@ -7879,13 +7948,7 @@ msgstr "Mostrar configurações avançadas"
 msgid "Show templates in your public profile for your audience to sign and get started quickly"
 msgstr "Mostre modelos em seu perfil público para seu público assinar e começar rapidamente"
 
-#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
@@ -7919,10 +7982,6 @@ msgstr "Assinar como {0} <0>({1})</0>"
 msgid "Sign as<0>{0} <1>({1})</1></0>"
 msgstr "Assinar como<0>{0} <1>({1})</1></0>"
 
-#: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
-msgid "Sign Checkbox Field"
-msgstr "Assinar Campo de Caixa de Seleção"
-
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
@@ -7938,10 +7997,6 @@ msgstr "Assinar Documento"
 #: apps/remix/app/components/embed/multisign/multi-sign-document-list.tsx
 msgid "Sign Documents"
 msgstr "Assinar Documentos"
-
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-msgid "Sign Email"
-msgstr "Assinar E-mail"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
@@ -7965,18 +8020,6 @@ msgstr "Entrar"
 msgid "Sign in to your account"
 msgstr "Entre na sua conta"
 
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-msgid "Sign Initials"
-msgstr "Assinar Iniciais"
-
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-msgid "Sign Name"
-msgstr "Assinar Nome"
-
-#: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
-msgid "Sign Number Field"
-msgstr "Assinar Campo Numérico"
-
 #: apps/remix/app/components/general/app-nav-mobile.tsx
 #: apps/remix/app/components/general/menu-switcher.tsx
 #: apps/remix/app/components/general/org-menu-switcher.tsx
@@ -7986,10 +8029,6 @@ msgstr "Sair"
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
 msgid "Sign Signature Field"
 msgstr "Assinar Campo de Assinatura"
-
-#: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
-msgid "Sign Text Field"
-msgstr "Assinar Campo de Texto"
 
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
@@ -8012,18 +8051,6 @@ msgstr "Inscrever-se com Microsoft"
 #: apps/remix/app/components/forms/signup.tsx
 msgid "Sign Up with OIDC"
 msgstr "Inscrever-se com OIDC"
-
-#: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
-msgid "Sign your email into the field"
-msgstr "Assine seu e-mail no campo"
-
-#: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
-msgid "Sign your full name into the field"
-msgstr "Assine seu nome completo no campo"
-
-#: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
-msgid "Sign your initials into the field"
-msgstr "Assine suas iniciais no campo"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/embed/embed-direct-template-client-page.tsx

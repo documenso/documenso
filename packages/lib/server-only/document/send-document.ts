@@ -33,7 +33,7 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
@@ -334,7 +334,7 @@ const injectFormValuesIntoDocument = async (
     fileName = `${envelope.title}.pdf`;
   }
 
-  const newDocumentData = await putPdfFileServerSide({
+  const newDocumentData = await putNormalizedPdfFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(prefilled),
