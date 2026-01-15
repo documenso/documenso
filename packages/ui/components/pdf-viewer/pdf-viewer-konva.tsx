@@ -4,7 +4,7 @@ import type { MessageDescriptor } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import Konva from 'konva';
-import { Loader } from 'lucide-react';
+import { Loader, ZoomIn, ZoomOut } from 'lucide-react';
 import { type PDFDocumentProxy } from 'pdfjs-dist';
 import { Document as PDFDocument, Page as PDFPage, pdfjs } from 'react-pdf';
 
@@ -78,6 +78,7 @@ export const PdfViewerKonva = ({
 
   const { getPdfBuffer, currentEnvelopeItem, renderError } = useCurrentEnvelopeRender();
 
+  const [scale, setScale] = useState(1.0);
   const [width, setWidth] = useState(0);
   const [numPages, setNumPages] = useState(0);
   const [pdfError, setPdfError] = useState(false);
@@ -173,12 +174,17 @@ export const PdfViewerKonva = ({
             </div>
           }
           options={pdfViewerOptions}
+          scale={scale}
         >
           {Array(numPages)
             .fill(null)
             .map((_, i) => (
               <div key={i} className="last:-mb-2">
-                <div className="rounded border border-border will-change-transform">
+                <div
+                  className={cn('rounded border border-border will-change-transform', {
+                    'overflow-x-auto overflow-y-hidden': scale > 1.0,
+                  })}
+                >
                   <PDFPage
                     pageNumber={i + 1}
                     width={width}
@@ -189,11 +195,29 @@ export const PdfViewerKonva = ({
                     customRenderer={customPageRenderer}
                   />
                 </div>
-                <p className="my-2 text-center text-[11px] text-muted-foreground/80">
-                  <Trans>
-                    Page {i + 1} of {numPages}
-                  </Trans>
-                </p>
+                <div className="relative my-2 flex flex-row-reverse items-center">
+                  <p className="absolute left-1/2 -translate-x-1/2 text-[11px] text-muted-foreground/80">
+                    <Trans>
+                      Page {i + 1} of {numPages}
+                    </Trans>
+                  </p>
+                  <p className="mr-2 flex gap-1">
+                    <button
+                      className="disabled:text-gray-500"
+                      disabled={scale <= 1.0}
+                      onClick={() => setScale((prevScale) => prevScale - 0.25)}
+                    >
+                      <ZoomOut size={16} />
+                    </button>
+                    <button
+                      className="disabled:text-gray-500"
+                      disabled={scale >= 2.0}
+                      onClick={() => setScale((prevScale) => prevScale + 0.25)}
+                    >
+                      <ZoomIn size={16} />
+                    </button>
+                  </p>
+                </div>
               </div>
             ))}
         </PDFDocument>
