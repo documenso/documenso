@@ -17,6 +17,7 @@ import { P, match } from 'ts-pattern';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
 import { useCopyToClipboard } from '@documenso/lib/client-only/hooks/use-copy-to-clipboard';
+import { useOptionalEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { DIRECT_TEMPLATE_RECIPIENT_EMAIL } from '@documenso/lib/constants/direct-templates';
 import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-roles';
@@ -68,6 +69,11 @@ export const TemplateDirectLinkDialog = ({
   const { quota, remaining } = useLimits();
   const { _ } = useLingui();
   const { revalidate } = useRevalidator();
+  const envelopeEditor = useOptionalEnvelopeEditor();
+  const revalidateTemplate = async () => {
+    await revalidate();
+    await envelopeEditor?.syncEnvelope();
+  };
 
   const [, copy] = useCopyToClipboard();
 
@@ -96,7 +102,7 @@ export const TemplateDirectLinkDialog = ({
     reset: resetCreateTemplateDirectLink,
   } = trpcReact.template.createTemplateDirectLink.useMutation({
     onSuccess: async (data) => {
-      await revalidate();
+      await revalidateTemplate();
 
       setToken(data.token);
       setIsEnabled(data.enabled);
@@ -116,7 +122,7 @@ export const TemplateDirectLinkDialog = ({
   const { mutateAsync: toggleTemplateDirectLink, isPending: isTogglingTemplateAccess } =
     trpcReact.template.toggleTemplateDirectLink.useMutation({
       onSuccess: async (data) => {
-        await revalidate();
+        await revalidateTemplate();
 
         const enabledDescription = msg`Direct link signing has been enabled`;
         const disabledDescription = msg`Direct link signing has been disabled`;
@@ -141,7 +147,7 @@ export const TemplateDirectLinkDialog = ({
   const { mutateAsync: deleteTemplateDirectLink, isPending: isDeletingTemplateDirectLink } =
     trpcReact.template.deleteTemplateDirectLink.useMutation({
       onSuccess: async () => {
-        await revalidate();
+        await revalidateTemplate();
 
         setOpen(false);
         setToken(null);
@@ -234,7 +240,7 @@ export const TemplateDirectLinkDialog = ({
                         </div>
 
                         <h3 className="font-semibold">{_(step.title)}</h3>
-                        <p className="text-muted-foreground mt-1 text-sm">{_(step.description)}</p>
+                        <p className="mt-1 text-sm text-muted-foreground">{_(step.description)}</p>
                       </li>
                     ))}
                   </ul>
@@ -320,13 +326,13 @@ export const TemplateDirectLinkDialog = ({
                             onClick={async () => onRecipientTableRowClick(row.id)}
                           >
                             <TableCell>
-                              <div className="text-muted-foreground text-sm">
+                              <div className="text-sm text-muted-foreground">
                                 <p>{row.name}</p>
-                                <p className="text-muted-foreground/70 text-xs">{row.email}</p>
+                                <p className="text-xs text-muted-foreground/70">{row.email}</p>
                               </div>
                             </TableCell>
 
-                            <TableCell className="text-muted-foreground text-sm">
+                            <TableCell className="text-sm text-muted-foreground">
                               {_(RECIPIENT_ROLES_DESCRIPTION[row.role].roleName)}
                             </TableCell>
 
@@ -350,7 +356,7 @@ export const TemplateDirectLinkDialog = ({
                     <DialogFooter className="mx-auto">
                       <div className="flex flex-col items-center justify-center">
                         {validDirectTemplateRecipients.length !== 0 && (
-                          <p className="text-muted-foreground text-sm">
+                          <p className="text-sm text-muted-foreground">
                             <Trans>Or</Trans>
                           </p>
                         )}
@@ -392,7 +398,7 @@ export const TemplateDirectLinkDialog = ({
                           <TooltipTrigger tabIndex={-1} className="ml-2">
                             <InfoIcon className="h-4 w-4" />
                           </TooltipTrigger>
-                          <TooltipContent className="text-foreground z-9999 max-w-md p-4">
+                          <TooltipContent className="z-9999 max-w-md p-4 text-foreground">
                             <Trans>
                               Disabling direct link signing will prevent anyone from accessing the
                               link.

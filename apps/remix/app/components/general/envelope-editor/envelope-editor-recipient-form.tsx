@@ -15,7 +15,7 @@ import { motion } from 'framer-motion';
 import { GripVerticalIcon, HelpCircleIcon, PlusIcon, SparklesIcon, TrashIcon } from 'lucide-react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 import { useRevalidator, useSearchParams } from 'react-router';
-import { isDeepEqual, prop, sortBy } from 'remeda';
+import { isDeepEqual } from 'remeda';
 import { z } from 'zod';
 
 import { useLimits } from '@documenso/ee/server-only/limits/provider/client';
@@ -161,38 +161,72 @@ export const EnvelopeEditorRecipientForm = () => {
 
   const recipientSuggestions = recipientSuggestionsData?.results || [];
 
-  const defaultRecipients = [
-    {
-      formId: initialId,
-      name: '',
-      email: '',
-      role: RecipientRole.SIGNER,
-      signingOrder: 1,
-      actionAuth: [],
-    },
-  ];
+  type TSignerForm = TEnvelopeRecipientsForm['signers'][number];
+
+  const defaultRecipients = useMemo<TSignerForm[]>(
+    () => [
+      {
+        formId: initialId,
+        id: undefined,
+        name: '',
+        email: '',
+        role: RecipientRole.SIGNER,
+        signingOrder: 1,
+        actionAuth: [],
+      },
+    ],
+    [initialId],
+  );
+
+  const sortSigners = useCallback((signers: TSignerForm[]) => {
+    return [...signers].sort((a, b) => {
+      const signingOrderDiff = (a.signingOrder ?? 0) - (b.signingOrder ?? 0);
+
+      if (signingOrderDiff !== 0) {
+        return signingOrderDiff;
+      }
+
+      if (a.id && b.id) {
+        return a.id - b.id;
+      }
+
+      if (a.id) {
+        return -1;
+      }
+
+      if (b.id) {
+        return 1;
+      }
+
+      return a.formId.localeCompare(b.formId);
+    });
+  }, []);
+
+  const mapEnvelopeRecipientsToFormSigners = useCallback(() => {
+    if (recipients.length === 0) {
+      return defaultRecipients;
+    }
+
+    const mappedRecipients = recipients.map(
+      (recipient, index): TSignerForm => ({
+        id: recipient.id,
+        formId: String(recipient.id),
+        name: recipient.name,
+        email: recipient.email,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder ?? index + 1,
+        actionAuth: ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? [],
+      }),
+    );
+
+    return sortSigners(mappedRecipients);
+  }, [recipients, defaultRecipients, sortSigners]);
 
   const form = useForm<TEnvelopeRecipientsForm>({
     resolver: zodResolver(ZEnvelopeRecipientsForm),
-    mode: 'onChange', // Used for autosave purposes, maybe can try onBlur instead?
+    mode: 'onChange',
     defaultValues: {
-      signers:
-        recipients.length > 0
-          ? sortBy(
-              recipients.map((recipient, index) => ({
-                id: recipient.id,
-                formId: String(recipient.id),
-                name: recipient.name,
-                email: recipient.email,
-                role: recipient.role,
-                signingOrder: recipient.signingOrder ?? index + 1,
-                actionAuth:
-                  ZRecipientAuthOptionsSchema.parse(recipient.authOptions)?.actionAuth ?? undefined,
-              })),
-              [prop('signingOrder'), 'asc'],
-              [prop('id'), 'asc'],
-            )
-          : defaultRecipients,
+      signers: mapEnvelopeRecipientsToFormSigners(),
       signingOrder: envelope.documentMeta.signingOrder,
       allowDictateNextSigner: envelope.documentMeta.allowDictateNextSigner,
     },
@@ -580,6 +614,33 @@ export const EnvelopeEditorRecipientForm = () => {
 
     void form.trigger();
   }, [form]);
+
+  useEffect(() => {
+    const expectedSigners = mapEnvelopeRecipientsToFormSigners();
+    const currentSigners = form.getValues('signers');
+    const hasSignersChanged = !isDeepEqual<TSignerForm[]>(expectedSigners, currentSigners);
+
+    const hasSigningOrderChanged =
+      form.getValues('signingOrder') !== envelope.documentMeta.signingOrder;
+
+    const hasAllowDictateNextSignerChanged =
+      form.getValues('allowDictateNextSigner') !== envelope.documentMeta.allowDictateNextSigner;
+
+    if (!hasSignersChanged && !hasSigningOrderChanged && !hasAllowDictateNextSignerChanged) {
+      return;
+    }
+
+    form.reset({
+      signers: expectedSigners,
+      signingOrder: envelope.documentMeta.signingOrder,
+      allowDictateNextSigner: envelope.documentMeta.allowDictateNextSigner,
+    });
+  }, [
+    form,
+    envelope.documentMeta.signingOrder,
+    envelope.documentMeta.allowDictateNextSigner,
+    mapEnvelopeRecipientsToFormSigners,
+  ]);
 
   // Dupecode/Inefficient: Done because native isValid won't work for our usecase.
   useEffect(() => {
