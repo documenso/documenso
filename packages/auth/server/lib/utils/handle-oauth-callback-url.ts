@@ -3,8 +3,10 @@ import { OAuth2Client, decodeIdToken } from 'arctic';
 import type { Context } from 'hono';
 import { deleteCookie } from 'hono/cookie';
 
+import { isEmailDomainAllowedForSignup } from '@documenso/lib/constants/auth';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { onCreateUserHook } from '@documenso/lib/server-only/user/create-user';
+import { env } from '@documenso/lib/utils/env';
 import { isValidReturnTo, normalizeReturnTo } from '@documenso/lib/utils/is-valid-return-to';
 import { prisma } from '@documenso/prisma';
 
@@ -103,6 +105,14 @@ export const handleOAuthCallbackUrl = async (options: HandleOAuthCallbackUrlOpti
     await onAuthorize({ userId: userWithSameEmail.id }, c);
 
     return c.redirect(redirectPath, 302);
+  }
+
+  // Check domain restriction for new SSO users
+  if (!isEmailDomainAllowedForSignup(email)) {
+    const errorUrl = new URL('/signin', env('NEXT_PUBLIC_WEBAPP_URL'));
+    errorUrl.searchParams.set('error', AuthenticationErrorCode.SignupDomainNotAllowed);
+
+    return c.redirect(errorUrl.toString(), 302);
   }
 
   // Handle new user.
