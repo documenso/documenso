@@ -4,6 +4,8 @@ import { Outlet, useLoaderData } from 'react-router';
 
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 
 import { ZBaseEmbedAuthoringSchema } from '~/types/embed-authoring-base-schema';
@@ -57,7 +59,7 @@ export default function AuthoringLayout() {
         return;
       }
 
-      const { css, cssVars, darkModeDisabled } = result.data;
+      const { css, cssVars, darkModeDisabled, language } = result.data;
 
       if (darkModeDisabled) {
         document.documentElement.classList.add('dark-mode-disabled');
@@ -68,6 +70,10 @@ export default function AuthoringLayout() {
           css,
           cssVars,
         });
+      }
+
+      if (language && language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(language);
       }
     } catch (error) {
       console.error(error);
