@@ -48,6 +48,7 @@ type PutNormalizedPdfOptions = {
   file: File;
   originalData?: string;
   originalMimeType?: string;
+  flattenForm?: boolean;
 };
 
 /**
@@ -57,10 +58,11 @@ export const putNormalizedPdfFileServerSide = async ({
   file,
   originalData,
   originalMimeType,
+  flattenForm = true,
 }: PutNormalizedPdfOptions) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer);
+  const normalized = await normalizePdf(buffer, { flattenForm });
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 

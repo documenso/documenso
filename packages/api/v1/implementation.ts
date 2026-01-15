@@ -41,7 +41,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
-import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -822,10 +822,12 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           formValues: body.formValues,
         });
 
-        const newDocumentData = await putPdfFileServerSide({
-          name: fileName,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(prefilled),
+        const newDocumentData = await putNormalizedPdfFileServerSide({
+          file: {
+            name: fileName,
+            type: 'application/pdf',
+            arrayBuffer: async () => Promise.resolve(prefilled),
+          },
         });
 
         await prisma.envelopeItem.update({
@@ -911,59 +913,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             title: body.title,
             ...body.meta,
           },
+          formValues: body.formValues,
           requestMetadata: metadata,
         });
       } catch (err) {
         return AppError.toRestAPIError(err);
-      }
-
-      if (envelope.envelopeItems.length !== 1) {
-        throw new Error('API V1 does not support envelopes');
-      }
-
-      const firstEnvelopeDocumentData = await prisma.envelopeItem.findFirstOrThrow({
-        where: {
-          envelopeId: envelope.id,
-        },
-        include: {
-          documentData: true,
-        },
-      });
-
-      if (body.formValues) {
-        const fileName = envelope.title.endsWith('.pdf') ? envelope.title : `${envelope.title}.pdf`;
-
-        const pdf = await getFileServerSide(firstEnvelopeDocumentData.documentData);
-
-        const prefilled = await insertFormValuesInPdf({
-          pdf: Buffer.from(pdf),
-          formValues: body.formValues,
-        });
-
-        const newDocumentData = await putPdfFileServerSide({
-          name: fileName,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(prefilled),
-        });
-
-        await prisma.envelope.update({
-          where: {
-            id: envelope.id,
-          },
-          data: {
-            formValues: body.formValues,
-            envelopeItems: {
-              update: {
-                where: {
-                  id: firstEnvelopeDocumentData.id,
-                },
-                data: {
-                  documentDataId: newDocumentData.id,
-                },
-              },
-            },
-          },
-        });
       }
 
       if (body.authOptions) {

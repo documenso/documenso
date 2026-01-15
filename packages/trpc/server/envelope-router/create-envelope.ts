@@ -1,3 +1,5 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
@@ -96,6 +98,7 @@ export const createEnvelopeRoute = authenticatedProcedure
           },
           originalData,
           originalMimeType,
+          flattenForm: type !== EnvelopeType.TEMPLATE,
         });
 
         return {

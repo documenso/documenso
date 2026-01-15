@@ -21,17 +21,17 @@ export default function DocumentEditSkeleton() {
       </div>
 
       <div className="mt-4 grid h-[80vh] max-h-[60rem] w-full grid-cols-12 gap-x-8">
-        <div className="dark:bg-background border-border col-span-12 rounded-xl border-2 bg-white/50 p-2 before:rounded-xl lg:col-span-6 xl:col-span-7">
+        <div className="col-span-12 rounded-xl border-2 border-border bg-white/50 p-2 before:rounded-xl lg:col-span-6 xl:col-span-7 dark:bg-background">
           <div className="flex h-[80vh] max-h-[60rem] flex-col items-center justify-center">
-            <Loader className="text-documenso h-12 w-12 animate-spin" />
+            <Loader className="h-12 w-12 animate-spin text-documenso" />
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>Loading document...</Trans>
             </p>
           </div>
         </div>
 
-        <div className="bg-background border-border col-span-12 rounded-xl border-2 before:rounded-xl lg:col-span-6 xl:col-span-5" />
+        <div className="col-span-12 rounded-xl border-2 border-border bg-background before:rounded-xl lg:col-span-6 xl:col-span-5" />
       </div>
     </div>
   );
