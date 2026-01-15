@@ -4,7 +4,7 @@ import React from 'react';
 import type { Field, Recipient } from '@prisma/client';
 
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
+import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
@@ -194,13 +194,7 @@ export const EnvelopeRenderProvider = ({
   );
 
   const getRecipientColorKey = useCallback(
-    (recipientId: number) => {
-      const recipientIndex = recipientIds.findIndex((id) => id === recipientId);
-
-      return AVAILABLE_RECIPIENT_COLORS[
-        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
-      ];
-    },
+    (recipientId: number) => getRecipientColor(recipientIds.findIndex((id) => id === recipientId)),
     [recipientIds],
   );
 
