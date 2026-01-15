@@ -1008,6 +1008,7 @@ msgid "Acknowledgment"
 msgstr "Kennisgeving"
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
@@ -1948,7 +1949,12 @@ msgstr "Probeert het document opnieuw te verzegelen, handig nadat een codewijzig
 msgid "Audit Log"
 msgstr "Auditlog"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
+msgid "Audit Log Details"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Audit Logs"
 msgstr "Auditlogs"
 
@@ -2070,6 +2076,7 @@ msgstr "Brandingvoorkeuren"
 msgid "Branding preferences updated"
 msgstr "Brandingvoorkeuren bijgewerkt"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Browser"
@@ -2734,6 +2741,7 @@ msgstr "Veld naar klembord gekopieerd"
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
@@ -3104,6 +3112,10 @@ msgstr "Standaardbestand"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Default Organisation Role for New Users"
 msgstr "Standaard organisatierol voor nieuwe gebruikers"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Recipients"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
@@ -3642,6 +3654,7 @@ msgstr "Externe document-ID bijgewerkt"
 msgid "Document found in your account"
 msgstr "Document gevonden in je account"
 
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
 msgstr "Document‑ID"
@@ -5223,6 +5236,7 @@ msgstr "Authenticatiemethode overnemen"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Inherit from organisation"
@@ -5341,6 +5355,7 @@ msgstr "Uitgenodigd op"
 msgid "Invoice"
 msgstr "Factuur"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
@@ -6440,6 +6455,7 @@ msgstr "Origineel"
 msgid "Otherwise, the document will be created as a draft."
 msgstr "Anders wordt het document als concept aangemaakt."
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Override organisation settings"
 msgstr "Organisatie-instellingen overschrijven"
@@ -7118,6 +7134,10 @@ msgstr "Ontvangers"
 msgid "Recipients metrics"
 msgstr "Ontvangerstatistieken"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Recipients that will be automatically added to new documents."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Recipients will be able to sign the document once sent"
 msgstr "Ontvangers kunnen het document ondertekenen zodra het is verzonden"
@@ -7734,6 +7754,11 @@ msgstr "Selecteer opties"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "Passkey selecteren"
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select recipients"
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -9490,6 +9515,7 @@ msgstr "Hiermee worden alle e-mails die aan dit e-maildomein zijn gekoppeld verw
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
 msgstr "Hiermee wordt je op alle andere apparaten uitgelogd. Je moet op die apparaten opnieuw inloggen om je account verder te gebruiken."
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 msgid "Time"
 msgstr "Tijd"
@@ -10148,6 +10174,7 @@ msgstr "Gebruik uw authenticatie-app om een code te genereren"
 msgid "Use your passkey for authentication"
 msgstr "Gebruik je passkey voor authenticatie"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
@@ -10366,6 +10393,10 @@ msgstr "Inzichten bekijken"
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "View invites"
 msgstr "Uitnodigingen bekijken"
+
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
+msgid "View JSON"
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "View more"
@@ -11723,4 +11754,3 @@ msgstr "Uw verificatiecode:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
