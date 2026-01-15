@@ -256,10 +256,10 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
 
             <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Preferences`)}>
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('language')}>
-                Change language
+                {_(msg`Change language`)}
               </CommandItem>
               <CommandItem className="-mx-2 -my-1 rounded-lg" onSelect={() => addPage('theme')}>
-                Change theme
+                {_(msg`Change theme`)}
               </CommandItem>
             </CommandGroup>
 
@@ -367,15 +367,14 @@ const LanguageCommands = () => {
   return Object.values(SUPPORTED_LANGUAGES).map((language) => (
     <CommandItem
       disabled={isLoading}
-      key={language.full}
+      key={language.short}
       onSelect={async () => setLanguage(language.short)}
       className="-my-1 mx-2 rounded-lg first:mt-2 last:mb-2"
     >
       <CheckIcon
         className={cn('mr-2 h-4 w-4', i18n.locale === language.short ? 'opacity-100' : 'opacity-0')}
       />
-
-      {language.full}
+      {_(language.full)}
     </CommandItem>
   ));
 };
