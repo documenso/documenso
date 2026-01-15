@@ -4,13 +4,26 @@ import { useLingui } from '@lingui/react/macro';
 import { useLocation, useSearchParams } from 'react-router';
 
 import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounced-value';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { Input } from '@documenso/ui/primitives/input';
 
 import { ClaimCreateDialog } from '~/components/dialogs/claim-create-dialog';
 import { SettingsHeader } from '~/components/general/settings-header';
 import { AdminClaimsTable } from '~/components/tables/admin-claims-table';
 
-export default function Claims() {
+import type { Route } from './+types/claims';
+
+export async function loader() {
+  const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
+
+  return {
+    licenseFlags: licenseData?.license?.flags,
+  };
+}
+
+export default function Claims({ loaderData }: Route.ComponentProps) {
+  const { licenseFlags } = loaderData;
+
   const { t } = useLingui();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +60,7 @@ export default function Claims() {
         subtitle={t`Manage all subscription claims`}
         hideDivider
       >
-        <ClaimCreateDialog />
+        <ClaimCreateDialog licenseFlags={licenseFlags} />
       </SettingsHeader>
 
       <div className="mt-4">
@@ -58,7 +71,7 @@ export default function Claims() {
           className="mb-4"
         />
 
-        <AdminClaimsTable />
+        <AdminClaimsTable licenseFlags={licenseFlags} />
       </div>
     </div>
   );

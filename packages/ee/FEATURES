@@ -2,6 +2,7 @@ This file lists all features currently licensed under the Documenso Enterprise E
 Copyright (c) 2023 Documenso, Inc
 
 - The Stripe Billing Module
+- Organisation Authentication Portal
 - Document Action Reauthentication (Passkeys and 2FA)
 - 21 CFR
 - Email domains

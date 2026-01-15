@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Trans, useLingui } from '@lingui/react/macro';
 import type { z } from 'zod';
 
+import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { generateDefaultSubscriptionClaim } from '@documenso/lib/utils/organisations-claims';
 import { trpc } from '@documenso/trpc/react';
 import type { ZCreateSubscriptionClaimRequestSchema } from '@documenso/trpc/server/admin-router/create-subscription-claim.types';
@@ -22,7 +23,11 @@ import { SubscriptionClaimForm } from '../forms/subscription-claim-form';
 
 export type CreateClaimFormValues = z.infer<typeof ZCreateSubscriptionClaimRequestSchema>;
 
-export const ClaimCreateDialog = () => {
+type ClaimCreateDialogProps = {
+  licenseFlags?: TLicenseClaim;
+};
+
+export const ClaimCreateDialog = ({ licenseFlags }: ClaimCreateDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -67,6 +72,7 @@ export const ClaimCreateDialog = () => {
             ...generateDefaultSubscriptionClaim(),
           }}
           onFormSubmit={createClaim}
+          licenseFlags={licenseFlags}
           formSubmitTrigger={
             <DialogFooter>
               <Button
