@@ -179,7 +179,9 @@ export default function DocumentsLogsPage({ loaderData }: Route.ComponentProps) 
           ))}
 
           <div className="text-sm text-foreground">
-            <h3 className="font-semibold">Recipients</h3>
+            <h3 className="font-semibold">
+              <Trans>Recipients</Trans>
+            </h3>
             <ul className="list-inside list-disc text-muted-foreground">
               {recipients.map((recipient) => (
                 <li key={`recipient-${recipient.id}`}>
