@@ -10,6 +10,8 @@ import { HydratedRouter } from 'react-router/dom';
 import { extractPostHogConfig } from '@documenso/lib/constants/feature-flags';
 import { dynamicActivate } from '@documenso/lib/utils/i18n';
 
+import './utils/polyfills/promise-with-resolvers';
+
 function PosthogInit() {
   const postHogConfig = extractPostHogConfig();
 

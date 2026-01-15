@@ -290,11 +290,12 @@ export const diffDocumentMetaChanges = (
  * Provide a userId to prefix the action with the user, example 'X did Y'.
  */
 export const formatDocumentAuditLogAction = (
-  _: I18n['_'],
+  i18n: I18n,
   auditLog: TDocumentAuditLog,
   userId?: number,
 ) => {
-  const prefix = userId === auditLog.userId ? _(msg`You`) : auditLog.name || auditLog.email || '';
+  const prefix =
+    userId === auditLog.userId ? i18n._(msg`You`) : auditLog.name || auditLog.email || '';
 
   const description = match(auditLog)
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.FIELD_CREATED }, () => ({
@@ -452,7 +453,7 @@ export const formatDocumentAuditLogAction = (
       identified: msg`${prefix} moved the document to team`,
     }))
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_COMPLETED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+      const userName = prefix || i18n._(msg`Recipient`);
 
       const result = match(data.recipientRole)
         .with(RecipientRole.SIGNER, () => msg`${userName} signed the document`)
@@ -467,7 +468,7 @@ export const formatDocumentAuditLogAction = (
       };
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_RECIPIENT_REJECTED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+      const userName = prefix || i18n._(msg`Recipient`);
 
       const result = msg`${userName} rejected the document`;
 
@@ -477,7 +478,7 @@ export const formatDocumentAuditLogAction = (
       };
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_REQUESTED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+      const userName = prefix || i18n._(msg`Recipient`);
 
       const result = msg`${userName} requested a 2FA token for the document`;
 
@@ -487,7 +488,7 @@ export const formatDocumentAuditLogAction = (
       };
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_VALIDATED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+      const userName = prefix || i18n._(msg`Recipient`);
 
       const result = msg`${userName} validated a 2FA token for the document`;
 
@@ -497,7 +498,7 @@ export const formatDocumentAuditLogAction = (
       };
     })
     .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_ACCESS_AUTH_2FA_FAILED }, ({ data }) => {
-      const userName = prefix || _(msg`Recipient`);
+      const userName = prefix || i18n._(msg`Recipient`);
 
       const result = msg`${userName} failed to validate a 2FA token for the document`;
 
@@ -530,10 +531,17 @@ export const formatDocumentAuditLogAction = (
       anonymous: msg`Envelope item deleted`,
       identified: msg`${prefix} deleted an envelope item with title ${data.envelopeItemTitle}`,
     }))
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED }, ({ data }) => ({
+      anonymous: msg({
+        message: `Document ownership delegated`,
+        context: `Audit log format`,
+      }),
+      identified: msg`The document ownership was delegated to ${data.delegatedOwnerName || data.delegatedOwnerEmail} on behalf of ${data.teamName}`,
+    }))
     .exhaustive();
 
   return {
     prefix,
-    description: _(prefix ? description.identified : description.anonymous),
+    description: i18n._(prefix ? description.identified : description.anonymous),
   };
 };

@@ -5,6 +5,20 @@ export const deletedAccountServiceAccount = async () => {
     where: {
       email: 'deleted-account@documenso.com',
     },
+    select: {
+      id: true,
+      email: true,
+      ownedOrganisations: {
+        select: {
+          id: true,
+          teams: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!serviceAccount) {

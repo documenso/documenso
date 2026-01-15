@@ -35,7 +35,7 @@ export const DocumentGlobalAuthAccessSelect = ({
     },
     ...Object.values(DocumentAccessAuth).map((authType) => ({
       value: authType,
-      label: DOCUMENT_AUTH_TYPES[authType].value,
+      label: _(DOCUMENT_AUTH_TYPES[authType].value),
     })),
   ];
 
@@ -79,7 +79,7 @@ export const DocumentGlobalAuthAccessTooltip = () => (
       <InfoIcon className="mx-2 h-4 w-4" />
     </TooltipTrigger>
 
-    <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+    <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
       <h2>
         <strong>
           <Trans>Document access</Trans>

@@ -14,7 +14,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from '../../constants/app';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { extractDerivedDocumentEmailSettings } from '../../types/document-email';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
-import { canRecipientBeModified } from '../../utils/recipients';
+import { canRecipientBeModified, isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { buildTeamWhereQuery } from '../../utils/teams';
 import { getEmailContext } from '../email/get-email-context';
@@ -142,7 +142,8 @@ export const deleteEnvelopeRecipient = async ({
   if (
     recipientToDelete.sendStatus === SendStatus.SENT &&
     isRecipientRemovedEmailEnabled &&
-    envelope.type === EnvelopeType.DOCUMENT
+    envelope.type === EnvelopeType.DOCUMENT &&
+    isRecipientEmailValidForSending(recipientToDelete)
   ) {
     const assetBaseUrl = NEXT_PUBLIC_WEBAPP_URL() || 'http://localhost:3000';
 

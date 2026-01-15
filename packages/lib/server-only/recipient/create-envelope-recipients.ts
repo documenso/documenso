@@ -27,7 +27,7 @@ export interface CreateEnvelopeRecipientsOptions {
     accessAuth?: TRecipientAccessAuthTypes[];
     actionAuth?: TRecipientActionAuthTypes[];
   }[];
-  requestMetadata: ApiRequestMetadata;
+  requestMetadata?: ApiRequestMetadata;
 }
 
 export const createEnvelopeRecipients = async ({

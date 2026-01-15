@@ -184,6 +184,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     documentLanguage: null,
     documentTimezone: null,
     documentDateFormat: null,
+    delegateDocumentOwnership: null,
 
     includeSenderDetails: null,
     includeSigningCertificate: null,
@@ -202,6 +203,9 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     emailId: null,
     emailReplyTo: null,
     // emailReplyToName: null,
+
+    defaultRecipients: null,
+    aiFeaturesEnabled: null,
   };
 };
 

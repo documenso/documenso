@@ -80,12 +80,14 @@ export const EnvelopeSignerCompleteDialog = () => {
   const handleOnCompleteClick = async (
     nextSigner?: { name: string; email: string },
     accessAuthOptions?: TRecipientAccessAuth,
+    recipientDetails?: { name: string; email: string },
   ) => {
     try {
       await completeDocument({
         token: recipient.token,
         documentId: mapSecondaryIdToDocumentId(envelope.secondaryId),
         accessAuthOptions,
+        recipientOverride: recipientDetails,
         ...(nextSigner?.email && nextSigner?.name ? { nextSigner } : {}),
       });
 
@@ -205,21 +207,30 @@ export const EnvelopeSignerCompleteDialog = () => {
     }
   };
 
-  const directTemplatePayload = useMemo(() => {
+  const recipientPayload = useMemo(() => {
     if (!isDirectTemplate) {
-      return;
+      return {
+        name:
+          recipient.name ||
+          recipient.fields.find((field) => field.type === FieldType.NAME)?.customText ||
+          '',
+        email:
+          recipient.email ||
+          recipient.fields.find((field) => field.type === FieldType.EMAIL)?.customText ||
+          '',
+      };
     }
 
     return {
       name: fullName,
       email: email,
     };
-  }, [email, fullName, isDirectTemplate]);
+  }, [email, fullName, isDirectTemplate, recipient.email, recipient.name, recipient.fields]);
 
   return (
     <DocumentSigningCompleteDialog
       isSubmitting={isPending}
-      directTemplatePayload={directTemplatePayload}
+      recipientPayload={recipientPayload}
       onSignatureComplete={
         isDirectTemplate ? handleDirectTemplateCompleteClick : handleOnCompleteClick
       }
@@ -230,6 +241,7 @@ export const EnvelopeSignerCompleteDialog = () => {
       allowDictateNextSigner={Boolean(
         nextRecipient && envelope.documentMeta.allowDictateNextSigner,
       )}
+      disableNameInput={!isDirectTemplate && recipient.name !== ''}
       defaultNextSigner={
         nextRecipient ? { name: nextRecipient.name, email: nextRecipient.email } : undefined
       }

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem, FieldType } from '@prisma/client';
@@ -229,8 +230,8 @@ export const ConfigureFieldsView = ({
         setFieldClipboard(lastActiveField);
 
         toast({
-          title: 'Copied field',
-          description: 'Copied field to clipboard',
+          title: _(msg`Copied field`),
+          description: _(msg`Copied field to clipboard`),
         });
       }
     },

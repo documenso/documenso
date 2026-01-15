@@ -4,7 +4,9 @@ import { AppError } from '../../errors/app-error';
 import { flattenAnnotations } from './flatten-annotations';
 import { flattenForm, removeOptionalContentGroups } from './flatten-form';
 
-export const normalizePdf = async (pdf: Buffer) => {
+export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
+  const shouldFlattenForm = options.flattenForm ?? true;
+
   const pdfDoc = await PDFDocument.load(pdf).catch((e) => {
     console.error(`PDF normalization error: ${e.message}`);
 
@@ -20,8 +22,11 @@ export const normalizePdf = async (pdf: Buffer) => {
   }
 
   removeOptionalContentGroups(pdfDoc);
-  await flattenForm(pdfDoc);
-  flattenAnnotations(pdfDoc);
+
+  if (shouldFlattenForm) {
+    await flattenForm(pdfDoc);
+    flattenAnnotations(pdfDoc);
+  }
 
   return Buffer.from(await pdfDoc.save());
 };

@@ -505,7 +505,9 @@ test('[TEMPLATE]: should create a document from a template using template docume
   });
 
   expect(document.title).toEqual('TEMPLATE_WITH_ORIGINAL_DOC');
-  expect(firstDocumentData.data).toEqual(templateWithData.envelopeItems[0].documentData.data);
+  expect(firstDocumentData.initialData).toEqual(
+    templateWithData.envelopeItems[0].documentData.data,
+  );
   expect(firstDocumentData.initialData).toEqual(
     templateWithData.envelopeItems[0].documentData.initialData,
   );

@@ -1,5 +1,6 @@
 import { generateRegistrationOptions } from '@simplewebauthn/server';
-import type { AuthenticatorTransportFuture } from '@simplewebauthn/types';
+import type { AuthenticatorTransportFuture } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
@@ -32,14 +33,13 @@ export const createPasskeyRegistrationOptions = async ({
   const options = await generateRegistrationOptions({
     rpName,
     rpID,
-    userID: userId.toString(),
+    userID: Buffer.from(userId.toString()),
     userName: user.email,
     userDisplayName: user.name ?? undefined,
     timeout: PASSKEY_TIMEOUT,
     attestationType: 'none',
     excludeCredentials: passkeys.map((passkey) => ({
-      id: passkey.credentialId,
-      type: 'public-key',
+      id: isoBase64URL.fromBuffer(passkey.credentialId),
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       transports: passkey.transports as AuthenticatorTransportFuture[],
     })),

@@ -33,10 +33,12 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
+import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -127,6 +129,24 @@ export const sendDocument = async ({
       }),
     );
   }
+
+  // Validate that recipients with auth requirements have a valid email.
+  envelope.recipients.forEach((recipient) => {
+    const auth = extractDocumentAuthMethods({
+      documentAuth: envelope.authOptions,
+      recipientAuth: recipient.authOptions,
+    });
+
+    if (
+      recipient.role !== RecipientRole.CC &&
+      (auth.recipientAccessAuthRequired || auth.recipientActionAuthRequired) &&
+      !isRecipientEmailValidForSending(recipient)
+    ) {
+      throw new AppError(AppErrorCode.INVALID_REQUEST, {
+        message: `Recipient ${recipient.id} requires an email because they have auth requirements.`,
+      });
+    }
+  });
 
   // Commented out server side checks for minimum 1 signature per signer now since we need to
   // decide if we want to enforce this for API & templates.
@@ -314,7 +334,7 @@ const injectFormValuesIntoDocument = async (
     fileName = `${envelope.title}.pdf`;
   }
 
-  const newDocumentData = await putPdfFileServerSide({
+  const newDocumentData = await putNormalizedPdfFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(prefilled),

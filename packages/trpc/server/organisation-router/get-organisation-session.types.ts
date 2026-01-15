@@ -16,6 +16,9 @@ export const ZGetOrganisationSessionResponseSchema = ZOrganisationSchema.extend(
       organisationId: true,
     }).extend({
       currentTeamRole: z.nativeEnum(TeamMemberRole),
+      preferences: z.object({
+        aiFeaturesEnabled: z.boolean(),
+      }),
     }),
   ),
   subscription: SubscriptionSchema.nullable(),

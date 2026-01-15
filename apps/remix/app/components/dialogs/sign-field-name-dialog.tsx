@@ -47,11 +47,11 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              <Trans>Sign Name</Trans>
+              <Trans>Enter Name</Trans>
             </DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>Sign your full name into the field</Trans>
+              <Trans>Please enter your full name</Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -80,7 +80,7 @@ export const SignFieldNameDialog = createCallable<SignFieldNameDialogProps, stri
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>

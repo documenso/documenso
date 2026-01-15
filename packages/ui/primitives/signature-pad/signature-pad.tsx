@@ -21,6 +21,7 @@ export type SignaturePadValue = {
 };
 
 export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
+  fullName?: string;
   value?: string;
   onChange?: (_value: SignaturePadValue) => void;
 
@@ -34,6 +35,7 @@ export type SignaturePadProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChang
 };
 
 export const SignaturePad = ({
+  fullName,
   value = '',
   onChange,
   disabled = false,
@@ -168,7 +170,7 @@ export const SignaturePad = ({
 
       <TabsContent
         value="draw"
-        className="border-border aspect-signature-pad dark:bg-background relative flex items-center justify-center rounded-md border bg-neutral-50 text-center"
+        className="relative flex aspect-signature-pad items-center justify-center rounded-md border border-border bg-neutral-50 text-center dark:bg-background"
       >
         <SignaturePadDraw
           className="h-full w-full"
@@ -179,15 +181,19 @@ export const SignaturePad = ({
 
       <TabsContent
         value="text"
-        className="border-border aspect-signature-pad dark:bg-background relative flex items-center justify-center rounded-md border bg-neutral-50 text-center"
+        className="relative flex aspect-signature-pad items-center justify-center rounded-md border border-border bg-neutral-50 text-center dark:bg-background"
       >
-        <SignaturePadType value={typedSignature} onChange={onTypedSignatureChange} />
+        <SignaturePadType
+          value={typedSignature}
+          defaultValue={fullName}
+          onChange={onTypedSignatureChange}
+        />
       </TabsContent>
 
       <TabsContent
         value="image"
         className={cn(
-          'border-border aspect-signature-pad dark:bg-background relative rounded-md border bg-neutral-50',
+          'relative aspect-signature-pad rounded-md border border-border bg-neutral-50 dark:bg-background',
           {
             'bg-white': imageSignature,
           },

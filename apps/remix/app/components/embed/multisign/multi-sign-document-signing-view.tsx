@@ -150,8 +150,8 @@ export const MultiSignDocumentSigningView = ({
       onDocumentError?.();
 
       toast({
-        title: 'Error',
-        description: 'Failed to complete the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`Failed to complete the document. Please try again.`),
         variant: 'destructive',
       });
     } finally {
@@ -319,6 +319,7 @@ export const MultiSignDocumentSigningView = ({
                                     className="mt-2"
                                     disabled={isSubmitting}
                                     disableAnimation
+                                    fullName={fullName}
                                     value={signature ?? ''}
                                     onChange={(v) => setSignature(v ?? '')}
                                     typedSignatureEnabled={

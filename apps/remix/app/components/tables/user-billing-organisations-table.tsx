@@ -28,19 +28,19 @@ export const UserBillingOrganisationsTable = () => {
   const getSubscriptionStatusDisplay = (status: SubscriptionStatus | undefined) => {
     return match(status)
       .with(SubscriptionStatus.ACTIVE, () => ({
-        label: t`Active`,
+        label: t({ message: `Active`, context: `Subscription status` }),
         variant: 'default' as const,
       }))
       .with(SubscriptionStatus.PAST_DUE, () => ({
-        label: t`Past Due`,
+        label: t({ message: `Past Due`, context: `Subscription status` }),
         variant: 'warning' as const,
       }))
       .with(SubscriptionStatus.INACTIVE, () => ({
-        label: t`Inactive`,
+        label: t({ message: `Inactive`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }))
       .otherwise(() => ({
-        label: t`Free`,
+        label: t({ message: `Free`, context: `Subscription status` }),
         variant: 'neutral' as const,
       }));
   };
@@ -57,7 +57,7 @@ export const UserBillingOrganisationsTable = () => {
               avatarClass="h-12 w-12"
               avatarFallback={row.original.name.slice(0, 1).toUpperCase()}
               primaryText={
-                <span className="text-foreground/80 font-semibold">{row.original.name}</span>
+                <span className="font-semibold text-foreground/80">{row.original.name}</span>
               }
               secondaryText={`${NEXT_PUBLIC_WEBAPP_URL()}/o/${row.original.url}`}
             />
@@ -91,7 +91,7 @@ export const UserBillingOrganisationsTable = () => {
 
   if (billingOrganisations.length === 0) {
     return (
-      <div className="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed py-12 text-center text-muted-foreground">
         <p className="text-sm">
           <Trans>You don't manage billing for any organisations.</Trans>
         </p>

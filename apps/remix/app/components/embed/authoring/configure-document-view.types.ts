@@ -5,6 +5,7 @@ import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaLanguageSchema,
 } from '@documenso/lib/types/document-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { DocumentDistributionMethod } from '@documenso/prisma/generated/types';
 
 // Define the schema for configuration
@@ -55,7 +56,7 @@ export const ZConfigureTemplateEmbedFormSchema = ZConfigureEmbedFormSchema.exten
       nativeId: z.number().optional(),
       formId: z.string(),
       name: z.string(),
-      email: z.union([z.string().length(0), z.string().email('Invalid email address')]),
+      email: ZRecipientEmailSchema,
       role: z.enum(['SIGNER', 'CC', 'APPROVER', 'VIEWER', 'ASSISTANT']),
       signingOrder: z.number().optional(),
       disabled: z.boolean().optional(),

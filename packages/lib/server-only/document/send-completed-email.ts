@@ -16,6 +16,7 @@ import { getFileServerSide } from '../../universal/upload/get-file.server';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
 import { unsafeBuildEnvelopeIdQuery } from '../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderCustomEmailTemplate } from '../../utils/render-custom-email-template';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { formatDocumentsPath } from '../../utils/teams';
@@ -176,8 +177,12 @@ export const sendCompletedEmail = async ({ id, requestMetadata }: SendDocumentOp
     return;
   }
 
+  const recipientsToNotify = envelope.recipients.filter((recipient) =>
+    isRecipientEmailValidForSending(recipient),
+  );
+
   await Promise.all(
-    envelope.recipients.map(async (recipient) => {
+    recipientsToNotify.map(async (recipient) => {
       const customEmailTemplate = {
         'signer.name': recipient.name,
         'signer.email': recipient.email,

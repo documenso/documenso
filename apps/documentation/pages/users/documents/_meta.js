@@ -4,4 +4,5 @@ export default {
   'document-visibility': 'Document Visibility',
   fields: 'Document Fields',
   'email-preferences': 'Email Preferences',
+  'ai-detection': 'AI Recipient & Field Detection',
 };

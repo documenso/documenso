@@ -83,8 +83,8 @@ export const StackAvatarsWithTooltip = ({
                 fallbackText={recipientAbbreviation(recipient)}
               />
               <div>
-                <p className="text-muted-foreground text-sm">{recipient.email}</p>
-                <p className="text-muted-foreground/70 text-xs">
+                <p className="text-sm text-muted-foreground">{recipient.email || recipient.name}</p>
+                <p className="text-xs text-muted-foreground/70">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               </div>
@@ -107,8 +107,8 @@ export const StackAvatarsWithTooltip = ({
                 fallbackText={recipientAbbreviation(recipient)}
               />
               <div>
-                <p className="text-muted-foreground text-sm">{recipient.email}</p>
-                <p className="text-muted-foreground/70 text-xs">
+                <p className="text-sm text-muted-foreground">{recipient.email || recipient.name}</p>
+                <p className="text-xs text-muted-foreground/70">
                   {_(RECIPIENT_ROLES_DESCRIPTION[recipient.role].roleName)}
                 </p>
               </div>

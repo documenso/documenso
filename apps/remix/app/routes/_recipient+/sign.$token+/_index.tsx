@@ -355,24 +355,25 @@ const SigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV1Loade
             </Trans>
           </h2>
 
-          <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+          <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
             <Trans>This document has been cancelled by the owner.</Trans>
           </p>
 
           {user ? (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            <Link to="/" className="mt-36 text-documenso-700 hover:text-documenso-600">
               <Trans>Go Back Home</Trans>
             </Link>
           ) : (
-            <p className="text-muted-foreground/60 mt-36 text-sm">
+            <p className="mt-36 text-sm text-muted-foreground/60">
               <Trans>
                 Want to send slick signing links like this one?{' '}
                 <Link
                   to="https://documenso.com"
                   className="text-documenso-700 hover:text-documenso-600"
                 >
-                  Check out Documenso.
+                  Check out Documenso
                 </Link>
+                .
               </Trans>
             </p>
           )}
@@ -454,24 +455,25 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
             </Trans>
           </h2>
 
-          <p className="text-muted-foreground/60 mt-2.5 max-w-[60ch] text-center text-sm font-medium md:text-base">
+          <p className="mt-2.5 max-w-[60ch] text-center text-sm font-medium text-muted-foreground/60 md:text-base">
             <Trans>This document has been cancelled by the owner.</Trans>
           </p>
 
           {user ? (
-            <Link to="/" className="text-documenso-700 hover:text-documenso-600 mt-36">
+            <Link to="/" className="mt-36 text-documenso-700 hover:text-documenso-600">
               <Trans>Go Back Home</Trans>
             </Link>
           ) : (
-            <p className="text-muted-foreground/60 mt-36 text-sm">
+            <p className="mt-36 text-sm text-muted-foreground/60">
               <Trans>
                 Want to send slick signing links like this one?{' '}
                 <Link
                   to="https://documenso.com"
                   className="text-documenso-700 hover:text-documenso-600"
                 >
-                  Check out Documenso.
+                  Check out Documenso
                 </Link>
+                .
               </Trans>
             </p>
           )}

@@ -24,7 +24,10 @@ import {
 import { Input } from '@documenso/ui/primitives/input';
 
 const ZSignFieldEmailFormSchema = z.object({
-  email: z.string().min(1, { message: msg`Email is required`.id }),
+  email: z
+    .string()
+    .email()
+    .min(1, { message: msg`Email is required`.id }),
 });
 
 type TSignFieldEmailFormSchema = z.infer<typeof ZSignFieldEmailFormSchema>;
@@ -47,11 +50,11 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
         <DialogContent>
           <DialogHeader>
             <DialogTitle>
-              <Trans>Sign Email</Trans>
+              <Trans>Enter Email</Trans>
             </DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>Sign your email into the field</Trans>
+              <Trans>Please enter your email address</Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -80,7 +83,7 @@ export const SignFieldEmailDialog = createCallable<SignFieldEmailDialogProps, st
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>

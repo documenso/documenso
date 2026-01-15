@@ -63,6 +63,7 @@ export class LocalJobProvider extends BaseJobProvider {
           jobId: pendingJob.id,
           jobDefinitionId: pendingJob.jobId,
           data: options,
+          isRetry: false,
         });
       }),
     );
@@ -198,6 +199,7 @@ export class LocalJobProvider extends BaseJobProvider {
           jobId,
           jobDefinitionId: backgroundJob.jobId,
           data: options,
+          isRetry: true,
         });
       }
 

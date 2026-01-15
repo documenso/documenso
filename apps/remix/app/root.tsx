@@ -46,11 +46,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const { getTheme } = await themeSessionResolver(request);
 
-  let lang: SupportedLanguageCodes = await langCookie.parse(request.headers.get('cookie') ?? '');
+  const cookieHeader = request.headers.get('cookie') ?? '';
+
+  let lang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(lang)) {
     lang = extractLocaleData({ headers: request.headers }).lang;
   }
+
+  const disableAnimations = cookieHeader.includes('__disable_animations=true');
 
   let organisations = null;
 
@@ -62,6 +66,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     {
       lang,
       theme: getTheme(),
+      disableAnimations,
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -92,7 +97,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, ...data } = useLoaderData<typeof loader>() || {};
+  const { publicEnv, session, lang, disableAnimations, ...data } =
+    useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
@@ -110,6 +116,14 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <Links />
         <meta name="google" content="notranslate" />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
+
+        {disableAnimations && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
+            }}
+          />
+        )}
 
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>

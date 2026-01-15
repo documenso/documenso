@@ -1,6 +1,7 @@
 import { useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { AlertTriangle, Building2, Database, Eye, Settings, UserCircle2 } from 'lucide-react';
 import { data, isRouteErrorResponse } from 'react-router';
@@ -125,6 +126,7 @@ export async function loader({ params }: Route.LoaderArgs) {
 export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Route.ComponentProps) {
   const { token, type, user, organisation } = loaderData;
 
+  const { _ } = useLingui();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -136,12 +138,12 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
         await navigate('/');
 
         toast({
-          title: 'Account link declined',
+          title: _(msg`Account link declined`),
         });
       },
       onError: (error) => {
         toast({
-          title: 'Error declining account link',
+          title: _(msg`Error declining account link`),
           description: error.message,
         });
       },
@@ -153,12 +155,12 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
         await navigate(formatOrganisationLoginPath(organisation.url));
 
         toast({
-          title: 'Account linked successfully',
+          title: _(msg`Account linked successfully`),
         });
       },
       onError: (error) => {
         toast({
-          title: 'Error linking account',
+          title: _(msg`Error linking account`),
           description: error.message,
         });
       },
@@ -191,11 +193,11 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
         <CardContent className="space-y-6">
           {/* Current User Section */}
           <div className="space-y-3">
-            <h3 className="text-muted-foreground flex items-center gap-2 font-semibold">
+            <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <UserCircle2 className="h-4 w-4" />
               <Trans>Your Account</Trans>
             </h3>
-            <div className="bg-muted/50 flex items-center justify-between gap-3 rounded-lg p-3">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3">
               <AvatarWithText
                 avatarSrc={formatAvatarUrl(user.avatar)}
                 avatarFallback={extractInitials(user.name || user.email)}
@@ -213,11 +215,11 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
 
           {/* Organisation Section */}
           <div className="space-y-3">
-            <h3 className="text-muted-foreground flex items-center gap-2 font-semibold">
+            <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <Building2 className="h-4 w-4" />
               <Trans>Requesting Organisation</Trans>
             </h3>
-            <div className="bg-muted/50 flex items-center justify-between gap-3 rounded-lg p-3">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-muted/50 p-3">
               <AvatarWithText
                 avatarSrc={formatAvatarUrl(organisation.avatar)}
                 avatarFallback={extractInitials(organisation.name)}
@@ -235,7 +237,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
 
           {/* Warnings Section */}
           <div className="space-y-3">
-            <h3 className="text-muted-foreground flex items-center gap-2 font-semibold">
+            <h3 className="flex items-center gap-2 font-semibold text-muted-foreground">
               <AlertTriangle className="h-4 w-4" />
               <Trans>Important: What This Means</Trans>
             </h3>
@@ -251,7 +253,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   <Eye className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="text-muted-foreground font-semibold">
+                      <span className="font-semibold text-muted-foreground">
                         Full account access:
                       </span>{' '}
                       View all your profile information, settings, and activity
@@ -262,7 +264,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   <Settings className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="text-muted-foreground font-semibold">
+                      <span className="font-semibold text-muted-foreground">
                         Account management:
                       </span>{' '}
                       Modify your account settings, permissions, and preferences
@@ -273,7 +275,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
                   <Database className="mt-0.5 h-4 w-4 flex-shrink-0" />
                   <span>
                     <Trans>
-                      <span className="text-muted-foreground font-semibold">Data access:</span>{' '}
+                      <span className="font-semibold text-muted-foreground">Data access:</span>{' '}
                       Access all data associated with your account
                     </Trans>
                   </span>
@@ -302,7 +304,7 @@ export default function OrganisationSsoConfirmationTokenPage({ loaderData }: Rou
             />
 
             <label
-              className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+              className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
               htmlFor={`accept-conditions`}
             >
               <Trans>I agree to link my account with this organization</Trans>

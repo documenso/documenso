@@ -89,9 +89,8 @@ test.describe('AutoSave Fields Step', () => {
       });
 
       expect(retrievedFields.length).toBe(3);
-      expect(retrievedFields[0].type).toBe('SIGNATURE');
-      expect(retrievedFields[1].type).toBe('TEXT');
-      expect(retrievedFields[2].type).toBe('SIGNATURE');
+      expect(retrievedFields.filter((field) => field.type === 'SIGNATURE')).toHaveLength(2);
+      expect(retrievedFields.filter((field) => field.type === 'TEXT')).toHaveLength(1);
     }).toPass();
   });
 
@@ -214,10 +213,8 @@ test.describe('AutoSave Fields Step', () => {
       });
 
       expect(retrievedFields.length).toBe(4);
-      expect(retrievedFields[0].type).toBe('SIGNATURE');
-      expect(retrievedFields[1].type).toBe('TEXT');
-      expect(retrievedFields[2].type).toBe('SIGNATURE');
-      expect(retrievedFields[3].type).toBe('SIGNATURE');
+      expect(retrievedFields.filter((field) => field.type === 'SIGNATURE')).toHaveLength(3);
+      expect(retrievedFields.filter((field) => field.type === 'TEXT')).toHaveLength(1);
     }).toPass();
   });
 
@@ -259,10 +256,16 @@ test.describe('AutoSave Fields Step', () => {
       });
 
       expect(retrievedFields.length).toBe(2);
-      expect(retrievedFields[0].type).toBe('SIGNATURE');
-      expect(retrievedFields[1].type).toBe('TEXT');
+      const textField = retrievedFields.find((field) => field.type === 'TEXT');
+      const signatureField = retrievedFields.find((field) => field.type === 'SIGNATURE');
 
-      const textField = retrievedFields[1];
+      expect(signatureField).toBeDefined();
+      expect(textField).toBeDefined();
+
+      if (!signatureField || !textField) {
+        throw new Error('No signature or text field');
+      }
+
       expect(textField.fieldMeta).toBeDefined();
 
       if (

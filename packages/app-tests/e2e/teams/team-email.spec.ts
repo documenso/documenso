@@ -5,6 +5,7 @@ import { seedTeamEmailVerification } from '@documenso/prisma/seed/teams';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
+import { openDropdownMenu } from '../fixtures/generic';
 
 test('[TEAMS]: send team email request', async ({ page }) => {
   const { user, team } = await seedUser();
@@ -54,8 +55,13 @@ test('[TEAMS]: delete team email', async ({ page }) => {
     redirectPath: `/t/${team.url}/settings`,
   });
 
-  await page.locator('section div').filter({ hasText: 'Team email' }).getByRole('button').click();
+  const settingsBtn = page
+    .locator('section div')
+    .filter({ hasText: 'Team email' })
+    .getByRole('button');
+  await openDropdownMenu(page, settingsBtn);
 
+  await expect(page.getByRole('menuitem', { name: 'Remove' })).toBeVisible();
   await page.getByRole('menuitem', { name: 'Remove' }).click();
   await page.getByRole('button', { name: 'Remove' }).click();
 

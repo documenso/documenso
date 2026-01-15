@@ -108,8 +108,8 @@ export const DocumentSigningForm = ({
       await completeDocument({ nextSigner });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while completing the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while completing the document. Please try again.`),
         variant: 'destructive',
       });
 
@@ -280,6 +280,7 @@ export const DocumentSigningForm = ({
                       <SignaturePadDialog
                         className="mt-2"
                         disabled={isSubmitting}
+                        fullName={fullName}
                         value={signature ?? ''}
                         onChange={(v) => setSignature(v ?? '')}
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}

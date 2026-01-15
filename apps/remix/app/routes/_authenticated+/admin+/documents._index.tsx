@@ -89,8 +89,8 @@ export default function AdminDocumentsPage() {
             <Tooltip delayDuration={200}>
               <TooltipTrigger>
                 <Link to={`/admin/users/${row.original.user.id}`}>
-                  <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                    <AvatarFallback className="text-muted-foreground text-xs">
+                  <Avatar className="h-12 w-12 border-2 border-solid border-white dark:border-border">
+                    <AvatarFallback className="text-xs text-muted-foreground">
                       {avatarFallbackText}
                     </AvatarFallback>
                   </Avatar>
@@ -98,13 +98,13 @@ export default function AdminDocumentsPage() {
               </TooltipTrigger>
 
               <TooltipContent className="flex max-w-xs items-center gap-2">
-                <Avatar className="dark:border-border h-12 w-12 border-2 border-solid border-white">
-                  <AvatarFallback className="text-muted-foreground text-xs">
+                <Avatar className="h-12 w-12 border-2 border-solid border-white dark:border-border">
+                  <AvatarFallback className="text-xs text-muted-foreground">
                     {avatarFallbackText}
                   </AvatarFallback>
                 </Avatar>
 
-                <div className="text-muted-foreground flex flex-col text-sm">
+                <div className="flex flex-col text-sm text-muted-foreground">
                   <span>{row.original.user.name}</span>
                   <span>{row.original.user.email}</span>
                 </div>
@@ -114,7 +114,7 @@ export default function AdminDocumentsPage() {
         },
       },
       {
-        header: 'Last updated',
+        header: _(msg`Last updated`),
         accessorKey: 'updatedAt',
         cell: ({ row }) => i18n.date(row.original.updatedAt),
       },

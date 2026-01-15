@@ -2,12 +2,20 @@
   "$schema": "https://turbo.build/schema.json",
   "pipeline": {
     "build": {
-      "dependsOn": ["prebuild", "^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "prebuild",
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "prebuild": {
       "cache": false,
-      "dependsOn": ["^prebuild"]
+      "dependsOn": [
+        "^prebuild"
+      ]
     },
     "lint": {
       "cache": false
@@ -23,7 +31,9 @@
       "persistent": true
     },
     "start": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false,
       "persistent": true
     },
@@ -31,11 +41,15 @@
       "cache": false
     },
     "test:e2e": {
-      "dependsOn": ["^build"],
+      "dependsOn": [
+        "^build"
+      ],
       "cache": false
     }
   },
-  "globalDependencies": ["**/.env.*local"],
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
   "globalEnv": [
     "APP_VERSION",
     "PORT",
@@ -112,6 +126,9 @@
     "NEXT_PRIVATE_TELEMETRY_KEY",
     "NEXT_PRIVATE_TELEMETRY_HOST",
     "DOCUMENSO_DISABLE_TELEMETRY",
+    "GOOGLE_VERTEX_PROJECT_ID",
+    "GOOGLE_VERTEX_LOCATION",
+    "GOOGLE_VERTEX_API_KEY",
     "CI",
     "NODE_ENV",
     "POSTGRES_URL",

@@ -34,6 +34,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       prefillFields,
       override,
       attachments,
+      formValues,
     } = payload;
 
     ctx.logger.info({
@@ -79,7 +80,10 @@ export const useEnvelopeRoute = authenticatedProcedure
     // Process uploaded files and create document data for them
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        // We disable flattening here since `createDocumentFromTemplate` will handle it.
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
+          flattenForm: false,
+        });
 
         return {
           name: file.name,
@@ -146,6 +150,7 @@ export const useEnvelopeRoute = authenticatedProcedure
       prefillFields,
       override,
       attachments,
+      formValues,
     });
 
     // Distribute document if requested

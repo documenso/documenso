@@ -15,7 +15,7 @@ export type RenderOptions = ReactEmail.Options & {
 // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
 const colors = (config.theme?.extend?.colors || {}) as Record<string, string>;
 
-export const render = (element: React.ReactNode, options?: RenderOptions) => {
+export const render = async (element: React.ReactNode, options?: RenderOptions) => {
   const { branding, ...otherOptions } = options ?? {};
 
   return ReactEmail.render(
@@ -36,7 +36,7 @@ export const render = (element: React.ReactNode, options?: RenderOptions) => {
   );
 };
 
-export const renderWithI18N = (element: React.ReactNode, options?: RenderOptions) => {
+export const renderWithI18N = async (element: React.ReactNode, options?: RenderOptions) => {
   const { branding, i18n, ...otherOptions } = options ?? {};
 
   if (!i18n) {
@@ -59,27 +59,6 @@ export const renderWithI18N = (element: React.ReactNode, options?: RenderOptions
         </Tailwind>
       </BrandingProvider>
     </I18nProvider>,
-    otherOptions,
-  );
-};
-
-export const renderAsync = async (element: React.ReactNode, options?: RenderOptions) => {
-  const { branding, ...otherOptions } = options ?? {};
-
-  return await ReactEmail.renderAsync(
-    <BrandingProvider branding={branding}>
-      <Tailwind
-        config={{
-          theme: {
-            extend: {
-              colors,
-            },
-          },
-        }}
-      >
-        {element}
-      </Tailwind>
-    </BrandingProvider>,
     otherOptions,
   );
 };

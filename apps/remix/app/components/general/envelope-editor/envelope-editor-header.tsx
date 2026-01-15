@@ -30,18 +30,11 @@ import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 export default function EnvelopeEditorHeader() {
   const { t } = useLingui();
 
-  const {
-    envelope,
-    isDocument,
-    isTemplate,
-    updateEnvelope,
-    autosaveError,
-    relativePath,
-    editorFields,
-  } = useCurrentEnvelopeEditor();
+  const { envelope, isDocument, isTemplate, updateEnvelope, autosaveError, relativePath } =
+    useCurrentEnvelopeEditor();
 
   return (
-    <nav className="bg-background border-border w-full border-b px-4 py-3 md:px-6">
+    <nav className="w-full border-b border-border bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/">
@@ -147,10 +140,6 @@ export default function EnvelopeEditorHeader() {
           {isDocument && (
             <>
               <EnvelopeDistributeDialog
-                envelope={{
-                  ...envelope,
-                  fields: editorFields.localFields,
-                }}
                 documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button size="sm">

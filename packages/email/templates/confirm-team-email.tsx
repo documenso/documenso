@@ -106,14 +106,14 @@ export const ConfirmTeamEmailTemplate = ({
                 <Text className="mt-2 text-sm">
                   <Trans>
                     You can revoke access at any time in your team settings on Documenso{' '}
-                    <Link href={`${baseUrl}/settings/teams`}>here.</Link>
+                    <Link href={`${baseUrl}/settings/teams`}>here</Link>.
                   </Trans>
                 </Text>
               </Section>
 
               <Section className="mb-6 mt-8 text-center">
                 <Button
-                  className="bg-documenso-500 inline-flex items-center justify-center rounded-lg px-6 py-3 text-center text-sm font-medium text-black no-underline"
+                  className="inline-flex items-center justify-center rounded-lg bg-documenso-500 px-6 py-3 text-center text-sm font-medium text-black no-underline"
                   href={`${baseUrl}/team/verify/email/${token}`}
                 >
                   <Trans>Accept</Trans>

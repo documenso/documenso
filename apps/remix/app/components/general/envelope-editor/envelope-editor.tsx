@@ -175,7 +175,7 @@ export default function EnvelopeEditor() {
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="absolute inset-y-0 left-0 bg-documenso"
+                className="absolute inset-y-0 left-0 bg-primary"
                 style={{
                   width: `${(100 / envelopeEditorSteps.length) * (currentStepData.order ?? 0)}%`,
                 }}
@@ -246,10 +246,6 @@ export default function EnvelopeEditor() {
 
             {isDocument && (
               <EnvelopeDistributeDialog
-                envelope={{
-                  ...envelope,
-                  fields: editorFields.localFields,
-                }}
                 documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">

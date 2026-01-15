@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -16,6 +17,7 @@ import {
 } from '@documenso/lib/types/document-meta';
 import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import { ZFieldMetaPrefillFieldsSchema } from '@documenso/lib/types/field-meta';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 
 import { zodFormData } from '../../utils/zod-form-data';
 import type { TrpcRouteMeta } from '../trpc';
@@ -40,7 +42,7 @@ export const ZUseEnvelopePayloadSchema = z.object({
     .array(
       z.object({
         id: z.number().describe('The ID of the recipient in the template.'),
-        email: z.string().email().max(254),
+        email: ZRecipientEmailSchema,
         name: z.string().max(255).optional(),
         signingOrder: z.number().optional(),
       }),
@@ -107,6 +109,8 @@ export const ZUseEnvelopePayloadSchema = z.object({
       }),
     )
     .optional(),
+
+  formValues: ZDocumentFormValuesSchema.optional(),
 });
 
 export const ZUseEnvelopeRequestSchema = zodFormData({

@@ -1,4 +1,4 @@
-import type { RegistrationResponseJSON } from '@simplewebauthn/types';
+import type { RegistrationResponseJSON } from '@simplewebauthn/server';
 
 import { createPasskey } from '@documenso/lib/server-only/auth/create-passkey';
 
