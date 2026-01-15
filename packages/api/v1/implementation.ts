@@ -823,9 +823,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         });
 
         const newDocumentData = await putNormalizedPdfFileServerSide({
-          name: fileName,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(prefilled),
+          file: {
+            name: fileName,
+            type: 'application/pdf',
+            arrayBuffer: async () => Promise.resolve(prefilled),
+          },
         });
 
         await prisma.envelopeItem.update({

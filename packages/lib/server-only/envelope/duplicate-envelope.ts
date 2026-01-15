@@ -42,6 +42,7 @@ export const duplicateEnvelope = async ({ id, userId, teamId }: DuplicateEnvelop
               data: true,
               initialData: true,
               type: true,
+              originalMimeType: true,
             },
           },
         },

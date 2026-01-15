@@ -51,6 +51,7 @@ export const ZDocumentSchema = LegacyDocumentSchema.pick({
     id: true,
     data: true,
     initialData: true,
+    originalMimeType: true,
   }).extend({
     envelopeItemId: z.string(),
   }),

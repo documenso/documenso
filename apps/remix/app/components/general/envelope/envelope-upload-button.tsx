@@ -128,6 +128,19 @@ export const EnvelopeUploadButton = ({ className, type, folderId }: EnvelopeUplo
       const errorMessage = match(error.code)
         .with('INVALID_DOCUMENT_FILE', () => t`You cannot upload encrypted PDFs.`)
         .with(
+          'UNSUPPORTED_FILE_TYPE',
+          () => t`This file type is not supported. Please upload a PDF, DOCX, JPEG, or PNG file.`,
+        )
+        .with(
+          'CONVERSION_SERVICE_UNAVAILABLE',
+          () => t`File conversion is temporarily unavailable. Please upload a PDF file instead.`,
+        )
+        .with(
+          'CONVERSION_FAILED',
+          () =>
+            t`Failed to convert the file to PDF. Please try again or upload a PDF file instead.`,
+        )
+        .with(
           AppErrorCode.LIMIT_EXCEEDED,
           () => t`You have reached your document limit for this month. Please upgrade your plan.`,
         )

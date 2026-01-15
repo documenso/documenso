@@ -82,6 +82,8 @@ export const sendDocument = async ({
               id: true,
               data: true,
               initialData: true,
+              originalMimeType: true,
+              originalData: true,
             },
           },
         },
@@ -335,9 +337,11 @@ const injectFormValuesIntoDocument = async (
   }
 
   const newDocumentData = await putNormalizedPdfFileServerSide({
-    name: fileName,
-    type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(prefilled),
+    file: {
+      name: fileName,
+      type: 'application/pdf',
+      arrayBuffer: async () => Promise.resolve(prefilled),
+    },
   });
 
   await prisma.envelopeItem.update({
