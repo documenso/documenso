@@ -65,6 +65,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const [pages, setPages] = useState<string[]>([]);
 
   const debouncedSearch = useDebouncedValue(search, 200);
+  const hasValidSearch = debouncedSearch.trim().length > 0;
 
   const { data: searchDocumentsData, isPending: isSearchingDocuments } =
     trpcReact.document.search.useQuery(
@@ -72,7 +73,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         query: debouncedSearch,
       },
       {
-        enabled: debouncedSearch.trim().length > 0,
+        enabled: hasValidSearch,
         placeholderData: (previousData) => previousData,
         // Do not batch this due to relatively long request time compared to
         // other queries which are generally batched with this.
@@ -87,7 +88,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         query: debouncedSearch,
       },
       {
-        enabled: debouncedSearch.trim().length > 0,
+        enabled: hasValidSearch,
         placeholderData: (previousData) => previousData,
         ...SKIP_QUERY_BATCH_META,
         ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
@@ -172,7 +173,6 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
     }));
   }, [searchTemplatesData]);
 
-  const hasValidSearch = debouncedSearch.trim().length > 0;
   const isSearching = hasValidSearch && (isSearchingDocuments || isSearchingTemplates);
 
   const currentPage = pages[pages.length - 1];
