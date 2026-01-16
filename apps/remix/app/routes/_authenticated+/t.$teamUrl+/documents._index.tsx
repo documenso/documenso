@@ -16,15 +16,19 @@ import { trpc } from '@documenso/trpc/react';
 import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
+import { DocumentsBulkDeleteDialog } from '~/components/dialogs/documents-bulk-delete-dialog';
+import { DocumentsBulkMoveDialog } from '~/components/dialogs/documents-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { PeriodSelector } from '~/components/general/period-selector';
 import { DocumentsTable } from '~/components/tables/documents-table';
+import { DocumentsTableBulkActionBar } from '~/components/tables/documents-table-bulk-action-bar';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
 import { useCurrentTeam } from '~/providers/team';
@@ -54,6 +58,17 @@ export default function DocumentsPage() {
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
 
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [isBulkMoving, setIsBulkMoving] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
+  const selectedDocumentIds = useMemo(() => {
+    return Object.entries(rowSelection)
+      .filter(([_, selected]) => selected)
+      .map(([id]) => parseInt(id))
+      .filter((id) => !isNaN(id));
+  }, [rowSelection]);
+
   const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
     [ExtendedDocumentStatus.DRAFT]: 0,
     [ExtendedDocumentStatus.PENDING]: 0,
@@ -67,6 +82,11 @@ export default function DocumentsPage() {
     () => ZSearchParamsSchema.safeParse(Object.fromEntries(searchParams.entries())).data || {},
     [searchParams],
   );
+
+  // Clear selection when navigation or filters change
+  useEffect(() => {
+    setRowSelection({});
+  }, [folderId, findDocumentSearchParams.status, findDocumentSearchParams.senderIds]);
 
   const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery({
     ...findDocumentSearchParams,
@@ -116,9 +136,9 @@ export default function DocumentsPage() {
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-muted-foreground text-xs">
+              <AvatarFallback className="text-xs text-muted-foreground">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
@@ -148,7 +168,7 @@ export default function DocumentsPage() {
                   .map((value) => (
                     <TabsTrigger
                       key={value}
-                      className="hover:text-foreground min-w-[60px]"
+                      className="min-w-[60px] hover:text-foreground"
                       value={value}
                       asChild
                     >
@@ -190,6 +210,9 @@ export default function DocumentsPage() {
                   setDocumentToMove(documentId);
                   setIsMovingDocument(true);
                 }}
+                enableSelection
+                rowSelection={rowSelection}
+                onRowSelectionChange={setRowSelection}
               />
             )}
           </div>
@@ -209,6 +232,28 @@ export default function DocumentsPage() {
             }}
           />
         )}
+
+        <DocumentsTableBulkActionBar
+          selectedCount={selectedDocumentIds.length}
+          onMoveToFolder={() => setIsBulkMoving(true)}
+          onDelete={() => setIsBulkDeleting(true)}
+          onClearSelection={() => setRowSelection({})}
+        />
+
+        <DocumentsBulkMoveDialog
+          documentIds={selectedDocumentIds}
+          open={isBulkMoving}
+          currentFolderId={folderId}
+          onOpenChange={setIsBulkMoving}
+          onSuccess={() => setRowSelection({})}
+        />
+
+        <DocumentsBulkDeleteDialog
+          documentIds={selectedDocumentIds}
+          open={isBulkDeleting}
+          onOpenChange={setIsBulkDeleting}
+          onSuccess={() => setRowSelection({})}
+        />
       </div>
     </EnvelopeDropZoneWrapper>
   );

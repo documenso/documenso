@@ -4,6 +4,7 @@ import { Trans } from '@lingui/react/macro';
 import type {
   ColumnDef,
   PaginationState,
+  RowSelectionState,
   Table as TTable,
   Updater,
   VisibilityState,
@@ -15,7 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 export type DataTableChildren<TData> = (_table: TTable<TData>) => React.ReactNode;
 
-export type { ColumnDef as DataTableColumnDef } from '@tanstack/react-table';
+export type { ColumnDef as DataTableColumnDef, RowSelectionState } from '@tanstack/react-table';
 
 export interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -40,6 +41,10 @@ export interface DataTableProps<TData, TValue> {
     enable: boolean;
     component?: React.ReactNode;
   };
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: (selection: RowSelectionState) => void;
+  getRowId?: (row: TData) => string;
 }
 
 export function DataTable<TData, TValue>({
@@ -58,6 +63,10 @@ export function DataTable<TData, TValue>({
   rowClassName,
   children,
   emptyState,
+  enableRowSelection,
+  rowSelection,
+  onRowSelectionChange,
+  getRowId,
 }: DataTableProps<TData, TValue>) {
   const pagination = useMemo<PaginationState>(() => {
     if (currentPage !== undefined && perPage !== undefined) {
@@ -85,6 +94,13 @@ export function DataTable<TData, TValue>({
     }
   };
 
+  const onTableRowSelectionChange = (updater: Updater<RowSelectionState>) => {
+    if (onRowSelectionChange) {
+      const newSelection = typeof updater === 'function' ? updater(rowSelection ?? {}) : updater;
+      onRowSelectionChange(newSelection);
+    }
+  };
+
   const table = useReactTable({
     data,
     columns,
@@ -92,10 +108,14 @@ export function DataTable<TData, TValue>({
     state: {
       pagination: manualPagination ? pagination : undefined,
       columnVisibility,
+      rowSelection: rowSelection ?? {},
     },
     manualPagination,
     pageCount: totalPages,
     onPaginationChange: onTablePaginationChange,
+    enableRowSelection: enableRowSelection ?? false,
+    onRowSelectionChange: onTableRowSelectionChange,
+    getRowId,
   });
 
   return (
@@ -162,7 +182,7 @@ export function DataTable<TData, TValue>({
                       {hasFilters && onClearFilters !== undefined && (
                         <button
                           onClick={() => onClearFilters()}
-                          className="text-foreground mt-1 text-sm"
+                          className="mt-1 text-sm text-foreground"
                         >
                           <Trans>Clear filters</Trans>
                         </button>
