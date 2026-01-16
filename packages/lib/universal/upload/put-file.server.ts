@@ -47,10 +47,13 @@ export const putPdfFileServerSide = async (file: File) => {
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (file: File) => {
+export const putNormalizedPdfFileServerSide = async (
+  file: File,
+  options: { flattenForm?: boolean } = {},
+) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer);
+  const normalized = await normalizePdf(buffer, options);
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 
