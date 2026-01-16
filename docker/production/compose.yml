@@ -21,7 +21,7 @@ services:
 
   documenso:
     container_name: documenso
-    image: documenso/documenso:latest
+    image: ghcr.io/justx-br/justx-signature:latest
     depends_on:
       database:
         condition: service_healthy

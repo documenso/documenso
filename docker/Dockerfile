@@ -127,8 +127,10 @@ COPY --from=installer --chown=nodejs:nodejs /app/apps/remix/public ./apps/remix/
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/schema.prisma ./packages/prisma/schema.prisma
 COPY --from=installer --chown=nodejs:nodejs /app/packages/prisma/migrations ./packages/prisma/migrations
 
-# Generate the prisma client again
-RUN npx prisma generate --schema ./packages/prisma/schema.prisma
+# Copy the already-generated Prisma client from the installer stage
+# This avoids needing devDependencies (like prisma-kysely) in the production image
+COPY --from=installer --chown=nodejs:nodejs /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=installer --chown=nodejs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 
 
 # Get the start script from docker/
