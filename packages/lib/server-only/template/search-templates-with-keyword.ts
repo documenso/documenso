@@ -1,5 +1,5 @@
 import { EnvelopeType } from '@prisma/client';
-import type { Envelope } from '@prisma/client';
+import type { Envelope, User } from '@prisma/client';
 import { DocumentVisibility, TeamMemberRole } from '@prisma/client';
 import { match } from 'ts-pattern';
 
@@ -26,6 +26,12 @@ export const searchTemplatesWithKeyword = async ({
   if (!query.trim()) {
     return [];
   }
+
+  const user = await prisma.user.findFirstOrThrow({
+    where: {
+      id: userId,
+    },
+  });
 
   const envelopes = await prisma.envelope.findMany({
     where: {
@@ -89,11 +95,11 @@ export const searchTemplatesWithKeyword = async ({
     take: limit,
   });
 
-  const isOwner = (envelope: Envelope) => envelope.userId === userId;
+  const isOwner = (envelope: Envelope, user: User) => envelope.userId === user.id;
 
   const filteredTemplates = envelopes
     .filter((envelope) => {
-      if (!envelope.teamId || isOwner(envelope)) {
+      if (!envelope.teamId || isOwner(envelope, user)) {
         return true;
       }
 
