@@ -135,7 +135,7 @@ export const PdfViewerKonva = ({
       {envelopeItemFile && Konva ? (
         <PDFDocument
           file={envelopeItemFile}
-          className={cn('w-full rounded', {
+          className={cn('group w-full rounded', {
             'h-[80vh] max-h-[60rem]': numPages === 0,
           })}
           onLoadSuccess={(d) => onDocumentLoaded(d)}
@@ -179,11 +179,28 @@ export const PdfViewerKonva = ({
           {Array(numPages)
             .fill(null)
             .map((_, i) => (
-              <div key={i} className="last:-mb-2">
+              <div key={i} className="relative last:-mb-2">
+                <div className="absolute right-2 z-10 mt-2 text-primary-foreground opacity-10 group-hover:opacity-80">
+                  <button
+                    className="mr-1 disabled:text-gray-500"
+                    disabled={scale <= 1}
+                    onClick={() => setScale((prevScale) => prevScale - 0.25)}
+                  >
+                    <ZoomOut size={20} />
+                  </button>
+                  <button
+                    className="disabled:text-gray-500"
+                    disabled={scale >= 2.0}
+                    onClick={() => setScale((prevScale) => prevScale + 0.25)}
+                  >
+                    <ZoomIn size={20} />
+                  </button>
+                </div>
                 <div
-                  className={cn('rounded border border-border will-change-transform', {
-                    'overflow-x-auto overflow-y-hidden': scale > 1.0,
-                  })}
+                  className={cn(
+                    'overflow-hidden rounded border border-border will-change-transform',
+                    { 'overflow-x-auto': scale > 1.0 },
+                  )}
                 >
                   <PDFPage
                     pageNumber={i + 1}
@@ -195,29 +212,11 @@ export const PdfViewerKonva = ({
                     customRenderer={customPageRenderer}
                   />
                 </div>
-                <div className="relative my-2 flex flex-row-reverse items-center">
-                  <p className="absolute left-1/2 -translate-x-1/2 text-[11px] text-muted-foreground/80">
-                    <Trans>
-                      Page {i + 1} of {numPages}
-                    </Trans>
-                  </p>
-                  <p className="mr-2 flex gap-1">
-                    <button
-                      className="disabled:text-gray-500"
-                      disabled={scale <= 1.0}
-                      onClick={() => setScale((prevScale) => prevScale - 0.25)}
-                    >
-                      <ZoomOut size={16} />
-                    </button>
-                    <button
-                      className="disabled:text-gray-500"
-                      disabled={scale >= 2.0}
-                      onClick={() => setScale((prevScale) => prevScale + 0.25)}
-                    >
-                      <ZoomIn size={16} />
-                    </button>
-                  </p>
-                </div>
+                <p className="my-2 text-center text-[11px] text-muted-foreground/80">
+                  <Trans>
+                    Page {i + 1} of {numPages}
+                  </Trans>
+                </p>
               </div>
             ))}
         </PDFDocument>
