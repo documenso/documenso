@@ -11,15 +11,22 @@ import {
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { normalizePdf as makeNormalizedPdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
 import { nanoid, prefixedId } from '@documenso/lib/universal/id';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { prisma } from '@documenso/prisma';
-import type { TCreateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/create-envelope.types';
 
-import type { TDocumentAccessAuthTypes, TDocumentActionAuthTypes } from '../../types/document-auth';
+import type {
+  TDocumentAccessAuthTypes,
+  TDocumentActionAuthTypes,
+  TRecipientAccessAuthTypes,
+  TRecipientActionAuthTypes,
+} from '../../types/document-auth';
 import type { TDocumentFormValues } from '../../types/document-form-values';
+import type { TEnvelopeAttachmentType } from '../../types/envelope-attachment';
+import type { TFieldAndMeta } from '../../types/field-meta';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -33,6 +40,25 @@ import { incrementDocumentId, incrementTemplateId } from '../envelope/increment-
 import { getTeamSettings } from '../team/get-team-settings';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
 
+type CreateEnvelopeRecipientFieldOptions = TFieldAndMeta & {
+  documentDataId: string;
+  page: number;
+  positionX: number;
+  positionY: number;
+  width: number;
+  height: number;
+};
+
+type CreateEnvelopeRecipientOptions = {
+  email: string;
+  name: string;
+  role: RecipientRole;
+  signingOrder?: number;
+  accessAuth?: TRecipientAccessAuthTypes[];
+  actionAuth?: TRecipientActionAuthTypes[];
+  fields?: CreateEnvelopeRecipientFieldOptions[];
+};
+
 export type CreateEnvelopeOptions = {
   userId: number;
   teamId: number;
@@ -45,7 +71,6 @@ export type CreateEnvelopeOptions = {
     envelopeItems: { title?: string; documentDataId: string; order?: number }[];
     formValues?: TDocumentFormValues;
 
-    timezone?: string;
     userTimezone?: string;
 
     templateType?: TemplateType;
@@ -55,9 +80,15 @@ export type CreateEnvelopeOptions = {
     visibility?: DocumentVisibility;
     globalAccessAuth?: TDocumentAccessAuthTypes[];
     globalActionAuth?: TDocumentActionAuthTypes[];
-    recipients?: TCreateEnvelopeRequest['recipients'];
+    recipients?: CreateEnvelopeRecipientOptions[];
     folderId?: string;
+    delegatedDocumentOwner?: string;
   };
+  attachments?: Array<{
+    label: string;
+    data: string;
+    type?: TEnvelopeAttachmentType;
+  }>;
   meta?: Partial<Omit<DocumentMeta, 'id'>>;
   requestMetadata: ApiRequestMetadata;
 };
@@ -67,6 +98,7 @@ export const createEnvelope = async ({
   teamId,
   normalizePdf,
   data,
+  attachments,
   meta,
   requestMetadata,
   internalVersion,
@@ -76,7 +108,6 @@ export const createEnvelope = async ({
     title,
     externalId,
     formValues,
-    timezone,
     userTimezone,
     folderId,
     templateType,
@@ -85,6 +116,7 @@ export const createEnvelope = async ({
     publicTitle,
     publicDescription,
     visibility: visibilityOverride,
+    delegatedDocumentOwner,
   } = data;
 
   const team = await prisma.team.findFirst({
@@ -135,6 +167,7 @@ export const createEnvelope = async ({
   let envelopeItems: { title?: string; documentDataId: string; order?: number }[] =
     data.envelopeItems;
 
+  // Todo: Envelopes - Remove
   if (normalizePdf) {
     envelopeItems = await Promise.all(
       data.envelopeItems.map(async (item) => {
@@ -152,7 +185,9 @@ export const createEnvelope = async ({
 
         const buffer = await getFileServerSide(documentData);
 
-        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer));
+        const normalizedPdf = await makeNormalizedPdf(Buffer.from(buffer), {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
 
         const titleToUse = item.title || title;
 
@@ -212,7 +247,7 @@ export const createEnvelope = async ({
 
   // userTimezone is last because it's always passed in regardless of the organisation/team settings
   // for uploads from the frontend
-  const timezoneToUse = timezone || settings.documentTimezone || userTimezone;
+  const timezoneToUse = meta?.timezone || settings.documentTimezone || userTimezone;
 
   const documentMeta = await prisma.documentMeta.create({
     data: extractDerivedDocumentMeta(settings, {
@@ -225,6 +260,43 @@ export const createEnvelope = async ({
     type === EnvelopeType.DOCUMENT
       ? await incrementDocumentId().then((v) => v.formattedDocumentId)
       : await incrementTemplateId().then((v) => v.formattedTemplateId);
+
+  const getValidatedDelegatedOwner = async () => {
+    if (
+      !settings.delegateDocumentOwnership ||
+      !delegatedDocumentOwner ||
+      requestMetadata.source === 'app'
+    ) {
+      return null;
+    }
+
+    const delegatedOwner = await prisma.user.findFirst({
+      where: {
+        email: delegatedDocumentOwner,
+      },
+    });
+
+    if (!delegatedOwner) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
+    }
+
+    const isTeamMember = await prisma.team.findFirst({
+      where: buildTeamWhereQuery({ teamId, userId: delegatedOwner.id }),
+    });
+
+    if (!isTeamMember) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'Delegated document owner must be a member of the team',
+      });
+    }
+
+    return delegatedOwner;
+  };
+
+  const delegatedOwner = await getValidatedDelegatedOwner();
+  const envelopeOwnerId = delegatedOwner?.id ?? userId;
 
   return await prisma.$transaction(async (tx) => {
     const envelope = await tx.envelope.create({
@@ -246,7 +318,16 @@ export const createEnvelope = async ({
             })),
           },
         },
-        userId,
+        envelopeAttachments: {
+          createMany: {
+            data: (attachments || []).map((attachment) => ({
+              label: attachment.label,
+              data: attachment.data,
+              type: attachment.type ?? 'link',
+            })),
+          },
+        },
+        userId: envelopeOwnerId,
         teamId,
         authOptions,
         visibility,
@@ -267,8 +348,22 @@ export const createEnvelope = async ({
 
     const firstEnvelopeItem = envelope.envelopeItems[0];
 
+    const defaultRecipients = settings.defaultRecipients
+      ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+      : [];
+
+    const mappedDefaultRecipients: CreateEnvelopeRecipientOptions[] = defaultRecipients.map(
+      (recipient) => ({
+        email: recipient.email,
+        name: recipient.name,
+        role: recipient.role,
+      }),
+    );
+
+    const allRecipients = [...(data.recipients || []), ...mappedDefaultRecipients];
+
     await Promise.all(
-      (data.recipients || []).map(async (recipient) => {
+      allRecipients.map(async (recipient) => {
         const recipientAuthOptions = createRecipientAuthOptions({
           accessAuth: recipient.accessAuth ?? [],
           actionAuth: recipient.actionAuth ?? [],
@@ -338,6 +433,7 @@ export const createEnvelope = async ({
         fields: true,
         folder: true,
         envelopeItems: true,
+        envelopeAttachments: true,
       },
     });
 
@@ -353,6 +449,9 @@ export const createEnvelope = async ({
         data: createDocumentAuditLogData({
           type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_CREATED,
           envelopeId: envelope.id,
+          user: {
+            id: envelopeOwnerId,
+          },
           metadata: requestMetadata,
           data: {
             title,
@@ -362,6 +461,25 @@ export const createEnvelope = async ({
           },
         }),
       });
+
+      // Create audit log for delegated owner if validation passed
+      if (delegatedOwner) {
+        await tx.documentAuditLog.create({
+          data: createDocumentAuditLogData({
+            type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED,
+            envelopeId: envelope.id,
+            user: {
+              id: userId,
+            },
+            metadata: requestMetadata,
+            data: {
+              delegatedOwnerName: delegatedOwner.name,
+              delegatedOwnerEmail: delegatedOwner.email,
+              teamName: team.name,
+            },
+          }),
+        });
+      }
 
       await triggerWebhook({
         event: WebhookTriggerEvents.DOCUMENT_CREATED,

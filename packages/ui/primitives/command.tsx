@@ -25,14 +25,25 @@ Command.displayName = CommandPrimitive.displayName;
 
 type CommandDialogProps = DialogProps & {
   commandProps?: React.ComponentPropsWithoutRef<typeof CommandPrimitive>;
+  position?: 'start' | 'end' | 'center';
+  dialogContentClassName?: string;
 };
 
-const CommandDialog = ({ children, commandProps, ...props }: CommandDialogProps) => {
+const CommandDialog = ({
+  children,
+  commandProps,
+  position = 'center',
+  dialogContentClassName,
+  ...props
+}: CommandDialogProps) => {
   return (
     <Dialog {...props}>
       <DialogContent
-        className="w-11/12 items-center overflow-hidden rounded-lg p-0 shadow-2xl lg:mt-0"
-        position="center"
+        className={cn(
+          'w-11/12 items-center overflow-hidden rounded-lg p-0 shadow-2xl lg:mt-0',
+          dialogContentClassName,
+        )}
+        position={position}
         overlayClassName="bg-background/60"
       >
         <Command

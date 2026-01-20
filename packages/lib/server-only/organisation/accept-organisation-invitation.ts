@@ -40,7 +40,10 @@ export const acceptOrganisationInvitation = async ({
 
   const user = await prisma.user.findFirst({
     where: {
-      email: organisationMemberInvite.email,
+      email: {
+        equals: organisationMemberInvite.email,
+        mode: 'insensitive',
+      },
     },
     select: {
       id: true,
@@ -88,11 +91,13 @@ export const addUserToOrganisation = async ({
   organisationId,
   organisationGroups,
   organisationMemberRole,
+  bypassEmail = false,
 }: {
   userId: number;
   organisationId: string;
   organisationGroups: OrganisationGroup[];
   organisationMemberRole: OrganisationMemberRole;
+  bypassEmail?: boolean;
 }) => {
   const organisationGroupToUse = organisationGroups.find(
     (group) =>
@@ -122,13 +127,15 @@ export const addUserToOrganisation = async ({
         },
       });
 
-      await jobs.triggerJob({
-        name: 'send.organisation-member-joined.email',
-        payload: {
-          organisationId,
-          memberUserId: userId,
-        },
-      });
+      if (!bypassEmail) {
+        await jobs.triggerJob({
+          name: 'send.organisation-member-joined.email',
+          payload: {
+            organisationId,
+            memberUserId: userId,
+          },
+        });
+      }
     },
     { timeout: 30_000 },
   );

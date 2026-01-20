@@ -2,15 +2,19 @@ import { z } from 'zod';
 
 import { ZDocumentMetaUpdateSchema } from '@documenso/lib/types/document-meta';
 
-// export const distributeEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/distribute',
-//     summary: 'Distribute envelope',
-//     description: 'Send the document out to recipients based on your distribution method',
-//     tags: ['Envelope'],
-//   },
-// };
+import { ZSuccessResponseSchema } from '../schema';
+import type { TrpcRouteMeta } from '../trpc';
+import { ZRecipientWithSigningUrlSchema } from './schema';
+
+export const distributeEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/distribute',
+    summary: 'Distribute envelope',
+    description: 'Send the envelope to recipients based on your distribution method',
+    tags: ['Envelope'],
+  },
+};
 
 export const ZDistributeEnvelopeRequestSchema = z.object({
   envelopeId: z.string().describe('The ID of the envelope to send.'),
@@ -28,7 +32,10 @@ export const ZDistributeEnvelopeRequestSchema = z.object({
   }).optional(),
 });
 
-export const ZDistributeEnvelopeResponseSchema = z.void();
+export const ZDistributeEnvelopeResponseSchema = ZSuccessResponseSchema.extend({
+  id: z.string().describe('The ID of the envelope that was sent.'),
+  recipients: ZRecipientWithSigningUrlSchema.array(),
+});
 
 export type TDistributeEnvelopeRequest = z.infer<typeof ZDistributeEnvelopeRequestSchema>;
 export type TDistributeEnvelopeResponse = z.infer<typeof ZDistributeEnvelopeResponseSchema>;

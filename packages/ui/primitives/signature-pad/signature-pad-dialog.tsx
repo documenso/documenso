@@ -15,6 +15,7 @@ import { SignatureRender } from './signature-render';
 
 export type SignaturePadDialogProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'onChange'> & {
   disabled?: boolean;
+  fullName?: string;
   value?: string;
   onChange: (_value: string) => void;
   dialogConfirmText?: MessageDescriptor | string;
@@ -26,6 +27,7 @@ export type SignaturePadDialogProps = Omit<HTMLAttributes<HTMLCanvasElement>, 'o
 
 export const SignaturePadDialog = ({
   className,
+  fullName,
   value,
   onChange,
   disabled = false,
@@ -43,7 +45,7 @@ export const SignaturePadDialog = ({
   return (
     <div
       className={cn(
-        'aspect-signature-pad bg-background relative block w-full select-none rounded-lg border',
+        'relative block aspect-signature-pad w-full select-none rounded-lg border bg-background',
         className,
         {
           'pointer-events-none opacity-50': disabled,
@@ -112,6 +114,7 @@ export const SignaturePadDialog = ({
         <DialogContent hideClose={true} className="p-6 pt-4">
           <SignaturePad
             id="signature"
+            fullName={fullName}
             value={value}
             className={className}
             disabled={disabled}

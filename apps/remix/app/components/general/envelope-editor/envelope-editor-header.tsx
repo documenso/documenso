@@ -13,7 +13,6 @@ import { match } from 'ts-pattern';
 
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { Badge } from '@documenso/ui/primitives/badge';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -22,8 +21,8 @@ import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribu
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { BrandingLogo } from '~/components/general/branding-logo';
+import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
-import { useCurrentTeam } from '~/providers/team';
 
 import { TemplateDirectLinkBadge } from '../template/template-direct-link-badge';
 import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
@@ -31,30 +30,27 @@ import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 export default function EnvelopeEditorHeader() {
   const { t } = useLingui();
 
-  const team = useCurrentTeam();
-
-  const { envelope, isDocument, isTemplate, updateEnvelope, autosaveError } =
+  const { envelope, isDocument, isTemplate, updateEnvelope, autosaveError, relativePath } =
     useCurrentEnvelopeEditor();
 
-  // Todo: Envelopes this probably won't work with embed? Maybe hide the back items when no team?
-
-  const rootPath = isDocument ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
-
   return (
-    <nav className="w-full border-b border-gray-200 bg-white px-6 py-3">
+    <nav className="w-full border-b border-border bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <Link to="/">
             <BrandingLogo className="h-6 w-auto" />
           </Link>
           <Separator orientation="vertical" className="h-6" />
+
           <div className="flex items-center space-x-2">
             <EnvelopeItemTitleInput
               disabled={envelope.status !== DocumentStatus.DRAFT}
               value={envelope.title}
               onChange={(title) => {
                 updateEnvelope({
-                  title,
+                  data: {
+                    title,
+                  },
                 });
               }}
               placeholder={t`Envelope Title`}
@@ -131,6 +127,8 @@ export default function EnvelopeEditorHeader() {
         </div>
 
         <div className="flex items-center space-x-2">
+          <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" />
+
           <EnvelopeEditorSettingsDialog
             trigger={
               <Button variant="outline" size="sm">
@@ -142,7 +140,7 @@ export default function EnvelopeEditorHeader() {
           {isDocument && (
             <>
               <EnvelopeDistributeDialog
-                envelope={envelope}
+                documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button size="sm">
                     <SendIcon className="mr-2 h-4 w-4" />
@@ -165,10 +163,11 @@ export default function EnvelopeEditorHeader() {
 
           {isTemplate && (
             <TemplateUseDialog
+              envelopeId={envelope.id}
               templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
               templateSigningOrder={envelope.documentMeta?.signingOrder}
               recipients={envelope.recipients}
-              documentRootPath={rootPath}
+              documentRootPath={relativePath.documentRootPath}
               trigger={
                 <Button size="sm">
                   <Trans>Use Template</Trans>

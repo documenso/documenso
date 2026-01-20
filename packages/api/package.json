@@ -17,14 +17,13 @@
   "dependencies": {
     "@documenso/lib": "*",
     "@documenso/prisma": "*",
-    "@ts-rest/core": "^3.30.5",
-    "@ts-rest/open-api": "^3.33.0",
-    "@ts-rest/serverless": "^3.30.5",
+    "@ts-rest/core": "^3.52.1",
+    "@ts-rest/open-api": "^3.52.1",
+    "@ts-rest/serverless": "^3.52.1",
     "@types/swagger-ui-react": "^5.18.0",
-    "luxon": "^3.4.0",
-    "superjson": "^1.13.1",
-    "swagger-ui-react": "^5.21.0",
-    "ts-pattern": "^5.0.5",
-    "zod": "3.24.1"
+    "luxon": "^3.7.2",
+    "superjson": "^2.2.5",
+    "ts-pattern": "^5.9.0",
+    "zod": "^3.25.76"
   }
 }

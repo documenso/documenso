@@ -146,7 +146,7 @@ export const TeamMemberUpdateDialog = ({
 
           <DialogDescription>
             <Trans>
-              You are currently updating <span className="font-bold">{memberName}.</span>
+              You are currently updating <span className="font-bold">{memberName}</span>.
             </Trans>
           </DialogDescription>
         </DialogHeader>

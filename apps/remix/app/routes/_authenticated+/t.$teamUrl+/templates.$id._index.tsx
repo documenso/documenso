@@ -1,3 +1,5 @@
+import { lazy } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
@@ -11,16 +13,16 @@ import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/t
 import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
-import EnvelopeGenericPageRenderer from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
@@ -32,6 +34,10 @@ import { TemplatesTableActionDropdown } from '~/components/tables/templates-tabl
 import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/templates.$id._index';
+
+const EnvelopeGenericPageRenderer = lazy(
+  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+);
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
@@ -50,7 +56,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   if (isLoadingEnvelope) {
     return (
-      <div className="text-foreground flex w-screen flex-col items-center justify-center gap-2 py-64">
+      <div className="flex w-screen flex-col items-center justify-center gap-2 py-64 text-foreground">
         <Spinner />
         <Trans>Loading</Trans>
       </div>
@@ -65,8 +71,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Not found`,
             subHeading: msg`404 Not found`,
-            message: msg`The template you are looking for may have been removed, renamed or may have never
-                  existed.`,
+            message: msg`The template you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -108,9 +113,11 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       }
     : undefined;
 
+  const isMultiEnvelopeItem = envelope.envelopeItems.length > 1 && envelope.internalVersion === 2;
+
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={templateRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Templates</Trans>
       </Link>
@@ -163,43 +170,63 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
       </div>
 
       <div className="mt-6 grid w-full grid-cols-12 gap-8">
-        <Card
-          className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
-          gradient
-        >
-          <CardContent className="p-2">
-            {envelope.internalVersion === 2 ? (
-              <EnvelopeRenderProvider envelope={envelope} fields={envelope.fields}>
+        {envelope.internalVersion === 2 ? (
+          <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
+            <EnvelopeRenderProvider
+              envelope={envelope}
+              token={undefined}
+              fields={envelope.fields}
+              recipients={envelope.recipients}
+              overrideSettings={{
+                showRecipientTooltip: true,
+              }}
+            >
+              {isMultiEnvelopeItem && (
                 <EnvelopeRendererFileSelector fields={envelope.fields} className="mb-4 p-0" />
+              )}
 
-                <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
-              </EnvelopeRenderProvider>
-            ) : (
-              <>
-                <DocumentReadOnlyFields
-                  fields={readOnlyFields}
-                  showFieldStatus={false}
-                  showRecipientTooltip={true}
-                  showRecipientColors={true}
-                  recipientIds={envelope.recipients.map((recipient) => recipient.id)}
-                  documentMeta={mockedDocumentMeta}
-                />
+              <Card className="rounded-xl before:rounded-xl" gradient>
+                <CardContent className="p-2">
+                  <PDFViewerKonvaLazy
+                    renderer="preview"
+                    customPageRenderer={EnvelopeGenericPageRenderer}
+                  />
+                </CardContent>
+              </Card>
+            </EnvelopeRenderProvider>
+          </div>
+        ) : (
+          <Card
+            className="relative col-span-12 rounded-xl before:rounded-xl lg:col-span-6 xl:col-span-7"
+            gradient
+          >
+            <CardContent className="p-2">
+              <DocumentReadOnlyFields
+                fields={readOnlyFields}
+                showFieldStatus={false}
+                showRecipientTooltip={true}
+                showRecipientColors={true}
+                recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+                documentMeta={mockedDocumentMeta}
+              />
 
-                <PDFViewer
-                  document={envelope}
-                  key={envelope.envelopeItems[0].id}
-                  documentData={envelope.envelopeItems[0].documentData}
-                />
-              </>
-            )}
-          </CardContent>
-        </Card>
+              <PDFViewerLazy
+                envelopeItem={envelope.envelopeItems[0]}
+                token={undefined}
+                version="signed"
+                key={envelope.envelopeItems[0].id}
+              />
+            </CardContent>
+          </Card>
+        )}
 
-        <div className="col-span-12 lg:col-span-6 xl:col-span-5">
+        <div
+          className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
+        >
           <div className="space-y-6">
-            <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
+            <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
-                <h3 className="text-foreground text-2xl font-semibold">
+                <h3 className="text-2xl font-semibold text-foreground">
                   <Trans>Template</Trans>
                 </h3>
 
@@ -217,12 +244,13 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 </div>
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm">
+              <p className="mt-2 px-4 text-sm text-muted-foreground">
                 <Trans>Manage and view template</Trans>
               </p>
 
               <div className="mt-4 border-t px-4 pt-4">
                 <TemplateUseDialog
+                  envelopeId={envelope.id}
                   templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                   templateSigningOrder={envelope.documentMeta?.signingOrder}
                   recipients={envelope.recipients}

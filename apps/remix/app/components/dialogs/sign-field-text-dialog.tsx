@@ -22,7 +22,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Textarea } from '@documenso/ui/primitives/textarea';
@@ -50,14 +49,12 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
 
     return (
       <Dialog open={true} onOpenChange={(value) => (!value ? call.end(null) : null)}>
-        <DialogContent position="center">
+        <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              <Trans>Sign Text Field</Trans>
-            </DialogTitle>
+            <DialogTitle>{fieldMeta?.label || <Trans>Enter Text</Trans>}</DialogTitle>
 
             <DialogDescription className="mt-4">
-              <Trans>Insert a value into the text field</Trans>
+              <Trans>Please enter a value</Trans>
             </DialogDescription>
           </DialogHeader>
 
@@ -72,8 +69,6 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                   name="text"
                   render={({ field, fieldState }) => (
                     <FormItem>
-                      {fieldMeta?.label && <FormLabel>{fieldMeta?.label}</FormLabel>}
-
                       <FormControl>
                         <Textarea
                           id="custom-text"
@@ -89,7 +84,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                       {fieldMeta?.characterLimit !== undefined &&
                         fieldMeta?.characterLimit > 0 &&
                         !fieldState.error && (
-                          <div className="text-muted-foreground text-sm">
+                          <div className="text-sm text-muted-foreground">
                             <Plural
                               value={fieldMeta?.characterLimit - (field.value?.length ?? 0)}
                               one="# character remaining"
@@ -107,7 +102,7 @@ export const SignFieldTextDialog = createCallable<SignFieldTextDialogProps, stri
                   </Button>
 
                   <Button type="submit">
-                    <Trans>Sign</Trans>
+                    <Trans>Enter</Trans>
                   </Button>
                 </DialogFooter>
               </fieldset>

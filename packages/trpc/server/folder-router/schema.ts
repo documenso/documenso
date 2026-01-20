@@ -1,34 +1,21 @@
 import { z } from 'zod';
 
 import { ZFolderTypeSchema } from '@documenso/lib/types/folder-type';
-import { ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
+import { ZFindResultResponse, ZFindSearchParamsSchema } from '@documenso/lib/types/search-params';
 import { DocumentVisibility } from '@documenso/prisma/generated/types';
+import FolderSchema from '@documenso/prisma/generated/zod/modelSchema/FolderSchema';
 
-/**
- * Required for empty responses since we currently can't 201 requests for our openapi setup.
- *
- * Without this it will throw an error in Speakeasy SDK when it tries to parse an empty response.
- */
-export const ZSuccessResponseSchema = z.object({
-  success: z.boolean(),
-  type: ZFolderTypeSchema.optional(),
-});
-
-export const ZGenericSuccessResponse = {
-  success: true,
-} satisfies z.infer<typeof ZSuccessResponseSchema>;
-
-export const ZFolderSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  userId: z.number(),
-  teamId: z.number().nullable(),
-  parentId: z.string().nullable(),
-  pinned: z.boolean(),
-  createdAt: z.date(),
-  updatedAt: z.date(),
-  visibility: z.nativeEnum(DocumentVisibility),
-  type: ZFolderTypeSchema,
+export const ZFolderSchema = FolderSchema.pick({
+  id: true,
+  name: true,
+  userId: true,
+  teamId: true,
+  parentId: true,
+  pinned: true,
+  createdAt: true,
+  updatedAt: true,
+  visibility: true,
+  type: true,
 });
 
 export type TFolder = z.infer<typeof ZFolderSchema>;
@@ -51,40 +38,39 @@ export const ZFolderWithSubfoldersSchema = ZFolderSchema.extend({
 
 export type TFolderWithSubfolders = z.infer<typeof ZFolderWithSubfoldersSchema>;
 
-export const ZCreateFolderSchema = z.object({
+const ZFolderParentIdSchema = z
+  .string()
+  .describe(
+    'The folder ID to place this folder within. Leave empty to place folder at the root level.',
+  );
+
+export const ZCreateFolderRequestSchema = z.object({
   name: z.string(),
-  parentId: z.string().optional(),
+  parentId: ZFolderParentIdSchema.optional(),
   type: ZFolderTypeSchema.optional(),
 });
 
-export const ZUpdateFolderSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  visibility: z.nativeEnum(DocumentVisibility),
-  type: ZFolderTypeSchema.optional(),
+export const ZCreateFolderResponseSchema = ZFolderSchema;
+
+export const ZUpdateFolderRequestSchema = z.object({
+  folderId: z.string().describe('The ID of the folder to update'),
+  data: z.object({
+    name: z.string().optional().describe('The name of the folder'),
+    parentId: ZFolderParentIdSchema.optional().nullable(),
+    visibility: z
+      .nativeEnum(DocumentVisibility)
+      .optional()
+      .describe('The visibility of the folder'),
+    pinned: z.boolean().optional().describe('Whether the folder should be pinned'),
+  }),
 });
 
-export type TUpdateFolderSchema = z.infer<typeof ZUpdateFolderSchema>;
+export type TUpdateFolderRequestSchema = z.infer<typeof ZUpdateFolderRequestSchema>;
 
-export const ZDeleteFolderSchema = z.object({
-  id: z.string(),
-  type: ZFolderTypeSchema.optional(),
-});
+export const ZUpdateFolderResponseSchema = ZFolderSchema;
 
-export const ZMoveFolderSchema = z.object({
-  id: z.string(),
-  parentId: z.string().nullable(),
-  type: ZFolderTypeSchema.optional(),
-});
-
-export const ZPinFolderSchema = z.object({
+export const ZDeleteFolderRequestSchema = z.object({
   folderId: z.string(),
-  type: ZFolderTypeSchema.optional(),
-});
-
-export const ZUnpinFolderSchema = z.object({
-  folderId: z.string(),
-  type: ZFolderTypeSchema.optional(),
 });
 
 export const ZGetFoldersSchema = z.object({
@@ -101,11 +87,20 @@ export const ZGetFoldersResponseSchema = z.object({
 export type TGetFoldersResponse = z.infer<typeof ZGetFoldersResponseSchema>;
 
 export const ZFindFoldersRequestSchema = ZFindSearchParamsSchema.extend({
+  parentId: z.string().optional().describe('Filter folders by the parent folder ID'),
+  type: ZFolderTypeSchema.optional().describe('Filter folders by the folder type'),
+});
+
+export const ZFindFoldersResponseSchema = ZFindResultResponse.extend({
+  data: z.array(ZFolderSchema),
+});
+
+export const ZFindFoldersInternalRequestSchema = ZFindSearchParamsSchema.extend({
   parentId: z.string().nullable().optional(),
   type: ZFolderTypeSchema.optional(),
 });
 
-export const ZFindFoldersResponseSchema = z.object({
+export const ZFindFoldersInternalResponseSchema = z.object({
   data: z.array(ZFolderWithSubfoldersSchema),
   breadcrumbs: z.array(ZFolderSchema),
   type: ZFolderTypeSchema.optional(),

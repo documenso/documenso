@@ -10,6 +10,7 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
 import { decryptSecondaryData } from '@documenso/lib/server-only/crypto/decrypt';
 import { findDocumentAuditLogs } from '@documenso/lib/server-only/document/find-document-audit-logs';
+import { getOrganisationClaimByTeamId } from '@documenso/lib/server-only/organisation/get-organisation-claims';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { getTranslations } from '@documenso/lib/utils/i18n';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
@@ -53,6 +54,8 @@ export async function loader({ request }: Route.LoaderArgs) {
     throw redirect('/');
   }
 
+  const organisationClaim = await getOrganisationClaimByTeamId({ teamId: envelope.teamId });
+
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(envelope.documentMeta?.language);
 
   const { data: auditLogs } = await findDocumentAuditLogs({
@@ -81,6 +84,7 @@ export async function loader({ request }: Route.LoaderArgs) {
       deletedAt: envelope.deletedAt,
       documentMeta: envelope.documentMeta,
     },
+    hidePoweredBy: organisationClaim.flags.hidePoweredBy,
     documentLanguage,
     messages,
   };
@@ -95,7 +99,7 @@ export async function loader({ request }: Route.LoaderArgs) {
  * Update: Maybe <Trans> tags work now after RR7 migration.
  */
 export default function AuditLog({ loaderData }: Route.ComponentProps) {
-  const { auditLogs, document, documentLanguage, messages } = loaderData;
+  const { auditLogs, document, documentLanguage, hidePoweredBy, messages } = loaderData;
 
   const { i18n, _ } = useLingui();
 
@@ -145,7 +149,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.createdAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -155,7 +159,7 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
             <span className="mt-1 block">
               {DateTime.fromJSDate(document.updatedAt)
                 .setLocale(APP_I18N_OPTIONS.defaultLocale)
-                .toFormat('yyyy-mm-dd hh:mm:ss a (ZZZZ)')}
+                .toFormat('yyyy-MM-dd hh:mm:ss a (ZZZZ)')}
             </span>
           </p>
 
@@ -188,11 +192,13 @@ export default function AuditLog({ loaderData }: Route.ComponentProps) {
         <InternalAuditLogTable logs={auditLogs} />
       </div>
 
-      <div className="my-8 flex-row-reverse">
-        <div className="flex items-end justify-end gap-x-4">
-          <BrandingLogo className="max-h-6 print:max-h-4" />
+      {!hidePoweredBy && (
+        <div className="my-8 flex-row-reverse">
+          <div className="flex items-end justify-end gap-x-4">
+            <BrandingLogo className="max-h-6 print:max-h-4" />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

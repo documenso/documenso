@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
@@ -22,6 +23,8 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     typedSignatureEnabled: z.boolean().optional(),
     uploadSignatureEnabled: z.boolean().optional(),
     drawSignatureEnabled: z.boolean().optional(),
+    defaultRecipients: ZDefaultRecipientsSchema.nullish(),
+    delegateDocumentOwnership: z.boolean().nullish(),
 
     // Branding related settings.
     brandingEnabled: z.boolean().optional(),
@@ -34,6 +37,9 @@ export const ZUpdateOrganisationSettingsRequestSchema = z.object({
     emailReplyTo: z.string().email().nullish(),
     // emailReplyToName: z.string().optional(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.optional(),
+
+    // AI features settings.
+    aiFeaturesEnabled: z.boolean().optional(),
   }),
 });
 

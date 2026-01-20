@@ -13,19 +13,21 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
 
 type DocumentDuplicateDialogProps = {
-  id: number;
+  id: string;
+  token?: string;
   open: boolean;
   onOpenChange: (_open: boolean) => void;
 };
 
 export const DocumentDuplicateDialog = ({
   id,
+  token,
   open,
   onOpenChange,
 }: DocumentDuplicateDialogProps) => {
@@ -36,27 +38,23 @@ export const DocumentDuplicateDialog = ({
 
   const team = useCurrentTeam();
 
-  const { data: document, isLoading } = trpcReact.document.get.useQuery(
-    {
-      documentId: id,
-    },
-    {
-      queryHash: `document-duplicate-dialog-${id}`,
-      enabled: open === true,
-    },
-  );
+  const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
+    trpcReact.envelope.item.getManyByToken.useQuery(
+      {
+        envelopeId: id,
+        access: token ? { type: 'recipient', token } : { type: 'user' },
+      },
+      {
+        enabled: open,
+      },
+    );
 
-  const documentData = document?.documentData
-    ? {
-        ...document.documentData,
-        data: document.documentData.initialData,
-      }
-    : undefined;
+  const envelopeItems = envelopeItemsPayload?.data || [];
 
   const documentsPath = formatDocumentsPath(team.url);
 
-  const { mutateAsync: duplicateDocument, isPending: isDuplicateLoading } =
-    trpcReact.document.duplicate.useMutation({
+  const { mutateAsync: duplicateEnvelope, isPending: isDuplicating } =
+    trpcReact.envelope.duplicate.useMutation({
       onSuccess: async ({ id }) => {
         toast({
           title: _(msg`Document Duplicated`),
@@ -71,7 +69,7 @@ export const DocumentDuplicateDialog = ({
 
   const onDuplicate = async () => {
     try {
-      await duplicateDocument({ documentId: id });
+      await duplicateEnvelope({ envelopeId: id });
     } catch {
       toast({
         title: _(msg`Something went wrong`),
@@ -83,14 +81,14 @@ export const DocumentDuplicateDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !isLoading && onOpenChange(value)}>
+    <Dialog open={open} onOpenChange={(value) => !isDuplicating && onOpenChange(value)}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>
             <Trans>Duplicate</Trans>
           </DialogTitle>
         </DialogHeader>
-        {!documentData || isLoading ? (
+        {isLoadingEnvelopeItems || !envelopeItems || envelopeItems.length === 0 ? (
           <div className="mx-auto -mt-4 flex w-full max-w-screen-xl flex-col px-4 md:px-8">
             <h1 className="mt-4 grow-0 truncate text-2xl font-semibold md:text-3xl">
               <Trans>Loading Document...</Trans>
@@ -98,7 +96,12 @@ export const DocumentDuplicateDialog = ({
           </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
-            <PDFViewer key={document?.id} documentData={documentData} />
+            <PDFViewerLazy
+              key={envelopeItems[0].id}
+              envelopeItem={envelopeItems[0]}
+              token={undefined}
+              version="original"
+            />
           </div>
         )}
 
@@ -115,8 +118,8 @@ export const DocumentDuplicateDialog = ({
 
             <Button
               type="button"
-              disabled={isDuplicateLoading || isLoading}
-              loading={isDuplicateLoading}
+              disabled={isDuplicating}
+              loading={isDuplicating}
               onClick={onDuplicate}
               className="flex-1"
             >

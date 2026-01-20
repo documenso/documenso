@@ -174,7 +174,7 @@ export const EnvelopeEditorSettingsDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope } = useCurrentEnvelopeEditor();
+  const { envelope, updateEnvelopeAsync } = useCurrentEnvelopeEditor();
 
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
@@ -186,14 +186,12 @@ export const EnvelopeEditorSettingsDialog = ({
     documentAuth: envelope.authOptions,
   });
 
-  const form = useForm<TAddSettingsFormSchema>({
-    resolver: zodResolver(ZAddSettingsFormSchema),
-    defaultValues: {
-      externalId: envelope.externalId || '', // Todo: String or undefined?
+  const createDefaultValues = () => {
+    return {
+      externalId: envelope.externalId || '',
       visibility: envelope.visibility || '',
       globalAccessAuth: documentAuthOption?.globalAccessAuth || [],
       globalActionAuth: documentAuthOption?.globalActionAuth || [],
-
       meta: {
         subject: envelope.documentMeta.subject ?? '',
         message: envelope.documentMeta.message ?? '',
@@ -210,12 +208,14 @@ export const EnvelopeEditorSettingsDialog = ({
         emailSettings: ZDocumentEmailSettingsSchema.parse(envelope.documentMeta.emailSettings),
         signatureTypes: extractTeamSignatureSettings(envelope.documentMeta),
       },
-    },
+    };
+  };
+
+  const form = useForm<TAddSettingsFormSchema>({
+    resolver: zodResolver(ZAddSettingsFormSchema),
+    defaultValues: createDefaultValues(),
   });
 
-  const { mutateAsync: updateEnvelope } = trpc.envelope.update.useMutation();
-
-  // Todo: Envelopes - Extract into provider.
   const envelopeHasBeenSent =
     envelope.type === EnvelopeType.DOCUMENT &&
     envelope.recipients.some((recipient) => recipient.sendStatus === SendStatus.SENT);
@@ -230,20 +230,29 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const emails = emailData?.data || [];
 
-  // Todo: Envelopes this doesn't make sense (look at previous)
   const canUpdateVisibility = canAccessTeamDocument(team.currentTeamRole, envelope.visibility);
 
   const onFormSubmit = async (data: TAddSettingsFormSchema) => {
-    const { timezone, dateFormat, redirectUrl, language, signatureTypes } = data.meta;
+    const {
+      timezone,
+      dateFormat,
+      redirectUrl,
+      language,
+      signatureTypes,
+      distributionMethod,
+      emailId,
+      emailSettings,
+      message,
+      subject,
+      emailReplyTo,
+    } = data.meta;
 
     const parsedGlobalAccessAuth = z
       .array(ZDocumentAccessAuthTypesSchema)
       .safeParse(data.globalAccessAuth);
 
     try {
-      await updateEnvelope({
-        envelopeId: envelope.id,
-        envelopeType: envelope.type,
+      await updateEnvelopeAsync({
         data: {
           externalId: data.externalId || null,
           visibility: data.visibility,
@@ -254,10 +263,16 @@ export const EnvelopeEditorSettingsDialog = ({
           timezone,
           dateFormat,
           redirectUrl,
+          emailId,
+          message,
+          subject,
+          emailReplyTo,
+          emailSettings,
+          distributionMethod,
           language: isValidLanguageCode(language) ? language : undefined,
+          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
           typedSignatureEnabled: signatureTypes.includes(DocumentSignatureType.TYPE),
           uploadSignatureEnabled: signatureTypes.includes(DocumentSignatureType.UPLOAD),
-          drawSignatureEnabled: signatureTypes.includes(DocumentSignatureType.DRAW),
         },
       });
 
@@ -298,11 +313,9 @@ export const EnvelopeEditorSettingsDialog = ({
   ]);
 
   useEffect(() => {
-    form.reset();
+    form.reset(createDefaultValues());
     setActiveTab('general');
   }, [open, form]);
-
-  // Todo: Envelopes - Show error indicator if error is in different tab.
 
   const selectedTab = tabs.find((tab) => tab.id === activeTab);
 
@@ -326,9 +339,11 @@ export const EnvelopeEditorSettingsDialog = ({
 
       <DialogContent className="flex w-full !max-w-5xl flex-row gap-0 p-0">
         {/* Sidebar. */}
-        <div className="flex w-80 flex-col border-r bg-gray-50">
+        <div className="flex w-80 flex-col border-r bg-accent/20">
           <DialogHeader className="p-6 pb-4">
-            <DialogTitle>Document Settings</DialogTitle>
+            <DialogTitle>
+              <Trans>Document Settings</Trans>
+            </DialogTitle>
           </DialogHeader>
 
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
@@ -358,7 +373,7 @@ export const EnvelopeEditorSettingsDialog = ({
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onFormSubmit)}>
               <fieldset
-                className="flex min-h-[45rem] w-full flex-col space-y-6 px-6 pt-6"
+                className="flex h-[45rem] max-h-[calc(100vh-14rem)] w-full flex-col space-y-6 overflow-y-auto px-6 pt-6"
                 disabled={form.formState.isSubmitting}
                 key={activeTab}
               >
@@ -377,7 +392,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                                   <Trans>
                                     Controls the language for the document, including the language
                                     to be used for email notifications, and the final certificate
@@ -428,7 +443,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                 }))}
                                 selectedValues={field.value}
                                 onChange={field.onChange}
-                                className="bg-background w-full"
+                                className="w-full bg-background"
                                 emptySelectionPlaceholder="Select signature types"
                               />
                             </FormControl>
@@ -505,7 +520,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                <TooltipContent className="max-w-xs text-muted-foreground">
                                   <Trans>
                                     Add an external ID to the document. This can be used to identify
                                     the document in external systems.
@@ -535,7 +550,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-muted-foreground max-w-xs">
+                                <TooltipContent className="max-w-xs text-muted-foreground">
                                   <Trans>
                                     Add a URL to redirect the user to once the document is signed
                                   </Trans>
@@ -563,7 +578,7 @@ export const EnvelopeEditorSettingsDialog = ({
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
 
-                                <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                                   <h2>
                                     <strong>
                                       <Trans>Document Distribution Method</Trans>
@@ -674,8 +689,10 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>
-                              <Trans>Reply To Email</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Reply To Email{' '}
+                                <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                             </FormLabel>
 
                             <FormControl>
@@ -713,20 +730,21 @@ export const EnvelopeEditorSettingsDialog = ({
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel className="flex flex-row items-center">
-                              <Trans>Message</Trans>{' '}
-                              <span className="text-muted-foreground">(Optional)</span>
+                              <Trans>
+                                Message <span className="text-muted-foreground">(Optional)</span>
+                              </Trans>
                               <Tooltip>
                                 <TooltipTrigger>
                                   <InfoIcon className="mx-2 h-4 w-4" />
                                 </TooltipTrigger>
-                                <TooltipContent className="text-muted-foreground p-4">
+                                <TooltipContent className="p-4 text-muted-foreground">
                                   <DocumentSendEmailMessageHelper />
                                 </TooltipContent>
                               </Tooltip>
                             </FormLabel>
 
                             <FormControl>
-                              <Textarea className="bg-background h-16 resize-none" {...field} />
+                              <Textarea className="h-16 resize-none bg-background" {...field} />
                             </FormControl>
 
                             <FormMessage />
