@@ -1,4 +1,4 @@
-import { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
+import type { Prisma, WebhookCallStatus, WebhookTriggerEvents } from '@prisma/client';
 
 import { TEAM_MEMBER_ROLE_PERMISSIONS_MAP } from '@documenso/lib/constants/teams';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';

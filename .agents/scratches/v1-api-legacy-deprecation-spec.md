@@ -21,6 +21,22 @@ Mark all V1 API endpoints as legacy/deprecated in the OpenAPI documentation to s
 1. `packages/api/v1/contract.ts` - Add `deprecated: true` and `description` to all endpoints
 2. `packages/api/v1/openapi.ts` - Update the OpenAPI info description
 
+### Documentation Files to Modify
+
+1. `apps/documentation/pages/developers/public-api/index.mdx` - Add deprecation `<Callout type="warning">` under "API V1 - Deprecated" section:
+   ```
+   <Callout type="warning">
+     V1 API is deprecated and will be removed in a future release. Please migrate to V2.
+   </Callout>
+   ```
+
+2. `apps/documentation/pages/developers/public-api/versioning.mdx` - Add callout after "current version is v2" stating V1 is deprecated:
+   ```
+   <Callout type="warning">
+     V1 API is deprecated. Please migrate to V2.
+   </Callout>
+   ```
+
 ### Deprecation Message
 
 **Per-endpoint message:**
