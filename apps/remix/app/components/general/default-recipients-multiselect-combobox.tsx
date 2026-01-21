@@ -2,9 +2,9 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
-import { z } from 'zod';
 
 import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 
@@ -14,8 +14,6 @@ type DefaultRecipientsMultiSelectComboboxProps = {
   teamId?: number;
   organisationId?: string;
 };
-
-const isValidEmail = (email: string) => z.string().email().safeParse(email).success;
 
 export const DefaultRecipientsMultiSelectCombobox = ({
   listValues,
@@ -65,7 +63,7 @@ export const DefaultRecipientsMultiSelectCombobox = ({
 
   const onSelectionChange = (selected: Option[]) => {
     const updatedRecipients = selected
-      .filter((option) => isValidEmail(option.value))
+      .filter((option) => isRecipientEmailValidForSending({ email: option.value }))
       .map((option) => {
         const existingRecipient = listValues.find((r) => r.email === option.value);
         const member = members?.find((m) => m.email === option.value);
@@ -90,7 +88,13 @@ export const DefaultRecipientsMultiSelectCombobox = ({
       hideClearAllButton
       hidePlaceholderWhenSelected
       creatable
-      loadingIndicator={isLoading ? <p className="text-center text-sm">Loading...</p> : undefined}
+      loadingIndicator={
+        isLoading ? (
+          <p className="text-center text-sm">
+            <Trans>Loading...</Trans>
+          </p>
+        ) : undefined
+      }
       emptyIndicator={
         <p className="text-center text-sm">
           <Trans>Type an email address to add a recipient</Trans>
