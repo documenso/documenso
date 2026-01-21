@@ -1,88 +1,72 @@
-import type { PDFDocument } from '@cantoo/pdf-lib';
-import { TextAlignment, rgb, setFontAndSize } from '@cantoo/pdf-lib';
-import fontkit from '@pdf-lib/fontkit';
+import { type PDF, rgb } from '@libpdf/core';
 
 import { NEXT_PRIVATE_INTERNAL_WEBAPP_URL } from '../../constants/app';
-import { getPageSize } from './get-page-size';
 
 /**
  * Adds a rejection stamp to each page of a PDF document.
  * The stamp is placed in the center of the page.
  */
-export async function addRejectionStampToPdf(
-  pdfDoc: PDFDocument,
-  reason: string,
-): Promise<PDFDocument> {
-  const pages = pdfDoc.getPages();
-  pdfDoc.registerFontkit(fontkit);
+export async function addRejectionStampToPdf(pdf: PDF, reason: string): Promise<PDF> {
+  const pages = pdf.getPages();
 
   const fontBytes = await fetch(`${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/fonts/noto-sans.ttf`).then(
     async (res) => res.arrayBuffer(),
   );
 
-  const font = await pdfDoc.embedFont(fontBytes, {
-    customName: 'Noto',
-  });
+  const font = pdf.embedFont(new Uint8Array(fontBytes));
 
-  const form = pdfDoc.getForm();
-
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i];
-    const { width, height } = getPageSize(page);
+  for (const page of pages) {
+    const height = page.height;
+    const width = page.width;
 
     // Draw the "REJECTED" text
     const rejectedTitleText = 'DOCUMENT REJECTED';
     const rejectedTitleFontSize = 36;
-    const rejectedTitleTextField = form.createTextField(`internal-document-rejected-title-${i}`);
-
-    if (!rejectedTitleTextField.acroField.getDefaultAppearance()) {
-      rejectedTitleTextField.acroField.setDefaultAppearance(
-        setFontAndSize('Noto', rejectedTitleFontSize).toString(),
-      );
-    }
-
-    rejectedTitleTextField.updateAppearances(font);
-
-    rejectedTitleTextField.setFontSize(rejectedTitleFontSize);
-    rejectedTitleTextField.setText(rejectedTitleText);
-    rejectedTitleTextField.setAlignment(TextAlignment.Center);
-
-    const rejectedTitleTextWidth =
-      font.widthOfTextAtSize(rejectedTitleText, rejectedTitleFontSize) * 1.2;
-    const rejectedTitleTextHeight = font.heightAtSize(rejectedTitleFontSize);
+    const rotationAngle = 45;
 
     // Calculate the center position of the page
     const centerX = width / 2;
     const centerY = height / 2;
 
-    // Position the title text at the center of the page
-    const rejectedTitleTextX = centerX - rejectedTitleTextWidth / 2;
-    const rejectedTitleTextY = centerY - rejectedTitleTextHeight / 2;
+    const widthOfText = font.getTextWidth(rejectedTitleText, rejectedTitleFontSize);
 
     // Add padding for the rectangle
     const padding = 20;
+    const rectWidth = widthOfText + padding;
+    const rectHeight = rejectedTitleFontSize + padding;
 
-    // Draw the stamp background
+    const rectX = centerX - rectWidth / 2;
+    const rectY = centerY - rectHeight / 4;
+
     page.drawRectangle({
-      x: rejectedTitleTextX - padding / 2,
-      y: rejectedTitleTextY - padding / 2,
-      width: rejectedTitleTextWidth + padding,
-      height: rejectedTitleTextHeight + padding,
+      x: rectX,
+      y: rectY,
+      width: rectWidth,
+      height: rectHeight,
       borderColor: rgb(220 / 255, 38 / 255, 38 / 255),
       borderWidth: 4,
+      rotate: {
+        angle: rotationAngle,
+        origin: 'center',
+      },
     });
 
-    rejectedTitleTextField.addToPage(page, {
-      x: rejectedTitleTextX,
-      y: rejectedTitleTextY,
-      width: rejectedTitleTextWidth,
-      height: rejectedTitleTextHeight,
-      textColor: rgb(220 / 255, 38 / 255, 38 / 255),
-      backgroundColor: undefined,
-      borderWidth: 0,
-      borderColor: undefined,
+    const textX = centerX - widthOfText / 2;
+    const textY = centerY;
+
+    // Draw the text centered within the rectangle
+    page.drawText(rejectedTitleText, {
+      x: textX,
+      y: textY,
+      size: rejectedTitleFontSize,
+      font,
+      color: rgb(220 / 255, 38 / 255, 38 / 255),
+      rotate: {
+        angle: rotationAngle,
+        origin: 'center',
+      },
     });
   }
 
-  return pdfDoc;
+  return pdf;
 }

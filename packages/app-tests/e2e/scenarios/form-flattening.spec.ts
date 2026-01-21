@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { expect, test } from '@playwright/test';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -39,24 +39,30 @@ const TEST_FORM_VALUES = {
  * Returns true if the PDF has form fields, false if they've been flattened.
  */
 async function pdfHasFormFields(pdfBuffer: Uint8Array): Promise<boolean> {
-  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pdfDoc = await PDF.load(new Uint8Array(pdfBuffer));
 
-  const form = pdfDoc.getForm();
-  const fields = form.getFields();
+  const form = await pdfDoc.getForm();
 
-  return fields.length > 0;
+  if (!form) {
+    return false;
+  }
+
+  return form.fieldCount > 0;
 }
 
 /**
  * Helper to get form field names from a PDF.
  */
 async function getPdfFormFieldNames(pdfBuffer: Uint8Array): Promise<string[]> {
-  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pdfDoc = await PDF.load(new Uint8Array(pdfBuffer));
 
-  const form = pdfDoc.getForm();
-  const fields = form.getFields();
+  const form = await pdfDoc.getForm();
 
-  return fields.map((field) => field.getName());
+  if (!form) {
+    return [];
+  }
+
+  return form.getFieldNames();
 }
 
 /**
@@ -66,17 +72,21 @@ async function getPdfTextFieldValue(
   pdfBuffer: Uint8Array,
   fieldName: string,
 ): Promise<string | undefined> {
-  const pdfDoc = await PDFDocument.load(pdfBuffer);
+  const pdfDoc = await PDF.load(new Uint8Array(pdfBuffer));
 
-  const form = pdfDoc.getForm();
+  const form = await pdfDoc.getForm();
 
-  try {
-    const textField = form.getTextField(fieldName);
-
-    return textField.getText() ?? '';
-  } catch {
+  if (!form) {
     return undefined;
   }
+
+  const textField = form.getTextField(fieldName);
+
+  if (!textField) {
+    return undefined;
+  }
+
+  return textField.getValue();
 }
 
 test.describe.configure({
