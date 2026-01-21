@@ -8,6 +8,7 @@ import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
+import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
@@ -56,6 +57,7 @@ export const adminRouter = router({
     delete: deleteDocumentRoute,
     reseal: resealDocumentRoute,
     findJobs: findDocumentJobsRoute,
+    findAuditLogs: findDocumentAuditLogsRoute,
   },
   recipient: {
     update: updateRecipientRoute,

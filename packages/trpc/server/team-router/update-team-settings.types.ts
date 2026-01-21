@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 import { SUPPORTED_LANGUAGE_CODES } from '@documenso/lib/constants/i18n';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
 import {
   ZDocumentMetaDateFormatSchema,
@@ -40,6 +41,8 @@ export const ZUpdateTeamSettingsRequestSchema = z.object({
     // emailReplyToName: z.string().nullish(),
     emailDocumentSettings: ZDocumentEmailSettingsSchema.nullish(),
 
+    // Default recipients settings.
+    defaultRecipients: ZDefaultRecipientsSchema.nullish(),
     // AI features settings.
     aiFeaturesEnabled: z.boolean().nullish(),
   }),

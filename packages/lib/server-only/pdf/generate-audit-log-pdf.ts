@@ -1,3 +1,4 @@
+import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 
 import { prisma } from '@documenso/prisma';
@@ -7,7 +8,6 @@ import { parseDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { getTranslations } from '../../utils/i18n';
 import { getOrganisationClaimByTeamId } from '../organisation/get-organisation-claims';
 import type { GenerateCertificatePdfOptions } from './generate-certificate-pdf';
-import { mergeFilesIntoPdf } from './generate-certificate-pdf';
 import { renderAuditLogs } from './render-audit-logs';
 
 type GenerateAuditLogPdfOptions = GenerateCertificatePdfOptions & {
@@ -43,7 +43,9 @@ export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) =
     i18n,
   });
 
-  return await mergeFilesIntoPdf(auditLogPages);
+  return await PDF.merge(auditLogPages, {
+    includeAnnotations: true,
+  });
 };
 
 const getAuditLogs = async (envelopeId: string) => {
