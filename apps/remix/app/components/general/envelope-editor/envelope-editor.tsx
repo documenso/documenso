@@ -81,7 +81,7 @@ export default function EnvelopeEditor() {
     isAutosaving,
     flushAutosave,
     relativePath,
-    editorFields,
+    syncEnvelope,
   } = useCurrentEnvelopeEditor();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -278,6 +278,8 @@ export default function EnvelopeEditor() {
                 templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                 directLink={envelope.directLink}
                 recipients={envelope.recipients}
+                onCreateSuccess={async () => await syncEnvelope()}
+                onDeleteSuccess={async () => await syncEnvelope()}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     <LinkIcon className="mr-2 h-4 w-4" />
