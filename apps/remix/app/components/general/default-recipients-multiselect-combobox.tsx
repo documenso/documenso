@@ -1,6 +1,8 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
+import { z } from 'zod';
 
 import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
 import { trpc } from '@documenso/trpc/react';
@@ -12,6 +14,8 @@ type DefaultRecipientsMultiSelectComboboxProps = {
   teamId?: number;
   organisationId?: string;
 };
+
+const isValidEmail = (email: string) => z.string().email().safeParse(email).success;
 
 export const DefaultRecipientsMultiSelectCombobox = ({
   listValues,
@@ -60,31 +64,38 @@ export const DefaultRecipientsMultiSelectCombobox = ({
   }));
 
   const onSelectionChange = (selected: Option[]) => {
-    const updatedRecipients = selected.map((option) => {
-      const existingRecipient = listValues.find((r) => r.email === option.value);
-      const member = members?.find((m) => m.email === option.value);
+    const updatedRecipients = selected
+      .filter((option) => isValidEmail(option.value))
+      .map((option) => {
+        const existingRecipient = listValues.find((r) => r.email === option.value);
+        const member = members?.find((m) => m.email === option.value);
 
-      return {
-        email: option.value,
-        name: member?.name || option.value,
-        role: existingRecipient?.role ?? RecipientRole.CC,
-      };
-    });
+        return {
+          email: option.value,
+          name: member?.name || option.value,
+          role: existingRecipient?.role ?? RecipientRole.CC,
+        };
+      });
 
     onChange(updatedRecipients);
   };
 
   return (
     <MultiSelect
-      commandProps={{ label: _(msg`Select recipients`) }}
+      commandProps={{ label: _(msg`Select or add recipients`) }}
       options={options}
       value={value}
       onChange={onSelectionChange}
-      placeholder={_(msg`Select recipients`)}
+      placeholder={_(msg`Select or enter email address`)}
       hideClearAllButton
       hidePlaceholderWhenSelected
+      creatable
       loadingIndicator={isLoading ? <p className="text-center text-sm">Loading...</p> : undefined}
-      emptyIndicator={<p className="text-center text-sm">No members found</p>}
+      emptyIndicator={
+        <p className="text-center text-sm">
+          <Trans>Type an email address to add a recipient</Trans>
+        </p>
+      }
     />
   );
 };
