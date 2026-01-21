@@ -78,7 +78,7 @@ export const DefaultRecipientsMultiSelectCombobox = ({
     }
 
     const updatedRecipients = selected
-      .filter((option) => isRecipientEmailValidForSending({ email: option.value }))
+      .filter((option) => !invalidEmails.includes(option))
       .map((option) => {
         const existingRecipient = listValues.find((r) => r.email === option.value);
         const member = members?.find((m) => m.email === option.value);
