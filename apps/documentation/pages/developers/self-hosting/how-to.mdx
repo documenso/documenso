@@ -291,10 +291,13 @@ For AI setup specifics, see the [AI Recipient & Field Detection (Self-hosting)](
 | `NEXT_PUBLIC_SUPPORT_EMAIL`                  | The support email address displayed to users (default `support@documenso.com`).                                                                         |
 | `NEXT_PRIVATE_DATABASE_URL`                  | The URL for the primary database connection (with connection pooling).                                                                                  |
 | `NEXT_PRIVATE_DIRECT_DATABASE_URL`           | The URL for the direct database connection (without connection pooling).                                                                                |
-| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default)                                                                                        |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`             | The signing transport to use. Available options: local (default), gcloud-hsm                                                                            |
 | `NEXT_PRIVATE_SIGNING_PASSPHRASE`            | The passphrase for the key file.                                                                                                                        |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`   | The base64-encoded contents of the key file will be used instead of the file path.                                                                      |
 | `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`       | The path to the key file, default `/opt/documenso/cert.p12`.                                                                                            |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`   | Comma-separated list of timestamp authority URLs for PDF signing. Enables LTV and archival timestamps.                                                  |
+| `NEXT_PUBLIC_SIGNING_CONTACT_INFO`           | Contact info to embed in PDF signatures. Defaults to the webapp URL.                                                                                    |
+| `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER`  | Set to "true" to use the legacy adbe.pkcs7.detached subfilter instead of ETSI.CAdES.detached.                                                           |
 | `NEXT_PUBLIC_UPLOAD_TRANSPORT`               | The transport for file uploads (database or s3).                                                                                                        |
 | `NEXT_PRIVATE_UPLOAD_ENDPOINT`               | The endpoint for the S3 storage transport (for third-party S3-compatible providers).                                                                    |
 | `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`       | Whether to force path-style URLs for the S3 storage transport.                                                                                          |

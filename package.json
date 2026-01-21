@@ -87,6 +87,7 @@
     "@ai-sdk/google-vertex": "3.0.81",
     "@documenso/pdf-sign": "^0.1.0",
     "@documenso/prisma": "*",
+    "@libpdf/core": "^0.1.0",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
     "ai": "^5.0.104",
