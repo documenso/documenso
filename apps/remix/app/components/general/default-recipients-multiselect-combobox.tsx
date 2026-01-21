@@ -1,12 +1,13 @@
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui as useLinguiMacro } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 
 import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
 import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { trpc } from '@documenso/trpc/react';
 import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
+import { useToast } from '@documenso/ui/primitives/use-toast';
 
 type DefaultRecipientsMultiSelectComboboxProps = {
   listValues: TDefaultRecipient[];
@@ -22,6 +23,8 @@ export const DefaultRecipientsMultiSelectCombobox = ({
   organisationId,
 }: DefaultRecipientsMultiSelectComboboxProps) => {
   const { _ } = useLingui();
+  const { t } = useLinguiMacro();
+  const { toast } = useToast();
 
   const { data: organisationData, isLoading: isLoadingOrganisation } =
     trpc.organisation.member.find.useQuery(
@@ -62,6 +65,18 @@ export const DefaultRecipientsMultiSelectCombobox = ({
   }));
 
   const onSelectionChange = (selected: Option[]) => {
+    const invalidEmails = selected.filter(
+      (option) => !isRecipientEmailValidForSending({ email: option.value }),
+    );
+
+    if (invalidEmails.length > 0) {
+      toast({
+        title: t`Invalid email`,
+        description: t`"${invalidEmails[0].value}" is not a valid email address.`,
+        variant: 'destructive',
+      });
+    }
+
     const updatedRecipients = selected
       .filter((option) => isRecipientEmailValidForSending({ email: option.value }))
       .map((option) => {
