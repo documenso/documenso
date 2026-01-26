@@ -556,16 +556,9 @@ export const AddFieldsFormPartial = ({
   };
 
   const handleGoNextClick = () => {
-    // Map local fields to match the expected shape for getRecipientsWithMissingFields
-    const fieldsWithRecipientId = localFields.map((field) => ({
-      ...field,
-      recipientId: recipients.find((r) => r.email === field.signerEmail)?.id ?? -1,
-    }));
-
-    const recipientsMissingFields = getRecipientsWithMissingFields(
-      recipients,
-      fieldsWithRecipientId,
-    );
+    // localFields already have recipientId set correctly (see field creation at line 338)
+    // Using the existing recipientId is important for handling duplicate email recipients
+    const recipientsMissingFields = getRecipientsWithMissingFields(recipients, localFields);
 
     if (recipientsMissingFields.length > 0) {
       setIsMissingSignatureDialogVisible(true);
