@@ -55,7 +55,7 @@ const BROWSER_LANGUAGE_MAP: Record<string, SupportedLanguageCodes> = {
   'pl-PL': 'pl',
   'pt': 'pt-BR',
   'pt-BR': 'pt-BR',
-  'pt-PT': 'pt-BR', // Map Portugal Portuguese to Brazil for now
+  'pt-PT': 'pt-PT', // Map Portugal Portuguese to Portugal Portuguese
   'zh': 'zh',
   'zh-CN': 'zh',
   'zh-TW': 'zh',
