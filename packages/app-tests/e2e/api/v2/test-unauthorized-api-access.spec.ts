@@ -216,6 +216,7 @@ test.describe('Document API V2', () => {
           height: 1,
           customText: '',
           inserted: false,
+          fieldMeta: { type: 'signature', fontSize: 14 },
         },
       });
 
@@ -230,6 +231,31 @@ test.describe('Document API V2', () => {
 
     test('should allow authorized access to document distribute endpoint', async ({ request }) => {
       const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
+
+      // Get the recipient created during seeding.
+      const recipient = await prisma.recipient.findFirstOrThrow({
+        where: {
+          envelopeId: doc.id,
+        },
+      });
+
+      // Create a signature field for the recipient so distribution validation can run.
+      await prisma.field.create({
+        data: {
+          envelopeId: doc.id,
+          envelopeItemId: doc.envelopeItems[0].id,
+          recipientId: recipient.id,
+          type: FieldType.SIGNATURE,
+          page: 1,
+          positionX: 1,
+          positionY: 1,
+          width: 1,
+          height: 1,
+          customText: '',
+          inserted: false,
+          fieldMeta: { type: 'signature', fontSize: 14 },
+        },
+      });
 
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/distribute`, {
         headers: { Authorization: `Bearer ${tokenA}` },
@@ -3702,6 +3728,26 @@ test.describe('Document API V2', () => {
           internalVersion: 2,
         });
 
+        const [recipient] = doc.recipients;
+
+        // add signing field for recipient (fieldMeta required for v2 envelopes)
+        await prisma.field.create({
+          data: {
+            page: 1,
+            type: FieldType.SIGNATURE,
+            inserted: false,
+            customText: '',
+            positionX: 1,
+            positionY: 1,
+            width: 1,
+            height: 1,
+            envelopeId: doc.id,
+            envelopeItemId: doc.envelopeItems[0].id,
+            recipientId: recipient.id,
+            fieldMeta: { type: 'signature', fontSize: 14 },
+          },
+        });
+
         const payload: TUseEnvelopePayload = {
           envelopeId: doc.id,
           distributeDocument: true,
@@ -3764,6 +3810,31 @@ test.describe('Document API V2', () => {
         request,
       }) => {
         const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
+
+        // Get the recipient created during seeding.
+        const recipient = await prisma.recipient.findFirstOrThrow({
+          where: {
+            envelopeId: doc.id,
+          },
+        });
+
+        // Create a signature field for the recipient so distribution validation can pass.
+        await prisma.field.create({
+          data: {
+            envelopeId: doc.id,
+            envelopeItemId: doc.envelopeItems[0].id,
+            recipientId: recipient.id,
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 1,
+            positionY: 1,
+            width: 1,
+            height: 1,
+            customText: '',
+            inserted: false,
+            fieldMeta: { type: 'signature', fontSize: 14 },
+          },
+        });
 
         const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/distribute`, {
           headers: { Authorization: `Bearer ${tokenA}` },

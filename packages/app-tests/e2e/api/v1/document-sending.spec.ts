@@ -371,15 +371,16 @@ test.describe('Document API', () => {
       data: {
         type: FieldType.SIGNATURE,
         page: 1,
-        positionX: 100,
-        positionY: 100,
-        width: 50,
-        height: 50,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
         customText: '',
         inserted: false,
         recipientId: signer.id,
         envelopeId: document.id,
         envelopeItemId: document.envelopeItems[0].id,
+        fieldMeta: { type: 'signature', fontSize: 14 },
       },
     });
 
