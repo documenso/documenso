@@ -3,12 +3,13 @@ import { useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { DocumentStatus, FieldType, SigningStatus } from '@prisma/client';
+import { DocumentStatus, SigningStatus } from '@prisma/client';
 import { Loader, LucideChevronDown, LucideChevronUp, X } from 'lucide-react';
 import { P, match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
 import type {
   TRemovedSignedFieldWithTokenMutationSchema,
@@ -83,7 +84,7 @@ export const MultiSignDocumentSigningView = ({
   const { mutateAsync: completeDocumentWithToken } =
     trpc.recipient.completeDocumentWithToken.useMutation();
 
-  const hasSignatureField = document?.fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = document?.fields.some((field) => isSignatureFieldType(field.type));
 
   const [pendingFields, completedFields] = [
     document?.fields.filter((field) => field.recipient.signingStatus !== SigningStatus.SIGNED) ??

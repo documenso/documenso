@@ -35,6 +35,7 @@ import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
+  getRecipientsWithMissingFields,
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
@@ -555,15 +556,18 @@ export const AddFieldsFormPartial = ({
   };
 
   const handleGoNextClick = () => {
-    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
-      localFields.some(
-        (field) =>
-          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
-      ),
+    // Map local fields to match the expected shape for getRecipientsWithMissingFields
+    const fieldsWithRecipientId = localFields.map((field) => ({
+      ...field,
+      recipientId: recipients.find((r) => r.email === field.signerEmail)?.id ?? -1,
+    }));
+
+    const recipientsMissingFields = getRecipientsWithMissingFields(
+      recipients,
+      fieldsWithRecipientId,
     );
 
-    if (!everySignerHasSignature) {
+    if (recipientsMissingFields.length > 0) {
       setIsMissingSignatureDialogVisible(true);
       return;
     }
