@@ -171,6 +171,24 @@ test.describe('Template Field Prefill API v2', () => {
       },
     });
 
+    // Add SIGNATURE field (required for distribution)
+    await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: firstEnvelopeItem.id,
+        recipientId: recipient.id,
+        type: FieldType.SIGNATURE,
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'signature', fontSize: 14 },
+      },
+    });
+
     // 6. Sign in as the user
     await apiSignin({
       page,
@@ -438,6 +456,24 @@ test.describe('Template Field Prefill API v2', () => {
           type: 'number',
           label: 'Default Number Field',
         },
+      },
+    });
+
+    // Add SIGNATURE field (required for distribution)
+    await prisma.field.create({
+      data: {
+        envelopeId: template.id,
+        envelopeItemId: firstEnvelopeItem.id,
+        recipientId: recipient.id,
+        type: FieldType.SIGNATURE,
+        page: 1,
+        positionX: 1,
+        positionY: 1,
+        width: 1,
+        height: 1,
+        customText: '',
+        inserted: false,
+        fieldMeta: { type: 'signature', fontSize: 14 },
       },
     });
 
