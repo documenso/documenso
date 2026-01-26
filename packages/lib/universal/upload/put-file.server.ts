@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
@@ -25,7 +25,7 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const arrayBuffer = await file.arrayBuffer();
 
-  const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
+  const pdf = await PDF.load(new Uint8Array(arrayBuffer)).catch((e) => {
     console.error(`PDF upload parse error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE');

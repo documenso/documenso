@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { i18n } from '@lingui/core';
 import { msg } from '@lingui/core/macro';
 import type { DocumentMeta } from '@prisma/client';
@@ -144,17 +144,5 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
 
   const certificatePages = await renderCertificate(payload);
 
-  return await mergeFilesIntoPdf(certificatePages);
+  return await PDF.merge(certificatePages);
 };
-
-export async function mergeFilesIntoPdf(buffers: Uint8Array[]) {
-  const mergedPdf = await PDFDocument.create();
-
-  for (const buffer of buffers) {
-    const pdf = await PDFDocument.load(buffer);
-    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-    pages.forEach((p) => mergedPdf.addPage(p));
-  }
-
-  return mergedPdf;
-}

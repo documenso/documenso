@@ -5,4 +5,5 @@ export default {
   fields: 'Document Fields',
   'email-preferences': 'Email Preferences',
   'ai-detection': 'AI Recipient & Field Detection',
+  'default-recipients': 'Default Recipients',
 };
