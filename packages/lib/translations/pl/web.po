@@ -8,7 +8,7 @@ msgstr ""
 "Language: pl\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-13 02:39\n"
+"PO-Revision-Date: 2026-01-15 04:18\n"
 "Last-Translator: \n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=4; plural=(n==1 ? 0 : (n%10>=2 && n%10<=4) && (n%100<12 || n%100>14) ? 1 : n!=1 && (n%10>=0 && n%10<=1) || (n%10>=5 && n%10<=9) || (n%100>=12 && n%100<=14) ? 2 : 3);\n"
@@ -1951,7 +1951,7 @@ msgstr "Dziennik logów"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "Audit Log Details"
-msgstr ""
+msgstr "Szczegóły dziennika logu"
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -3115,7 +3115,7 @@ msgstr "Domyślna rola w organizacji dla nowych użytkowników"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Recipients"
-msgstr ""
+msgstr "Domyślni odbiorcy"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
@@ -4343,7 +4343,7 @@ msgstr "Załączniki"
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 #: apps/remix/app/components/dialogs/sign-field-text-dialog.tsx
 msgid "Enter"
-msgstr "Wpisz lub wprowadź wartość"
+msgstr "Wpisz"
 
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 msgid "Enter a name for your new folder. Folders help you organise your items."
@@ -4363,7 +4363,7 @@ msgstr "Wpisz inicjały"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Enter Name"
-msgstr "Wpisz imię i nazwisko"
+msgstr "Wpisz nazwę"
 
 #: apps/remix/app/components/dialogs/sign-field-number-dialog.tsx
 msgid "Enter Number"
@@ -6761,15 +6761,15 @@ msgstr "Wpisz wartość"
 
 #: apps/remix/app/components/dialogs/sign-field-email-dialog.tsx
 msgid "Please enter your email address"
-msgstr "Wpisz swój adres e-mail"
+msgstr "Wpisz adres e-mail"
 
 #: apps/remix/app/components/dialogs/sign-field-name-dialog.tsx
 msgid "Please enter your full name"
-msgstr "Wpisz swoje pełne imię i nazwisko"
+msgstr "Wpisz nazwę"
 
 #: apps/remix/app/components/dialogs/sign-field-initials-dialog.tsx
 msgid "Please enter your initials"
-msgstr "Wprowadź swoje inicjały"
+msgstr "Wpisz inicjały"
 
 #: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
 msgid "Please mark as viewed to complete"
@@ -7136,7 +7136,7 @@ msgstr "Metryki odbiorców"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Recipients that will be automatically added to new documents."
-msgstr ""
+msgstr "Odbiorcy, którzy będą automatycznie dodawani do nowych dokumentów."
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Recipients will be able to sign the document once sent"
@@ -7758,7 +7758,7 @@ msgstr "Wybierz klucz dostępu"
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 msgid "Select recipients"
-msgstr ""
+msgstr "Wybierz odbiorców"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -10396,7 +10396,7 @@ msgstr "Wyświetl zaproszenia"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "View JSON"
-msgstr ""
+msgstr "Zobacz JSON"
 
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "View more"
@@ -11754,3 +11754,4 @@ msgstr "Twój kod weryfikacyjny:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
