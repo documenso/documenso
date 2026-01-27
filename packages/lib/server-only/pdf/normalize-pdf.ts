@@ -1,13 +1,11 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 
 import { AppError } from '../../errors/app-error';
-import { flattenAnnotations } from './flatten-annotations';
-import { flattenForm, removeOptionalContentGroups } from './flatten-form';
 
 export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
   const shouldFlattenForm = options.flattenForm ?? true;
 
-  const pdfDoc = await PDFDocument.load(pdf).catch((e) => {
+  const pdfDoc = await PDF.load(pdf).catch((e) => {
     console.error(`PDF normalization error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE', {
@@ -21,11 +19,13 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
     });
   }
 
-  removeOptionalContentGroups(pdfDoc);
+  pdfDoc.flattenLayers();
 
-  if (shouldFlattenForm) {
-    await flattenForm(pdfDoc);
-    flattenAnnotations(pdfDoc);
+  const form = pdfDoc.getForm();
+
+  if (shouldFlattenForm && form) {
+    form.flatten();
+    pdfDoc.flattenAnnotations();
   }
 
   return Buffer.from(await pdfDoc.save());

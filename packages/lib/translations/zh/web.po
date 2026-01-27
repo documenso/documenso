@@ -1008,6 +1008,7 @@ msgid "Acknowledgment"
 msgstr "确认"
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
@@ -1948,7 +1949,12 @@ msgstr "将再次尝试对文档进行封存，这在代码变更后用于修复
 msgid "Audit Log"
 msgstr "审计日志"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
+msgid "Audit Log Details"
+msgstr ""
+
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "Audit Logs"
 msgstr "审计日志"
 
@@ -2070,6 +2076,7 @@ msgstr "品牌偏好设置"
 msgid "Branding preferences updated"
 msgstr "品牌偏好设置已更新"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
 msgid "Browser"
@@ -2734,6 +2741,7 @@ msgstr "字段已复制到剪贴板"
 #: apps/remix/app/components/general/document/document-recipient-link-copy-dialog.tsx
 #: apps/remix/app/components/general/template/template-direct-link-badge.tsx
 #: apps/remix/app/components/general/webhook-logs-sheet.tsx
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/settings-public-profile-templates-table.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
@@ -3104,6 +3112,10 @@ msgstr "默认文件"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "Default Organisation Role for New Users"
 msgstr "新用户的默认组织角色"
+
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Default Recipients"
+msgstr ""
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
@@ -3642,6 +3654,7 @@ msgstr "文档外部 ID 已更新"
 msgid "Document found in your account"
 msgstr "在您的账户中找到了该文档"
 
+#: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 msgid "Document ID"
 msgstr "文档 ID"
@@ -5223,6 +5236,7 @@ msgstr "继承认证方式"
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Inherit from organisation"
@@ -5341,6 +5355,7 @@ msgstr "邀请时间"
 msgid "Invoice"
 msgstr "发票"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/components/tables/settings-security-activity-table.tsx
@@ -6440,6 +6455,7 @@ msgstr "原始"
 msgid "Otherwise, the document will be created as a draft."
 msgstr "否则将把文档创建为草稿。"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
 #: apps/remix/app/components/forms/email-preferences-form.tsx
 msgid "Override organisation settings"
 msgstr "覆盖组织设置"
@@ -7118,6 +7134,10 @@ msgstr "收件人"
 msgid "Recipients metrics"
 msgstr "收件人仍将保留其文档副本"
 
+#: apps/remix/app/components/forms/document-preferences-form.tsx
+msgid "Recipients that will be automatically added to new documents."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Recipients will be able to sign the document once sent"
 msgstr "发送后，收件人将能够签署此文档"
@@ -7734,6 +7754,11 @@ msgstr "选择选项"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "选择通行密钥"
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select recipients"
+msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -9490,6 +9515,7 @@ msgstr "这将移除此邮箱域名下的所有邮箱"
 msgid "This will sign you out of all other devices. You will need to sign in again on those devices to continue using your account."
 msgstr "这将使您在所有其他设备上退出登录。您需要在那些设备上重新登录才能继续使用账户。"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 msgid "Time"
 msgstr "时间"
@@ -10148,6 +10174,7 @@ msgstr "使用您的验证器应用生成验证码"
 msgid "Use your passkey for authentication"
 msgstr "使用您的通行密钥进行认证"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
 #: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
@@ -10366,6 +10393,10 @@ msgstr "查看洞察"
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "View invites"
 msgstr "查看邀请"
+
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
+msgid "View JSON"
+msgstr ""
 
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "View more"
@@ -11723,4 +11754,3 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
