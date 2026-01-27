@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { zfd } from 'zod-form-data';
 
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -108,6 +109,8 @@ export const ZUseEnvelopePayloadSchema = z.object({
       }),
     )
     .optional(),
+
+  formValues: ZDocumentFormValuesSchema.optional(),
 });
 
 export const ZUseEnvelopeRequestSchema = zodFormData({

@@ -1,6 +1,8 @@
 import React, { forwardRef } from 'react';
 
-import { Trans, useLingui } from '@lingui/react/macro';
+import { t } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
 import { TeamMemberRole } from '@prisma/client';
 import type { SelectProps } from '@radix-ui/react-select';
 import { InfoIcon } from 'lucide-react';
@@ -28,7 +30,7 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
     { currentTeamMemberRole, isTeamSettings = false, disabled, canUpdateVisibility, ...props },
     ref,
   ) => {
-    const { t } = useLingui();
+    const { _ } = useLingui();
 
     const isAdmin = currentTeamMemberRole === TeamMemberRole.ADMIN;
     const isManager = currentTeamMemberRole === TeamMemberRole.MANAGER;
@@ -42,16 +44,16 @@ export const DocumentVisibilitySelect = forwardRef<HTMLButtonElement, DocumentVi
 
         <SelectContent position="popper">
           <SelectItem value={DocumentVisibility.EVERYONE}>
-            {DOCUMENT_VISIBILITY.EVERYONE.value}
+            {_(DOCUMENT_VISIBILITY.EVERYONE.value)}
           </SelectItem>
           <SelectItem
             value={DocumentVisibility.MANAGER_AND_ABOVE}
             disabled={!isAdmin && !isManager}
           >
-            {DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value}
+            {_(DOCUMENT_VISIBILITY.MANAGER_AND_ABOVE.value)}
           </SelectItem>
           <SelectItem value={DocumentVisibility.ADMIN} disabled={!isAdmin}>
-            {DOCUMENT_VISIBILITY.ADMIN.value}
+            {_(DOCUMENT_VISIBILITY.ADMIN.value)}
           </SelectItem>
         </SelectContent>
       </Select>

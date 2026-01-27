@@ -67,7 +67,6 @@ export default defineConfig({
       'node_modules',
       '@napi-rs/canvas',
       '@node-rs/bcrypt',
-      '@documenso/pdf-sign',
       'sharp',
       'playwright',
       'playwright-core',
@@ -98,7 +97,6 @@ export default defineConfig({
       external: [
         '@napi-rs/canvas',
         '@node-rs/bcrypt',
-        '@documenso/pdf-sign',
         '@aws-sdk/cloudfront-signer',
         'nodemailer',
         /playwright/,

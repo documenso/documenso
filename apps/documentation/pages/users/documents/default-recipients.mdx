@@ -1,0 +1,45 @@
+---
+title: Default Document Recipients
+description: Learn how to set default recipients with various roles for your documents.
+---
+
+import { Callout, Steps } from 'nextra/components';
+
+# Default Document Recipients
+
+Documenso allows you to set default recipients for your documents. This is useful when you require specific recipients to be added to every document you send.
+
+You can add default recipients with the same roles as the recipients you can add when sending a document:
+
+- **Signer** - The recipient will be required to sign the document.
+- **Approver** - The recipient will be required to approve the document.
+- **Viewer** - The recipient will be required to view the document.
+- **CC** - The recipient will receive a copy of the document.
+
+You can set default recipients at the organisation or team level.
+
+### Organisation level
+
+To set default recipients at the organisation level, navigate to the organisation settings page and click the "Document" tab under the "Preferences" section.
+
+Then scroll down to the "Default Recipients" section and add the recipients you want to be included in every document you send.
+
+![A screenshot of the organisation's default recipients page](/default-recipients/organisation-default-recipients-select-step.webp)
+
+The recipients are added with the "CC" role by default, but you can select a different role for each recipient.
+
+![A screenshot of the organisation's default recipients page when selecting the role of the recipient](/default-recipients/organisation-default-recipients-role-step.webp)
+
+### Team level
+
+Setting the default recipients at the team level follows the same process as setting them at the organisation level.
+
+<Callout type="info">
+  Setting the default recipients at the team level will override organisation-level defaults.
+</Callout>
+
+To set default recipients at the team level, navigate to the team settings page and click the "Document" tab under the "Preferences" section.
+
+Then scroll down to the "Default Recipients" section. By default, the team will inherit the default recipients from the organisation. You can override these defaults by adding the recipients you want to be added to every document you send.
+
+![A screenshot of the team's default recipients page](/default-recipients/team-default-recipients.webp)

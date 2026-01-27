@@ -492,6 +492,8 @@ model DocumentAuditLog {
   ipAddress String?
 
   envelope Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 enum DocumentDataType {
@@ -826,7 +828,7 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
@@ -838,10 +840,13 @@ model OrganisationGlobalSettings {
   includeAuditLog           Boolean            @default(false)
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
+  delegateDocumentOwnership Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+
+  defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
   emailId String?
   email   OrganisationEmail? @relation(fields: [emailId], references: [id])
@@ -859,15 +864,16 @@ model OrganisationGlobalSettings {
   aiFeaturesEnabled Boolean @default(false)
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
 
-  documentVisibility DocumentVisibility?
-  documentLanguage   String?
-  documentTimezone   String?
-  documentDateFormat String?
+  documentVisibility        DocumentVisibility?
+  documentLanguage          String?
+  documentTimezone          String?
+  documentDateFormat        String?
+  delegateDocumentOwnership Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
@@ -876,6 +882,8 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+
+  defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
   emailId String?
   email   OrganisationEmail? @relation(fields: [emailId], references: [id])

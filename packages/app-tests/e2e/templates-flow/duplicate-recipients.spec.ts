@@ -50,11 +50,13 @@ const completeTemplateFlowWithDuplicateRecipients = async (options: {
   await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({ position: { x: 200, y: 100 } });
 
-  // Switch to different recipient and add their field
+  // Switch to different recipient and add their fields
   await page.getByRole('combobox').first().click();
   await page.getByText('Different Recipient').first().click();
-  await page.getByRole('button', { name: 'Name' }).click();
+  await page.getByRole('button', { name: 'Signature' }).click();
   await page.locator('canvas').click({ position: { x: 300, y: 100 } });
+  await page.getByRole('button', { name: 'Name' }).click();
+  await page.locator('canvas').click({ position: { x: 300, y: 150 } });
 
   // Save template
   await page.getByRole('button', { name: 'Save Template' }).click();

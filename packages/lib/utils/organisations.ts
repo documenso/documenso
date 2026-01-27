@@ -117,6 +117,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
     documentLanguage: 'en',
     documentTimezone: null, // Null means local timezone.
     documentDateFormat: DEFAULT_DOCUMENT_DATE_FORMAT,
+    delegateDocumentOwnership: false,
 
     includeSenderDetails: true,
     includeSigningCertificate: true,
@@ -136,6 +137,7 @@ export const generateDefaultOrganisationSettings = (): Omit<
     // emailReplyToName: null,
     emailDocumentSettings: DEFAULT_DOCUMENT_EMAIL_SETTINGS,
 
+    defaultRecipients: null,
     aiFeaturesEnabled: false,
   };
 };

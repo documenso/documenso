@@ -1,10 +1,4 @@
-import {
-  PDFCheckBox,
-  PDFDocument,
-  PDFDropdown,
-  PDFRadioGroup,
-  PDFTextField,
-} from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 
 export type InsertFormValuesInPdfOptions = {
   pdf: Buffer;
@@ -12,7 +6,7 @@ export type InsertFormValuesInPdfOptions = {
 };
 
 export const insertFormValuesInPdf = async ({ pdf, formValues }: InsertFormValuesInPdfOptions) => {
-  const doc = await PDFDocument.load(pdf);
+  const doc = await PDF.load(pdf);
 
   const form = doc.getForm();
 
@@ -20,41 +14,12 @@ export const insertFormValuesInPdf = async ({ pdf, formValues }: InsertFormValue
     return pdf;
   }
 
-  for (const [key, value] of Object.entries(formValues)) {
-    try {
-      const field = form.getField(key);
+  const filledForm = Object.entries(formValues).map(([key, value]) => [
+    key,
+    typeof value === 'boolean' ? value : value.toString(),
+  ]);
 
-      if (!field) {
-        continue;
-      }
+  form.fill(Object.fromEntries(filledForm));
 
-      if (typeof value === 'boolean' && field instanceof PDFCheckBox) {
-        if (value) {
-          field.check();
-        } else {
-          field.uncheck();
-        }
-      }
-
-      if (field instanceof PDFTextField) {
-        field.setText(value.toString());
-      }
-
-      if (field instanceof PDFDropdown) {
-        field.select(value.toString());
-      }
-
-      if (field instanceof PDFRadioGroup) {
-        field.select(value.toString());
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        console.error(`Error setting value for field ${key}: ${err.message}`);
-      } else {
-        console.error(`Error setting value for field ${key}`);
-      }
-    }
-  }
-
-  return await doc.save().then((buf) => Buffer.from(buf));
+  return await doc.save({ incremental: true }).then((buf) => Buffer.from(buf));
 };

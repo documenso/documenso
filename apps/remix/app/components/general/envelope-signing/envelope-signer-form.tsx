@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 
 import { Plural, Trans } from '@lingui/react/macro';
-import { FieldType, RecipientRole } from '@prisma/client';
+import { RecipientRole } from '@prisma/client';
 
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
 import { RadioGroup, RadioGroupItem } from '@documenso/ui/primitives/radio-group';
@@ -30,7 +31,7 @@ export default function EnvelopeSignerForm() {
   const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
 
   const hasSignatureField = useMemo(() => {
-    return recipientFields.some((field) => field.type === FieldType.SIGNATURE);
+    return recipientFields.some((field) => isSignatureFieldType(field.type));
   }, [recipientFields]);
 
   const isSubmitting = false;

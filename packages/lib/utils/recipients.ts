@@ -2,8 +2,39 @@ import type { Envelope } from '@prisma/client';
 import { type Field, type Recipient, RecipientRole, SigningStatus } from '@prisma/client';
 import { z } from 'zod';
 
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
+
 import { NEXT_PUBLIC_WEBAPP_URL } from '../constants/app';
 import { extractLegacyIds } from '../universal/id';
+
+/**
+ * Roles that require fields to be assigned before a document can be distributed.
+ *
+ * Currently only SIGNER requires a signature field.
+ */
+export const RECIPIENT_ROLES_THAT_REQUIRE_FIELDS = [RecipientRole.SIGNER] as const;
+
+/**
+ * Returns recipients who are missing required fields for their role.
+ *
+ * Currently only SIGNERs are validated - they must have at least one signature field.
+ */
+export const getRecipientsWithMissingFields = <T extends Pick<Recipient, 'id' | 'role'>>(
+  recipients: T[],
+  fields: Pick<Field, 'type' | 'recipientId'>[],
+): T[] => {
+  return recipients.filter((recipient) => {
+    if (recipient.role === RecipientRole.SIGNER) {
+      const hasSignatureField = fields.some(
+        (field) => field.recipientId === recipient.id && isSignatureFieldType(field.type),
+      );
+
+      return !hasSignatureField;
+    }
+
+    return false;
+  });
+};
 
 export const formatSigningLink = (token: string) => `${NEXT_PUBLIC_WEBAPP_URL()}/sign/${token}`;
 

@@ -65,7 +65,7 @@ const formatUserAgent = (userAgent: string | null | undefined, userAgentInfo: UA
 };
 
 export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
-  const { _ } = useLingui();
+  const { _, i18n } = useLingui();
 
   const parser = new UAParser();
 
@@ -73,7 +73,7 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
     <div className="space-y-4">
       {logs.map((log, index) => {
         parser.setUA(log.userAgent || '');
-        const formattedAction = formatDocumentAuditLogAction(_, log);
+        const formattedAction = formatDocumentAuditLogAction(i18n, log);
         const userAgentInfo = parser.getResult();
 
         return (
@@ -95,17 +95,17 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
                   />
 
                   <div>
-                    <div className="text-muted-foreground text-sm font-medium uppercase tracking-wide print:text-[8pt]">
+                    <div className="text-sm font-medium uppercase tracking-wide text-muted-foreground print:text-[8pt]">
                       {log.type.replace(/_/g, ' ')}
                     </div>
 
-                    <div className="text-foreground text-sm font-medium print:text-[8pt]">
+                    <div className="text-sm font-medium text-foreground print:text-[8pt]">
                       {formattedAction.description}
                     </div>
                   </div>
                 </div>
 
-                <div className="text-muted-foreground text-sm print:text-[8pt]">
+                <div className="text-sm text-muted-foreground print:text-[8pt]">
                   {DateTime.fromJSDate(log.createdAt)
                     .setLocale(APP_I18N_OPTIONS.defaultLocale)
                     .toLocaleString(dateFormat)}
@@ -117,27 +117,27 @@ export const InternalAuditLogTable = ({ logs }: AuditLogDataTableProps) => {
               {/* Details Section - Two column layout */}
               <div className="grid grid-cols-2 gap-x-8 gap-y-2 text-xs print:text-[6pt]">
                 <div>
-                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
+                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
                     {_(msg`User`)}
                   </div>
 
-                  <div className="text-foreground mt-1 font-mono">{log.email || 'N/A'}</div>
+                  <div className="mt-1 font-mono text-foreground">{log.email || 'N/A'}</div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
+                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
                     {_(msg`IP Address`)}
                   </div>
 
-                  <div className="text-foreground mt-1 font-mono">{log.ipAddress || 'N/A'}</div>
+                  <div className="mt-1 font-mono text-foreground">{log.ipAddress || 'N/A'}</div>
                 </div>
 
                 <div className="col-span-2">
-                  <div className="text-muted-foreground/70 font-medium uppercase tracking-wide">
+                  <div className="font-medium uppercase tracking-wide text-muted-foreground/70">
                     {_(msg`User Agent`)}
                   </div>
 
-                  <div className="text-foreground mt-1">
+                  <div className="mt-1 text-foreground">
                     {_(formatUserAgent(log.userAgent, userAgentInfo))}
                   </div>
                 </div>

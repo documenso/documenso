@@ -306,7 +306,7 @@ export const EnvelopeEditorUploadPage = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             style={provided.draggableProps.style}
-                            className={`bg-accent/50 flex items-center justify-between rounded-lg p-3 transition-shadow ${
+                            className={`flex items-center justify-between rounded-lg bg-accent/50 p-3 transition-shadow ${
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
@@ -332,7 +332,7 @@ export const EnvelopeEditorUploadPage = () => {
                                   <p className="text-sm font-medium">{localFile.title}</p>
                                 )}
 
-                                <div className="text-muted-foreground text-xs">
+                                <div className="text-xs text-muted-foreground">
                                   {localFile.isUploading ? (
                                     <Trans>Uploading</Trans>
                                   ) : localFile.isError ? (
@@ -345,13 +345,13 @@ export const EnvelopeEditorUploadPage = () => {
                             <div className="flex items-center space-x-2">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                 </div>
                               )}
 
                               {localFile.isError && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <FileWarningIcon className="text-destructive h-4 w-4" />
+                                  <FileWarningIcon className="h-4 w-4 text-destructive" />
                                 </div>
                               )}
 

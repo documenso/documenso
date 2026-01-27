@@ -41,6 +41,11 @@ export const createEnvelopeMeta: TrpcRouteMeta = {
 export const ZCreateEnvelopePayloadSchema = z.object({
   title: ZDocumentTitleSchema,
   type: z.nativeEnum(EnvelopeType),
+  delegatedDocumentOwner: z
+    .string()
+    .email()
+    .describe('The email of the user who will own the document.')
+    .optional(),
   externalId: ZDocumentExternalIdSchema.optional(),
   visibility: ZDocumentVisibilitySchema.optional(),
   globalAccessAuth: z.array(ZDocumentAccessAuthTypesSchema).optional(),

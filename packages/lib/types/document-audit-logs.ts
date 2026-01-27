@@ -44,6 +44,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_DELEGATED_OWNER_CREATED', // When the document delegated owner is created.
 
   // ACCESS AUTH 2FA events.
   'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
@@ -681,6 +682,18 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document delegated owner created.
+ */
+export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED),
+  data: z.object({
+    delegatedOwnerName: z.string().nullable(),
+    delegatedOwnerEmail: z.string(),
+    teamName: z.string(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -701,6 +714,7 @@ export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
+    ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema,
     ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
@@ -745,3 +759,5 @@ export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
   TDocumentAuditLog,
   { type: T }
 >;
+
+export type TDocumentAuditLogBaseSchema = z.infer<typeof ZDocumentAuditLogBaseSchema>;
