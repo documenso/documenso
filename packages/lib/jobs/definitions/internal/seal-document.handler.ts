@@ -1,12 +1,5 @@
-import {
-  PDFDocument,
-  RotationTypes,
-  popGraphicsState,
-  pushGraphicsState,
-  radiansToDegrees,
-  rotateDegrees,
-  translate,
-} from '@cantoo/pdf-lib';
+import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import type { DocumentData, Envelope, EnvelopeItem, Field } from '@prisma/client';
 import {
   DocumentStatus,
@@ -18,8 +11,8 @@ import {
 import { nanoid } from 'nanoid';
 import path from 'node:path';
 import { groupBy } from 'remeda';
-import { match } from 'ts-pattern';
 
+import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
 import { prisma } from '@documenso/prisma';
@@ -31,14 +24,9 @@ import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
 import { getCertificatePdf } from '../../../server-only/htmltopdf/get-certificate-pdf';
-import { addRejectionStampToPdf } from '../../../server-only/pdf/add-rejection-stamp-to-pdf';
-import { flattenAnnotations } from '../../../server-only/pdf/flatten-annotations';
-import { flattenForm } from '../../../server-only/pdf/flatten-form';
-import { getPageSize } from '../../../server-only/pdf/get-page-size';
 import { insertFieldInPDFV1 } from '../../../server-only/pdf/insert-field-in-pdf-v1';
 import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf-v2';
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
-import { normalizeSignatureAppearances } from '../../../server-only/pdf/normalize-signature-appearances';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
@@ -181,8 +169,8 @@ export const run = async ({
       });
     }
 
-    let certificateDoc: PDFDocument | null = null;
-    let auditLogDoc: PDFDocument | null = null;
+    let certificateDoc: PDF | null = null;
+    let auditLogDoc: PDF | null = null;
 
     if (settings.includeSigningCertificate || settings.includeAuditLog) {
       const certificatePayload = {
@@ -208,7 +196,7 @@ export const run = async ({
           ? getCertificatePdf({
               documentId,
               language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDFDocument.load(buffer))
+            }).then(async (buffer) => PDF.load(buffer))
           : generateCertificatePdf(certificatePayload);
 
       const makeAuditLogPdf = async () =>
@@ -216,7 +204,7 @@ export const run = async ({
           ? getAuditLogsPdf({
               documentId,
               language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDFDocument.load(buffer))
+            }).then(async (buffer) => PDF.load(buffer))
           : generateAuditLogPdf(certificatePayload);
 
       const [createdCertificatePdf, createdAuditLogPdf] = await Promise.all([
@@ -342,8 +330,8 @@ type DecorateAndSignPdfOptions = {
   envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
-  certificateDoc: PDFDocument | null;
-  auditLogDoc: PDFDocument | null;
+  certificateDoc: PDF | null;
+  auditLogDoc: PDF | null;
 };
 
 /**
@@ -360,48 +348,47 @@ const decorateAndSignPdf = async ({
 }: DecorateAndSignPdfOptions) => {
   const pdfData = await getFileServerSide(envelopeItem.documentData);
 
-  const pdfDoc = await PDFDocument.load(pdfData);
+  let pdfDoc = await PDF.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
-  normalizeSignatureAppearances(pdfDoc);
-  await flattenForm(pdfDoc);
-  flattenAnnotations(pdfDoc);
+  pdfDoc.flattenAll();
+  // Upgrade to PDF 1.7 for better compatibility with signing
+  pdfDoc.upgradeVersion('1.7');
 
   // Add rejection stamp if the document is rejected
-  if (isRejected && rejectionReason) {
+  if (isRejected) {
     await addRejectionStampToPdf(pdfDoc, rejectionReason);
   }
 
   if (certificateDoc) {
-    const certificatePages = await pdfDoc.copyPages(
+    await pdfDoc.copyPagesFrom(
       certificateDoc,
-      certificateDoc.getPageIndices(),
+      Array.from({ length: certificateDoc.getPageCount() }, (_, index) => index),
     );
-
-    certificatePages.forEach((page) => {
-      pdfDoc.addPage(page);
-    });
   }
 
   if (auditLogDoc) {
-    const auditLogPages = await pdfDoc.copyPages(auditLogDoc, auditLogDoc.getPageIndices());
-
-    auditLogPages.forEach((page) => {
-      pdfDoc.addPage(page);
-    });
+    await pdfDoc.copyPagesFrom(
+      auditLogDoc,
+      Array.from({ length: auditLogDoc.getPageCount() }, (_, index) => index),
+    );
   }
 
   // Handle V1 and legacy insertions.
   if (envelope.internalVersion === 1) {
+    const legacy_pdfLibDoc = await PDFDocument.load(await pdfDoc.save({ useXRefStream: true }));
+
     for (const field of envelopeItemFields) {
       if (field.inserted) {
         if (envelope.useLegacyFieldInsertion) {
-          await legacy_insertFieldInPDF(pdfDoc, field);
+          await legacy_insertFieldInPDF(legacy_pdfLibDoc, field);
         } else {
-          await insertFieldInPDFV1(pdfDoc, field);
+          await insertFieldInPDFV1(legacy_pdfLibDoc, field);
         }
       }
     }
+
+    await pdfDoc.reload(await legacy_pdfLibDoc.save());
   }
 
   // Handle V2 envelope insertions.
@@ -410,87 +397,61 @@ const decorateAndSignPdf = async ({
 
     for (const [pageNumber, fields] of Object.entries(fieldsGroupedByPage)) {
       const page = pdfDoc.getPage(Number(pageNumber) - 1);
-      const pageRotation = page.getRotation();
 
-      let { width: pageWidth, height: pageHeight } = getPageSize(page);
-
-      let pageRotationInDegrees = match(pageRotation.type)
-        .with(RotationTypes.Degrees, () => pageRotation.angle)
-        .with(RotationTypes.Radians, () => radiansToDegrees(pageRotation.angle))
-        .exhaustive();
-
-      // Round to the closest multiple of 90 degrees.
-      pageRotationInDegrees = Math.round(pageRotationInDegrees / 90) * 90;
-
-      // PDFs can have pages that are rotated, which are correctly rendered in the frontend.
-      // However when we load the PDF in the backend, the rotation is applied.
-      // To account for this, we swap the width and height for pages that are rotated by 90/270
-      // degrees. This is so we can calculate the virtual position the field was placed if it
-      // was correctly oriented in the frontend.
-      if (pageRotationInDegrees === 90 || pageRotationInDegrees === 270) {
-        [pageWidth, pageHeight] = [pageHeight, pageWidth];
+      if (!page) {
+        throw new Error(`Page ${pageNumber} does not exist`);
       }
 
-      // Rotate the page to the orientation that the react-pdf renders on the frontend.
-      // Note: These transformations are undone at the end of the function.
-      // If you change this if statement, update the if statement at the end as well
-      if (pageRotationInDegrees !== 0) {
-        let translateX = 0;
-        let translateY = 0;
+      const pageWidth = page.width;
+      const pageHeight = page.height;
 
-        switch (pageRotationInDegrees) {
-          case 90:
-            translateX = pageHeight;
-            translateY = 0;
-            break;
-          case 180:
-            translateX = pageWidth;
-            translateY = pageHeight;
-            break;
-          case 270:
-            translateX = 0;
-            translateY = pageWidth;
-            break;
-          case 0:
-          default:
-            translateX = 0;
-            translateY = 0;
-        }
-
-        page.pushOperators(pushGraphicsState());
-        page.pushOperators(translate(translateX, translateY), rotateDegrees(pageRotationInDegrees));
-      }
-
-      const renderedPdfOverlay = await insertFieldInPDFV2({
+      const overlayBytes = await insertFieldInPDFV2({
         pageWidth,
         pageHeight,
         fields,
       });
 
-      const [embeddedPage] = await pdfDoc.embedPdf(renderedPdfOverlay);
+      const overlayPdf = await PDF.load(overlayBytes);
 
-      // Draw the SVG on the page
-      page.drawPage(embeddedPage, {
-        x: 0,
-        y: 0,
-        width: pageWidth,
-        height: pageHeight,
-      });
+      const embeddedPage = await pdfDoc.embedPage(overlayPdf, 0);
 
-      // Remove the transformations applied to the page if any were applied.
-      if (pageRotationInDegrees !== 0) {
-        page.pushOperators(popGraphicsState());
+      // Rotate the page to the orientation that the react-pdf renders on the frontend.
+      let translateX = 0;
+      let translateY = 0;
+
+      switch (page.rotation) {
+        case 90:
+          translateX = pageHeight;
+          translateY = 0;
+          break;
+        case 180:
+          translateX = pageWidth;
+          translateY = pageHeight;
+          break;
+        case 270:
+          translateX = 0;
+          translateY = pageWidth;
+          break;
       }
+
+      // Draw the overlay on the page
+      page.drawPage(embeddedPage, {
+        x: translateX,
+        y: translateY,
+        rotate: {
+          angle: page.rotation,
+        },
+      });
     }
   }
 
   // Re-flatten the form to handle our checkbox and radio fields that
   // create native arcoFields
-  await flattenForm(pdfDoc);
+  pdfDoc.flattenAll();
 
-  const pdfBytes = await pdfDoc.save();
+  pdfDoc = await PDF.load(await pdfDoc.save({ useXRefStream: true }));
 
-  const pdfBuffer = await signPdf({ pdf: Buffer.from(pdfBytes) });
+  const pdfBytes = await signPdf({ pdf: pdfDoc });
 
   const { name } = path.parse(envelopeItem.title);
 
@@ -500,7 +461,7 @@ const decorateAndSignPdf = async ({
   const newDocumentData = await putPdfFileServerSide({
     name: `${name}${suffix}`,
     type: 'application/pdf',
-    arrayBuffer: async () => Promise.resolve(pdfBuffer),
+    arrayBuffer: async () => Promise.resolve(pdfBytes),
   });
 
   return {
