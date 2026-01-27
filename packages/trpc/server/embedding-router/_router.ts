@@ -1,5 +1,4 @@
 import { router } from '../trpc';
-import { applyMultiSignSignatureRoute } from './apply-multi-sign-signature';
 import { createEmbeddingDocumentRoute } from './create-embedding-document';
 import { createEmbeddingPresignTokenRoute } from './create-embedding-presign-token';
 import { createEmbeddingTemplateRoute } from './create-embedding-template';
@@ -15,6 +14,6 @@ export const embeddingPresignRouter = router({
   createEmbeddingTemplate: createEmbeddingTemplateRoute,
   updateEmbeddingDocument: updateEmbeddingDocumentRoute,
   updateEmbeddingTemplate: updateEmbeddingTemplateRoute,
-  applyMultiSignSignature: applyMultiSignSignatureRoute,
+  // applyMultiSignSignature: applyMultiSignSignatureRoute,
   getMultiSignDocument: getMultiSignDocumentRoute,
 });

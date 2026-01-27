@@ -3,7 +3,7 @@ import { type Page, expect, test } from '@playwright/test';
 import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
 
-import { apiSignin, apiSignout } from '../fixtures/authentication';
+import { apiSignin, apiSignout, checkSessionValid } from '../fixtures/authentication';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
@@ -17,6 +17,7 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
 
   await page.goto('http://localhost:3000/signin');
   await page.getByRole('link', { name: 'Forgot your password?' }).click();
+  await expect(page).toHaveURL('http://localhost:3000/forgot-password');
 
   await page.getByRole('textbox', { name: 'Email' }).click();
   await page.getByRole('textbox', { name: 'Email' }).fill(user.email);
@@ -24,7 +25,9 @@ test('[USER] can reset password via forgot password', async ({ page }: { page: P
   await expect(page.getByRole('button', { name: 'Reset Password' })).toBeEnabled();
   await page.getByRole('button', { name: 'Reset Password' }).click();
 
-  await expect(page.locator('body')).toContainText('Reset email sent', { timeout: 10000 });
+  await expect(page.locator('body')).toContainText('Reset email sent', {
+    timeout: 10000,
+  });
 
   const foundToken = await prisma.passwordResetToken.findFirstOrThrow({
     where: {
@@ -108,4 +111,117 @@ test('[USER] can reset password via user settings', async ({ page }: { page: Pag
 
   await page.waitForURL('/settings/profile');
   await expect(page).toHaveURL('/settings/profile');
+});
+
+test('[USER] password reset invalidates all sessions', async ({ page }: { page: Page }) => {
+  const oldPassword = 'Test123!';
+  const newPassword = 'Test124!';
+
+  const { user } = await seedUser({
+    password: oldPassword,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    password: oldPassword,
+    redirectPath: '/settings/profile',
+  });
+
+  expect(await checkSessionValid(page)).toBe(true);
+
+  const initialCookies = await page.context().cookies();
+
+  await page.context().clearCookies();
+
+  await page.goto('http://localhost:3000/signin');
+  await page.getByRole('link', { name: 'Forgot your password?' }).click();
+  await expect(page).toHaveURL('http://localhost:3000/forgot-password');
+  await page.getByRole('textbox', { name: 'Email' }).fill(user.email);
+  await page.getByRole('button', { name: 'Reset Password' }).click();
+  await expect(page.locator('body')).toContainText('Reset email sent', {
+    timeout: 10000,
+  });
+
+  const foundToken = await prisma.passwordResetToken.findFirstOrThrow({
+    where: { userId: user.id },
+  });
+
+  await page.goto(`http://localhost:3000/reset-password/${foundToken.token}`);
+  await page.getByLabel('Password', { exact: true }).fill(newPassword);
+  await page.getByLabel('Repeat Password').fill(newPassword);
+  await page.getByRole('button', { name: 'Reset Password' }).click();
+  await expect(page.locator('body')).toContainText('Your password has been updated successfully.');
+
+  await page.context().addCookies(initialCookies);
+
+  await page.goto('http://localhost:3000/settings/profile');
+  await expect(page).toHaveURL('http://localhost:3000/signin');
+
+  expect(await checkSessionValid(page)).toBe(false);
+
+  await apiSignin({
+    page,
+    email: user.email,
+    password: newPassword,
+    redirectPath: '/settings/profile',
+  });
+
+  await page.waitForURL('/settings/profile');
+  expect(await checkSessionValid(page)).toBe(true);
+});
+
+test('[USER] password update invalidates other sessions but keeps current', async ({
+  page,
+}: {
+  page: Page;
+}) => {
+  const oldPassword = 'Test123!';
+  const newPassword = 'Test124!';
+
+  const { user } = await seedUser({
+    password: oldPassword,
+  });
+
+  await apiSignin({
+    page,
+    email: user.email,
+    password: oldPassword,
+    redirectPath: '/settings/profile',
+  });
+
+  expect(await checkSessionValid(page)).toBe(true);
+
+  const initialCookies = await page.context().cookies();
+
+  await page.context().clearCookies();
+  await apiSignin({
+    page,
+    email: user.email,
+    password: oldPassword,
+    redirectPath: '/settings/profile',
+  });
+
+  expect(await checkSessionValid(page)).toBe(true);
+
+  await page.goto('http://localhost:3000/settings/security');
+  await page.getByLabel('Current password').fill(oldPassword);
+  await page.getByLabel('New password').fill(newPassword);
+  await page.getByLabel('Repeat password').fill(newPassword);
+  await page.getByRole('button', { name: 'Update password' }).click();
+  await expect(page.locator('body')).toContainText('Password updated');
+
+  const finalCookies = await page.context().cookies();
+
+  await page.context().clearCookies();
+  await page.context().addCookies(initialCookies);
+  await page.goto('http://localhost:3000/settings/profile');
+  await expect(page).toHaveURL('http://localhost:3000/signin');
+  expect(await checkSessionValid(page)).toBe(false);
+
+  await page.context().clearCookies();
+  await page.context().addCookies(finalCookies);
+  await page.goto('http://localhost:3000/settings/security');
+  await expect(page).toHaveURL('http://localhost:3000/settings/security');
+  expect(await checkSessionValid(page)).toBe(true);
 });

@@ -4,18 +4,11 @@ import { authenticatedProcedure } from '../../trpc';
 import {
   ZCreateAttachmentRequestSchema,
   ZCreateAttachmentResponseSchema,
+  createAttachmentMeta,
 } from './create-attachment.types';
 
 export const createAttachmentRoute = authenticatedProcedure
-  .meta({
-    openapi: {
-      method: 'POST',
-      path: '/envelope/attachment/create',
-      summary: 'Create attachment',
-      description: 'Create a new attachment for an envelope',
-      tags: ['Envelope'],
-    },
-  })
+  .meta(createAttachmentMeta)
   .input(ZCreateAttachmentRequestSchema)
   .output(ZCreateAttachmentResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -28,10 +21,14 @@ export const createAttachmentRoute = authenticatedProcedure
       input: { envelopeId, label: data.label },
     });
 
-    await createAttachment({
+    const attachment = await createAttachment({
       envelopeId,
       teamId,
       userId,
       data,
     });
+
+    return {
+      id: attachment.id,
+    };
   });

@@ -8,12 +8,17 @@ import { match } from 'ts-pattern';
 
 import { Button } from '@documenso/ui/primitives/button';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
+
+import { BrandingLogo } from '../branding-logo';
 import EnvelopeSignerForm from '../envelope-signing/envelope-signer-form';
 import { EnvelopeSignerCompleteDialog } from '../envelope-signing/envelope-signing-complete-dialog';
 import { useRequiredEnvelopeSigningContext } from './envelope-signing-provider';
 
 export const DocumentSigningMobileWidget = () => {
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const { hidePoweredBy = true } = useEmbedSigningContext() || {};
 
   const { recipientFieldsRemaining, recipient, requiredRecipientFields } =
     useRequiredEnvelopeSigningContext();
@@ -29,8 +34,8 @@ export const DocumentSigningMobileWidget = () => {
 
   return (
     <div className="pointer-events-none fixed bottom-0 left-0 right-0 z-50 flex justify-center px-2 pb-2 sm:px-4 sm:pb-6">
-      <div className="pointer-events-auto w-full max-w-2xl">
-        <div className="bg-card border-border overflow-hidden rounded-xl border shadow-2xl">
+      <div className="pointer-events-auto w-full max-w-[760px]">
+        <div className="overflow-hidden rounded-xl border border-border bg-card shadow-2xl">
           {/* Main Header Bar */}
           <div className="flex items-center justify-between gap-4 p-4">
             <div className="flex-1">
@@ -43,15 +48,15 @@ export const DocumentSigningMobileWidget = () => {
                     aria-label={isExpanded ? 'Collapse' : 'Expand'}
                   >
                     {isExpanded ? (
-                      <LucideChevronDown className="text-muted-foreground h-5 w-5 flex-shrink-0" />
+                      <LucideChevronDown className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                     ) : (
-                      <LucideChevronUp className="text-muted-foreground h-5 w-5 flex-shrink-0" />
+                      <LucideChevronUp className="h-5 w-5 flex-shrink-0 text-muted-foreground" />
                     )}
                   </Button>
                 )}
 
                 <div>
-                  <h2 className="text-foreground text-lg font-semibold">
+                  <h2 className="text-lg font-semibold text-foreground">
                     {match(recipient.role)
                       .with(RecipientRole.VIEWER, () => <Trans>View Document</Trans>)
                       .with(RecipientRole.SIGNER, () => <Trans>Sign Document</Trans>)
@@ -60,7 +65,7 @@ export const DocumentSigningMobileWidget = () => {
                       .otherwise(() => null)}
                   </h2>
 
-                  <p className="text-muted-foreground -mt-0.5 text-sm">
+                  <p className="-mt-0.5 text-sm text-muted-foreground">
                     {recipientFieldsRemaining.length === 0 ? (
                       match(recipient.role)
                         .with(RecipientRole.VIEWER, () => (
@@ -97,11 +102,11 @@ export const DocumentSigningMobileWidget = () => {
           {recipient.role !== RecipientRole.VIEWER &&
             recipient.role !== RecipientRole.ASSISTANT && (
               <div className="px-4 pb-3">
-                <div className="bg-muted relative h-[4px] rounded-md">
+                <div className="relative h-[4px] rounded-md bg-muted">
                   <motion.div
                     layout="size"
                     layoutId="document-signing-mobile-widget-progress-bar"
-                    className="bg-documenso absolute inset-y-0 left-0"
+                    className="absolute inset-y-0 left-0 bg-primary"
                     style={{
                       width: `${100 - (100 / requiredRecipientFields.length) * (recipientFieldsRemaining.length ?? 0)}%`,
                     }}
@@ -112,8 +117,15 @@ export const DocumentSigningMobileWidget = () => {
 
           {/* Expandable Content */}
           {isExpanded && (
-            <div className="border-border animate-in slide-in-from-bottom-2 border-t p-4 duration-200">
+            <div className="border-t border-border p-4 duration-200 animate-in slide-in-from-bottom-2">
               <EnvelopeSignerForm />
+
+              {!hidePoweredBy && (
+                <div className="mt-2 inline-block rounded bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100 lg:hidden">
+                  <span>Powered by</span>
+                  <BrandingLogo className="ml-2 inline-block h-[14px]" />
+                </div>
+              )}
             </div>
           )}
         </div>

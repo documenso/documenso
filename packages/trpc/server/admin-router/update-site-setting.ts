@@ -10,18 +10,16 @@ export const updateSiteSettingRoute = adminProcedure
   .input(ZUpdateSiteSettingRequestSchema)
   .output(ZUpdateSiteSettingResponseSchema)
   .mutation(async ({ ctx, input }) => {
-    const { id, enabled, data } = input;
+    const { ...siteSetting } = input;
 
     ctx.logger.info({
       input: {
-        id,
+        id: siteSetting.id,
       },
     });
 
     await upsertSiteSetting({
-      id,
-      enabled,
-      data,
+      ...siteSetting,
       userId: ctx.user.id,
     });
   });

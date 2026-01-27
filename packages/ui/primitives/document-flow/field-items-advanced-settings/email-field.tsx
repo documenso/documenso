@@ -1,6 +1,4 @@
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 
 import { validateFields as validateEmailFields } from '@documenso/lib/advanced-fields-validation/validate-fields';
 import { type TEmailFieldMeta as EmailFieldMeta } from '@documenso/lib/types/field-meta';
@@ -25,7 +23,7 @@ export const EmailFieldAdvancedSettings = ({
   handleFieldChange,
   handleErrors,
 }: EmailFieldAdvancedSettingsProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
   const handleInput = (field: keyof EmailFieldMeta, value: string | boolean) => {
     const fontSize = field === 'fontSize' ? Number(value) : Number(fieldState.fontSize ?? 14);
@@ -49,7 +47,7 @@ export const EmailFieldAdvancedSettings = ({
           id="fontSize"
           type="number"
           className="bg-background mt-2"
-          placeholder={_(msg`Field font size`)}
+          placeholder={t`Field font size`}
           value={fieldState.fontSize}
           onChange={(e) => handleInput('fontSize', e.target.value)}
           min={8}
@@ -67,7 +65,7 @@ export const EmailFieldAdvancedSettings = ({
           onValueChange={(value) => handleInput('textAlign', value)}
         >
           <SelectTrigger className="bg-background mt-2">
-            <SelectValue placeholder="Select text align" />
+            <SelectValue placeholder={t`Select text align`} />
           </SelectTrigger>
 
           <SelectContent>

@@ -1,5 +1,4 @@
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentDistributionMethod } from '@prisma/client';
 import { InfoIcon } from 'lucide-react';
 import type { Control } from 'react-hook-form';
@@ -45,7 +44,7 @@ export const ConfigureDocumentAdvancedSettings = ({
   control,
   isSubmitting,
 }: ConfigureDocumentAdvancedSettingsProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
 
   const form = useFormContext<TConfigureEmbedFormSchema>();
   const { features } = useConfigureDocument();
@@ -82,33 +81,6 @@ export const ConfigureDocumentAdvancedSettings = ({
 
         <TabsContent value="general" className="mt-0">
           <div className="flex flex-col space-y-6">
-            {/* <FormField
-              control={control}
-              name="meta.externalId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="flex flex-row items-center">
-                    <Trans>External ID</Trans>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <InfoIcon className="mx-2 h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent className="text-muted-foreground max-w-xs">
-                        <Trans>
-                          Add an external ID to the document. This can be used to identify the
-                          document in external systems.
-                        </Trans>
-                      </TooltipContent>
-                    </Tooltip>
-                  </FormLabel>
-                  <FormControl>
-                    <Input className="bg-background" {...field} disabled={isSubmitting} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            /> */}
-
             {features.allowConfigureSignatureTypes && (
               <FormField
                 control={control}
@@ -121,13 +93,13 @@ export const ConfigureDocumentAdvancedSettings = ({
                     <FormControl>
                       <MultiSelectCombobox
                         options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                          label: _(option.label),
+                          label: t(option.label),
                           value: option.value,
                         }))}
                         selectedValues={field.value}
                         onChange={field.onChange}
                         className="bg-background w-full"
-                        emptySelectionPlaceholder="Select signature types"
+                        emptySelectionPlaceholder={t`Select signature types`}
                       />
                     </FormControl>
                     <FormMessage />

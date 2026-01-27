@@ -11,7 +11,7 @@ export const validateNumberField = (
 
   const { minValue, maxValue, readOnly, required, numberFormat, fontSize } = fieldMeta || {};
 
-  if (numberFormat) {
+  if (numberFormat && value.length > 0) {
     const foundRegex = numberFormatValues.find((item) => item.value === numberFormat)?.regex;
 
     if (!foundRegex) {

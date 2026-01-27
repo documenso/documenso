@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 export const ZGetEnvelopeItemsByTokenRequestSchema = z.object({
@@ -17,18 +16,10 @@ export const ZGetEnvelopeItemsByTokenRequestSchema = z.object({
 });
 
 export const ZGetEnvelopeItemsByTokenResponseSchema = z.object({
-  envelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
+    envelopeId: true,
     title: true,
     order: true,
-  })
-    .extend({
-      documentData: DocumentDataSchema.pick({
-        type: true,
-        id: true,
-        data: true,
-        initialData: true,
-      }),
-    })
-    .array(),
+  }).array(),
 });

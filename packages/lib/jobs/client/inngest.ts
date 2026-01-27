@@ -1,8 +1,8 @@
 import type { Context as HonoContext } from 'hono';
 import type { Context, Handler, InngestFunction } from 'inngest';
 import { Inngest as InngestClient } from 'inngest';
+import type { Logger } from 'inngest';
 import { serve as createHonoPagesRoute } from 'inngest/hono';
-import type { Logger } from 'inngest/middleware/logger';
 
 import { env } from '../../utils/env';
 import type { JobDefinition, JobRunIO, SimpleTriggerJobOptions } from './_internal/job';
@@ -40,6 +40,7 @@ export class InngestJobProvider extends BaseJobProvider {
       {
         id: job.id,
         name: job.name,
+        optimizeParallelism: job.optimizeParallelism ?? false,
       },
       {
         event: job.trigger.name,

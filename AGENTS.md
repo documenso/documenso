@@ -11,6 +11,8 @@
 - `npm run format` - Format code with Prettier
 - `npm run dev` - Start development server for Remix app
 
+**Important:** Do not run `npm run build` to verify changes unless explicitly asked. Builds take a long time (~2 minutes). Use `npx tsc --noEmit` for type checking specific packages if needed.
+
 ## Code Style Guidelines
 
 - Use TypeScript for all code; prefer `type` over `interface`

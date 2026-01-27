@@ -73,6 +73,7 @@ model User {
   siteSettings       SiteSettings[]
   passkeys           Passkey[]
   avatarImage        AvatarImage?           @relation(fields: [avatarImageId], references: [id], onDelete: SetNull)
+  suiteOpAuthorizations SuiteOpAuthorization[]
 
   @@index([email])
 }
@@ -134,8 +135,8 @@ model Passkey {
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @default(now())
   lastUsedAt           DateTime?
-  credentialId         Bytes
-  credentialPublicKey  Bytes
+  credentialId         Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
+  credentialPublicKey  Bytes /// @zod.custom.use(z.instanceof(Uint8Array))
   counter              BigInt
   credentialDeviceType String
   credentialBackedUp   Boolean
@@ -223,6 +224,25 @@ model ApiToken {
   user      User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
   teamId    Int
   team      Team              @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  suiteOpAuthorizations SuiteOpAuthorization[]
+}
+
+model SuiteOpAuthorization {
+  id             Int       @id @default(autoincrement())
+  claimCode      String    @unique
+  expiresAt      DateTime
+  claimed        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  userId         Int
+  teamId         Int
+  apiTokenId     Int
+  plaintextToken String    // Temporary storage of plaintext token until claimed
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  team           Team      @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  apiToken       ApiToken  @relation(fields: [apiTokenId], references: [id], onDelete: Cascade)
+
+  @@index([claimCode])
+  @@index([userId])
 }
 
 enum SubscriptionStatus {
@@ -319,6 +339,9 @@ model Session {
   updatedAt DateTime @updatedAt
 
   user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([sessionToken])
 }
 
 enum DocumentStatus {
@@ -426,6 +449,13 @@ model Envelope {
   documentMeta   DocumentMeta @relation(fields: [documentMetaId], references: [id])
 
   envelopeAttachments EnvelopeAttachment[]
+
+  @@index([type])
+  @@index([status])
+  @@index([userId])
+  @@index([teamId])
+  @@index([folderId])
+  @@index([createdAt])
 }
 
 model EnvelopeItem {
@@ -444,6 +474,7 @@ model EnvelopeItem {
   field Field[]
 
   @@unique([documentDataId])
+  @@index([envelopeId])
 }
 
 model DocumentAuditLog {
@@ -461,6 +492,8 @@ model DocumentAuditLog {
   ipAddress String?
 
   envelope Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 enum DocumentDataType {
@@ -526,6 +559,8 @@ model EnvelopeAttachment {
 
   envelopeId String
   envelope   Envelope @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([envelopeId])
 }
 
 enum ReadStatus {
@@ -573,8 +608,10 @@ model Recipient {
   fields            Field[]
   signatures        Signature[]
 
-  @@index([envelopeId])
   @@index([token])
+  @@index([email])
+  @@index([envelopeId])
+  @@index([signedAt])
 }
 
 enum FieldType {
@@ -613,6 +650,7 @@ model Field {
   fieldMeta      Json? /// [FieldMeta] @zod.custom.use(ZFieldMetaNotOptionalSchema)
 
   @@index([envelopeId])
+  @@index([envelopeItemId])
   @@index([recipientId])
 }
 
@@ -683,6 +721,9 @@ model Organisation {
 
   organisationAuthenticationPortalId String                           @unique
   organisationAuthenticationPortal   OrganisationAuthenticationPortal @relation(fields: [organisationAuthenticationPortalId], references: [id])
+
+  @@index([name])
+  @@index([ownerUserId])
 }
 
 model OrganisationMember {
@@ -699,6 +740,7 @@ model OrganisationMember {
   organisationGroupMembers OrganisationGroupMember[]
 
   @@unique([userId, organisationId])
+  @@index([organisationId])
 }
 
 model OrganisationMemberInvite {
@@ -728,6 +770,8 @@ model OrganisationGroup {
   organisationGroupMembers OrganisationGroupMember[]
 
   teamGroups TeamGroup[]
+
+  @@index([organisationId])
 }
 
 model OrganisationGroupMember {
@@ -740,6 +784,8 @@ model OrganisationGroupMember {
   organisationMemberId String
 
   @@unique([organisationMemberId, groupId])
+  @@index([groupId])
+  @@index([organisationMemberId])
 }
 
 model TeamGroup {
@@ -754,6 +800,8 @@ model TeamGroup {
   team   Team @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, organisationGroupId])
+  @@index([teamId])
+  @@index([organisationGroupId])
 }
 
 enum OrganisationGroupType {
@@ -780,7 +828,7 @@ enum OrganisationMemberInviteStatus {
   DECLINED
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
 model OrganisationGlobalSettings {
   id           String        @id
   organisation Organisation?
@@ -792,10 +840,13 @@ model OrganisationGlobalSettings {
   includeAuditLog           Boolean            @default(false)
   documentTimezone          String? // Nullable to allow using local timezones if not set.
   documentDateFormat        String             @default("yyyy-MM-dd hh:mm a")
+  delegateDocumentOwnership Boolean            @default(false)
 
   typedSignatureEnabled  Boolean @default(true)
   uploadSignatureEnabled Boolean @default(true)
   drawSignatureEnabled   Boolean @default(true)
+
+  defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
   emailId String?
   email   OrganisationEmail? @relation(fields: [emailId], references: [id])
@@ -808,17 +859,21 @@ model OrganisationGlobalSettings {
   brandingLogo           String  @default("")
   brandingUrl            String  @default("")
   brandingCompanyDetails String  @default("")
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean @default(false)
 }
 
-/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';"])
+/// @zod.import(["import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';", "import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';"])
 model TeamGlobalSettings {
   id   String @id
   team Team?
 
-  documentVisibility DocumentVisibility?
-  documentLanguage   String?
-  documentTimezone   String?
-  documentDateFormat String?
+  documentVisibility        DocumentVisibility?
+  documentLanguage          String?
+  documentTimezone          String?
+  documentDateFormat        String?
+  delegateDocumentOwnership Boolean?
 
   includeSenderDetails      Boolean?
   includeSigningCertificate Boolean?
@@ -827,6 +882,8 @@ model TeamGlobalSettings {
   typedSignatureEnabled  Boolean?
   uploadSignatureEnabled Boolean?
   drawSignatureEnabled   Boolean?
+
+  defaultRecipients Json? /// [DefaultRecipient[]] @zod.custom.use(ZDefaultRecipientsSchema)
 
   emailId String?
   email   OrganisationEmail? @relation(fields: [emailId], references: [id])
@@ -839,6 +896,9 @@ model TeamGlobalSettings {
   brandingLogo           String?
   brandingUrl            String?
   brandingCompanyDetails String?
+
+  // AI features settings.
+  aiFeaturesEnabled Boolean?
 }
 
 model Team {
@@ -859,12 +919,16 @@ model Team {
   apiTokens  ApiToken[]
   webhooks   Webhook[]
   teamGroups TeamGroup[]
+  suiteOpAuthorizations SuiteOpAuthorization[]
 
   organisationId String
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Cascade)
 
   teamGlobalSettingsId String             @unique
   teamGlobalSettings   TeamGlobalSettings @relation(fields: [teamGlobalSettingsId], references: [id], onDelete: Cascade)
+
+  @@index([name])
+  @@index([organisationId])
 }
 
 model TeamEmail {

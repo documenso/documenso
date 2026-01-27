@@ -81,6 +81,10 @@ export const mapFieldToLegacyField = (
 };
 
 export const parseCheckboxCustomText = (customText: string): number[] => {
+  if (!customText) {
+    return [];
+  }
+
   return JSON.parse(customText);
 };
 

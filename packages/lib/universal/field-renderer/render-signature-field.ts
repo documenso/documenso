@@ -96,6 +96,7 @@ const createFieldSignature = (
 
         img.onload = () => {
           image.setAttrs({
+            image: img,
             ...getImageDimensions(img, fieldWidth, fieldHeight),
           });
         };
@@ -142,7 +143,7 @@ export const renderSignatureFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { mode = 'edit', pageLayer } = options;
+  const { mode = 'edit', pageLayer, color } = options;
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
 
@@ -211,7 +212,9 @@ export const renderSignatureFieldElement = (
     fieldRect.opacity(0);
   }
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,

@@ -1,9 +1,9 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 
 import { getDocumentByToken } from '@documenso/lib/server-only/document/get-document-by-token';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { getEnvelopeItemPdfUrl } from '@documenso/lib/utils/envelope-download';
 import { prisma } from '@documenso/prisma';
 import { seedPendingDocumentWithFullFields } from '@documenso/prisma/seed/documents';
 import { seedTeam } from '@documenso/prisma/seed/teams';
@@ -25,19 +25,25 @@ test.describe('Signing Certificate Tests', () => {
       teamId: team.id,
     });
 
-    const documentData = await prisma.documentData
+    const recipient = recipients[0];
+
+    const documentData = await prisma.envelopeItem
       .findFirstOrThrow({
         where: {
-          envelopeItem: {
-            envelopeId: document.id,
-          },
+          envelopeId: document.id,
         },
       })
-      .then(async (data) => getFile(data));
+      .then(async (data) => {
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
+          envelopeItem: data,
+          token: recipient.token,
+          version: 'signed',
+        });
+        return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+      });
 
-    const originalPdf = await PDFDocument.load(documentData);
-
-    const recipient = recipients[0];
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -51,6 +57,9 @@ test.describe('Signing Certificate Tests', () => {
     }
 
     await page.getByRole('button', { name: 'Complete' }).click();
+
+    await page.waitForTimeout(1000);
+
     await page.getByRole('button', { name: 'Sign' }).click({ force: true });
     await page.waitForURL(`/sign/${recipient.token}/complete`);
 
@@ -78,13 +87,21 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    // Todo: Envelopes
-    const firstDocumentData = completedDocument.envelopeItems[0].documentData;
+    const firstDocumentData = completedDocument.envelopeItems[0];
 
-    const completedDocumentData = await getFile(firstDocumentData);
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
+      envelopeItem: firstDocumentData,
+      token: recipient.token,
+      version: 'signed',
+    });
+
+    const pdfData = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+
+    const completedDocumentData = new Uint8Array(pdfData);
 
     // Load the PDF and check number of pages
-    const pdfDoc = await PDFDocument.load(completedDocumentData);
+    const pdfDoc = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(pdfDoc.getPageCount()).toBe(originalPdf.getPageCount() + 1); // Original + Certificate
   });
@@ -118,19 +135,25 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    const documentData = await prisma.documentData
+    const recipient = recipients[0];
+
+    const documentData = await prisma.envelopeItem
       .findFirstOrThrow({
         where: {
-          envelopeItem: {
-            envelopeId: document.id,
-          },
+          envelopeId: document.id,
         },
       })
-      .then(async (data) => getFile(data));
+      .then(async (data) => {
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
+          envelopeItem: data,
+          token: recipient.token,
+          version: 'signed',
+        });
+        return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+      });
 
-    const originalPdf = await PDFDocument.load(documentData);
-
-    const recipient = recipients[0];
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -169,13 +192,21 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    // Todo: Envelopes
-    const firstDocumentData = completedDocument.envelopeItems[0].documentData;
+    const firstDocumentData = completedDocument.envelopeItems[0];
 
-    const completedDocumentData = await getFile(firstDocumentData);
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
+      envelopeItem: firstDocumentData,
+      token: recipient.token,
+      version: 'signed',
+    });
+
+    const pdfData = await fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+
+    const completedDocumentData = new Uint8Array(pdfData);
 
     // Load the PDF and check number of pages
-    const completedPdf = await PDFDocument.load(completedDocumentData);
+    const completedPdf = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(completedPdf.getPageCount()).toBe(originalPdf.getPageCount() + 1); // Original + Certificate
   });
@@ -209,19 +240,25 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    const documentData = await prisma.documentData
+    const recipient = recipients[0];
+
+    const documentData = await prisma.envelopeItem
       .findFirstOrThrow({
         where: {
-          envelopeItem: {
-            envelopeId: document.id,
-          },
+          envelopeId: document.id,
         },
       })
-      .then(async (data) => getFile(data));
+      .then(async (data) => {
+        const documentUrl = getEnvelopeItemPdfUrl({
+          type: 'download',
+          envelopeItem: data,
+          token: recipient.token,
+          version: 'signed',
+        });
+        return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
+      });
 
-    const originalPdf = await PDFDocument.load(documentData);
-
-    const recipient = recipients[0];
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -260,10 +297,19 @@ test.describe('Signing Certificate Tests', () => {
       },
     });
 
-    const completedDocumentData = await getFile(completedDocument.envelopeItems[0].documentData);
+    const documentUrl = getEnvelopeItemPdfUrl({
+      type: 'download',
+      envelopeItem: completedDocument.envelopeItems[0],
+      token: recipient.token,
+      version: 'signed',
+    });
+
+    const completedDocumentData = await fetch(documentUrl).then(
+      async (res) => await res.arrayBuffer(),
+    );
 
     // Load the PDF and check number of pages
-    const completedPdf = await PDFDocument.load(completedDocumentData);
+    const completedPdf = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(completedPdf.getPageCount()).toBe(originalPdf.getPageCount());
   });

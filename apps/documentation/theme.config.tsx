@@ -2,16 +2,17 @@ import type { DocsThemeConfig } from 'nextra-theme-docs';
 import { useConfig } from 'nextra-theme-docs';
 
 const themeConfig: DocsThemeConfig = {
-  logo: <span>Documenso</span>,
+  logo: <span>SuiteOp</span>,
   head: function useHead() {
-    const config = useConfig<{ title?: string; description?: string }>();
+    const config = useConfig();
 
-    const title = `${config.frontMatter.title} | Documenso Docs` || 'Documenso Docs';
-    const description = config.frontMatter.description || 'The official Documenso documentation';
+    const title = `${config.frontMatter.title} | SuiteOp Docs` || 'SuiteOp Docs';
+    const description = config.frontMatter.description || 'The official SuiteOp documentation';
 
     return (
       <>
         <meta httpEquiv="Content-Language" content="en" />
+        <title>{title}</title>
         <meta name="title" content={title} />
         <meta name="og:title" content={title} />
         <meta name="description" content={description} />
@@ -46,22 +47,19 @@ const themeConfig: DocsThemeConfig = {
   },
   docsRepositoryBase: 'https://github.com/documenso/documenso/tree/main/apps/documentation',
   footer: {
-    text: (
+    content: (
       <span>
         {new Date().getFullYear()} ©{' '}
-        <a href="https://documen.so" target="_blank">
-          Documenso
+        <a href="https://suiteop.com" target="_blank">
+          SuiteOp
         </a>
         .
       </span>
     ),
   },
-  primaryHue: 100,
-  primarySaturation: 48.47,
-  useNextSeoProps() {
-    return {
-      titleTemplate: '%s | Documenso Docs',
-    };
+  color: {
+    hue: 248,
+    saturation: 99,
   },
 };
 

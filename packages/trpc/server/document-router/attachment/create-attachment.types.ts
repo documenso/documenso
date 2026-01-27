@@ -8,7 +8,9 @@ export const ZCreateAttachmentRequestSchema = z.object({
   }),
 });
 
-export const ZCreateAttachmentResponseSchema = z.void();
+export const ZCreateAttachmentResponseSchema = z.object({
+  id: z.string(),
+});
 
 export type TCreateAttachmentRequest = z.infer<typeof ZCreateAttachmentRequestSchema>;
 export type TCreateAttachmentResponse = z.infer<typeof ZCreateAttachmentResponseSchema>;

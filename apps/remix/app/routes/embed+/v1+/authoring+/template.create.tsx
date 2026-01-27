@@ -62,6 +62,7 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
         arrayBuffer: async () => Promise.resolve(configuration.documentData!.data.buffer),
         name: configuration.documentData.name,
         type: configuration.documentData.type,
+        size: configuration.documentData.data.byteLength,
       });
 
       // Use the externalId from the URL fragment if available
@@ -154,6 +155,7 @@ export default function EmbeddingAuthoringTemplateCreatePage() {
       <ConfigureDocumentProvider isTemplate={true} features={features ?? {}}>
         <Stepper currentStep={currentStep} setCurrentStep={setCurrentStep}>
           <ConfigureDocumentView
+            type="template"
             defaultValues={configuration ?? undefined}
             onSubmit={handleConfigurePageViewSubmit}
           />

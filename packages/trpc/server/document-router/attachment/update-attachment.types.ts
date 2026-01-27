@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { ZSuccessResponseSchema } from '../../schema';
+
 export const ZUpdateAttachmentRequestSchema = z.object({
   id: z.string(),
   data: z.object({
@@ -8,7 +10,7 @@ export const ZUpdateAttachmentRequestSchema = z.object({
   }),
 });
 
-export const ZUpdateAttachmentResponseSchema = z.void();
+export const ZUpdateAttachmentResponseSchema = ZSuccessResponseSchema;
 
 export type TUpdateAttachmentRequest = z.infer<typeof ZUpdateAttachmentRequestSchema>;
 export type TUpdateAttachmentResponse = z.infer<typeof ZUpdateAttachmentResponseSchema>;

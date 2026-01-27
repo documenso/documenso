@@ -131,7 +131,7 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
       const errorMessage = match(error.code)
         .with(
           AppErrorCode.UNAUTHORIZED,
-          () => msg`You do not have permission to create a token for this team`,
+          () => msg`You do not have permission to create a token for this team.`,
         )
         .otherwise(() => msg`Something went wrong. Please try again later.`);
 
@@ -212,12 +212,12 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
               />
 
               <div>
-                <FormLabel className="text-muted-foreground mt-2">
+                <FormLabel className="mt-2 text-muted-foreground">
                   <Trans>Never expire</Trans>
                 </FormLabel>
                 <div className="block md:py-1.5">
                   <Switch
-                    className="bg-background mt-2"
+                    className="mt-2 bg-background"
                     checked={noExpirationDate}
                     onCheckedChange={setNoExpirationDate}
                   />
@@ -254,14 +254,14 @@ export const ApiTokenForm = ({ className, tokens }: ApiTokenFormProps) => {
             >
               <Card gradient>
                 <CardContent className="p-4">
-                  <p className="text-muted-foreground mt-2 text-sm">
+                  <p className="mt-2 text-sm text-muted-foreground">
                     <Trans>
                       Your token was created successfully! Make sure to copy it because you won't be
                       able to see it again!
                     </Trans>
                   </p>
 
-                  <p className="bg-muted-foreground/10 my-4 rounded-md px-2.5 py-1 font-mono text-sm">
+                  <p className="my-4 rounded-md bg-muted-foreground/10 px-2.5 py-1 font-mono text-sm">
                     {newlyCreatedToken.token}
                   </p>
 

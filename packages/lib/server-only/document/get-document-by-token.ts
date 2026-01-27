@@ -92,6 +92,10 @@ export const getDocumentAndSenderByToken = async ({
       },
       envelopeItems: {
         select: {
+          id: true,
+          title: true,
+          order: true,
+          envelopeId: true,
           documentData: true,
         },
       },
@@ -99,6 +103,7 @@ export const getDocumentAndSenderByToken = async ({
         select: {
           name: true,
           teamEmail: true,
+          url: true,
           teamGlobalSettings: {
             select: {
               brandingEnabled: true,

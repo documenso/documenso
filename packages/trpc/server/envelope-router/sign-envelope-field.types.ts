@@ -16,7 +16,7 @@ export const ZSignEnvelopeFieldValue = z.discriminatedUnion('type', [
   }),
   z.object({
     type: z.literal(FieldType.NUMBER),
-    value: z.number().nullable(),
+    value: z.string().nullable(),
   }),
   z.object({
     type: z.literal(FieldType.EMAIL),

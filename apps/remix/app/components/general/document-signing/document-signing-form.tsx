@@ -3,7 +3,7 @@ import { useId, useMemo, useState } from 'react';
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
-import { type Field, FieldType, type Recipient, RecipientRole } from '@prisma/client';
+import { type Field, type Recipient, RecipientRole } from '@prisma/client';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 
@@ -11,6 +11,7 @@ import type { DocumentAndSender } from '@documenso/lib/server-only/document/get-
 import type { TRecipientAccessAuth } from '@documenso/lib/types/document-auth';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
 import { Button } from '@documenso/ui/primitives/button';
@@ -78,7 +79,7 @@ export const DocumentSigningForm = ({
     [fields],
   );
 
-  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = fields.some((field) => isSignatureFieldType(field.type));
 
   const uninsertedFields = useMemo(() => {
     return sortFieldsByPosition(fieldsRequiringValidation.filter((field) => !field.inserted));
@@ -108,8 +109,8 @@ export const DocumentSigningForm = ({
       await completeDocument({ nextSigner });
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while completing the document. Please try again.',
+        title: _(msg`Error`),
+        description: _(msg`An error occurred while completing the document. Please try again.`),
         variant: 'destructive',
       });
 
@@ -135,7 +136,7 @@ export const DocumentSigningForm = ({
                 <div className="flex flex-col gap-4 md:flex-row">
                   <Button
                     type="button"
-                    className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+                    className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                     variant="secondary"
                     size="lg"
                     disabled={typeof window !== 'undefined' && window.history.length <= 1}
@@ -166,7 +167,7 @@ export const DocumentSigningForm = ({
           ) : recipient.role === RecipientRole.ASSISTANT ? (
             <>
               <form onSubmit={assistantForm.handleSubmit(onAssistantFormSubmit)}>
-                <fieldset className="dark:bg-background border-border rounded-2xl border bg-white p-3">
+                <fieldset className="rounded-2xl border border-border bg-white p-3 dark:bg-background">
                   <Controller
                     name="selectedSignerId"
                     control={assistantForm.control}
@@ -185,7 +186,7 @@ export const DocumentSigningForm = ({
                           .map((r) => (
                             <div
                               key={`${assistantSignersId}-${r.id}`}
-                              className="bg-widget border-border relative flex flex-col gap-4 rounded-lg border p-4"
+                              className="relative flex flex-col gap-4 rounded-lg border border-border bg-widget p-4"
                             >
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-3">
@@ -203,15 +204,15 @@ export const DocumentSigningForm = ({
                                       {r.name}
 
                                       {r.id === recipient.id && (
-                                        <span className="text-muted-foreground ml-2">
+                                        <span className="ml-2 text-muted-foreground">
                                           {_(msg`(You)`)}
                                         </span>
                                       )}
                                     </Label>
-                                    <p className="text-muted-foreground text-xs">{r.email}</p>
+                                    <p className="text-xs text-muted-foreground">{r.email}</p>
                                   </div>
                                 </div>
-                                <div className="text-muted-foreground text-xs leading-[inherit]">
+                                <div className="text-xs leading-[inherit] text-muted-foreground">
                                   {r.fields.length} {r.fields.length === 1 ? 'field' : 'fields'}
                                 </div>
                               </div>
@@ -265,7 +266,7 @@ export const DocumentSigningForm = ({
                     <Input
                       type="text"
                       id="full-name"
-                      className="bg-background mt-2"
+                      className="mt-2 bg-background"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value.trimStart())}
                     />
@@ -280,6 +281,7 @@ export const DocumentSigningForm = ({
                       <SignaturePadDialog
                         className="mt-2"
                         disabled={isSubmitting}
+                        fullName={fullName}
                         value={signature ?? ''}
                         onChange={(v) => setSignature(v ?? '')}
                         typedSignatureEnabled={document.documentMeta?.typedSignatureEnabled}
@@ -294,7 +296,7 @@ export const DocumentSigningForm = ({
               <div className="mt-6 flex flex-col gap-4 md:flex-row">
                 <Button
                   type="button"
-                  className="dark:bg-muted dark:hover:bg-muted/80 w-full bg-black/5 hover:bg-black/10"
+                  className="w-full bg-black/5 hover:bg-black/10 dark:bg-muted dark:hover:bg-muted/80"
                   variant="secondary"
                   size="lg"
                   disabled={typeof window !== 'undefined' && window.history.length <= 1}

@@ -29,7 +29,7 @@ export const createEmbeddingPresignTokenRoute = procedure
         });
       }
 
-      const { expiresIn } = input;
+      const { expiresIn, scope } = input;
 
       if (IS_BILLING_ENABLED()) {
         const token = await getApiTokenByToken({ token: apiToken });
@@ -54,6 +54,7 @@ export const createEmbeddingPresignTokenRoute = procedure
       const presignToken = await createEmbeddingPresignToken({
         apiToken,
         expiresIn,
+        scope,
       });
 
       return { ...presignToken };

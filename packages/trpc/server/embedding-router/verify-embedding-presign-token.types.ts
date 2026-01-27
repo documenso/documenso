@@ -18,6 +18,7 @@ export const ZVerifyEmbeddingPresignTokenRequestSchema = z.object({
     .string()
     .min(1, { message: 'Token is required' })
     .describe('The presign token to verify'),
+  scope: z.string().optional().describe('The scope to verify'),
 });
 
 export const ZVerifyEmbeddingPresignTokenResponseSchema = z.object({

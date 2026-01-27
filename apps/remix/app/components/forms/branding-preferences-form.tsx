@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useLingui } from '@lingui/react/macro';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -28,6 +28,8 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 import { Textarea } from '@documenso/ui/primitives/textarea';
+
+import { useOptionalCurrentTeam } from '~/providers/team';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
@@ -68,6 +70,9 @@ export function BrandingPreferencesForm({
 }: BrandingPreferencesFormProps) {
   const { t } = useLingui();
 
+  const team = useOptionalCurrentTeam();
+  const organisation = useCurrentOrganisation();
+
   const [previewUrl, setPreviewUrl] = useState<string>('');
   const [hasLoadedPreview, setHasLoadedPreview] = useState(false);
 
@@ -88,14 +93,13 @@ export function BrandingPreferencesForm({
       const file = JSON.parse(settings.brandingLogo);
 
       if ('type' in file && 'data' in file) {
-        void getFile(file).then((binaryData) => {
-          const objectUrl = URL.createObjectURL(new Blob([binaryData]));
+        const logoUrl =
+          context === 'Team'
+            ? `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/team/${team?.id}`
+            : `${NEXT_PUBLIC_WEBAPP_URL()}/api/branding/logo/organisation/${organisation?.id}`;
 
-          setPreviewUrl(objectUrl);
-          setHasLoadedPreview(true);
-        });
-
-        return;
+        setPreviewUrl(logoUrl);
+        setHasLoadedPreview(true);
       }
     }
 

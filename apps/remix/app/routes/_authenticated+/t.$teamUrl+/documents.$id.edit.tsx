@@ -82,8 +82,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
           404: {
             heading: msg`Not found`,
             subHeading: msg`404 Not found`,
-            message: msg`The document you are looking for may have been removed, renamed or may have never
-                  existed.`,
+            message: msg`The document you are looking for may have been removed, renamed or may have never existed.`,
           },
         }}
         primaryButton={
@@ -101,8 +100,9 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
     <EnvelopeEditorProvider initialEnvelope={envelope}>
       <EnvelopeRenderProvider
         envelope={envelope}
+        token={undefined}
         fields={envelope.fields}
-        recipientIds={envelope.recipients.map((recipient) => recipient.id)}
+        recipients={envelope.recipients}
       >
         <EnvelopeEditor />
       </EnvelopeRenderProvider>

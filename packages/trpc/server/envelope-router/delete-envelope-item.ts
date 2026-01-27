@@ -5,13 +5,16 @@ import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
 
+import { ZGenericSuccessResponse } from '../schema';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZDeleteEnvelopeItemRequestSchema,
   ZDeleteEnvelopeItemResponseSchema,
+  deleteEnvelopeItemMeta,
 } from './delete-envelope-item.types';
 
 export const deleteEnvelopeItemRoute = authenticatedProcedure
+  .meta(deleteEnvelopeItemMeta)
   .input(ZDeleteEnvelopeItemRequestSchema)
   .output(ZDeleteEnvelopeItemResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -98,4 +101,6 @@ export const deleteEnvelopeItemRoute = authenticatedProcedure
         },
       },
     });
+
+    return ZGenericSuccessResponse;
   });

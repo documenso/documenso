@@ -16,14 +16,15 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
         <Text className="my-4 text-base text-slate-400">
           <Trans>
             This document was sent using{' '}
-            <Link className="text-[#7AC455]" href="https://documen.so/mail-footer">
-              Documenso.
+            <Link className="text-[#3636A1]" href="https://suiteop.com">
+              SuiteOp
             </Link>
+            .
           </Trans>
         </Text>
       )}
 
-      {branding.brandingCompanyDetails ? (
+      {branding.brandingEnabled && branding.brandingCompanyDetails && (
         <Text className="my-8 text-sm text-slate-400">
           {branding.brandingCompanyDetails.split('\n').map((line, idx) => {
             return (
@@ -34,11 +35,13 @@ export const TemplateFooter = ({ isDocument = true }: TemplateFooterProps) => {
             );
           })}
         </Text>
-      ) : (
+      )}
+
+      {!branding.brandingEnabled && (
         <Text className="my-8 text-sm text-slate-400">
-          Documenso, Inc.
+          SuiteOp, Inc.
           <br />
-          2261 Market Street, #5211, San Francisco, CA 94114, USA
+          Professional Document Signing Platform
         </Text>
       )}
     </Section>

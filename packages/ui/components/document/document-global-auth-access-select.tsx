@@ -35,7 +35,7 @@ export const DocumentGlobalAuthAccessSelect = ({
     },
     ...Object.values(DocumentAccessAuth).map((authType) => ({
       value: authType,
-      label: DOCUMENT_AUTH_TYPES[authType].value,
+      label: _(DOCUMENT_AUTH_TYPES[authType].value),
     })),
   ];
 

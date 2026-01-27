@@ -29,7 +29,7 @@ export const EnvelopeItemSelector = ({
       {...buttonProps}
     >
       <div
-        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
+        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium ${
           isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'
         }`}
       >

@@ -1,9 +1,46 @@
+import { msg } from '@lingui/core/macro';
 import { FieldType } from '@prisma/client';
 import { z } from 'zod';
 
 import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '../constants/pdf';
 
-export const DEFAULT_FIELD_FONT_SIZE = 14;
+export const FIELD_DEFAULT_GENERIC_VERTICAL_ALIGN = 'middle';
+export const FIELD_DEFAULT_GENERIC_ALIGN = 'left';
+export const FIELD_DEFAULT_LINE_HEIGHT = 1;
+export const FIELD_DEFAULT_LETTER_SPACING = 0;
+
+export const FIELD_MIN_LINE_HEIGHT = 1;
+export const FIELD_MAX_LINE_HEIGHT = 10;
+
+export const FIELD_MIN_LETTER_SPACING = 0;
+export const FIELD_MAX_LETTER_SPACING = 100;
+
+export const DEFAULT_FIELD_FONT_SIZE = 12;
+
+/**
+ * Grouped field types that use the same generic text rendering function.
+ */
+export type GenericTextFieldTypeMetas =
+  | TInitialsFieldMeta
+  | TNameFieldMeta
+  | TEmailFieldMeta
+  | TDateFieldMeta
+  | TTextFieldMeta
+  | TNumberFieldMeta;
+
+const ZFieldMetaLineHeight = z.coerce
+  .number()
+  .min(FIELD_MIN_LINE_HEIGHT)
+  .max(FIELD_MAX_LINE_HEIGHT)
+  .describe('The line height of the text');
+const ZFieldMetaLetterSpacing = z.coerce
+  .number()
+  .min(FIELD_MIN_LETTER_SPACING)
+  .max(FIELD_MAX_LETTER_SPACING)
+  .describe('The spacing between each character');
+const ZFieldMetaVerticalAlign = z
+  .enum(['top', 'middle', 'bottom'])
+  .describe('The vertical alignment of the text');
 
 export const ZBaseFieldMeta = z.object({
   label: z.string().optional(),
@@ -50,8 +87,14 @@ export type TDateFieldMeta = z.infer<typeof ZDateFieldMeta>;
 export const ZTextFieldMeta = ZBaseFieldMeta.extend({
   type: z.literal('text'),
   text: z.string().optional(),
-  characterLimit: z.number().optional(),
+  characterLimit: z.coerce
+    .number({ invalid_type_error: msg`Value must be a number`.id })
+    .min(0)
+    .optional(),
   textAlign: ZFieldTextAlignSchema.optional(),
+  lineHeight: ZFieldMetaLineHeight.nullish(),
+  letterSpacing: ZFieldMetaLetterSpacing.nullish(),
+  verticalAlign: ZFieldMetaVerticalAlign.nullish(),
 });
 
 export type TTextFieldMeta = z.infer<typeof ZTextFieldMeta>;
@@ -63,6 +106,9 @@ export const ZNumberFieldMeta = ZBaseFieldMeta.extend({
   minValue: z.coerce.number().nullish(),
   maxValue: z.coerce.number().nullish(),
   textAlign: ZFieldTextAlignSchema.optional(),
+  lineHeight: ZFieldMetaLineHeight.nullish(),
+  letterSpacing: ZFieldMetaLetterSpacing.nullish(),
+  verticalAlign: ZFieldMetaVerticalAlign.nullish(),
 });
 
 export type TNumberFieldMeta = z.infer<typeof ZNumberFieldMeta>;
@@ -188,7 +234,7 @@ export type TFieldMetaSchema = z.infer<typeof ZFieldMetaSchema>;
 export const ZFieldAndMetaSchema = z.discriminatedUnion('type', [
   z.object({
     type: z.literal(FieldType.SIGNATURE),
-    fieldMeta: z.undefined(),
+    fieldMeta: ZSignatureFieldMeta.optional(),
   }),
   z.object({
     type: z.literal(FieldType.FREE_SIGNATURE),
@@ -326,3 +372,52 @@ export const FIELD_META_DEFAULT_VALUES: Record<FieldType, TFieldMetaSchema> = {
   [FieldType.CHECKBOX]: FIELD_CHECKBOX_META_DEFAULT_VALUES,
   [FieldType.DROPDOWN]: FIELD_DROPDOWN_META_DEFAULT_VALUES,
 } as const;
+
+export const ZEnvelopeFieldAndMetaSchema = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal(FieldType.SIGNATURE),
+    fieldMeta: ZSignatureFieldMeta.optional().default(FIELD_SIGNATURE_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.FREE_SIGNATURE),
+    fieldMeta: z.undefined(),
+  }),
+  z.object({
+    type: z.literal(FieldType.INITIALS),
+    fieldMeta: ZInitialsFieldMeta.optional().default(FIELD_INITIALS_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.NAME),
+    fieldMeta: ZNameFieldMeta.optional().default(FIELD_NAME_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.EMAIL),
+    fieldMeta: ZEmailFieldMeta.optional().default(FIELD_EMAIL_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.DATE),
+    fieldMeta: ZDateFieldMeta.optional().default(FIELD_DATE_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.TEXT),
+    fieldMeta: ZTextFieldMeta.optional().default(FIELD_TEXT_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.NUMBER),
+    fieldMeta: ZNumberFieldMeta.optional().default(FIELD_NUMBER_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.RADIO),
+    fieldMeta: ZRadioFieldMeta.optional().default(FIELD_RADIO_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.CHECKBOX),
+    fieldMeta: ZCheckboxFieldMeta.optional().default(FIELD_CHECKBOX_META_DEFAULT_VALUES),
+  }),
+  z.object({
+    type: z.literal(FieldType.DROPDOWN),
+    fieldMeta: ZDropdownFieldMeta.optional().default(FIELD_DROPDOWN_META_DEFAULT_VALUES),
+  }),
+]);
+
+type TEnvelopeFieldAndMeta = z.infer<typeof ZEnvelopeFieldAndMetaSchema>;

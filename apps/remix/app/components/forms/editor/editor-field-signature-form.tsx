@@ -5,11 +5,8 @@ import { Trans } from '@lingui/react/macro';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
-import {
-  DEFAULT_FIELD_FONT_SIZE,
-  type TSignatureFieldMeta,
-  ZSignatureFieldMeta,
-} from '@documenso/lib/types/field-meta';
+import { DEFAULT_SIGNATURE_TEXT_FONT_SIZE } from '@documenso/lib/constants/pdf';
+import { type TSignatureFieldMeta, ZSignatureFieldMeta } from '@documenso/lib/types/field-meta';
 import { Form } from '@documenso/ui/primitives/form/form';
 
 import { EditorGenericFontSizeField } from './editor-field-generic-field-forms';
@@ -35,7 +32,7 @@ export const EditorFieldSignatureForm = ({
     resolver: zodResolver(ZSignatureFieldFormSchema),
     mode: 'onChange',
     defaultValues: {
-      fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
+      fontSize: value.fontSize || DEFAULT_SIGNATURE_TEXT_FONT_SIZE,
     },
   });
 

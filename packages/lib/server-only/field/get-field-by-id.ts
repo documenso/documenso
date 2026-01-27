@@ -11,7 +11,7 @@ export type GetFieldByIdOptions = {
   userId: number;
   teamId: number;
   fieldId: number;
-  envelopeType: EnvelopeType;
+  envelopeType?: EnvelopeType;
 };
 
 export const getFieldById = async ({
@@ -41,7 +41,7 @@ export const getFieldById = async ({
       type: 'envelopeId',
       id: field.envelopeId,
     },
-    type: envelopeType,
+    type: envelopeType ?? null,
     userId,
     teamId,
   });

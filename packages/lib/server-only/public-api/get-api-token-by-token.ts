@@ -1,5 +1,6 @@
 import { prisma } from '@documenso/prisma';
 
+import { AppError, AppErrorCode } from '../../errors/app-error';
 import { hashString } from '../auth/hash';
 
 export const getApiTokenByToken = async ({ token }: { token: string }) => {
@@ -38,11 +39,17 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
   });
 
   if (!apiToken) {
-    throw new Error('Invalid token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid token',
+      statusCode: 401,
+    });
   }
 
   if (apiToken.expires && apiToken.expires < new Date()) {
-    throw new Error('Expired token');
+    throw new AppError(AppErrorCode.EXPIRED_CODE, {
+      message: 'Expired token',
+      statusCode: 401,
+    });
   }
 
   // Handle a silly choice from many moons ago
@@ -54,7 +61,10 @@ export const getApiTokenByToken = async ({ token }: { token: string }) => {
 
   // This will never happen but we need to narrow types
   if (!user) {
-    throw new Error('Invalid token');
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Invalid token',
+      statusCode: 401,
+    });
   }
 
   return {

@@ -1,9 +1,10 @@
 ###########################
 #     BASE CONTAINER      #
 ###########################
-FROM node:22-alpine3.20 AS base
+FROM node:22-alpine3.22 AS base
 
 RUN apk add --no-cache openssl
+RUN apk add --no-cache font-freefont
 
 
 ###########################
@@ -49,6 +50,13 @@ ENV NEXT_PRIVATE_ENCRYPTION_KEY="$NEXT_PRIVATE_ENCRYPTION_KEY"
 ARG NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="DEADBEEF"
 ENV NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="$NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY"
 
+# Telemetry credentials (optional, baked into image at build time)
+ARG NEXT_PRIVATE_TELEMETRY_KEY=""
+ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
+
+ARG NEXT_PRIVATE_TELEMETRY_HOST=""
+ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
+
 
 # Uncomment and use build args to enable remote caching
 # ARG TURBO_TEAM
@@ -62,6 +70,7 @@ COPY --from=builder /app/out/json/ .
 COPY --from=builder /app/out/package-lock.json ./package-lock.json
 
 COPY --from=builder /app/lingui.config.ts ./lingui.config.ts
+COPY --from=builder /app/patches ./patches
 
 RUN npm ci
 
@@ -82,6 +91,13 @@ FROM base AS runner
 ENV HUSKY 0
 ENV DOCKER_OUTPUT 1
 
+# Telemetry credentials (baked into image at build time, can be disabled at runtime)
+ARG NEXT_PRIVATE_TELEMETRY_KEY=""
+ENV NEXT_PRIVATE_TELEMETRY_KEY="$NEXT_PRIVATE_TELEMETRY_KEY"
+
+ARG NEXT_PRIVATE_TELEMETRY_HOST=""
+ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
+
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
@@ -93,6 +109,8 @@ WORKDIR /app
 COPY --from=builder --chown=nodejs:nodejs /app/out/json/ .
 # Copy the tailwind config files across
 COPY --from=builder --chown=nodejs:nodejs /app/out/full/packages/tailwind-config ./packages/tailwind-config
+# Copy the patches across
+COPY --from=builder --chown=nodejs:nodejs /app/patches ./patches
 
 RUN npm ci --only=production
 

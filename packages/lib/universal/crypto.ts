@@ -1,7 +1,7 @@
 import { xchacha20poly1305 } from '@noble/ciphers/chacha';
 import { bytesToHex, hexToBytes, utf8ToBytes } from '@noble/ciphers/utils';
-import { managedNonce } from '@noble/ciphers/webcrypto/utils';
-import { sha256 } from '@noble/hashes/sha256';
+import { managedNonce } from '@noble/ciphers/webcrypto';
+import { sha256 } from '@noble/hashes/sha2';
 
 export type SymmetricEncryptOptions = {
   key: string;
@@ -30,3 +30,5 @@ export const symmetricDecrypt = ({ key, data }: SymmetricDecryptOptions) => {
 
   return chacha.decrypt(dataAsBytes);
 };
+
+export { sha256 };

@@ -1,6 +1,20 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
+import os from 'os';
 import path from 'path';
+
+function calculateWorkers() {
+  const total = os.cpus().length;
+
+  // Reserve 2 cores for the system
+  const usable = Math.max(total - 2, 1);
+
+  // 1 worker per 2 cores, minimum 1
+  const workers = Math.max(Math.floor(usable / 2), 1);
+
+  // Max 6 workers
+  return Math.min(workers, 6);
+}
 
 const ENV_FILES = ['.env', '.env.local', `.env.${process.env.NODE_ENV || 'development'}`];
 
@@ -15,9 +29,8 @@ ENV_FILES.forEach((file) => {
  */
 export default defineConfig({
   testDir: './e2e',
-  /* Run tests in files in parallel */
-  fullyParallel: false,
-  workers: 2,
+  fullyParallel: true,
+  workers: 10, // See Projects where 10 is utilized for API tests. We're not running 10 workers for UI tests.
   maxFailures: process.env.CI ? 1 : undefined,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
@@ -31,25 +44,54 @@ export default defineConfig({
     baseURL: 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
-
-    video: 'on-first-retry',
+    trace: 'retain-on-failure',
+    video: 'retain-on-failure',
 
     /* Add explicit timeouts for actions */
     actionTimeout: 15_000,
     navigationTimeout: 30_000,
+
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
+
+    /* Disable animations via cookie for more stable tests */
+    storageState: {
+      cookies: [
+        {
+          name: '__disable_animations',
+          value: 'true',
+          domain: 'localhost',
+          path: '/',
+          expires: -1,
+          httpOnly: false,
+          secure: false,
+          sameSite: 'Lax' as const,
+        },
+      ],
+      origins: [],
+    },
   },
 
   timeout: 60_000,
 
   /* Configure projects for major browsers */
   projects: [
+    // API Tests e2e/api/**/*.spec.ts
     {
-      name: 'chromium',
+      name: 'api',
+      testMatch: /e2e\/api\/.*\.spec\.ts/,
+      workers: 10, // Limited by DB connections before it gets flakey.
+    },
+    // Run UI Tests
+    {
+      name: 'ui',
+      testMatch: /e2e\/(?!api\/).*\.spec\.ts/,
       use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1920, height: 1200 },
       },
+      workers: calculateWorkers(),
     },
 
     // {

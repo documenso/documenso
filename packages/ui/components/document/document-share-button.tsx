@@ -108,7 +108,7 @@ export const DocumentShareButton = ({
 
     window.open(
       generateTwitterIntent(
-        `I just ${token ? 'signed' : 'sent'} a document in style with @documenso. Check it out!`,
+        `I just ${token ? 'signed' : 'sent'} a document in style with @get_suiteop. Check it out!`,
         `${NEXT_PUBLIC_WEBAPP_URL()}/share/${slug}`,
       ),
       '_blank',
@@ -127,11 +127,11 @@ export const DocumentShareButton = ({
           <Button
             variant="outline"
             disabled={!token || !documentId}
-            className={cn('flex-1 text-[11px]', className)}
+            className={cn('h-11 w-full max-w-lg flex-1', className)}
             loading={isLoading}
           >
             {!isLoading && <Sparkles className="mr-2 h-5 w-5" />}
-            <Trans>Share Signature Card</Trans>
+            <Trans>Share</Trans>
           </Button>
         )}
       </DialogTrigger>
@@ -154,7 +154,7 @@ export const DocumentShareButton = ({
         <div className="flex w-full flex-col">
           <div className="rounded-md border p-4">
             I just {token ? 'signed' : 'sent'} a document in style with{' '}
-            <span className="font-medium text-blue-400">@documenso</span>
+            <span className="font-medium text-blue-400">@get_suiteop</span>
             . Check it out!
             <span className="mt-2 block" />
             <span

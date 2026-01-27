@@ -50,6 +50,11 @@ export const ZFieldSchema = FieldSchema.pick({
   templateId: z.number().nullish(),
 });
 
+export const ZEnvelopeFieldSchema = ZFieldSchema.omit({
+  documentId: true,
+  templateId: true,
+});
+
 export const ZFieldPageNumberSchema = z
   .number()
   .min(1)
@@ -68,6 +73,30 @@ export const ZFieldPageYSchema = z
 export const ZFieldWidthSchema = z.number().min(1).describe('The width of the field.');
 
 export const ZFieldHeightSchema = z.number().min(1).describe('The height of the field.');
+
+export const ZClampedFieldPositionXSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based X coordinate where the field will be placed.');
+
+export const ZClampedFieldPositionYSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based Y coordinate where the field will be placed.');
+
+export const ZClampedFieldWidthSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based width of the field on the page.');
+
+export const ZClampedFieldHeightSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based height of the field on the page.');
 
 // ---------------------------------------------
 

@@ -3,7 +3,7 @@ import { createThemeSessionResolver } from 'remix-themes';
 
 import { getCookieDomain, useSecureCookies } from '@documenso/lib/constants/auth';
 
-const themeSessionStorage = createCookieSessionStorage({
+export const themeSessionStorage = createCookieSessionStorage({
   cookie: {
     name: 'theme',
     path: '/',

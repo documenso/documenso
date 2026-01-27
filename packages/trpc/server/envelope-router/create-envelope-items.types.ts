@@ -1,38 +1,41 @@
 import { z } from 'zod';
+import { zfd } from 'zod-form-data';
 
-import DocumentDataSchema from '@documenso/prisma/generated/zod/modelSchema/DocumentDataSchema';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
-import { ZDocumentTitleSchema } from '../document-router/schema';
+import { zodFormData } from '../../utils/zod-form-data';
+import type { TrpcRouteMeta } from '../trpc';
 
-export const ZCreateEnvelopeItemsRequestSchema = z.object({
+export const createEnvelopeItemsMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/item/create-many',
+    summary: 'Create envelope items',
+    contentTypes: ['multipart/form-data'],
+    description: 'Create multiple envelope items for an envelope',
+    tags: ['Envelope Items'],
+  },
+};
+
+export const ZCreateEnvelopeItemsPayloadSchema = z.object({
   envelopeId: z.string(),
-  items: z
-    .object({
-      title: ZDocumentTitleSchema,
-      documentDataId: z.string(),
-    })
-    .array(),
+  // data: z.object() // Currently not used.
+});
+
+export const ZCreateEnvelopeItemsRequestSchema = zodFormData({
+  payload: zfd.json(ZCreateEnvelopeItemsPayloadSchema),
+  files: zfd.repeatableOfType(zfd.file()),
 });
 
 export const ZCreateEnvelopeItemsResponseSchema = z.object({
-  createdEnvelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
     title: true,
-    documentDataId: true,
     envelopeId: true,
     order: true,
-  })
-    .extend({
-      documentData: DocumentDataSchema.pick({
-        type: true,
-        id: true,
-        data: true,
-        initialData: true,
-      }),
-    })
-    .array(),
+  }).array(),
 });
 
+export type TCreateEnvelopeItemsPayload = z.infer<typeof ZCreateEnvelopeItemsPayloadSchema>;
 export type TCreateEnvelopeItemsRequest = z.infer<typeof ZCreateEnvelopeItemsRequestSchema>;
 export type TCreateEnvelopeItemsResponse = z.infer<typeof ZCreateEnvelopeItemsResponseSchema>;

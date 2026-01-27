@@ -7,11 +7,13 @@ import type { User } from '@prisma/client';
 import { DateTime } from 'luxon';
 
 import { useIsMounted } from '@documenso/lib/client-only/hooks/use-is-mounted';
+import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 
 export type TemplatePageViewInformationProps = {
   userId: number;
   template: {
     userId: number;
+    secondaryId: string;
     createdAt: Date;
     updatedAt: Date;
     user: Pick<User, 'id' | 'name' | 'email'>;
@@ -42,6 +44,10 @@ export const TemplatePageViewInformation = ({
         value: DateTime.fromJSDate(template.updatedAt)
           .setLocale(i18n.locales?.[0] || i18n.locale)
           .toRelative(),
+      },
+      {
+        description: msg`Template ID (Legacy)`,
+        value: mapSecondaryIdToTemplateId(template.secondaryId),
       },
     ];
     // eslint-disable-next-line react-hooks/exhaustive-deps

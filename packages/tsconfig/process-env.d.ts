@@ -41,6 +41,12 @@ declare namespace NodeJS {
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS?: string;
     NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS?: string;
+    NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH?: string;
+    NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY?: string;
+    NEXT_PUBLIC_SIGNING_CONTACT_INFO?: string;
+    NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER?: string;
 
     NEXT_PRIVATE_SMTP_TRANSPORT?: 'mailchannels' | 'resend' | 'smtp-auth' | 'smtp-api';
 
@@ -72,6 +78,8 @@ declare namespace NodeJS {
 
     NEXT_PRIVATE_JOBS_PROVIDER?: 'inngest' | 'local';
 
+    NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS?: string;
+
     /**
      * Inngest environment variables
      */
@@ -80,9 +88,26 @@ declare namespace NodeJS {
     NEXT_PRIVATE_INNGEST_APP_ID?: string;
     NEXT_PRIVATE_INNGEST_EVENT_KEY?: string;
 
+    /**
+     * SuiteOp OAuth configuration
+     */
+    NEXT_PRIVATE_SUITEOP_MASTER_KEY?: string;
+    NEXT_PRIVATE_SUITEOP_REDIRECT_URL?: string;
+
     POSTGRES_URL?: string;
     DATABASE_URL?: string;
     POSTGRES_PRISMA_URL?: string;
     POSTGRES_URL_NON_POOLING?: string;
+
+    /**
+     * Google Vertex AI environment variables
+     */
+    GOOGLE_VERTEX_PROJECT_ID?: string;
+    GOOGLE_VERTEX_LOCATION?: string;
+    /**
+     * Service account credentials for Vertex AI authentication (required for AI features)
+     */
+    GOOGLE_CLIENT_EMAIL?: string;
+    GOOGLE_PRIVATE_KEY?: string;
   }
 }

@@ -5,7 +5,7 @@ import type { FieldType } from '@prisma/client';
 import Konva from 'konva';
 import type { KonvaEventObject } from 'konva/lib/Node';
 import type { Transformer } from 'konva/lib/shapes/Transformer';
-import { CopyPlusIcon, SquareStackIcon, TrashIcon } from 'lucide-react';
+import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide-react';
 
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -20,13 +20,15 @@ import {
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
+import { CommandDialog } from '@documenso/ui/primitives/command';
 
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
+import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
 export default function EnvelopeEditorFieldsPageRenderer() {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
 
   const interactiveTransformer = useRef<Transformer | null>(null);
 
@@ -103,7 +105,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       fieldUpdates.height = fieldPageHeight;
     }
 
-    // Todo: envelopes Use id
     editorFields.updateFieldByFormId(fieldFormId, fieldUpdates);
 
     // Select the field if it is not already selected.
@@ -114,7 +115,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     pageLayer.current?.batchDraw();
   };
 
-  const renderFieldOnLayer = (field: TLocalField) => {
+  const unsafeRenderFieldOnLayer = (field: TLocalField) => {
     if (!pageLayer.current) {
       return;
     }
@@ -158,6 +159,15 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
     fieldGroup.on('transformend', handleResizeOrMove);
     fieldGroup.on('dragend', handleResizeOrMove);
+  };
+
+  const renderFieldOnLayer = (field: TLocalField) => {
+    try {
+      unsafeRenderFieldOnLayer(field);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**
@@ -460,6 +470,18 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     setSelectedFields([]);
   };
 
+  const changeSelectedFieldsRecipients = (recipientId: number) => {
+    const fields = selectedKonvaFieldGroups
+      .map((field) => editorFields.getFieldByFormId(field.id()))
+      .filter((field) => field !== undefined);
+
+    for (const field of fields) {
+      if (field.recipientId !== recipientId) {
+        editorFields.updateFieldByFormId(field.formId, { recipientId, id: undefined });
+      }
+    }
+  };
+
   const duplicatedSelectedFields = () => {
     const fields = selectedKonvaFieldGroups
       .map((field) => editorFields.getFieldByFormId(field.id()))
@@ -544,7 +566,12 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       {selectedKonvaFieldGroups.length > 0 &&
         interactiveTransformer.current &&
         !isFieldChanging && (
-          <div
+          <FieldActionButtons
+            handleDuplicateSelectedFields={duplicatedSelectedFields}
+            handleDuplicateSelectedFieldsOnAllPages={duplicatedSelectedFieldsOnAllPages}
+            handleDeleteSelectedFields={deletedSelectedFields}
+            handleChangeRecipient={changeSelectedFieldsRecipients}
+            selectedFieldFormId={selectedKonvaFieldGroups.map((field) => field.id())}
             style={{
               position: 'absolute',
               top:
@@ -561,35 +588,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
               pointerEvents: 'auto',
               zIndex: 50,
             }}
-            className="group flex items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5"
-          >
-            <button
-              title={t`Duplicate`}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-              onClick={() => duplicatedSelectedFields()}
-              onTouchEnd={() => duplicatedSelectedFields()}
-            >
-              <CopyPlusIcon className="h-3 w-3" />
-            </button>
-
-            <button
-              title={t`Duplicate on all pages`}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-              onClick={() => duplicatedSelectedFieldsOnAllPages()}
-              onTouchEnd={() => duplicatedSelectedFieldsOnAllPages()}
-            >
-              <SquareStackIcon className="h-3 w-3" />
-            </button>
-
-            <button
-              title={t`Remove`}
-              className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
-              onClick={() => deletedSelectedFields()}
-              onTouchEnd={() => deletedSelectedFields()}
-            >
-              <TrashIcon className="h-3 w-3" />
-            </button>
-          </div>
+          />
         )}
 
       {pendingFieldCreation && (
@@ -608,13 +607,14 @@ export default function EnvelopeEditorFieldsPageRenderer() {
             transform: 'translateX(-50%)',
             zIndex: 50,
           }}
-          className="text-muted-foreground grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border bg-white p-1 shadow-sm"
+          // Don't use darkmode for this component, it should look the same for both light/dark modes.
+          className="grid w-max grid-cols-5 gap-x-1 gap-y-0.5 rounded-md border border-gray-300 bg-white p-1 text-gray-500 shadow-sm"
         >
           {fieldButtonList.map((field) => (
             <button
               key={field.type}
               onClick={() => createFieldFromPendingTemplate(pendingFieldCreation, field.type)}
-              className="hover:text-foreground col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100"
+              className="col-span-1 w-full flex-shrink-0 rounded-sm px-2 py-1 text-xs hover:bg-gray-100 hover:text-gray-600"
             >
               {t(field.name)}
             </button>
@@ -635,3 +635,119 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     </div>
   );
 }
+
+type FieldActionButtonsProps = React.HTMLAttributes<HTMLDivElement> & {
+  handleDuplicateSelectedFields: () => void;
+  handleDuplicateSelectedFieldsOnAllPages: () => void;
+  handleDeleteSelectedFields: () => void;
+  handleChangeRecipient: (recipientId: number) => void;
+  selectedFieldFormId: string[];
+};
+
+const FieldActionButtons = ({
+  handleDuplicateSelectedFields,
+  handleDuplicateSelectedFieldsOnAllPages,
+  handleDeleteSelectedFields,
+  handleChangeRecipient,
+  selectedFieldFormId,
+  ...props
+}: FieldActionButtonsProps) => {
+  const { t } = useLingui();
+
+  const [showRecipientSelector, setShowRecipientSelector] = useState(false);
+
+  const { editorFields, envelope } = useCurrentEnvelopeEditor();
+
+  /**
+   * Decide the preselected recipient in the command input.
+   *
+   * If all fields belong to the same recipient then use that recipient as the default.
+   *
+   * Otherwise show the placeholder.
+   */
+  const preselectedRecipient = useMemo(() => {
+    if (selectedFieldFormId.length === 0) {
+      return null;
+    }
+
+    const fields = editorFields.localFields.filter((field) =>
+      selectedFieldFormId.includes(field.formId),
+    );
+
+    const recipient = envelope.recipients.find(
+      (recipient) => recipient.id === fields[0].recipientId,
+    );
+
+    if (!recipient) {
+      return null;
+    }
+
+    const isRecipientsSame = fields.every((field) => field.recipientId === recipient.id);
+
+    if (isRecipientsSame) {
+      return recipient;
+    }
+
+    return null;
+  }, [editorFields.localFields]);
+
+  return (
+    <div className="flex flex-col items-center" {...props}>
+      <div className="group flex w-fit items-center justify-evenly gap-x-1 rounded-md border bg-gray-900 p-0.5">
+        <button
+          title={t`Change Recipient`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={() => setShowRecipientSelector(true)}
+          onTouchEnd={() => setShowRecipientSelector(true)}
+        >
+          <UserCircleIcon className="h-3 w-3" />
+        </button>
+
+        <button
+          title={t`Duplicate`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={handleDuplicateSelectedFields}
+          onTouchEnd={handleDuplicateSelectedFields}
+        >
+          <CopyPlusIcon className="h-3 w-3" />
+        </button>
+
+        <button
+          title={t`Duplicate on all pages`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={handleDuplicateSelectedFieldsOnAllPages}
+          onTouchEnd={handleDuplicateSelectedFieldsOnAllPages}
+        >
+          <SquareStackIcon className="h-3 w-3" />
+        </button>
+
+        <button
+          title={t`Remove`}
+          className="rounded-sm p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-gray-100"
+          onClick={handleDeleteSelectedFields}
+          onTouchEnd={handleDeleteSelectedFields}
+        >
+          <TrashIcon className="h-3 w-3" />
+        </button>
+      </div>
+
+      <CommandDialog
+        position="start"
+        open={showRecipientSelector}
+        onOpenChange={setShowRecipientSelector}
+      >
+        <EnvelopeRecipientSelectorCommand
+          placeholder={t`Select a recipient`}
+          selectedRecipient={preselectedRecipient}
+          onSelectedRecipientChange={(recipient) => {
+            editorFields.setSelectedRecipient(recipient.id);
+            handleChangeRecipient(recipient.id);
+            setShowRecipientSelector(false);
+          }}
+          recipients={envelope.recipients}
+          fields={envelope.fields}
+        />
+      </CommandDialog>
+    </div>
+  );
+};

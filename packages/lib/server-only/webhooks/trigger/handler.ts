@@ -13,6 +13,7 @@ export type HandlerTriggerWebhooksResponse =
       error: string;
     };
 
+// Todo: [Webhooks] delete after deployment.
 export const handlerTriggerWebhooks = async (req: Request) => {
   const signature = req.headers.get('x-webhook-signature');
 

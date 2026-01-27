@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
-import type { DocumentData, EnvelopeItem } from '@prisma/client';
+import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
+import { DownloadIcon } from 'lucide-react';
 import { DateTime } from 'luxon';
 
 import {
@@ -20,11 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
+
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
-import EnvelopeGenericPageRenderer from '../envelope-editor/envelope-generic-page-renderer';
-import { ShareDocumentDownloadButton } from '../share-document-download-button';
+
+const EnvelopeGenericPageRenderer = lazy(
+  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+);
 
 export type DocumentCertificateQRViewProps = {
   documentId: number;
@@ -34,6 +39,7 @@ export type DocumentCertificateQRViewProps = {
   documentTeamUrl: string;
   recipientCount?: number;
   completedDate?: Date;
+  token: string;
 };
 
 export const DocumentCertificateQRView = ({
@@ -44,6 +50,7 @@ export const DocumentCertificateQRView = ({
   documentTeamUrl,
   recipientCount = 0,
   completedDate,
+  token,
 }: DocumentCertificateQRViewProps) => {
   const { data: documentViaUser } = trpc.document.get.useQuery({
     documentId,
@@ -96,11 +103,19 @@ export const DocumentCertificateQRView = ({
       )}
 
       {internalVersion === 2 ? (
-        <EnvelopeRenderProvider envelope={{ envelopeItems }}>
+        <EnvelopeRenderProvider
+          envelope={{
+            envelopeItems,
+            status: DocumentStatus.COMPLETED,
+            type: EnvelopeType.DOCUMENT,
+          }}
+          token={token}
+        >
           <DocumentCertificateQrV2
             title={title}
             recipientCount={recipientCount}
             formattedDate={formattedDate}
+            token={token}
           />
         </EnvelopeRenderProvider>
       ) : (
@@ -108,7 +123,7 @@ export const DocumentCertificateQRView = ({
           <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
             <div className="space-y-1">
               <h1 className="text-xl font-medium">{title}</h1>
-              <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
+              <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
                 <p>
                   <Trans>{recipientCount} recipients</Trans>
                 </p>
@@ -119,14 +134,27 @@ export const DocumentCertificateQRView = ({
               </div>
             </div>
 
-            <ShareDocumentDownloadButton
-              title={title}
-              documentData={envelopeItems[0].documentData}
+            <EnvelopeDownloadDialog
+              envelopeId={envelopeItems[0].envelopeId}
+              envelopeStatus={DocumentStatus.COMPLETED}
+              envelopeItems={envelopeItems}
+              token={token}
+              trigger={
+                <Button type="button" variant="outline" className="w-fit">
+                  <DownloadIcon className="mr-2 h-5 w-5" />
+                  <Trans>Download</Trans>
+                </Button>
+              }
             />
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewer key={envelopeItems[0].id} documentData={envelopeItems[0].documentData} />
+            <PDFViewerLazy
+              key={envelopeItems[0].id}
+              envelopeItem={envelopeItems[0]}
+              token={token}
+              version="signed"
+            />
           </div>
         </>
       )}
@@ -138,21 +166,23 @@ type DocumentCertificateQrV2Props = {
   title: string;
   recipientCount: number;
   formattedDate: string;
+  token: string;
 };
 
 const DocumentCertificateQrV2 = ({
   title,
   recipientCount,
   formattedDate,
+  token,
 }: DocumentCertificateQrV2Props) => {
-  const { currentEnvelopeItem } = useCurrentEnvelopeRender();
+  const { currentEnvelopeItem, envelopeItems } = useCurrentEnvelopeRender();
 
   return (
     <div className="flex min-h-screen flex-col items-start">
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
           <h1 className="text-xl font-medium">{title}</h1>
-          <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
+          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
             <p>
               <Trans>{recipientCount} recipients</Trans>
             </p>
@@ -163,18 +193,24 @@ const DocumentCertificateQrV2 = ({
           </div>
         </div>
 
-        {currentEnvelopeItem && (
-          <ShareDocumentDownloadButton
-            title={title}
-            documentData={currentEnvelopeItem.documentData}
-          />
-        )}
+        <EnvelopeDownloadDialog
+          envelopeId={envelopeItems[0].envelopeId}
+          envelopeStatus={DocumentStatus.COMPLETED}
+          envelopeItems={envelopeItems}
+          token={token}
+          trigger={
+            <Button type="button" variant="outline" className="w-fit">
+              <DownloadIcon className="mr-2 h-5 w-5" />
+              <Trans>Download</Trans>
+            </Button>
+          }
+        />
       </div>
 
       <div className="mt-12 w-full">
         <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
-        <PDFViewerKonvaLazy customPageRenderer={EnvelopeGenericPageRenderer} />
+        <PDFViewerKonvaLazy renderer="preview" customPageRenderer={EnvelopeGenericPageRenderer} />
       </div>
     </div>
   );

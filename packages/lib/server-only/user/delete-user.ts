@@ -1,9 +1,7 @@
-import { DocumentStatus, EnvelopeType } from '@prisma/client';
-
 import { prisma } from '@documenso/prisma';
 
 import { AppError, AppErrorCode } from '../../errors/app-error';
-import { deletedAccountServiceAccount } from './service-accounts/deleted-account';
+import { orphanEnvelopes } from '../envelope/orphan-envelopes';
 
 export type DeleteUserOptions = {
   id: number;
@@ -14,6 +12,30 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
     where: {
       id,
     },
+    include: {
+      ownedOrganisations: {
+        include: {
+          teams: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      },
+      organisationMember: {
+        include: {
+          organisation: {
+            include: {
+              teams: {
+                select: {
+                  id: true,
+                },
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -22,22 +44,36 @@ export const deleteUser = async ({ id }: DeleteUserOptions) => {
     });
   }
 
-  const serviceAccount = await deletedAccountServiceAccount();
+  // Get team IDs from organisations the user owns.
+  const ownedTeamIds = user.ownedOrganisations.flatMap((org) => org.teams.map((team) => team.id));
 
-  // TODO: Send out cancellations for all pending docs
-  await prisma.envelope.updateMany({
-    where: {
-      userId: user.id,
-      type: EnvelopeType.DOCUMENT,
-      status: {
-        in: [DocumentStatus.PENDING, DocumentStatus.REJECTED, DocumentStatus.COMPLETED],
-      },
-    },
-    data: {
-      userId: serviceAccount.id,
-      deletedAt: new Date(),
-    },
-  });
+  // Get team IDs from organisations the user is a member of (but not owner).
+  const memberTeams = user.organisationMember
+    .filter((member) => member.organisation.ownerUserId !== user.id)
+    .flatMap((member) =>
+      member.organisation.teams.map((team) => ({
+        teamId: team.id,
+        orgOwnerId: member.organisation.ownerUserId,
+      })),
+    );
+
+  // For teams where user is the org owner - orphan their envelopes.
+  await Promise.all(ownedTeamIds.map(async (teamId) => orphanEnvelopes({ teamId })));
+
+  // For teams where user is a member (not owner) - transfer envelopes to team owner.
+  await Promise.all(
+    memberTeams.map(async ({ teamId, orgOwnerId }) => {
+      return prisma.envelope.updateMany({
+        where: {
+          userId: user.id,
+          teamId,
+        },
+        data: {
+          userId: orgOwnerId,
+        },
+      });
+    }),
+  );
 
   return await prisma.user.delete({
     where: {

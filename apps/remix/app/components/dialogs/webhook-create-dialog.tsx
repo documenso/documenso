@@ -38,7 +38,7 @@ import { useCurrentTeam } from '~/providers/team';
 
 import { WebhookMultiSelectCombobox } from '../general/webhook-multiselect-combobox';
 
-const ZCreateWebhookFormSchema = ZCreateWebhookRequestSchema.omit({ teamId: true });
+const ZCreateWebhookFormSchema = ZCreateWebhookRequestSchema;
 
 type TCreateWebhookFormSchema = z.infer<typeof ZCreateWebhookFormSchema>;
 
@@ -78,7 +78,6 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
         eventTriggers,
         secret,
         webhookUrl,
-        teamId: team.id,
       });
 
       setOpen(false);
@@ -220,9 +219,8 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     <FormDescription>
                       <Trans>
                         A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso
+                        has been sent by Documenso.
                       </Trans>
-                      .
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

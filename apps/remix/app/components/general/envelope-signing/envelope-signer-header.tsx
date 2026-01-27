@@ -16,6 +16,7 @@ import {
 import { Separator } from '@documenso/ui/primitives/separator';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { BrandingLogo } from '~/components/general/branding-logo';
 
 import { BrandingLogoIcon } from '../branding-logo-icon';
@@ -27,36 +28,40 @@ export const EnvelopeSignerHeader = () => {
   const { envelopeData, envelope, recipientFieldsRemaining, recipient } =
     useRequiredEnvelopeSigningContext();
 
+  const isEmbedSigning = useEmbedSigningContext() !== null;
+
   return (
-    <nav className="bg-background border-border max-w-screen flex flex-row justify-between border-b px-4 py-3 md:px-6">
+    <nav className="embed--DocumentWidgetHeader max-w-screen flex flex-row justify-between border-b border-border bg-background px-4 py-3 md:px-6">
       {/* Left side - Logo and title */}
       <div className="flex min-w-0 flex-1 items-center space-x-2 md:w-auto md:flex-none">
-        <Link to="/" className="flex-shrink-0">
-          {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
-            <img
-              src={`/api/branding/logo/team/${envelope.teamId}`}
-              alt={`${envelope.team.name}'s Logo`}
-              className="h-6 w-auto"
-            />
-          ) : (
-            <>
-              <BrandingLogo className="hidden h-6 w-auto md:block" />
-              <BrandingLogoIcon className="h-6 w-auto md:hidden" />
-            </>
-          )}
-        </Link>
+        {!isEmbedSigning && (
+          <Link to="/" className="flex-shrink-0">
+            {envelopeData.settings.brandingEnabled && envelopeData.settings.brandingLogo ? (
+              <img
+                src={`/api/branding/logo/team/${envelope.teamId}`}
+                alt={`${envelope.team.name}'s Logo`}
+                className="h-6 w-auto"
+              />
+            ) : (
+              <>
+                <BrandingLogo className="hidden h-6 w-auto md:block" />
+                <BrandingLogoIcon className="h-6 w-auto md:hidden" />
+              </>
+            )}
+          </Link>
+        )}
 
         <h1
           title={envelope.title}
-          className="text-foreground min-w-0 truncate text-base font-semibold md:hidden"
+          className="min-w-0 truncate text-base font-semibold text-foreground md:hidden"
         >
           {envelope.title}
         </h1>
 
-        <Separator orientation="vertical" className="hidden h-6 md:block" />
+        {!isEmbedSigning && <Separator orientation="vertical" className="hidden h-6 md:block" />}
 
         <div className="hidden items-center space-x-2 md:flex">
-          <h1 className="text-foreground whitespace-nowrap text-sm font-medium">
+          <h1 className="whitespace-nowrap text-sm font-medium text-foreground">
             {envelope.title}
           </h1>
 
@@ -72,8 +77,8 @@ export const EnvelopeSignerHeader = () => {
       </div>
 
       {/* Right side - Desktop content */}
-      <div className="hidden items-center space-x-2 md:flex">
-        <p className="text-muted-foreground mr-2 flex-shrink-0 text-sm">
+      <div className="hidden items-center space-x-2 lg:flex">
+        <p className="mr-2 flex-shrink-0 text-sm text-muted-foreground">
           <Plural
             one="1 Field Remaining"
             other="# Fields Remaining"
@@ -85,7 +90,7 @@ export const EnvelopeSignerHeader = () => {
       </div>
 
       {/* Mobile Actions button */}
-      <div className="flex-shrink-0 md:hidden">
+      <div className="flex-shrink-0 lg:hidden">
         <MobileDropdownMenu />
       </div>
     </nav>
@@ -94,6 +99,8 @@ export const EnvelopeSignerHeader = () => {
 
 const MobileDropdownMenu = () => {
   const { envelope, recipient } = useRequiredEnvelopeSigningContext();
+
+  const { allowDocumentRejection } = useEmbedSigningContext() || {};
 
   return (
     <DropdownMenu>
@@ -119,7 +126,7 @@ const MobileDropdownMenu = () => {
           }
         />
 
-        {envelope.type === EnvelopeType.DOCUMENT && (
+        {envelope.type === EnvelopeType.DOCUMENT && allowDocumentRejection !== false && (
           <DocumentSigningRejectDialog
             documentId={mapSecondaryIdToDocumentId(envelope.secondaryId)}
             token={recipient.token}

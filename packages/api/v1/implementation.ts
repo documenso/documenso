@@ -20,12 +20,12 @@ import {
   getEnvelopeWhereInput,
 } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { deleteDocumentField } from '@documenso/lib/server-only/field/delete-document-field';
-import { updateDocumentFields } from '@documenso/lib/server-only/field/update-document-fields';
+import { updateEnvelopeFields } from '@documenso/lib/server-only/field/update-envelope-fields';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
-import { deleteDocumentRecipient } from '@documenso/lib/server-only/recipient/delete-document-recipient';
+import { deleteEnvelopeRecipient } from '@documenso/lib/server-only/recipient/delete-envelope-recipient';
 import { getRecipientsForDocument } from '@documenso/lib/server-only/recipient/get-recipients-for-document';
 import { setDocumentRecipients } from '@documenso/lib/server-only/recipient/set-document-recipients';
-import { updateDocumentRecipients } from '@documenso/lib/server-only/recipient/update-document-recipients';
+import { updateEnvelopeRecipients } from '@documenso/lib/server-only/recipient/update-envelope-recipients';
 import { createDocumentFromTemplate } from '@documenso/lib/server-only/template/create-document-from-template';
 import { deleteTemplate } from '@documenso/lib/server-only/template/delete-template';
 import { findTemplates } from '@documenso/lib/server-only/template/find-templates';
@@ -41,7 +41,7 @@ import {
   ZTextFieldMeta,
 } from '@documenso/lib/types/field-meta';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
-import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import {
   getPresignGetUrl,
   getPresignPostUrl,
@@ -56,6 +56,7 @@ import { prisma } from '@documenso/prisma';
 
 import { ApiContractV1 } from './contract';
 import { authenticatedMiddleware } from './middleware/authenticated';
+import { masterKeyMiddleware } from './middleware/master-key';
 
 export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
   getDocuments: authenticatedMiddleware(async (args, user, team) => {
@@ -822,7 +823,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           formValues: body.formValues,
         });
 
-        const newDocumentData = await putPdfFileServerSide({
+        const newDocumentData = await putNormalizedPdfFileServerSide({
           name: fileName,
           type: 'application/pdf',
           arrayBuffer: async () => Promise.resolve(prefilled),
@@ -911,59 +912,11 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
             title: body.title,
             ...body.meta,
           },
+          formValues: body.formValues,
           requestMetadata: metadata,
         });
       } catch (err) {
         return AppError.toRestAPIError(err);
-      }
-
-      if (envelope.envelopeItems.length !== 1) {
-        throw new Error('API V1 does not support envelopes');
-      }
-
-      const firstEnvelopeDocumentData = await prisma.envelopeItem.findFirstOrThrow({
-        where: {
-          envelopeId: envelope.id,
-        },
-        include: {
-          documentData: true,
-        },
-      });
-
-      if (body.formValues) {
-        const fileName = envelope.title.endsWith('.pdf') ? envelope.title : `${envelope.title}.pdf`;
-
-        const pdf = await getFileServerSide(firstEnvelopeDocumentData.documentData);
-
-        const prefilled = await insertFormValuesInPdf({
-          pdf: Buffer.from(pdf),
-          formValues: body.formValues,
-        });
-
-        const newDocumentData = await putPdfFileServerSide({
-          name: fileName,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(prefilled),
-        });
-
-        await prisma.envelope.update({
-          where: {
-            id: envelope.id,
-          },
-          data: {
-            formValues: body.formValues,
-            envelopeItems: {
-              update: {
-                where: {
-                  id: firstEnvelopeDocumentData.id,
-                },
-                data: {
-                  documentDataId: newDocumentData.id,
-                },
-              },
-            },
-          },
-        });
       }
 
       if (body.authOptions) {
@@ -1089,12 +1042,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       };
     } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while sending the document for signing',
-        },
-      };
+      return AppError.toRestAPIError(err);
     }
   }),
 
@@ -1285,7 +1233,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const updatedRecipient = await updateDocumentRecipients({
+    const updatedRecipient = await updateEnvelopeRecipients({
       userId: user.id,
       teamId: team.id,
       id: {
@@ -1336,7 +1284,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       },
     });
 
-    const deletedRecipient = await deleteDocumentRecipient({
+    const deletedRecipient = await deleteEnvelopeRecipient({
       userId: user.id,
       teamId: team.id,
       recipientId: Number(recipientId),
@@ -1634,10 +1582,13 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       };
     }
 
-    const { fields } = await updateDocumentFields({
+    const { fields } = await updateEnvelopeFields({
       userId: user.id,
       teamId: team.id,
-      documentId: legacyDocumentId,
+      id: {
+        type: 'documentId',
+        id: legacyDocumentId,
+      },
       fields: [
         {
           id: Number(fieldId),
@@ -1727,5 +1678,32 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       status: 200,
       body: remappedField,
     };
+  }),
+
+  getSuiteOpCode: masterKeyMiddleware(async (args) => {
+    const { claimCode } = args.body;
+
+    const { claimAuthorization } = await import(
+      '@documenso/lib/server-only/suiteop/claim-authorization'
+    );
+
+    const result = await claimAuthorization({ claimCode });
+
+    return {
+      status: 200,
+      body: result,
+    };
+  }),
+
+  getSuiteOpInfo: authenticatedMiddleware(async (args, user, team) => {
+    // eslint-disable-next-line @typescript-eslint/require-await
+    return Promise.resolve({
+      status: 200 as const,
+      body: {
+        teamId: team.id,
+        teamName: team.name,
+        valid: true,
+      },
+    });
   }),
 });

@@ -34,10 +34,25 @@ export const getEnvelopeItemsByTokenRoute = maybeAuthenticatedProcedure
         });
       }
 
-      return await handleGetEnvelopeItemsByUser({ envelopeId, userId: user.id, teamId });
+      const { envelopeItems: data } = await handleGetEnvelopeItemsByUser({
+        envelopeId,
+        userId: user.id,
+        teamId,
+      });
+
+      return {
+        data,
+      };
     }
 
-    return await handleGetEnvelopeItemsByToken({ envelopeId, token: access.token });
+    const { envelopeItems: data } = await handleGetEnvelopeItemsByToken({
+      envelopeId,
+      token: access.token,
+    });
+
+    return {
+      data,
+    };
   });
 
 const handleGetEnvelopeItemsByToken = async ({

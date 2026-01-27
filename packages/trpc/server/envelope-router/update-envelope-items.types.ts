@@ -3,6 +3,17 @@ import { z } from 'zod';
 import EnvelopeItemSchema from '@documenso/prisma/generated/zod/modelSchema/EnvelopeItemSchema';
 
 import { ZDocumentTitleSchema } from '../document-router/schema';
+import type { TrpcRouteMeta } from '../trpc';
+
+export const updateEnvelopeItemsMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/item/update-many',
+    summary: 'Update envelope items',
+    description: 'Update multiple envelope items for an envelope',
+    tags: ['Envelope Items'],
+  },
+};
 
 export const ZUpdateEnvelopeItemsRequestSchema = z.object({
   envelopeId: z.string(),
@@ -17,7 +28,7 @@ export const ZUpdateEnvelopeItemsRequestSchema = z.object({
 });
 
 export const ZUpdateEnvelopeItemsResponseSchema = z.object({
-  updatedEnvelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
     order: true,
     title: true,

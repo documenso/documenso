@@ -217,8 +217,8 @@ export const AddTemplateFieldsFormPartial = ({
         setFieldClipboard(lastActiveField);
 
         toast({
-          title: 'Copied field',
-          description: 'Copied field to clipboard',
+          title: _(msg`Copied field`),
+          description: _(msg`Copied field to clipboard`),
         });
       }
     },
@@ -581,7 +581,7 @@ export const AddTemplateFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size]',
                     selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -650,7 +650,7 @@ export const AddTemplateFieldsFormPartial = ({
                     variant="outline"
                     role="combobox"
                     className={cn(
-                      'bg-background text-muted-foreground hover:text-foreground mb-12 mt-2 justify-between font-normal',
+                      'mb-12 mt-2 justify-between bg-background font-normal text-muted-foreground hover:text-foreground',
                       selectedSignerStyles?.comboxBoxTrigger,
                     )}
                   >
@@ -681,7 +681,7 @@ export const AddTemplateFieldsFormPartial = ({
                     <CommandInput />
 
                     <CommandEmpty>
-                      <span className="text-muted-foreground inline-block px-4">
+                      <span className="inline-block px-4 text-muted-foreground">
                         <Trans>No recipient matching this description was found.</Trans>
                       </span>
                     </CommandEmpty>
@@ -689,14 +689,14 @@ export const AddTemplateFieldsFormPartial = ({
                     {/* Note: This is duplicated in `add-fields.tsx` */}
                     {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
                       <CommandGroup key={roleIndex}>
-                        <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
+                        <div className="mb-1 ml-2 mt-2 text-xs font-medium text-muted-foreground">
                           {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
                         </div>
 
                         {roleRecipients.length === 0 && (
                           <div
                             key={`${role}-empty`}
-                            className="text-muted-foreground/80 px-4 pb-4 pt-2.5 text-center text-xs"
+                            className="px-4 pb-4 pt-2.5 text-center text-xs text-muted-foreground/80"
                           >
                             <Trans>No recipients with this role</Trans>
                           </div>
@@ -720,7 +720,7 @@ export const AddTemplateFieldsFormPartial = ({
                             }}
                           >
                             <span
-                              className={cn('text-foreground/70 truncate', {
+                              className={cn('truncate text-foreground/70', {
                                 'text-foreground/80': recipient === selectedSigner,
                               })}
                             >
@@ -768,7 +768,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal',
+                              'flex items-center justify-center gap-x-1.5 font-signature text-lg font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -793,7 +793,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -819,7 +819,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -845,7 +845,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -871,7 +871,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -897,7 +897,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -923,7 +923,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -949,7 +949,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -975,7 +975,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -1002,7 +1002,7 @@ export const AddTemplateFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />

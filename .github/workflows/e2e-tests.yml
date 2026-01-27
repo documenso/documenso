@@ -1,14 +1,19 @@
 name: Playwright Tests
 on:
   push:
-    branches: ['main', 'feat/rr7']
+    branches: ['main']
   pull_request:
     branches: ['main']
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   e2e_tests:
     name: 'E2E Tests'
     timeout-minutes: 60
-    runs-on: warp-ubuntu-2204-x64-16x
+    runs-on: warp-ubuntu-2204-x64-8x
     steps:
       - uses: actions/checkout@v4
 
@@ -28,9 +33,6 @@ jobs:
       - name: Seed the database
         run: npm run prisma:seed
 
-      - name: Build app
-        run: npm run build
-
       - name: Install playwright browsers
         run: npx playwright install --with-deps
 
@@ -45,7 +47,7 @@ jobs:
         with:
           name: test-results
           path: 'packages/app-tests/**/test-results/*'
-          retention-days: 30
+          retention-days: 7
     env:
       TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
       TURBO_TEAM: ${{ vars.TURBO_TEAM }}

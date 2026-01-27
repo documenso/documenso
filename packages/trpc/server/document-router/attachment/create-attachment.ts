@@ -41,10 +41,14 @@ export const createAttachmentRoute = authenticatedProcedure
       type: EnvelopeType.DOCUMENT,
     });
 
-    await createAttachment({
+    const attachment = await createAttachment({
       envelopeId: envelope.id,
       teamId,
       userId,
       data,
     });
+
+    return {
+      id: attachment.id,
+    };
   });

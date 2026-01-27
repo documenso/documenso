@@ -67,6 +67,7 @@ export async function loader({ request }: Route.LoaderArgs) {
 export default function MultisignPage() {
   const { envelopes, user, hidePoweredBy, allowWhitelabelling } =
     useSuperLoaderData<typeof loader>();
+
   const revalidator = useRevalidator();
 
   const [selectedDocument, setSelectedDocument] = useState<

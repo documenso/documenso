@@ -7,10 +7,12 @@ import { AppError, AppErrorCode } from '../../errors/app-error';
 
 export type VerifyEmbeddingPresignTokenOptions = {
   token: string;
+  scope?: string;
 };
 
 export const verifyEmbeddingPresignToken = async ({
   token,
+  scope,
 }: VerifyEmbeddingPresignTokenOptions) => {
   // First decode the JWT to get the claims without verification
   let decodedToken: JWTPayload;
@@ -78,6 +80,12 @@ export const verifyEmbeddingPresignToken = async ({
   if (audienceId !== apiToken.teamId && audienceId !== apiToken.userId) {
     throw new AppError(AppErrorCode.UNAUTHORIZED, {
       message: 'Invalid presign token: API token does not match audience',
+    });
+  }
+
+  if (decodedToken.scope && scope && decodedToken.scope !== scope) {
+    throw new AppError(AppErrorCode.UNAUTHORIZED, {
+      message: 'Presign token scope not matched',
     });
   }
 

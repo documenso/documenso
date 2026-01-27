@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type * as DialogPrimitive from '@radix-ui/react-dialog';
 import { Plus } from 'lucide-react';
 import { useForm } from 'react-hook-form';
@@ -49,7 +47,7 @@ type TCreateTeamEmailFormSchema = z.infer<typeof ZCreateTeamEmailFormSchema>;
 export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDialogProps) => {
   const [open, setOpen] = useState(false);
 
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
   const { revalidate } = useRevalidator();
 
@@ -73,8 +71,8 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
       });
 
       toast({
-        title: _(msg`Success`),
-        description: _(msg`We have sent a confirmation email for verification.`),
+        title: t`Success`,
+        description: t`We have sent a confirmation email for verification.`,
         duration: 5000,
       });
 
@@ -87,17 +85,15 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
       if (error.code === AppErrorCode.ALREADY_EXISTS) {
         form.setError('email', {
           type: 'manual',
-          message: _(msg`This email is already being used by another team.`),
+          message: t`This email is already being used by another team.`,
         });
 
         return;
       }
 
       toast({
-        title: _(msg`An unknown error occurred`),
-        description: _(
-          msg`We encountered an unknown error while attempting to add this email. Please try again later.`,
-        ),
+        title: t`An unknown error occurred`,
+        description: t`We encountered an unknown error while attempting to add this email. Please try again later.`,
         variant: 'destructive',
       });
     }
@@ -150,7 +146,7 @@ export const TeamEmailAddDialog = ({ teamId, trigger, ...props }: TeamEmailAddDi
                       <Trans>Name</Trans>
                     </FormLabel>
                     <FormControl>
-                      <Input className="bg-background" placeholder="eg. Legal" {...field} />
+                      <Input className="bg-background" placeholder={t`eg. Legal`} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

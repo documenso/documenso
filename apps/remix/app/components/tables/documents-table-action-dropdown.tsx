@@ -10,7 +10,6 @@ import {
   Download,
   Edit,
   EyeIcon,
-  FileDown,
   FolderInput,
   Loader,
   MoreHorizontal,
@@ -20,12 +19,10 @@ import {
 } from 'lucide-react';
 import { Link } from 'react-router';
 
-import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import type { TDocumentMany as TDocumentRow } from '@documenso/lib/types/document';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
-import { trpc as trpcClient } from '@documenso/trpc/client';
 import { DocumentShareButton } from '@documenso/ui/components/document/document-share-button';
 import {
   DropdownMenu,
@@ -34,7 +31,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '@documenso/ui/primitives/dropdown-menu';
-import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { DocumentDuplicateDialog } from '~/components/dialogs/document-duplicate-dialog';
@@ -56,7 +52,6 @@ export const DocumentsTableActionDropdown = ({
   const { user } = useSession();
   const team = useCurrentTeam();
 
-  const { toast } = useToast();
   const { _ } = useLingui();
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -75,58 +70,6 @@ export const DocumentsTableActionDropdown = ({
 
   const documentsPath = formatDocumentsPath(team.url);
   const formatPath = `${documentsPath}/${row.envelopeId}/edit`;
-
-  const onDownloadClick = async () => {
-    try {
-      const document = !recipient
-        ? await trpcClient.document.get.query({
-            documentId: row.id,
-          })
-        : await trpcClient.document.getDocumentByToken.query({
-            token: recipient.token,
-          });
-
-      const documentData = document?.documentData;
-
-      if (!documentData) {
-        return;
-      }
-
-      await downloadPDF({ documentData, fileName: row.title });
-    } catch (err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while downloading your document.`),
-        variant: 'destructive',
-      });
-    }
-  };
-
-  const onDownloadOriginalClick = async () => {
-    try {
-      const document = !recipient
-        ? await trpcClient.document.get.query({
-            documentId: row.id,
-          })
-        : await trpcClient.document.getDocumentByToken.query({
-            token: recipient.token,
-          });
-
-      const documentData = document?.documentData;
-
-      if (!documentData) {
-        return;
-      }
-
-      await downloadPDF({ documentData, fileName: row.title, version: 'original' });
-    } catch (err) {
-      toast({
-        title: _(msg`Something went wrong`),
-        description: _(msg`An error occurred while downloading your document.`),
-        variant: 'destructive',
-      });
-    }
-  };
 
   const nonSignedRecipients = row.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
@@ -178,33 +121,19 @@ export const DocumentsTableActionDropdown = ({
           </Link>
         </DropdownMenuItem>
 
-        {row.internalVersion === 2 ? (
-          <EnvelopeDownloadDialog
-            envelopeId={row.envelopeId}
-            envelopeStatus={row.status}
-            token={recipient?.token}
-            trigger={
-              <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-                <div>
-                  <Download className="mr-2 h-4 w-4" />
-                  <Trans>Download</Trans>
-                </div>
-              </DropdownMenuItem>
-            }
-          />
-        ) : (
-          <>
-            <DropdownMenuItem disabled={!isComplete} onClick={onDownloadClick}>
-              <Download className="mr-2 h-4 w-4" />
-              <Trans>Download</Trans>
+        <EnvelopeDownloadDialog
+          envelopeId={row.envelopeId}
+          envelopeStatus={row.status}
+          token={recipient?.token}
+          trigger={
+            <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
+              <div>
+                <Download className="mr-2 h-4 w-4" />
+                <Trans>Download</Trans>
+              </div>
             </DropdownMenuItem>
-
-            <DropdownMenuItem onClick={onDownloadOriginalClick}>
-              <FileDown className="mr-2 h-4 w-4" />
-              <Trans>Download Original</Trans>
-            </DropdownMenuItem>
-          </>
-        )}
+          }
+        />
 
         <DropdownMenuItem onClick={() => setDuplicateDialogOpen(true)}>
           <Copy className="mr-2 h-4 w-4" />
@@ -273,7 +202,8 @@ export const DocumentsTableActionDropdown = ({
       />
 
       <DocumentDuplicateDialog
-        id={row.id}
+        id={row.envelopeId}
+        token={recipient?.token}
         open={isDuplicateDialogOpen}
         onOpenChange={setDuplicateDialogOpen}
       />
