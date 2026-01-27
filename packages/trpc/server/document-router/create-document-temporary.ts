@@ -38,6 +38,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
       meta,
       folderId,
       attachments,
+      formValues,
     } = input;
 
     const { remaining } = await getServerLimits({ userId: user.id, teamId });
@@ -68,6 +69,7 @@ export const createDocumentTemporaryRoute = authenticatedProcedure
         title,
         externalId,
         visibility,
+        formValues,
         globalAccessAuth,
         globalActionAuth,
         recipients: (recipients || []).map((recipient) => ({
