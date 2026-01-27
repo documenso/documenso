@@ -257,10 +257,12 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
 
     // Change second recipient role if role selector is available
     const roleDropdown = page.getByLabel('Role').nth(1);
+    let secondRecipientIsApprover = false;
 
     if (await roleDropdown.isVisible()) {
       await roleDropdown.click();
       await page.getByText('Approver').click();
+      secondRecipientIsApprover = true;
     }
 
     // Step 3: Add different field types for each duplicate
@@ -280,6 +282,13 @@ test.describe('[DOCUMENT_FLOW]: Duplicate Recipients', () => {
     // Add date field for second recipient
     await page.getByRole('button', { name: 'Date' }).click();
     await page.locator('canvas').click({ position: { x: 200, y: 150 } });
+
+    // If second recipient is still a SIGNER (role change wasn't available),
+    // add a signature field for them to pass validation
+    if (!secondRecipientIsApprover) {
+      await page.getByRole('button', { name: 'Signature' }).click();
+      await page.locator('canvas').click({ position: { x: 200, y: 200 } });
+    }
 
     // Complete the document
     await page.getByRole('button', { name: 'Continue' }).click();
