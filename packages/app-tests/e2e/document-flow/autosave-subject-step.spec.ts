@@ -2,6 +2,7 @@ import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
 import { EnvelopeType } from '@prisma/client';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { getEnvelopeById } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
@@ -28,7 +29,7 @@ export const setupDocumentAndNavigateToSubjectStep = async (page: Page) => {
   await page.getByRole('button', { name: 'Continue' }).click();
 
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({
     position: {
       x: 100,
       y: 100,

@@ -11,12 +11,13 @@ import {
   EnvelopeRenderProvider,
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 import { extractFieldInsertionValues } from '@documenso/lib/utils/envelope-signing';
 import { toCheckboxCustomText } from '@documenso/lib/utils/fields';
 import { extractInitials } from '@documenso/lib/utils/recipient-formatter';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { EnvelopePdfViewer } from '@documenso/ui/components/pdf-viewer/envelope-pdf-viewer';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -200,6 +201,7 @@ export const EnvelopeEditorPreviewPage = () => {
   // Override the parent renderer provider so we can inject custom fields.
   return (
     <EnvelopeRenderProvider
+      version="current"
       envelope={envelope}
       token={undefined}
       fields={fieldsWithPlaceholders}
@@ -217,7 +219,7 @@ export const EnvelopeEditorPreviewPage = () => {
           <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
           {/* Document View */}
-          <div className="mt-4 flex flex-col items-center justify-center">
+          <div className="mt-4 flex h-full flex-col items-center justify-center">
             <Alert variant="warning" className="mb-4 max-w-[800px]">
               <AlertTitle>
                 <Trans>Preview Mode</Trans>
@@ -228,9 +230,9 @@ export const EnvelopeEditorPreviewPage = () => {
             </Alert>
 
             {currentEnvelopeItem !== null ? (
-              <PDFViewerKonvaLazy
-                renderer="editor"
+              <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}
+                errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
               />
             ) : (
               <div className="flex flex-col items-center justify-center py-32">

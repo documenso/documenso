@@ -14,11 +14,11 @@ import {
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import type { TTemplate } from '@documenso/lib/types/template';
 import { trpc } from '@documenso/trpc/react';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { AddTemplateFieldsFormPartial } from '@documenso/ui/primitives/template-flow/add-template-fields';
 import type { TAddTemplateFieldsFormSchema } from '@documenso/ui/primitives/template-flow/add-template-fields.types';
@@ -312,11 +312,11 @@ export const TemplateEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewerLazy
+          <PDFViewer
             key={template.envelopeItems[0].id}
             envelopeItem={template.envelopeItems[0]}
             token={undefined}
-            version="signed"
+            version="current"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

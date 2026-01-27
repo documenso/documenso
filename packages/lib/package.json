@@ -55,7 +55,6 @@
     "posthog-js": "^1.297.2",
     "posthog-node": "4.18.0",
     "react": "^18",
-    "react-pdf": "^10.3.0",
     "remeda": "^2.32.0",
     "sharp": "0.34.5",
     "skia-canvas": "^3.0.8",

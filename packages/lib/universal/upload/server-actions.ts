@@ -91,13 +91,13 @@ export const getPresignGetUrl = async (key: string) => {
 /**
  * Uploads a file to S3.
  */
-export const uploadS3File = async (file: File) => {
+export const uploadS3File = async (file: File, keyOverride?: string) => {
   const client = getS3Client();
 
   // Get the basename and extension for the file
   const { name, ext } = path.parse(file.name);
 
-  const key = `${alphaid(12)}/${slugify(name)}${ext}`;
+  const key = keyOverride ?? `${alphaid(12)}/${slugify(name)}${ext}`;
 
   const fileBuffer = await file.arrayBuffer();
 
@@ -122,6 +122,28 @@ export const deleteS3File = async (key: string) => {
       Key: key,
     }),
   );
+};
+
+/**
+ * Be careful about using this function as we don't allow the
+ * frontend to ever pull a file from S3 directly.
+ */
+export const UNSAFE_getS3File = async (key: string) => {
+  // Additional safeguard to prevent path traversal.
+  if (key.includes('..') || key.startsWith('/')) {
+    throw new Error('Invalid S3 key');
+  }
+
+  const client = getS3Client();
+
+  const response = await client.send(
+    new GetObjectCommand({
+      Bucket: env('NEXT_PRIVATE_UPLOAD_BUCKET'),
+      Key: key,
+    }),
+  );
+
+  return response.Body;
 };
 
 const getS3Client = () => {

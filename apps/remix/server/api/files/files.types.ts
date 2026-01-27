@@ -72,3 +72,23 @@ export const ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema = z.object({
 export type TGetEnvelopeItemFileTokenDownloadRequestParams = z.infer<
   typeof ZGetEnvelopeItemFileTokenDownloadRequestParamsSchema
 >;
+
+export const ZGetEnvelopeItemMetaSchema = z.object({
+  envelopeItemId: z.string(),
+  documentDataId: z.string(),
+  pages: z
+    .object({
+      originalWidth: z.number(),
+      originalHeight: z.number(),
+      scale: z.number(),
+      scaledWidth: z.number(),
+      scaledHeight: z.number(),
+    })
+    .array(),
+});
+
+export const ZGetEnvelopeItemsMetaResponseSchema = z.object({
+  envelopeItems: z.array(ZGetEnvelopeItemMetaSchema),
+});
+
+export type TGetEnvelopeItemsMetaResponse = z.infer<typeof ZGetEnvelopeItemsMetaResponseSchema>;

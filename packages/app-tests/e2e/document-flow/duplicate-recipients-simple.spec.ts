@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 
+import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { seedBlankDocument } from '@documenso/prisma/seed/documents';
 import { seedUser } from '@documenso/prisma/seed/users';
 
@@ -33,14 +34,14 @@ test('[DOCUMENT_FLOW]: Simple duplicate recipients test', async ({ page }) => {
 
   // Step 3: Add fields
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 100, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 100, y: 100 } });
 
   await page.getByRole('combobox').first().click();
 
   // Switch to second duplicate and add field
   await page.getByText('Duplicate 2 (duplicate@example.com)').first().click();
   await page.getByRole('button', { name: 'Signature' }).click();
-  await page.locator('canvas').click({ position: { x: 200, y: 100 } });
+  await page.locator(PDF_VIEWER_PAGE_SELECTOR).click({ position: { x: 200, y: 100 } });
 
   // Continue to send
   await page.getByRole('button', { name: 'Continue' }).click();

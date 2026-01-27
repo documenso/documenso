@@ -10,10 +10,10 @@ import { RECIPIENT_ROLES_DESCRIPTION } from '@documenso/lib/constants/recipient-
 import type { TTemplate } from '@documenso/lib/types/template';
 import { isRequiredField } from '@documenso/lib/utils/advanced-fields-helpers';
 import { trpc } from '@documenso/trpc/react';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -151,11 +151,11 @@ export const DirectTemplatePageView = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewerLazy
+          <PDFViewer
             key={template.id}
             envelopeItem={template.envelopeItems[0]}
             token={directTemplateRecipient.token}
-            version="signed"
+            version="current"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

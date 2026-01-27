@@ -242,18 +242,13 @@ export const run = async ({
 
     await prisma.$transaction(async (tx) => {
       for (const { oldDocumentDataId, newDocumentDataId } of newDocumentData) {
-        const newData = await tx.documentData.findFirstOrThrow({
+        await tx.envelopeItem.update({
           where: {
-            id: newDocumentDataId,
-          },
-        });
-
-        await tx.documentData.update({
-          where: {
-            id: oldDocumentDataId,
+            envelopeId: envelope.id,
+            documentDataId: oldDocumentDataId,
           },
           data: {
-            data: newData.data,
+            documentDataId: newDocumentDataId,
           },
         });
       }

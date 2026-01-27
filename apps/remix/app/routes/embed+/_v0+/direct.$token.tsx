@@ -320,7 +320,7 @@ const EmbedDirectTemplatePageV2 = ({
         user={user}
         isDirectTemplate={true}
       >
-        <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
+        <EnvelopeRenderProvider version="current" envelope={envelope} token={recipient.token}>
           <EmbedSignDocumentV2ClientPage
             hidePoweredBy={hidePoweredBy}
             allowWhitelabelling={allowEmbedSigningWhitelabel}

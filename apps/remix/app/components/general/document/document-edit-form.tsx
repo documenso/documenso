@@ -15,6 +15,7 @@ import {
 import type { TDocument } from '@documenso/lib/types/document';
 import { ZDocumentAccessAuthTypesSchema } from '@documenso/lib/types/document-auth';
 import { trpc } from '@documenso/trpc/react';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
 import { AddFieldsFormPartial } from '@documenso/ui/primitives/document-flow/add-fields';
@@ -27,7 +28,6 @@ import { AddSubjectFormPartial } from '@documenso/ui/primitives/document-flow/ad
 import type { TAddSubjectFormSchema } from '@documenso/ui/primitives/document-flow/add-subject.types';
 import { DocumentFlowFormContainer } from '@documenso/ui/primitives/document-flow/document-flow-root';
 import type { DocumentFlowStep } from '@documenso/ui/primitives/document-flow/types';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Stepper } from '@documenso/ui/primitives/stepper';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -440,11 +440,11 @@ export const DocumentEditForm = ({
         gradient
       >
         <CardContent className="p-2">
-          <PDFViewerLazy
+          <PDFViewer
             key={document.envelopeItems[0].id}
             envelopeItem={document.envelopeItems[0]}
             token={undefined}
-            version="signed"
+            version="current"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

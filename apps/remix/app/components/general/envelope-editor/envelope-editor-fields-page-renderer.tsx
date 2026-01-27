@@ -10,7 +10,10 @@ import { CopyPlusIcon, SquareStackIcon, TrashIcon, UserCircleIcon } from 'lucide
 import type { TLocalField } from '@documenso/lib/client-only/hooks/use-editor-fields';
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
-import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/envelope-render-provider';
+import {
+  type PageRenderData,
+  useCurrentEnvelopeRender,
+} from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { FIELD_META_DEFAULT_VALUES } from '@documenso/lib/types/field-meta';
 import {
   MIN_FIELD_HEIGHT_PX,
@@ -22,10 +25,15 @@ import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
 import { canRecipientFieldsBeModified } from '@documenso/lib/utils/recipients';
 import { CommandDialog } from '@documenso/ui/primitives/command';
 
+import { EnvelopePageImage } from '../envelope/envelope-page-image';
 import { fieldButtonList } from './envelope-editor-fields-drag-drop';
 import { EnvelopeRecipientSelectorCommand } from './envelope-recipient-selector';
 
-export default function EnvelopeEditorFieldsPageRenderer() {
+export default function EnvelopeEditorFieldsPageRenderer({
+  pageData,
+}: {
+  pageData: PageRenderData;
+}) {
   const { t, i18n } = useLingui();
   const { envelope, editorFields, getRecipientColorKey } = useCurrentEnvelopeEditor();
   const { currentEnvelopeItem, setRenderError } = useCurrentEnvelopeRender();
@@ -40,31 +48,24 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   const {
     stage,
     pageLayer,
-    canvasElement,
     konvaContainer,
-    pageContext,
     scaledViewport,
     unscaledViewport,
-  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer));
+    renderStatus,
+    imageProps,
+  } = usePageRenderer(({ stage, pageLayer }) => createPageCanvas(stage, pageLayer), pageData);
 
-  const { _className, scale } = pageContext;
+  const { scale, pageNumber } = pageData;
 
   const localPageFields = useMemo(
     () =>
       editorFields.localFields.filter(
-        (field) =>
-          field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
+        (field) => field.page === pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
       ),
-    [editorFields.localFields, pageContext.pageNumber],
+    [editorFields.localFields, pageNumber],
   );
 
   const handleResizeOrMove = (event: KonvaEventObject<Event>) => {
-    const { current: container } = canvasElement;
-
-    if (!container) {
-      return;
-    }
-
     const isDragEvent = event.type === 'dragend';
 
     const fieldGroup = event.target as Konva.Group;
@@ -344,7 +345,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       // Create a field if no items are selected or the size is too small.
       if (
         selectedFieldGroups.length === 0 &&
-        canvasElement.current &&
         unscaledBoxWidth > MIN_FIELD_WIDTH_PX &&
         unscaledBoxHeight > MIN_FIELD_HEIGHT_PX &&
         editorFields.selectedRecipient &&
@@ -515,7 +515,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
     removePendingField();
 
-    if (!canvasElement.current || !currentEnvelopeItem || !editorFields.selectedRecipient) {
+    if (!currentEnvelopeItem || !editorFields.selectedRecipient) {
       return;
     }
 
@@ -530,7 +530,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
 
     editorFields.addField({
       envelopeItemId: currentEnvelopeItem.id,
-      page: pageContext.pageNumber,
+      page: pageNumber,
       type,
       positionX: fieldX,
       positionY: fieldY,
@@ -559,10 +559,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
   }
 
   return (
-    <div
-      className="relative w-full"
-      key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
-    >
+    <div className="relative w-full" key={`${currentEnvelopeItem.id}-renderer-${pageNumber}`}>
       {selectedKonvaFieldGroups.length > 0 &&
         interactiveTransformer.current &&
         !isFieldChanging && (
@@ -625,13 +622,7 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 
-      {/* Canvas the PDF will be rendered on. */}
-      <canvas
-        className={`${_className}__canvas z-0`}
-        ref={canvasElement}
-        height={scaledViewport.height}
-        width={scaledViewport.width}
-      />
+      <EnvelopePageImage renderStatus={renderStatus} imageProps={imageProps} />
     </div>
   );
 }

@@ -8,6 +8,8 @@ import { useDropzone } from 'react-dropzone';
 import { useFormContext } from 'react-hook-form';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
+import { PDF_IMAGE_RENDER_SCALE } from '@documenso/lib/constants/pdf-viewer';
+import { pdfToImages } from '@documenso/lib/server-only/ai/pdf-to-images';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -52,12 +54,21 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
 
+      const pdfImages = await pdfToImages(uint8Array, {
+        scale: PDF_IMAGE_RENDER_SCALE,
+      });
+
       // Store file metadata and UInt8Array in form data
       form.setValue('documentData', {
         name: file.name,
         type: file.type,
         size: file.size,
         data: uint8Array, // Store as UInt8Array
+        images: pdfImages.map((image) => ({
+          width: image.originalWidth,
+          height: image.originalHeight,
+          image: image.image,
+        })),
       });
 
       // Auto-populate title if it's empty
@@ -144,7 +155,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                     <div
                       {...getRootProps()}
                       className={cn(
-                        'border-border bg-background relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed transition',
+                        'relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-border bg-background transition',
                         {
                           'border-primary/50 bg-primary/5': isDragActive,
                           'hover:bg-muted/30':
@@ -193,21 +204,21 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
                   </FormControl>
 
                   {isLoading && (
-                    <div className="bg-background/50 absolute inset-0 flex items-center justify-center rounded-lg">
-                      <Loader className="text-muted-foreground h-10 w-10 animate-spin" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-background/50">
+                      <Loader className="h-10 w-10 animate-spin text-muted-foreground" />
                     </div>
                   )}
                 </div>
               ) : (
                 <div className="mt-2 rounded-lg border p-4">
                   <div className="flex items-center gap-x-4">
-                    <div className="bg-primary/10 text-primary flex h-12 w-12 items-center justify-center rounded-md">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-md bg-primary/10 text-primary">
                       <FileText className="h-6 w-6" />
                     </div>
 
                     <div className="flex-1">
                       <div className="text-sm font-medium">{documentData.name}</div>
-                      <div className="text-muted-foreground text-xs">
+                      <div className="text-xs text-muted-foreground">
                         {formatFileSize(documentData.size)}
                       </div>
                     </div>

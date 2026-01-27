@@ -1,23 +1,46 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import React from 'react';
 
 import type { Field, Recipient } from '@prisma/client';
 
+import type { TGetEnvelopeItemsMetaResponse } from '@documenso/remix/server/api/files/files.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 
+import type { DocumentDataVersion } from '../../types/document-data';
 import type { TEnvelope } from '../../types/envelope';
 import type { FieldRenderMode } from '../../universal/field-renderer/render-field';
-import { getEnvelopeItemPdfUrl } from '../../utils/envelope-download';
+import { getEnvelopeItemMetaUrl, getEnvelopeItemPageImageUrl } from '../../utils/envelope-images';
 
-type FileData =
-  | {
-      status: 'loading' | 'error';
-    }
-  | {
-      file: Uint8Array;
-      status: 'loaded';
-    };
+/**
+ * Number of pages to load eagerly on initial render.
+ * Pages beyond this threshold will be loaded lazily when they enter the viewport.
+ */
+export const EAGER_LOAD_PAGE_COUNT = 5;
+
+export type PageRenderData = BasePageRenderData & {
+  scale: number;
+};
+
+export type BasePageRenderData = {
+  envelopeItemId: string;
+  documentDataId: string;
+  pageIndex: number;
+  pageNumber: number;
+  pageWidth: number;
+  pageHeight: number;
+  imageUrl: string;
+};
+
+export type ImageLoadingState = 'loading' | 'loaded' | 'error';
 
 type EnvelopeRenderOverrideSettings = {
   mode?: FieldRenderMode;
@@ -28,8 +51,10 @@ type EnvelopeRenderOverrideSettings = {
 type EnvelopeRenderItem = TEnvelope['envelopeItems'][number];
 
 type EnvelopeRenderProviderValue = {
-  getPdfBuffer: (envelopeItemId: string) => FileData | null;
+  version: DocumentDataVersion;
   envelopeItems: EnvelopeRenderItem[];
+  envelopeItemsMeta: Record<string, BasePageRenderData[]>;
+  envelopeItemsMetaLoadingState: ImageLoadingState;
   envelopeStatus: TEnvelope['status'];
   envelopeType: TEnvelope['type'];
   currentEnvelopeItem: EnvelopeRenderItem | null;
@@ -46,7 +71,12 @@ type EnvelopeRenderProviderValue = {
 interface EnvelopeRenderProviderProps {
   children: React.ReactNode;
 
-  envelope: Pick<TEnvelope, 'envelopeItems' | 'status' | 'type'>;
+  /**
+   * The envelope item version to render.
+   */
+  version: DocumentDataVersion;
+
+  envelope: Pick<TEnvelope, 'id' | 'envelopeItems' | 'status' | 'type'>;
 
   /**
    * Optional fields which are passed down to renderers for custom rendering needs.
@@ -89,7 +119,7 @@ export const useCurrentEnvelopeRender = () => {
 };
 
 /**
- * Manages fetching and storing PDF files to render on the client.
+ * Manages fetching the data required to render an envelope and it's items.
  */
 export const EnvelopeRenderProvider = ({
   children,
@@ -97,70 +127,106 @@ export const EnvelopeRenderProvider = ({
   fields,
   token,
   recipients = [],
+  version,
   overrideSettings,
 }: EnvelopeRenderProviderProps) => {
-  // Indexed by documentDataId.
-  const [files, setFiles] = useState<Record<string, FileData>>({});
+  // Indexed by envelope item ID.
+  const [envelopeItemsMeta, setEnvelopeItemsMeta] = useState<Record<string, BasePageRenderData[]>>(
+    {},
+  );
 
-  const [currentItem, setCurrentItem] = useState<EnvelopeRenderItem | null>(null);
+  const [envelopeItemsMetaLoadingState, setEnvelopeItemsMetaLoadingState] =
+    useState<ImageLoadingState>('loading');
 
   const [renderError, setRenderError] = useState<boolean>(false);
+
+  // Track the timestamp of the most recent fetch to prevent race conditions
+  const fetchStartedAtRef = useRef<number>(0);
 
   const envelopeItems = useMemo(
     () => envelope.envelopeItems.sort((a, b) => a.order - b.order),
     [envelope.envelopeItems],
   );
 
-  const loadEnvelopeItemPdfFile = async (envelopeItem: EnvelopeRenderItem) => {
-    if (files[envelopeItem.id]?.status === 'loading') {
+  const [currentItem, setCurrentItem] = useState<EnvelopeRenderItem | null>(
+    envelope.envelopeItems[0] ?? null,
+  );
+
+  /**
+   * Fetch metadata and preload initial images when the envelope or token changes.
+   */
+  useEffect(() => {
+    void fetchEnvelopeRenderData();
+  }, [envelope.id, envelope.envelopeItems.length, token]);
+
+  const fetchEnvelopeRenderData = async () => {
+    if (!envelope.id || envelope.envelopeItems.length === 0) {
       return;
     }
 
-    if (!files[envelopeItem.id]) {
-      setFiles((prev) => ({
-        ...prev,
-        [envelopeItem.id]: {
-          status: 'loading',
-        },
-      }));
-    }
+    // Record when this fetch started to detect stale responses
+    const fetchStartedAt = Date.now();
+    fetchStartedAtRef.current = fetchStartedAt;
+
+    setEnvelopeItemsMetaLoadingState('loading');
 
     try {
-      const downloadUrl = getEnvelopeItemPdfUrl({
-        type: 'view',
-        envelopeItem: envelopeItem,
+      // Fetch metadata for all envelope items
+      const metaUrl = getEnvelopeItemMetaUrl({
+        envelopeId: envelope.id,
         token,
       });
 
-      const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
+      const response = await fetch(metaUrl);
 
-      const file = await blob.arrayBuffer();
+      if (!response.ok) {
+        throw new Error(`Failed to fetch envelope meta: ${response.status}`);
+      }
 
-      setFiles((prev) => ({
-        ...prev,
-        [envelopeItem.id]: {
-          file: new Uint8Array(file),
-          status: 'loaded',
-        },
-      }));
+      const data: TGetEnvelopeItemsMetaResponse = await response.json();
+
+      // Check again after parsing JSON in case a newer fetch started
+      if (fetchStartedAtRef.current !== fetchStartedAt) {
+        return;
+      }
+
+      // Build a map of envelope items by ID
+      const metaMap: Record<string, BasePageRenderData[]> = {};
+
+      for (const item of data.envelopeItems) {
+        metaMap[item.envelopeItemId] = item.pages.map((page, pageIndex) => {
+          const imageUrl = getEnvelopeItemPageImageUrl({
+            envelopeId: envelope.id,
+            envelopeItemId: item.envelopeItemId,
+            documentDataId: item.documentDataId,
+            pageIndex,
+            token,
+            version,
+          });
+
+          return {
+            envelopeItemId: item.envelopeItemId,
+            documentDataId: item.documentDataId,
+            pageIndex,
+            pageNumber: pageIndex + 1,
+            pageWidth: page.originalWidth,
+            pageHeight: page.originalHeight,
+            imageUrl,
+          };
+        });
+      }
+
+      setEnvelopeItemsMeta(metaMap);
+
+      setEnvelopeItemsMetaLoadingState('loaded');
     } catch (error) {
-      console.error(error);
-
-      setFiles((prev) => ({
-        ...prev,
-        [envelopeItem.id]: {
-          status: 'error',
-        },
-      }));
+      // Only set error state if this is still the most recent fetch
+      if (fetchStartedAtRef.current === fetchStartedAt) {
+        console.error('Failed to load envelope data:', error);
+        setEnvelopeItemsMetaLoadingState('error');
+      }
     }
   };
-
-  const getPdfBuffer = useCallback(
-    (envelopeItemId: string) => {
-      return files[envelopeItemId] || null;
-    },
-    [files],
-  );
 
   const setCurrentEnvelopeItem = (envelopeItemId: string) => {
     const foundItem = envelope.envelopeItems.find((item) => item.id === envelopeItemId);
@@ -178,15 +244,6 @@ export const EnvelopeRenderProvider = ({
       setCurrentEnvelopeItem(envelopeItems[0].id);
     }
   }, [currentItem, envelopeItems]);
-
-  // Look for any missing pdf files and load them.
-  useEffect(() => {
-    const missingFiles = envelope.envelopeItems.filter((item) => !files[item.id]);
-
-    for (const item of missingFiles) {
-      void loadEnvelopeItemPdfFile(item);
-    }
-  }, [envelope.envelopeItems]);
 
   const recipientIds = useMemo(
     () => recipients.map((recipient) => recipient.id).sort(),
@@ -207,7 +264,9 @@ export const EnvelopeRenderProvider = ({
   return (
     <EnvelopeRenderContext.Provider
       value={{
-        getPdfBuffer,
+        version,
+        envelopeItemsMeta,
+        envelopeItemsMetaLoadingState,
         envelopeItems,
         envelopeStatus: envelope.status,
         envelopeType: envelope.type,
