@@ -19,7 +19,7 @@ import { useVirtualList } from '../virtual-list/use-virtual-list';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 
 export type OverrideImage = {
-  image: Buffer;
+  image: string;
   width: number;
   height: number;
 };
@@ -78,7 +78,7 @@ export const PDFViewer = ({
   const derivedPages = useMemo((): PageMeta[] => {
     if (overrideImages) {
       return overrideImages.map((image) => ({
-        imageUrl: `data:image/jpeg;base64,${image.image.toString('base64')}`,
+        imageUrl: image.image,
         width: image.width,
         height: image.height,
         documentDataId: '',

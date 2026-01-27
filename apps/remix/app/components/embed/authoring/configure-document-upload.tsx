@@ -9,7 +9,7 @@ import { useFormContext } from 'react-hook-form';
 
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { PDF_IMAGE_RENDER_SCALE } from '@documenso/lib/constants/pdf-viewer';
-import { pdfToImages } from '@documenso/lib/server-only/ai/pdf-to-images';
+import { pdfToImagesClientSide } from '@documenso/lib/server-only/ai/pdf-to-images.client';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -54,7 +54,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
       const arrayBuffer = await file.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
 
-      const pdfImages = await pdfToImages(uint8Array, {
+      const pdfImages = await pdfToImagesClientSide(uint8Array, {
         scale: PDF_IMAGE_RENDER_SCALE,
       });
 
@@ -64,11 +64,7 @@ export const ConfigureDocumentUpload = ({ isSubmitting = false }: ConfigureDocum
         type: file.type,
         size: file.size,
         data: uint8Array, // Store as UInt8Array
-        images: pdfImages.map((image) => ({
-          width: image.originalWidth,
-          height: image.originalHeight,
-          image: image.image,
-        })),
+        images: pdfImages,
       });
 
       // Auto-populate title if it's empty

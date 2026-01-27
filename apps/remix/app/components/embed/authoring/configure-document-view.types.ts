@@ -50,7 +50,7 @@ export const ZConfigureEmbedFormSchema = z.object({
         .object({
           width: z.number(),
           height: z.number(),
-          image: z.instanceof(Buffer),
+          image: z.string(),
         })
         .array(),
     })
