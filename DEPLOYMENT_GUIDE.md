@@ -21,7 +21,7 @@ Complete guide for updating, building, and deploying your white-labeled Documens
 **Repository Structure:**
 - **Origin:** `https://github.com/JeanSuiteop/documenso-fork` (your fork)
 - **Upstream:** `https://github.com/documenso/documenso` (original Documenso)
-- **Current Base Version:** v2.3.0
+- **Current Base Version:** v2.5.0
 - **Docker Image:** `jeanlosi/suiteop-sign:latest`
 - **Branding:** SuiteOp Sign (purple theme)
 
@@ -855,10 +855,11 @@ npm run dev
 
 | Version | Base Documenso | Date | Changes |
 |---------|----------------|------|---------|
+| v2.5.0 | v2.5.0 | 2026-01-27 | Merged upstream v2.5.0 with security fixes, PDF library upgrades, WebAuthn v13, and default recipients feature |
 | v2.3.0 | v2.3.0 | 2025-12-22 | Merged upstream v2.3.0 with SuiteOp branding, OAuth, and global webhook |
 | v2.0.0 | v2.0.0 | 2025-01-28 | Merged upstream v2.0.0 with SuiteOp branding and OAuth integration |
 
 ---
 
-**Last Updated:** December 22, 2025
+**Last Updated:** January 27, 2026
 
