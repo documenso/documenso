@@ -92,7 +92,7 @@ export const pdfToImage = async (pdfBytes: Uint8Array, options: PdfToImageOption
   const { scale = PDF_IMAGE_RENDER_SCALE, pageIndex, imageFormat = 'jpeg' } = options;
 
   if (pageIndex !== undefined && pageIndex < 0) {
-    throw new Error('Page index must be greater than 0');
+    throw new Error('Page index must be greater than or equal to 0');
   }
 
   const task = await pdfjsLib.getDocument({
@@ -151,7 +151,6 @@ const getPdfPageAsImage = async ({
     scale,
     scaledWidth: Math.floor(viewport.width),
     scaledHeight: Math.floor(viewport.height),
-    mimeType: 'image/jpeg',
   };
 
   void page.cleanup();

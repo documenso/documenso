@@ -39,13 +39,7 @@ route.get(
   sValidator('param', ZGetEnvelopeItemPageRequestParamsSchema),
   sValidator('query', ZGetEnvelopeItemPageRequestQuerySchema),
   async (c) => {
-    const {
-      envelopeId,
-      envelopeItemId,
-      documentDataId: _documentDataId,
-      version,
-      pageIndex,
-    } = c.req.valid('param');
+    const { envelopeId, envelopeItemId, documentDataId, version, pageIndex } = c.req.valid('param');
 
     const { presignToken } = c.req.valid('query');
 
@@ -70,8 +64,13 @@ route.get(
       where: { id: envelopeId },
       include: {
         envelopeItems: {
-          where: { id: envelopeItemId },
-          include: { documentData: true },
+          where: {
+            id: envelopeItemId,
+            documentDataId,
+          },
+          include: {
+            documentData: true,
+          },
         },
       },
     });

@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
+import type { TDocumentDataMeta } from '@documenso/lib/types/document-data';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { extractAndStorePdfImages } from '@documenso/lib/universal/upload/put-file.server';
 import { prisma } from '@documenso/prisma';
@@ -106,7 +107,7 @@ export const handleEnvelopeItemsMetaRequest = async ({
           data: item.documentData.data,
         });
 
-        const pdfPageMetadata = await extractAndStorePdfImages(
+        const pdfPageMetadata: TDocumentDataMeta['pages'] = await extractAndStorePdfImages(
           new Uint8Array(pdfBytes).buffer,
           item.documentData.id,
         );

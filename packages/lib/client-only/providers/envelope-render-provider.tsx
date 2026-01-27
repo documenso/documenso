@@ -157,7 +157,7 @@ export const EnvelopeRenderProvider = ({
    */
   useEffect(() => {
     void fetchEnvelopeRenderData();
-  }, [envelope.id, envelope.envelopeItems.length, token]);
+  }, [envelope.id, envelope.envelopeItems.length, token, version]);
 
   const fetchEnvelopeRenderData = async () => {
     if (!envelope.id || envelope.envelopeItems.length === 0) {
