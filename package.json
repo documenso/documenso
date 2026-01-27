@@ -5,7 +5,7 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "2.3.2",
+  "version": "2.5.0",
   "scripts": {
     "postinstall": "patch-package",
     "build": "turbo run build",
@@ -64,7 +64,7 @@
     "lint-staged": "^16.2.7",
     "nanoid": "^5.1.6",
     "nodemailer": "^7.0.10",
-    "pdfjs-dist": "5.4.449",
+    "pdfjs-dist": "5.4.296",
     "pino": "^9.14.0",
     "pino-pretty": "^13.1.2",
     "playwright": "1.56.1",
@@ -85,8 +85,8 @@
   },
   "dependencies": {
     "@ai-sdk/google-vertex": "3.0.81",
-    "@documenso/pdf-sign": "^0.1.0",
     "@documenso/prisma": "*",
+    "@libpdf/core": "^0.2.2",
     "@lingui/conf": "^5.6.0",
     "@lingui/core": "^5.6.0",
     "ai": "^5.0.104",
@@ -99,7 +99,7 @@
     "zod": "^3.25.76"
   },
   "overrides": {
-    "pdfjs-dist": "5.4.449",
+    "pdfjs-dist": "5.4.296",
     "typescript": "5.6.2",
     "zod": "^3.25.76"
   }

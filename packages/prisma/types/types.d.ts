@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-namespace */
+import type { TDefaultRecipient } from '@documenso/lib/types/default-recipients';
 import type {
   TDocumentAuthOptions,
   TRecipientAuthOptions,
@@ -26,6 +27,8 @@ declare global {
     type FieldMeta = TFieldMetaNotOptionalSchema;
 
     type EnvelopeAttachmentType = TEnvelopeAttachmentType;
+
+    type DefaultRecipient = TDefaultRecipient;
   }
 }
 

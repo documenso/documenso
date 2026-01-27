@@ -8,7 +8,6 @@ import 'konva/skia-backend';
 import { DateTime } from 'luxon';
 import fs from 'node:fs';
 import path from 'node:path';
-import sharp from 'sharp';
 import type { Canvas } from 'skia-canvas';
 import { FontLibrary } from 'skia-canvas';
 import { Image as SkiaImage } from 'skia-canvas';
@@ -22,6 +21,7 @@ import {
   RECIPIENT_ROLE_SIGNING_REASONS,
 } from '../../constants/recipient-roles';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
+import { svgToPng } from '../../utils/images/svg-to-png';
 
 type ColumnWidths = [number, number, number];
 
@@ -584,7 +584,7 @@ const renderBranding = async ({ qrToken, i18n }: { qrToken: string | null; i18n:
       ecc: 'Q',
     });
 
-    const svgImage = await sharp(Buffer.from(qrSvg)).toFormat('png').toBuffer();
+    const svgImage = await svgToPng(qrSvg);
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const qrSkiaImage = new SkiaImage(svgImage) as unknown as HTMLImageElement;

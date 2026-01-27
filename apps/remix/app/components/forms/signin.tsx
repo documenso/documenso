@@ -171,7 +171,7 @@ export const SignInForm = ({
 
       const { options, sessionId } = await createPasskeySigninOptions();
 
-      const credential = await startAuthentication(options);
+      const credential = await startAuthentication({ optionsJSON: options });
 
       await authClient.passkey.signIn({
         credential: JSON.stringify(credential),

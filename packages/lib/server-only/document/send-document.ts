@@ -33,12 +33,15 @@ import {
   mapEnvelopeToWebhookDocumentPayload,
 } from '../../types/webhook-payload';
 import { getFileServerSide } from '../../universal/upload/get-file.server';
-import { putPdfFileServerSide } from '../../universal/upload/put-file.server';
+import { putNormalizedPdfFileServerSide } from '../../universal/upload/put-file.server';
 import { isDocumentCompleted } from '../../utils/document';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
 import { type EnvelopeIdOptions, mapSecondaryIdToDocumentId } from '../../utils/envelope';
 import { toCheckboxCustomText, toRadioCustomText } from '../../utils/fields';
-import { isRecipientEmailValidForSending } from '../../utils/recipients';
+import {
+  getRecipientsWithMissingFields,
+  isRecipientEmailValidForSending,
+} from '../../utils/recipients';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
 import { insertFormValuesInPdf } from '../pdf/insert-form-values-in-pdf';
 import { triggerWebhook } from '../webhooks/trigger/trigger-webhook';
@@ -148,30 +151,19 @@ export const sendDocument = async ({
     }
   });
 
-  // Commented out server side checks for minimum 1 signature per signer now since we need to
-  // decide if we want to enforce this for API & templates.
-  // const fields = await getFieldsForDocument({
-  //   documentId: documentId,
-  //   userId: userId,
-  // });
+  // Validate that recipients who require fields (e.g., signers need signature fields) have them.
+  const recipientsWithMissingFields = getRecipientsWithMissingFields(
+    envelope.recipients,
+    envelope.fields,
+  );
 
-  // const fieldsWithSignerEmail = fields.map((field) => ({
-  //   ...field,
-  //   signerEmail:
-  //     envelope.Recipient.find((recipient) => recipient.id === field.recipientId)?.email ?? '',
-  // }));
+  if (recipientsWithMissingFields.length > 0) {
+    const missingRecipientIds = recipientsWithMissingFields.map((r) => r.id).join(', ');
 
-  // const everySignerHasSignature = document?.Recipient.every(
-  //   (recipient) =>
-  //     recipient.role !== RecipientRole.SIGNER ||
-  //     fieldsWithSignerEmail.some(
-  //       (field) => field.type === 'SIGNATURE' && field.signerEmail === recipient.email,
-  //     ),
-  // );
-
-  // if (!everySignerHasSignature) {
-  //   throw new Error('Some signers have not been assigned a signature field.');
-  // }
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: `The following recipients are missing required fields: ${missingRecipientIds}. Signers must have at least one signature field.`,
+    });
+  }
 
   const allRecipientsHaveNoActionToTake = envelope.recipients.every(
     (recipient) =>
@@ -334,7 +326,7 @@ const injectFormValuesIntoDocument = async (
     fileName = `${envelope.title}.pdf`;
   }
 
-  const newDocumentData = await putPdfFileServerSide({
+  const newDocumentData = await putNormalizedPdfFileServerSide({
     name: fileName,
     type: 'application/pdf',
     arrayBuffer: async () => Promise.resolve(prefilled),

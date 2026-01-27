@@ -8,6 +8,7 @@ import {
   ZDocumentActionAuthTypesSchema,
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentEmailSettingsSchema } from '@documenso/lib/types/document-email';
+import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import {
   ZDocumentMetaDateFormatSchema,
   ZDocumentMetaDistributionMethodSchema,
@@ -172,6 +173,8 @@ export const ZCreateDocumentFromTemplateRequestSchema = z.object({
       }),
     )
     .optional(),
+
+  formValues: ZDocumentFormValuesSchema.optional(),
 });
 
 export const ZCreateDocumentFromTemplateResponseSchema = ZDocumentSchema;

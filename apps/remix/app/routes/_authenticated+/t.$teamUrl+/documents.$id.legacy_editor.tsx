@@ -106,7 +106,7 @@ export default function DocumentEditPage() {
             />
 
             {recipients.length > 0 && (
-              <div className="text-muted-foreground flex items-center">
+              <div className="flex items-center text-muted-foreground">
                 <Users2 className="mr-2 h-5 w-5" />
 
                 <StackAvatarsWithTooltip
