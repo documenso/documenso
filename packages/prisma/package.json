@@ -26,7 +26,7 @@
     "nanoid": "^5.1.6",
     "prisma": "^6.19.0",
     "prisma-extension-kysely": "^3.0.0",
-    "prisma-kysely": "^2.2.1",
+    "prisma-kysely": "^2.3.0",
     "prisma-json-types-generator": "^3.6.2",
     "ts-pattern": "^5.9.0",
     "zod": "^3.25.76",
