@@ -106,5 +106,5 @@
     "vite-plugin-babel-macros": "^1.0.6",
     "vite-tsconfig-paths": "^5.1.4"
   },
-  "version": "2.4.0"
+  "version": "2.5.1"
 }
