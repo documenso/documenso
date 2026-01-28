@@ -25,7 +25,7 @@ This feature enables automatic field placement in PDFs using placeholder text, e
 
 ### Components
 
-- **FIELD_TYPE** (required): One of `signature`, `free_signature`, `initials`, `name`, `email`, `date`, `text`, `number`, `radio`, `checkbox`, `dropdown`
+- **FIELD_TYPE** (required): One of `signature`, `initials`, `name`, `email`, `date`, `text`, `number`, `radio`, `checkbox`, `dropdown`
 - **RECIPIENT** (required): `r1`, `r2`, `r3`, etc. - identifies which recipient the field belongs to
 - **OPTIONS** (optional): Key-value pairs like `required=true`, `fontSize=14`, `readOnly=true`
 
@@ -55,12 +55,12 @@ The `/api/v2/envelope/field/create-many` endpoint accepts `placeholder` as an al
 
 ### Parameters
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `placeholder` | string | Text to search for in the PDF |
-| `width` | number | Optional override (percentage) |
-| `height` | number | Optional override (percentage) |
-| `matchAll` | boolean | When true, creates fields at ALL occurrences |
+| Parameter     | Type    | Description                                  |
+| ------------- | ------- | -------------------------------------------- |
+| `placeholder` | string  | Text to search for in the PDF                |
+| `width`       | number  | Optional override (percentage)               |
+| `height`      | number  | Optional override (percentage)               |
+| `matchAll`    | boolean | When true, creates fields at ALL occurrences |
 
 ### matchAll Behavior
 
@@ -108,6 +108,7 @@ Note: Signature fields do not support fieldMeta options.
 ### E2E Tests
 
 **UI Tests** (`e2e/auto-placing-fields/`):
+
 - Single recipient placeholder detection
 - Multiple recipient placeholder detection
 - Field configuration from placeholder options
@@ -115,6 +116,7 @@ Note: Signature fields do not support fieldMeta options.
 - Skipping invalid field types
 
 **API Tests** (`e2e/api/v2/placeholder-fields-api.spec.ts`):
+
 - Placeholder-based field positioning
 - Width/height overrides
 - Error on placeholder not found
@@ -127,6 +129,7 @@ Note: Signature fields do not support fieldMeta options.
 ### User Documentation
 
 `/users/documents/pdf-placeholders` - Explains:
+
 - Placeholder format and syntax
 - Supported field types
 - Recipient identifiers
@@ -136,6 +139,7 @@ Note: Signature fields do not support fieldMeta options.
 ### Developer Documentation
 
 `/developers/public-api/reference` - Documents:
+
 - Coordinate-based positioning (existing)
 - Placeholder-based positioning (new)
 - matchAll parameter
