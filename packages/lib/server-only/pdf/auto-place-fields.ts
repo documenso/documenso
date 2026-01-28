@@ -1,41 +1,48 @@
-import { PDFDocument, rgb } from '@cantoo/pdf-lib';
+import { PDF, rgb } from '@libpdf/core';
 import type { Recipient } from '@prisma/client';
-import PDFParser from 'pdf2json';
 
-import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
-import { createEnvelopeFields } from '@documenso/lib/server-only/field/create-envelope-fields';
 import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
-import { prisma } from '@documenso/prisma';
 
-import { getPageSize } from './get-page-size';
-import {
-  determineRecipientsForPlaceholders,
-  extractRecipientPlaceholder,
-  findRecipientByPlaceholder,
-  parseFieldMetaFromPlaceholder,
-  parseFieldTypeFromPlaceholder,
-} from './helpers';
+import { parseFieldMetaFromPlaceholder, parseFieldTypeFromPlaceholder } from './helpers';
 
-const PLACEHOLDER_REGEX = /{{([^}]+)}}/g;
+const PLACEHOLDER_REGEX = /\{\{([^}]+)\}\}/g;
 const DEFAULT_FIELD_HEIGHT_PERCENT = 2;
-const WIDTH_ADJUSTMENT_FACTOR = 0.1;
 const MIN_HEIGHT_THRESHOLD = 0.01;
 
-type TextPosition = {
-  text: string;
+export type BoundingBox = {
   x: number;
   y: number;
-  w: number;
+  width: number;
+  height: number;
 };
 
-type CharIndexMapping = {
-  textPositionIndex: number;
+/**
+ * Draw white rectangles over specified regions in a loaded PDF document.
+ *
+ * Mutates the PDF in place. Coordinates use bottom-left origin (standard PDF coordinates).
+ */
+export const whiteoutRegions = (
+  pdfDoc: PDF,
+  regions: Array<{ pageIndex: number; bbox: BoundingBox }>,
+): void => {
+  const pages = pdfDoc.getPages();
+
+  for (const { pageIndex, bbox } of regions) {
+    const page = pages[pageIndex];
+
+    page.drawRectangle({
+      x: bbox.x,
+      y: bbox.y,
+      width: bbox.width,
+      height: bbox.height,
+      color: rgb(1, 1, 1),
+      borderColor: rgb(1, 1, 1),
+      borderWidth: 2,
+    });
+  }
 };
 
-type PlaceholderInfo = {
+export type PlaceholderInfo = {
   placeholder: string;
   recipient: string;
   fieldAndMeta: TFieldAndMeta;
@@ -48,7 +55,7 @@ type PlaceholderInfo = {
   pageHeight: number;
 };
 
-type FieldToCreate = TFieldAndMeta & {
+export type FieldToCreate = TFieldAndMeta & {
   envelopeItemId?: string;
   recipientId: number;
   page: number;
@@ -59,289 +66,171 @@ type FieldToCreate = TFieldAndMeta & {
 };
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
-  return new Promise((resolve, reject) => {
-    const parser = new PDFParser(null, true);
+  const pdfDoc = await PDF.load(new Uint8Array(pdf));
+  const placeholders: PlaceholderInfo[] = [];
 
-    parser.on('pdfParser_dataError', (errData) => {
-      reject(errData);
-    });
+  for (const page of pdfDoc.getPages()) {
+    const pageWidth = page.width;
+    const pageHeight = page.height;
 
-    parser.on('pdfParser_dataReady', (pdfData) => {
-      const placeholders: PlaceholderInfo[] = [];
+    const matches = page.findText(PLACEHOLDER_REGEX);
 
-      pdfData.Pages.forEach((page, pageIndex) => {
-        /*
-          pdf2json returns the PDF page content as an array of characters.
-          We need to concatenate the characters to get the full text.
-          We also need to get the position of the text so we can place the placeholders in the correct position.
-          
-          Page dimensions from PDF2JSON are in "page units" (relative coordinates)
-        */
-        let pageText = '';
-        const textPositions: TextPosition[] = [];
-        const charIndexMappings: CharIndexMapping[] = [];
+    for (const match of matches) {
+      const placeholder = match.text;
 
-        page.Texts.forEach((text) => {
-          /*
-            R is an array of objects containing each character, its position and styling information.
-            The decodedText stores the characters, without any other information.
+      /*
+        Extract the inner content from the placeholder match.
+        E.g. '{{SIGNATURE, r1, required=true}}' -> 'SIGNATURE, r1, required=true'
+      */
+      const innerMatch = placeholder.match(/^\{\{([^}]+)\}\}$/);
 
-            textPositions stores each character and its position on the page.
-          */
-          const decodedText = text.R.map((run) => decodeURIComponent(run.T)).join('');
+      if (!innerMatch) {
+        continue;
+      }
 
-          /*
-            For each character in the decodedText, we store its position in the textPositions array.
-            This allows us to quickly find the position of a character in the textPositions array by its index.
-          */
-          for (let i = 0; i < decodedText.length; i++) {
-            charIndexMappings.push({
-              textPositionIndex: textPositions.length,
-            });
-          }
+      const placeholderData = innerMatch[1].split(',').map((property) => property.trim());
+      const [fieldTypeString, recipientOrMeta, ...fieldMetaData] = placeholderData;
 
-          pageText += decodedText;
+      let fieldType: ReturnType<typeof parseFieldTypeFromPlaceholder>;
 
-          textPositions.push({
-            text: decodedText,
-            x: text.x,
-            y: text.y,
-            w: text.w || 0,
-          });
-        });
+      try {
+        fieldType = parseFieldTypeFromPlaceholder(fieldTypeString);
+      } catch {
+        // Skip placeholders with unrecognized field types.
+        continue;
+      }
 
-        const placeholderMatches = pageText.matchAll(PLACEHOLDER_REGEX);
+      /*
+        A recipient identifier (e.g. "r1", "R2") is required for auto-placement.
+        Placeholders without an explicit recipient like {{name}} are reserved for
+        future API use where callers can reference a placeholder by name with
+        optional dimensions instead of absolute coordinates.
+      */
+      if (!recipientOrMeta || !/^r\d+$/i.test(recipientOrMeta)) {
+        continue;
+      }
 
-        /*
-          A placeholder match has the following format:
+      const recipient = recipientOrMeta;
 
-          [
-            '{{fieldType,recipient,fieldMeta}}',
-            'fieldType,recipient,fieldMeta',
-            'index: <number>',
-            'input: <pdf-text>'
-          ]
-        */
-        for (const placeholderMatch of placeholderMatches) {
-          const placeholder = placeholderMatch[0];
-          const placeholderData = placeholderMatch[1].split(',').map((property) => property.trim());
+      const rawFieldMeta = Object.fromEntries(fieldMetaData.map((property) => property.split('=')));
 
-          const [fieldTypeString, recipient, ...fieldMetaData] = placeholderData;
+      const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
 
-          const rawFieldMeta = Object.fromEntries(
-            fieldMetaData.map((property) => property.split('=')),
-          );
-
-          const fieldType = parseFieldTypeFromPlaceholder(fieldTypeString);
-          const parsedFieldMeta = parseFieldMetaFromPlaceholder(rawFieldMeta, fieldType);
-
-          const fieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
-            type: fieldType,
-            fieldMeta: parsedFieldMeta,
-          });
-
-          /*
-            Find the position of where the placeholder starts and ends in the text.
-
-            Then find the position of the characters in the textPositions array.
-            This allows us to quickly find the position of a character in the textPositions array by its index.
-          */
-          const placeholderEndCharIndex = placeholderMatch.index + placeholder.length;
-
-          /*
-            Get the index of the placeholder's first and last character in the textPositions array.
-            Used to retrieve the character information from the textPositions array.
-
-            Example:
-              startTextPosIndex - 1
-              endTextPosIndex - 40
-          */
-          const startTextPosIndex = charIndexMappings[placeholderMatch.index].textPositionIndex;
-          const endTextPosIndex = charIndexMappings[placeholderEndCharIndex - 1].textPositionIndex;
-
-          /*
-            Get the placeholder's first and last character information from the textPositions array.
-
-            Example:
-              placeholderStart = { text: '{', x: 100, y: 100, w: 100 }
-              placeholderEnd = { text: '}', x: 200, y: 100, w: 100 }
-          */
-          const placeholderStart = textPositions[startTextPosIndex];
-          const placeholderEnd = textPositions[endTextPosIndex];
-
-          const width =
-            placeholderEnd.x + placeholderEnd.w * WIDTH_ADJUSTMENT_FACTOR - placeholderStart.x;
-
-          placeholders.push({
-            placeholder,
-            recipient,
-            fieldAndMeta,
-            page: pageIndex + 1,
-            x: placeholderStart.x,
-            y: placeholderStart.y,
-            width,
-            height: 1,
-            pageWidth: page.Width,
-            pageHeight: page.Height,
-          });
-        }
+      const fieldAndMeta: TFieldAndMeta = ZFieldAndMetaSchema.parse({
+        type: fieldType,
+        fieldMeta: parsedFieldMeta,
       });
 
-      resolve(placeholders);
-    });
+      /*
+        LibPDF returns bbox in points with bottom-left origin.
+        Convert Y to top-left origin for consistency with the rest of the system.
+      */
+      const topLeftY = pageHeight - match.bbox.y - match.bbox.height;
 
-    parser.parseBuffer(pdf);
-  });
+      placeholders.push({
+        placeholder,
+        recipient,
+        fieldAndMeta,
+        page: page.index + 1,
+        x: match.bbox.x,
+        y: topLeftY,
+        width: match.bbox.width,
+        height: match.bbox.height,
+        pageWidth,
+        pageHeight,
+      });
+    }
+  }
+
+  return placeholders;
 };
 
-export const removePlaceholdersFromPDF = async (pdf: Buffer): Promise<Buffer> => {
-  const placeholders = await extractPlaceholdersFromPDF(pdf);
+/**
+ * Draw white rectangles over placeholder text in a PDF.
+ *
+ * Accepts optional pre-extracted placeholders to avoid re-parsing the PDF.
+ */
+export const removePlaceholdersFromPDF = async (
+  pdf: Buffer,
+  placeholders?: PlaceholderInfo[],
+): Promise<Buffer> => {
+  const resolved = placeholders ?? (await extractPlaceholdersFromPDF(pdf));
 
-  const pdfDoc = await PDFDocument.load(new Uint8Array(pdf));
+  const pdfDoc = await PDF.load(new Uint8Array(pdf));
   const pages = pdfDoc.getPages();
 
-  for (const placeholder of placeholders) {
-    const pageIndex = placeholder.page - 1;
-    const page = pages[pageIndex];
+  /*
+    Convert PlaceholderInfo[] to whiteout regions.
+    PlaceholderInfo uses top-left origin, but whiteoutRegions expects bottom-left.
+  */
+  const regions = resolved.map((p) => {
+    const page = pages[p.page - 1];
+    const bottomLeftY = page.height - p.y - p.height;
 
-    const { width: pdfLibPageWidth, height: pdfLibPageHeight } = getPageSize(page);
+    return {
+      pageIndex: p.page - 1,
+      bbox: { x: p.x, y: bottomLeftY, width: p.width, height: p.height },
+    };
+  });
 
-    /*
-      Convert PDF2JSON coordinates to pdf-lib coordinates:
-      
-      PDF2JSON uses relative "page units":
-      - x, y, width, height are in page units
-      - Page dimensions (Width, Height) are also in page units
-      
-      pdf-lib uses absolute points (1 point = 1/72 inch):
-      - Need to convert from page units to points
-      - Y-axis in pdf-lib is bottom-up (origin at bottom-left)
-      - Y-axis in PDF2JSON is top-down (origin at top-left)
-    */
-
-    const xPoints = (placeholder.x / placeholder.pageWidth) * pdfLibPageWidth;
-    const yPoints = pdfLibPageHeight - (placeholder.y / placeholder.pageHeight) * pdfLibPageHeight;
-    const widthPoints = (placeholder.width / placeholder.pageWidth) * pdfLibPageWidth;
-    const heightPoints = (placeholder.height / placeholder.pageHeight) * pdfLibPageHeight;
-
-    page.drawRectangle({
-      x: xPoints,
-      y: yPoints - heightPoints, // Adjust for height since y is at baseline
-      width: widthPoints,
-      height: heightPoints,
-      color: rgb(1, 1, 1),
-      borderColor: rgb(1, 1, 1),
-      borderWidth: 2,
-    });
-  }
+  whiteoutRegions(pdfDoc, regions);
 
   const modifiedPdfBytes = await pdfDoc.save();
 
   return Buffer.from(modifiedPdfBytes);
 };
 
-export const insertFieldsFromPlaceholdersInPDF = async (
+/**
+ * Extract placeholders from a PDF and remove them from the document.
+ *
+ * Returns the cleaned PDF buffer and the extracted placeholders. If no
+ * placeholders are found the original buffer is returned as-is.
+ */
+export const extractPdfPlaceholders = async (
   pdf: Buffer,
-  userId: number,
-  teamId: number,
-  envelopeId: EnvelopeIdOptions,
-  requestMetadata: ApiRequestMetadata,
-  envelopeItemId?: string,
-  recipients?: Pick<Recipient, 'id' | 'email'>[],
-): Promise<Buffer> => {
+): Promise<{ cleanedPdf: Buffer; placeholders: PlaceholderInfo[] }> => {
   const placeholders = await extractPlaceholdersFromPDF(pdf);
 
   if (placeholders.length === 0) {
-    return pdf;
+    return { cleanedPdf: pdf, placeholders: [] };
   }
 
-  /*
-    A structure that maps the recipient index to the recipient name.
-    Example: 1 => 'Recipient 1'
-  */
-  const recipientPlaceholders = new Map<number, string>();
+  const cleanedPdf = await removePlaceholdersFromPDF(pdf, placeholders);
 
-  for (const placeholder of placeholders) {
-    const { name, recipientIndex } = extractRecipientPlaceholder(placeholder.recipient);
+  return { cleanedPdf, placeholders };
+};
 
-    recipientPlaceholders.set(recipientIndex, name);
-  }
+/**
+ * Convert pre-extracted PlaceholderInfo[] to field creation inputs.
+ *
+ * Pure data transform — converts point-based coordinates to percentages and
+ * resolves recipient references via the provided callback. No DB calls.
+ */
+export const convertPlaceholdersToFieldInputs = (
+  placeholders: PlaceholderInfo[],
+  recipientResolver: (recipientPlaceholder: string, placeholder: string) => Pick<Recipient, 'id'>,
+  envelopeItemId?: string,
+): FieldToCreate[] => {
+  return placeholders.map((p) => {
+    const xPercent = (p.x / p.pageWidth) * 100;
+    const yPercent = (p.y / p.pageHeight) * 100;
+    const widthPercent = (p.width / p.pageWidth) * 100;
+    const heightPercent = (p.height / p.pageHeight) * 100;
 
-  const { envelopeWhereInput } = await getEnvelopeWhereInput({
-    id: envelopeId,
-    userId,
-    teamId,
-    type: null,
-  });
-
-  const envelope = await prisma.envelope.findFirst({
-    where: envelopeWhereInput,
-    select: {
-      id: true,
-      type: true,
-      secondaryId: true,
-    },
-  });
-
-  if (!envelope) {
-    throw new AppError(AppErrorCode.NOT_FOUND, {
-      message: 'Envelope not found',
-    });
-  }
-
-  const createdRecipients = await determineRecipientsForPlaceholders(
-    recipients,
-    recipientPlaceholders,
-    envelope,
-    userId,
-    teamId,
-    requestMetadata,
-  );
-
-  const fieldsToCreate: FieldToCreate[] = [];
-
-  for (const placeholder of placeholders) {
-    /*
-      Convert PDF2JSON coordinates to percentage-based coordinates (0-100)
-      The UI expects positionX and positionY as percentages, not absolute points
-      PDF2JSON uses relative coordinates: x/pageWidth and y/pageHeight give us the percentage
-    */
-    const xPercent = (placeholder.x / placeholder.pageWidth) * 100;
-    const yPercent = (placeholder.y / placeholder.pageHeight) * 100;
-
-    const widthPercent = (placeholder.width / placeholder.pageWidth) * 100;
-    const heightPercent = (placeholder.height / placeholder.pageHeight) * 100;
-
-    const recipient = findRecipientByPlaceholder(
-      placeholder.recipient,
-      placeholder.placeholder,
-      recipients,
-      createdRecipients,
-    );
-
-    // Default height percentage if too small (use 2% as a reasonable default)
     const finalHeightPercent =
       heightPercent > MIN_HEIGHT_THRESHOLD ? heightPercent : DEFAULT_FIELD_HEIGHT_PERCENT;
 
-    fieldsToCreate.push({
-      ...placeholder.fieldAndMeta,
+    const recipient = recipientResolver(p.recipient, p.placeholder);
+
+    return {
+      ...p.fieldAndMeta,
       envelopeItemId,
       recipientId: recipient.id,
-      page: placeholder.page,
+      page: p.page,
       positionX: xPercent,
       positionY: yPercent,
       width: widthPercent,
       height: finalHeightPercent,
-    });
-  }
-
-  await createEnvelopeFields({
-    userId,
-    teamId,
-    id: envelopeId,
-    fields: fieldsToCreate,
-    requestMetadata,
+    };
   });
-
-  return pdf;
 };

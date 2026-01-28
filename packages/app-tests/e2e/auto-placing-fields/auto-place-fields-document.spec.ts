@@ -1,19 +1,28 @@
 import { type Page, expect, test } from '@playwright/test';
 import path from 'path';
 
+import { prisma } from '@documenso/prisma';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
 
+const FIXTURES_DIR = path.join(__dirname, '../../../assets/fixtures/auto-placement');
+
 const SINGLE_PLACEHOLDER_PDF_PATH = path.join(
-  __dirname,
-  '../../../assets/project-proposal-single-recipient.pdf',
+  FIXTURES_DIR,
+  'project-proposal-single-recipient.pdf',
 );
 
 const MULTIPLE_PLACEHOLDER_PDF_PATH = path.join(
-  __dirname,
-  '../../../assets/project-proposal-multiple-fields-and-recipients.pdf',
+  FIXTURES_DIR,
+  'project-proposal-multiple-fields-and-recipients.pdf',
 );
+
+const NO_RECIPIENT_PDF_PATH = path.join(FIXTURES_DIR, 'no-recipient-placeholders.pdf');
+
+const INVALID_FIELD_TYPE_PDF_PATH = path.join(FIXTURES_DIR, 'invalid-field-type.pdf');
+
+const FIELD_TYPE_ONLY_PDF_PATH = path.join(FIXTURES_DIR, 'field-type-only.pdf');
 
 const setupUserAndSignIn = async (page: Page) => {
   const { user, team } = await seedUser();
@@ -27,62 +36,86 @@ const setupUserAndSignIn = async (page: Page) => {
   return { user, team };
 };
 
-const uploadPdfAndContinue = async (page: Page, pdfPath: string, continueClicks: number = 1) => {
-  const fileInput = page.locator('input[type="file"]').nth(1);
-  await fileInput.waitFor({ state: 'attached' });
-  await fileInput.setInputFiles(pdfPath);
+const uploadPdf = async (page: Page, team: { url: string }, pdfPath: string) => {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent('filechooser'),
+    page
+      .locator('input[type=file]')
+      .nth(1)
+      .evaluate((e) => {
+        if (e instanceof HTMLInputElement) {
+          e.click();
+        }
+      }),
+  ]);
 
-  await page.waitForTimeout(3000);
+  await fileChooser.setFiles(pdfPath);
 
-  for (let i = 0; i < continueClicks; i++) {
-    await page.getByRole('button', { name: 'Continue' }).click();
+  // Wait for redirect to v2 envelope editor.
+  await page.waitForURL(new RegExp(`/t/${team.url}/documents/envelope_.*`));
+
+  // Extract envelope ID from URL.
+  const urlParts = page.url().split('/');
+  const envelopeId = urlParts.find((part) => part.startsWith('envelope_'));
+
+  if (!envelopeId) {
+    throw new Error('Could not extract envelope ID from URL');
   }
+
+  return envelopeId;
 };
 
 test.describe('PDF Placeholders with single recipient', () => {
   test('[AUTO_PLACING_FIELDS]: should automatically create recipients from PDF placeholders', async ({
     page,
   }) => {
-    await setupUserAndSignIn(page);
-    await uploadPdfAndContinue(page, SINGLE_PLACEHOLDER_PDF_PATH, 1);
+    const { team } = await setupUserAndSignIn(page);
+    await uploadPdf(page, team, SINGLE_PLACEHOLDER_PDF_PATH);
 
-    await expect(page.getByRole('heading', { name: 'Add Signers' })).toBeVisible();
-    await expect(page.getByPlaceholder('Email')).toHaveValue('recipient.1@documenso.com');
-    await expect(page.getByPlaceholder('Name')).toHaveValue('Recipient 1');
+    // V2 editor shows recipients on the upload page under "Recipients" heading.
+    await expect(page.getByRole('heading', { name: 'Recipients' })).toBeVisible();
+    await expect(page.getByTestId('signer-email-input').first()).toHaveValue(
+      'recipient.1@documenso.com',
+    );
+    await expect(page.getByLabel('Name').first()).toHaveValue('Recipient 1');
   });
 
   test('[AUTO_PLACING_FIELDS]: should automatically place fields from PDF placeholders', async ({
     page,
   }) => {
-    await setupUserAndSignIn(page);
-    await uploadPdfAndContinue(page, SINGLE_PLACEHOLDER_PDF_PATH, 2);
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, SINGLE_PLACEHOLDER_PDF_PATH);
 
-    await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+    // V2 editor renders fields on a Konva canvas, so we verify via the database.
+    await expect(async () => {
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
 
-    await expect(page.locator('[data-field-type="SIGNATURE"]')).toBeVisible();
-    await expect(page.locator('[data-field-type="EMAIL"]')).toBeVisible();
-    await expect(page.locator('[data-field-type="NAME"]')).toBeVisible();
-    await expect(page.locator('[data-field-type="TEXT"]')).toBeVisible();
+      const fieldTypes = fields.map((f) => f.type).sort();
+      expect(fieldTypes).toEqual(['EMAIL', 'NAME', 'SIGNATURE', 'TEXT'].sort());
+    }).toPass();
   });
 
   test('[AUTO_PLACING_FIELDS]: should automatically configure fields from PDF placeholders', async ({
     page,
   }) => {
-    await setupUserAndSignIn(page);
-    await uploadPdfAndContinue(page, SINGLE_PLACEHOLDER_PDF_PATH, 2);
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, SINGLE_PLACEHOLDER_PDF_PATH);
 
-    await page.getByText('Text').nth(1).click();
-    await page.getByRole('button', { name: 'Advanced settings' }).click();
+    // Verify field metadata was correctly parsed from the placeholder.
+    await expect(async () => {
+      const textField = await prisma.field.findFirst({
+        where: { envelopeId, type: 'TEXT' },
+      });
 
-    await expect(page.getByRole('heading', { name: 'Advanced settings' })).toBeVisible();
-    await expect(
-      page
-        .locator('div')
-        .filter({ hasText: /^Required field$/ })
-        .getByRole('switch'),
-    ).toBeChecked();
+      expect(textField).toBeDefined();
+      expect(textField!.fieldMeta).toBeDefined();
 
-    await expect(page.getByRole('combobox')).toHaveText('Right');
+      const meta = textField!.fieldMeta as Record<string, unknown>;
+      expect(meta.required).toBe(true);
+      expect(meta.textAlign).toBe('right');
+    }).toPass();
   });
 });
 
@@ -90,40 +123,118 @@ test.describe('PDF Placeholders with multiple recipients', () => {
   test('[AUTO_PLACING_FIELDS]: should automatically create recipients from PDF placeholders', async ({
     page,
   }) => {
-    await setupUserAndSignIn(page);
-    await uploadPdfAndContinue(page, MULTIPLE_PLACEHOLDER_PDF_PATH, 1);
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, MULTIPLE_PLACEHOLDER_PDF_PATH);
+
+    // V2 editor shows recipients on the upload page.
+    await expect(page.getByRole('heading', { name: 'Recipients' })).toBeVisible();
 
     await expect(page.getByTestId('signer-email-input').first()).toHaveValue(
       'recipient.1@documenso.com',
     );
-    await expect(page.getByLabel('Name').first()).toHaveValue('Recipient 1');
 
     await expect(page.getByTestId('signer-email-input').nth(1)).toHaveValue(
       'recipient.2@documenso.com',
     );
-    await expect(page.getByLabel('Name').nth(1)).toHaveValue('Recipient 2');
 
     await expect(page.getByTestId('signer-email-input').nth(2)).toHaveValue(
       'recipient.3@documenso.com',
     );
-    await expect(page.getByLabel('Name').nth(2)).toHaveValue('Recipient 3');
+
+    // Verify recipients via the database for name validation since the v2 editor
+    // only shows the "Name" label on the first recipient row.
+    await expect(async () => {
+      const recipients = await prisma.recipient.findMany({
+        where: { envelopeId },
+        orderBy: { signingOrder: 'asc' },
+      });
+
+      expect(recipients).toHaveLength(3);
+      expect(recipients[0].name).toBe('Recipient 1');
+      expect(recipients[1].name).toBe('Recipient 2');
+      expect(recipients[2].name).toBe('Recipient 3');
+    }).toPass();
   });
 
   test('[AUTO_PLACING_FIELDS]: should automatically create fields from PDF placeholders', async ({
     page,
   }) => {
-    await setupUserAndSignIn(page);
-    await uploadPdfAndContinue(page, MULTIPLE_PLACEHOLDER_PDF_PATH, 2);
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, MULTIPLE_PLACEHOLDER_PDF_PATH);
 
-    await expect(page.getByRole('heading', { name: 'Add Fields' })).toBeVisible();
+    // V2 editor renders fields on a Konva canvas, so we verify via the database.
+    await expect(async () => {
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
 
-    await expect(page.locator('[data-field-type="SIGNATURE"]').first()).toBeVisible();
-    await expect(page.locator('[data-field-type="SIGNATURE"]').nth(1)).toBeVisible();
-    await expect(page.locator('[data-field-type="SIGNATURE"]').nth(2)).toBeVisible();
-    await expect(page.locator('[data-field-type="EMAIL"]').first()).toBeVisible();
-    await expect(page.locator('[data-field-type="EMAIL"]').nth(1)).toBeVisible();
-    await expect(page.locator('[data-field-type="NAME"]')).toBeVisible();
-    await expect(page.locator('[data-field-type="TEXT"]')).toBeVisible();
-    await expect(page.locator('[data-field-type="NUMBER"]')).toBeVisible();
+      const fieldTypes = fields.map((f) => f.type).sort();
+      expect(fieldTypes).toEqual(
+        ['SIGNATURE', 'SIGNATURE', 'SIGNATURE', 'EMAIL', 'EMAIL', 'NAME', 'TEXT', 'NUMBER'].sort(),
+      );
+    }).toPass();
+  });
+});
+
+test.describe('PDF Placeholders without recipient identifier', () => {
+  test('[AUTO_PLACING_FIELDS]: should skip placeholders without a recipient identifier', async ({
+    page,
+  }) => {
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, NO_RECIPIENT_PDF_PATH);
+
+    // Placeholders like {{signature}}, {{name}}, {{email}} have no recipient
+    // identifier and should be skipped entirely. No fields or auto-created
+    // recipients should exist.
+    await expect(async () => {
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
+
+      expect(fields).toHaveLength(0);
+    }).toPass();
+  });
+
+  test('[AUTO_PLACING_FIELDS]: should skip a bare field type placeholder', async ({ page }) => {
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, FIELD_TYPE_ONLY_PDF_PATH);
+
+    await expect(async () => {
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
+
+      expect(fields).toHaveLength(0);
+    }).toPass();
+  });
+});
+
+test.describe('PDF Placeholders with invalid field types', () => {
+  test('[AUTO_PLACING_FIELDS]: should skip invalid field types and process valid ones', async ({
+    page,
+  }) => {
+    const { team } = await setupUserAndSignIn(page);
+    const envelopeId = await uploadPdf(page, team, INVALID_FIELD_TYPE_PDF_PATH);
+
+    // Only the valid placeholders (signature,r1 and email,r2) should create fields.
+    // The invalid ones (bogus,r1 and foobar,r2) should be skipped.
+    await expect(async () => {
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
+
+      const fieldTypes = fields.map((f) => f.type).sort();
+      expect(fieldTypes).toEqual(['EMAIL', 'SIGNATURE'].sort());
+    }).toPass();
+
+    // Both valid recipients should still be created.
+    await expect(async () => {
+      const recipients = await prisma.recipient.findMany({
+        where: { envelopeId },
+        orderBy: { signingOrder: 'asc' },
+      });
+
+      expect(recipients).toHaveLength(2);
+    }).toPass();
   });
 });

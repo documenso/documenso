@@ -1,14 +1,8 @@
 import { FieldType } from '@prisma/client';
-import { type Envelope, EnvelopeType, RecipientRole } from '@prisma/client';
 import type { Recipient } from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { createEnvelopeRecipients } from '@documenso/lib/server-only/recipient/create-envelope-recipients';
-import type { ApiRequestMetadata } from '@documenso/lib/universal/extract-request-metadata';
-import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import type { EnvelopeIdOptions } from '@documenso/lib/utils/envelope';
-import { prisma } from '@documenso/prisma';
 
 type RecipientPlaceholderInfo = {
   email: string;
@@ -96,7 +90,7 @@ export const parseFieldMetaFromPlaceholder = (
   return parsedFieldMeta;
 };
 
-export const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderInfo => {
+const extractRecipientPlaceholder = (placeholder: string): RecipientPlaceholderInfo => {
   const indexMatch = placeholder.match(/^r(\d+)$/i);
 
   if (!indexMatch) {
@@ -155,112 +149,4 @@ export const findRecipientByPlaceholder = (
   }
 
   return recipient;
-};
-
-/*
-  Determines the recipients to use for field creation.
-  If recipients are provided, uses them directly.
-  Otherwise, creates recipients from placeholders.
-*/
-export const determineRecipientsForPlaceholders = async (
-  recipients: Pick<Recipient, 'id' | 'email'>[] | undefined,
-  recipientPlaceholders: Map<number, string>,
-  envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
-  userId: number,
-  teamId: number,
-  requestMetadata: ApiRequestMetadata,
-): Promise<Pick<Recipient, 'id' | 'email'>[]> => {
-  if (recipients && recipients.length > 0) {
-    return recipients;
-  }
-
-  return createRecipientsFromPlaceholders(
-    recipientPlaceholders,
-    envelope,
-    userId,
-    teamId,
-    requestMetadata,
-  );
-};
-
-export const createRecipientsFromPlaceholders = async (
-  recipientPlaceholders: Map<number, string>,
-  envelope: Pick<Envelope, 'id' | 'type' | 'secondaryId'>,
-  userId: number,
-  teamId: number,
-  requestMetadata: ApiRequestMetadata,
-): Promise<Pick<Recipient, 'id' | 'email'>[]> => {
-  const recipientsToCreate = Array.from(
-    recipientPlaceholders.entries(),
-    ([recipientIndex, name]) => {
-      return {
-        email: `recipient.${recipientIndex}@documenso.com`,
-        name,
-        role: RecipientRole.SIGNER,
-        signingOrder: recipientIndex,
-      };
-    },
-  );
-
-  const existingRecipients = await prisma.recipient.findMany({
-    where: {
-      envelopeId: envelope.id,
-    },
-    select: {
-      id: true,
-      email: true,
-    },
-  });
-
-  const existingEmails = new Set(existingRecipients.map((r) => r.email));
-  const recipientsToCreateFiltered = recipientsToCreate.filter(
-    (recipient) => !existingEmails.has(recipient.email),
-  );
-
-  if (recipientsToCreateFiltered.length === 0) {
-    return existingRecipients;
-  }
-
-  const newRecipients = await match(envelope.type)
-    .with(EnvelopeType.DOCUMENT, async () => {
-      const envelopeId: EnvelopeIdOptions = {
-        type: 'envelopeId',
-        id: envelope.id,
-      };
-
-      const { recipients } = await createEnvelopeRecipients({
-        userId,
-        teamId,
-        id: envelopeId,
-        recipients: recipientsToCreateFiltered,
-        requestMetadata,
-      });
-
-      return recipients;
-    })
-    .with(EnvelopeType.TEMPLATE, async () => {
-      const templateId = mapSecondaryIdToTemplateId(envelope.secondaryId ?? '');
-
-      const envelopeId: EnvelopeIdOptions = {
-        type: 'templateId',
-        id: templateId,
-      };
-
-      const { recipients } = await createEnvelopeRecipients({
-        userId,
-        teamId,
-        id: envelopeId,
-        recipients: recipientsToCreateFiltered,
-        requestMetadata,
-      });
-
-      return recipients;
-    })
-    .otherwise(() => {
-      throw new AppError(AppErrorCode.INVALID_BODY, {
-        message: `Invalid envelope type: ${envelope.type}`,
-      });
-    });
-
-  return [...existingRecipients, ...newRecipients];
 };

@@ -1,8 +1,14 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
+import {
+  convertPlaceholdersToFieldInputs,
+  extractPdfPlaceholders,
+} from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
+import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { prefixedId } from '@documenso/lib/universal/id';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 import { createDocumentAuditLogData } from '@documenso/lib/utils/document-audit-logs';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { prisma } from '@documenso/prisma';
@@ -84,14 +90,24 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
       });
     }
 
-    // For each file, stream to s3 and create the document data.
+    // For each file: normalize, extract & clean placeholders, then upload.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const normalized = await normalizePdf(buffer);
+
+        const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+
+        const { id: documentDataId } = await putPdfFileServerSide({
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(cleanedPdf),
+        });
 
         return {
           title: file.name,
           documentDataId,
+          placeholders,
         };
       }),
     );
@@ -130,6 +146,54 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
           }),
         ),
       });
+
+      // Create fields from placeholders if the envelope already has recipients.
+      if (envelope.recipients.length > 0) {
+        for (const uploadedItem of envelopeItems) {
+          if (!uploadedItem.placeholders || uploadedItem.placeholders.length === 0) {
+            continue;
+          }
+
+          const createdItem = createdItems.find(
+            (ci) => ci.documentDataId === uploadedItem.documentDataId,
+          );
+
+          if (!createdItem) {
+            continue;
+          }
+
+          const fieldsToCreate = convertPlaceholdersToFieldInputs(
+            uploadedItem.placeholders,
+            (recipientPlaceholder, placeholder) =>
+              findRecipientByPlaceholder(
+                recipientPlaceholder,
+                placeholder,
+                envelope.recipients,
+                envelope.recipients,
+              ),
+            createdItem.id,
+          );
+
+          if (fieldsToCreate.length > 0) {
+            await tx.field.createMany({
+              data: fieldsToCreate.map((field) => ({
+                envelopeId: envelope.id,
+                envelopeItemId: createdItem.id,
+                recipientId: field.recipientId,
+                type: field.type,
+                page: field.page,
+                positionX: field.positionX,
+                positionY: field.positionY,
+                width: field.width,
+                height: field.height,
+                customText: '',
+                inserted: false,
+                fieldMeta: field.fieldMeta || undefined,
+              })),
+            });
+          }
+        }
+      }
 
       return createdItems;
     });
