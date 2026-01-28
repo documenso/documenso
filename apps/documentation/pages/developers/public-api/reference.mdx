@@ -316,6 +316,8 @@ Before adding fields to an envelope, you will need the following details:
 
 See the [Get Envelope](#get-envelope) section for more details on how to retrieve these details.
 
+### Coordinate-Based Positioning
+
 The following is an example of a request which creates 2 new fields on the first page of the envelope.
 
 Note that width, height, positionX and positionY are percentage numbers between 0 and 100, which scale the field relative to the size of the PDF.
@@ -358,6 +360,95 @@ curl https://app.documenso.com/api/v2/envelope/field/create-many \
       }
     ]
   }'
+```
+
+### Placeholder-Based Positioning
+
+Instead of specifying exact coordinates, you can position fields using placeholder text in the PDF. The API will search for the text and place the field at that location.
+
+This is useful when:
+
+- You have PDFs with designated placeholder text (e.g., `{{signature}}`, `[SIGN HERE]`)
+- You want field positions to adapt to document content changes
+- You're working with templated documents generated from other systems
+
+```sh
+curl https://app.documenso.com/api/v2/envelope/field/create-many \
+  --request POST \
+  --header 'Authorization: api_xxxxxxxxxxxxxx' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "envelopeId": "envelope_xxxxxxxxxx",
+    "data": [
+      {
+        "recipientId": recipient_id_here,
+        "type": "SIGNATURE",
+        "placeholder": "{{signature}}"
+      },
+      {
+        "recipientId": recipient_id_here,
+        "type": "NAME",
+        "placeholder": "{{name}}",
+        "width": 30,
+        "height": 5
+      }
+    ]
+  }'
+```
+
+#### Placeholder Parameters
+
+| Parameter     | Type    | Required | Description                                                                                                      |
+| ------------- | ------- | -------- | ---------------------------------------------------------------------------------------------------------------- |
+| `placeholder` | string  | Yes      | Text to search for in the PDF. The field is placed at the location of this text.                                 |
+| `width`       | number  | No       | Override the field width (percentage). If omitted, uses the placeholder text width.                              |
+| `height`      | number  | No       | Override the field height (percentage). If omitted, uses the placeholder text height.                            |
+| `matchAll`    | boolean | No       | When `true`, creates a field at every occurrence of the placeholder. Default is `false` (first occurrence only). |
+
+<Callout type="info">
+  The placeholder text is automatically covered with a white rectangle after field creation, so it
+  won't appear in the final signed document.
+</Callout>
+
+#### Multiple Occurrences
+
+If your PDF contains the same placeholder text multiple times (e.g., initials on every page), use `matchAll: true` to create fields at all occurrences:
+
+```json
+{
+  "recipientId": 123,
+  "type": "INITIALS",
+  "placeholder": "{{initials}}",
+  "matchAll": true
+}
+```
+
+This will create one INITIALS field for each occurrence of `{{initials}}` in the PDF.
+
+#### Mixing Positioning Methods
+
+You can combine coordinate-based and placeholder-based positioning in the same request:
+
+```json
+{
+  "envelopeId": "envelope_xxxxxxxxxx",
+  "data": [
+    {
+      "recipientId": 123,
+      "type": "SIGNATURE",
+      "placeholder": "{{signature}}"
+    },
+    {
+      "recipientId": 123,
+      "type": "DATE",
+      "page": 1,
+      "positionX": 70,
+      "positionY": 85,
+      "width": 20,
+      "height": 3
+    }
+  ]
+}
 ```
 
 Field meta allows you to further configure fields, for example it will allow you to add multiple items for checkboxes or radios.
