@@ -149,6 +149,17 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
 
       // Create fields from placeholders if the envelope already has recipients.
       if (envelope.recipients.length > 0) {
+        const orderedRecipients = [...envelope.recipients].sort((a, b) => {
+          const aOrder = a.signingOrder ?? Number.MAX_SAFE_INTEGER;
+          const bOrder = b.signingOrder ?? Number.MAX_SAFE_INTEGER;
+
+          if (aOrder !== bOrder) {
+            return aOrder - bOrder;
+          }
+
+          return a.id - b.id;
+        });
+
         for (const uploadedItem of envelopeItems) {
           if (!uploadedItem.placeholders || uploadedItem.placeholders.length === 0) {
             continue;
@@ -168,8 +179,8 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
               findRecipientByPlaceholder(
                 recipientPlaceholder,
                 placeholder,
-                envelope.recipients,
-                envelope.recipients,
+                orderedRecipients,
+                orderedRecipients,
               ),
             createdItem.id,
           );

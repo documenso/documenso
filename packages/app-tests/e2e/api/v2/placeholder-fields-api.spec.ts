@@ -66,6 +66,29 @@ test.describe('Placeholder-based field creation', () => {
     return res.json();
   };
 
+  const createEnvelopeItemsWithPdf = async (
+    request: APIRequestContext,
+    envelopeId: string,
+    pdfFilename: string,
+  ) => {
+    const pdfPath = path.join(FIXTURES_DIR, pdfFilename);
+    const pdfData = fs.readFileSync(pdfPath);
+
+    const formData = new FormData();
+
+    formData.append('payload', JSON.stringify({ envelopeId }));
+    formData.append('files', new File([pdfData], pdfFilename, { type: 'application/pdf' }));
+
+    const res = await request.post(`${baseUrl}/envelope/item/create-many`, {
+      headers: { Authorization: `Bearer ${token}` },
+      multipart: formData,
+    });
+
+    expect(res.ok()).toBeTruthy();
+
+    return res.json();
+  };
+
   const addRecipient = async (request: APIRequestContext, envelopeId: string) => {
     const payload: TCreateEnvelopeRecipientsRequest = {
       envelopeId,
@@ -78,6 +101,24 @@ test.describe('Placeholder-based field creation', () => {
           actionAuth: [],
         },
       ],
+    };
+
+    const res = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+      headers: { Authorization: `Bearer ${token}` },
+      data: payload,
+    });
+
+    expect(res.ok()).toBeTruthy();
+  };
+
+  const addRecipients = async (
+    request: APIRequestContext,
+    envelopeId: string,
+    recipients: TCreateEnvelopeRecipientsRequest['data'],
+  ) => {
+    const payload: TCreateEnvelopeRecipientsRequest = {
+      envelopeId,
+      data: recipients,
     };
 
     const res = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
@@ -366,5 +407,47 @@ test.describe('Placeholder-based field creation', () => {
     const uniqueYPositions = new Set(yPositions);
 
     expect(uniqueYPositions.size).toBe(3);
+  });
+
+  test('should map placeholder recipients by signing order when adding items', async ({
+    request,
+  }) => {
+    const envelope = await createEnvelopeWithPdf(request, 'no-recipient-placeholders.pdf');
+
+    await addRecipients(request, envelope.id, [
+      {
+        email: 'second.recipient@documenso.com',
+        name: 'Second Recipient',
+        role: RecipientRole.SIGNER,
+        signingOrder: 2,
+        accessAuth: [],
+        actionAuth: [],
+      },
+      {
+        email: 'first.recipient@documenso.com',
+        name: 'First Recipient',
+        role: RecipientRole.SIGNER,
+        signingOrder: 1,
+        accessAuth: [],
+        actionAuth: [],
+      },
+    ]);
+
+    await createEnvelopeItemsWithPdf(request, envelope.id, 'project-proposal-single-recipient.pdf');
+
+    const recipients = await prisma.recipient.findMany({
+      where: { envelopeId: envelope.id },
+    });
+
+    const firstRecipient = recipients.find((recipient) => recipient.signingOrder === 1);
+
+    expect(firstRecipient).toBeDefined();
+
+    const fields = await prisma.field.findMany({
+      where: { envelopeId: envelope.id },
+    });
+
+    expect(fields.length).toBeGreaterThan(0);
+    expect(fields.every((field) => field.recipientId === firstRecipient!.id)).toBe(true);
   });
 });

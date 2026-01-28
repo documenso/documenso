@@ -1,5 +1,5 @@
 import { PDF, rgb } from '@libpdf/core';
-import type { Recipient } from '@prisma/client';
+import type { FieldType, Recipient } from '@prisma/client';
 
 import { type TFieldAndMeta, ZFieldAndMetaSchema } from '@documenso/lib/types/field-meta';
 
@@ -67,6 +67,7 @@ export type FieldToCreate = TFieldAndMeta & {
 
 export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<PlaceholderInfo[]> => {
   const pdfDoc = await PDF.load(new Uint8Array(pdf));
+
   const placeholders: PlaceholderInfo[] = [];
 
   for (const page of pdfDoc.getPages()) {
@@ -91,7 +92,7 @@ export const extractPlaceholdersFromPDF = async (pdf: Buffer): Promise<Placehold
       const placeholderData = innerMatch[1].split(',').map((property) => property.trim());
       const [fieldTypeString, recipientOrMeta, ...fieldMetaData] = placeholderData;
 
-      let fieldType: ReturnType<typeof parseFieldTypeFromPlaceholder>;
+      let fieldType: FieldType;
 
       try {
         fieldType = parseFieldTypeFromPlaceholder(fieldTypeString);

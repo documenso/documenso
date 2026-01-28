@@ -452,14 +452,21 @@ export const createEnvelope = async ({
         }
       }
 
-      // Fetch existing recipients (may have been created above from data.recipients).
+      // Fetch existing recipients (may have been created above from data.recipients or defaults).
       let availableRecipients = await tx.recipient.findMany({
         where: { envelopeId: envelope.id },
         select: { id: true, email: true },
       });
 
-      // If no real recipients were provided, create placeholder recipients.
-      if (availableRecipients.length === 0 && uniqueRecipientRefs.size > 0) {
+      const shouldCreatePlaceholderRecipients =
+        (!data.recipients || data.recipients.length === 0) && uniqueRecipientRefs.size > 0;
+
+      // If recipients were not provided, create placeholder recipients even when defaults exist.
+      if (shouldCreatePlaceholderRecipients) {
+        const existingRecipientEmails = new Set(
+          availableRecipients.map((recipient) => recipient.email.toLowerCase()),
+        );
+
         const placeholderRecipients = Array.from(
           uniqueRecipientRefs.entries(),
           ([recipientIndex, name]) => ({
@@ -472,17 +479,19 @@ export const createEnvelope = async ({
             sendStatus: SendStatus.NOT_SENT,
             signingStatus: SigningStatus.NOT_SIGNED,
           }),
-        );
+        ).filter((recipient) => !existingRecipientEmails.has(recipient.email.toLowerCase()));
 
-        await tx.recipient.createMany({
-          data: placeholderRecipients,
-        });
+        if (placeholderRecipients.length > 0) {
+          await tx.recipient.createMany({
+            data: placeholderRecipients,
+          });
 
-        // eslint-disable-next-line require-atomic-updates
-        availableRecipients = await tx.recipient.findMany({
-          where: { envelopeId: envelope.id },
-          select: { id: true, email: true },
-        });
+          // eslint-disable-next-line require-atomic-updates
+          availableRecipients = await tx.recipient.findMany({
+            where: { envelopeId: envelope.id },
+            select: { id: true, email: true },
+          });
+        }
       }
 
       for (const item of itemsWithPlaceholders) {

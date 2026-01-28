@@ -2,6 +2,7 @@ import { type Page, expect, test } from '@playwright/test';
 import path from 'path';
 
 import { prisma } from '@documenso/prisma';
+import { RecipientRole } from '@documenso/prisma/client';
 import { seedUser } from '@documenso/prisma/seed/users';
 
 import { apiSignin } from '../fixtures/authentication';
@@ -23,6 +24,28 @@ const NO_RECIPIENT_PDF_PATH = path.join(FIXTURES_DIR, 'no-recipient-placeholders
 const INVALID_FIELD_TYPE_PDF_PATH = path.join(FIXTURES_DIR, 'invalid-field-type.pdf');
 
 const FIELD_TYPE_ONLY_PDF_PATH = path.join(FIXTURES_DIR, 'field-type-only.pdf');
+
+const setTeamDefaultRecipients = async (
+  teamId: number,
+  defaultRecipients: Array<{ email: string; name: string; role: RecipientRole }>,
+) => {
+  const teamSettings = await prisma.teamGlobalSettings.findFirstOrThrow({
+    where: {
+      team: {
+        id: teamId,
+      },
+    },
+  });
+
+  await prisma.teamGlobalSettings.update({
+    where: {
+      id: teamSettings.id,
+    },
+    data: {
+      defaultRecipients,
+    },
+  });
+};
 
 const setupUserAndSignIn = async (page: Page) => {
   const { user, team } = await seedUser();
@@ -66,6 +89,50 @@ const uploadPdf = async (page: Page, team: { url: string }, pdfPath: string) => 
 };
 
 test.describe('PDF Placeholders with single recipient', () => {
+  test('[AUTO_PLACING_FIELDS]: should create placeholder recipients even with default recipients', async ({
+    page,
+  }) => {
+    const { user, team } = await seedUser();
+
+    await setTeamDefaultRecipients(team.id, [
+      {
+        email: user.email,
+        name: user.name || user.email,
+        role: RecipientRole.CC,
+      },
+    ]);
+
+    await apiSignin({
+      page,
+      email: user.email,
+      redirectPath: `/t/${team.url}/documents`,
+    });
+
+    const envelopeId = await uploadPdf(page, team, SINGLE_PLACEHOLDER_PDF_PATH);
+
+    await expect(async () => {
+      const recipients = await prisma.recipient.findMany({
+        where: { envelopeId },
+      });
+
+      const placeholderRecipient = recipients.find(
+        (recipient) => recipient.email === 'recipient.1@documenso.com',
+      );
+
+      const defaultRecipient = recipients.find((recipient) => recipient.email === user.email);
+
+      expect(placeholderRecipient).toBeDefined();
+      expect(defaultRecipient).toBeDefined();
+
+      const fields = await prisma.field.findMany({
+        where: { envelopeId },
+      });
+
+      expect(fields.length).toBeGreaterThan(0);
+      expect(fields.every((field) => field.recipientId === placeholderRecipient!.id)).toBe(true);
+    }).toPass();
+  });
+
   test('[AUTO_PLACING_FIELDS]: should automatically create recipients from PDF placeholders', async ({
     page,
   }) => {
