@@ -6,6 +6,7 @@ import { EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
 import { mailer } from '@documenso/email/mailer';
 import DocumentRejectedEmail from '@documenso/email/templates/document-rejected';
 import DocumentRejectionConfirmedEmail from '@documenso/email/templates/document-rejection-confirmed';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
@@ -85,36 +86,38 @@ export const run = async ({
   const i18n = await getI18nInstance(emailLanguage);
 
   // Send confirmation email to the recipient who rejected
-  await io.runTask('send-rejection-confirmation-email', async () => {
-    const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
-      recipientName: recipient.name,
-      documentName: envelope.title,
-      documentOwnerName: envelope.user.name || envelope.user.email,
-      reason: recipient.rejectionReason || '',
-      assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
-    });
+  if (isRecipientEmailValidForSending(recipient)) {
+    await io.runTask('send-rejection-confirmation-email', async () => {
+      const recipientTemplate = createElement(DocumentRejectionConfirmedEmail, {
+        recipientName: recipient.name,
+        documentName: envelope.title,
+        documentOwnerName: envelope.user.name || envelope.user.email,
+        reason: recipient.rejectionReason || '',
+        assetBaseUrl: NEXT_PUBLIC_WEBAPP_URL(),
+      });
 
-    const [html, text] = await Promise.all([
-      renderEmailWithI18N(recipientTemplate, { lang: emailLanguage, branding }),
-      renderEmailWithI18N(recipientTemplate, {
-        lang: emailLanguage,
-        branding,
-        plainText: true,
-      }),
-    ]);
+      const [html, text] = await Promise.all([
+        renderEmailWithI18N(recipientTemplate, { lang: emailLanguage, branding }),
+        renderEmailWithI18N(recipientTemplate, {
+          lang: emailLanguage,
+          branding,
+          plainText: true,
+        }),
+      ]);
 
-    await mailer.sendMail({
-      to: {
-        name: recipient.name,
-        address: recipient.email,
-      },
-      from: senderEmail,
-      replyTo: replyToEmail,
-      subject: i18n._(msg`Document "${envelope.title}" - Rejection Confirmed`),
-      html,
-      text,
+      await mailer.sendMail({
+        to: {
+          name: recipient.name,
+          address: recipient.email,
+        },
+        from: senderEmail,
+        replyTo: replyToEmail,
+        subject: i18n._(msg`Document "${envelope.title}" - Rejection Confirmed`),
+        html,
+        text,
+      });
     });
-  });
+  }
 
   // Send notification email to document owner
   await io.runTask('send-owner-notification-email', async () => {

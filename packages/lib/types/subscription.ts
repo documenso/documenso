@@ -31,7 +31,7 @@ export const ZClaimFlagsSchema = z.object({
 
   authenticationPortal: z.boolean().optional(),
 
-  allowEnvelopes: z.boolean().optional(),
+  allowLegacyEnvelopes: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -84,9 +84,9 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
     key: 'authenticationPortal',
     label: 'Authentication portal',
   },
-  allowEnvelopes: {
-    key: 'allowEnvelopes',
-    label: 'Allow envelopes',
+  allowLegacyEnvelopes: {
+    key: 'allowLegacyEnvelopes',
+    label: 'Allow Legacy Envelopes',
   },
 };
 

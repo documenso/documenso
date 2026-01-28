@@ -35,6 +35,7 @@ import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
+  getRecipientsWithMissingFields,
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
@@ -457,8 +458,8 @@ export const AddFieldsFormPartial = ({
         setFieldClipboard(lastActiveField);
 
         toast({
-          title: 'Copied field',
-          description: 'Copied field to clipboard',
+          title: _(msg`Copied field`),
+          description: _(msg`Copied field to clipboard`),
         });
       }
     },
@@ -555,15 +556,11 @@ export const AddFieldsFormPartial = ({
   };
 
   const handleGoNextClick = () => {
-    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
-      localFields.some(
-        (field) =>
-          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
-      ),
-    );
+    // localFields already have recipientId set correctly (see field creation at line 338)
+    // Using the existing recipientId is important for handling duplicate email recipients
+    const recipientsMissingFields = getRecipientsWithMissingFields(recipients, localFields);
 
-    if (!everySignerHasSignature) {
+    if (recipientsMissingFields.length > 0) {
       setIsMissingSignatureDialogVisible(true);
       return;
     }
@@ -626,7 +623,7 @@ export const AddFieldsFormPartial = ({
               {selectedField && (
                 <div
                   className={cn(
-                    'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white ring-2 transition duration-200 [container-type:size]',
+                    'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center rounded-[2px] bg-white text-muted-foreground ring-2 transition duration-200 [container-type:size]',
                     selectedSignerStyles?.base,
                     {
                       '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -728,7 +725,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground font-signature flex items-center justify-center gap-x-1.5 text-lg font-normal',
+                              'flex items-center justify-center gap-x-1.5 font-signature text-lg font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Trans>Signature</Trans>
@@ -752,7 +749,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Contact className="h-4 w-4" />
@@ -777,7 +774,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="flex flex-col items-center justify-center px-6 py-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Mail className="h-4 w-4" />
@@ -802,7 +799,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <User className="h-4 w-4" />
@@ -827,7 +824,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <CalendarDays className="h-4 w-4" />
@@ -852,7 +849,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Type className="h-4 w-4" />
@@ -877,7 +874,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Hash className="h-4 w-4" />
@@ -902,7 +899,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <Disc className="h-4 w-4" />
@@ -927,7 +924,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
@@ -953,7 +950,7 @@ export const AddFieldsFormPartial = ({
                         <CardContent className="p-4">
                           <p
                             className={cn(
-                              'text-muted-foreground group-data-[selected]:text-foreground flex items-center justify-center gap-x-1.5 text-sm font-normal',
+                              'flex items-center justify-center gap-x-1.5 text-sm font-normal text-muted-foreground group-data-[selected]:text-foreground',
                             )}
                           >
                             <ChevronDown className="h-4 w-4" />

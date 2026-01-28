@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { EnvelopeItem, FieldType } from '@prisma/client';
@@ -23,7 +24,7 @@ import { FRIENDLY_FIELD_TYPE } from '@documenso/ui/primitives/document-flow/type
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { FieldSelector } from '@documenso/ui/primitives/field-selector';
 import { Form } from '@documenso/ui/primitives/form/form';
-import PDFViewer from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { RecipientSelector } from '@documenso/ui/primitives/recipient-selector';
 import { Sheet, SheetContent, SheetTrigger } from '@documenso/ui/primitives/sheet';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -229,8 +230,8 @@ export const ConfigureFieldsView = ({
         setFieldClipboard(lastActiveField);
 
         toast({
-          title: 'Copied field',
-          description: 'Copied field to clipboard',
+          title: _(msg`Copied field`),
+          description: _(msg`Copied field to clipboard`),
         });
       }
     },
@@ -463,12 +464,12 @@ export const ConfigureFieldsView = ({
         {/* Desktop sidebar */}
         {!isMobile && (
           <div className="order-2 col-span-12 md:order-1 md:col-span-4">
-            <div className="bg-widget border-border sticky top-4 max-h-[calc(100vh-2rem)] rounded-lg border p-4 pb-6">
+            <div className="sticky top-4 max-h-[calc(100vh-2rem)] rounded-lg border border-border bg-widget p-4 pb-6">
               <h2 className="mb-1 text-lg font-medium">
                 <Trans>Configure Fields</Trans>
               </h2>
 
-              <p className="text-muted-foreground mb-6 text-sm">
+              <p className="mb-6 text-sm text-muted-foreground">
                 <Trans>Configure the fields you want to place on the document.</Trans>
               </p>
 
@@ -522,7 +523,7 @@ export const ConfigureFieldsView = ({
             {selectedField && (
               <div
                 className={cn(
-                  'text-muted-foreground dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white transition duration-200 [container-type:size]',
+                  'dark:text-muted-background pointer-events-none fixed z-50 flex cursor-pointer flex-col items-center justify-center bg-white text-muted-foreground transition duration-200 [container-type:size]',
                   selectedRecipientStyles.base,
                   {
                     '-rotate-6 scale-90 opacity-50 dark:bg-black/20': !isFieldWithinBounds,
@@ -545,7 +546,7 @@ export const ConfigureFieldsView = ({
 
             <Form {...form}>
               <div>
-                <PDFViewer
+                <PDFViewerLazy
                   presignToken={presignToken}
                   overrideData={normalizedDocumentData}
                   envelopeItem={normalizedEnvelopeItem}
@@ -597,14 +598,14 @@ export const ConfigureFieldsView = ({
       {isMobile && (
         <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
           <SheetTrigger asChild>
-            <div className="bg-widget border-border fixed bottom-6 left-6 right-6 z-50 flex items-center justify-between gap-2 rounded-lg border p-4">
+            <div className="fixed bottom-6 left-6 right-6 z-50 flex items-center justify-between gap-2 rounded-lg border border-border bg-widget p-4">
               <span className="text-lg font-medium">
                 <Trans>Configure Fields</Trans>
               </span>
 
               <button
                 type="button"
-                className="border-border text-muted-foreground inline-flex h-10 w-10 items-center justify-center rounded-lg border"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-border text-muted-foreground"
               >
                 <ChevronsUpDown className="h-6 w-6" />
               </button>
@@ -614,13 +615,13 @@ export const ConfigureFieldsView = ({
           <SheetContent
             position="bottom"
             size="xl"
-            className="bg-widget h-fit max-h-[80vh] overflow-y-auto rounded-t-xl p-4"
+            className="h-fit max-h-[80vh] overflow-y-auto rounded-t-xl bg-widget p-4"
           >
             <h2 className="mb-1 text-lg font-medium">
               <Trans>Configure Fields</Trans>
             </h2>
 
-            <p className="text-muted-foreground mb-6 text-sm">
+            <p className="mb-6 text-sm text-muted-foreground">
               <Trans>Configure the fields you want to place on the document.</Trans>
             </p>
 

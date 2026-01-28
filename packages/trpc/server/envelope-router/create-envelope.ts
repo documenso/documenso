@@ -1,3 +1,5 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
@@ -32,6 +34,7 @@ export const createEnvelopeRoute = authenticatedProcedure
       folderId,
       meta,
       attachments,
+      delegatedDocumentOwner,
     } = payload;
 
     ctx.logger.info({
@@ -79,11 +82,16 @@ export const createEnvelopeRoute = authenticatedProcedure
           });
         }
 
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide({
-          name: file.name,
-          type: 'application/pdf',
-          arrayBuffer: async () => Promise.resolve(pdf),
-        });
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide(
+          {
+            name: file.name,
+            type: 'application/pdf',
+            arrayBuffer: async () => Promise.resolve(pdf),
+          },
+          {
+            flattenForm: type !== EnvelopeType.TEMPLATE,
+          },
+        );
 
         return {
           title: file.name,
@@ -144,6 +152,7 @@ export const createEnvelopeRoute = authenticatedProcedure
         recipients: recipientsToCreate,
         folderId,
         envelopeItems,
+        delegatedDocumentOwner,
       },
       attachments,
       meta,

@@ -33,7 +33,10 @@ export const updateEmbeddingTemplateRoute = procedure
         });
       }
 
-      const apiToken = await verifyEmbeddingPresignToken({ token: presignToken });
+      const apiToken = await verifyEmbeddingPresignToken({
+        token: presignToken,
+        scope: `templateId:${input.templateId}`,
+      });
 
       const { templateId, title, externalId, recipients, meta } = input;
 

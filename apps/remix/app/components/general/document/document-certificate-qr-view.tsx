@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
@@ -21,12 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 
 import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 
 import { EnvelopeRendererFileSelector } from '../envelope-editor/envelope-file-selector';
-import EnvelopeGenericPageRenderer from '../envelope-editor/envelope-generic-page-renderer';
+
+const EnvelopeGenericPageRenderer = lazy(
+  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+);
 
 export type DocumentCertificateQRViewProps = {
   documentId: number;
@@ -120,7 +123,7 @@ export const DocumentCertificateQRView = ({
           <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
             <div className="space-y-1">
               <h1 className="text-xl font-medium">{title}</h1>
-              <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
+              <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
                 <p>
                   <Trans>{recipientCount} recipients</Trans>
                 </p>
@@ -146,7 +149,7 @@ export const DocumentCertificateQRView = ({
           </div>
 
           <div className="mt-12 w-full">
-            <PDFViewer
+            <PDFViewerLazy
               key={envelopeItems[0].id}
               envelopeItem={envelopeItems[0]}
               token={token}
@@ -179,7 +182,7 @@ const DocumentCertificateQrV2 = ({
       <div className="flex w-full flex-col justify-between gap-4 md:flex-row md:items-end">
         <div className="space-y-1">
           <h1 className="text-xl font-medium">{title}</h1>
-          <div className="text-muted-foreground flex flex-col gap-0.5 text-sm">
+          <div className="flex flex-col gap-0.5 text-sm text-muted-foreground">
             <p>
               <Trans>{recipientCount} recipients</Trans>
             </p>

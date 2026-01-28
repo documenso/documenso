@@ -63,6 +63,7 @@ export class LocalJobProvider extends BaseJobProvider {
           jobId: pendingJob.id,
           jobDefinitionId: pendingJob.jobId,
           data: options,
+          isRetry: false,
         });
       }),
     );
@@ -198,6 +199,7 @@ export class LocalJobProvider extends BaseJobProvider {
           jobId,
           jobDefinitionId: backgroundJob.jobId,
           data: options,
+          isRetry: true,
         });
       }
 
@@ -213,7 +215,7 @@ export class LocalJobProvider extends BaseJobProvider {
   }) {
     const { jobId, jobDefinitionId, data, isRetry } = options;
 
-    const endpoint = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL}/api/jobs/${jobDefinitionId}/${jobId}`;
+    const endpoint = `${NEXT_PRIVATE_INTERNAL_WEBAPP_URL()}/api/jobs/${jobDefinitionId}/${jobId}`;
     const signature = sign(data);
 
     const headers: Record<string, string> = {

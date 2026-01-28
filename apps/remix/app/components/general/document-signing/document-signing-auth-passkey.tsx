@@ -90,7 +90,7 @@ export const DocumentSigningAuthPasskey = ({
         preferredPasskeyId: passkeyId,
       });
 
-      const authenticationResponse = await startAuthentication(options);
+      const authenticationResponse = await startAuthentication({ optionsJSON: options });
 
       await onReauthFormSubmit({
         type: DocumentAuth.PASSKEY,
@@ -146,7 +146,7 @@ export const DocumentSigningAuthPasskey = ({
   if (passkeyData.isInitialLoading || (passkeyData.isError && passkeyData.passkeys.length === 0)) {
     return (
       <div className="flex h-28 items-center justify-center">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }

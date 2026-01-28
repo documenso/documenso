@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { expect, test } from '@playwright/test';
 import { DocumentStatus, FieldType } from '@prisma/client';
 
@@ -43,7 +43,7 @@ test.describe('Signing Certificate Tests', () => {
         return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
       });
 
-    const originalPdf = await PDFDocument.load(documentData);
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -57,6 +57,9 @@ test.describe('Signing Certificate Tests', () => {
     }
 
     await page.getByRole('button', { name: 'Complete' }).click();
+
+    await page.waitForTimeout(1000);
+
     await page.getByRole('button', { name: 'Sign' }).click({ force: true });
     await page.waitForURL(`/sign/${recipient.token}/complete`);
 
@@ -98,7 +101,7 @@ test.describe('Signing Certificate Tests', () => {
     const completedDocumentData = new Uint8Array(pdfData);
 
     // Load the PDF and check number of pages
-    const pdfDoc = await PDFDocument.load(completedDocumentData);
+    const pdfDoc = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(pdfDoc.getPageCount()).toBe(originalPdf.getPageCount() + 1); // Original + Certificate
   });
@@ -150,7 +153,7 @@ test.describe('Signing Certificate Tests', () => {
         return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
       });
 
-    const originalPdf = await PDFDocument.load(documentData);
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -203,7 +206,7 @@ test.describe('Signing Certificate Tests', () => {
     const completedDocumentData = new Uint8Array(pdfData);
 
     // Load the PDF and check number of pages
-    const completedPdf = await PDFDocument.load(completedDocumentData);
+    const completedPdf = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(completedPdf.getPageCount()).toBe(originalPdf.getPageCount() + 1); // Original + Certificate
   });
@@ -255,7 +258,7 @@ test.describe('Signing Certificate Tests', () => {
         return fetch(documentUrl).then(async (res) => await res.arrayBuffer());
       });
 
-    const originalPdf = await PDFDocument.load(new Uint8Array(documentData));
+    const originalPdf = await PDF.load(new Uint8Array(documentData));
 
     // Sign the document
     await page.goto(`/sign/${recipient.token}`);
@@ -306,7 +309,7 @@ test.describe('Signing Certificate Tests', () => {
     );
 
     // Load the PDF and check number of pages
-    const completedPdf = await PDFDocument.load(completedDocumentData);
+    const completedPdf = await PDF.load(new Uint8Array(completedDocumentData));
 
     expect(completedPdf.getPageCount()).toBe(originalPdf.getPageCount());
   });

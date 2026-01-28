@@ -1,3 +1,5 @@
+import { lazy } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentSigningOrder, SigningStatus } from '@prisma/client';
@@ -14,14 +16,13 @@ import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-k
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewer } from '@documenso/ui/primitives/pdf-viewer';
+import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { TemplateUseDialog } from '~/components/dialogs/template-use-dialog';
 import { EnvelopeRendererFileSelector } from '~/components/general/envelope-editor/envelope-file-selector';
-import EnvelopeGenericPageRenderer from '~/components/general/envelope-editor/envelope-generic-page-renderer';
 import { GenericErrorLayout } from '~/components/general/generic-error-layout';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplatePageViewDocumentsTable } from '~/components/general/template/template-page-view-documents-table';
@@ -33,6 +34,10 @@ import { TemplatesTableActionDropdown } from '~/components/tables/templates-tabl
 import { useCurrentTeam } from '~/providers/team';
 
 import type { Route } from './+types/templates.$id._index';
+
+const EnvelopeGenericPageRenderer = lazy(
+  async () => import('~/components/general/envelope-editor/envelope-generic-page-renderer'),
+);
 
 export default function TemplatePage({ params }: Route.ComponentProps) {
   const { t } = useLingui();
@@ -51,7 +56,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   if (isLoadingEnvelope) {
     return (
-      <div className="text-foreground flex w-screen flex-col items-center justify-center gap-2 py-64">
+      <div className="flex w-screen flex-col items-center justify-center gap-2 py-64 text-foreground">
         <Spinner />
         <Trans>Loading</Trans>
       </div>
@@ -112,7 +117,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
   return (
     <div className="mx-auto -mt-4 w-full max-w-screen-xl px-4 md:px-8">
-      <Link to={templateRootPath} className="flex items-center text-[#7AC455] hover:opacity-80">
+      <Link to={templateRootPath} className="flex items-center text-documenso-700 hover:opacity-80">
         <ChevronLeft className="mr-2 inline-block h-5 w-5" />
         <Trans>Templates</Trans>
       </Link>
@@ -205,7 +210,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 documentMeta={mockedDocumentMeta}
               />
 
-              <PDFViewer
+              <PDFViewerLazy
                 envelopeItem={envelope.envelopeItems[0]}
                 token={undefined}
                 version="signed"
@@ -219,9 +224,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
           className={cn('col-span-12 lg:col-span-6 xl:col-span-5', isMultiEnvelopeItem && 'mt-20')}
         >
           <div className="space-y-6">
-            <section className="border-border bg-widget flex flex-col rounded-xl border pb-4 pt-6">
+            <section className="flex flex-col rounded-xl border border-border bg-widget pb-4 pt-6">
               <div className="flex flex-row items-center justify-between px-4">
-                <h3 className="text-foreground text-2xl font-semibold">
+                <h3 className="text-2xl font-semibold text-foreground">
                   <Trans>Template</Trans>
                 </h3>
 
@@ -239,7 +244,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 </div>
               </div>
 
-              <p className="text-muted-foreground mt-2 px-4 text-sm">
+              <p className="mt-2 px-4 text-sm text-muted-foreground">
                 <Trans>Manage and view template</Trans>
               </p>
 

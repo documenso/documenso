@@ -1,4 +1,9 @@
-import { OrganisationGroupType, OrganisationMemberRole, TeamMemberRole } from '@prisma/client';
+import {
+  OrganisationGroupType,
+  OrganisationMemberRole,
+  Prisma,
+  TeamMemberRole,
+} from '@prisma/client';
 import { match } from 'ts-pattern';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -137,6 +142,7 @@ export const createTeam = async ({
         const teamSettings = await tx.teamGlobalSettings.create({
           data: {
             ...generateDefaultTeamSettings(),
+            defaultRecipients: Prisma.DbNull,
             id: generateDatabaseId('team_setting'),
           },
         });

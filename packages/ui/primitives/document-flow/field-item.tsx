@@ -269,8 +269,8 @@ export const FieldItem = ({
             className={cn(
               'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
               {
-                'bg-foreground/5 border-primary border': !fieldHasCheckedValues,
-                'bg-documenso-200 border-primary border': fieldHasCheckedValues,
+                'border border-primary bg-foreground/5': !fieldHasCheckedValues,
+                'border border-primary bg-documenso-200': fieldHasCheckedValues,
               },
             )}
           >
@@ -321,8 +321,25 @@ export const FieldItem = ({
         </div>
 
         {isDevMode && (
-          <div className="text-muted-foreground absolute -top-6 left-0 right-0 text-center text-[10px]">
-            {`x: ${field.pageX.toFixed(2)}, y: ${field.pageY.toFixed(2)}`}
+          <div className="absolute -top-20 left-1/2 z-50 -translate-x-1/2 rounded-md border border-border bg-background/95 px-2 py-1 shadow-sm backdrop-blur-sm">
+            <div className="flex flex-col gap-0.5 text-[9px]">
+              <span>
+                <span className="text-muted-foreground">Pos X:&nbsp;</span>
+                <span className="font-mono text-foreground">{field.pageX.toFixed(2)}</span>
+              </span>
+              <span>
+                <span className="text-muted-foreground">Pos Y:&nbsp;</span>
+                <span className="font-mono text-foreground">{field.pageY.toFixed(2)}</span>
+              </span>
+              <span>
+                <span className="text-muted-foreground">Width:&nbsp;</span>
+                <span className="font-mono text-foreground">{field.pageWidth.toFixed(2)}</span>
+              </span>
+              <span>
+                <span className="text-muted-foreground">Height:&nbsp;</span>
+                <span className="font-mono text-foreground">{field.pageHeight.toFixed(2)}</span>
+              </span>
+            </div>
           </div>
         )}
       </div>

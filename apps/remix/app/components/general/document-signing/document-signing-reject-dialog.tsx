@@ -74,8 +74,8 @@ export function DocumentSigningRejectDialog({
       });
 
       toast({
-        title: 'Document rejected',
-        description: 'The document has been successfully rejected.',
+        title: t`Document rejected`,
+        description: t`The document has been successfully rejected.`,
         duration: 5000,
       });
 
@@ -88,8 +88,8 @@ export function DocumentSigningRejectDialog({
       }
     } catch (err) {
       toast({
-        title: 'Error',
-        description: 'An error occurred while rejecting the document. Please try again.',
+        title: t`Error`,
+        description: t`An error occurred while rejecting the document. Please try again.`,
         variant: 'destructive',
         duration: 5000,
       });

@@ -171,7 +171,7 @@ export default function EnvelopeSignerPageRenderer() {
 
     const handleFieldGroupClick = (e: KonvaEventObject<Event>) => {
       const currentTarget = e.currentTarget as Konva.Group;
-      const target = e.target;
+      const target = e.target as Konva.Shape;
 
       const { width: fieldWidth, height: fieldHeight } = fieldGroup.getClientRect();
 
@@ -374,6 +374,7 @@ export default function EnvelopeSignerPageRenderer() {
         .with({ type: FieldType.SIGNATURE }, (field) => {
           handleSignatureFieldClick({
             field,
+            fullName,
             signature,
             typedSignatureEnabled: envelope.documentMeta.typedSignatureEnabled,
             uploadSignatureEnabled: envelope.documentMeta.uploadSignatureEnabled,

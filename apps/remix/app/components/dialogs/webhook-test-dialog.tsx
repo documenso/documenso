@@ -36,8 +36,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useCurrentTeam } from '~/providers/team';
-
 export type WebhookTestDialogProps = {
   webhook: Pick<Webhook, 'id' | 'webhookUrl' | 'eventTriggers'>;
   children: React.ReactNode;
@@ -52,8 +50,6 @@ type TTestWebhookFormSchema = z.infer<typeof ZTestWebhookFormSchema>;
 export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps) => {
   const { t } = useLingui();
   const { toast } = useToast();
-
-  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
 
@@ -71,7 +67,6 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
       await testWebhook({
         id: webhook.id,
         event,
-        teamId: team.id,
       });
 
       toast({
@@ -150,11 +145,11 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  <Trans>Cancel</Trans>
+                  <Trans>Close</Trans>
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  <Trans>Send Test Webhook</Trans>
+                  <Trans>Send</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>

@@ -152,12 +152,6 @@ export default function AdminStatsPage({ loaderData }: Route.ComponentProps) {
         <div className="mt-5 grid grid-cols-2 gap-8">
           <MonthlyActiveUsersChart title={_(msg`MAU (signed in)`)} data={monthlyActiveUsers} />
 
-          <MonthlyActiveUsersChart
-            title={_(msg`Cumulative MAU (signed in)`)}
-            data={monthlyActiveUsers}
-            cummulative
-          />
-
           <AdminStatsUsersWithDocumentsChart
             data={monthlyUsersWithDocuments}
             title={_(msg`MAU (created document)`)}

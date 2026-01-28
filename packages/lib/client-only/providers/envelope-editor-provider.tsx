@@ -15,6 +15,7 @@ import type { TEnvelope } from '../../types/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
+import { useEditorRecipients } from '../hooks/use-editor-recipients';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export const useDebounceFunction = <Args extends unknown[]>(
@@ -53,6 +54,7 @@ type EnvelopeEditorProviderValue = {
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
   flushAutosave: () => Promise<void>;
@@ -101,6 +103,10 @@ export const EnvelopeEditorProvider = ({
     handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
   });
 
+  const editorRecipients = useEditorRecipients({
+    envelope,
+  });
+
   const envelopeUpdateMutationQuery = trpc.envelope.update.useMutation({
     onSuccess: (response, input) => {
       setEnvelope({
@@ -132,7 +138,12 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeFieldSetMutationQuery = trpc.envelope.field.set.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ data: fields }) => {
+      setEnvelope((prev) => ({
+        ...prev,
+        fields,
+      }));
+
       setAutosaveError(false);
     },
     onError: (err) => {
@@ -154,7 +165,17 @@ export const EnvelopeEditorProvider = ({
       setEnvelope((prev) => ({
         ...prev,
         recipients,
+        fields: prev.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
       }));
+
+      // Reset the local fields to ensure deleted recipient fields are removed.
+      editorFields.resetForm(
+        envelope.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
+      );
 
       setAutosaveError(false);
     },
@@ -265,7 +286,7 @@ export const EnvelopeEditorProvider = ({
   );
 
   /**
-   * Fetch and sycn the envelope back into the editor.
+   * Fetch and sync the envelope back into the editor.
    *
    * Overrides everything.
    */
@@ -276,6 +297,12 @@ export const EnvelopeEditorProvider = ({
 
     if (fetchedEnvelopeData.data) {
       setEnvelope(fetchedEnvelopeData.data);
+
+      editorRecipients.resetForm({
+        recipients: fetchedEnvelopeData.data.recipients,
+        documentMeta: fetchedEnvelopeData.data.documentMeta,
+      });
+      editorFields.resetForm(fetchedEnvelopeData.data.fields);
     }
   };
 
@@ -333,6 +360,7 @@ export const EnvelopeEditorProvider = ({
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorRecipients,
         autosaveError,
         flushAutosave,
         isAutosaving,
