@@ -3,8 +3,12 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion/convert-to-pdf';
 import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import {
+  putFileServerSide,
+  putNormalizedPdfFileServerSide,
+} from '@documenso/lib/universal/upload/put-file.server';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 
 import { authenticatedProcedure } from '../trpc';
@@ -36,7 +40,9 @@ export const createDocumentRoute = authenticatedProcedure
       attachments,
     } = payload;
 
-    let pdf = Buffer.from(await file.arrayBuffer());
+    const { pdfBuffer, originalBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
+
+    let pdf = pdfBuffer;
 
     if (formValues) {
       // eslint-disable-next-line require-atomic-updates
@@ -46,10 +52,24 @@ export const createDocumentRoute = authenticatedProcedure
       });
     }
 
+    let originalData: string | undefined;
+    if (originalBuffer) {
+      const stored = await putFileServerSide({
+        name: `original-${file.name}`,
+        type: originalMimeType,
+        arrayBuffer: async () => Promise.resolve(originalBuffer),
+      });
+      originalData = stored.data;
+    }
+
     const { id: documentDataId } = await putNormalizedPdfFileServerSide({
-      name: file.name,
-      type: 'application/pdf',
-      arrayBuffer: async () => Promise.resolve(pdf),
+      file: {
+        name: file.name,
+        type: 'application/pdf',
+        arrayBuffer: async () => Promise.resolve(pdf),
+      },
+      originalData,
+      originalMimeType,
     });
 
     ctx.logger.info({

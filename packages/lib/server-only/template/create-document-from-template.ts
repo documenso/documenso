@@ -474,9 +474,11 @@ export const createDocumentFromTemplate = async ({
       }
 
       const duplicatedFile = await putNormalizedPdfFileServerSide({
-        name: titleToUse,
-        type: 'application/pdf',
-        arrayBuffer: async () => Promise.resolve(buffer),
+        file: {
+          name: titleToUse,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(buffer),
+        },
       });
 
       const newDocumentData = await prisma.documentData.create({

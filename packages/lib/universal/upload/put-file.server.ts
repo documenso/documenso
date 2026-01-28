@@ -44,16 +44,25 @@ export const putPdfFileServerSide = async (file: File) => {
   return await createDocumentData({ type, data });
 };
 
+type PutNormalizedPdfOptions = {
+  file: File;
+  originalData?: string;
+  originalMimeType?: string;
+  flattenForm?: boolean;
+};
+
 /**
  * Uploads a pdf file and normalizes it.
  */
-export const putNormalizedPdfFileServerSide = async (
-  file: File,
-  options: { flattenForm?: boolean } = {},
-) => {
+export const putNormalizedPdfFileServerSide = async ({
+  file,
+  originalData,
+  originalMimeType,
+  flattenForm = true,
+}: PutNormalizedPdfOptions) => {
   const buffer = Buffer.from(await file.arrayBuffer());
 
-  const normalized = await normalizePdf(buffer, options);
+  const normalized = await normalizePdf(buffer, { flattenForm });
 
   const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
 
@@ -66,6 +75,8 @@ export const putNormalizedPdfFileServerSide = async (
   return await createDocumentData({
     type: documentData.type,
     data: documentData.data,
+    originalData,
+    originalMimeType,
   });
 };
 

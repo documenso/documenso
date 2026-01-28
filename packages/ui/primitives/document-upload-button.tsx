@@ -11,6 +11,7 @@ import { Link } from 'react-router';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT, IS_BILLING_ENABLED } from '@documenso/lib/constants/app';
+import { ALLOWED_UPLOAD_MIME_TYPES } from '@documenso/lib/constants/upload';
 import { megabytesToBytes } from '@documenso/lib/universal/unit-convertions';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 
@@ -52,9 +53,7 @@ export const DocumentUploadButton = ({
   const isPersonalLayoutMode = isPersonalLayout(organisations);
 
   const { getRootProps, getInputProps } = useDropzone({
-    accept: {
-      'application/pdf': ['.pdf'],
-    },
+    accept: ALLOWED_UPLOAD_MIME_TYPES,
     multiple: internalVersion === '2',
     disabled,
     maxFiles,
@@ -79,7 +78,7 @@ export const DocumentUploadButton = ({
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
-            <Button className="hover:bg-warning/80 bg-warning" asChild>
+            <Button className="bg-warning hover:bg-warning/80" asChild>
               <Link
                 to={
                   isPersonalLayoutMode

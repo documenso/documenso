@@ -81,7 +81,8 @@ export const useEnvelopeRoute = authenticatedProcedure
     const uploadedFiles = await Promise.all(
       filesToUpload.map(async (file) => {
         // We disable flattening here since `createDocumentFromTemplate` will handle it.
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(file, {
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+          file,
           flattenForm: false,
         });
 

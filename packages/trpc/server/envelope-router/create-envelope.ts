@@ -3,7 +3,11 @@ import { EnvelopeType } from '@prisma/client';
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
-import { putNormalizedPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
+import { convertToPdfIfNeeded } from '@documenso/lib/server-only/file-conversion/convert-to-pdf';
+import {
+  putFileServerSide,
+  putNormalizedPdfFileServerSide,
+} from '@documenso/lib/universal/upload/put-file.server';
 
 import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
@@ -62,17 +66,11 @@ export const createEnvelopeRoute = authenticatedProcedure
       });
     }
 
-    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
-      throw new AppError('INVALID_DOCUMENT_FILE', {
-        message: 'You cannot upload non-PDF files',
-        statusCode: 400,
-      });
-    }
-
-    // For each file, stream to s3 and create the document data.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        let pdf = Buffer.from(await file.arrayBuffer());
+        const { pdfBuffer, originalBuffer, originalMimeType } = await convertToPdfIfNeeded(file);
+
+        let pdf = pdfBuffer;
 
         if (formValues) {
           // eslint-disable-next-line require-atomic-updates
@@ -82,16 +80,26 @@ export const createEnvelopeRoute = authenticatedProcedure
           });
         }
 
-        const { id: documentDataId } = await putNormalizedPdfFileServerSide(
-          {
+        let originalData: string | undefined;
+        if (originalBuffer) {
+          const stored = await putFileServerSide({
+            name: `original-${file.name}`,
+            type: originalMimeType,
+            arrayBuffer: async () => Promise.resolve(originalBuffer),
+          });
+          originalData = stored.data;
+        }
+
+        const { id: documentDataId } = await putNormalizedPdfFileServerSide({
+          file: {
             name: file.name,
             type: 'application/pdf',
             arrayBuffer: async () => Promise.resolve(pdf),
           },
-          {
-            flattenForm: type !== EnvelopeType.TEMPLATE,
-          },
-        );
+          originalData,
+          originalMimeType,
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
 
         return {
           title: file.name,
