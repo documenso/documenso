@@ -46,7 +46,12 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
           },
         },
         documentMeta: true,
-        user: true,
+        user: {
+          select: {
+            email: true,
+            name: true,
+          },
+        },
       },
     });
 
