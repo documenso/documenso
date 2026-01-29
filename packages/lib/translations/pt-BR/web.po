@@ -8819,7 +8819,7 @@ msgstr "O documento já está salvo e não pode ser alterado."
 
 #: apps/remix/app/components/embed/embed-document-completed.tsx
 msgid "The document is now completed, please follow any instructions provided within the parent application."
-msgstr "O documento está concluído agora, siga as instruções fornecidas no aplicativo pai."
+msgstr "O documento está concluído agora, você receberá ele em seu Whatsapp em instantes!"
 
 #: packages/email/template-components/template-document-rejection-confirmed.tsx
 msgid "The document owner has been notified of this rejection. No further action is required from you at this time. The document owner may contact you with any questions regarding this rejection."
