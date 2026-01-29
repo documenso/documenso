@@ -753,7 +753,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Contact className="h-4 w-4" />
-                            Initials
+                            <Trans>Initials</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -903,7 +903,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Disc className="h-4 w-4" />
-                            Radio
+                            <Trans>Radio</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -928,8 +928,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
-                            {/* Not translated on purpose. */}
-                            Checkbox
+                            <Trans>Checkbox</Trans>
                           </p>
                         </CardContent>
                       </Card>
