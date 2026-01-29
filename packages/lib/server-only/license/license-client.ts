@@ -88,11 +88,14 @@ export class LicenseClient {
       this.cachedLicense = cachedLicense;
     }
 
-    const response = await this.pingLicenseServer();
+    let response: TLicenseResponse | null = null;
 
-    // If server is not responding, or erroring, use the cached license.
-    if (!response) {
+    try {
+      response = await this.pingLicenseServer();
+    } catch (err) {
+      // If server is not responding, or erroring, use the cached license.
       console.warn('[License] License server not responding, using cached license.');
+      console.error(err);
       return;
     }
 

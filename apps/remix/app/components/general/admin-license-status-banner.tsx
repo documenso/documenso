@@ -14,7 +14,7 @@ export type AdminLicenseStatusBannerProps = {
 export const AdminLicenseStatusBanner = ({ license }: AdminLicenseStatusBannerProps) => {
   const licenseStatus = license?.derivedStatus;
 
-  if (!license || licenseStatus === 'ACTIVE') {
+  if (!license || licenseStatus === 'ACTIVE' || licenseStatus === 'NOT_FOUND') {
     return null;
   }
 
