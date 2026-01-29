@@ -127,6 +127,10 @@ export class LicenseClient {
     await this.saveToFile(data);
 
     console.log('[License] License check completed successfully.');
+    console.log(`[License] Unauthorized Flag Usage: ${unauthorizedFlagUsage ? 'Yes' : 'No'}`);
+    console.log(`[License] Derived Status: ${status}`);
+    console.log(`[License] Status: ${response?.data?.status}`);
+    console.log(`[License] Flags: ${JSON.stringify(allowedFlags)}`);
   }
 
   /**
