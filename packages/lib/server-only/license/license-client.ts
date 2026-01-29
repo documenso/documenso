@@ -19,9 +19,12 @@ const LICENSE_KEY = env('NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY');
 const LICENSE_SERVER_URL =
   env('INTERNAL_OVERRIDE_LICENSE_SERVER_URL') || 'https://license.documenso.com';
 
-export class LicenseClient {
-  private static instance: LicenseClient | null = null;
+declare global {
+  // eslint-disable-next-line no-var
+  var __documenso_license_client__: LicenseClient | undefined;
+}
 
+export class LicenseClient {
   /**
    * We cache the license in memory incase there is permission issues with
    * retrieving the license from the local file system.
@@ -35,15 +38,18 @@ export class LicenseClient {
    *
    * This will ping the license server with the configured license key and store
    * the response locally in a JSON file.
+   *
+   * Uses globalThis to store the singleton instance so that it's shared across
+   * different bundles (e.g. Hono and Remix) at runtime.
    */
   public static async start(): Promise<void> {
-    if (LicenseClient.instance) {
+    if (globalThis.__documenso_license_client__) {
       return;
     }
 
     const instance = new LicenseClient();
 
-    LicenseClient.instance = instance;
+    globalThis.__documenso_license_client__ = instance;
 
     try {
       await instance.initialize();
@@ -55,9 +61,12 @@ export class LicenseClient {
 
   /**
    * Get the current license client instance.
+   *
+   * Returns the shared instance from globalThis, ensuring both Hono and Remix
+   * bundles access the same instance.
    */
   public static getInstance(): LicenseClient | null {
-    return LicenseClient.instance;
+    return globalThis.__documenso_license_client__ ?? null;
   }
 
   public async getCachedLicense(): Promise<TCachedLicense | null> {
@@ -88,11 +97,14 @@ export class LicenseClient {
       this.cachedLicense = cachedLicense;
     }
 
-    const response = await this.pingLicenseServer();
+    let response: TLicenseResponse | null = null;
 
-    // If server is not responding, or erroring, use the cached license.
-    if (!response) {
+    try {
+      response = await this.pingLicenseServer();
+    } catch (err) {
+      // If server is not responding, or erroring, use the cached license.
       console.warn('[License] License server not responding, using cached license.');
+      console.error(err);
       return;
     }
 
