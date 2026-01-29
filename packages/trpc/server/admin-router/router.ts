@@ -17,6 +17,7 @@ import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
+import { resyncLicenseRoute } from './resync-license';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -43,6 +44,9 @@ export const adminRouter = router({
   },
   stripe: {
     createCustomer: createStripeCustomerRoute,
+  },
+  license: {
+    resync: resyncLicenseRoute,
   },
   user: {
     get: getUserRoute,
