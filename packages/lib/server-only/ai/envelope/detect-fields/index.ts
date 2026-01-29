@@ -162,8 +162,8 @@ export const detectFieldsFromPdf = async ({
       // Mask existing fields on the image
       const maskedImage = await maskFieldsOnImage({
         image: page.image,
-        width: page.width,
-        height: page.height,
+        width: page.scaledWidth,
+        height: page.scaledHeight,
         fields: fieldsOnPage,
       });
 

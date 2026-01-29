@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router';
 
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc as trpcReact } from '@documenso/trpc/react';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Dialog,
@@ -13,7 +14,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@documenso/ui/primitives/dialog';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import { useCurrentTeam } from '~/providers/team';
@@ -96,11 +96,11 @@ export const DocumentDuplicateDialog = ({
           </div>
         ) : (
           <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
-            <PDFViewerLazy
+            <PDFViewer
               key={envelopeItems[0].id}
               envelopeItem={envelopeItems[0]}
               token={undefined}
-              version="original"
+              version="initial"
             />
           </div>
         )}

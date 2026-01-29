@@ -8,15 +8,16 @@ import { Link, useNavigate } from 'react-router';
 
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
+import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
-import PDFViewerKonvaLazy from '@documenso/ui/components/pdf-viewer/pdf-viewer-konva-lazy';
+import { EnvelopePdfViewer } from '@documenso/ui/components/pdf-viewer/envelope-pdf-viewer';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { Card, CardContent } from '@documenso/ui/primitives/card';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { Spinner } from '@documenso/ui/primitives/spinner';
 
 import { TemplateBulkSendDialog } from '~/components/dialogs/template-bulk-send-dialog';
@@ -173,6 +174,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
         {envelope.internalVersion === 2 ? (
           <div className="relative col-span-12 lg:col-span-6 xl:col-span-7">
             <EnvelopeRenderProvider
+              version="current"
               envelope={envelope}
               token={undefined}
               fields={envelope.fields}
@@ -187,9 +189,9 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
 
               <Card className="rounded-xl before:rounded-xl" gradient>
                 <CardContent className="p-2">
-                  <PDFViewerKonvaLazy
-                    renderer="preview"
+                  <EnvelopePdfViewer
                     customPageRenderer={EnvelopeGenericPageRenderer}
+                    errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
                   />
                 </CardContent>
               </Card>
@@ -210,10 +212,10 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 documentMeta={mockedDocumentMeta}
               />
 
-              <PDFViewerLazy
+              <PDFViewer
                 envelopeItem={envelope.envelopeItems[0]}
                 token={undefined}
-                version="signed"
+                version="current"
                 key={envelope.envelopeItems[0].id}
               />
             </CardContent>
