@@ -196,7 +196,7 @@ export const SignUpForm = ({
 
   return (
     <div className={cn('flex justify-center gap-x-12', className)}>
-      <div className="border-border relative hidden flex-1 overflow-hidden rounded-xl border xl:flex">
+      <div className="relative hidden flex-1 overflow-hidden rounded-xl border border-border xl:flex">
         <div className="absolute -inset-8 -z-[2] backdrop-blur">
           <img
             src={communityCardsImage}
@@ -205,17 +205,17 @@ export const SignUpForm = ({
           />
         </div>
 
-        <div className="bg-background/50 absolute -inset-8 -z-[1] backdrop-blur-[2px]" />
+        <div className="absolute -inset-8 -z-[1] bg-background/50 backdrop-blur-[2px]" />
 
         <div className="relative flex h-full w-full flex-col items-center justify-evenly">
-          <div className="bg-background rounded-2xl border px-4 py-1 text-sm font-medium">
+          <div className="rounded-2xl border bg-background px-4 py-1 text-sm font-medium">
             <Trans>User profiles are here!</Trans>
           </div>
 
           <div className="w-full max-w-md">
             <UserProfileTimur
               rows={2}
-              className="bg-background border-border rounded-2xl border shadow-md"
+              className="rounded-2xl border border-border bg-background shadow-md"
             />
           </div>
 
@@ -223,13 +223,13 @@ export const SignUpForm = ({
         </div>
       </div>
 
-      <div className="border-border dark:bg-background relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border bg-neutral-100 p-6">
+      <div className="relative z-10 flex min-h-[min(850px,80vh)] w-full max-w-lg flex-col rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
         <div className="h-20">
           <h1 className="text-xl font-semibold md:text-2xl">
             <Trans>Create a new account</Trans>
           </h1>
 
-          <p className="text-muted-foreground mt-2 text-xs md:text-sm">
+          <p className="mt-2 text-xs text-muted-foreground md:text-sm">
             <Trans>
               Create your account and start using state-of-the-art document signing. Open and
               beautiful signing is within your grasp.
@@ -246,8 +246,8 @@ export const SignUpForm = ({
           >
             <fieldset
               className={cn(
-                'flex h-[550px] w-full flex-col gap-y-4',
-                hasSocialAuthEnabled && 'h-[650px]',
+                'flex min-h-[550px] w-full flex-col gap-y-4',
+                hasSocialAuthEnabled && 'min-h-[650px]',
               )}
               disabled={isSubmitting}
             >
@@ -325,11 +325,11 @@ export const SignUpForm = ({
               {hasSocialAuthEnabled && (
                 <>
                   <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-                    <div className="bg-border h-px flex-1" />
-                    <span className="text-muted-foreground bg-transparent">
+                    <div className="h-px flex-1 bg-border" />
+                    <span className="bg-transparent text-muted-foreground">
                       <Trans>Or</Trans>
                     </span>
-                    <div className="bg-border h-px flex-1" />
+                    <div className="h-px flex-1 bg-border" />
                   </div>
                 </>
               )}
@@ -340,7 +340,7 @@ export const SignUpForm = ({
                     type="button"
                     size="lg"
                     variant={'outline'}
-                    className="bg-background text-muted-foreground border"
+                    className="border bg-background text-muted-foreground"
                     disabled={isSubmitting}
                     onClick={onSignUpWithGoogleClick}
                   >
@@ -356,7 +356,7 @@ export const SignUpForm = ({
                     type="button"
                     size="lg"
                     variant={'outline'}
-                    className="bg-background text-muted-foreground border"
+                    className="border bg-background text-muted-foreground"
                     disabled={isSubmitting}
                     onClick={onSignUpWithMicrosoftClick}
                   >
@@ -376,7 +376,7 @@ export const SignUpForm = ({
                     type="button"
                     size="lg"
                     variant={'outline'}
-                    className="bg-background text-muted-foreground border"
+                    className="border bg-background text-muted-foreground"
                     disabled={isSubmitting}
                     onClick={onSignUpWithOIDCClick}
                   >
@@ -386,7 +386,7 @@ export const SignUpForm = ({
                 </>
               )}
 
-              <p className="text-muted-foreground mt-4 text-sm">
+              <p className="mt-4 text-sm text-muted-foreground">
                 <Trans>
                   Already have an account?{' '}
                   <Link to="/signin" className="text-documenso-700 duration-200 hover:opacity-70">
@@ -406,7 +406,7 @@ export const SignUpForm = ({
             </Button>
           </form>
         </Form>
-        <p className="text-muted-foreground mt-6 text-xs">
+        <p className="mt-6 text-xs text-muted-foreground">
           <Trans>
             By proceeding, you agree to our{' '}
             <Link
