@@ -179,6 +179,16 @@ msgstr "{0, plural, other {ページ {3}/{4} - # 人の受信者が見つかり�
 msgid "{0, plural, one {Recipient added} other {Recipients added}}"
 msgstr "{0, plural, other {受信者を追加しました}}"
 
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "{0, plural, one {Select a folder to move the selected document to.} other {Select a folder to move the # selected documents to.}}"
+msgstr ""
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "{0, plural, one {Select a folder to move the selected template to.} other {Select a folder to move the # selected templates to.}}"
+msgstr ""
+
 #. placeholder {0}: pendingRecipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
@@ -193,6 +203,16 @@ msgstr "{0, plural, other {ドキュメント内で # 個のフィールドが�
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "{0, plural, one {We found # recipient in your document.} other {We found # recipients in your document.}}"
 msgstr "{0, plural, other {ドキュメント内で # 人の受信者が見つかりました。}}"
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {You are about to delete the selected document.} other {You are about to delete # documents.}}"
+msgstr ""
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {You are about to delete the selected template.} other {You are about to delete # templates.}}"
+msgstr ""
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
@@ -222,6 +242,17 @@ msgstr "{0} からドキュメント「{1}」への{recipientActionVerb}依頼�
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} からドキュメントへの{recipientActionVerb}依頼が届いています"
+
+#. placeholder {0}: result.deletedCount
+#. placeholder {1}: result.failedIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0} item(s) deleted. {1} item(s) could not be deleted."
+msgstr ""
+
+#. placeholder {0}: result.deletedCount
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0} item(s) have been deleted."
+msgstr ""
 
 #. placeholder {0}: remaining.documents
 #. placeholder {1}: quota.documents
@@ -461,6 +492,10 @@ msgstr "{recipientReference} が {documentName} に署名しました"
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{remaningLength, plural, other {# 文字残り}}"
+
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
+msgid "{selectedCount} selected"
+msgstr ""
 
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -1362,11 +1397,16 @@ msgstr "すべてのフォルダ"
 msgid "All inserted signatures will be voided"
 msgstr "挿入されたすべての署名は無効になります"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "All items must be of the same type."
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
 msgstr "すべての受信者が署名しました。現在ドキュメントを処理しており、まもなく署名済みドキュメントのコピーがメールで送信されます。"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "All recipients will be notified"
 msgstr "すべての受信者に通知されます"
 
@@ -1528,6 +1568,10 @@ msgstr "テンプレートから文書を作成する際にエラーが発生し
 msgid "An error occurred while creating the webhook. Please try again."
 msgstr "Webhook の作成中にエラーが発生しました。もう一度お試しください。"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "An error occurred while deleting the items."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "An error occurred while deleting the user."
 msgstr "ユーザーの削除中にエラーが発生しました。"
@@ -1559,6 +1603,10 @@ msgstr "ドキュメントの読み込み中にエラーが発生しました。
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the document."
 msgstr "文書の移動中にエラーが発生しました。"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "An error occurred while moving the items."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the template."
@@ -2165,6 +2213,8 @@ msgstr "準備ができる"
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -2371,6 +2421,10 @@ msgstr "クレーム"
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
 msgstr "フィルターをクリア"
+
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
+msgid "Clear selection"
+msgstr ""
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
@@ -3141,6 +3195,7 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -3159,6 +3214,7 @@ msgstr "delete"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -3213,6 +3269,10 @@ msgstr "文書を削除"
 msgid "Delete Document"
 msgstr "文書を削除"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Delete Documents"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "Delete email"
 msgstr "メールを削除"
@@ -3261,6 +3321,10 @@ msgstr "チームグループを削除"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Delete Template"
 msgstr "テンプレートを削除"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Delete Templates"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
@@ -3398,6 +3462,10 @@ msgstr "ダイレクトリンク署名は有効になりました"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Direct link templates contain one dynamic recipient placeholder. Anyone with access to this link can sign the document, and it will then appear on your documents page."
 msgstr "ダイレクトリンクテンプレートには 1 つの動的受信者プレースホルダーが含まれます。このリンクにアクセスできる人であれば誰でも文書に署名でき、その文書はあなたの文書一覧に表示されます。"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Direct links associated with templates will be removed"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Direct template link deleted"
@@ -3871,6 +3939,14 @@ msgstr "作成された文書数"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Documents created from template"
 msgstr "テンプレートから作成された文書"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Documents deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Documents partially deleted"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Documents Received"
@@ -4476,6 +4552,7 @@ msgstr "封筒を更新しました"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
@@ -4782,6 +4859,7 @@ msgid "Fill in the details to create a new subscription claim."
 msgstr "新しいサブスクリプションクレームを作成するための詳細を入力してください。"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Folder"
 msgstr "フォルダ"
@@ -5104,6 +5182,7 @@ msgid "Home"
 msgstr "ホーム"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Home (No Folder)"
 msgstr "ホーム（フォルダなし）"
@@ -5902,6 +5981,7 @@ msgid "Monthly Active Users: Users that had at least one of their documents comp
 msgstr "月間アクティブユーザー：1 つ以上の文書が完了したユーザー"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -5916,6 +5996,10 @@ msgstr "「{templateTitle}」をフォルダに移動"
 msgid "Move Document to Folder"
 msgstr "ドキュメントをフォルダに移動"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Move Documents to Folder"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Move Folder"
 msgstr "フォルダを移動"
@@ -5924,7 +6008,12 @@ msgstr "フォルダを移動"
 msgid "Move Template to Folder"
 msgstr "テンプレートをフォルダに移動"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Move Templates to Folder"
+msgstr ""
+
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 msgid "Move to Folder"
 msgstr "フォルダに移動"
@@ -6061,6 +6150,7 @@ msgid "No fields were detected in your document."
 msgstr "ドキュメント内でフィールドが検出されませんでした。"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "No folders found"
 msgstr "フォルダが見つかりません"
@@ -6238,6 +6328,7 @@ msgid "On this page, you can create new Webhooks and manage the existing ones."
 msgstr "このページでは Webhook の新規作成と既存 Webhook の管理が行えます。"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Once confirmed, the following will occur:"
 msgstr "確認すると、次のことが行われます。"
 
@@ -6612,6 +6703,10 @@ msgstr "保留中の文書"
 msgid "Pending Documents"
 msgstr "保留中の文書"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Pending documents will have their signing process cancelled"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
 msgstr "保留中の招待"
@@ -6788,6 +6883,7 @@ msgid "Please note that proceeding will remove direct linking recipient and turn
 msgstr "続行すると、ダイレクトリンクの受信者が削除され、プレースホルダーに変換されます。"
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "この操作は<0>取り消せません</0>のでご注意ください。"
 
@@ -7602,6 +7698,7 @@ msgid "Search documents..."
 msgstr "文書を検索..."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
@@ -7678,6 +7775,11 @@ msgstr "タイムゾーンを選択"
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Select access methods"
 msgstr "アクセス方法を選択"
+
+#: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/templates-table.tsx
+msgid "Select all"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
@@ -7760,6 +7862,11 @@ msgstr "パスキーを選択"
 msgid "Select recipients"
 msgstr "受信者を選択"
 
+#: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/templates-table.tsx
+msgid "Select row"
+msgstr ""
+
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 #: packages/ui/primitives/document-flow/add-settings.tsx
@@ -7806,10 +7913,22 @@ msgstr "縦位置揃えを選択"
 msgid "Select visibility"
 msgstr "公開範囲を選択"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Selected documents will be permanently deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Selected items have been moved."
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Selected Recipient"
 msgstr "選択中の受信者"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Selected templates will be permanently deleted"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -8812,6 +8931,14 @@ msgstr "テンプレートをアップロードしました"
 msgid "Templates"
 msgstr "テンプレート"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Templates deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Templates partially deleted"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
 msgstr "テスト"
@@ -9008,6 +9135,10 @@ msgstr "移動しようとしているフォルダは存在しません。"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the document to does not exist."
 msgstr "ドキュメントの移動先として指定されたフォルダは存在しません。"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "The folder you are trying to move the items to does not exist."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the template to does not exist."
@@ -11103,6 +11234,10 @@ msgstr "現在、<0>{passkeyName}</0> パスキーを更新しています。"
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
 msgstr "現在、チームグループ <0>{teamGroupName}</0> を更新しています。"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "You are not allowed to move these items."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "You are not allowed to move this document."
 msgstr "このドキュメントを移動する権限がありません。"
@@ -11754,4 +11889,3 @@ msgstr "認証コード:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
-
