@@ -5,6 +5,7 @@ import {
   extractPdfPlaceholders,
 } from '@documenso/lib/server-only/pdf/auto-place-fields';
 import { findRecipientByPlaceholder } from '@documenso/lib/server-only/pdf/helpers';
+import { insertFormValuesInPdf } from '@documenso/lib/server-only/pdf/insert-form-values-in-pdf';
 import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '@documenso/lib/types/document-audit-logs';
 import { prefixedId } from '@documenso/lib/universal/id';
@@ -93,8 +94,15 @@ export const createEnvelopeItemsRoute = authenticatedProcedure
     // For each file: normalize, extract & clean placeholders, then upload.
     const envelopeItems = await Promise.all(
       files.map(async (file) => {
-        const buffer = Buffer.from(await file.arrayBuffer());
-        const normalized = await normalizePdf(buffer);
+        let buffer = Buffer.from(await file.arrayBuffer());
+
+        if (envelope.formValues) {
+          buffer = await insertFormValuesInPdf({ pdf: buffer, formValues: envelope.formValues });
+        }
+
+        const normalized = await normalizePdf(buffer, {
+          flattenForm: envelope.type !== 'TEMPLATE',
+        });
 
         const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
 
