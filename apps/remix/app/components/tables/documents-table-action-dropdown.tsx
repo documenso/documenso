@@ -56,6 +56,7 @@ export const DocumentsTableActionDropdown = ({
 
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [isDuplicateDialogOpen, setDuplicateDialogOpen] = useState(false);
+  const [isDropdownOpen, setDropdownOpen] = useState(false);
 
   const recipient = row.recipients.find((recipient) => recipient.email === user.email);
 
@@ -74,9 +75,9 @@ export const DocumentsTableActionDropdown = ({
   const nonSignedRecipients = row.recipients.filter((item) => item.signingStatus !== 'SIGNED');
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger data-testid="document-table-action-btn">
-        <MoreHorizontal className="text-muted-foreground h-5 w-5" />
+        <MoreHorizontal className="h-5 w-5 text-muted-foreground" />
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="w-52" align="start" forceMount>
@@ -181,6 +182,7 @@ export const DocumentsTableActionDropdown = ({
         <DocumentShareButton
           documentId={row.id}
           token={isOwner ? undefined : recipient?.token}
+          onDialogClose={() => setDropdownOpen(false)}
           trigger={({ loading, disabled }) => (
             <DropdownMenuItem disabled={disabled || isDraft} onSelect={(e) => e.preventDefault()}>
               <div className="flex items-center">
