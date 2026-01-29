@@ -1,3 +1,4 @@
+import { plural } from '@lingui/core/macro';
 import { Plural, useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
@@ -51,13 +52,22 @@ export const EnvelopesBulkDeleteDialog = ({
       if (result.failedIds.length > 0) {
         toast({
           title: isDocument ? t`Documents partially deleted` : t`Templates partially deleted`,
-          description: t`${result.deletedCount} item(s) deleted. ${result.failedIds.length} item(s) could not be deleted.`,
+          description: t`${plural(result.deletedCount, {
+            one: '# item deleted.',
+            other: '# items deleted.',
+          })} ${plural(result.failedIds.length, {
+            one: '# item could not be deleted.',
+            other: '# items could not be deleted.',
+          })}`,
           variant: 'destructive',
         });
       } else {
         toast({
           title: isDocument ? t`Documents deleted` : t`Templates deleted`,
-          description: t`${result.deletedCount} item(s) have been deleted.`,
+          description: plural(result.deletedCount, {
+            one: '# item has been deleted.',
+            other: '# items have been deleted.',
+          }),
           variant: 'default',
         });
       }
