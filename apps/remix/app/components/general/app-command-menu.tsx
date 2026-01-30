@@ -65,6 +65,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
   const [pages, setPages] = useState<string[]>([]);
 
   const debouncedSearch = useDebouncedValue(search, 200);
+  const hasValidSearch = debouncedSearch.trim().length > 0;
 
   const { data: searchDocumentsData, isPending: isSearchingDocuments } =
     trpcReact.document.search.useQuery(
@@ -72,9 +73,23 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
         query: debouncedSearch,
       },
       {
+        enabled: hasValidSearch,
         placeholderData: (previousData) => previousData,
         // Do not batch this due to relatively long request time compared to
         // other queries which are generally batched with this.
+        ...SKIP_QUERY_BATCH_META,
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      },
+    );
+
+  const { data: searchTemplatesData, isPending: isSearchingTemplates } =
+    trpcReact.template.search.useQuery(
+      {
+        query: debouncedSearch,
+      },
+      {
+        enabled: hasValidSearch,
+        placeholderData: (previousData) => previousData,
         ...SKIP_QUERY_BATCH_META,
         ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
       },
@@ -134,7 +149,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
     ];
   }, [currentTeam, organisations]);
 
-  const searchResults = useMemo(() => {
+  const documentSearchResults = useMemo(() => {
     if (!searchDocumentsData) {
       return [];
     }
@@ -145,6 +160,20 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
       value: document.value,
     }));
   }, [searchDocumentsData]);
+
+  const templateSearchResults = useMemo(() => {
+    if (!searchTemplatesData) {
+      return [];
+    }
+
+    return searchTemplatesData.map((template) => ({
+      label: template.title,
+      path: template.path,
+      value: template.value,
+    }));
+  }, [searchTemplatesData]);
+
+  const isSearching = hasValidSearch && (isSearchingDocuments || isSearchingTemplates);
 
   const currentPage = pages[pages.length - 1];
 
@@ -222,7 +251,7 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
       />
 
       <CommandList>
-        {isSearchingDocuments ? (
+        {isSearching ? (
           <CommandEmpty>
             <div className="flex items-center justify-center">
               <span className="animate-spin">
@@ -263,9 +292,15 @@ export function AppCommandMenu({ open, onOpenChange }: AppCommandMenuProps) {
               </CommandItem>
             </CommandGroup>
 
-            {searchResults.length > 0 && (
+            {documentSearchResults.length > 0 && (
               <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Your documents`)}>
-                <Commands push={push} pages={searchResults} />
+                <Commands push={push} pages={documentSearchResults} />
+              </CommandGroup>
+            )}
+
+            {templateSearchResults.length > 0 && (
+              <CommandGroup className="mx-2 p-0 pb-2" heading={_(msg`Your templates`)}>
+                <Commands push={push} pages={templateSearchResults} />
               </CommandGroup>
             )}
           </>
