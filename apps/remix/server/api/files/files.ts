@@ -23,6 +23,10 @@ import {
   ZGetPresignedPostUrlRequestSchema,
   ZUploadPdfRequestSchema,
 } from './files.types';
+import getEnvelopeItemImageRoute from './routes/get-envelope-item-image';
+import getEnvelopeItemImageByTokenRoute from './routes/get-envelope-item-image-by-token';
+import getEnvelopeItemMetaRoute from './routes/get-envelope-item-meta';
+import getEnvelopeItemMetaByTokenRoute from './routes/get-envelope-item-meta-by-token';
 
 export const filesRoute = new Hono<HonoEnv>()
   /**
@@ -319,3 +323,11 @@ export const filesRoute = new Hono<HonoEnv>()
       });
     },
   );
+
+// Envelope item meta routes for both tokens and auth based
+filesRoute.route('/', getEnvelopeItemMetaRoute);
+filesRoute.route('/', getEnvelopeItemMetaByTokenRoute);
+
+// Image routes for both tokens and auth based
+filesRoute.route('/', getEnvelopeItemImageRoute);
+filesRoute.route('/', getEnvelopeItemImageByTokenRoute);
