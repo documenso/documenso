@@ -7,7 +7,7 @@ import { trpc } from '@documenso/trpc/react';
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
 import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
 import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
+import { getRecipientColor } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
@@ -264,15 +264,8 @@ export const EnvelopeEditorProvider = ({
   };
 
   const getRecipientColorKey = useCallback(
-    (recipientId: number) => {
-      const recipientIndex = envelope.recipients.findIndex(
-        (recipient) => recipient.id === recipientId,
-      );
-
-      return AVAILABLE_RECIPIENT_COLORS[
-        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
-      ];
-    },
+    (recipientId: number) =>
+      getRecipientColor(envelope.recipients.findIndex((r) => r.id === recipientId)),
     [envelope.recipients],
   );
 
