@@ -388,6 +388,11 @@ const decorateAndSignPdf = async ({
       }
     }
 
+    // Flatten the form to bake checkbox/radio appearances into the PDF content
+    // This ensures proper rendering when the PDF is processed by libpdf
+    const form = legacy_pdfLibDoc.getForm();
+    form.flatten();
+
     await pdfDoc.reload(await legacy_pdfLibDoc.save());
   }
 
