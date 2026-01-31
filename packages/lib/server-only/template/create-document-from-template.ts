@@ -551,6 +551,7 @@ export const createDocumentFromTemplate = async ({
         visibility: template.visibility || settings.documentVisibility,
         useLegacyFieldInsertion: template.useLegacyFieldInsertion ?? false,
         documentMetaId: documentMeta.id,
+        formValues: formValues ?? undefined,
         recipients: {
           createMany: {
             data: allFinalRecipients.map((recipient) => {
