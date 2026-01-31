@@ -96,7 +96,7 @@ jobs:
             docker tag ${IMAGE_NAME}:stage ${IMAGE_NAME}:latest
 
             # Deploy using production compose file
-            docker compose -f docker/production/compose.yml up -d documenso
+            docker compose -f docker/production/compose.yml --env-file .env up -d documenso
 
             # Show logs
-            docker compose -f docker/production/compose.yml logs --tail=50 documenso
+            docker compose -f docker/production/compose.yml --env-file .env logs --tail=50 documenso

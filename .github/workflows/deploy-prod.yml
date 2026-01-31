@@ -75,7 +75,7 @@ jobs:
             attempt=1
             while [ $attempt -le $max_attempts ]; do
               echo "Pull attempt $attempt of $max_attempts..."
-              if timeout 600 docker compose -f docker/production/compose.yml pull documenso; then
+              if timeout 600 docker compose -f docker/production/compose.yml --env-file .env pull documenso; then
                 echo "Pull successful"
                 break
               else
@@ -90,7 +90,7 @@ jobs:
             done
 
             # Deploy
-            docker compose -f docker/production/compose.yml up -d documenso
+            docker compose -f docker/production/compose.yml --env-file .env up -d documenso
 
             # Show logs
-            docker compose -f docker/production/compose.yml logs --tail=50 documenso
+            docker compose -f docker/production/compose.yml --env-file .env logs --tail=50 documenso
