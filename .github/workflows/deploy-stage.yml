@@ -27,7 +27,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ghcr.io/${{ github.repository }}
+          images: ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}
           tags: |
             type=raw,value=stage
             type=sha,prefix=stage-
@@ -70,12 +70,15 @@ jobs:
             # Log in to GitHub Container Registry
             echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
+            # Convert repo name to lowercase for Docker
+            IMAGE_NAME=$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+
             # Pull the stage image with retries and timeout
             max_attempts=3
             attempt=1
             while [ $attempt -le $max_attempts ]; do
               echo "Pull attempt $attempt of $max_attempts..."
-              if timeout 600 docker pull ghcr.io/${{ github.repository }}:stage; then
+              if timeout 600 docker pull ${IMAGE_NAME}:stage; then
                 echo "Pull successful"
                 break
               else
@@ -90,7 +93,7 @@ jobs:
             done
 
             # Tag the stage image as latest for docker-compose
-            docker tag ghcr.io/${{ github.repository }}:stage ghcr.io/${{ github.repository }}:latest
+            docker tag ${IMAGE_NAME}:stage ${IMAGE_NAME}:latest
 
             # Deploy using production compose file
             docker compose -f docker/production/compose.yml up -d documenso
