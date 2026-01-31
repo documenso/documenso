@@ -1,0 +1,96 @@
+name: Deploy Stage
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=stage
+            type=sha,prefix=stage-
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./docker/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NEXT_PRIVATE_ENCRYPTION_KEY=${{ secrets.NEXT_PRIVATE_ENCRYPTION_KEY }}
+            NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=${{ secrets.NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Deploy to stage server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: 22
+          command_timeout: 10m
+          script: |
+            set -e
+            cd /home/shared/documenso
+
+            # Pull latest code to get updated docker-compose files
+            git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+            git fetch origin
+            git reset --hard origin/main
+
+            # Log in to GitHub Container Registry
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+
+            # Pull the stage image with retries and timeout
+            max_attempts=3
+            attempt=1
+            while [ $attempt -le $max_attempts ]; do
+              echo "Pull attempt $attempt of $max_attempts..."
+              if timeout 600 docker pull ghcr.io/${{ github.repository }}:stage; then
+                echo "Pull successful"
+                break
+              else
+                if [ $attempt -eq $max_attempts ]; then
+                  echo "Pull failed after $max_attempts attempts"
+                  exit 1
+                fi
+                echo "Pull failed, retrying in 10 seconds..."
+                sleep 10
+                attempt=$((attempt + 1))
+              fi
+            done
+
+            # Tag the stage image as latest for docker-compose
+            docker tag ghcr.io/${{ github.repository }}:stage ghcr.io/${{ github.repository }}:latest
+
+            # Deploy using production compose file
+            docker compose -f docker/production/compose.yml up -d documenso
+
+            # Show logs
+            docker compose -f docker/production/compose.yml logs --tail=50 documenso
