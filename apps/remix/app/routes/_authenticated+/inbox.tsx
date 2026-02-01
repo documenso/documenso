@@ -1,3 +1,4 @@
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { InboxIcon } from 'lucide-react';
 
@@ -6,7 +7,7 @@ import { InboxTable } from '~/components/tables/inbox-table';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Personal Inbox');
+  return appMetaTags(msg`Personal Inbox`);
 }
 
 export default function InboxPage() {
