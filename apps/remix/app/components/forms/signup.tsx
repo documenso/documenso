@@ -66,14 +66,18 @@ export type SignUpFormProps = {
   className?: string;
   initialEmail?: string;
   isGoogleSSOEnabled?: boolean;
+  isMicrosoftSSOEnabled?: boolean;
   isOIDCSSOEnabled?: boolean;
+  returnTo?: string;
 };
 
 export const SignUpForm = ({
   className,
   initialEmail,
   isGoogleSSOEnabled,
+  isMicrosoftSSOEnabled,
   isOIDCSSOEnabled,
+  returnTo,
 }: SignUpFormProps) => {
   const { _ } = useLingui();
   const { toast } = useToast();
@@ -83,6 +87,8 @@ export const SignUpForm = ({
   const [searchParams] = useSearchParams();
 
   const utmSrc = searchParams.get('utm_source') ?? null;
+
+  const hasSocialAuthEnabled = isGoogleSSOEnabled || isMicrosoftSSOEnabled || isOIDCSSOEnabled;
 
   const form = useForm<TSignUpFormSchema>({
     values: {
@@ -106,7 +112,7 @@ export const SignUpForm = ({
         signature,
       });
 
-      await navigate(`/unverified-account`);
+      await navigate(returnTo ? returnTo : '/unverified-account');
 
       toast({
         title: _(msg`Registration Successful`),
@@ -137,6 +143,20 @@ export const SignUpForm = ({
   const onSignUpWithGoogleClick = async () => {
     try {
       await authClient.google.signIn();
+    } catch (err) {
+      toast({
+        title: _(msg`An unknown error occurred`),
+        description: _(
+          msg`We encountered an unknown error while attempting to sign you Up. Please try again later.`,
+        ),
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const onSignUpWithMicrosoftClick = async () => {
+    try {
+      await authClient.microsoft.signIn();
     } catch (err) {
       toast({
         title: _(msg`An unknown error occurred`),
@@ -227,7 +247,7 @@ export const SignUpForm = ({
             <fieldset
               className={cn(
                 'flex h-[550px] w-full flex-col gap-y-4',
-                (isGoogleSSOEnabled || isOIDCSSOEnabled) && 'h-[650px]',
+                hasSocialAuthEnabled && 'h-[650px]',
               )}
               disabled={isSubmitting}
             >
@@ -302,7 +322,7 @@ export const SignUpForm = ({
                 )}
               />
 
-              {(isGoogleSSOEnabled || isOIDCSSOEnabled) && (
+              {hasSocialAuthEnabled && (
                 <>
                   <div className="relative flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
                     <div className="bg-border h-px flex-1" />
@@ -326,6 +346,26 @@ export const SignUpForm = ({
                   >
                     <FcGoogle className="mr-2 h-5 w-5" />
                     <Trans>Sign Up with Google</Trans>
+                  </Button>
+                </>
+              )}
+
+              {isMicrosoftSSOEnabled && (
+                <>
+                  <Button
+                    type="button"
+                    size="lg"
+                    variant={'outline'}
+                    className="bg-background text-muted-foreground border"
+                    disabled={isSubmitting}
+                    onClick={onSignUpWithMicrosoftClick}
+                  >
+                    <img
+                      className="mr-2 h-4 w-4"
+                      alt="Microsoft Logo"
+                      src={'/static/microsoft.svg'}
+                    />
+                    <Trans>Sign Up with Microsoft</Trans>
                   </Button>
                 </>
               )}
@@ -362,7 +402,7 @@ export const SignUpForm = ({
               size="lg"
               className="mt-6 w-full"
             >
-              <Trans>Complete</Trans>
+              <Trans>Create account</Trans>
             </Button>
           </form>
         </Form>

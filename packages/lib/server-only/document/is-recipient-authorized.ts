@@ -1,5 +1,6 @@
 import type { Envelope, Recipient } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { match } from 'ts-pattern';
 
 import { prisma } from '@documenso/prisma';
@@ -252,9 +253,9 @@ const verifyPasskey = async ({
     expectedChallenge: verificationToken.token,
     expectedOrigin: origin,
     expectedRPID: rpId,
-    authenticator: {
-      credentialID: new Uint8Array(Array.from(passkey.credentialId)),
-      credentialPublicKey: new Uint8Array(passkey.credentialPublicKey),
+    credential: {
+      id: isoBase64URL.fromBuffer(passkey.credentialId),
+      publicKey: new Uint8Array(passkey.credentialPublicKey),
       counter: Number(passkey.counter),
     },
   }).catch(() => null); // May want to log this for insights.

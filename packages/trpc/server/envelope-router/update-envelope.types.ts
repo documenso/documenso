@@ -1,5 +1,3 @@
-import { EnvelopeType } from '@prisma/client';
-// import type { OpenApiMeta } from 'trpc-to-openapi';
 import { z } from 'zod';
 
 import {
@@ -14,19 +12,19 @@ import {
   ZDocumentTitleSchema,
   ZDocumentVisibilitySchema,
 } from '../document-router/schema';
+import type { TrpcRouteMeta } from '../trpc';
 
-// export const updateEnvelopeMeta: TrpcRouteMeta = {
-//   openapi: {
-//     method: 'POST',
-//     path: '/envelope/update',
-//     summary: 'Update envelope',
-//     tags: ['Envelope'],
-//   },
-// };
+export const updateEnvelopeMeta: TrpcRouteMeta = {
+  openapi: {
+    method: 'POST',
+    path: '/envelope/update',
+    summary: 'Update envelope',
+    tags: ['Envelope'],
+  },
+};
 
 export const ZUpdateEnvelopeRequestSchema = z.object({
   envelopeId: z.string(),
-  envelopeType: z.nativeEnum(EnvelopeType),
   data: z
     .object({
       title: ZDocumentTitleSchema.optional(),

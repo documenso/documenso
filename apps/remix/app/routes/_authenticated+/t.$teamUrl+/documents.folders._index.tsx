@@ -42,9 +42,6 @@ export default function DocumentsFoldersPage() {
     parentId: null,
   });
 
-  const { mutateAsync: pinFolder } = trpc.folder.pinFolder.useMutation();
-  const { mutateAsync: unpinFolder } = trpc.folder.unpinFolder.useMutation();
-
   const navigateToFolder = (folderId?: string | null) => {
     const documentsPath = formatDocumentsPath(team.url);
 
@@ -113,8 +110,6 @@ export default function DocumentsFoldersPage() {
                         setFolderToMove(folder);
                         setIsMovingFolder(true);
                       }}
-                      onPin={(folderId) => void pinFolder({ folderId })}
-                      onUnpin={(folderId) => void unpinFolder({ folderId })}
                       onSettings={(folder) => {
                         setFolderToSettings(folder);
                         setIsSettingsFolderOpen(true);
@@ -147,8 +142,6 @@ export default function DocumentsFoldersPage() {
                       setFolderToMove(folder);
                       setIsMovingFolder(true);
                     }}
-                    onPin={(folderId) => void pinFolder({ folderId })}
-                    onUnpin={(folderId) => void unpinFolder({ folderId })}
                     onSettings={(folder) => {
                       setFolderToSettings(folder);
                       setIsSettingsFolderOpen(true);

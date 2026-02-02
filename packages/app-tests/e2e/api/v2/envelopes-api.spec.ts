@@ -1,0 +1,1298 @@
+import { type APIRequestContext, expect, test } from '@playwright/test';
+import type { Team, User } from '@prisma/client';
+import fs from 'node:fs';
+import path from 'node:path';
+import { pick } from 'remeda';
+
+import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
+import { createApiToken } from '@documenso/lib/server-only/public-api/create-api-token';
+import { DocumentAccessAuth } from '@documenso/lib/types/document-auth';
+import { prisma } from '@documenso/prisma';
+import {
+  DocumentDistributionMethod,
+  DocumentSigningOrder,
+  DocumentStatus,
+  DocumentVisibility,
+  EnvelopeType,
+  FieldType,
+  FolderType,
+  RecipientRole,
+} from '@documenso/prisma/client';
+import { seedUser } from '@documenso/prisma/seed/users';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
+import type {
+  TCreateEnvelopePayload,
+  TCreateEnvelopeResponse,
+} from '@documenso/trpc/server/envelope-router/create-envelope.types';
+import type { TDistributeEnvelopeRequest } from '@documenso/trpc/server/envelope-router/distribute-envelope.types';
+import type { TCreateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/create-envelope-recipients.types';
+import type { TUpdateEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/envelope-recipients/update-envelope-recipients.types';
+import type { TFindEnvelopesResponse } from '@documenso/trpc/server/envelope-router/find-envelopes.types';
+import type { TGetEnvelopeResponse } from '@documenso/trpc/server/envelope-router/get-envelope.types';
+import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
+
+import { ALIGNMENT_TEST_FIELDS } from '../../../constants/field-alignment-pdf';
+import { FIELD_META_TEST_FIELDS } from '../../../constants/field-meta-pdf';
+
+const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
+const baseUrl = `${WEBAPP_BASE_URL}/api/v2-beta`;
+
+test.describe.configure({
+  mode: 'parallel',
+});
+
+test.describe('API V2 Envelopes', () => {
+  let userA: User, teamA: Team, userB: User, teamB: Team, tokenA: string, tokenB: string;
+
+  test.beforeEach(async () => {
+    ({ user: userA, team: teamA } = await seedUser());
+    ({ token: tokenA } = await createApiToken({
+      userId: userA.id,
+      teamId: teamA.id,
+      tokenName: 'userA',
+      expiresIn: null,
+    }));
+
+    ({ user: userB, team: teamB } = await seedUser());
+    ({ token: tokenB } = await createApiToken({
+      userId: userB.id,
+      teamId: teamB.id,
+      tokenName: 'userB',
+      expiresIn: null,
+    }));
+  });
+
+  test.describe('Envelope create endpoint', () => {
+    test('should fail on invalid form', async ({ request }) => {
+      const payload = {
+        type: 'Invalid Type',
+        title: 'Test Envelope',
+      };
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeFalsy();
+      expect(res.status()).toBe(400);
+    });
+
+    test('should create envelope with single file', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Test Envelope',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'field-font-alignment.pdf',
+          data: fs.readFileSync(
+            path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
+          ),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TCreateEnvelopeResponse;
+
+      const envelope = await prisma.envelope.findUnique({
+        where: {
+          id: response.id,
+        },
+        include: {
+          envelopeItems: true,
+        },
+      });
+
+      expect(envelope).toBeDefined();
+      expect(envelope?.title).toBe('Test Envelope');
+      expect(envelope?.type).toBe(EnvelopeType.TEMPLATE);
+      expect(envelope?.status).toBe(DocumentStatus.DRAFT);
+      expect(envelope?.envelopeItems.length).toBe(1);
+      expect(envelope?.envelopeItems[0].title).toBe('field-font-alignment.pdf');
+      expect(envelope?.envelopeItems[0].documentDataId).toBeDefined();
+    });
+
+    test('should create envelope with multiple file', async ({ request }) => {
+      const folder = await prisma.folder.create({
+        data: {
+          name: 'Test Folder',
+          teamId: teamA.id,
+          userId: userA.id,
+          type: FolderType.DOCUMENT,
+        },
+      });
+
+      const payload = {
+        title: 'Envelope Title',
+        type: EnvelopeType.DOCUMENT,
+        externalId: 'externalId',
+        visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+        globalAccessAuth: ['ACCOUNT'],
+        // Ignore this error in the test since it doesn't actually exist in the PDF:
+        // - Error setting value for field hello: PDFDocument has no form field with the name "hello"
+        // We want to check if the form value is set in the DB.
+        formValues: {
+          hello: 'world',
+        },
+        folderId: folder.id,
+        recipients: [
+          {
+            email: userA.email,
+            name: 'Name',
+            role: RecipientRole.SIGNER,
+            accessAuth: ['TWO_FACTOR_AUTH'],
+            signingOrder: 1,
+            fields: [
+              {
+                type: FieldType.SIGNATURE,
+                identifier: 'field-font-alignment.pdf',
+                page: 1,
+                positionX: 0,
+                positionY: 0,
+                width: 0,
+                height: 0,
+              },
+              {
+                type: FieldType.SIGNATURE,
+                identifier: 0,
+                page: 1,
+                positionX: 0,
+                positionY: 0,
+                width: 0,
+                height: 0,
+              },
+            ],
+          },
+        ],
+        meta: {
+          subject: 'Subject',
+          message: 'Message',
+          timezone: 'Europe/Berlin',
+          dateFormat: 'dd.MM.yyyy',
+          distributionMethod: DocumentDistributionMethod.NONE,
+          signingOrder: DocumentSigningOrder.SEQUENTIAL,
+          allowDictateNextSigner: true,
+          redirectUrl: 'https://documenso.com',
+          language: 'de',
+          typedSignatureEnabled: true,
+          uploadSignatureEnabled: false,
+          drawSignatureEnabled: false,
+          emailReplyTo: userA.email,
+          emailSettings: {
+            recipientSigningRequest: false,
+            recipientRemoved: false,
+            recipientSigned: false,
+            documentPending: false,
+            documentCompleted: false,
+            documentDeleted: false,
+            ownerDocumentCompleted: true,
+          },
+        },
+        attachments: [
+          {
+            label: 'Test Attachment',
+            data: 'https://documenso.com',
+            type: 'link',
+          },
+        ],
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'field-meta.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/field-meta.pdf')),
+        },
+        {
+          name: 'field-font-alignment.pdf',
+          data: fs.readFileSync(
+            path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
+          ),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      // Should error since folder is not owned by the user.
+      const invalidRes = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+        multipart: formData,
+      });
+
+      expect(invalidRes.ok()).toBeFalsy();
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TCreateEnvelopeResponse;
+
+      const envelope = await prisma.envelope.findUniqueOrThrow({
+        where: {
+          id: response.id,
+        },
+        include: {
+          documentMeta: true,
+          envelopeItems: true,
+          recipients: true,
+          fields: true,
+          envelopeAttachments: true,
+        },
+      });
+
+      expect(envelope.envelopeItems.length).toBe(2);
+      expect(envelope.envelopeItems[0].title).toBe('field-meta.pdf');
+      expect(envelope.envelopeItems[1].title).toBe('field-font-alignment.pdf');
+
+      expect(envelope.title).toBe(payload.title);
+      expect(envelope.type).toBe(payload.type);
+      expect(envelope.externalId).toBe(payload.externalId);
+      expect(envelope.visibility).toBe(payload.visibility);
+      expect(envelope.authOptions).toEqual({
+        globalAccessAuth: payload.globalAccessAuth,
+        globalActionAuth: [],
+      });
+      expect(envelope.formValues).toEqual(payload.formValues);
+      expect(envelope.folderId).toBe(payload.folderId);
+
+      expect(envelope.documentMeta.subject).toBe(payload.meta.subject);
+      expect(envelope.documentMeta.message).toBe(payload.meta.message);
+      expect(envelope.documentMeta.timezone).toBe(payload.meta.timezone);
+      expect(envelope.documentMeta.dateFormat).toBe(payload.meta.dateFormat);
+      expect(envelope.documentMeta.distributionMethod).toBe(payload.meta.distributionMethod);
+      expect(envelope.documentMeta.signingOrder).toBe(payload.meta.signingOrder);
+      expect(envelope.documentMeta.allowDictateNextSigner).toBe(
+        payload.meta.allowDictateNextSigner,
+      );
+      expect(envelope.documentMeta.redirectUrl).toBe(payload.meta.redirectUrl);
+      expect(envelope.documentMeta.language).toBe(payload.meta.language);
+      expect(envelope.documentMeta.typedSignatureEnabled).toBe(payload.meta.typedSignatureEnabled);
+      expect(envelope.documentMeta.uploadSignatureEnabled).toBe(
+        payload.meta.uploadSignatureEnabled,
+      );
+      expect(envelope.documentMeta.drawSignatureEnabled).toBe(payload.meta.drawSignatureEnabled);
+      expect(envelope.documentMeta.emailReplyTo).toBe(payload.meta.emailReplyTo);
+      expect(envelope.documentMeta.emailSettings).toEqual(payload.meta.emailSettings);
+
+      expect([
+        {
+          label: envelope.envelopeAttachments[0].label,
+          data: envelope.envelopeAttachments[0].data,
+          type: envelope.envelopeAttachments[0].type,
+        },
+      ]).toEqual(payload.attachments);
+
+      const field = envelope.fields[0];
+      const recipient = envelope.recipients[0];
+
+      expect({
+        email: recipient.email,
+        name: recipient.name,
+        role: recipient.role,
+        signingOrder: recipient.signingOrder,
+        accessAuth: recipient.authOptions?.accessAuth,
+      }).toEqual(
+        pick(payload.recipients[0], ['email', 'name', 'role', 'signingOrder', 'accessAuth']),
+      );
+
+      expect({
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX.toNumber(),
+        positionY: field.positionY.toNumber(),
+        width: field.width.toNumber(),
+        height: field.height.toNumber(),
+      }).toEqual(
+        pick(payload.recipients[0].fields[0], [
+          'type',
+          'page',
+          'positionX',
+          'positionY',
+          'width',
+          'height',
+        ]),
+      );
+
+      // Expect string based ID to work.
+      expect(field.envelopeItemId).toBe(
+        envelope.envelopeItems.find((item) => item.title === 'field-font-alignment.pdf')?.id,
+      );
+
+      // Expect index based ID to work.
+      expect(envelope.fields[1].envelopeItemId).toBe(
+        envelope.envelopeItems.find((item) => item.title === 'field-meta.pdf')?.id,
+      );
+    });
+  });
+
+  /**
+   * Creates envelopes with the two field test PDFs.
+   */
+  test('Envelope full test', async ({ request }) => {
+    // Step 1: Create initial envelope with Prisma (with first envelope item)
+    const alignmentPdf = fs.readFileSync(
+      path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
+    );
+
+    const fieldMetaPdf = fs.readFileSync(
+      path.join(__dirname, '../../../../../assets/field-meta.pdf'),
+    );
+
+    const formData = new FormData();
+
+    formData.append(
+      'payload',
+      JSON.stringify({
+        type: EnvelopeType.DOCUMENT,
+        title: 'Envelope Full Field Test',
+      } satisfies TCreateEnvelopePayload),
+    );
+
+    // Only add one file for now.
+    formData.append(
+      'files',
+      new File([alignmentPdf], 'field-font-alignment.pdf', { type: 'application/pdf' }),
+    );
+
+    const createEnvelopeRequest = await request.post(`${baseUrl}/envelope/create`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      multipart: formData,
+    });
+
+    expect(createEnvelopeRequest.ok()).toBeTruthy();
+    expect(createEnvelopeRequest.status()).toBe(200);
+
+    const { id: createdEnvelopeId }: TCreateEnvelopeResponse = await createEnvelopeRequest.json();
+
+    const getEnvelopeRequest = await request.get(`${baseUrl}/envelope/${createdEnvelopeId}`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+    });
+
+    const createdEnvelope: TGetEnvelopeResponse = await getEnvelopeRequest.json();
+
+    // Might as well testing access control here as well.
+    const unauthRequest = await request.get(`${baseUrl}/envelope/${createdEnvelopeId}`, {
+      headers: { Authorization: `Bearer ${tokenB}` },
+    });
+
+    expect(unauthRequest.ok()).toBeFalsy();
+    expect(unauthRequest.status()).toBe(404);
+
+    // Step 2: Create second envelope item via API
+    const createEnvelopeItemsPayload: TCreateEnvelopeItemsPayload = {
+      envelopeId: createdEnvelope.id,
+    };
+
+    const createEnvelopeItemFormData = new FormData();
+    createEnvelopeItemFormData.append('payload', JSON.stringify(createEnvelopeItemsPayload));
+    createEnvelopeItemFormData.append(
+      'files',
+      new File([fieldMetaPdf], 'field-meta.pdf', { type: 'application/pdf' }),
+    );
+
+    const createItemsRes = await request.post(`${baseUrl}/envelope/item/create-many`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      multipart: createEnvelopeItemFormData,
+    });
+
+    expect(createItemsRes.ok()).toBeTruthy();
+    expect(createItemsRes.status()).toBe(200);
+
+    // Step 3: Update envelope via API
+    const updateEnvelopeRequest: TUpdateEnvelopeRequest = {
+      envelopeId: createdEnvelope.id,
+      data: {
+        title: 'Envelope Full Field Test',
+        visibility: DocumentVisibility.MANAGER_AND_ABOVE,
+      },
+    };
+
+    const updateRes = await request.post(`${baseUrl}/envelope/update`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      data: updateEnvelopeRequest,
+    });
+
+    expect(updateRes.ok()).toBeTruthy();
+    expect(updateRes.status()).toBe(200);
+
+    // Step 4: Create recipient via API
+    const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+      envelopeId: createdEnvelope.id,
+      data: [
+        {
+          email: userA.email,
+          name: userA.name || '',
+          role: RecipientRole.SIGNER,
+          accessAuth: [],
+          actionAuth: [],
+        },
+      ],
+    };
+
+    const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      data: createRecipientsRequest,
+    });
+
+    expect(createRecipientsRes.ok()).toBeTruthy();
+    expect(createRecipientsRes.status()).toBe(200);
+
+    // Step 5: Get envelope to retrieve recipients and envelope items
+    const getRes = await request.get(`${baseUrl}/envelope/${createdEnvelope.id}`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+    });
+
+    expect(getRes.ok()).toBeTruthy();
+    expect(getRes.status()).toBe(200);
+
+    const envelopeResponse = (await getRes.json()) as TGetEnvelopeResponse;
+
+    const recipientId = envelopeResponse.recipients[0].id;
+    const alignmentItem = envelopeResponse.envelopeItems.find(
+      (item: { order: number }) => item.order === 1,
+    );
+    const fieldMetaItem = envelopeResponse.envelopeItems.find(
+      (item: { order: number }) => item.order === 2,
+    );
+
+    expect(recipientId).toBeDefined();
+    expect(alignmentItem).toBeDefined();
+    expect(fieldMetaItem).toBeDefined();
+
+    if (!alignmentItem || !fieldMetaItem) {
+      throw new Error('Envelope items not found');
+    }
+
+    // Step 6: Create fields for first PDF (alignment fields)
+    const alignmentFieldsRequest = {
+      envelopeId: createdEnvelope.id,
+      data: ALIGNMENT_TEST_FIELDS.map((field) => ({
+        recipientId,
+        envelopeItemId: alignmentItem.id,
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta,
+      })),
+    };
+
+    const createAlignmentFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      data: alignmentFieldsRequest,
+    });
+
+    expect(createAlignmentFieldsRes.ok()).toBeTruthy();
+    expect(createAlignmentFieldsRes.status()).toBe(200);
+
+    // Step 7: Create fields for second PDF (field-meta fields)
+    const fieldMetaFieldsRequest = {
+      envelopeId: createdEnvelope.id,
+      data: FIELD_META_TEST_FIELDS.map((field) => ({
+        recipientId,
+        envelopeItemId: fieldMetaItem.id,
+        type: field.type,
+        page: field.page,
+        positionX: field.positionX,
+        positionY: field.positionY,
+        width: field.width,
+        height: field.height,
+        fieldMeta: field.fieldMeta,
+      })),
+    };
+
+    const createFieldMetaFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+      data: fieldMetaFieldsRequest,
+    });
+
+    expect(createFieldMetaFieldsRes.ok()).toBeTruthy();
+    expect(createFieldMetaFieldsRes.status()).toBe(200);
+
+    // Step 8: Verify final envelope structure
+    const finalGetRes = await request.get(`${baseUrl}/envelope/${createdEnvelope.id}`, {
+      headers: { Authorization: `Bearer ${tokenA}` },
+    });
+
+    expect(finalGetRes.ok()).toBeTruthy();
+    const finalEnvelope = (await finalGetRes.json()) as TGetEnvelopeResponse;
+
+    // Verify structure
+    expect(finalEnvelope.envelopeItems.length).toBe(2);
+    expect(finalEnvelope.recipients.length).toBe(1);
+    expect(finalEnvelope.fields.length).toBe(
+      ALIGNMENT_TEST_FIELDS.length + FIELD_META_TEST_FIELDS.length,
+    );
+    expect(finalEnvelope.title).toBe('Envelope Full Field Test');
+    expect(finalEnvelope.type).toBe(EnvelopeType.DOCUMENT);
+
+    console.log({
+      createdEnvelopeId: finalEnvelope.id,
+      userEmail: userA.email,
+    });
+  });
+
+  test.describe('Envelope find endpoint', () => {
+    const createEnvelope = async (
+      request: APIRequestContext,
+      token: string,
+      payload: TCreateEnvelopePayload,
+    ) => {
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const pdfData = fs.readFileSync(
+        path.join(__dirname, '../../../../../assets/field-font-alignment.pdf'),
+      );
+      formData.append('files', new File([pdfData], 'test.pdf', { type: 'application/pdf' }));
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${token}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      return (await res.json()) as TCreateEnvelopeResponse;
+    };
+
+    test('should find envelopes with pagination', async ({ request }) => {
+      // Create 3 envelopes
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document 1',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document 2',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Template 1',
+      });
+
+      // Find all envelopes
+      const res = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.length).toBe(3);
+      expect(response.count).toBe(3);
+      expect(response.currentPage).toBe(1);
+      expect(response.totalPages).toBe(1);
+
+      // Test pagination
+      const paginatedRes = await request.get(`${baseUrl}/envelope?perPage=2&page=1`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(paginatedRes.ok()).toBeTruthy();
+      const paginatedResponse = (await paginatedRes.json()) as TFindEnvelopesResponse;
+
+      expect(paginatedResponse.data.length).toBe(2);
+      expect(paginatedResponse.count).toBe(3);
+      expect(paginatedResponse.totalPages).toBe(2);
+    });
+
+    test('should filter envelopes by type', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document Only',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Template Only',
+      });
+
+      // Filter by DOCUMENT type
+      const documentRes = await request.get(`${baseUrl}/envelope?type=DOCUMENT`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(documentRes.ok()).toBeTruthy();
+      const documentResponse = (await documentRes.json()) as TFindEnvelopesResponse;
+
+      expect(documentResponse.data.every((e) => e.type === EnvelopeType.DOCUMENT)).toBe(true);
+
+      // Filter by TEMPLATE type
+      const templateRes = await request.get(`${baseUrl}/envelope?type=TEMPLATE`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(templateRes.ok()).toBeTruthy();
+      const templateResponse = (await templateRes.json()) as TFindEnvelopesResponse;
+
+      expect(templateResponse.data.every((e) => e.type === EnvelopeType.TEMPLATE)).toBe(true);
+    });
+
+    test('should filter envelopes by status', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Draft Document',
+      });
+
+      // Filter by DRAFT status (default for new envelopes)
+      const res = await request.get(`${baseUrl}/envelope?status=DRAFT`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.every((e) => e.status === DocumentStatus.DRAFT)).toBe(true);
+    });
+
+    test('should search envelopes by query', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Unique Searchable Title',
+      });
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Another Document',
+      });
+
+      const res = await request.get(`${baseUrl}/envelope?query=Unique%20Searchable`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      expect(response.data.length).toBe(1);
+      expect(response.data[0].title).toBe('Unique Searchable Title');
+    });
+
+    test('should not return envelopes from other users', async ({ request }) => {
+      // Create envelope for userA
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'UserA Document',
+      });
+
+      // Create envelope for userB
+      await createEnvelope(request, tokenB, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'UserB Document',
+      });
+
+      // userA should only see their own envelopes
+      const resA = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(resA.ok()).toBeTruthy();
+      const responseA = (await resA.json()) as TFindEnvelopesResponse;
+
+      expect(responseA.data.every((e) => e.title !== 'UserB Document')).toBe(true);
+
+      // userB should only see their own envelopes
+      const resB = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenB}` },
+      });
+
+      expect(resB.ok()).toBeTruthy();
+      const responseB = (await resB.json()) as TFindEnvelopesResponse;
+
+      expect(responseB.data.every((e) => e.title !== 'UserA Document')).toBe(true);
+    });
+
+    test('should return envelope with expected schema fields', async ({ request }) => {
+      await createEnvelope(request, tokenA, {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Schema Test Document',
+      });
+
+      const res = await request.get(`${baseUrl}/envelope`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TFindEnvelopesResponse;
+
+      const envelope = response.data.find((e) => e.title === 'Schema Test Document');
+
+      expect(envelope).toBeDefined();
+      expect(envelope?.id).toBeDefined();
+      expect(envelope?.type).toBe(EnvelopeType.DOCUMENT);
+      expect(envelope?.status).toBe(DocumentStatus.DRAFT);
+      expect(envelope?.recipients).toBeDefined();
+      expect(envelope?.user).toBeDefined();
+      expect(envelope?.team).toBeDefined();
+    });
+  });
+
+  test.describe('Empty recipient tests', () => {
+    test('Create template envelope with empty email recipient', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Template with Empty Email Recipient',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TCreateEnvelopeResponse;
+
+      // Create recipient with empty email
+      const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+        envelopeId: response.id,
+        data: [
+          {
+            email: '',
+            name: 'Test Recipient',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+        ],
+      };
+
+      const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createRecipientsRequest,
+      });
+
+      expect(createRecipientsRes.ok()).toBeTruthy();
+      expect(createRecipientsRes.status()).toBe(200);
+
+      const recipientsResponse = await createRecipientsRes.json();
+      const recipient = recipientsResponse.data[0];
+
+      expect(recipient.email).toBe('');
+      expect(recipient.name).toBe('Test Recipient');
+
+      // Get envelope items to assign fields
+      const getEnvelopeRes = await request.get(`${baseUrl}/envelope/${response.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      const envelope: TGetEnvelopeResponse = await getEnvelopeRes.json();
+      const envelopeItem = envelope.envelopeItems[0];
+
+      // Create field for the recipient with empty email
+      const createFieldsRequest = {
+        envelopeId: response.id,
+        data: [
+          {
+            recipientId: recipient.id,
+            envelopeItemId: envelopeItem.id,
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 100,
+            positionY: 100,
+            width: 50,
+            height: 50,
+          },
+        ],
+      };
+
+      const createFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createFieldsRequest,
+      });
+
+      expect(createFieldsRes.ok()).toBeTruthy();
+      expect(createFieldsRes.status()).toBe(200);
+    });
+
+    test('Create document envelope with empty email recipient', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document with Empty Email Recipient',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      expect(res.status()).toBe(200);
+
+      const response = (await res.json()) as TCreateEnvelopeResponse;
+
+      // Create recipient with empty email
+      const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+        envelopeId: response.id,
+        data: [
+          {
+            email: '',
+            name: 'Document Recipient No Email',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+        ],
+      };
+
+      const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createRecipientsRequest,
+      });
+
+      expect(createRecipientsRes.ok()).toBeTruthy();
+      const recipientsResponse = await createRecipientsRes.json();
+      const recipient = recipientsResponse.data[0];
+
+      expect(recipient.email).toBe('');
+      expect(recipient.name).toBe('Document Recipient No Email');
+    });
+
+    test('Update recipient to have empty email', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Update Recipient Email Test',
+        recipients: [
+          {
+            email: userA.email,
+            name: 'Test User',
+            role: RecipientRole.SIGNER,
+          },
+        ],
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const createRes = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(createRes.ok()).toBeTruthy();
+      const createResponse = (await createRes.json()) as TCreateEnvelopeResponse;
+
+      // Get the envelope to get recipient ID
+      const getRes = await request.get(`${baseUrl}/envelope/${createResponse.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      const envelope: TGetEnvelopeResponse = await getRes.json();
+      const recipientId = envelope.recipients[0].id;
+
+      // Update recipient to have empty email
+      const updateRequest: TUpdateEnvelopeRecipientsRequest = {
+        envelopeId: createResponse.id,
+        data: [
+          {
+            id: recipientId,
+            email: '',
+            name: 'Updated Name No Email',
+          },
+        ],
+      };
+
+      const updateRes = await request.post(`${baseUrl}/envelope/recipient/update-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: updateRequest,
+      });
+
+      expect(updateRes.ok()).toBeTruthy();
+      const updateResponse = await updateRes.json();
+      const updatedRecipient = updateResponse.data[0];
+
+      expect(updatedRecipient.email).toBe('');
+      expect(updatedRecipient.name).toBe('Updated Name No Email');
+    });
+
+    test('Mixed recipients with and without emails', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.TEMPLATE,
+        title: 'Mixed Recipients Test',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const res = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(res.ok()).toBeTruthy();
+      const response = (await res.json()) as TCreateEnvelopeResponse;
+
+      // Create multiple recipients, some with email, some without
+      const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+        envelopeId: response.id,
+        data: [
+          {
+            email: userA.email,
+            name: 'Recipient With Email',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+          {
+            email: '',
+            name: 'Recipient Without Email 1',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+          {
+            email: userB.email,
+            name: 'Another With Email',
+            role: RecipientRole.APPROVER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+          {
+            email: '',
+            name: 'Recipient Without Email 2',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+        ],
+      };
+
+      const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createRecipientsRequest,
+      });
+
+      expect(createRecipientsRes.ok()).toBeTruthy();
+      const recipientsResponse = await createRecipientsRes.json();
+      const recipients = recipientsResponse.data;
+
+      expect(recipients.length).toBe(4);
+      expect(recipients[0].email).toBe(userA.email.toLowerCase());
+      expect(recipients[1].email).toBe('');
+      expect(recipients[2].email).toBe(userB.email.toLowerCase());
+      expect(recipients[3].email).toBe('');
+
+      // Get envelope to assign fields
+      const getEnvelopeRes = await request.get(`${baseUrl}/envelope/${response.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      const envelope: TGetEnvelopeResponse = await getEnvelopeRes.json();
+      const envelopeItem = envelope.envelopeItems[0];
+
+      // Create fields for all recipients including those without emails
+      const createFieldsRequest = {
+        envelopeId: response.id,
+        data: recipients.map((recipient, index) => ({
+          recipientId: recipient.id,
+          envelopeItemId: envelopeItem.id,
+          type: FieldType.SIGNATURE,
+          page: 1,
+          positionX: 100,
+          positionY: 0 + index,
+          width: 50,
+          height: 50,
+        })),
+      };
+
+      const createFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createFieldsRequest,
+      });
+
+      expect(createFieldsRes.ok()).toBeTruthy();
+    });
+
+    test('Distribute envelope with empty email recipients', async ({ request }) => {
+      const payload = {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document for Distribution with Empty Email',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const createRes = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(createRes.ok()).toBeTruthy();
+      const createResponse = (await createRes.json()) as TCreateEnvelopeResponse;
+
+      // Create recipients with empty emails
+      const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+        envelopeId: createResponse.id,
+        data: [
+          {
+            email: '',
+            name: 'Recipient One',
+            role: RecipientRole.SIGNER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+          {
+            email: '',
+            name: 'Recipient Two',
+            role: RecipientRole.APPROVER,
+            accessAuth: [],
+            actionAuth: [],
+          },
+        ],
+      };
+
+      const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createRecipientsRequest,
+      });
+
+      expect(createRecipientsRes.ok()).toBeTruthy();
+      const recipientsResponse = await createRecipientsRes.json();
+      const recipients = recipientsResponse.data;
+
+      // Get envelope to assign fields
+      const getEnvelopeRes = await request.get(`${baseUrl}/envelope/${createResponse.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      const envelope: TGetEnvelopeResponse = await getEnvelopeRes.json();
+      const envelopeItem = envelope.envelopeItems[0];
+
+      // Create fields for recipients
+      const createFieldsRequest = {
+        envelopeId: createResponse.id,
+        data: recipients.map((recipient, index) => ({
+          recipientId: recipient.id,
+          envelopeItemId: envelopeItem.id,
+          type: FieldType.SIGNATURE,
+          page: 1,
+          positionX: 100,
+          positionY: 0 + index,
+          width: 50,
+          height: 50,
+        })),
+      };
+
+      const createFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createFieldsRequest,
+      });
+
+      expect(createFieldsRes.ok()).toBeTruthy();
+
+      // Distribute the envelope
+      const distributeRes = await request.post(`${baseUrl}/envelope/distribute`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          envelopeId: createResponse.id,
+        } satisfies TDistributeEnvelopeRequest,
+      });
+
+      expect(distributeRes.ok()).toBeTruthy();
+      expect(distributeRes.status()).toBe(200);
+
+      const distributeResponse = await distributeRes.json();
+      expect(distributeResponse.success).toBe(true);
+      expect(distributeResponse.id).toBe(createResponse.id);
+      expect(distributeResponse.recipients).toHaveLength(2);
+
+      // Verify recipients have empty emails and signing URLs
+      expect(distributeResponse.recipients[0].email).toBe('');
+      expect(distributeResponse.recipients[0].signingUrl).toBeTruthy();
+      expect(distributeResponse.recipients[1].email).toBe('');
+      expect(distributeResponse.recipients[1].signingUrl).toBeTruthy();
+    });
+
+    test('Distribute envelope with empty email recipient and auth requirements fails', async ({
+      request,
+    }) => {
+      const payload = {
+        type: EnvelopeType.DOCUMENT,
+        title: 'Document with Auth Requirements',
+      } satisfies TCreateEnvelopePayload;
+
+      const formData = new FormData();
+      formData.append('payload', JSON.stringify(payload));
+
+      const files = [
+        {
+          name: 'example.pdf',
+          data: fs.readFileSync(path.join(__dirname, '../../../../../assets/example.pdf')),
+        },
+      ];
+
+      for (const file of files) {
+        formData.append('files', new File([file.data], file.name, { type: 'application/pdf' }));
+      }
+
+      const createRes = await request.post(`${baseUrl}/envelope/create`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        multipart: formData,
+      });
+
+      expect(createRes.ok()).toBeTruthy();
+      const createResponse = (await createRes.json()) as TCreateEnvelopeResponse;
+
+      // Create recipient with empty email and TWO_FACTOR_AUTH action auth
+      const createRecipientsRequest: TCreateEnvelopeRecipientsRequest = {
+        envelopeId: createResponse.id,
+        data: [
+          {
+            email: '',
+            name: 'Recipient With Auth',
+            role: RecipientRole.SIGNER,
+            accessAuth: [DocumentAccessAuth.TWO_FACTOR_AUTH],
+          },
+        ],
+      };
+
+      const createRecipientsRes = await request.post(`${baseUrl}/envelope/recipient/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createRecipientsRequest,
+      });
+
+      expect(createRecipientsRes.ok()).toBeTruthy();
+      const recipientsResponse = await createRecipientsRes.json();
+      const recipient = recipientsResponse.data[0];
+
+      // Get envelope to assign fields
+      const getEnvelopeRes = await request.get(`${baseUrl}/envelope/${createResponse.id}`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+      });
+
+      const envelope: TGetEnvelopeResponse = await getEnvelopeRes.json();
+      const envelopeItem = envelope.envelopeItems[0];
+
+      // Create field for the recipient
+      const createFieldsRequest = {
+        envelopeId: createResponse.id,
+        data: [
+          {
+            recipientId: recipient.id,
+            envelopeItemId: envelopeItem.id,
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 100,
+            positionY: 100,
+            width: 50,
+            height: 50,
+          },
+        ],
+      };
+
+      const createFieldsRes = await request.post(`${baseUrl}/envelope/field/create-many`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: createFieldsRequest,
+      });
+
+      expect(createFieldsRes.ok()).toBeTruthy();
+
+      // Try to distribute the envelope - should fail
+      const distributeRes = await request.post(`${baseUrl}/envelope/distribute`, {
+        headers: { Authorization: `Bearer ${tokenA}` },
+        data: {
+          envelopeId: createResponse.id,
+        },
+      });
+
+      // Expect distribution to fail
+      expect(distributeRes.ok()).toBeFalsy();
+      expect(distributeRes.status()).toBe(400);
+
+      const errorResponse = await distributeRes.json();
+      expect(errorResponse.message).toContain('requires an email');
+    });
+  });
+});

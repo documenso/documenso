@@ -38,7 +38,6 @@ export const getTemplateByDirectLinkToken = async ({
 
   const directLink = envelope?.directLink;
 
-  // Todo: Envelopes
   const firstDocumentData = envelope?.envelopeItems[0]?.documentData;
 
   // Doing this to enforce type safety for directLink.
@@ -88,5 +87,9 @@ export const getTemplateByDirectLinkToken = async ({
     },
     recipients: recipientsWithMappedFields,
     fields: recipientsWithMappedFields.flatMap((recipient) => recipient.fields),
+    envelopeItems: envelope.envelopeItems.map((item) => ({
+      id: item.id,
+      envelopeId: item.envelopeId,
+    })),
   };
 };

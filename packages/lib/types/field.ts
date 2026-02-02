@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { FieldSchema } from '@documenso/prisma/generated/zod/modelSchema/FieldSchema';
 
 import {
+  FIELD_SIGNATURE_META_DEFAULT_VALUES,
   ZCheckboxFieldMeta,
   ZDateFieldMeta,
   ZDropdownFieldMeta,
@@ -12,6 +13,7 @@ import {
   ZNameFieldMeta,
   ZNumberFieldMeta,
   ZRadioFieldMeta,
+  ZSignatureFieldMeta,
   ZTextFieldMeta,
 } from './field-meta';
 
@@ -48,6 +50,11 @@ export const ZFieldSchema = FieldSchema.pick({
   templateId: z.number().nullish(),
 });
 
+export const ZEnvelopeFieldSchema = ZFieldSchema.omit({
+  documentId: true,
+  templateId: true,
+});
+
 export const ZFieldPageNumberSchema = z
   .number()
   .min(1)
@@ -67,9 +74,32 @@ export const ZFieldWidthSchema = z.number().min(1).describe('The width of the fi
 
 export const ZFieldHeightSchema = z.number().min(1).describe('The height of the field.');
 
+export const ZClampedFieldPositionXSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based X coordinate where the field will be placed.');
+
+export const ZClampedFieldPositionYSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based Y coordinate where the field will be placed.');
+
+export const ZClampedFieldWidthSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based width of the field on the page.');
+
+export const ZClampedFieldHeightSchema = z
+  .number()
+  .min(0)
+  .max(100)
+  .describe('The percentage based height of the field on the page.');
+
 // ---------------------------------------------
 
-// Todo: Envelopes - dunno man
 const PrismaDecimalSchema = z.preprocess(
   (val) => (typeof val === 'string' ? new Prisma.Decimal(val) : val),
   z.instanceof(Prisma.Decimal, { message: 'Must be a Decimal' }),
@@ -91,7 +121,7 @@ export type TFieldText = z.infer<typeof ZFieldTextSchema>;
 
 export const ZFieldSignatureSchema = BaseFieldSchemaUsingNumbers.extend({
   type: z.literal(FieldType.SIGNATURE),
-  fieldMeta: z.literal(null),
+  fieldMeta: ZSignatureFieldMeta.catch(FIELD_SIGNATURE_META_DEFAULT_VALUES),
 });
 
 export type TFieldSignature = z.infer<typeof ZFieldSignatureSchema>;

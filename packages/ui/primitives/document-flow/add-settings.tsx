@@ -312,7 +312,7 @@ export const AddSettingsFormPartial = ({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="flex flex-row items-center">
-                      Document visibility
+                      <Trans>Document visibility</Trans>
                       <DocumentVisibilityTooltip />
                     </FormLabel>
 
@@ -419,7 +419,7 @@ export const AddSettingsFormPartial = ({
                                 void handleAutoSave();
                               }}
                               className="bg-background w-full"
-                              emptySelectionPlaceholder="Select signature types"
+                              emptySelectionPlaceholder={t`Select signature types`}
                             />
                           </FormControl>
 

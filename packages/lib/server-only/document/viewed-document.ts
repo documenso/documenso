@@ -31,26 +31,16 @@ export const viewedDocument = async ({
         type: EnvelopeType.DOCUMENT,
       },
     },
-    include: {
-      envelope: {
-        include: {
-          documentMeta: true,
-          recipients: true,
-        },
-      },
-    },
   });
 
   if (!recipient) {
     return;
   }
 
-  const { envelope } = recipient;
-
   await prisma.documentAuditLog.create({
     data: createDocumentAuditLogData({
       type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_VIEWED,
-      envelopeId: envelope.id,
+      envelopeId: recipient.envelopeId,
       user: {
         name: recipient.name,
         email: recipient.email,
@@ -86,7 +76,7 @@ export const viewedDocument = async ({
     await tx.documentAuditLog.create({
       data: createDocumentAuditLogData({
         type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_OPENED,
-        envelopeId: envelope.id,
+        envelopeId: recipient.envelopeId,
         user: {
           name: recipient.name,
           email: recipient.email,
@@ -101,6 +91,16 @@ export const viewedDocument = async ({
         },
       }),
     });
+  });
+
+  const envelope = await prisma.envelope.findUniqueOrThrow({
+    where: {
+      id: recipient.envelopeId,
+    },
+    include: {
+      documentMeta: true,
+      recipients: true,
+    },
   });
 
   await triggerWebhook({

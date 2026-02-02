@@ -39,6 +39,11 @@ export const getAdminOrganisation = async ({ organisationId }: GetOrganisationOp
       teams: true,
       members: {
         include: {
+          organisationGroupMembers: {
+            include: {
+              group: true,
+            },
+          },
           user: {
             select: {
               id: true,

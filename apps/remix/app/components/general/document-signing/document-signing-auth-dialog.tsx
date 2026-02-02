@@ -47,7 +47,8 @@ export const DocumentSigningAuthDialog = ({
   onOpenChange,
   onReauthFormSubmit,
 }: DocumentSigningAuthDialogProps) => {
-  const { recipient, user, isCurrentlyAuthenticating } = useRequiredDocumentSigningAuthContext();
+  const { recipient, user, isCurrentlyAuthenticating, isDirectTemplate } =
+    useRequiredDocumentSigningAuthContext();
 
   // Filter out EXPLICIT_NONE from available auth types for the chooser
   const validAuthTypes = availableAuthTypes.filter(
@@ -168,7 +169,11 @@ export const DocumentSigningAuthDialog = ({
           match({ documentAuthType: selectedAuthType, user })
             .with(
               { documentAuthType: DocumentAuth.ACCOUNT },
-              { user: P.when((user) => !user || user.email !== recipient.email) }, // Assume all current auth methods requires them to be logged in.
+              {
+                user: P.when(
+                  (user) => !user || (user.email !== recipient.email && !isDirectTemplate),
+                ),
+              }, // Assume all current auth methods requires them to be logged in.
               () => <DocumentSigningAuthAccount onOpenChange={onOpenChange} />,
             )
             .with({ documentAuthType: DocumentAuth.PASSKEY }, () => (

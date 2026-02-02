@@ -8,6 +8,7 @@ import { getTemplateById } from '@documenso/lib/server-only/template/get-templat
 import { formatTemplatesPath } from '@documenso/lib/utils/teams';
 
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
+import { DocumentAttachmentsPopover } from '~/components/general/document/document-attachments-popover';
 import { LegacyFieldWarningPopover } from '~/components/general/legacy-field-warning-popover';
 import { TemplateDirectLinkBadge } from '~/components/general/template/template-direct-link-badge';
 import { TemplateEditForm } from '~/components/general/template/template-edit-form';
@@ -60,7 +61,7 @@ export default function TemplateEditPage() {
         <div>
           <Link
             to={`${templateRootPath}/${template.envelopeId}`}
-            className="flex items-center text-[#7AC455] hover:opacity-80"
+            className="flex items-center text-documenso-700 hover:opacity-80"
           >
             <ChevronLeft className="mr-2 inline-block h-5 w-5" />
             <Trans>Template</Trans>
@@ -87,6 +88,8 @@ export default function TemplateEditPage() {
         </div>
 
         <div className="mt-2 flex items-center gap-2 sm:mt-0 sm:self-end">
+          <DocumentAttachmentsPopover envelopeId={template.envelopeId} />
+
           <TemplateDirectLinkDialog
             templateId={template.id}
             directLink={template.directLink}

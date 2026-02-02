@@ -1,6 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import type { Field } from '@prisma/client';
@@ -57,8 +55,6 @@ export const DirectTemplateConfigureForm = ({
   initialEmail,
   onSubmit,
 }: DirectTemplateConfigureFormProps) => {
-  const { _ } = useLingui();
-
   const { sessionData } = useOptionalSession();
   const user = sessionData?.user;
 
@@ -77,17 +73,7 @@ export const DirectTemplateConfigureForm = ({
   });
 
   const form = useForm<TDirectTemplateConfigureFormSchema>({
-    resolver: zodResolver(
-      ZDirectTemplateConfigureFormSchema.superRefine((items, ctx) => {
-        if (template.recipients.map((recipient) => recipient.email).includes(items.email)) {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: _(msg`Email cannot already exist in the template`),
-            path: ['email'],
-          });
-        }
-      }),
-    ),
+    resolver: zodResolver(ZDirectTemplateConfigureFormSchema),
     defaultValues: {
       email: initialEmail || '',
     },
@@ -138,7 +124,7 @@ export const DirectTemplateConfigureForm = ({
                   </FormControl>
 
                   {!fieldState.error && (
-                    <p className="text-muted-foreground text-xs">
+                    <p className="text-xs text-muted-foreground">
                       <Trans>Enter your email address to receive the completed document.</Trans>
                     </p>
                   )}

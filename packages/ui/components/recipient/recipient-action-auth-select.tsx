@@ -10,6 +10,8 @@ import { RecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { MultiSelect, type Option } from '@documenso/ui/primitives/multiselect';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 
+import { cn } from '../../lib/utils';
+
 export interface RecipientActionAuthSelectProps {
   value?: string[];
   defaultValue?: string[];
@@ -37,7 +39,7 @@ export const RecipientActionAuthSelect = ({
       .filter((auth) => auth !== RecipientActionAuth.ACCOUNT)
       .map((authType) => ({
         value: authType,
-        label: DOCUMENT_AUTH_TYPES[authType].value,
+        label: _(DOCUMENT_AUTH_TYPES[authType].value),
       })),
   ];
 
@@ -73,7 +75,11 @@ export const RecipientActionAuthSelect = ({
       />
 
       <Tooltip>
-        <TooltipTrigger className="absolute right-2 top-1/2 -translate-y-1/2">
+        <TooltipTrigger
+          className={cn('absolute right-2 top-1/2 -translate-y-1/2', {
+            'right-8': selectedOptions.length > 0,
+          })}
+        >
           <InfoIcon className="h-4 w-4" />
         </TooltipTrigger>
 

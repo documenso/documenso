@@ -63,7 +63,7 @@ export const FolderDeleteDialog = ({ folder, isOpen, onOpenChange }: FolderDelet
   const onFormSubmit = async () => {
     try {
       await deleteFolder({
-        id: folder.id,
+        folderId: folder.id,
       });
 
       onOpenChange(false);

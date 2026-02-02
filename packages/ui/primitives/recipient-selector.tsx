@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -34,8 +34,8 @@ export const RecipientSelector = ({
   const { _ } = useLingui();
   const [showRecipientsSelector, setShowRecipientsSelector] = useState(false);
 
-  const recipientsByRole = useCallback(() => {
-    const recipientsByRole: Record<RecipientRole, Recipient[]> = {
+  const recipientsByRole = useMemo(() => {
+    const recipientsWithRole: Record<RecipientRole, Recipient[]> = {
       CC: [],
       VIEWER: [],
       SIGNER: [],
@@ -44,14 +44,14 @@ export const RecipientSelector = ({
     };
 
     recipients.forEach((recipient) => {
-      recipientsByRole[recipient.role].push(recipient);
+      recipientsWithRole[recipient.role].push(recipient);
     });
 
-    return recipientsByRole;
+    return recipientsWithRole;
   }, [recipients]);
 
-  const recipientsByRoleToDisplay = useCallback(() => {
-    return Object.entries(recipientsByRole())
+  const recipientsByRoleToDisplay = useMemo(() => {
+    return Object.entries(recipientsByRole)
       .filter(
         ([role]) =>
           role !== RecipientRole.CC &&
@@ -71,6 +71,28 @@ export const RecipientSelector = ({
       );
   }, [recipientsByRole]);
 
+  const getRecipientLabel = useCallback(
+    (recipient: Recipient) => {
+      if (recipient.name && recipient.email) {
+        return `${recipient.name} (${recipient.email})`;
+      }
+
+      if (recipient.name) {
+        return recipient.name;
+      }
+
+      if (recipient.email) {
+        return recipient.email;
+      }
+
+      // Since objects are basically pointers we can use `indexOf` rather than `findIndex`
+      const index = recipients.indexOf(recipient);
+
+      return `Recipient ${index + 1}`;
+    },
+    [recipients, selectedRecipient],
+  );
+
   return (
     <Popover open={showRecipientsSelector} onOpenChange={setShowRecipientsSelector}>
       <PopoverTrigger asChild>
@@ -89,14 +111,10 @@ export const RecipientSelector = ({
             className,
           )}
         >
-          {selectedRecipient?.email && (
+          {selectedRecipient && (
             <span className="flex-1 truncate text-left">
-              {selectedRecipient?.name} ({selectedRecipient?.email})
+              {getRecipientLabel(selectedRecipient)}
             </span>
-          )}
-
-          {!selectedRecipient?.email && (
-            <span className="flex-1 truncate text-left">{selectedRecipient?.email}</span>
           )}
 
           <ChevronsUpDown className="ml-2 h-4 w-4" />
@@ -113,7 +131,7 @@ export const RecipientSelector = ({
             </span>
           </CommandEmpty>
 
-          {recipientsByRoleToDisplay().map(([role, roleRecipients], roleIndex) => (
+          {recipientsByRoleToDisplay.map(([role, roleRecipients], roleIndex) => (
             <CommandGroup key={roleIndex}>
               <div className="text-muted-foreground mb-1 ml-2 mt-2 text-xs font-medium">
                 {_(RECIPIENT_ROLES_DESCRIPTION[role].roleNamePlural)}
@@ -154,13 +172,7 @@ export const RecipientSelector = ({
                       'text-foreground/80': recipient.id === selectedRecipient?.id,
                     })}
                   >
-                    {recipient.name && (
-                      <span title={`${recipient.name} (${recipient.email})`}>
-                        {recipient.name} ({recipient.email})
-                      </span>
-                    )}
-
-                    {!recipient.name && <span title={recipient.email}>{recipient.email}</span>}
+                    {getRecipientLabel(recipient)}
                   </span>
 
                   <div className="ml-auto flex items-center justify-center">

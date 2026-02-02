@@ -9,7 +9,7 @@ import { Button } from '@documenso/ui/primitives/button';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 export type DocumentSigningAuthPageViewProps = {
-  email: string;
+  email?: string;
   emailHasAccount?: boolean;
 };
 
@@ -22,12 +22,18 @@ export const DocumentSigningAuthPageView = ({
 
   const [isSigningOut, setIsSigningOut] = useState(false);
 
-  const handleChangeAccount = async (email: string) => {
+  const handleChangeAccount = async (email?: string) => {
     try {
       setIsSigningOut(true);
 
+      let redirectPath = '/signin';
+
+      if (email) {
+        redirectPath = emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`;
+      }
+
       await authClient.signOut({
-        redirectPath: emailHasAccount ? `/signin#email=${email}` : `/signup#email=${email}`,
+        redirectPath,
       });
     } catch {
       toast({
@@ -49,9 +55,13 @@ export const DocumentSigningAuthPageView = ({
         </h1>
 
         <p className="text-muted-foreground mt-2 text-sm">
-          <Trans>
-            You need to be logged in as <strong>{email}</strong> to view this page.
-          </Trans>
+          {email ? (
+            <Trans>
+              You need to be logged in as <strong>{email}</strong> to view this page.
+            </Trans>
+          ) : (
+            <Trans>You need to be logged in to view this page.</Trans>
+          )}
         </p>
 
         <Button

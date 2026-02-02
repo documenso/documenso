@@ -60,6 +60,7 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
 
     return {
       document,
+      token: slug,
     };
   }
 
@@ -74,7 +75,7 @@ export const loader = async ({ request, params: { slug } }: Route.LoaderArgs) =>
 };
 
 export default function SharePage() {
-  const { document } = useLoaderData<typeof loader>();
+  const { document, token } = useLoaderData<typeof loader>();
 
   if (document) {
     return (
@@ -86,6 +87,7 @@ export default function SharePage() {
         envelopeItems={document.envelopeItems}
         recipientCount={document.recipientCount}
         completedDate={document.completedAt ?? undefined}
+        token={token}
       />
     );
   }

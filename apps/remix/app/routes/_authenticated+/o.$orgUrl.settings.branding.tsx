@@ -79,7 +79,7 @@ export default function OrganisationSettingsBrandingPage() {
   if (isLoadingOrganisation || !organisationWithSettings) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -87,9 +87,9 @@ export default function OrganisationSettingsBrandingPage() {
   const settingsHeaderText = t`Branding Preferences`;
 
   const settingsHeaderSubtitle = isPersonalLayoutMode
-    ? t`Here you can set your general branding preferences`
+    ? t`Here you can set your general branding preferences.`
     : team
-      ? t`Here you can set branding preferences for your team`
+      ? t`Here you can set branding preferences for your team.`
       : t`Here you can set branding preferences for your organisation. Teams will inherit these settings by default.`;
 
   return (

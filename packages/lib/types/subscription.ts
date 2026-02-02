@@ -30,6 +30,8 @@ export const ZClaimFlagsSchema = z.object({
   cfr21: z.boolean().optional(),
 
   authenticationPortal: z.boolean().optional(),
+
+  allowLegacyEnvelopes: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -40,6 +42,7 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   {
     label: string;
     key: keyof TClaimFlags;
+    isEnterprise?: boolean;
   }
 > = {
   unlimitedDocuments: {
@@ -57,10 +60,12 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   emailDomains: {
     key: 'emailDomains',
     label: 'Email domains',
+    isEnterprise: true,
   },
   embedAuthoring: {
     key: 'embedAuthoring',
     label: 'Embed authoring',
+    isEnterprise: true,
   },
   embedSigning: {
     key: 'embedSigning',
@@ -69,6 +74,7 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   embedAuthoringWhiteLabel: {
     key: 'embedAuthoringWhiteLabel',
     label: 'White label for embed authoring',
+    isEnterprise: true,
   },
   embedSigningWhiteLabel: {
     key: 'embedSigningWhiteLabel',
@@ -77,10 +83,16 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   cfr21: {
     key: 'cfr21',
     label: '21 CFR',
+    isEnterprise: true,
   },
   authenticationPortal: {
     key: 'authenticationPortal',
     label: 'Authentication portal',
+    isEnterprise: true,
+  },
+  allowLegacyEnvelopes: {
+    key: 'allowLegacyEnvelopes',
+    label: 'Allow Legacy Envelopes',
   },
 };
 
@@ -105,6 +117,7 @@ export const internalClaims: InternalClaims = {
     name: 'Free',
     teamCount: 1,
     memberCount: 1,
+    envelopeItemCount: 5,
     locked: true,
     flags: {},
   },
@@ -113,6 +126,7 @@ export const internalClaims: InternalClaims = {
     name: 'Individual',
     teamCount: 1,
     memberCount: 1,
+    envelopeItemCount: 5,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -123,6 +137,7 @@ export const internalClaims: InternalClaims = {
     name: 'Teams',
     teamCount: 1,
     memberCount: 5,
+    envelopeItemCount: 5,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -135,6 +150,7 @@ export const internalClaims: InternalClaims = {
     name: 'Platform',
     teamCount: 1,
     memberCount: 0,
+    envelopeItemCount: 10,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -152,6 +168,7 @@ export const internalClaims: InternalClaims = {
     name: 'Enterprise',
     teamCount: 0,
     memberCount: 0,
+    envelopeItemCount: 10,
     locked: true,
     flags: {
       unlimitedDocuments: true,
@@ -171,6 +188,7 @@ export const internalClaims: InternalClaims = {
     name: 'Early Adopter',
     teamCount: 0,
     memberCount: 0,
+    envelopeItemCount: 5,
     locked: true,
     flags: {
       unlimitedDocuments: true,

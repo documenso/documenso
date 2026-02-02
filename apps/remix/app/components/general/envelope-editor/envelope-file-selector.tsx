@@ -20,16 +20,17 @@ export const EnvelopeItemSelector = ({
 }: EnvelopeItemSelectorProps) => {
   return (
     <button
-      className={`flex min-w-0 cursor-pointer items-center space-x-3 rounded-lg border px-4 py-3 transition-colors ${
+      title={typeof primaryText === 'string' ? primaryText : undefined}
+      className={`flex h-fit max-w-72 flex-shrink-0 cursor-pointer items-center space-x-3 rounded-lg border px-4 py-3 transition-colors ${
         isSelected
-          ? 'border-blue-200 bg-blue-50 text-blue-900'
-          : 'border-gray-200 bg-gray-50 hover:bg-gray-100'
+          ? 'border-green-200 bg-green-50 text-green-900 dark:border-green-400/30 dark:bg-green-400/10 dark:text-green-400'
+          : 'border-border bg-muted/50 hover:bg-muted/70'
       }`}
       {...buttonProps}
     >
       <div
-        className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${
-          isSelected ? 'bg-blue-100 text-blue-600' : 'bg-gray-200 text-gray-600'
+        className={`flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full text-xs font-medium ${
+          isSelected ? 'bg-green-100 text-green-600' : 'bg-gray-200 text-gray-600'
         }`}
       >
         {number}
@@ -39,8 +40,8 @@ export const EnvelopeItemSelector = ({
         <div className="text-xs text-gray-500">{secondaryText}</div>
       </div>
       <div
-        className={cn('h-2 w-2 rounded-full', {
-          'bg-blue-500': isSelected,
+        className={cn('h-2 w-2 flex-shrink-0 rounded-full', {
+          'bg-green-500': isSelected,
         })}
       ></div>
     </button>
@@ -61,7 +62,7 @@ export const EnvelopeRendererFileSelector = ({
   const { envelopeItems, currentEnvelopeItem, setCurrentEnvelopeItem } = useCurrentEnvelopeRender();
 
   return (
-    <div className={cn('flex h-fit space-x-2 overflow-x-auto p-4', className)}>
+    <div className={cn('flex h-fit flex-shrink-0 space-x-2 overflow-x-auto p-4', className)}>
       {envelopeItems.map((doc, i) => (
         <EnvelopeItemSelector
           key={doc.id}

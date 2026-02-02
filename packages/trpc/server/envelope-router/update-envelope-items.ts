@@ -7,9 +7,11 @@ import { authenticatedProcedure } from '../trpc';
 import {
   ZUpdateEnvelopeItemsRequestSchema,
   ZUpdateEnvelopeItemsResponseSchema,
+  updateEnvelopeItemsMeta,
 } from './update-envelope-items.types';
 
 export const updateEnvelopeItemsRoute = authenticatedProcedure
+  .meta(updateEnvelopeItemsMeta)
   .input(ZUpdateEnvelopeItemsRequestSchema)
   .output(ZUpdateEnvelopeItemsResponseSchema)
   .mutation(async ({ input, ctx }) => {
@@ -90,10 +92,9 @@ export const updateEnvelopeItemsRoute = authenticatedProcedure
       ),
     );
 
-    // Todo: Envelope - Audit logs?
-    // Todo: Envelopes - Delete the document data as well?
+    // Todo: Envelope [AUDIT_LOGS]
 
     return {
-      updatedEnvelopeItems,
+      data: updatedEnvelopeItems,
     };
   });

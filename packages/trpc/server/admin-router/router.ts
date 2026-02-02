@@ -8,6 +8,7 @@ import { deleteUserRoute } from './delete-user';
 import { disableUserRoute } from './disable-user';
 import { enableUserRoute } from './enable-user';
 import { findAdminOrganisationsRoute } from './find-admin-organisations';
+import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
@@ -16,7 +17,9 @@ import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
+import { resyncLicenseRoute } from './resync-license';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
+import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
 import { updateSiteSettingRoute } from './update-site-setting';
 import { updateSubscriptionClaimRoute } from './update-subscription-claim';
@@ -31,6 +34,7 @@ export const adminRouter = router({
   },
   organisationMember: {
     promoteToOwner: promoteMemberToOwnerRoute,
+    updateRole: updateOrganisationMemberRoleRoute,
   },
   claims: {
     find: findSubscriptionClaimsRoute,
@@ -40,6 +44,9 @@ export const adminRouter = router({
   },
   stripe: {
     createCustomer: createStripeCustomerRoute,
+  },
+  license: {
+    resync: resyncLicenseRoute,
   },
   user: {
     get: getUserRoute,
@@ -54,6 +61,7 @@ export const adminRouter = router({
     delete: deleteDocumentRoute,
     reseal: resealDocumentRoute,
     findJobs: findDocumentJobsRoute,
+    findAuditLogs: findDocumentAuditLogsRoute,
   },
   recipient: {
     update: updateRecipientRoute,

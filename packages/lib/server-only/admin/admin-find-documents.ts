@@ -78,6 +78,14 @@ export const adminFindDocuments = async ({
             url: true,
           },
         },
+        envelopeItems: {
+          select: {
+            id: true,
+            envelopeId: true,
+            title: true,
+            order: true,
+          },
+        },
       },
     }),
     prisma.envelope.count({

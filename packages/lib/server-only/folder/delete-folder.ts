@@ -1,6 +1,7 @@
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { prisma } from '@documenso/prisma';
 
+import { TEAM_DOCUMENT_VISIBILITY_MAP } from '../../constants/teams';
 import { buildTeamWhereQuery, canAccessTeamDocument } from '../../utils/teams';
 import { getTeamById } from '../team/get-team';
 
@@ -20,6 +21,9 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
         teamId,
         userId,
       }),
+      visibility: {
+        in: TEAM_DOCUMENT_VISIBILITY_MAP[team.currentTeamRole],
+      },
     },
   });
 
@@ -39,7 +43,7 @@ export const deleteFolder = async ({ userId, teamId, folderId }: DeleteFolderOpt
 
   return await prisma.folder.delete({
     where: {
-      id: folderId,
+      id: folder.id,
     },
   });
 };

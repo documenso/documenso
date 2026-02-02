@@ -72,7 +72,13 @@ export const RadioFieldAdvancedSettings = ({
     setReadOnly(readOnly);
     setRequired(required);
 
-    const errors = validateRadioField(String(value), { readOnly, required, values, type: 'radio' });
+    const errors = validateRadioField(String(value), {
+      readOnly,
+      required,
+      values,
+      type: 'radio',
+      direction: 'vertical',
+    });
     handleErrors(errors);
 
     handleFieldChange(field, value);
@@ -97,7 +103,13 @@ export const RadioFieldAdvancedSettings = ({
   }, [fieldState.values]);
 
   useEffect(() => {
-    const errors = validateRadioField(undefined, { readOnly, required, values, type: 'radio' });
+    const errors = validateRadioField(undefined, {
+      readOnly,
+      required,
+      values,
+      type: 'radio',
+      direction: 'vertical',
+    });
     handleErrors(errors);
   }, [values]);
 

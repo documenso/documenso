@@ -24,7 +24,6 @@ import {
   mapSecondaryIdToDocumentId,
   mapSecondaryIdToTemplateId,
 } from '@documenso/lib/utils/envelope';
-import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { AnimateGenericFadeInOut } from '@documenso/ui/components/animate/animate-generic-fade-in-out';
 import { Button } from '@documenso/ui/primitives/button';
 import { Separator } from '@documenso/ui/primitives/separator';
@@ -32,17 +31,17 @@ import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 
 import { DocumentDeleteDialog } from '~/components/dialogs/document-delete-dialog';
 import { EnvelopeDistributeDialog } from '~/components/dialogs/envelope-distribute-dialog';
+import { EnvelopeDownloadDialog } from '~/components/dialogs/envelope-download-dialog';
 import { EnvelopeDuplicateDialog } from '~/components/dialogs/envelope-duplicate-dialog';
 import { EnvelopeRedistributeDialog } from '~/components/dialogs/envelope-redistribute-dialog';
 import { TemplateDeleteDialog } from '~/components/dialogs/template-delete-dialog';
 import { TemplateDirectLinkDialog } from '~/components/dialogs/template-direct-link-dialog';
 import { EnvelopeEditorSettingsDialog } from '~/components/general/envelope-editor/envelope-editor-settings-dialog';
-import { useCurrentTeam } from '~/providers/team';
 
+import { EnvelopeEditorFieldsPage } from './envelope-editor-fields-page';
 import EnvelopeEditorHeader from './envelope-editor-header';
-import { EnvelopeEditorPageFields } from './envelope-editor-page-fields';
-import { EnvelopeEditorPagePreview } from './envelope-editor-page-preview';
-import { EnvelopeEditorPageUpload } from './envelope-editor-page-upload';
+import { EnvelopeEditorPreviewPage } from './envelope-editor-preview-page';
+import { EnvelopeEditorUploadPage } from './envelope-editor-upload-page';
 
 type EnvelopeEditorStep = 'upload' | 'addFields' | 'preview';
 
@@ -74,10 +73,16 @@ export default function EnvelopeEditor() {
   const { t } = useLingui();
 
   const navigate = useNavigate();
-  const team = useCurrentTeam();
 
-  const { envelope, isDocument, isTemplate, isAutosaving, flushAutosave } =
-    useCurrentEnvelopeEditor();
+  const {
+    envelope,
+    isDocument,
+    isTemplate,
+    isAutosaving,
+    flushAutosave,
+    relativePath,
+    syncEnvelope,
+  } = useCurrentEnvelopeEditor();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -100,13 +105,10 @@ export default function EnvelopeEditor() {
     return 'upload';
   });
 
-  const documentsPath = formatDocumentsPath(team.url);
-  const templatesPath = formatTemplatesPath(team.url);
-
   const navigateToStep = (step: EnvelopeEditorStep) => {
     setCurrentStep(step);
 
-    flushAutosave();
+    void flushAutosave();
 
     if (!isStepLoading && isAutosaving) {
       setIsStepLoading(true);
@@ -128,6 +130,18 @@ export default function EnvelopeEditor() {
     }
   };
 
+  // Watch the URL params and setStep if the step changes.
+  useEffect(() => {
+    const stepParam = searchParams.get('step') || envelopeEditorSteps[0].id;
+
+    const foundStep = envelopeEditorSteps.find((step) => step.id === stepParam);
+
+    if (foundStep && foundStep.id !== currentStep) {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      navigateToStep(foundStep.id as EnvelopeEditorStep);
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (!isAutosaving) {
       setIsStepLoading(false);
@@ -138,28 +152,30 @@ export default function EnvelopeEditor() {
     envelopeEditorSteps.find((step) => step.id === currentStep) || envelopeEditorSteps[0];
 
   return (
-    <div className="h-screen w-screen bg-gray-50">
+    <div className="h-screen w-screen bg-gray-50 dark:bg-background">
       <EnvelopeEditorHeader />
 
       {/* Main Content Area */}
-      <div className="flex h-[calc(100vh-73px)] w-screen">
+      <div className="flex h-[calc(100vh-4rem)] w-screen">
         {/* Left Section - Step Navigation */}
-        <div className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-gray-200 bg-white py-4">
+        <div className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-border bg-background py-4">
           {/* Left section step selector. */}
           <div className="px-4">
-            <h3 className="flex items-end justify-between text-sm font-semibold text-gray-900">
+            <h3 className="flex items-end justify-between text-sm font-semibold text-foreground">
               {isDocument ? <Trans>Document Editor</Trans> : <Trans>Template Editor</Trans>}
 
-              <span className="text-muted-foreground ml-2 rounded border bg-gray-50 px-2 py-0.5 text-xs">
-                Step {currentStepData.order}/{envelopeEditorSteps.length}
+              <span className="ml-2 rounded border bg-muted/50 px-2 py-0.5 text-xs text-muted-foreground">
+                <Trans context="The step counter">
+                  Step {currentStepData.order}/{envelopeEditorSteps.length}
+                </Trans>
               </span>
             </h3>
 
-            <div className="bg-muted relative my-4 h-[4px] rounded-md">
+            <div className="relative my-4 h-[4px] rounded-md bg-muted">
               <motion.div
                 layout="size"
                 layoutId="document-flow-container-step"
-                className="bg-documenso absolute inset-y-0 left-0"
+                className="absolute inset-y-0 left-0 bg-primary"
                 style={{
                   width: `${(100 / envelopeEditorSteps.length) * (currentStepData.order ?? 0)}%`,
                 }}
@@ -176,15 +192,17 @@ export default function EnvelopeEditor() {
                     key={step.id}
                     className={`cursor-pointer rounded-lg p-3 transition-colors ${
                       isActive
-                        ? 'border border-green-200 bg-green-50'
-                        : 'border border-gray-200 hover:bg-gray-50'
+                        ? 'border border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
+                        : 'border border-gray-200 hover:bg-gray-50 dark:border-gray-400/20 dark:hover:bg-gray-400/10'
                     }`}
                     onClick={() => navigateToStep(step.id as EnvelopeEditorStep)}
                   >
                     <div className="flex items-center space-x-3">
                       <div
                         className={`rounded border p-2 ${
-                          isActive ? 'border-green-200 bg-green-50' : 'border-gray-100 bg-gray-100'
+                          isActive
+                            ? 'border-green-200 bg-green-50 dark:border-green-500/20 dark:bg-green-500/10'
+                            : 'border-gray-100 bg-gray-100 dark:border-gray-400/20 dark:bg-gray-400/10'
                         }`}
                       >
                         <Icon
@@ -194,12 +212,14 @@ export default function EnvelopeEditor() {
                       <div>
                         <div
                           className={`text-sm font-medium ${
-                            isActive ? 'text-green-900' : 'text-gray-700'
+                            isActive
+                              ? 'text-green-900 dark:text-green-400'
+                              : 'text-foreground dark:text-muted-foreground'
                           }`}
                         >
                           {t(step.title)}
                         </div>
-                        <div className="text-xs text-gray-500">{t(step.description)}</div>
+                        <div className="text-xs text-muted-foreground">{t(step.description)}</div>
                       </div>
                     </div>
                   </div>
@@ -212,12 +232,21 @@ export default function EnvelopeEditor() {
 
           {/* Quick Actions. */}
           <div className="space-y-3 px-4">
-            <h4 className="text-sm font-semibold text-gray-900">
+            <h4 className="text-sm font-semibold text-foreground">
               <Trans>Quick Actions</Trans>
             </h4>
+            <EnvelopeEditorSettingsDialog
+              trigger={
+                <Button variant="ghost" size="sm" className="w-full justify-start">
+                  <SettingsIcon className="mr-2 h-4 w-4" />
+                  {isDocument ? <Trans>Document Settings</Trans> : <Trans>Template Settings</Trans>}
+                </Button>
+              }
+            />
+
             {isDocument && (
               <EnvelopeDistributeDialog
-                envelope={envelope}
+                documentRootPath={relativePath.documentRootPath}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     <SendIcon className="mr-2 h-4 w-4" />
@@ -239,16 +268,6 @@ export default function EnvelopeEditor() {
               />
             )}
 
-            <EnvelopeEditorSettingsDialog
-              trigger={
-                <Button variant="ghost" size="sm" className="w-full justify-start">
-                  <SettingsIcon className="mr-2 h-4 w-4" />
-                  {isDocument ? <Trans>Document Settings</Trans> : <Trans>Template Settings</Trans>}
-                </Button>
-              }
-            />
-
-            {/* Todo: Envelopes */}
             {/* <Button variant="ghost" size="sm" className="w-full justify-start">
               <FileText className="mr-2 h-4 w-4" />
               Save as Template
@@ -259,6 +278,8 @@ export default function EnvelopeEditor() {
                 templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
                 directLink={envelope.directLink}
                 recipients={envelope.recipients}
+                onCreateSuccess={async () => await syncEnvelope()}
+                onDeleteSuccess={async () => await syncEnvelope()}
                 trigger={
                   <Button variant="ghost" size="sm" className="w-full justify-start">
                     <LinkIcon className="mr-2 h-4 w-4" />
@@ -283,11 +304,17 @@ export default function EnvelopeEditor() {
               }
             />
 
-            {/* Todo: Allow selecting which document to download and/or the original */}
-            <Button variant="ghost" size="sm" className="w-full justify-start">
-              <DownloadCloudIcon className="mr-2 h-4 w-4" />
-              <Trans>Download PDF</Trans>
-            </Button>
+            <EnvelopeDownloadDialog
+              envelopeId={envelope.id}
+              envelopeStatus={envelope.status}
+              envelopeItems={envelope.envelopeItems}
+              trigger={
+                <Button variant="ghost" size="sm" className="w-full justify-start">
+                  <DownloadCloudIcon className="mr-2 h-4 w-4" />
+                  <Trans>Download PDF</Trans>
+                </Button>
+              }
+            />
 
             <Button
               variant="ghost"
@@ -309,7 +336,7 @@ export default function EnvelopeEditor() {
               open={isDeleteDialogOpen}
               onOpenChange={setDeleteDialogOpen}
               onDelete={async () => {
-                await navigate(documentsPath);
+                await navigate(relativePath.documentRootPath);
               }}
             />
           ) : (
@@ -318,7 +345,7 @@ export default function EnvelopeEditor() {
               open={isDeleteDialogOpen}
               onOpenChange={setDeleteDialogOpen}
               onDelete={async () => {
-                await navigate(templatesPath);
+                await navigate(relativePath.templateRootPath);
               }}
             />
           )}
@@ -326,7 +353,7 @@ export default function EnvelopeEditor() {
           {/* Footer of left sidebar. */}
           <div className="mt-auto px-4">
             <Button variant="ghost" className="w-full justify-start" asChild>
-              <Link to={isDocument ? documentsPath : templatesPath}>
+              <Link to={relativePath.basePath}>
                 <ArrowLeftIcon className="mr-2 h-4 w-4" />
                 {isDocument ? (
                   <Trans>Return to documents</Trans>
@@ -339,17 +366,14 @@ export default function EnvelopeEditor() {
         </div>
 
         {/* Main Content - Changes based on current step */}
-        <div className="flex-1 overflow-y-auto">
-          <p>{isAutosaving ? 'Autosaving...' : 'Not autosaving'}</p>
-          <AnimateGenericFadeInOut key={currentStep}>
-            {match({ currentStep, isStepLoading })
-              .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)
-              .with({ currentStep: 'upload' }, () => <EnvelopeEditorPageUpload />)
-              .with({ currentStep: 'addFields' }, () => <EnvelopeEditorPageFields />)
-              .with({ currentStep: 'preview' }, () => <EnvelopeEditorPagePreview />)
-              .exhaustive()}
-          </AnimateGenericFadeInOut>
-        </div>
+        <AnimateGenericFadeInOut className="flex-1 overflow-y-auto" key={currentStep}>
+          {match({ currentStep, isStepLoading })
+            .with({ isStepLoading: true }, () => <SpinnerBox className="py-32" />)
+            .with({ currentStep: 'upload' }, () => <EnvelopeEditorUploadPage />)
+            .with({ currentStep: 'addFields' }, () => <EnvelopeEditorFieldsPage />)
+            .with({ currentStep: 'preview' }, () => <EnvelopeEditorPreviewPage />)
+            .exhaustive()}
+        </AnimateGenericFadeInOut>
       </div>
     </div>
   );

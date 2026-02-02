@@ -69,11 +69,7 @@ test('[NEXT_RECIPIENT_DICTATION]: should allow updating next recipient when dict
 
   // Verify next recipient info is shown
   await expect(page.getByRole('dialog')).toBeVisible();
-  await expect(page.getByText('The next recipient to sign this document will be')).toBeVisible();
-
-  // Update next recipient
-  await page.locator('button').filter({ hasText: 'Update Recipient' }).click();
-  await page.waitForTimeout(1000);
+  await expect(page.getByText('Next Recipient Name')).toBeVisible();
 
   // Use dialog context to ensure we're targeting the correct form fields
   const dialog = page.getByRole('dialog');

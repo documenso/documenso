@@ -1,8 +1,15 @@
+import { FieldType } from '@prisma/client';
 import Konva from 'konva';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TDropdownFieldMeta } from '../../types/field-meta';
-import { upsertFieldGroup, upsertFieldRect } from './field-generic-items';
+import {
+  createFieldHoverInteraction,
+  konvaTextFill,
+  konvaTextFontFamily,
+  upsertFieldGroup,
+  upsertFieldRect,
+} from './field-generic-items';
 import { calculateFieldPosition } from './field-renderer';
 import type { FieldToRender, RenderFieldElementOptions } from './field-renderer';
 
@@ -26,7 +33,7 @@ const calculateDropdownPosition = (options: CalculateDropdownPositionOptions) =>
   const textY = fieldPadding;
 
   const arrowX = fieldWidth - arrowSize - fieldPadding;
-  const arrowY = fieldHeight / 2;
+  const arrowY = fieldHeight / 2 - arrowSize / 4;
 
   return {
     arrowX,
@@ -43,76 +50,44 @@ export const renderDropdownFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { pageWidth, pageHeight, pageLayer, mode } = options;
+  const { pageWidth, pageHeight, pageLayer, mode, translations, color } = options;
+
+  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
+
+  const dropdownMeta: TDropdownFieldMeta | null = (field.fieldMeta as TDropdownFieldMeta) || null;
+
+  let selectedValue = translations?.[FieldType.DROPDOWN] || 'Select Option';
 
   const isFirstRender = !pageLayer.findOne(`#${field.renderId}`);
 
-  const fieldGroup = upsertFieldGroup(field, options);
-
   // Clear previous children to re-render fresh.
+  const fieldGroup = upsertFieldGroup(field, options);
   fieldGroup.removeChildren();
+  fieldGroup.off('transform');
 
-  fieldGroup.add(upsertFieldRect(field, options));
+  const fieldRect = upsertFieldRect(field, options);
+  fieldGroup.add(fieldRect);
 
   if (isFirstRender) {
     pageLayer.add(fieldGroup);
-
-    fieldGroup.on('transform', () => {
-      const groupScaleX = fieldGroup.scaleX();
-      const groupScaleY = fieldGroup.scaleY();
-
-      const fieldRect = fieldGroup.findOne('.field-rect');
-      const text = fieldGroup.findOne('.dropdown-selected-text');
-      const arrow = fieldGroup.findOne('.dropdown-arrow');
-
-      if (!fieldRect || !text || !arrow) {
-        console.log('fieldRect or text or arrow not found');
-        return;
-      }
-
-      const rectWidth = fieldRect.width() * groupScaleX;
-      const rectHeight = fieldRect.height() * groupScaleY;
-
-      const { arrowX, arrowY, textX, textY, textWidth, textHeight } = calculateDropdownPosition({
-        fieldWidth: rectWidth,
-        fieldHeight: rectHeight,
-      });
-
-      arrow.setAttrs({
-        x: arrowX,
-        y: arrowY,
-        scaleX: 1,
-        scaleY: 1,
-      });
-
-      text.setAttrs({
-        scaleX: 1,
-        scaleY: 1,
-        x: textX,
-        y: textY,
-        width: textWidth,
-        height: textHeight,
-      });
-
-      fieldRect.setAttrs({
-        width: rectWidth,
-        height: rectHeight,
-      });
-
-      fieldGroup.scale({
-        x: 1,
-        y: 1,
-      });
-
-      pageLayer.batchDraw();
-    });
   }
 
-  const dropdownMeta: TDropdownFieldMeta | null = (field.fieldMeta as TDropdownFieldMeta) || null;
-  const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
+  const fontSize = dropdownMeta?.fontSize || DEFAULT_STANDARD_FONT_SIZE;
 
-  // Todo: Envelopes - Translations
-  let selectedValue = 'Select Option';
+  // Don't show any labels when exporting.
+  if (mode === 'export') {
+    selectedValue = '';
+  }
+
+  // Render the default value if readonly.
+  if (
+    dropdownMeta?.readOnly &&
+    dropdownMeta.defaultValue &&
+    dropdownMeta.values &&
+    dropdownMeta.values.some((value) => value.value === dropdownMeta.defaultValue)
+  ) {
+    selectedValue = dropdownMeta.defaultValue;
+  }
 
   if (field.inserted) {
     selectedValue = field.customText;
@@ -132,9 +107,9 @@ export const renderDropdownFieldElement = (
     width: textWidth,
     height: textHeight,
     text: selectedValue,
-    fontSize: DEFAULT_STANDARD_FONT_SIZE,
-    fontFamily: 'Inter, system-ui, sans-serif',
-    fill: '#111827',
+    fontSize,
+    fontFamily: konvaTextFontFamily,
+    fill: konvaTextFill,
     verticalAlign: 'middle',
   });
 
@@ -151,25 +126,63 @@ export const renderDropdownFieldElement = (
     visible: mode !== 'export',
   });
 
-  // Add hover state for dropdown
-  fieldGroup.on('mouseenter', () => {
-    // dropdownContainer.stroke('#2563EB');
-    // dropdownContainer.strokeWidth(2);
-    document.body.style.cursor = 'pointer';
-    pageLayer.batchDraw();
-  });
-
-  fieldGroup.on('mouseleave', () => {
-    // dropdownContainer.stroke('#374151');
-    // dropdownContainer.strokeWidth(2);
-    document.body.style.cursor = 'default';
-    pageLayer.batchDraw();
-  });
-
   fieldGroup.add(selectedText);
 
   if (!field.inserted || mode === 'export') {
     fieldGroup.add(arrow);
+  }
+
+  fieldGroup.on('transform', () => {
+    const groupScaleX = fieldGroup.scaleX();
+    const groupScaleY = fieldGroup.scaleY();
+
+    const fieldRect = fieldGroup.findOne('.field-rect');
+    const text = fieldGroup.findOne('.dropdown-selected-text');
+    const arrow = fieldGroup.findOne('.dropdown-arrow');
+
+    if (!fieldRect || !text || !arrow) {
+      return;
+    }
+
+    const rectWidth = fieldRect.width() * groupScaleX;
+    const rectHeight = fieldRect.height() * groupScaleY;
+
+    const { arrowX, arrowY, textX, textY, textWidth, textHeight } = calculateDropdownPosition({
+      fieldWidth: rectWidth,
+      fieldHeight: rectHeight,
+    });
+
+    arrow.setAttrs({
+      x: arrowX,
+      y: arrowY,
+      scaleX: 1,
+      scaleY: 1,
+    });
+
+    text.setAttrs({
+      scaleX: 1,
+      scaleY: 1,
+      x: textX,
+      y: textY,
+      width: textWidth,
+      height: textHeight,
+    });
+
+    fieldRect.setAttrs({
+      width: rectWidth,
+      height: rectHeight,
+    });
+
+    fieldGroup.scale({
+      x: 1,
+      y: 1,
+    });
+
+    pageLayer.batchDraw();
+  });
+
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
   }
 
   return {

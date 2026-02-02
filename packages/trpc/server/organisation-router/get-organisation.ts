@@ -52,6 +52,11 @@ export const getOrganisation = async ({
       organisationGlobalSettings: true,
       subscription: true,
       organisationClaim: true,
+      members: {
+        select: {
+          id: true,
+        },
+      },
       teams: {
         where: {
           teamGroups: {

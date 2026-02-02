@@ -1,6 +1,7 @@
 import { sValidator } from '@hono/standard-validator';
 import { UserSecurityAuditLogType } from '@prisma/client';
 import { verifyAuthenticationResponse } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { Hono } from 'hono';
 
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
@@ -80,9 +81,9 @@ export const passkeyRoute = new Hono<HonoAuthContext>()
       expectedChallenge: challengeToken.token,
       expectedOrigin: origin,
       expectedRPID: rpId,
-      authenticator: {
-        credentialID: new Uint8Array(Array.from(passkey.credentialId)),
-        credentialPublicKey: new Uint8Array(passkey.credentialPublicKey),
+      credential: {
+        id: isoBase64URL.fromBuffer(passkey.credentialId),
+        publicKey: new Uint8Array(passkey.credentialPublicKey),
         counter: Number(passkey.counter),
       },
     }).catch(() => null);

@@ -6,7 +6,7 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { Recipient } from '@prisma/client';
 import { DocumentDistributionMethod, DocumentSigningOrder } from '@prisma/client';
-import { InfoIcon, Plus, Upload, X } from 'lucide-react';
+import { FileTextIcon, InfoIcon, Plus, UploadCloudIcon, X } from 'lucide-react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
 import * as z from 'zod';
@@ -16,7 +16,12 @@ import {
   TEMPLATE_RECIPIENT_EMAIL_PLACEHOLDER_REGEX,
   TEMPLATE_RECIPIENT_NAME_PLACEHOLDER_REGEX,
 } from '@documenso/lib/constants/template';
+import {
+  DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+  SKIP_QUERY_BATCH_META,
+} from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
 import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { trpc } from '@documenso/trpc/react';
 import { cn } from '@documenso/ui/lib/utils';
@@ -41,6 +46,7 @@ import {
   FormMessage,
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
+import { SpinnerBox } from '@documenso/ui/primitives/spinner';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@documenso/ui/primitives/tooltip';
 import type { Toast } from '@documenso/ui/primitives/use-toast';
 import { useToast } from '@documenso/ui/primitives/use-toast';
@@ -49,13 +55,18 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
   distributeDocument: z.boolean(),
   useCustomDocument: z.boolean().default(false),
   customDocumentData: z
-    .any()
-    .refine((data) => data instanceof File || data === undefined)
+    .array(
+      z.object({
+        title: z.string(),
+        data: z.instanceof(File).optional(),
+        envelopeItemId: z.string(),
+      }),
+    )
     .optional(),
   recipients: z.array(
     z.object({
       id: z.number(),
-      email: z.string().email(),
+      email: ZRecipientEmailSchema,
       name: z.string(),
       signingOrder: z.number().optional(),
     }),
@@ -65,6 +76,7 @@ const ZAddRecipientsForNewDocumentSchema = z.object({
 type TAddRecipientsForNewDocumentSchema = z.infer<typeof ZAddRecipientsForNewDocumentSchema>;
 
 export type TemplateUseDialogProps = {
+  envelopeId: string;
   templateId: number;
   templateSigningOrder?: DocumentSigningOrder | null;
   recipients: Recipient[];
@@ -77,6 +89,7 @@ export function TemplateUseDialog({
   recipients,
   documentDistributionMethod = DocumentDistributionMethod.EMAIL,
   documentRootPath,
+  envelopeId,
   templateId,
   templateSigningOrder,
   trigger,
@@ -88,12 +101,29 @@ export function TemplateUseDialog({
 
   const [open, setOpen] = useState(false);
 
-  const form = useForm<TAddRecipientsForNewDocumentSchema>({
-    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
-    defaultValues: {
+  const { data: response, isLoading: isLoadingEnvelopeItems } = trpc.envelope.item.getMany.useQuery(
+    {
+      envelopeId,
+    },
+    {
+      placeholderData: (previousData) => previousData,
+      ...SKIP_QUERY_BATCH_META,
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      enabled: open,
+    },
+  );
+
+  const envelopeItems = response?.data ?? [];
+
+  const generateDefaultFormValues = () => {
+    return {
       distributeDocument: false,
       useCustomDocument: false,
-      customDocumentData: undefined,
+      customDocumentData: envelopeItems.map((item) => ({
+        title: item.title,
+        data: undefined,
+        envelopeItemId: item.id,
+      })),
       recipients: recipients
         .sort((a, b) => (a.signingOrder || 0) - (b.signingOrder || 0))
         .map((recipient) => {
@@ -112,7 +142,17 @@ export function TemplateUseDialog({
             signingOrder: recipient.signingOrder ?? undefined,
           };
         }),
-    },
+    };
+  };
+
+  const form = useForm<TAddRecipientsForNewDocumentSchema>({
+    resolver: zodResolver(ZAddRecipientsForNewDocumentSchema),
+    defaultValues: generateDefaultFormValues(),
+  });
+
+  const { replace, fields: localCustomDocumentData } = useFieldArray({
+    control: form.control,
+    name: 'customDocumentData',
   });
 
   const { mutateAsync: createDocumentFromTemplate } =
@@ -120,18 +160,27 @@ export function TemplateUseDialog({
 
   const onSubmit = async (data: TAddRecipientsForNewDocumentSchema) => {
     try {
-      let customDocumentDataId: string | undefined = undefined;
+      const customFilesToUpload = (data.customDocumentData || []).filter(
+        (item): item is { data: File; envelopeItemId: string; title: string } =>
+          item.data !== undefined && item.envelopeItemId !== undefined && item.title !== undefined,
+      );
 
-      if (data.useCustomDocument && data.customDocumentData) {
-        const customDocumentData = await putPdfFile(data.customDocumentData);
-        customDocumentDataId = customDocumentData.id;
-      }
+      const customDocumentData = await Promise.all(
+        customFilesToUpload.map(async (item) => {
+          const customDocumentData = await putPdfFile(item.data);
 
-      const { id } = await createDocumentFromTemplate({
+          return {
+            documentDataId: customDocumentData.id,
+            envelopeItemId: item.envelopeItemId,
+          };
+        }),
+      );
+
+      const { envelopeId } = await createDocumentFromTemplate({
         templateId,
         recipients: data.recipients,
         distributeDocument: data.distributeDocument,
-        customDocumentDataId,
+        customDocumentData,
       });
 
       toast({
@@ -140,7 +189,7 @@ export function TemplateUseDialog({
         duration: 5000,
       });
 
-      let documentPath = `${documentRootPath}/${id}`;
+      let documentPath = `${documentRootPath}/${envelopeId}`;
 
       if (
         data.distributeDocument &&
@@ -175,10 +224,22 @@ export function TemplateUseDialog({
   });
 
   useEffect(() => {
-    if (!open) {
-      form.reset();
+    if (open) {
+      form.reset(generateDefaultFormValues());
     }
   }, [open, form]);
+
+  useEffect(() => {
+    if (envelopeItems.length > 0 && localCustomDocumentData.length === 0) {
+      replace(
+        envelopeItems.map((item) => ({
+          title: item.title,
+          data: undefined,
+          envelopeItemId: item.id,
+        })),
+      );
+    }
+  }, [envelopeItems, form, open]);
 
   return (
     <Dialog open={open} onOpenChange={(value) => !form.formState.isSubmitting && setOpen(value)}>
@@ -271,7 +332,7 @@ export function TemplateUseDialog({
                             <Input
                               {...field}
                               aria-label="Name"
-                              placeholder={recipients[index].name || _(msg`Name`)}
+                              placeholder={recipients[index].name || _(msg`Recipient ${index + 1}`)}
                             />
                           </FormControl>
                           <FormMessage />
@@ -298,7 +359,7 @@ export function TemplateUseDialog({
 
                             {documentDistributionMethod === DocumentDistributionMethod.EMAIL && (
                               <label
-                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
                               >
                                 <Trans>Send document</Trans>
@@ -307,7 +368,7 @@ export function TemplateUseDialog({
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
 
-                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
                                         The document will be immediately sent to recipients if this
@@ -327,7 +388,7 @@ export function TemplateUseDialog({
 
                             {documentDistributionMethod === DocumentDistributionMethod.NONE && (
                               <label
-                                className="text-muted-foreground ml-2 flex items-center text-sm"
+                                className="ml-2 flex items-center text-sm text-muted-foreground"
                                 htmlFor="distributeDocument"
                               >
                                 <Trans>Create as pending</Trans>
@@ -335,7 +396,7 @@ export function TemplateUseDialog({
                                   <TooltipTrigger type="button">
                                     <InfoIcon className="mx-1 h-4 w-4" />
                                   </TooltipTrigger>
-                                  <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                                  <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                                     <p>
                                       <Trans>
                                         Create the document as pending and ready to sign.
@@ -381,16 +442,15 @@ export function TemplateUseDialog({
                           }}
                         />
                         <label
-                          className="text-muted-foreground ml-2 flex items-center text-sm"
+                          className="ml-2 flex items-center text-sm text-muted-foreground"
                           htmlFor="useCustomDocument"
                         >
-                          {/* Todo: Envelopes - How will this work? */}
                           <Trans>Upload custom document</Trans>
                           <Tooltip>
                             <TooltipTrigger type="button">
                               <InfoIcon className="mx-1 h-4 w-4" />
                             </TooltipTrigger>
-                            <TooltipContent className="text-muted-foreground z-[99999] max-w-md space-y-2 p-4">
+                            <TooltipContent className="z-[99999] max-w-md space-y-2 p-4 text-muted-foreground">
                               <p>
                                 <Trans>
                                   Upload a custom document to use instead of the template's default
@@ -406,116 +466,133 @@ export function TemplateUseDialog({
                 />
 
                 {form.watch('useCustomDocument') && (
-                  <div className="my-4">
-                    <FormField
-                      control={form.control}
-                      name="customDocumentData"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <div className="w-full space-y-4">
-                              <label
-                                className={cn(
-                                  'text-muted-foreground hover:border-muted-foreground/50 group relative flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 px-6 py-10 transition-colors',
-                                  {
-                                    'border-destructive hover:border-destructive':
-                                      form.formState.errors.customDocumentData,
-                                  },
-                                )}
-                              >
-                                <div className="text-center">
-                                  {!field.value && (
-                                    <>
-                                      <Upload className="text-muted-foreground/50 mx-auto h-10 w-10" />
-                                      <div className="mt-4 flex text-sm leading-6">
-                                        <span className="text-muted-foreground relative">
-                                          <Trans>
-                                            <span className="text-primary font-semibold">
-                                              Click to upload
-                                            </span>{' '}
-                                            or drag and drop
-                                          </Trans>
-                                        </span>
-                                      </div>
-                                      <p className="text-muted-foreground/80 text-xs">
-                                        PDF files only
-                                      </p>
-                                    </>
-                                  )}
-
-                                  {field.value && (
-                                    <div className="text-muted-foreground space-y-1">
-                                      <p className="text-sm font-medium">{field.value.name}</p>
-                                      <p className="text-muted-foreground/60 text-xs">
-                                        {(field.value.size / (1024 * 1024)).toFixed(2)} MB
-                                      </p>
+                  <div className="my-4 space-y-2">
+                    {isLoadingEnvelopeItems ? (
+                      <SpinnerBox className="py-16" />
+                    ) : (
+                      localCustomDocumentData.map((item, i) => (
+                        <FormField
+                          key={item.id}
+                          control={form.control}
+                          name={`customDocumentData.${i}.data`}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div
+                                  key={item.id}
+                                  className="flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent/10"
+                                >
+                                  <div className="flex-shrink-0">
+                                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                                      <FileTextIcon className="h-5 w-5 text-primary" />
                                     </div>
-                                  )}
-                                </div>
-
-                                <input
-                                  type="file"
-                                  data-testid="template-use-dialog-file-input"
-                                  className="absolute h-full w-full opacity-0"
-                                  accept=".pdf,application/pdf"
-                                  onChange={(e) => {
-                                    const file = e.target.files?.[0];
-
-                                    if (!file) {
-                                      field.onChange(undefined);
-
-                                      return;
-                                    }
-
-                                    if (file.type !== 'application/pdf') {
-                                      form.setError('customDocumentData', {
-                                        type: 'manual',
-                                        message: _(msg`Please select a PDF file`),
-                                      });
-
-                                      return;
-                                    }
-
-                                    if (file.size > APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024) {
-                                      form.setError('customDocumentData', {
-                                        type: 'manual',
-                                        message: _(
-                                          msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
-                                        ),
-                                      });
-
-                                      return;
-                                    }
-
-                                    field.onChange(file);
-                                  }}
-                                />
-
-                                {field.value && (
-                                  <div className="absolute right-2 top-2">
-                                    <Button
-                                      type="button"
-                                      variant="destructive"
-                                      className="h-6 w-6 p-0"
-                                      onClick={(e) => {
-                                        e.preventDefault();
-                                        field.onChange(undefined);
-                                      }}
-                                    >
-                                      <X className="h-4 w-4" />
-                                      <div className="sr-only">
-                                        <Trans>Clear file</Trans>
-                                      </div>
-                                    </Button>
                                   </div>
-                                )}
-                              </label>
-                            </div>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+
+                                  <div className="min-w-0 flex-1">
+                                    <h4 className="truncate text-sm font-medium text-foreground">
+                                      {item.title}
+                                    </h4>
+                                    <p className="mt-0.5 text-xs text-muted-foreground">
+                                      {field.value ? (
+                                        <div>
+                                          <Trans>
+                                            Custom {(field.value.size / (1024 * 1024)).toFixed(2)}{' '}
+                                            MB file
+                                          </Trans>
+                                        </div>
+                                      ) : (
+                                        <Trans>Default file</Trans>
+                                      )}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex flex-shrink-0 items-center gap-2">
+                                    {field.value ? (
+                                      <div className="">
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          size="sm"
+                                          className="text-xs"
+                                          onClick={(e) => {
+                                            e.preventDefault();
+                                            field.onChange(undefined);
+                                          }}
+                                        >
+                                          <X className="mr-2 h-4 w-4" />
+                                          <Trans>Remove</Trans>
+                                        </Button>
+                                      </div>
+                                    ) : (
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-xs"
+                                        onClick={() => {
+                                          const fileInput = document.getElementById(
+                                            `template-use-dialog-file-input-${item.envelopeItemId}`,
+                                          );
+
+                                          if (fileInput instanceof HTMLInputElement) {
+                                            fileInput.click();
+                                          }
+                                        }}
+                                      >
+                                        <UploadCloudIcon className="mr-2 h-4 w-4" />
+                                        <Trans>Upload</Trans>
+                                      </Button>
+                                    )}
+
+                                    <input
+                                      type="file"
+                                      id={`template-use-dialog-file-input-${item.envelopeItemId}`}
+                                      className="hidden"
+                                      accept=".pdf,application/pdf"
+                                      onChange={(e) => {
+                                        const file = e.target.files?.[0];
+
+                                        if (!file) {
+                                          field.onChange(undefined);
+
+                                          return;
+                                        }
+
+                                        if (file.type !== 'application/pdf') {
+                                          form.setError('customDocumentData', {
+                                            type: 'manual',
+                                            message: _(msg`Please select a PDF file`),
+                                          });
+
+                                          return;
+                                        }
+
+                                        if (
+                                          file.size >
+                                          APP_DOCUMENT_UPLOAD_SIZE_LIMIT * 1024 * 1024
+                                        ) {
+                                          form.setError('customDocumentData', {
+                                            type: 'manual',
+                                            message: _(
+                                              msg`File size exceeds the limit of ${APP_DOCUMENT_UPLOAD_SIZE_LIMIT} MB`,
+                                            ),
+                                          });
+
+                                          return;
+                                        }
+
+                                        field.onChange(file);
+                                      }}
+                                    />
+                                  </div>
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      ))
+                    )}
                   </div>
                 )}
               </div>

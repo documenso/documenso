@@ -21,10 +21,14 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'RECIPIENT_DELETED',
   'RECIPIENT_UPDATED',
 
+  'ENVELOPE_ITEM_CREATED',
+  'ENVELOPE_ITEM_DELETED',
+
   // Document events.
   'DOCUMENT_COMPLETED', // When the document is sealed and fully completed.
   'DOCUMENT_CREATED', // When the document is created.
   'DOCUMENT_DELETED', // When the document is soft deleted.
+  'DOCUMENT_FIELDS_AUTO_INSERTED', // When a field is auto inserted during send due to default values (radio/dropdown/checkbox).
   'DOCUMENT_FIELD_INSERTED', // When a field is inserted (signed/approved/etc) by a recipient.
   'DOCUMENT_FIELD_UNINSERTED', // When a field is uninserted by a recipient.
   'DOCUMENT_FIELD_PREFILLED', // When a field is prefilled by an assistant.
@@ -40,6 +44,7 @@ export const ZDocumentAuditLogTypeSchema = z.enum([
   'DOCUMENT_TITLE_UPDATED', // When the document title is updated.
   'DOCUMENT_EXTERNAL_ID_UPDATED', // When the document external ID is updated.
   'DOCUMENT_MOVED_TO_TEAM', // When the document is moved to a team.
+  'DOCUMENT_DELEGATED_OWNER_CREATED', // When the document delegated owner is created.
 
   // ACCESS AUTH 2FA events.
   'DOCUMENT_ACCESS_AUTH_2FA_REQUESTED', // When ACCESS AUTH 2FA is requested.
@@ -182,6 +187,28 @@ const ZBaseRecipientDataSchema = z.object({
 });
 
 /**
+ * Event: Envelope item created.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemCreatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_CREATED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
+  }),
+});
+
+/**
+ * Event: Envelope item deleted.
+ */
+export const ZDocumentAuditLogEventEnvelopeItemDeletedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.ENVELOPE_ITEM_DELETED),
+  data: z.object({
+    envelopeItemId: z.string(),
+    envelopeItemTitle: z.string(),
+  }),
+});
+
+/**
  * Event: Email sent.
  */
 export const ZDocumentAuditLogEventEmailSentSchema = z.object({
@@ -311,6 +338,22 @@ export const ZDocumentAuditLogEventDocumentFieldInsertedSchema = z.object({
           type: ZRecipientActionAuthTypesSchema.optional(),
         })
         .optional(),
+    ),
+  }),
+});
+
+/**
+ * Event: Document field auto inserted.
+ */
+export const ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELDS_AUTO_INSERTED),
+  data: z.object({
+    fields: z.array(
+      z.object({
+        fieldId: z.number(),
+        fieldType: z.nativeEnum(FieldType),
+        recipientId: z.number(),
+      }),
     ),
   }),
 });
@@ -639,6 +682,18 @@ export const ZDocumentAuditLogEventDocumentMovedToTeamSchema = z.object({
   }),
 });
 
+/**
+ * Event: Document delegated owner created.
+ */
+export const ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema = z.object({
+  type: z.literal(DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_DELEGATED_OWNER_CREATED),
+  data: z.object({
+    delegatedOwnerName: z.string().nullable(),
+    delegatedOwnerEmail: z.string(),
+    teamName: z.string(),
+  }),
+});
+
 export const ZDocumentAuditLogBaseSchema = z.object({
   id: z.string(),
   createdAt: z.date(),
@@ -652,11 +707,15 @@ export const ZDocumentAuditLogBaseSchema = z.object({
 
 export const ZDocumentAuditLogSchema = ZDocumentAuditLogBaseSchema.and(
   z.union([
+    ZDocumentAuditLogEventEnvelopeItemCreatedSchema,
+    ZDocumentAuditLogEventEnvelopeItemDeletedSchema,
     ZDocumentAuditLogEventEmailSentSchema,
     ZDocumentAuditLogEventDocumentCompletedSchema,
     ZDocumentAuditLogEventDocumentCreatedSchema,
     ZDocumentAuditLogEventDocumentDeletedSchema,
     ZDocumentAuditLogEventDocumentMovedToTeamSchema,
+    ZDocumentAuditLogEventDocumentDelegatedOwnerCreatedSchema,
+    ZDocumentAuditLogEventDocumentFieldsAutoInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldInsertedSchema,
     ZDocumentAuditLogEventDocumentFieldUninsertedSchema,
     ZDocumentAuditLogEventDocumentFieldPrefilledSchema,
@@ -700,3 +759,5 @@ export type DocumentAuditLogByType<T = TDocumentAuditLog['type']> = Extract<
   TDocumentAuditLog,
   { type: T }
 >;
+
+export type TDocumentAuditLogBaseSchema = z.infer<typeof ZDocumentAuditLogBaseSchema>;

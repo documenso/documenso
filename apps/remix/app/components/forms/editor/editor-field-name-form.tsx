@@ -6,6 +6,7 @@ import type { z } from 'zod';
 
 import {
   DEFAULT_FIELD_FONT_SIZE,
+  FIELD_DEFAULT_GENERIC_ALIGN,
   type TNameFieldMeta as NameFieldMeta,
   ZNameFieldMeta,
 } from '@documenso/lib/types/field-meta';
@@ -39,7 +40,7 @@ export const EditorFieldNameForm = ({
     mode: 'onChange',
     defaultValues: {
       fontSize: value.fontSize || DEFAULT_FIELD_FONT_SIZE,
-      textAlign: value.textAlign || 'left',
+      textAlign: value.textAlign ?? FIELD_DEFAULT_GENERIC_ALIGN,
     },
   });
 

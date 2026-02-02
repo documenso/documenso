@@ -71,7 +71,7 @@ export const DocumentMoveToFolderDialog = ({
     },
   });
 
-  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFolders.useQuery(
+  const { data: folders, isLoading: isFoldersLoading } = trpc.folder.findFoldersInternal.useQuery(
     {
       parentId: currentFolderId,
       type: FolderType.DOCUMENT,

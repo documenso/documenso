@@ -7,6 +7,7 @@ import {
 } from '@documenso/lib/types/document-auth';
 import { ZDocumentFormValuesSchema } from '@documenso/lib/types/document-form-values';
 import { ZDocumentMetaCreateSchema } from '@documenso/lib/types/document-meta';
+import { ZEnvelopeAttachmentTypeSchema } from '@documenso/lib/types/envelope-attachment';
 import {
   ZFieldHeightSchema,
   ZFieldPageNumberSchema,
@@ -26,6 +27,7 @@ import {
 
 /**
  * Temporariy endpoint for V2 Beta until we allow passthrough documents on create.
+ * @deprecated
  */
 export const createDocumentTemporaryMeta: TrpcRouteMeta = {
   openapi: {
@@ -35,6 +37,7 @@ export const createDocumentTemporaryMeta: TrpcRouteMeta = {
     description:
       'You will need to upload the PDF to the provided URL returned. Note: Once V2 API is released, this will be removed since we will allow direct uploads, instead of using an upload URL.',
     tags: ['Document'],
+    deprecated: true,
   },
 };
 
@@ -68,6 +71,15 @@ export const ZCreateDocumentTemporaryRequestSchema = z.object({
       }),
     )
 
+    .optional(),
+  attachments: z
+    .array(
+      z.object({
+        label: z.string().min(1, 'Label is required'),
+        data: z.string().url('Must be a valid URL'),
+        type: ZEnvelopeAttachmentTypeSchema.optional().default('link'),
+      }),
+    )
     .optional(),
   meta: ZDocumentMetaCreateSchema.optional(),
 });

@@ -1,5 +1,9 @@
 import { getHighestOrganisationRoleInGroup } from '@documenso/lib/utils/organisations';
-import { buildTeamWhereQuery, getHighestTeamRoleInGroup } from '@documenso/lib/utils/teams';
+import {
+  buildTeamWhereQuery,
+  extractDerivedTeamSettings,
+  getHighestTeamRoleInGroup,
+} from '@documenso/lib/utils/teams';
 import { prisma } from '@documenso/prisma';
 
 import { authenticatedProcedure } from '../trpc';
@@ -30,6 +34,7 @@ export const getOrganisationSession = async ({
     },
     include: {
       organisationClaim: true,
+      organisationGlobalSettings: true,
       subscription: true,
       groups: {
         where: {
@@ -45,6 +50,7 @@ export const getOrganisationSession = async ({
       teams: {
         where: buildTeamWhereQuery({ teamId: undefined, userId }),
         include: {
+          teamGlobalSettings: true,
           teamGroups: {
             where: {
               organisationGroup: {
@@ -67,12 +73,24 @@ export const getOrganisationSession = async ({
   });
 
   return organisations.map((organisation) => {
+    const { organisationGlobalSettings } = organisation;
+
     return {
       ...organisation,
-      teams: organisation.teams.map((team) => ({
-        ...team,
-        currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
-      })),
+      teams: organisation.teams.map((team) => {
+        const derivedSettings = extractDerivedTeamSettings(
+          organisationGlobalSettings,
+          team.teamGlobalSettings,
+        );
+
+        return {
+          ...team,
+          currentTeamRole: getHighestTeamRoleInGroup(team.teamGroups),
+          preferences: {
+            aiFeaturesEnabled: derivedSettings.aiFeaturesEnabled,
+          },
+        };
+      }),
       currentOrganisationRole: getHighestOrganisationRoleInGroup(organisation.groups),
     };
   });

@@ -1,5 +1,11 @@
 import type { Envelope, Recipient } from '@prisma/client';
-import { DocumentStatus, EnvelopeType, SendStatus, SigningStatus } from '@prisma/client';
+import {
+  DocumentStatus,
+  EnvelopeType,
+  RecipientRole,
+  SendStatus,
+  SigningStatus,
+} from '@prisma/client';
 import { match } from 'ts-pattern';
 import { z } from 'zod';
 
@@ -11,6 +17,8 @@ const envelopeTemplatePrefixId = 'template';
 const ZDocumentIdSchema = z.string().regex(/^document_\d+$/);
 const ZTemplateIdSchema = z.string().regex(/^template_\d+$/);
 const ZEnvelopeIdSchema = z.string().regex(/^envelope_.{2,}$/);
+
+const MAX_ENVELOPE_IDS_PER_REQUEST = 20;
 
 export type EnvelopeIdOptions =
   | {
@@ -24,6 +32,20 @@ export type EnvelopeIdOptions =
   | {
       type: 'templateId';
       id: number;
+    };
+
+export type EnvelopeIdsOptions =
+  | {
+      type: 'envelopeId';
+      ids: string[];
+    }
+  | {
+      type: 'documentId';
+      ids: number[];
+    }
+  | {
+      type: 'templateId';
+      ids: number[];
     };
 
 /**
@@ -78,6 +100,87 @@ export const unsafeBuildEnvelopeIdQuery = (
       return {
         type: EnvelopeType.TEMPLATE,
         secondaryId: mapTemplateIdToSecondaryId(value.id),
+      };
+    })
+    .exhaustive();
+};
+
+/**
+ * Parses multiple document or template IDs and builds a query filter.
+ *
+ * This is UNSAFE because it does not validate access, it only validates ID format and builds the query.
+ *
+ * @throws AppError if any ID is invalid or if the array exceeds the maximum limit
+ */
+export const unsafeBuildEnvelopeIdsQuery = (
+  options: EnvelopeIdsOptions,
+  expectedEnvelopeType: EnvelopeType | null,
+) => {
+  if (!options.ids || options.ids.length === 0) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: 'At least one ID is required',
+    });
+  }
+
+  if (options.ids.length > MAX_ENVELOPE_IDS_PER_REQUEST) {
+    throw new AppError(AppErrorCode.INVALID_BODY, {
+      message: `Cannot request more than ${MAX_ENVELOPE_IDS_PER_REQUEST} envelopes at once`,
+    });
+  }
+
+  return match(options)
+    .with({ type: 'envelopeId' }, (value) => {
+      const validatedIds: string[] = [];
+
+      for (const id of value.ids) {
+        const parsed = ZEnvelopeIdSchema.safeParse(id);
+
+        if (!parsed.success) {
+          throw new AppError(AppErrorCode.INVALID_BODY, {
+            message: `Invalid envelope ID: ${id}`,
+          });
+        }
+
+        validatedIds.push(parsed.data);
+      }
+
+      if (expectedEnvelopeType) {
+        return {
+          id: { in: validatedIds },
+          type: expectedEnvelopeType,
+        };
+      }
+
+      return {
+        id: { in: validatedIds },
+      };
+    })
+    .with({ type: 'documentId' }, (value) => {
+      if (expectedEnvelopeType && expectedEnvelopeType !== EnvelopeType.DOCUMENT) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid document ID type',
+        });
+      }
+
+      const secondaryIds = value.ids.map((id) => mapDocumentIdToSecondaryId(id));
+
+      return {
+        type: EnvelopeType.DOCUMENT,
+        secondaryId: { in: secondaryIds },
+      };
+    })
+    .with({ type: 'templateId' }, (value) => {
+      if (expectedEnvelopeType && expectedEnvelopeType !== EnvelopeType.TEMPLATE) {
+        throw new AppError(AppErrorCode.INVALID_BODY, {
+          message: 'Invalid template ID type',
+        });
+      }
+
+      const secondaryIds = value.ids.map((id) => mapTemplateIdToSecondaryId(id));
+
+      return {
+        type: EnvelopeType.TEMPLATE,
+        secondaryId: { in: secondaryIds },
       };
     })
     .exhaustive();
@@ -156,8 +259,9 @@ export const canEnvelopeItemsBeModified = (
   if (
     recipients.some(
       (recipient) =>
-        recipient.signingStatus === SigningStatus.SIGNED ||
-        recipient.sendStatus === SendStatus.SENT,
+        recipient.role !== RecipientRole.CC &&
+        (recipient.signingStatus === SigningStatus.SIGNED ||
+          recipient.sendStatus === SendStatus.SENT),
     )
   ) {
     return false;

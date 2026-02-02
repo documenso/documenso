@@ -1,7 +1,5 @@
-import { EnvelopeType, TeamMemberRole } from '@prisma/client';
 import type { Prisma, User } from '@prisma/client';
-import { SigningStatus } from '@prisma/client';
-import { DocumentVisibility } from '@prisma/client';
+import { DocumentVisibility, EnvelopeType, SigningStatus, TeamMemberRole } from '@prisma/client';
 import { DateTime } from 'luxon';
 import { match } from 'ts-pattern';
 
@@ -215,13 +213,14 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
     ],
   };
 
+  const rootPageFilter = folderId === undefined ? { folderId: null } : {};
+
   let ownerCountsWhereInput: Prisma.EnvelopeWhereInput = {
     type: EnvelopeType.DOCUMENT,
     userId: userIdWhereClause,
     createdAt,
     teamId,
     deletedAt: null,
-    folderId,
   };
 
   let notSignedCountsGroupByArgs = null;
@@ -265,8 +264,16 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
 
   ownerCountsWhereInput = {
     ...ownerCountsWhereInput,
-    ...visibilityFiltersWhereInput,
-    ...searchFilter,
+    AND: [
+      ...(Array.isArray(visibilityFiltersWhereInput.AND)
+        ? visibilityFiltersWhereInput.AND
+        : visibilityFiltersWhereInput.AND
+          ? [visibilityFiltersWhereInput.AND]
+          : []),
+      searchFilter,
+      rootPageFilter,
+      folderId ? { folderId } : {},
+    ],
   };
 
   if (teamEmail) {
@@ -285,6 +292,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         },
       ],
       deletedAt: null,
+      AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
     };
 
     notSignedCountsGroupByArgs = {
@@ -296,7 +304,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         type: EnvelopeType.DOCUMENT,
         userId: userIdWhereClause,
         createdAt,
-        folderId,
         status: ExtendedDocumentStatus.PENDING,
         recipients: {
           some: {
@@ -306,6 +313,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
           },
         },
         deletedAt: null,
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
     } satisfies Prisma.EnvelopeGroupByArgs;
 
@@ -318,7 +326,6 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
         type: EnvelopeType.DOCUMENT,
         userId: userIdWhereClause,
         createdAt,
-        folderId,
         OR: [
           {
             status: ExtendedDocumentStatus.PENDING,
@@ -342,6 +349,7 @@ const getTeamCounts = async (options: GetTeamCountsOption) => {
             },
           },
         ],
+        AND: [searchFilter, rootPageFilter, folderId ? { folderId } : {}],
       },
     } satisfies Prisma.EnvelopeGroupByArgs;
   }

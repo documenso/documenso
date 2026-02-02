@@ -1,12 +1,14 @@
-import type { DocumentData } from '@prisma/client';
+import type { EnvelopeItem } from '@prisma/client';
 
-import { getFile } from '../universal/upload/get-file';
+import { getEnvelopeItemPdfUrl } from '../utils/envelope-download';
 import { downloadFile } from './download-file';
 
 type DocumentVersion = 'original' | 'signed';
 
 type DownloadPDFProps = {
-  documentData: DocumentData;
+  envelopeItem: Pick<EnvelopeItem, 'id' | 'envelopeId'>;
+  token: string | undefined;
+
   fileName?: string;
   /**
    * Specifies which version of the document to download.
@@ -17,18 +19,19 @@ type DownloadPDFProps = {
 };
 
 export const downloadPDF = async ({
-  documentData,
+  envelopeItem,
+  token,
   fileName,
   version = 'signed',
 }: DownloadPDFProps) => {
-  const bytes = await getFile({
-    type: documentData.type,
-    data: version === 'signed' ? documentData.data : documentData.initialData,
+  const downloadUrl = getEnvelopeItemPdfUrl({
+    type: 'download',
+    envelopeItem: envelopeItem,
+    token,
+    version,
   });
 
-  const blob = new Blob([bytes], {
-    type: 'application/pdf',
-  });
+  const blob = await fetch(downloadUrl).then(async (res) => await res.blob());
 
   const baseTitle = (fileName ?? 'document').replace(/\.pdf$/, '');
   const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';

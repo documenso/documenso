@@ -27,9 +27,45 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'Noto Sans';
+  src: url('/fonts/noto-sans.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Korean noto sans */
+@font-face {
+  font-family: 'Noto Sans Korean';
+  src: url('/fonts/noto-sans-korean.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Japanese noto sans */
+@font-face {
+  font-family: 'Noto Sans Japanese';
+  src: url('/fonts/noto-sans-japanese.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Chinese noto sans */
+@font-face {
+  font-family: 'Noto Sans Chinese';
+  src: url('/fonts/noto-sans-chinese.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
     --font-sans: 'Inter';
     --font-signature: 'Caveat';
+    --font-noto: 'Noto Sans', 'Noto Sans Korean', 'Noto Sans Japanese', 'Noto Sans Chinese';
   }
 }

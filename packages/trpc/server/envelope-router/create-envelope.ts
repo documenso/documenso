@@ -1,18 +1,29 @@
+import { EnvelopeType } from '@prisma/client';
+
 import { getServerLimits } from '@documenso/ee/server-only/limits/server';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { createEnvelope } from '@documenso/lib/server-only/envelope/create-envelope';
+import { extractPdfPlaceholders } from '@documenso/lib/server-only/pdf/auto-place-fields';
+import { normalizePdf } from '@documenso/lib/server-only/pdf/normalize-pdf';
+import { putPdfFileServerSide } from '@documenso/lib/universal/upload/put-file.server';
 
+import { insertFormValuesInPdf } from '../../../lib/server-only/pdf/insert-form-values-in-pdf';
 import { authenticatedProcedure } from '../trpc';
 import {
   ZCreateEnvelopeRequestSchema,
   ZCreateEnvelopeResponseSchema,
+  createEnvelopeMeta,
 } from './create-envelope.types';
 
 export const createEnvelopeRoute = authenticatedProcedure
-  .input(ZCreateEnvelopeRequestSchema) // Note: Before releasing this to public, update the response schema to be correct.
+  .meta(createEnvelopeMeta)
+  .input(ZCreateEnvelopeRequestSchema)
   .output(ZCreateEnvelopeResponseSchema)
   .mutation(async ({ input, ctx }) => {
     const { user, teamId } = ctx;
+
+    const { payload, files } = input;
+
     const {
       title,
       type,
@@ -20,11 +31,13 @@ export const createEnvelopeRoute = authenticatedProcedure
       visibility,
       globalAccessAuth,
       globalActionAuth,
+      formValues,
       recipients,
       folderId,
-      items,
       meta,
-    } = input;
+      attachments,
+      delegatedDocumentOwner,
+    } = payload;
 
     ctx.logger.info({
       input: {
@@ -32,8 +45,10 @@ export const createEnvelopeRoute = authenticatedProcedure
       },
     });
 
-    // Todo: Envelopes - Put the claims for number of items into this.
-    const { remaining } = await getServerLimits({ userId: user.id, teamId });
+    const { remaining, maximumEnvelopeItemCount } = await getServerLimits({
+      userId: user.id,
+      teamId,
+    });
 
     if (remaining.documents <= 0) {
       throw new AppError(AppErrorCode.LIMIT_EXCEEDED, {
@@ -41,6 +56,90 @@ export const createEnvelopeRoute = authenticatedProcedure
         statusCode: 400,
       });
     }
+
+    if (files.length > maximumEnvelopeItemCount) {
+      throw new AppError('ENVELOPE_ITEM_LIMIT_EXCEEDED', {
+        message: `You cannot upload more than ${maximumEnvelopeItemCount} envelope items per envelope`,
+        statusCode: 400,
+      });
+    }
+
+    if (files.some((file) => !file.type.startsWith('application/pdf'))) {
+      throw new AppError('INVALID_DOCUMENT_FILE', {
+        message: 'You cannot upload non-PDF files',
+        statusCode: 400,
+      });
+    }
+
+    // For each file: normalize, extract & clean placeholders, then upload.
+    const envelopeItems = await Promise.all(
+      files.map(async (file) => {
+        let pdf = Buffer.from(await file.arrayBuffer());
+
+        if (formValues) {
+          // eslint-disable-next-line require-atomic-updates
+          pdf = await insertFormValuesInPdf({
+            pdf,
+            formValues,
+          });
+        }
+
+        const normalized = await normalizePdf(pdf, {
+          flattenForm: type !== EnvelopeType.TEMPLATE,
+        });
+
+        const { cleanedPdf, placeholders } = await extractPdfPlaceholders(normalized);
+
+        const { id: documentDataId } = await putPdfFileServerSide({
+          name: file.name,
+          type: 'application/pdf',
+          arrayBuffer: async () => Promise.resolve(cleanedPdf),
+        });
+
+        return {
+          title: file.name,
+          documentDataId,
+          placeholders,
+        };
+      }),
+    );
+
+    const recipientsToCreate = recipients?.map((recipient) => ({
+      email: recipient.email,
+      name: recipient.name,
+      role: recipient.role,
+      signingOrder: recipient.signingOrder,
+      accessAuth: recipient.accessAuth,
+      actionAuth: recipient.actionAuth,
+      fields: recipient.fields?.map((field) => {
+        let documentDataId: string | undefined = undefined;
+
+        if (typeof field.identifier === 'string') {
+          documentDataId = envelopeItems.find(
+            (item) => item.title === field.identifier,
+          )?.documentDataId;
+        }
+
+        if (typeof field.identifier === 'number') {
+          documentDataId = envelopeItems.at(field.identifier)?.documentDataId;
+        }
+
+        if (field.identifier === undefined) {
+          documentDataId = envelopeItems.at(0)?.documentDataId;
+        }
+
+        if (!documentDataId) {
+          throw new AppError(AppErrorCode.NOT_FOUND, {
+            message: 'Document data not found',
+          });
+        }
+
+        return {
+          ...field,
+          documentDataId,
+        };
+      }),
+    }));
 
     const envelope = await createEnvelope({
       userId: user.id,
@@ -50,15 +149,17 @@ export const createEnvelopeRoute = authenticatedProcedure
         type,
         title,
         externalId,
+        formValues,
         visibility,
         globalAccessAuth,
         globalActionAuth,
-        recipients,
+        recipients: recipientsToCreate,
         folderId,
-        envelopeItems: items,
+        envelopeItems,
+        delegatedDocumentOwner,
       },
+      attachments,
       meta,
-      normalizePdf: true,
       requestMetadata: ctx.metadata,
     });
 

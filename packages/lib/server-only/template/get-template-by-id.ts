@@ -29,6 +29,7 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
       envelopeItems: {
         select: {
           id: true,
+          envelopeId: true,
           documentData: true,
         },
       },
@@ -94,5 +95,9 @@ export const getTemplateById = async ({ id, userId, teamId }: GetTemplateByIdOpt
         }
       : null,
     id: mapSecondaryIdToTemplateId(envelope.secondaryId),
+    envelopeItems: envelope.envelopeItems.map((envelopeItem) => ({
+      id: envelopeItem.id,
+      envelopeId: envelopeItem.envelopeId,
+    })),
   };
 };

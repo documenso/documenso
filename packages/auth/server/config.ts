@@ -26,6 +26,16 @@ export const GoogleAuthOptions: OAuthClientOptions = {
   bypassEmailVerification: false,
 };
 
+export const MicrosoftAuthOptions: OAuthClientOptions = {
+  id: 'microsoft',
+  scope: ['openid', 'email', 'profile'],
+  clientId: env('NEXT_PRIVATE_MICROSOFT_CLIENT_ID') ?? '',
+  clientSecret: env('NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET') ?? '',
+  redirectUrl: `${NEXT_PUBLIC_WEBAPP_URL()}/api/auth/callback/microsoft`,
+  wellKnownUrl: 'https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration',
+  bypassEmailVerification: false,
+};
+
 export const OidcAuthOptions: OAuthClientOptions = {
   id: 'oidc',
   scope: ['openid', 'email', 'profile'],

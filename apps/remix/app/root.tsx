@@ -1,6 +1,3 @@
-import { useEffect } from 'react';
-
-import Plausible from 'plausible-tracker';
 import {
   Links,
   Meta,
@@ -10,14 +7,13 @@ import {
   data,
   isRouteErrorResponse,
   useLoaderData,
-  useLocation,
 } from 'react-router';
 import { PreventFlashOnWrongTheme, ThemeProvider, useTheme } from 'remix-themes';
 
 import { getOptionalSession } from '@documenso/auth/server/lib/utils/get-session';
 import { SessionProvider } from '@documenso/lib/client-only/providers/session';
 import { APP_I18N_OPTIONS, type SupportedLanguageCodes } from '@documenso/lib/constants/i18n';
-import { createPublicEnv, env } from '@documenso/lib/utils/env';
+import { createPublicEnv } from '@documenso/lib/utils/env';
 import { extractLocaleData } from '@documenso/lib/utils/i18n';
 import { TrpcProvider } from '@documenso/trpc/react';
 import { getOrganisationSession } from '@documenso/trpc/server/organisation-router/get-organisation-session';
@@ -30,11 +26,6 @@ import { GenericErrorLayout } from './components/general/generic-error-layout';
 import { langCookie } from './storage/lang-cookie.server';
 import { themeSessionResolver } from './storage/theme-session.server';
 import { appMetaTags } from './utils/meta';
-
-const { trackPageview } = Plausible({
-  domain: 'documenso.com',
-  trackLocalhost: false,
-});
 
 export const links: Route.LinksFunction = () => [{ rel: 'stylesheet', href: stylesheet }];
 
@@ -54,11 +45,15 @@ export async function loader({ request }: Route.LoaderArgs) {
 
   const { getTheme } = await themeSessionResolver(request);
 
-  let lang: SupportedLanguageCodes = await langCookie.parse(request.headers.get('cookie') ?? '');
+  const cookieHeader = request.headers.get('cookie') ?? '';
+
+  let lang: SupportedLanguageCodes = await langCookie.parse(cookieHeader);
 
   if (!APP_I18N_OPTIONS.supportedLangs.includes(lang)) {
     lang = extractLocaleData({ headers: request.headers }).lang;
   }
+
+  const disableAnimations = cookieHeader.includes('__disable_animations=true');
 
   let organisations = null;
 
@@ -70,6 +65,7 @@ export async function loader({ request }: Route.LoaderArgs) {
     {
       lang,
       theme: getTheme(),
+      disableAnimations,
       session: session.isAuthenticated
         ? {
             user: session.user,
@@ -90,14 +86,6 @@ export async function loader({ request }: Route.LoaderArgs) {
 export function Layout({ children }: { children: React.ReactNode }) {
   const { theme } = useLoaderData<typeof loader>() || {};
 
-  const location = useLocation();
-
-  useEffect(() => {
-    if (env('NODE_ENV') === 'production') {
-      trackPageview();
-    }
-  }, [location.pathname]);
-
   return (
     <ThemeProvider specifiedTheme={theme} themeAction="/api/theme">
       <LayoutContent>{children}</LayoutContent>
@@ -106,7 +94,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { publicEnv, session, lang, ...data } = useLoaderData<typeof loader>() || {};
+  const { publicEnv, session, lang, disableAnimations, ...data } =
+    useLoaderData<typeof loader>() || {};
 
   const [theme] = useTheme();
 
@@ -125,10 +114,30 @@ export function LayoutContent({ children }: { children: React.ReactNode }) {
         <meta name="google" content="notranslate" />
         <PreventFlashOnWrongTheme ssrTheme={Boolean(data.theme)} />
 
+        {disableAnimations && (
+          <style
+            dangerouslySetInnerHTML={{
+              __html: `*, *::before, *::after { animation: none !important; transition: none !important; }`,
+            }}
+          />
+        )}
+
         {/* Fix: https://stackoverflow.com/questions/21147149/flash-of-unstyled-content-fouc-in-firefox-only-is-ff-slow-renderer */}
         <script>0</script>
       </head>
       <body>
+        {/* Global license banner currently disabled. Need to wait until after a few releases. */}
+        {/* {licenseStatus === '?' && (
+          <div className="bg-destructive text-destructive-foreground">
+            <div className="mx-auto flex h-auto max-w-screen-xl items-center justify-center px-4 py-3 text-sm font-medium">
+              <div className="flex items-center">
+                <AlertTriangleIcon className="mr-2 h-4 w-4" />
+                <Trans>This is an expired license instance of Documenso</Trans>
+              </div>
+            </div>
+          </div>
+        )} */}
+
         <SessionProvider initialSession={session}>
           <TooltipProvider>
             <TrpcProvider>

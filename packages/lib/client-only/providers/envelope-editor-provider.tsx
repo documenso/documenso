@@ -5,17 +5,17 @@ import { EnvelopeType } from '@prisma/client';
 
 import { trpc } from '@documenso/trpc/react';
 import type { TSetEnvelopeRecipientsRequest } from '@documenso/trpc/server/envelope-router/set-envelope-recipients.types';
-import type { RecipientColorStyles, TRecipientColor } from '@documenso/ui/lib/recipient-colors';
-import {
-  AVAILABLE_RECIPIENT_COLORS,
-  getRecipientColorStyles,
-} from '@documenso/ui/lib/recipient-colors';
+import type { TUpdateEnvelopeRequest } from '@documenso/trpc/server/envelope-router/update-envelope.types';
+import type { TRecipientColor } from '@documenso/ui/lib/recipient-colors';
+import { AVAILABLE_RECIPIENT_COLORS } from '@documenso/ui/lib/recipient-colors';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
 import type { TDocumentEmailSettings } from '../../types/document-email';
 import type { TEnvelope } from '../../types/envelope';
+import { formatDocumentsPath, formatTemplatesPath } from '../../utils/teams';
 import { useEditorFields } from '../hooks/use-editor-fields';
 import type { TLocalField } from '../hooks/use-editor-fields';
+import { useEditorRecipients } from '../hooks/use-editor-recipients';
 import { useEnvelopeAutosave } from '../hooks/use-envelope-autosave';
 
 export const useDebounceFunction = <Args extends unknown[]>(
@@ -38,27 +38,37 @@ export const useDebounceFunction = <Args extends unknown[]>(
   );
 };
 
+type UpdateEnvelopePayload = Pick<TUpdateEnvelopeRequest, 'data' | 'meta'>;
+
 type EnvelopeEditorProviderValue = {
   envelope: TEnvelope;
   isDocument: boolean;
   isTemplate: boolean;
   setLocalEnvelope: (localEnvelope: Partial<TEnvelope>) => void;
 
-  updateEnvelope: (envelopeUpdates: Partial<TEnvelope>) => void;
+  updateEnvelope: (envelopeUpdates: UpdateEnvelopePayload) => void;
+  updateEnvelopeAsync: (envelopeUpdates: UpdateEnvelopePayload) => Promise<void>;
   setRecipientsDebounced: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => void;
   setRecipientsAsync: (recipients: TSetEnvelopeRecipientsRequest['recipients']) => Promise<void>;
 
-  getFieldColor: (field: TLocalField) => RecipientColorStyles;
   getRecipientColorKey: (recipientId: number) => TRecipientColor;
 
   editorFields: ReturnType<typeof useEditorFields>;
+  editorRecipients: ReturnType<typeof useEditorRecipients>;
 
   isAutosaving: boolean;
-  flushAutosave: () => void;
+  flushAutosave: () => Promise<void>;
   autosaveError: boolean;
 
-  // refetchEnvelope: () => Promise<void>;
-  // updateEnvelope: (envelope: TEnvelope) => Promise<void>;
+  relativePath: {
+    basePath: string;
+    envelopePath: string;
+    editorPath: string;
+    documentRootPath: string;
+    templateRootPath: string;
+  };
+
+  syncEnvelope: () => Promise<void>;
 };
 
 interface EnvelopeEditorProviderProps {
@@ -86,12 +96,19 @@ export const EnvelopeEditorProvider = ({
   const { toast } = useToast();
 
   const [envelope, setEnvelope] = useState(initialEnvelope);
-
   const [autosaveError, setAutosaveError] = useState<boolean>(false);
+
+  const editorFields = useEditorFields({
+    envelope,
+    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
+  });
+
+  const editorRecipients = useEditorRecipients({
+    envelope,
+  });
 
   const envelopeUpdateMutationQuery = trpc.envelope.update.useMutation({
     onSuccess: (response, input) => {
-      console.log(input.meta?.emailSettings);
       setEnvelope({
         ...envelope,
         ...response,
@@ -106,7 +123,9 @@ export const EnvelopeEditorProvider = ({
 
       setAutosaveError(false);
     },
-    onError: (error) => {
+    onError: (err) => {
+      console.error(err);
+
       setAutosaveError(true);
 
       toast({
@@ -119,10 +138,17 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeFieldSetMutationQuery = trpc.envelope.field.set.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ data: fields }) => {
+      setEnvelope((prev) => ({
+        ...prev,
+        fields,
+      }));
+
       setAutosaveError(false);
     },
-    onError: (error) => {
+    onError: (err) => {
+      console.error(err);
+
       setAutosaveError(true);
 
       toast({
@@ -135,10 +161,27 @@ export const EnvelopeEditorProvider = ({
   });
 
   const envelopeRecipientSetMutationQuery = trpc.envelope.recipient.set.useMutation({
-    onSuccess: () => {
+    onSuccess: ({ data: recipients }) => {
+      setEnvelope((prev) => ({
+        ...prev,
+        recipients,
+        fields: prev.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
+      }));
+
+      // Reset the local fields to ensure deleted recipient fields are removed.
+      editorFields.resetForm(
+        envelope.fields.filter((field) =>
+          recipients.some((recipient) => recipient.id === field.recipientId),
+        ),
+      );
+
       setAutosaveError(false);
     },
-    onError: (error) => {
+    onError: (err) => {
+      console.error(err);
+
       setAutosaveError(true);
 
       toast({
@@ -166,63 +209,71 @@ export const EnvelopeEditorProvider = ({
     triggerSave: setFieldsDebounced,
     flush: setFieldsAsync,
     isPending: isFieldsMutationPending,
-  } = useEnvelopeAutosave(async (fields: TLocalField[]) => {
-    await envelopeFieldSetMutationQuery.mutateAsync({
+  } = useEnvelopeAutosave(async (localFields: TLocalField[]) => {
+    const envelopeFields = await envelopeFieldSetMutationQuery.mutateAsync({
       envelopeId: envelope.id,
       envelopeType: envelope.type,
-      fields,
+      fields: localFields,
     });
-  }, 1000);
+
+    // Insert the IDs into the local fields.
+    envelopeFields.data.forEach((field) => {
+      const localField = localFields.find((localField) => localField.formId === field.formId);
+
+      if (localField && !localField.id) {
+        localField.id = field.id;
+
+        editorFields.setFieldId(localField.formId, field.id);
+      }
+    });
+  }, 2000);
 
   const {
     triggerSave: setEnvelopeDebounced,
     flush: setEnvelopeAsync,
     isPending: isEnvelopeMutationPending,
-  } = useEnvelopeAutosave(async (envelopeUpdates: Partial<TEnvelope>) => {
+  } = useEnvelopeAutosave(async (envelopeUpdates: UpdateEnvelopePayload) => {
     await envelopeUpdateMutationQuery.mutateAsync({
       envelopeId: envelope.id,
-      envelopeType: envelope.type,
-      data: {
-        ...envelopeUpdates,
-      },
+      data: envelopeUpdates.data,
+      meta: envelopeUpdates.meta,
     });
   }, 1000);
 
   /**
    * Updates the local envelope and debounces the update to the server.
    */
-  const updateEnvelope = (envelopeUpdates: Partial<TEnvelope>) => {
-    setEnvelope((prev) => ({ ...prev, ...envelopeUpdates }));
+  const updateEnvelope = (envelopeUpdates: UpdateEnvelopePayload) => {
+    setEnvelope((prev) => ({
+      ...prev,
+      ...envelopeUpdates.data,
+      meta: {
+        ...prev.documentMeta,
+        ...envelopeUpdates.meta,
+      },
+    }));
+
     setEnvelopeDebounced(envelopeUpdates);
   };
 
-  const editorFields = useEditorFields({
-    envelope,
-    handleFieldsUpdate: (fields) => setFieldsDebounced(fields),
-  });
-
-  const getFieldColor = useCallback(
-    (field: TLocalField) => {
-      // Todo: Envelopes - Local recipients
-      const recipientIndex = envelope.recipients.findIndex(
-        (recipient) => recipient.id === field.recipientId,
-      );
-
-      return getRecipientColorStyles(Math.max(recipientIndex, 0));
-    },
-    [envelope.recipients], // Todo: Envelopes - Local recipients
-  );
+  const updateEnvelopeAsync = async (envelopeUpdates: UpdateEnvelopePayload) => {
+    await envelopeUpdateMutationQuery.mutateAsync({
+      envelopeId: envelope.id,
+      ...envelopeUpdates,
+    });
+  };
 
   const getRecipientColorKey = useCallback(
     (recipientId: number) => {
-      // Todo: Envelopes - Local recipients
       const recipientIndex = envelope.recipients.findIndex(
         (recipient) => recipient.id === recipientId,
       );
 
-      return AVAILABLE_RECIPIENT_COLORS[Math.max(recipientIndex, 0)];
+      return AVAILABLE_RECIPIENT_COLORS[
+        Math.max(recipientIndex, 0) % AVAILABLE_RECIPIENT_COLORS.length
+      ];
     },
-    [envelope.recipients], // Todo: Envelopes - Local recipients
+    [envelope.recipients],
   );
 
   const { refetch: reloadEnvelope, isLoading: isReloadingEnvelope } = trpc.envelope.get.useQuery(
@@ -233,6 +284,27 @@ export const EnvelopeEditorProvider = ({
       initialData: envelope,
     },
   );
+
+  /**
+   * Fetch and sync the envelope back into the editor.
+   *
+   * Overrides everything.
+   */
+  const syncEnvelope = async () => {
+    await flushAutosave();
+
+    const fetchedEnvelopeData = await reloadEnvelope();
+
+    if (fetchedEnvelopeData.data) {
+      setEnvelope(fetchedEnvelopeData.data);
+
+      editorRecipients.resetForm({
+        recipients: fetchedEnvelopeData.data.recipients,
+        documentMeta: fetchedEnvelopeData.data.documentMeta,
+      });
+      editorFields.resetForm(fetchedEnvelopeData.data.fields);
+    }
+  };
 
   const setLocalEnvelope = (localEnvelope: Partial<TEnvelope>) => {
     setEnvelope((prev) => ({ ...prev, ...localEnvelope }));
@@ -256,10 +328,23 @@ export const EnvelopeEditorProvider = ({
     isEnvelopeMutationPending,
   ]);
 
-  const flushAutosave = () => {
-    void setFieldsAsync();
-    void setRecipientsAsync();
-    void setEnvelopeAsync();
+  const relativePath = useMemo(() => {
+    const documentRootPath = formatDocumentsPath(envelope.team.url);
+    const templateRootPath = formatTemplatesPath(envelope.team.url);
+
+    const basePath = envelope.type === EnvelopeType.DOCUMENT ? documentRootPath : templateRootPath;
+
+    return {
+      basePath,
+      envelopePath: `${basePath}/${envelope.id}`,
+      editorPath: `${basePath}/${envelope.id}/edit`,
+      documentRootPath,
+      templateRootPath,
+    };
+  }, [envelope.type, envelope.id]);
+
+  const flushAutosave = async (): Promise<void> => {
+    await Promise.all([setFieldsAsync(), setRecipientsAsync(), setEnvelopeAsync()]);
   };
 
   return (
@@ -269,15 +354,18 @@ export const EnvelopeEditorProvider = ({
         isDocument: envelope.type === EnvelopeType.DOCUMENT,
         isTemplate: envelope.type === EnvelopeType.TEMPLATE,
         setLocalEnvelope,
-        getFieldColor,
         getRecipientColorKey,
         updateEnvelope,
+        updateEnvelopeAsync,
         setRecipientsDebounced,
         setRecipientsAsync,
         editorFields,
+        editorRecipients,
         autosaveError,
         flushAutosave,
         isAutosaving,
+        relativePath,
+        syncEnvelope,
       }}
     >
       {children}

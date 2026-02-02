@@ -1,9 +1,7 @@
 import { useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { msg } from '@lingui/core/macro';
-import { useLingui } from '@lingui/react';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import type { Webhook } from '@prisma/client';
 import { WebhookTriggerEvents } from '@prisma/client';
 import { useForm } from 'react-hook-form';
@@ -38,8 +36,6 @@ import {
 } from '@documenso/ui/primitives/select';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-import { useCurrentTeam } from '~/providers/team';
-
 export type WebhookTestDialogProps = {
   webhook: Pick<Webhook, 'id' | 'webhookUrl' | 'eventTriggers'>;
   children: React.ReactNode;
@@ -52,10 +48,8 @@ const ZTestWebhookFormSchema = z.object({
 type TTestWebhookFormSchema = z.infer<typeof ZTestWebhookFormSchema>;
 
 export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps) => {
-  const { _ } = useLingui();
+  const { t } = useLingui();
   const { toast } = useToast();
-
-  const team = useCurrentTeam();
 
   const [open, setOpen] = useState(false);
 
@@ -73,22 +67,19 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
       await testWebhook({
         id: webhook.id,
         event,
-        teamId: team.id,
       });
 
       toast({
-        title: _(msg`Test webhook sent`),
-        description: _(msg`The test webhook has been successfully sent to your endpoint.`),
+        title: t`Test webhook sent`,
+        description: t`The test webhook has been successfully sent to your endpoint.`,
         duration: 5000,
       });
 
       setOpen(false);
     } catch (error) {
       toast({
-        title: _(msg`Test webhook failed`),
-        description: _(
-          msg`We encountered an error while sending the test webhook. Please check your endpoint and try again.`,
-        ),
+        title: t`Test webhook failed`,
+        description: t`We encountered an error while sending the test webhook. Please check your endpoint and try again.`,
         variant: 'destructive',
         duration: 5000,
       });
@@ -129,7 +120,7 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select an event type" />
+                          <SelectValue placeholder={t`Select an event type`} />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -154,11 +145,11 @@ export const WebhookTestDialog = ({ webhook, children }: WebhookTestDialogProps)
 
               <DialogFooter>
                 <Button type="button" variant="secondary" onClick={() => setOpen(false)}>
-                  <Trans>Cancel</Trans>
+                  <Trans>Close</Trans>
                 </Button>
 
                 <Button type="submit" loading={form.formState.isSubmitting}>
-                  <Trans>Send Test Webhook</Trans>
+                  <Trans>Send</Trans>
                 </Button>
               </DialogFooter>
             </fieldset>
