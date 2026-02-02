@@ -594,8 +594,12 @@ export const EnvelopeEditorRecipientForm = () => {
     <Card backdropBlur={false} className="border">
       <CardHeader className="flex flex-row justify-between">
         <div>
-          <CardTitle>Recipients</CardTitle>
-          <CardDescription className="mt-1.5">Add recipients to your document</CardDescription>
+          <CardTitle>
+            <Trans>Recipients</Trans>
+          </CardTitle>
+          <CardDescription className="mt-1.5">
+            <Trans>Add recipients to your document</Trans>
+          </CardDescription>
         </div>
 
         <div className="flex flex-row items-center space-x-2">
