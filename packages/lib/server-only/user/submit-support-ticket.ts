@@ -52,6 +52,43 @@ export const submitSupportTicket = async ({
       })
     : null;
 
+  const userName = user.name?.trim();
+  const fullName = userName || user.email;
+  const emailInput = {
+    email: user.email,
+    isVerified: Boolean(user.emailVerified),
+  };
+  const nameUpdate = userName ? { fullName: { value: userName } } : {};
+
+  const upsertCustomerResult = await plainClient.upsertCustomer({
+    identifier: {
+      emailAddress: user.email,
+    },
+    onCreate: {
+      fullName,
+      email: emailInput,
+    },
+    onUpdate: {
+      ...nameUpdate,
+      email: emailInput,
+    },
+  });
+
+  const customerId = upsertCustomerResult.data?.customer?.id;
+
+  if (upsertCustomerResult.error || !customerId) {
+    console.error('Plain upsertCustomer failed', {
+      userId,
+      organisationId,
+      teamId,
+      error: upsertCustomerResult.error,
+    });
+
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: upsertCustomerResult.error?.message ?? 'Failed to upsert Plain customer',
+    });
+  }
+
   const customMessage = `
 Organisation: ${organisation.name} (${organisation.id})
 Team: ${team ? `${team.name} (${team.id})` : 'No team provided'}
