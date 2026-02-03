@@ -20,6 +20,12 @@ export const submitSupportTicket = async ({
   organisationId,
   teamId,
 }: SubmitSupportTicketOptions) => {
+  if (!plainClient) {
+    throw new AppError(AppErrorCode.NOT_SETUP, {
+      message: 'Support ticket system is not configured',
+    });
+  }
+
   const user = await prisma.user.findFirst({
     where: {
       id: userId,
@@ -52,40 +58,26 @@ export const submitSupportTicket = async ({
       })
     : null;
 
-  const userName = user.name?.trim();
-  const fullName = userName || user.email;
-  const emailInput = {
-    email: user.email,
-    isVerified: Boolean(user.emailVerified),
-  };
-  const nameUpdate = userName ? { fullName: { value: userName } } : {};
-
-  const upsertCustomerResult = await plainClient.upsertCustomer({
+  // Ensure the customer exists in Plain before creating a thread
+  const plainCustomer = await plainClient.upsertCustomer({
     identifier: {
       emailAddress: user.email,
     },
     onCreate: {
-      fullName,
-      email: emailInput,
+      // If the user doesn't have a name, default to their email
+      fullName: user.name || user.email,
+      email: {
+        email: user.email,
+        isVerified: !!user.emailVerified,
+      },
     },
-    onUpdate: {
-      ...nameUpdate,
-      email: emailInput,
-    },
+    // No need to update the customer if it already exists
+    onUpdate: {},
   });
 
-  const customerId = upsertCustomerResult.data?.customer?.id;
-
-  if (upsertCustomerResult.error || !customerId) {
-    console.error('Plain upsertCustomer failed', {
-      userId,
-      organisationId,
-      teamId,
-      error: upsertCustomerResult.error,
-    });
-
+  if (plainCustomer.error) {
     throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
-      message: upsertCustomerResult.error?.message ?? 'Failed to upsert Plain customer',
+      message: `Failed to create customer in support system: ${plainCustomer.error.message}`,
     });
   }
 
@@ -97,12 +89,14 @@ ${message}`;
 
   const res = await plainClient.createThread({
     title: subject,
-    customerIdentifier: { emailAddress: user.email },
+    customerIdentifier: { customerId: plainCustomer.data.customer.id },
     components: [{ componentText: { text: customMessage } }],
   });
 
   if (res.error) {
-    throw new Error(res.error.message);
+    throw new AppError(AppErrorCode.UNKNOWN_ERROR, {
+      message: `Failed to create support ticket: ${res.error.message}`,
+    });
   }
 
   return res;
