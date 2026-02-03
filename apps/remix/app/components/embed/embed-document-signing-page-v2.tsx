@@ -2,7 +2,9 @@ import { useEffect, useLayoutEffect, useState } from 'react';
 
 import { useLingui } from '@lingui/react';
 
+import { APP_I18N_OPTIONS } from '@documenso/lib/constants/i18n';
 import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
+import { dynamicActivate } from '@documenso/lib/utils/i18n';
 
 import { ZSignDocumentEmbedDataSchema } from '~/types/embed-document-sign-schema';
 import { injectCss } from '~/utils/css-vars';
@@ -143,6 +145,10 @@ export const EmbedSignDocumentV2ClientPage = ({
           css: data.css,
           cssVars: data.cssVars,
         });
+      }
+
+      if (data.language && data.language !== APP_I18N_OPTIONS.sourceLang) {
+        void dynamicActivate(data.language);
       }
     } catch (err) {
       console.error(err);
