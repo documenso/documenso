@@ -12,6 +12,8 @@ import type { z } from 'zod';
 import { NEXT_PUBLIC_WEBAPP_URL } from '@documenso/lib/constants/app';
 import { SUBSCRIPTION_STATUS_MAP } from '@documenso/lib/constants/billing';
 import { AppError } from '@documenso/lib/errors/app-error';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
+import type { TLicenseClaim } from '@documenso/lib/types/license';
 import { SUBSCRIPTION_CLAIM_FEATURE_FLAGS } from '@documenso/lib/types/subscription';
 import { trpc } from '@documenso/trpc/react';
 import type { TGetAdminOrganisationResponse } from '@documenso/trpc/server/admin-router/get-admin-organisation.types';
@@ -40,7 +42,20 @@ import { SettingsHeader } from '~/components/general/settings-header';
 
 import type { Route } from './+types/organisations.$id';
 
-export default function OrganisationGroupSettingsPage({ params }: Route.ComponentProps) {
+export async function loader() {
+  const licenseData = await LicenseClient.getInstance()?.getCachedLicense();
+
+  return {
+    licenseFlags: licenseData?.license?.flags,
+  };
+}
+
+export default function OrganisationGroupSettingsPage({
+  params,
+  loaderData,
+}: Route.ComponentProps) {
+  const { licenseFlags } = loaderData;
+
   const { t } = useLingui();
   const { toast } = useToast();
 
@@ -129,7 +144,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
   if (isLoadingOrganisation) {
     return (
       <div className="flex items-center justify-center rounded-lg py-32">
-        <Loader className="text-muted-foreground h-6 w-6 animate-spin" />
+        <Loader className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -239,7 +254,7 @@ export default function OrganisationGroupSettingsPage({ params }: Route.Componen
         )}
       </Alert>
 
-      <OrganisationAdminForm organisation={organisation} />
+      <OrganisationAdminForm organisation={organisation} licenseFlags={licenseFlags} />
 
       <div className="mt-16 space-y-10">
         <div>
@@ -278,6 +293,7 @@ type TUpdateGenericOrganisationDataFormSchema = z.infer<
 
 type OrganisationAdminFormOptions = {
   organisation: TGetAdminOrganisationResponse;
+  licenseFlags?: TLicenseClaim;
 };
 
 const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) => {
@@ -349,7 +365,7 @@ const GenericOrganisationAdminForm = ({ organisation }: OrganisationAdminFormOpt
                 <Input {...field} />
               </FormControl>
               {!form.formState.errors.url && (
-                <span className="text-foreground/50 text-xs font-normal">
+                <span className="text-xs font-normal text-foreground/50">
                   {field.value ? (
                     `${NEXT_PUBLIC_WEBAPP_URL()}/o/${field.value}`
                   ) : (
@@ -381,11 +397,16 @@ const ZUpdateOrganisationBillingFormSchema = ZUpdateAdminOrganisationRequestSche
 
 type TUpdateOrganisationBillingFormSchema = z.infer<typeof ZUpdateOrganisationBillingFormSchema>;
 
-const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) => {
+const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdminFormOptions) => {
   const { toast } = useToast();
   const { t } = useLingui();
 
   const { mutateAsync: updateOrganisation } = trpc.admin.organisation.update.useMutation();
+
+  const hasRestrictedEnterpriseFeatures = Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).some(
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    (flag) => flag.isEnterprise && !licenseFlags?.[flag.key as keyof TLicenseClaim],
+  );
 
   const form = useForm<TUpdateOrganisationBillingFormSchema>({
     resolver: zodResolver(ZUpdateOrganisationBillingFormSchema),
@@ -440,7 +461,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                     <InfoIcon className="mx-2 h-4 w-4" />
                   </TooltipTrigger>
 
-                  <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
                     <h2>
                       <strong>
                         <Trans>Inherited subscription claim</Trans>
@@ -493,7 +514,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                 <Link
                   target="_blank"
                   to={`https://dashboard.stripe.com/customers/${field.value}`}
-                  className="text-foreground/50 text-xs font-normal"
+                  className="text-xs font-normal text-foreground/50"
                 >
                   {`https://dashboard.stripe.com/customers/${field.value}`}
                 </Link>
@@ -582,6 +603,7 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
           </FormLabel>
 
           <div className="mt-2 space-y-2 rounded-md border p-4">
+
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label }) => (
               <FormField
                 key={key}
@@ -609,7 +631,59 @@ const OrganisationAdminForm = ({ organisation }: OrganisationAdminFormOptions) =
                 )}
               />
             ))}
+
+            {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
+              const isRestrictedFeature =
+                isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
+
+              return (
+                <FormField
+                  key={key}
+                  control={form.control}
+                  name={`claims.flags.${key}`}
+                  render={({ field }) => (
+                    <FormItem className="flex items-center space-x-2">
+                      <FormControl>
+                        <div className="flex items-center">
+                          <Checkbox
+                            id={`flag-${key}`}
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={isRestrictedFeature && !field.value} // Allow disabling of restricted features.
+                          />
+
+                          <label
+                            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
+                            htmlFor={`flag-${key}`}
+                          >
+                            {label}
+                            {isRestrictedFeature && ' ¹'}
+                          </label>
+                        </div>
+                      </FormControl>
+                    </FormItem>
+                  )}
+                />
+              );
+            })}
+
           </div>
+
+          {hasRestrictedEnterpriseFeatures && (
+            <Alert variant="neutral" className="mt-4">
+              <AlertDescription>
+                <span>¹&nbsp;</span>
+                <Trans>Your current license does not include these features.</Trans>{' '}
+                <Link
+                  to="https://docs.documenso.com/users/licenses/enterprise-edition"
+                  target="_blank"
+                  className="text-foreground underline hover:opacity-80"
+                >
+                  <Trans>Learn more</Trans>
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
 
         <div className="flex justify-end">
