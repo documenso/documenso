@@ -383,6 +383,10 @@ const decorateAndSignPdf = async ({
       }
     }
 
+    // Should never run into issues with this flatten since all
+    // arcoFields are created by pdf-lib itself.
+    legacy_pdfLibDoc.getForm().flatten();
+
     await pdfDoc.reload(await legacy_pdfLibDoc.save());
   }
 

@@ -28,5 +28,7 @@ export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean
     pdfDoc.flattenAnnotations();
   }
 
-  return Buffer.from(await pdfDoc.save());
+  const normalizedPdfBytes = await pdfDoc.save();
+
+  return Buffer.from(normalizedPdfBytes);
 };

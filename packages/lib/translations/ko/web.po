@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-13 02:39\n"
+"PO-Revision-Date: 2026-01-13 10:04\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -179,6 +179,16 @@ msgstr "{0, plural, other {페이지 {1}/{2} - 수신자 #명 발견됨}}"
 msgid "{0, plural, one {Recipient added} other {Recipients added}}"
 msgstr "{0, plural, other {수신자 추가됨}}"
 
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "{0, plural, one {Select a folder to move the selected document to.} other {Select a folder to move the # selected documents to.}}"
+msgstr ""
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "{0, plural, one {Select a folder to move the selected template to.} other {Select a folder to move the # selected templates to.}}"
+msgstr ""
+
 #. placeholder {0}: pendingRecipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
 msgid "{0, plural, one {Waiting on 1 recipient} other {Waiting on # recipients}}"
@@ -193,6 +203,16 @@ msgstr "{0, plural, other {문서에서 필드 #개를 발견했습니다.}}"
 #: apps/remix/app/components/dialogs/ai-recipient-detection-dialog.tsx
 msgid "{0, plural, one {We found # recipient in your document.} other {We found # recipients in your document.}}"
 msgstr "{0, plural, other {문서에서 수신자 #명을 발견했습니다.}}"
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {You are about to delete the selected document.} other {You are about to delete # documents.}}"
+msgstr ""
+
+#. placeholder {0}: envelopeIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {You are about to delete the selected template.} other {You are about to delete # templates.}}"
+msgstr ""
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
@@ -222,6 +242,17 @@ msgstr "{0}에서 \"{1}\" 문서에 대해 귀하께 {recipientActionVerb}하도
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0}이(가) 귀하께 문서에 {recipientActionVerb}하도록 초대했습니다."
+
+#. placeholder {0}: result.deletedCount
+#. placeholder {1}: result.failedIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0} item(s) deleted. {1} item(s) could not be deleted."
+msgstr ""
+
+#. placeholder {0}: result.deletedCount
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0} item(s) have been deleted."
+msgstr ""
 
 #. placeholder {0}: remaining.documents
 #. placeholder {1}: quota.documents
@@ -461,6 +492,10 @@ msgstr "{recipientReference}님이 {documentName}에 서명했습니다."
 #: apps/remix/app/components/forms/public-profile-form.tsx
 msgid "{remaningLength, plural, one {# character remaining} other {# characters remaining}}"
 msgstr "{remaningLength, plural, other {#자 남음}}"
+
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
+msgid "{selectedCount} selected"
+msgstr ""
 
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -1362,11 +1397,16 @@ msgstr "모든 폴더"
 msgid "All inserted signatures will be voided"
 msgstr "삽입된 모든 서명이 무효화됩니다"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "All items must be of the same type."
+msgstr ""
+
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
 msgstr "모든 수신자가 서명했습니다. 문서를 처리 중이며 곧 서명된 문서의 사본이 이메일로 전송됩니다."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "All recipients will be notified"
 msgstr "모든 수신자에게 알림이 전송됩니다"
 
@@ -1528,6 +1568,10 @@ msgstr "템플릿에서 문서를 생성하는 중 오류가 발생했습니다.
 msgid "An error occurred while creating the webhook. Please try again."
 msgstr "웹훅을 생성하는 중 오류가 발생했습니다. 다시 시도해 주세요."
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "An error occurred while deleting the items."
+msgstr ""
+
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "An error occurred while deleting the user."
 msgstr "사용자를 삭제하는 동안 오류가 발생했습니다."
@@ -1559,6 +1603,10 @@ msgstr "문서를 불러오는 동안 오류가 발생했습니다."
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the document."
 msgstr "문서를 이동하는 중 오류가 발생했습니다."
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "An error occurred while moving the items."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the template."
@@ -1951,7 +1999,7 @@ msgstr "감사 로그"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "Audit Log Details"
-msgstr ""
+msgstr "감사 로그 세부 정보"
 
 #: apps/remix/app/components/general/document/document-page-view-dropdown.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
@@ -2165,6 +2213,8 @@ msgstr "준비 가능"
 #: apps/remix/app/components/dialogs/envelope-duplicate-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-create-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
@@ -2371,6 +2421,10 @@ msgstr "클레임"
 #: packages/ui/primitives/data-table.tsx
 msgid "Clear filters"
 msgstr "필터 지우기"
+
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
+msgid "Clear selection"
+msgstr ""
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
@@ -3115,7 +3169,7 @@ msgstr "새 사용자 기본 조직 역할"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Recipients"
-msgstr ""
+msgstr "기본 수신인들"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Default Signature Settings"
@@ -3141,6 +3195,7 @@ msgstr "delete"
 #: apps/remix/app/components/dialogs/claim-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-item-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
@@ -3159,6 +3214,7 @@ msgstr "delete"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 #: apps/remix/app/components/tables/organisation-email-domains-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
@@ -3213,6 +3269,10 @@ msgstr "문서 삭제"
 msgid "Delete Document"
 msgstr "문서 삭제"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Delete Documents"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "Delete email"
 msgstr "이메일 삭제"
@@ -3261,6 +3321,10 @@ msgstr "팀 그룹 삭제"
 #: apps/remix/app/components/general/envelope-editor/envelope-editor.tsx
 msgid "Delete Template"
 msgstr "템플릿 삭제"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Delete Templates"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
@@ -3398,6 +3462,10 @@ msgstr "직접 링크 서명이 활성화되었습니다"
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Direct link templates contain one dynamic recipient placeholder. Anyone with access to this link can sign the document, and it will then appear on your documents page."
 msgstr "직접 링크 템플릿에는 하나의 동적 수신자 플레이스홀더가 포함됩니다. 링크에 접근할 수 있는 모든 사람이 문서에 서명할 수 있으며, 해당 문서는 문서 페이지에 표시됩니다."
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Direct links associated with templates will be removed"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Direct template link deleted"
@@ -3871,6 +3939,14 @@ msgstr "생성된 문서"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.$id._index.tsx
 msgid "Documents created from template"
 msgstr "템플릿에서 생성된 문서"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Documents deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Documents partially deleted"
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Documents Received"
@@ -4476,6 +4552,7 @@ msgstr "봉투가 업데이트되었습니다"
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/session-logout-all-dialog.tsx
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 #: apps/remix/app/components/dialogs/template-duplicate-dialog.tsx
@@ -4782,6 +4859,7 @@ msgid "Fill in the details to create a new subscription claim."
 msgstr "새 구독 클레임을 생성하려면 세부 정보를 입력하세요."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Folder"
 msgstr "폴더"
@@ -5104,6 +5182,7 @@ msgid "Home"
 msgstr "홈"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "Home (No Folder)"
 msgstr "홈(폴더 없음)"
@@ -5902,6 +5981,7 @@ msgid "Monthly Active Users: Users that had at least one of their documents comp
 msgstr "월간 활성 사용자: 문서가 하나 이상 완료된 사용자"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-card.tsx
@@ -5916,6 +5996,10 @@ msgstr "\"{templateTitle}\"을(를) 폴더로 이동"
 msgid "Move Document to Folder"
 msgstr "문서를 폴더로 이동"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Move Documents to Folder"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Move Folder"
 msgstr "폴더 이동"
@@ -5924,7 +6008,12 @@ msgstr "폴더 이동"
 msgid "Move Template to Folder"
 msgstr "템플릿을 폴더로 이동"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Move Templates to Folder"
+msgstr ""
+
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
+#: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 #: apps/remix/app/components/tables/templates-table-action-dropdown.tsx
 msgid "Move to Folder"
 msgstr "폴더로 이동"
@@ -6061,6 +6150,7 @@ msgid "No fields were detected in your document."
 msgstr "문서에서 감지된 필드가 없습니다."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "No folders found"
 msgstr "폴더를 찾을 수 없습니다."
@@ -6238,6 +6328,7 @@ msgid "On this page, you can create new Webhooks and manage the existing ones."
 msgstr "이 페이지에서 새 웹훅을 생성하고 기존 웹훅을 관리할 수 있습니다."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Once confirmed, the following will occur:"
 msgstr "확인되면 다음 작업이 수행됩니다:"
 
@@ -6612,6 +6703,10 @@ msgstr "보류 중인 문서"
 msgid "Pending Documents"
 msgstr "보류 중인 문서"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Pending documents will have their signing process cancelled"
+msgstr ""
+
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
 msgstr "보류 중인 초대장"
@@ -6788,6 +6883,7 @@ msgid "Please note that proceeding will remove direct linking recipient and turn
 msgstr "이 작업을 계속하면 직접 링크 수신자가 제거되고 플레이스홀더로 변경됩니다."
 
 #: apps/remix/app/components/dialogs/document-delete-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Please note that this action is <0>irreversible</0>."
 msgstr "이 작업은 <0>되돌릴 수 없습니다</0>."
 
@@ -7136,7 +7232,7 @@ msgstr "수신자 지표"
 
 #: apps/remix/app/components/forms/document-preferences-form.tsx
 msgid "Recipients that will be automatically added to new documents."
-msgstr ""
+msgstr "새 문서에 자동으로 추가될 수신인들입니다."
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 msgid "Recipients will be able to sign the document once sent"
@@ -7602,6 +7698,7 @@ msgid "Search documents..."
 msgstr "문서 검색..."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
@@ -7678,6 +7775,11 @@ msgstr "시간대를 선택하세요."
 #: packages/ui/components/document/document-global-auth-access-select.tsx
 msgid "Select access methods"
 msgstr "접근 방식 선택"
+
+#: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/templates-table.tsx
+msgid "Select all"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
@@ -7758,6 +7860,11 @@ msgstr "패스키 선택"
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 msgid "Select recipients"
+msgstr "수신인 선택"
+
+#: apps/remix/app/components/tables/documents-table.tsx
+#: apps/remix/app/components/tables/templates-table.tsx
+msgid "Select row"
 msgstr ""
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
@@ -7806,10 +7913,22 @@ msgstr "세로 정렬 선택"
 msgid "Select visibility"
 msgstr "공개 범위 선택"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Selected documents will be permanently deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "Selected items have been moved."
+msgstr ""
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
 msgid "Selected Recipient"
 msgstr "선택된 수신자"
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Selected templates will be permanently deleted"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -8812,6 +8931,14 @@ msgstr "템플릿이 업로드되었습니다."
 msgid "Templates"
 msgstr "템플릿"
 
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Templates deleted"
+msgstr ""
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "Templates partially deleted"
+msgstr ""
+
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
 msgstr "테스트"
@@ -9008,6 +9135,10 @@ msgstr "이동하려는 폴더가 존재하지 않습니다."
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the document to does not exist."
 msgstr "문서를 이동하려는 폴더가 존재하지 않습니다."
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "The folder you are trying to move the items to does not exist."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the template to does not exist."
@@ -10396,7 +10527,7 @@ msgstr "초대 보기"
 
 #: apps/remix/app/components/tables/admin-document-logs-table.tsx
 msgid "View JSON"
-msgstr ""
+msgstr "JSON 보기"
 
 #: apps/remix/app/components/general/template/template-page-view-recent-activity.tsx
 msgid "View more"
@@ -11102,6 +11233,10 @@ msgstr "현재 <0>{passkeyName}</0> 패스키를 업데이트하는 중입니다
 #: apps/remix/app/components/dialogs/team-group-update-dialog.tsx
 msgid "You are currently updating the <0>{teamGroupName}</0> team group."
 msgstr "현재 <0>{teamGroupName}</0> 팀 그룹을 업데이트하고 있습니다."
+
+#: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
+msgid "You are not allowed to move these items."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "You are not allowed to move this document."
