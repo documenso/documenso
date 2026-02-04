@@ -19,7 +19,7 @@ import { appMetaTags } from '~/utils/meta';
 import type { Route } from './+types/_layout';
 
 export function meta() {
-  return appMetaTags('Profile');
+  return appMetaTags(msg`Profile`);
 }
 
 export default function PublicProfileLayout() {

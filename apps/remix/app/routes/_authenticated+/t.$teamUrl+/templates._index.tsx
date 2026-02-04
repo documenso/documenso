@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
+import { msg } from '@lingui/core/macro';
 import { Trans } from '@lingui/react/macro';
 import { EnvelopeType } from '@prisma/client';
 import { Bird } from 'lucide-react';
@@ -22,7 +23,7 @@ import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
 export function meta() {
-  return appMetaTags('Templates');
+  return appMetaTags(msg`Templates`);
 }
 
 export default function TemplatesPage() {
