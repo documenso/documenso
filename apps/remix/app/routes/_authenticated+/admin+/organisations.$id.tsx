@@ -205,7 +205,7 @@ export default function OrganisationGroupSettingsPage({
           <AlertDescription className="mr-2">
             {organisation.subscription ? (
               <span>
-                {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
+                {t(SUBSCRIPTION_STATUS_MAP[organisation.subscription.status])} subscription found
               </span>
             ) : (
               <span>No subscription found</span>
@@ -603,6 +603,35 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
           </FormLabel>
 
           <div className="mt-2 space-y-2 rounded-md border p-4">
+
+            {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={`claims.flags.${key}`}
+                render={({ field }) => (
+                  <FormItem className="flex items-center space-x-2">
+                    <FormControl>
+                      <div className="flex items-center">
+                        <Checkbox
+                          id={`flag-${key}`}
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+
+                        <label
+                          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+                          htmlFor={`flag-${key}`}
+                        >
+                          {t(label)}
+                        </label>
+                      </div>
+                    </FormControl>
+                  </FormItem>
+                )}
+              />
+            ))}
+
             {Object.values(SUBSCRIPTION_CLAIM_FEATURE_FLAGS).map(({ key, label, isEnterprise }) => {
               const isRestrictedFeature =
                 isEnterprise && !licenseFlags?.[key as keyof TLicenseClaim]; // eslint-disable-line @typescript-eslint/consistent-type-assertions
@@ -637,6 +666,7 @@ const OrganisationAdminForm = ({ organisation, licenseFlags }: OrganisationAdmin
                 />
               );
             })}
+
           </div>
 
           {hasRestrictedEnterpriseFeatures && (
