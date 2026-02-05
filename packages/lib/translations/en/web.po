@@ -7955,19 +7955,19 @@ msgstr "Send Document"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send document completed email"
-msgstr "Send document completed email"
+msgstr "Email recipients when the document is completed"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send document completed email to the owner"
-msgstr "Send document completed email to the owner"
+msgstr "Email the owner when the document is completed"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send document deleted email"
-msgstr "Send document deleted email"
+msgstr "Email recipients when a pending document is deleted"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send document pending email"
-msgstr "Send document pending email"
+msgstr "Email the signer if the document is still pending"
 
 #: packages/email/templates/confirm-team-email.tsx
 msgid "Send documents on behalf of the team using the email address"
@@ -7983,15 +7983,15 @@ msgstr "Send on Behalf of Team"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient removed email"
-msgstr "Send recipient removed email"
+msgstr "Email recipients when they're removed from a pending document"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient signed email"
-msgstr "Send recipient signed email"
+msgstr "Email the owner when a recipient signs"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Send recipient signing request email"
-msgstr "Send recipient signing request email"
+msgstr "Email recipients with a signing request"
 
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
