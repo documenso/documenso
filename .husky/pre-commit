@@ -1,6 +1,8 @@
 SCRIPT_DIR="$(readlink -f "$(dirname "$0")")"
 MONOREPO_ROOT="$(readlink -f "$SCRIPT_DIR/../")"
 
+node "$MONOREPO_ROOT/scripts/check-po-files.cjs" || exit 1
+
 echo "Copying .well-known/ contents"
 node "$MONOREPO_ROOT/scripts/copy-wellknown.cjs"
 
