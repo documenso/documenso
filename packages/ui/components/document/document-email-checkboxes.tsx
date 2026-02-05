@@ -63,19 +63,19 @@ export const DocumentEmailCheckboxes = ({
 
       <div className="flex flex-row items-center">
         <Checkbox
-          id={DocumentEmailEvents.RecipientSigningRequest}
+          id={DocumentEmailEvents.OwnerDocumentCompleted}
           className="h-5 w-5"
-          checked={value.recipientSigningRequest}
+          checked={value.ownerDocumentCompleted}
           onCheckedChange={(checked) =>
-            onChange({ ...value, [DocumentEmailEvents.RecipientSigningRequest]: Boolean(checked) })
+            onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })
           }
         />
 
         <label
           className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
-          htmlFor={DocumentEmailEvents.RecipientSigningRequest}
+          htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
         >
-          <Trans>Send recipient signing request email</Trans>
+          <Trans>Send document completed email to the owner</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -85,51 +85,14 @@ export const DocumentEmailCheckboxes = ({
             <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
               <h2>
                 <strong>
-                  <Trans>Recipient signing request email</Trans>
+                  <Trans>Document completed email</Trans>
                 </strong>
               </h2>
 
               <p>
                 <Trans>
-                  This email is sent to the recipient requesting them to sign the document.
-                </Trans>
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </label>
-      </div>
-
-      <div className="flex flex-row items-center">
-        <Checkbox
-          id={DocumentEmailEvents.RecipientRemoved}
-          className="h-5 w-5"
-          checked={value.recipientRemoved}
-          onCheckedChange={(checked) =>
-            onChange({ ...value, [DocumentEmailEvents.RecipientRemoved]: Boolean(checked) })
-          }
-        />
-
-        <label
-          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
-          htmlFor={DocumentEmailEvents.RecipientRemoved}
-        >
-          <Trans>Send recipient removed email</Trans>
-
-          <Tooltip>
-            <TooltipTrigger>
-              <InfoIcon className="mx-2 h-4 w-4" />
-            </TooltipTrigger>
-
-            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
-              <h2>
-                <strong>
-                  <Trans>Recipient removed email</Trans>
-                </strong>
-              </h2>
-
-              <p>
-                <Trans>
-                  This email is sent to the recipient if they are removed from a pending document.
+                  This will be sent to the document owner once the document has been fully
+                  completed.
                 </Trans>
               </p>
             </TooltipContent>
@@ -216,6 +179,44 @@ export const DocumentEmailCheckboxes = ({
 
       <div className="flex flex-row items-center">
         <Checkbox
+          id={DocumentEmailEvents.RecipientRemoved}
+          className="h-5 w-5"
+          checked={value.recipientRemoved}
+          onCheckedChange={(checked) =>
+            onChange({ ...value, [DocumentEmailEvents.RecipientRemoved]: Boolean(checked) })
+          }
+        />
+
+        <label
+          className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+          htmlFor={DocumentEmailEvents.RecipientRemoved}
+        >
+          <Trans>Send recipient removed email</Trans>
+
+          <Tooltip>
+            <TooltipTrigger>
+              <InfoIcon className="mx-2 h-4 w-4" />
+            </TooltipTrigger>
+
+            <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
+              <h2>
+                <strong>
+                  <Trans>Recipient removed email</Trans>
+                </strong>
+              </h2>
+
+              <p>
+                <Trans>
+                  This email is sent to the recipient if they are removed from a pending document.
+                </Trans>
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </label>
+      </div>
+
+      <div className="flex flex-row items-center">
+        <Checkbox
           id={DocumentEmailEvents.DocumentDeleted}
           className="h-5 w-5"
           checked={value.documentDeleted}
@@ -254,19 +255,19 @@ export const DocumentEmailCheckboxes = ({
 
       <div className="flex flex-row items-center">
         <Checkbox
-          id={DocumentEmailEvents.OwnerDocumentCompleted}
+          id={DocumentEmailEvents.RecipientSigningRequest}
           className="h-5 w-5"
-          checked={value.ownerDocumentCompleted}
+          checked={value.recipientSigningRequest}
           onCheckedChange={(checked) =>
-            onChange({ ...value, [DocumentEmailEvents.OwnerDocumentCompleted]: Boolean(checked) })
+            onChange({ ...value, [DocumentEmailEvents.RecipientSigningRequest]: Boolean(checked) })
           }
         />
 
         <label
           className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
-          htmlFor={DocumentEmailEvents.OwnerDocumentCompleted}
+          htmlFor={DocumentEmailEvents.RecipientSigningRequest}
         >
-          <Trans>Send document completed email to the owner</Trans>
+          <Trans>Send recipient signing request email</Trans>
 
           <Tooltip>
             <TooltipTrigger>
@@ -276,14 +277,13 @@ export const DocumentEmailCheckboxes = ({
             <TooltipContent className="text-foreground max-w-md space-y-2 p-4">
               <h2>
                 <strong>
-                  <Trans>Document completed email</Trans>
+                  <Trans>Recipient signing request email</Trans>
                 </strong>
               </h2>
 
               <p>
                 <Trans>
-                  This will be sent to the document owner once the document has been fully
-                  completed.
+                  This email is sent to the recipient requesting them to sign the document.
                 </Trans>
               </p>
             </TooltipContent>
