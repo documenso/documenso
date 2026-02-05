@@ -112,10 +112,7 @@ export const DocumentReadOnlyFields = ({
               color={
                 showRecipientColors
                   ? getRecipientColorStyles(
-                      Math.max(
-                        recipientIds.findIndex((id) => id === field.recipientId),
-                        0,
-                      ),
+                      recipientIds.findIndex((id) => id === field.recipientId),
                     )
                   : undefined
               }
