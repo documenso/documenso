@@ -1,0 +1,164 @@
+---
+title: Documenso Documentation
+description: Learn how to send documents for signing, integrate with the API, or self-host your own instance.
+full: true
+---
+
+import {
+  BookOpenIcon,
+  CodeIcon,
+  FileTextIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+  UserIcon,
+} from 'lucide-react';
+
+<div className="not-prose max-w-4xl mx-auto px-4">
+  <div className="mb-12 text-center pt-6">
+    <h1 className="text-4xl font-bold tracking-tight mb-4">Documenso Documentation</h1>
+    <p className="text-lg text-fd-muted-foreground max-w-2xl mx-auto">
+      The open-source document signing platform. Send documents for signatures, integrate with your apps, or self-host with full control.
+    </p>
+  </div>
+
+  <div className="grid gap-4 md:grid-cols-3 mb-12">
+    <a href="/docs/users" className="group relative flex flex-col rounded-xl border bg-fd-card p-6 transition-all hover:border-fd-primary/50 hover:shadow-md">
+      <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+        <UserIcon className="size-6" />
+      </div>
+      <h2 className="text-lg font-semibold mb-2">User Guide</h2>
+      <p className="text-sm text-fd-muted-foreground mb-4 flex-1">
+        Send documents, create templates, and manage your team using the web application.
+      </p>
+      <span className="text-sm font-medium text-fd-primary">Get started →</span>
+    </a>
+
+    <a href="/docs/developers" className="group relative flex flex-col rounded-xl border bg-fd-card p-6 transition-all hover:border-fd-primary/50 hover:shadow-md">
+      <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
+        <CodeIcon className="size-6" />
+      </div>
+      <h2 className="text-lg font-semibold mb-2">Developer Guide</h2>
+      <p className="text-sm text-fd-muted-foreground mb-4 flex-1">
+        Integrate document signing into your applications with the REST API, webhooks, and embedding.
+      </p>
+      <span className="text-sm font-medium text-fd-primary">View API docs →</span>
+    </a>
+
+    <a href="/docs/self-hosting" className="group relative flex flex-col rounded-xl border bg-fd-card p-6 transition-all hover:border-fd-primary/50 hover:shadow-md">
+      <div className="mb-4 flex size-12 items-center justify-center rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400">
+        <ServerIcon className="size-6" />
+      </div>
+      <h2 className="text-lg font-semibold mb-2">Self-Hosting Guide</h2>
+      <p className="text-sm text-fd-muted-foreground mb-4 flex-1">
+        Deploy your own Documenso instance with Docker, Kubernetes, or Railway.
+      </p>
+      <span className="text-sm font-medium text-fd-primary">Deploy now →</span>
+    </a>
+
+  </div>
+
+  <div className="grid gap-8 md:grid-cols-2 mb-12">
+    <div className="rounded-xl border bg-fd-card/50 p-6">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <BookOpenIcon className="size-5 text-fd-muted-foreground" />
+        Quick Start
+      </h3>
+      <div className="space-y-4">
+        <div>
+          <h4 className="text-sm font-medium mb-2">Send your first document</h4>
+          <ol className="text-sm text-fd-muted-foreground space-y-1 list-decimal list-inside">
+            <li><a href="/docs/users/getting-started/create-account" className="text-fd-primary hover:underline">Create an account</a></li>
+            <li><a href="/docs/users/getting-started/send-first-document" className="text-fd-primary hover:underline">Upload and send a document</a></li>
+          </ol>
+        </div>
+        <div>
+          <h4 className="text-sm font-medium mb-2">Integrate with the API</h4>
+          <ol className="text-sm text-fd-muted-foreground space-y-1 list-decimal list-inside">
+            <li><a href="/docs/developers/getting-started/authentication" className="text-fd-primary hover:underline">Get your API key</a></li>
+            <li><a href="/docs/developers/getting-started/first-api-call" className="text-fd-primary hover:underline">Make your first API call</a></li>
+          </ol>
+        </div>
+        <div>
+          <h4 className="text-sm font-medium mb-2">Deploy self-hosted</h4>
+          <ol className="text-sm text-fd-muted-foreground space-y-1 list-decimal list-inside">
+            <li><a href="/docs/self-hosting/getting-started/requirements" className="text-fd-primary hover:underline">Check requirements</a></li>
+            <li><a href="/docs/self-hosting/getting-started/quick-start" className="text-fd-primary hover:underline">Run with Docker</a></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+
+    <div className="rounded-xl border bg-fd-card/50 p-6">
+      <h3 className="font-semibold mb-4 flex items-center gap-2">
+        <BookOpenIcon className="size-5 text-fd-muted-foreground" />
+        Core Concepts
+      </h3>
+      <div className="grid grid-cols-2 gap-3">
+        <a href="/docs/concepts/document-lifecycle" className="rounded-lg border bg-fd-background p-3 text-sm hover:border-fd-primary/50 transition-colors">
+          <div className="font-medium mb-1">Document Lifecycle</div>
+          <div className="text-xs text-fd-muted-foreground">Draft to completed</div>
+        </a>
+        <a href="/docs/concepts/recipient-roles" className="rounded-lg border bg-fd-background p-3 text-sm hover:border-fd-primary/50 transition-colors">
+          <div className="font-medium mb-1">Recipient Roles</div>
+          <div className="text-xs text-fd-muted-foreground">Signers and approvers</div>
+        </a>
+        <a href="/docs/concepts/field-types" className="rounded-lg border bg-fd-background p-3 text-sm hover:border-fd-primary/50 transition-colors">
+          <div className="font-medium mb-1">Field Types</div>
+          <div className="text-xs text-fd-muted-foreground">Signatures and inputs</div>
+        </a>
+        <a href="/docs/concepts/signing-certificates" className="rounded-lg border bg-fd-background p-3 text-sm hover:border-fd-primary/50 transition-colors">
+          <div className="font-medium mb-1">Signing Certificates</div>
+          <div className="text-xs text-fd-muted-foreground">Digital verification</div>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <div className="grid gap-4 md:grid-cols-2 mb-12">
+    <a href="/docs/compliance" className="flex items-start gap-4 rounded-xl border bg-fd-card/50 p-5 transition-all hover:border-fd-primary/50">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
+        <ShieldCheckIcon className="size-5" />
+      </div>
+      <div>
+        <h3 className="font-semibold mb-1">Compliance & Legal</h3>
+        <p className="text-sm text-fd-muted-foreground">
+          ESIGN, UETA, eIDAS compliance, GDPR, and signature levels explained.
+        </p>
+      </div>
+    </a>
+
+    <a href="/docs/policies" className="flex items-start gap-4 rounded-xl border bg-fd-card/50 p-5 transition-all hover:border-fd-primary/50">
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-slate-500/10 text-slate-600 dark:text-slate-400">
+        <FileTextIcon className="size-5" />
+      </div>
+      <div>
+        <h3 className="font-semibold mb-1">Policies & Licensing</h3>
+        <p className="text-sm text-fd-muted-foreground">
+          AGPL and Enterprise licenses, fair use, privacy policy, and support.
+        </p>
+      </div>
+    </a>
+
+  </div>
+
+  <div className="rounded-xl border bg-gradient-to-r from-fd-primary/5 to-fd-primary/10 p-6 text-center">
+    <h3 className="font-semibold mb-2">Join the Community</h3>
+    <p className="text-sm text-fd-muted-foreground mb-4">
+      Documenso is open source. Contribute, ask questions, or share feedback.
+    </p>
+    <div className="flex flex-wrap justify-center gap-3">
+      <a href="https://github.com/documenso/documenso" className="inline-flex items-center gap-2 rounded-lg bg-fd-background border px-4 py-2 text-sm font-medium hover:bg-fd-accent transition-colors">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"></path></svg>
+        GitHub
+      </a>
+      <a href="https://documenso.com/discord" className="inline-flex items-center gap-2 rounded-lg bg-fd-background border px-4 py-2 text-sm font-medium hover:bg-fd-accent transition-colors">
+        <svg className="size-4" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.3698a19.7913 19.7913 0 00-4.8851-1.5152.0741.0741 0 00-.0785.0371c-.211.3753-.4447.8648-.6083 1.2495-1.8447-.2762-3.68-.2762-5.4868 0-.1636-.3933-.4058-.8742-.6177-1.2495a.077.077 0 00-.0785-.037 19.7363 19.7363 0 00-4.8852 1.515.0699.0699 0 00-.0321.0277C.5334 9.0458-.319 13.5799.0992 18.0578a.0824.0824 0 00.0312.0561c2.0528 1.5076 4.0413 2.4228 5.9929 3.0294a.0777.0777 0 00.0842-.0276c.4616-.6304.8731-1.2952 1.226-1.9942a.076.076 0 00-.0416-.1057c-.6528-.2476-1.2743-.5495-1.8722-.8923a.077.077 0 01-.0076-.1277c.1258-.0943.2517-.1923.3718-.2914a.0743.0743 0 01.0776-.0105c3.9278 1.7933 8.18 1.7933 12.0614 0a.0739.0739 0 01.0785.0095c.1202.099.246.1981.3728.2924a.077.077 0 01-.0066.1276 12.2986 12.2986 0 01-1.873.8914.0766.0766 0 00-.0407.1067c.3604.698.7719 1.3628 1.225 1.9932a.076.076 0 00.0842.0286c1.961-.6067 3.9495-1.5219 6.0023-3.0294a.077.077 0 00.0313-.0552c.5004-5.177-.8382-9.6739-3.5485-13.6604a.061.061 0 00-.0312-.0286zM8.02 15.3312c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9555-2.4189 2.157-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.9555 2.4189-2.1569 2.4189zm7.9748 0c-1.1825 0-2.1569-1.0857-2.1569-2.419 0-1.3332.9554-2.4189 2.1569-2.4189 1.2108 0 2.1757 1.0952 2.1568 2.419 0 1.3332-.946 2.4189-2.1568 2.4189Z"></path></svg>
+        Discord
+      </a>
+      <a href="https://documenso.com" className="inline-flex items-center gap-2 rounded-lg bg-fd-primary text-fd-primary-foreground px-4 py-2 text-sm font-medium hover:bg-fd-primary/90 transition-colors">
+        Try Documenso
+      </a>
+    </div>
+  </div>
+</div>

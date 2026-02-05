@@ -1,0 +1,195 @@
+---
+title: E-Sign Compliance
+description: ESIGN, UETA, eIDAS and electronic signature laws
+---
+
+# E-Sign Compliance
+
+Electronic signature laws establish the legal validity and enforceability of electronically signed documents. These laws define when an electronic signature can substitute for a handwritten signature and what conditions must be met for the signature to be legally binding.
+
+This page provides an overview of major e-signature laws and how Documenso supports compliance with these frameworks.
+
+---
+
+## ESIGN Act (United States)
+
+The Electronic Signatures in Global and National Commerce Act (ESIGN Act) is a U.S. federal law enacted in 2000. It ensures that electronic signatures and records have the same legal validity as paper documents and handwritten signatures in interstate and foreign commerce.
+
+### Key Requirements
+
+| Requirement             | Description                                                                               |
+| ----------------------- | ----------------------------------------------------------------------------------------- |
+| **Intent to Sign**      | Signers must demonstrate clear intent to sign the document                                |
+| **Consent**             | All parties must agree to conduct the transaction electronically                          |
+| **Consumer Disclosure** | For consumer transactions, specific disclosures must be provided before obtaining consent |
+| **Record Retention**    | Electronic records must be accurately preserved and accessible for later reference        |
+| **Association**         | The signature must be associated with the record being signed                             |
+
+### Exclusions
+
+The ESIGN Act does not apply to certain document types, including:
+
+- Wills, codicils, and testamentary trusts
+- Family law documents (adoption, divorce)
+- Court orders and official court documents
+- Cancellation of utility services
+- Documents related to hazardous materials transportation
+
+---
+
+## UETA (United States)
+
+The Uniform Electronic Transactions Act (UETA) is a model law adopted by 49 U.S. states (all except New York, which has its own Electronic Signatures and Records Act). UETA provides a legal framework for electronic signatures and records at the state level.
+
+### Relationship to ESIGN
+
+UETA and the ESIGN Act have similar requirements and purposes. The federal ESIGN Act allows states to modify or supersede certain ESIGN provisions if they adopt UETA or an equivalent law. In practice, the requirements for electronic signatures under both laws align closely.
+
+### Key Requirements
+
+- Intent to sign demonstrated by the signer
+- Consent to conduct transactions electronically
+- Retention of records in their original electronic form
+- Attribution of the signature to the signer
+
+---
+
+## eIDAS (European Union)
+
+The Electronic Identification, Authentication and Trust Services (eIDAS) regulation governs electronic signatures across all EU member states. eIDAS establishes three levels of electronic signatures, each with different requirements and legal effects.
+
+### Signature Levels
+
+| Level               | Description                                                                            | Legal Effect                                       |
+| ------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Simple (SES)**    | Basic electronic signature with no specific technical requirements                     | Admissible as evidence; legal effect varies by use |
+| **Advanced (AES)**  | Uniquely linked to signer, capable of identifying signer, under sole control           | Higher evidentiary weight than SES                 |
+| **Qualified (QES)** | AES created by a qualified signature creation device, based on a qualified certificate | Equivalent to handwritten signature across the EU  |
+
+### Simple Electronic Signatures (SES)
+
+SES is the baseline level. Any data in electronic form attached to or logically associated with other electronic data, used by the signatory to sign, qualifies as an SES. There are no specific technical requirements beyond demonstrating intent to sign.
+
+### Advanced Electronic Signatures (AES)
+
+AES must meet additional criteria:
+
+- Uniquely linked to the signatory
+- Capable of identifying the signatory
+- Created using signature creation data under the signatory's sole control
+- Linked to the signed data in a way that detects subsequent changes
+
+### Qualified Electronic Signatures (QES)
+
+QES requires:
+
+- A qualified certificate issued by a qualified trust service provider
+- Creation using a qualified electronic signature creation device
+- Identity verification compliant with eIDAS requirements
+
+QES carries the same legal standing as a handwritten signature in all EU member states.
+
+---
+
+## Other Jurisdictions
+
+Electronic signature laws exist in most countries. Below are selected examples:
+
+| Jurisdiction       | Framework                                     | Notes                                                        |
+| ------------------ | --------------------------------------------- | ------------------------------------------------------------ |
+| **United Kingdom** | UK eIDAS / Electronic Communications Act 2000 | Post-Brexit, UK maintains eIDAS-like framework               |
+| **Canada**         | PIPEDA, provincial laws                       | Federal and provincial laws govern e-signatures              |
+| **Australia**      | Electronic Transactions Act 1999              | Generally technology-neutral approach                        |
+| **Switzerland**    | ZertES                                        | Swiss federal law with qualified signature requirements      |
+| **Brazil**         | MP 2200-2, ICP-Brasil                         | PKI-based framework for digital signatures                   |
+| **India**          | IT Act 2000, Aadhaar e-KYC                    | Recognizes electronic signatures; Aadhaar-based verification |
+| **China**          | Electronic Signature Law                      | Requires reliable electronic signatures for certain uses     |
+| **Japan**          | Electronic Signatures Act                     | Three-tier system similar to eIDAS                           |
+
+Requirements vary significantly by jurisdiction. Some transactions may require specific signature types or have exclusions similar to the ESIGN Act.
+
+---
+
+## How Documenso Supports Compliance
+
+Documenso provides features that support compliance with e-signature laws across jurisdictions:
+
+### Intent to Sign
+
+- Signers must actively interact with signature fields to apply their signature
+- The signing interface clearly indicates the document being signed
+- Signers receive a copy of the completed document
+
+### Consent
+
+- Recipients receive clear notification that they are being asked to sign electronically
+- The signing process requires affirmative action from the signer
+
+### Record Retention
+
+- Signed documents are stored and accessible to all parties
+- Original documents and audit trails are preserved
+- Documents can be downloaded in their signed form at any time
+
+### Document Integrity
+
+- All completed documents are cryptographically sealed
+- Any modification after signing invalidates the digital signature
+- PDF readers can verify the document has not been altered
+
+### Signer Identification
+
+- Email-based delivery establishes signer identity
+- Optional access codes add verification
+- Signing activity is logged with timestamps and metadata
+
+---
+
+## Audit Trails
+
+Documenso maintains an audit trail for each document, recording:
+
+| Event              | Recorded Data                          |
+| ------------------ | -------------------------------------- |
+| Document creation  | Timestamp, creator identity            |
+| Recipient addition | Recipient details, assigned fields     |
+| Document sent      | Timestamp, delivery method             |
+| Document viewed    | Timestamp, viewer identity, IP address |
+| Field completed    | Timestamp, field type, signer identity |
+| Document completed | Timestamp, final document hash         |
+
+The audit trail provides evidence of the signing process, including who signed, when they signed, and the sequence of events. This information supports the legal enforceability of the signed document.
+
+---
+
+## What Documenso Does NOT Provide
+
+Documenso supports compliance with Simple Electronic Signature (SES) requirements. The following are not currently provided:
+
+| Capability                                | Status                                                                                |
+| ----------------------------------------- | ------------------------------------------------------------------------------------- |
+| **Qualified Electronic Signatures (QES)** | Not supported; requires integration with qualified trust service providers            |
+| **Advanced Electronic Signatures (AES)**  | Partial support; full AES requires identity verification services                     |
+| **Identity Verification (KYC)**           | Not built-in; optional integrations may be available                                  |
+| **Qualified Certificates**                | Not issued; would require becoming a qualified trust service provider                 |
+| **Industry-Specific Compliance**          | Features for specific regulations (e.g., healthcare, finance) depend on configuration |
+
+For transactions requiring AES or QES, consult with legal counsel about appropriate solutions.
+
+---
+
+## Disclaimer
+
+This page provides general information about electronic signature laws for educational purposes. It does not constitute legal advice.
+
+Electronic signature requirements vary by jurisdiction, transaction type, and specific circumstances. Some documents may have specific legal requirements that electronic signatures cannot satisfy.
+
+Consult qualified legal counsel in your jurisdiction to determine whether electronic signatures are appropriate for your specific use case and what requirements must be met.
+
+---
+
+## Related
+
+- [Signature Levels](/docs/compliance/signature-levels) - Simple, Advanced, and Qualified electronic signatures explained
+- [Standards & Regulations](/docs/compliance/standards) - SOC 2, 21 CFR Part 11, and other compliance frameworks
+- [Signing Certificates](/docs/concepts/signing-certificates) - How documents are digitally signed and verified

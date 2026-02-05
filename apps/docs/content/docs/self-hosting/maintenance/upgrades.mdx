@@ -1,0 +1,546 @@
+---
+title: Upgrades
+description: Upgrade to new versions safely.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+# Upgrades
+
+This guide covers upgrading your self-hosted Documenso installation to new versions. Regular upgrades ensure you have the latest features, security patches, and bug fixes.
+
+## Version Policy
+
+Documenso follows [Semantic Versioning](https://semver.org/):
+
+| Version Type | Format  | Description                                |
+| ------------ | ------- | ------------------------------------------ |
+| Major        | `x.0.0` | Breaking changes, may require manual steps |
+| Minor        | `x.y.0` | New features, backward compatible          |
+| Patch        | `x.y.z` | Bug fixes, security patches                |
+
+<Callout type="info">
+  Review the [release notes](https://github.com/documenso/documenso/releases) before upgrading to
+  understand what changes are included.
+</Callout>
+
+### Image Tags
+
+| Tag       | Description                      | Use Case             |
+| --------- | -------------------------------- | -------------------- |
+| `latest`  | Most recent stable release       | Development, testing |
+| `x.y.z`   | Specific version (e.g., `1.5.0`) | Production           |
+| `release` | Latest build from release branch | Pre-release testing  |
+
+For production deployments, pin to a specific version tag to avoid unexpected updates.
+
+## Checking for Updates
+
+### View Current Version
+
+Check your running Documenso version:
+
+**Docker:**
+
+```bash
+docker inspect documenso --format='{{.Config.Image}}'
+```
+
+**Docker Compose:**
+
+```bash
+docker compose images
+```
+
+**Kubernetes:**
+
+```bash
+kubectl get deployment documenso -n documenso -o jsonpath='{.spec.template.spec.containers[0].image}'
+```
+
+### Check for New Releases
+
+View available releases on GitHub:
+
+```bash
+curl -s https://api.github.com/repos/documenso/documenso/releases/latest | grep tag_name
+```
+
+Or visit the [releases page](https://github.com/documenso/documenso/releases).
+
+### Check Available Docker Tags
+
+List available image tags:
+
+```bash
+# DockerHub
+curl -s https://hub.docker.com/v2/repositories/documenso/documenso/tags | jq -r '.results[].name'
+
+# GitHub Container Registry
+curl -s https://api.github.com/orgs/documenso/packages/container/documenso/versions | jq -r '.[].metadata.container.tags[]'
+```
+
+## Backup Before Upgrading
+
+<Callout type="error">
+  Always back up your database before upgrading. Upgrades may include database migrations that
+  cannot be reversed.
+</Callout>
+
+### Database Backup
+
+**Docker Compose:**
+
+```bash
+docker compose exec database pg_dump -U documenso documenso > backup-$(date +%Y%m%d-%H%M%S).sql
+```
+
+**Kubernetes:**
+
+```bash
+kubectl exec -n documenso deploy/postgres -- pg_dump -U documenso documenso > backup-$(date +%Y%m%d-%H%M%S).sql
+```
+
+**External Database:**
+
+Use your database provider's backup tools or `pg_dump`:
+
+```bash
+pg_dump "postgresql://user:password@host:5432/documenso" > backup-$(date +%Y%m%d-%H%M%S).sql
+```
+
+### Configuration Backup
+
+Back up your environment configuration:
+
+```bash
+cp .env .env.backup-$(date +%Y%m%d)
+```
+
+For Kubernetes, export your secrets and configmaps:
+
+```bash
+kubectl get secret documenso-secrets -n documenso -o yaml > secrets-backup.yaml
+kubectl get configmap documenso-config -n documenso -o yaml > configmap-backup.yaml
+```
+
+See [Backups](/docs/self-hosting/maintenance/backups) for automated backup strategies.
+
+## Upgrade Process
+
+### Docker
+
+<Steps>
+<Step>
+### Pull the New Image
+
+```bash
+docker pull documenso/documenso:1.6.0
+```
+
+Replace `1.6.0` with your target version.
+
+</Step>
+<Step>
+### Stop the Current Container
+
+```bash
+docker stop documenso
+docker rm documenso
+```
+
+</Step>
+<Step>
+### Start with the New Image
+
+```bash
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  --env-file .env \
+  -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
+  documenso/documenso:1.6.0
+```
+
+</Step>
+<Step>
+### Verify the Upgrade
+
+```bash
+docker logs -f documenso
+```
+
+Wait for "Ready" or "Listening on port 3000" in the output.
+
+Test the health endpoint:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+</Step>
+</Steps>
+
+### Docker Compose
+
+<Steps>
+<Step>
+### Update the Image Tag
+
+Edit `compose.yml` or your `.env` file to specify the new version:
+
+```yaml
+services:
+  documenso:
+    image: documenso/documenso:1.6.0
+```
+
+Or if using environment variable substitution:
+
+```bash
+# In .env
+DOCUMENSO_VERSION=1.6.0
+```
+
+```yaml
+# In compose.yml
+services:
+  documenso:
+    image: documenso/documenso:${DOCUMENSO_VERSION:-latest}
+```
+
+</Step>
+<Step>
+### Pull the New Image
+
+```bash
+docker compose pull
+```
+
+</Step>
+<Step>
+### Apply the Update
+
+```bash
+docker compose --env-file .env up -d
+```
+
+Docker Compose recreates containers that have changed images.
+
+</Step>
+<Step>
+### Verify the Upgrade
+
+```bash
+docker compose ps
+docker compose logs -f documenso
+```
+
+Confirm the container is running and healthy.
+
+</Step>
+</Steps>
+
+### Kubernetes
+
+<Steps>
+<Step>
+### Update the Deployment Image
+
+Edit the deployment directly:
+
+```bash
+kubectl set image deployment/documenso \
+  documenso=documenso/documenso:1.6.0 \
+  -n documenso
+```
+
+Or update your manifest file:
+
+```yaml
+spec:
+  template:
+    spec:
+      containers:
+        - name: documenso
+          image: documenso/documenso:1.6.0
+```
+
+Then apply:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+</Step>
+<Step>
+### Monitor the Rollout
+
+```bash
+kubectl rollout status deployment/documenso -n documenso
+```
+
+Watch pods transition:
+
+```bash
+kubectl get pods -n documenso -w
+```
+
+</Step>
+<Step>
+### Verify the Upgrade
+
+Check the new pods are running:
+
+```bash
+kubectl get pods -n documenso -o wide
+```
+
+Test the health endpoint:
+
+```bash
+kubectl port-forward svc/documenso 3000:80 -n documenso &
+curl http://localhost:3000/api/health
+```
+
+</Step>
+</Steps>
+
+## Database Migrations
+
+Documenso runs database migrations automatically when the container starts. No manual intervention is required.
+
+### Migration Process
+
+1. Container starts and connects to the database
+2. Prisma checks for pending migrations
+3. Migrations are applied in order
+4. Application starts after migrations complete
+
+### Checking Migration Status
+
+View migration logs:
+
+**Docker/Docker Compose:**
+
+```bash
+docker logs documenso 2>&1 | grep -i migration
+```
+
+**Kubernetes:**
+
+```bash
+kubectl logs -l app.kubernetes.io/name=documenso -n documenso | grep -i migration
+```
+
+### Slow Migrations
+
+Large databases may take longer to migrate. The startup probe in Kubernetes allows up to 150 seconds (30 failures x 5 second period) for migrations to complete.
+
+If migrations take longer:
+
+1. Increase `failureThreshold` on the startup probe
+2. Consider running migrations separately before upgrading
+
+### Manual Migration (Advanced)
+
+To run migrations manually before upgrading:
+
+```bash
+# Pull the new image
+docker pull documenso/documenso:1.6.0
+
+# Run migrations only
+docker run --rm \
+  -e NEXT_PRIVATE_DATABASE_URL="postgresql://user:password@host:5432/documenso" \
+  documenso/documenso:1.6.0 \
+  npx prisma migrate deploy
+```
+
+<Callout type="warn">
+  This is an advanced operation. In most cases, automatic migrations are sufficient.
+</Callout>
+
+## Breaking Changes
+
+Major version upgrades may include breaking changes that require manual steps.
+
+### Before a Major Upgrade
+
+1. Read the [release notes](https://github.com/documenso/documenso/releases) carefully
+2. Check for required environment variable changes
+3. Review any configuration deprecations
+4. Back up your database
+5. Plan for potential downtime
+
+### Common Breaking Changes
+
+| Change Type               | Action Required                              |
+| ------------------------- | -------------------------------------------- |
+| New required env variable | Add the variable to your configuration       |
+| Removed env variable      | Remove from configuration to avoid confusion |
+| Renamed env variable      | Update to the new name                       |
+| Database schema change    | Automatic migration (back up first)          |
+| API changes               | Update integrations using the API            |
+
+### Environment Variable Changes
+
+Compare your current environment with the latest example:
+
+```bash
+# Download latest example
+curl -O https://raw.githubusercontent.com/documenso/documenso/main/.env.example
+
+# Compare with your current config
+diff .env .env.example
+```
+
+## Rollback Procedure
+
+If an upgrade fails, roll back to the previous version.
+
+### Docker Rollback
+
+```bash
+# Stop the new container
+docker stop documenso
+docker rm documenso
+
+# Start with the previous image
+docker run -d \
+  --name documenso \
+  -p 3000:3000 \
+  --env-file .env \
+  -v /path/to/cert.p12:/opt/documenso/cert.p12:ro \
+  documenso/documenso:1.5.0
+```
+
+### Docker Compose Rollback
+
+```bash
+# Revert the image tag in compose.yml or .env
+# Then recreate containers
+docker compose --env-file .env up -d
+```
+
+### Kubernetes Rollback
+
+```bash
+# View rollout history
+kubectl rollout history deployment/documenso -n documenso
+
+# Rollback to previous version
+kubectl rollout undo deployment/documenso -n documenso
+
+# Or rollback to a specific revision
+kubectl rollout undo deployment/documenso -n documenso --to-revision=2
+```
+
+### Database Rollback
+
+<Callout type="error">
+  Database migrations cannot be automatically reversed. If you need to rollback after migrations
+  have run, restore from your backup.
+</Callout>
+
+Restore from backup:
+
+**Docker Compose:**
+
+```bash
+docker compose exec -T database psql -U documenso documenso < backup-20240115-120000.sql
+```
+
+**External Database:**
+
+```bash
+psql "postgresql://user:password@host:5432/documenso" < backup-20240115-120000.sql
+```
+
+## Troubleshooting Upgrades
+
+### Container Fails to Start After Upgrade
+
+Check logs for error messages:
+
+```bash
+docker logs documenso
+```
+
+Common causes:
+
+| Issue                     | Solution                                                |
+| ------------------------- | ------------------------------------------------------- |
+| Missing env variable      | Check release notes for new required variables          |
+| Database connection error | Verify database is accessible and credentials are valid |
+| Migration failure         | Check logs for specific migration error                 |
+| Certificate error         | Verify certificate mount and passphrase                 |
+
+### Migration Errors
+
+If migrations fail:
+
+1. Check the specific error in the logs
+2. Verify database connectivity
+3. Ensure the database user has ALTER permissions
+4. Check for sufficient disk space on the database server
+
+```bash
+# Test database connectivity
+docker run --rm postgres:15 psql "postgresql://user:password@host:5432/documenso" -c "SELECT 1"
+```
+
+### Application Errors After Upgrade
+
+If the application starts but behaves unexpectedly:
+
+1. Clear browser cache and cookies
+2. Check for new environment variables in release notes
+3. Verify all environment variables are correctly set
+4. Check application logs for warnings
+
+```bash
+docker logs documenso 2>&1 | grep -i -E "(warn|error)"
+```
+
+### Performance Issues After Upgrade
+
+If performance degrades after upgrading:
+
+1. Check for any new indexes being created (normal, temporary slowdown)
+2. Monitor database CPU and memory usage
+3. Review release notes for known performance impacts
+4. Allow time for database query plans to stabilize
+
+### Rollback Failed
+
+If rollback also fails:
+
+1. Verify the old image tag exists and is accessible
+2. Check that your backup is valid and complete
+3. Review environment configuration for any changes
+4. Consider restoring to a clean database from backup
+
+## Upgrade Checklist
+
+Use this checklist for each upgrade:
+
+- [ ] Review release notes for the target version
+- [ ] Check for breaking changes or new requirements
+- [ ] Back up the database
+- [ ] Back up environment configuration
+- [ ] Note the current image tag for potential rollback
+- [ ] Pull the new image
+- [ ] Apply the upgrade
+- [ ] Verify container starts successfully
+- [ ] Check logs for migration completion
+- [ ] Test the health endpoint
+- [ ] Verify core functionality (login, document upload, signing)
+- [ ] Monitor for errors in logs
+
+## Next Steps
+
+- [Backups](/docs/self-hosting/maintenance/backups) - Automated backup strategies
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common issues and solutions
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Configuration reference

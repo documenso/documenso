@@ -1,0 +1,181 @@
+---
+title: Requirements
+description: System requirements and prerequisites for self-hosting Documenso.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Requirements
+
+Before deploying Documenso, ensure you have the required services and infrastructure. This page covers what you need, what's optional, and what's not supported.
+
+## What You Need
+
+Documenso requires the following external services:
+
+| Service       | Purpose                      | Minimum Version |
+| ------------- | ---------------------------- | --------------- |
+| PostgreSQL    | Primary database             | 14+             |
+| SMTP server   | Sending emails to recipients | Any             |
+| Reverse proxy | SSL termination, routing     | Any             |
+
+### PostgreSQL Database
+
+Documenso uses PostgreSQL for all data storage including documents, users, and audit logs. You cannot use MySQL, SQLite, or other databases.
+
+Documenso requires two connection strings:
+
+- **Pooled connection** (`NEXT_PRIVATE_DATABASE_URL`) - For general application queries
+- **Direct connection** (`NEXT_PRIVATE_DIRECT_DATABASE_URL`) - For migrations and operations that require a direct connection
+
+If you're not using a connection pooler (like PgBouncer), both can point to the same database URL.
+
+### Email Server
+
+Documenso sends transactional emails for:
+
+- Document signing requests
+- Signing reminders
+- Completion notifications
+- Password resets and verification
+
+Supported transports:
+
+| Transport      | Use Case                             |
+| -------------- | ------------------------------------ |
+| `smtp-auth`    | Standard SMTP with username/password |
+| `smtp-api`     | SMTP with API key authentication     |
+| `resend`       | Resend.com API                       |
+| `mailchannels` | MailChannels API                     |
+
+<Callout type="warn">
+  Without a working email configuration, recipients cannot receive signing requests. Configure email
+  before going to production.
+</Callout>
+
+### Reverse Proxy
+
+For production deployments, place Documenso behind a reverse proxy such as:
+
+- nginx
+- Caddy
+- Traefik
+- HAProxy
+- Cloud load balancers (AWS ALB, GCP Load Balancer, etc.)
+
+The reverse proxy handles SSL/TLS termination and forwards requests to Documenso on port 3000.
+
+---
+
+## Optional Services
+
+These services are not required but improve functionality or scalability:
+
+| Service               | Purpose                                  |
+| --------------------- | ---------------------------------------- |
+| S3-compatible storage | Store documents externally (recommended) |
+| Redis                 | Background job queues and caching        |
+| Browserless           | PDF generation for certain features      |
+
+### Document Storage
+
+By default, Documenso stores documents in the PostgreSQL database. For production deployments with significant document volume, use S3-compatible storage:
+
+- Amazon S3
+- MinIO
+- Cloudflare R2
+- DigitalOcean Spaces
+- Any S3-compatible provider
+
+See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup details.
+
+### Redis
+
+Redis enables background job processing and caching. While optional, it improves performance for:
+
+- Email delivery queues
+- Document processing
+- Session caching
+
+---
+
+## Hardware Requirements
+
+### Minimum (Testing/Development)
+
+| Resource | Requirement |
+| -------- | ----------- |
+| CPU      | 1 core      |
+| RAM      | 1 GB        |
+| Storage  | 10 GB       |
+
+### Recommended (Production)
+
+| Resource | Requirement |
+| -------- | ----------- |
+| CPU      | 2+ cores    |
+| RAM      | 2+ GB       |
+| Storage  | 20+ GB      |
+
+<Callout type="info">
+  Storage requirements depend on document volume. If using external S3 storage, local storage needs
+  are minimal. If storing documents in the database, plan for growth accordingly.
+</Callout>
+
+---
+
+## Build Requirements
+
+If building from source (not using Docker images):
+
+| Requirement | Version |
+| ----------- | ------- |
+| Node.js     | 18+     |
+| npm         | 8+      |
+
+---
+
+## Supported Platforms
+
+Documenso runs on:
+
+- **Linux** - Any modern distribution (Ubuntu, Debian, CentOS, Alpine)
+- **Docker** - Official images available on DockerHub and GitHub Container Registry
+- **Kubernetes** - Helm charts and manifests available
+- **PaaS providers** - Railway, Render, Koyeb (one-click deploys available)
+
+---
+
+## What's NOT Supported
+
+<Callout type="error">
+  The following configurations are not supported and may not work correctly.
+</Callout>
+
+| Configuration  | Reason                                |
+| -------------- | ------------------------------------- |
+| Windows native | Use Docker or WSL2 instead            |
+| MySQL/MariaDB  | PostgreSQL-specific features required |
+| SQLite         | Not suitable for production workloads |
+| MongoDB        | Relational database required          |
+| Node.js < 18   | Modern JavaScript features required   |
+
+---
+
+## Checklist
+
+Before proceeding to deployment, confirm you have:
+
+- [ ] PostgreSQL 14+ database accessible
+- [ ] SMTP credentials or email provider API key
+- [ ] Domain name for your Documenso instance
+- [ ] SSL certificate (or reverse proxy that handles SSL)
+- [ ] Server meeting minimum hardware requirements
+
+---
+
+## Next Steps
+
+- [Quick Start](/docs/self-hosting/getting-started/quick-start) - Deploy Documenso with Docker in 5 minutes
+- [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Production setup with Docker Compose
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference

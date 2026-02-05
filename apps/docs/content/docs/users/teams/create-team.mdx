@@ -1,0 +1,110 @@
+---
+title: Create a Team
+description: Set up a new team for your organization.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Teams let you collaborate with others by sharing documents, templates, and settings. Each team has its own workspace with separate documents and member access.
+
+## Prerequisites
+
+- An organisation. Teams exist within organisations.
+- Organisation Admin or Manager role to create teams.
+
+## Limitations
+
+- Team name: 3-30 characters
+- Team URL: 3-30 characters, lowercase letters, numbers, dashes, and underscores only
+- Team URL cannot start or end with dashes or underscores
+- Team URL cannot contain consecutive dashes or underscores
+- Maximum number of teams depends on your plan
+
+## Create a Team
+
+<Steps>
+<Step>
+### Open the create team dialog
+
+1. Go to your organisation page
+2. Click **Create team**
+
+![Team creation button on the organisation page](/teams/team-create.webp)
+
+</Step>
+
+<Step>
+### Enter team details
+
+Fill in the required information:
+
+- **Team Name** - A display name for your team (3-30 characters)
+- **Team URL** - A unique identifier used in URLs like `app.documenso.com/t/your-team-url`
+
+The Team URL is automatically generated from your team name, but you can customize it.
+
+![Team creation dialog with name and URL fields](/teams/team-create-dialog.webp)
+
+</Step>
+
+<Step>
+### Configure member access
+
+Choose whether to allow all organisation members to access this team:
+
+- **Checked** - All current and future organisation members can access team documents
+- **Unchecked** - Only organisation admins and managers are added initially; you control member access manually
+
+<Callout type="info">You can change member access settings later from team settings.</Callout>
+
+</Step>
+
+<Step>
+### Create the team
+
+Click **Create Team** to finish. You'll be taken to your new team's workspace.
+
+</Step>
+</Steps>
+
+## Team Settings
+
+After creating a team, you can configure additional settings from **Team Settings**:
+
+### General Settings
+
+- **Team Name** - Update the display name
+- **Team URL** - Change the URL identifier (this changes all team links)
+- **Team Avatar** - Upload an image to identify your team
+- **Team Email** - Add an email address to associate documents with the team
+
+### Branding
+
+Customize how your team's documents appear to recipients:
+
+- **Enable Custom Branding** - Turn branding on/off, or inherit from organisation settings
+- **Branding Logo** - Upload your logo (max 5MB, JPG, PNG, or WebP) to display on signing pages
+- **Brand Website** - Link your logo to your website
+- **Brand Details** - Additional information shown at the bottom of emails
+
+<Callout type="info">
+  Team branding settings can inherit from your organisation. Select "Inherit from organisation" to
+  use organisation-level branding, or configure team-specific branding.
+</Callout>
+
+### Other Settings
+
+- **Document Preferences** - Default settings for new documents
+- **Email Preferences** - Customize email notifications
+- **Public Profile** - Configure your team's public presence
+- **API Tokens** - Generate tokens for API access
+- **Webhooks** - Set up integrations with external services
+
+![Document visibility settings in team preferences](/teams/document-visibility-settings.webp)
+
+## Next Steps
+
+- [Manage Members](/docs/users/teams/manage-members) - Add team members and configure their roles
+- [Create Templates](/docs/users/templates/create-template) - Set up reusable document templates for your team
+- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your organisation

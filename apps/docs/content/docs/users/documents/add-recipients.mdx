@@ -1,0 +1,154 @@
+---
+title: Add Recipients
+description: Add signers, approvers, viewers, and CC recipients to your document.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Recipients are the people who interact with your document. This includes signers who need to sign, approvers who review and approve, viewers who acknowledge receipt, and CC recipients who receive a copy of the completed document.
+
+## Add a recipient
+
+<Steps>
+<Step>
+### Open the document editor
+
+After uploading a document, you'll be on the document editor. If you're editing an existing draft, click on it from your Documents dashboard.
+
+</Step>
+
+<Step>
+### Click Add Signer
+
+In the Recipients section, click **+ Add Signer** to add a new recipient row.
+
+![Recipients panel in the document editor](/document-signing/editor-upload-recipients.webp)
+
+</Step>
+
+<Step>
+### Enter recipient details
+
+Fill in the following information:
+
+- **Email** - The recipient's email address (required)
+- **Name** - The recipient's name (optional, but recommended for clarity)
+- **Role** - What the recipient needs to do (see [Recipient Roles](/docs/concepts/recipient-roles))
+
+</Step>
+</Steps>
+
+## Recipient information
+
+### Email address
+
+The email address is where the recipient receives their signing invitation. Make sure it's correct - once you send the document, the invitation goes to this address.
+
+### Name
+
+Adding a name helps recipients identify themselves when they receive the document. The name appears in:
+
+- The signing invitation email
+- The document activity log
+- The completed document's signature certificate
+
+If you leave the name blank, the email address is displayed instead.
+
+## Assigning roles
+
+Each recipient needs a role that determines what actions they can take:
+
+| Role      | What they do                                    |
+| --------- | ----------------------------------------------- |
+| Signer    | Must sign the document                          |
+| Approver  | Must approve the document (signing is optional) |
+| Viewer    | Must confirm they viewed the document           |
+| Assistant | Pre-fills fields for other recipients           |
+| CC        | Receives a copy after the document is completed |
+
+For detailed information about each role, see [Recipient Roles](/docs/concepts/recipient-roles).
+
+<Callout type="info">
+  The Assistant role is only available when sequential signing is enabled.
+</Callout>
+
+## Multiple recipients
+
+You can add as many recipients as you need. Click **+ Add Signer** for each additional person.
+
+Common scenarios:
+
+- **Two-party agreement** - Add yourself and the other party as signers
+- **Contract with witness** - Add the main signer plus a viewer as witness
+- **Approval workflow** - Add an approver first, then signers
+- **Keep stakeholders informed** - Add CC recipients who receive the final document
+
+## Signing order
+
+By default, all recipients receive the document at the same time and can complete their actions in any order (parallel signing). You can change this to require recipients to act in a specific sequence.
+
+### Parallel signing (default)
+
+All recipients receive the document simultaneously. The document is completed when everyone finishes their required actions. Use this when:
+
+- The order doesn't matter
+- You want the fastest completion time
+- Recipients are independent of each other
+
+### Sequential signing
+
+Recipients receive the document one at a time, in the order you specify. Each person must complete their action before the next person is notified.
+
+To enable sequential signing:
+
+1. Toggle on **Enable signing order** in the Recipients section
+2. Set the order number for each recipient (1, 2, 3, etc.)
+3. Recipients with the same number act simultaneously at that step
+
+<Callout type="info">
+  Sequential signing is required to use the Assistant role. Assistants must act before the signers
+  whose fields they pre-fill.
+</Callout>
+
+**Example workflow:**
+
+| Order | Recipient        | Role      |
+| ----- | ---------------- | --------- |
+| 1     | Admin Assistant  | Assistant |
+| 2     | Department Head  | Approver  |
+| 3     | Contract Party A | Signer    |
+| 3     | Contract Party B | Signer    |
+| -     | Legal Team       | CC        |
+
+In this example:
+
+1. The assistant pre-fills information
+2. The department head reviews and approves
+3. Both contract parties sign at the same time
+4. Legal receives a copy after completion
+
+## Editing recipients
+
+You can modify recipient details anytime before sending the document:
+
+- **Change email or name** - Click on the field and type the new value
+- **Change role** - Select a different role from the dropdown
+- **Change signing order** - Adjust the order number (if sequential signing is enabled)
+
+<Callout type="warn">
+  After sending a document, you cannot change recipients. If you need different recipients, you'll
+  need to create a new document.
+</Callout>
+
+## Removing recipients
+
+To remove a recipient, click the delete icon (trash) next to their row. This also removes any fields assigned to that recipient.
+
+You cannot remove recipients after the document has been sent.
+
+## Next steps
+
+After adding recipients, you need to place fields on the document for them to complete:
+
+- [Add Fields](/docs/users/documents/add-fields) - Place signature, text, date, and other fields on your document

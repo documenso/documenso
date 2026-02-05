@@ -1,0 +1,19 @@
+{
+  "title": "Users",
+  "description": "Learn how to use Documenso",
+  "root": true,
+  "pages": [
+    "getting-started",
+    "documents",
+    "templates",
+    "direct-links",
+    "organisations",
+    "profile",
+    "branding",
+    "email-domains",
+    "compliance",
+    "licenses",
+    "support",
+    "fair-use"
+  ]
+}

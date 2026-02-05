@@ -1,0 +1,233 @@
+---
+title: Security
+description: Security practices and vulnerability disclosure
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Documenso is built with security as a core principle. This page describes the security practices for both Documenso Cloud and self-hosted deployments, along with our vulnerability disclosure process.
+
+## Security Practices
+
+### Development Security
+
+- **Code review**: All code changes require review before merging
+- **Dependency management**: Dependencies are regularly updated and monitored for vulnerabilities
+- **Static analysis**: Automated security scanning is part of the CI/CD pipeline
+- **Open source**: The codebase is publicly available for security review at [github.com/documenso/documenso](https://github.com/documenso/documenso)
+
+### Access Controls
+
+- **Role-based access**: Teams support member, manager, and admin roles with distinct permissions
+- **API token scoping**: API tokens can be scoped to specific teams and set with expiration dates
+- **Session management**: Users can view and revoke active sessions
+- **Audit logging**: Document actions are logged with timestamps and IP addresses
+
+## Infrastructure Security
+
+### Documenso Cloud
+
+The hosted cloud service uses the following security measures:
+
+| Layer          | Implementation                                         |
+| -------------- | ------------------------------------------------------ |
+| **Hosting**    | Infrastructure hosted in EU data centers               |
+| **Network**    | TLS 1.2+ for all connections                           |
+| **Database**   | Managed PostgreSQL with automated backups              |
+| **Storage**    | Encrypted object storage for documents                 |
+| **Monitoring** | 24/7 infrastructure monitoring and alerting            |
+| **Updates**    | Regular security patches applied to all infrastructure |
+
+### Self-Hosted
+
+Self-hosted deployments are responsible for their own infrastructure security. See [Self-Hosted Security Considerations](#self-hosted-security-considerations) below.
+
+## Data Encryption
+
+### Encryption in Transit
+
+All data transmitted to and from Documenso is encrypted using TLS 1.2 or higher. This includes:
+
+- Web application traffic
+- API requests
+- Email delivery (when supported by the receiving server)
+- Webhook payloads
+
+### Encryption at Rest
+
+For Documenso Cloud:
+
+- Database contents are encrypted at rest
+- Document storage uses encrypted object storage
+- Backups are encrypted
+
+For self-hosted deployments, encryption at rest depends on your infrastructure configuration.
+
+### Application-Level Encryption
+
+Documenso encrypts sensitive data at the application level:
+
+- Encryption keys are configured via `NEXT_PRIVATE_ENCRYPTION_KEY` and `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
+- Session tokens are signed using `NEXTAUTH_SECRET`
+- Passwords are hashed using bcrypt
+
+## Authentication Security
+
+### Supported Authentication Methods
+
+| Method                        | Description                                      |
+| ----------------------------- | ------------------------------------------------ |
+| **Email and password**        | Traditional authentication with hashed passwords |
+| **OAuth providers**           | Google and Microsoft authentication              |
+| **Generic OIDC**              | Any OpenID Connect provider                      |
+| **Team SSO**                  | SAML-based single sign-on for enterprise teams   |
+| **Two-factor authentication** | TOTP-based 2FA with recovery codes               |
+| **Passkeys**                  | WebAuthn-based passwordless authentication       |
+
+### Password Requirements
+
+- Minimum length enforced
+- Passwords are hashed using bcrypt before storage
+- Password reset tokens are time-limited and single-use
+
+### Session Security
+
+- Sessions can be viewed and revoked from account settings
+- Session tokens are rotated on authentication events
+- Idle sessions expire after a configurable period
+
+## Vulnerability Disclosure
+
+Documenso operates a responsible disclosure process for security vulnerabilities.
+
+### Reporting a Vulnerability
+
+If you discover a security vulnerability, please report it by emailing:
+
+**security@documenso.com**
+
+Include the following information:
+
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Any suggested fixes (optional)
+
+### Response Timeline
+
+| Stage                 | Timeline            |
+| --------------------- | ------------------- |
+| **Acknowledgment**    | Within 48 hours     |
+| **Initial triage**    | Within 5 days       |
+| **Status update**     | Within 10 days      |
+| **Resolution target** | Depends on severity |
+
+### Scope
+
+The following are in scope for vulnerability reports:
+
+- Documenso application code
+- Authentication and authorization flaws
+- Data exposure vulnerabilities
+- Injection vulnerabilities
+- Cross-site scripting (XSS)
+- Cross-site request forgery (CSRF)
+
+The following are out of scope:
+
+- Social engineering attacks
+- Denial of service attacks
+- Issues in third-party dependencies (report to the upstream project)
+- Issues requiring physical access to a user's device
+- Theoretical vulnerabilities without proof of concept
+
+### Recognition
+
+We acknowledge security researchers who responsibly disclose vulnerabilities. With your permission, we will credit you when the fix is released.
+
+<Callout type="warn">
+  Do not publicly disclose vulnerabilities until they have been addressed. Public disclosure of
+  unpatched vulnerabilities puts users at risk.
+</Callout>
+
+## Security Updates
+
+### Notification
+
+Security updates are announced through:
+
+- [GitHub releases](https://github.com/documenso/documenso/releases)
+- [GitHub security advisories](https://github.com/documenso/documenso/security/advisories)
+
+### Update Policy
+
+- Critical vulnerabilities are patched as quickly as possible
+- Security patches are backported to supported versions when feasible
+- Release notes include security-related changes
+
+### Staying Updated
+
+For self-hosted deployments:
+
+1. Watch the [GitHub repository](https://github.com/documenso/documenso) for releases
+2. Subscribe to security advisories
+3. Apply updates promptly, especially security patches
+
+See [Upgrades](/docs/self-hosting/maintenance/upgrades) for update procedures.
+
+## Self-Hosted Security Considerations
+
+When self-hosting Documenso, you are responsible for the security of your deployment. The following recommendations apply:
+
+### Infrastructure
+
+- **Use HTTPS**: Configure TLS certificates for all traffic
+- **Firewall rules**: Restrict access to necessary ports only
+- **Network isolation**: Place the database on a private network
+- **Regular updates**: Keep the host OS and dependencies updated
+
+### Configuration
+
+- **Strong secrets**: Generate cryptographically random values for:
+  - `NEXTAUTH_SECRET`
+  - `NEXT_PRIVATE_ENCRYPTION_KEY`
+  - `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
+- **Database security**: Use strong passwords and restrict database access
+- **Environment variables**: Store secrets securely (do not commit to version control)
+
+### Operations
+
+- **Backups**: Implement regular encrypted backups
+- **Monitoring**: Set up logging and alerting for security events
+- **Access control**: Limit who has access to the server and database
+- **Incident response**: Have a plan for responding to security incidents
+
+### Signing Certificates
+
+- Store signing certificates securely
+- Use hardware security modules (HSM) for high-security requirements
+- Rotate certificates according to your security policy
+
+See [Environment Variables](/docs/self-hosting/configuration/environment) for security-related configuration options.
+
+<Callout type="info">
+  Self-hosted deployments have full control over security but also full responsibility. Consider
+  your organization's security requirements and compliance obligations when configuring your
+  deployment.
+</Callout>
+
+## Contact
+
+For security-related inquiries:
+
+- **Security vulnerabilities**: security@documenso.com
+- **General questions**: support@documenso.com
+- **GitHub**: [github.com/documenso/documenso](https://github.com/documenso/documenso)
+
+## Related
+
+- [Security Settings](/docs/users/settings/security) - Account security configuration
+- [Privacy Policy](/docs/policies/privacy) - Data handling practices
+- [GDPR](/docs/compliance/gdpr) - Data protection compliance
+- [Self-Hosting](/docs/self-hosting) - Deploy on your own infrastructure
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Configuration reference

@@ -1,0 +1,149 @@
+---
+title: Send Documents
+description: Send your document for signing and customize email notifications
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+After adding recipients and placing fields on your document, you can send it for signing. This page covers the sending process, email customization, and post-send actions.
+
+## Prerequisites
+
+Before sending, ensure your document has:
+
+- At least one recipient added
+- Signature fields assigned to each signer
+- Required email addresses for recipients with authentication enabled
+
+## Send a document
+
+1. Click **Send Document** in the document editor
+2. Choose the distribution method:
+   - **Email** - Recipients receive email notifications with signing links
+   - **None** - No emails sent; you receive signing links to share manually
+3. Configure email settings (if using email distribution)
+4. Click **Send** or **Generate Links**
+
+Once sent, the document status changes from **Draft** to **Pending**.
+
+## Email customization
+
+When sending via email, you can customize what recipients receive.
+
+![Document email settings](/document-signing/documenso-document-email-settings.webp)
+
+![Editor email settings](/document-signing/documenso-editor-email-settings.webp)
+
+### Reply-to email (optional)
+
+Set a reply-to address so recipient replies go to a specific email instead of the default.
+
+### Subject (optional)
+
+Customize the email subject line. If left blank, recipients see a default subject based on their role:
+
+- Signers: "Please sign this document"
+- Approvers: "Please approve this document"
+- Viewers: "Please view this document"
+
+For team documents, the subject includes the team name.
+
+### Message (optional)
+
+Add a custom message that appears in the email body. You can use these variables:
+
+- `{signer.name}` - Recipient's name
+- `{signer.email}` - Recipient's email
+- `{document.name}` - Document title
+
+If left blank, a default message is generated based on the recipient's role and whether the sender is part of an organization.
+
+<Callout type="info">
+  Enterprise organizations can configure custom sender email addresses from their organization
+  settings.
+</Callout>
+
+## What recipients receive
+
+![Email recipient receives](/document-signing/documenso-sign-email.webp)
+
+Each recipient receives an email containing:
+
+- The document title
+- Your name and email (or team name for organization accounts)
+- Your custom message (or a default message)
+- A button to access the document
+
+The email includes a unique signing link specific to that recipient. This link expires once the document is completed or deleted.
+
+## Document status after sending
+
+After sending, your document moves through these statuses:
+
+| Status        | Meaning                                          |
+| ------------- | ------------------------------------------------ |
+| **Pending**   | Waiting for recipients to complete their actions |
+| **Completed** | All recipients have completed their actions      |
+| **Rejected**  | A recipient rejected the document                |
+
+You can track progress from the document detail page, which shows each recipient's signing status.
+
+## Resend to recipients
+
+If a recipient hasn't acted on the document, you can send them a reminder:
+
+1. Open the document from your Documents page
+2. Click the actions menu (three dots)
+3. Select **Resend**
+4. Check the recipients you want to remind
+5. Click **Send reminder**
+
+Reminders are only available for:
+
+- Documents with **Pending** status
+- Recipients who haven't yet signed
+
+The reminder email includes "Reminder:" prefixed to the subject line and uses the same message from the original send.
+
+## Delete a pending document
+
+To stop a signing process and remove a document:
+
+1. Open the document
+2. Click the actions menu (three dots)
+3. Select **Delete**
+4. Type "delete" to confirm
+5. Click **Delete**
+
+<Callout type="warn">
+  Deleting a pending document is irreversible. The document is permanently deleted, all signatures
+  are voided, and recipients receive a cancellation email.
+</Callout>
+
+### Delete behavior by status
+
+| Status        | What happens                                             |
+| ------------- | -------------------------------------------------------- |
+| **Draft**     | Permanently deleted, no notifications sent               |
+| **Pending**   | Permanently deleted, recipients notified of cancellation |
+| **Completed** | Hidden from your account, recipients keep their copies   |
+
+## Distribution without email
+
+If you choose **None** as the distribution method:
+
+1. The document is sent without notifying recipients
+2. You're redirected to the document page with signing links displayed
+3. Copy the links and share them through your preferred channel
+
+This is useful when you want to:
+
+- Send links via SMS or messaging apps
+- Embed signing links in your own application
+- Control the notification timing yourself
+
+## Next steps
+
+- [Track document progress](/docs/users/documents/send-and-track) - Monitor who has signed
+- [Create templates](/docs/users/templates/create-template) - Save time on documents you send repeatedly
+- [Set up direct links](/docs/users/documents/direct-links) - Let recipients sign without invitations

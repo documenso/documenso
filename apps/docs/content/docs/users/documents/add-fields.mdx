@@ -1,0 +1,189 @@
+---
+title: Add Fields
+description: Place signature, text, date, and other fields on your document.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Fields are placeholders that recipients fill in when signing your document. You drag fields from the palette onto your document, position them where you want information collected, and assign them to specific recipients.
+
+![Document fields panel showing available field types](/document-signing/documenso-document-fields.webp)
+
+## Add a Field to Your Document
+
+<Steps>
+<Step>
+### Select a recipient
+
+In the document editor, select the recipient you want to assign fields to from the recipient list in the sidebar. The selected recipient's color highlights which fields belong to them.
+
+</Step>
+
+<Step>
+### Drag a field onto the document
+
+Click and drag a field type from the field palette onto your document. Available field types include:
+
+- **Signature** - Captures the recipient's legally binding signature
+- **Initials** - Abbreviated signature for acknowledging pages or clauses
+- **Name** - Recipient's full name (auto-filled when available)
+- **Email** - Recipient's email address (auto-filled)
+- **Date** - Date the field was completed (auto-filled)
+- **Text** - Free-form text input
+- **Number** - Numeric input with optional validation
+- **Checkbox** - Multiple selections from options
+- **Radio** - Single selection from options
+- **Dropdown** - Single selection from a menu
+
+</Step>
+
+<Step>
+### Position the field
+
+Drop the field where you want it on the document. You can drag it to reposition after placing.
+
+</Step>
+</Steps>
+
+<Callout type="info">
+  Each signer must have at least one Signature field assigned to them. The document cannot be sent
+  without this.
+</Callout>
+
+## Assign Fields to Recipients
+
+Fields are color-coded by recipient. To change which recipient a field belongs to:
+
+1. Click on the field to select it
+2. In the field properties panel, change the **Recipient** dropdown
+3. The field color updates to match the new recipient
+
+When you have multiple recipients, make sure each one has the appropriate fields assigned:
+
+- **Signers** need at least one Signature field
+- **Approvers** can have fields but don't require them
+- **Viewers** cannot have fields assigned
+- **Assistants** can pre-fill fields for other recipients
+
+## Position and Resize Fields
+
+### Moving fields
+
+Click and drag any field to reposition it on the document. Fields snap to help with alignment.
+
+### Resizing fields
+
+Click a field to select it, then drag the corner handles to resize. This is useful for:
+
+- Making signature fields larger for handwritten signatures
+- Expanding text fields to accommodate longer input
+- Fitting fields into existing form areas on your PDF
+
+### Multi-page documents
+
+Navigate between pages using the page controls. Fields placed on a page stay on that page. You can place fields on any page of your document.
+
+## Configure Field Properties
+
+Click on any field to open its properties panel. Available options vary by field type.
+
+### Common properties
+
+| Property  | Description                                                   |
+| --------- | ------------------------------------------------------------- |
+| Required  | Recipient must complete this field to finish signing          |
+| Read-only | Lock the field with a pre-filled value that cannot be changed |
+| Label     | Text displayed above the field                                |
+| Font size | Size of text in the field (8-96px)                            |
+
+### Text field properties
+
+| Property        | Description                                |
+| --------------- | ------------------------------------------ |
+| Placeholder     | Hint text shown when the field is empty    |
+| Default value   | Pre-filled text that recipients can modify |
+| Character limit | Maximum characters allowed                 |
+| Text alignment  | Left, center, or right                     |
+
+### Number field properties
+
+| Property      | Description                   |
+| ------------- | ----------------------------- |
+| Minimum value | Lowest allowed number         |
+| Maximum value | Highest allowed number        |
+| Number format | Display format for the number |
+
+### Selection field properties (Checkbox, Radio, Dropdown)
+
+| Property          | Description                                         |
+| ----------------- | --------------------------------------------------- |
+| Options           | List of selectable values                           |
+| Default selection | Pre-selected option(s)                              |
+| Direction         | Vertical or horizontal layout (Checkbox/Radio only) |
+
+![Dropdown field in the document editor](/document-signing/dropdown-field-document-editor-view.webp)
+
+For detailed information on all field types, see [Field Types](/docs/concepts/field-types).
+
+## Common Field Patterns
+
+### Signature block
+
+A typical signature block includes:
+
+1. **Signature** field - Where the recipient signs
+2. **Name** field - Prints their full name below
+3. **Date** field - Records when they signed
+
+![Signature field in the document editor](/document-signing/signature-field-document-editor-view.webp)
+
+Place these fields together at the bottom of your document or wherever signature lines appear.
+
+### Terms acceptance
+
+For documents requiring explicit agreement to terms:
+
+1. Add a **Checkbox** field with options like "I agree to the terms and conditions"
+2. Mark the field as **Required**
+3. Place it near the terms text
+
+### Information collection
+
+When gathering additional information from signers:
+
+1. Add **Text** fields for addresses, job titles, or company names
+2. Use **Number** fields for quantities, IDs, or phone numbers
+3. Use **Dropdown** fields for selections like country or department
+4. Set **Placeholder** text to guide what information you need
+
+### Multiple signers
+
+When you have multiple people signing the same document:
+
+1. Create separate signature blocks for each signer
+2. Assign each block's fields to the correct recipient
+3. Use the recipient color coding to verify assignments
+4. Consider enabling signing order if signers should sign in sequence
+
+## Edit or Delete Fields
+
+### Edit a field
+
+Click on any field to select it and open its properties panel. Make your changes and they save automatically.
+
+### Delete a field
+
+Select the field and press **Delete** or **Backspace** on your keyboard. Alternatively, click the delete icon in the field properties panel.
+
+### Duplicate a field
+
+Select a field and copy it (Ctrl+C or Cmd+C), then paste (Ctrl+V or Cmd+V) to create a duplicate. This is useful when you need multiple similar fields.
+
+## Next Steps
+
+Once you've added all the fields your recipients need:
+
+- [Send your document](/docs/users/documents/send-and-track) to start collecting signatures
+- [Create a template](/docs/users/templates/create-template) if you'll reuse this field layout
+- Review [Field Types](/docs/concepts/field-types) for detailed configuration options

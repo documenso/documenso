@@ -1,0 +1,172 @@
+---
+title: Quick Start
+description: Get Documenso running locally in minutes with Docker Compose.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+This guide gets Documenso running on your machine using Docker Compose. The setup takes about 5 minutes and includes everything you need to test document signing locally.
+
+## Limitations
+
+This quick start setup is for local development and testing only:
+
+- No HTTPS (not suitable for production)
+- No email delivery (emails are logged to console)
+- Uses a local PostgreSQL database
+- No signing certificate configured (documents will be signed with a generated certificate)
+- Single-node setup (no high availability)
+
+For production deployments, see [Docker Compose Deployment](/docs/self-hosting/deployment/docker-compose).
+
+## Prerequisites
+
+- [Docker](https://docs.docker.com/get-docker/) installed and running
+- [Docker Compose](https://docs.docker.com/compose/install/) v2.0 or later
+- At least 2GB of available RAM
+
+Verify your installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+## Quick Start
+
+<Steps>
+<Step>
+### Clone the repository
+
+```bash
+git clone https://github.com/documenso/documenso.git
+cd documenso
+```
+
+</Step>
+
+<Step>
+### Create the environment file
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+The default values work for local development. No changes are required.
+
+</Step>
+
+<Step>
+### Start Documenso
+
+```bash
+docker compose -f docker/development/compose.yml up -d
+```
+
+This pulls the required images and starts the containers. The first run takes a few minutes.
+
+</Step>
+
+<Step>
+### Access the application
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+</Step>
+</Steps>
+
+## Create Your First Account
+
+1. Click **Sign Up** on the login page
+2. Enter your email address and create a password
+3. Check the Docker logs for the verification email (emails are not sent in development mode):
+
+```bash
+docker compose -f docker/development/compose.yml logs -f
+```
+
+4. Copy the verification link from the logs and open it in your browser
+5. Log in with your credentials
+
+<Callout type="info">
+  In development mode, all emails are logged to the console instead of being sent. Look for the
+  verification link in the container logs.
+</Callout>
+
+## What's Included
+
+The quick start setup runs the following containers:
+
+| Container   | Purpose                          | Port  |
+| ----------- | -------------------------------- | ----- |
+| `documenso` | Main application                 | 3000  |
+| `database`  | PostgreSQL database              | 54320 |
+| `maildev`   | Local email testing server       | 2500  |
+| `minio`     | S3-compatible storage (optional) | 9000  |
+
+## Useful Commands
+
+**View logs:**
+
+```bash
+docker compose -f docker/development/compose.yml logs -f
+```
+
+**Stop containers:**
+
+```bash
+docker compose -f docker/development/compose.yml down
+```
+
+**Stop and remove all data:**
+
+```bash
+docker compose -f docker/development/compose.yml down -v
+```
+
+**Rebuild after changes:**
+
+```bash
+docker compose -f docker/development/compose.yml up -d --build
+```
+
+## Troubleshooting
+
+### Port 3000 already in use
+
+Another application is using port 3000. Either stop that application or change the port in your `.env` file:
+
+```bash
+PORT=3001
+```
+
+Then restart the containers.
+
+### Container fails to start
+
+Check the logs for error messages:
+
+```bash
+docker compose -f docker/development/compose.yml logs documenso
+```
+
+Common issues:
+
+- Insufficient memory: Ensure Docker has at least 2GB RAM allocated
+- Database connection: Wait for the database container to be healthy before the app starts
+
+### Cannot access localhost:3000
+
+- Verify containers are running: `docker compose -f docker/development/compose.yml ps`
+- Check if the app container is healthy
+- On Linux, ensure Docker is not running in rootless mode with network restrictions
+
+## Next Steps
+
+- [Docker Compose Deployment](/docs/self-hosting/deployment/docker-compose) - Production-ready setup with HTTPS and email
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Configure all available options
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Set up document signing
+- [Email Configuration](/docs/self-hosting/configuration/email) - Configure SMTP for production

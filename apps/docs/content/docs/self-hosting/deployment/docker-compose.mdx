@@ -1,0 +1,563 @@
+---
+title: Docker Compose
+description: Production-ready multi-container setup.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+# Docker Compose Deployment
+
+This guide covers deploying Documenso with Docker Compose, including PostgreSQL and the Documenso application. This setup is production-ready and suitable for most self-hosted deployments.
+
+For a standalone Docker container (when you manage the database separately), see [Docker Deployment](/docs/self-hosting/deployment/docker).
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- [Docker](https://docs.docker.com/get-docker/) 20.10 or later
+- [Docker Compose](https://docs.docker.com/compose/install/) v2.0 or later
+- SMTP credentials for sending emails
+- At least 2GB of available RAM
+- A domain name (for production deployments)
+
+Verify your installation:
+
+```bash
+docker --version
+docker compose version
+```
+
+## Clone and Configure
+
+<Steps>
+<Step>
+### Download the Compose File
+
+Download the production Docker Compose file:
+
+```bash
+mkdir documenso && cd documenso
+curl -O https://raw.githubusercontent.com/documenso/documenso/release/docker/production/compose.yml
+```
+
+Alternatively, clone the full repository:
+
+```bash
+git clone https://github.com/documenso/documenso.git
+cd documenso/docker/production
+```
+
+</Step>
+
+<Step>
+### Create Environment File
+
+Create a `.env` file in the same directory as `compose.yml`:
+
+```bash
+touch .env
+```
+
+Add the required configuration (see [Environment Configuration](#environment-configuration) below).
+
+</Step>
+</Steps>
+
+## Docker Compose File Overview
+
+The production `compose.yml` includes two services:
+
+```yaml
+name: documenso-production
+
+services:
+  database:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER:?err}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:?err}
+      - POSTGRES_DB=${POSTGRES_DB:?err}
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - database:/var/lib/postgresql/data
+
+  documenso:
+    image: documenso/documenso:latest
+    depends_on:
+      database:
+        condition: service_healthy
+    environment:
+      # See environment configuration below
+    ports:
+      - ${PORT:-3000}:${PORT:-3000}
+    volumes:
+      - /opt/documenso/cert.p12:/opt/documenso/cert.p12:ro
+
+volumes:
+  database:
+```
+
+| Service     | Purpose                                                      |
+| ----------- | ------------------------------------------------------------ |
+| `database`  | PostgreSQL 15 database with persistent storage               |
+| `documenso` | Main application container, waits for database to be healthy |
+
+The Documenso container waits for the database health check to pass before starting.
+
+## Environment Configuration
+
+Create a `.env` file with the following variables:
+
+### Required Variables
+
+```bash
+# Database (used by both database and documenso services)
+POSTGRES_USER=documenso
+POSTGRES_PASSWORD=your-secure-database-password
+POSTGRES_DB=documenso
+
+# Application secrets (generate with: openssl rand -base64 32)
+NEXTAUTH_SECRET=your-nextauth-secret
+NEXT_PRIVATE_ENCRYPTION_KEY=your-encryption-key-min-32-characters
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=your-secondary-key-min-32-characters
+
+# Public URL where Documenso is accessible
+NEXT_PUBLIC_WEBAPP_URL=https://sign.example.com
+
+# Database connection (uses Docker service name)
+NEXT_PRIVATE_DATABASE_URL=postgresql://documenso:your-secure-database-password@database:5432/documenso
+
+# Email configuration
+NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
+NEXT_PRIVATE_SMTP_HOST=smtp.example.com
+NEXT_PRIVATE_SMTP_PORT=587
+NEXT_PRIVATE_SMTP_USERNAME=your-smtp-username
+NEXT_PRIVATE_SMTP_PASSWORD=your-smtp-password
+NEXT_PRIVATE_SMTP_FROM_NAME=Documenso
+NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@example.com
+```
+
+### Optional Variables
+
+```bash
+# Application port (default: 3000)
+PORT=3000
+
+# Signing certificate (see Signing Certificate section)
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+
+# Disable public signups
+NEXT_PUBLIC_DISABLE_SIGNUP=false
+
+# Disable telemetry
+DOCUMENSO_DISABLE_TELEMETRY=false
+```
+
+<Callout type="info">Generate secure secrets using: `openssl rand -base64 32`</Callout>
+
+For the complete list of environment variables, see [Environment Variables](/docs/self-hosting/configuration/environment).
+
+### Generating Secrets
+
+Generate the required secrets:
+
+```bash
+# Generate NEXTAUTH_SECRET
+echo "NEXTAUTH_SECRET=$(openssl rand -base64 32)"
+
+# Generate encryption keys
+echo "NEXT_PRIVATE_ENCRYPTION_KEY=$(openssl rand -base64 32)"
+echo "NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=$(openssl rand -base64 32)"
+
+# Generate database password
+echo "POSTGRES_PASSWORD=$(openssl rand -base64 24)"
+```
+
+## Signing Certificate Setup
+
+<Callout type="warn">
+  The signing certificate is a common source of issues. Follow these steps carefully.
+</Callout>
+
+Documenso requires a `.p12` certificate file to sign documents. You have two options:
+
+### Option A: Generate Certificate Inside Container (Recommended)
+
+This method avoids file permission issues:
+
+1. Start the containers first:
+
+```bash
+docker compose --env-file .env up -d
+```
+
+2. Generate the certificate inside the container:
+
+```bash
+# Set certificate password securely
+read -s -p "Enter certificate password: " CERT_PASS
+echo
+
+# Generate certificate
+docker exec -e CERT_PASS="$CERT_PASS" -it documenso-production-documenso-1 bash -c "
+  mkdir -p /opt/documenso && \
+  openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+    -keyout /tmp/private.key \
+    -out /tmp/certificate.crt \
+    -subj '/C=US/ST=State/L=City/O=Organization/CN=localhost' && \
+  openssl pkcs12 -export -out /opt/documenso/cert.p12 \
+    -inkey /tmp/private.key -in /tmp/certificate.crt \
+    -passout env:CERT_PASS && \
+  rm /tmp/private.key /tmp/certificate.crt
+"
+```
+
+3. Add the passphrase to your `.env` file:
+
+```bash
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+4. Restart the container:
+
+```bash
+docker compose --env-file .env restart documenso
+```
+
+### Option B: Use an Existing Certificate
+
+If you have an existing `.p12` certificate:
+
+1. Place the certificate on your host system:
+
+```bash
+sudo mkdir -p /opt/documenso
+sudo cp /path/to/your/cert.p12 /opt/documenso/cert.p12
+```
+
+2. Set proper permissions:
+
+```bash
+sudo chmod 644 /opt/documenso/cert.p12
+sudo chown 1001:1001 /opt/documenso/cert.p12
+```
+
+3. Update your `.env` file:
+
+```bash
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+<Callout type="error">
+  The certificate must have a password. Certificates without passwords cause "Failed to get private
+  key bags" errors.
+</Callout>
+
+For detailed certificate configuration, see [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate).
+
+## Starting Services
+
+Start all services:
+
+```bash
+docker compose --env-file .env up -d
+```
+
+Check that containers are running:
+
+```bash
+docker compose ps
+```
+
+Expected output:
+
+```
+NAME                             STATUS              PORTS
+documenso-production-database-1  running (healthy)   5432/tcp
+documenso-production-documenso-1 running             0.0.0.0:3000->3000/tcp
+```
+
+Wait for the database to be healthy and for migrations to complete. Check the logs:
+
+```bash
+docker compose logs -f documenso
+```
+
+Look for "Ready" or "Listening on port 3000" in the output.
+
+## Accessing Documenso
+
+Once the containers are running:
+
+- **Local access**: Open [http://localhost:3000](http://localhost:3000)
+- **Remote access**: Use the URL configured in `NEXT_PUBLIC_WEBAPP_URL`
+
+### First Account Setup
+
+1. Navigate to the signup page
+2. Create your admin account
+3. Verify your email (check container logs if emails aren't delivered)
+
+<Callout type="info">
+  The first account created has full access. Consider disabling public signups after creating admin
+  accounts by setting `NEXT_PUBLIC_DISABLE_SIGNUP=true`.
+</Callout>
+
+## Managing Services
+
+### View Logs
+
+View all service logs:
+
+```bash
+docker compose logs -f
+```
+
+View logs for a specific service:
+
+```bash
+docker compose logs -f documenso
+docker compose logs -f database
+```
+
+### Restart Services
+
+Restart all services:
+
+```bash
+docker compose --env-file .env restart
+```
+
+Restart a specific service:
+
+```bash
+docker compose --env-file .env restart documenso
+```
+
+### Stop Services
+
+Stop without removing containers:
+
+```bash
+docker compose stop
+```
+
+Stop and remove containers (preserves volumes):
+
+```bash
+docker compose down
+```
+
+Stop, remove containers, and delete data:
+
+```bash
+docker compose down -v
+```
+
+<Callout type="error">
+  Using `down -v` deletes the database volume. Back up your data first.
+</Callout>
+
+### Update Documenso
+
+1. Pull the latest image:
+
+```bash
+docker compose pull
+```
+
+2. Recreate containers:
+
+```bash
+docker compose --env-file .env up -d
+```
+
+Database migrations run automatically on container startup.
+
+<Callout type="warn">
+  Back up your database before upgrading. See [Backups](/docs/self-hosting/maintenance/backups).
+</Callout>
+
+## Production Considerations
+
+### Reverse Proxy
+
+For production, place Documenso behind a reverse proxy for SSL termination:
+
+**nginx example:**
+
+```nginx
+server {
+    listen 443 ssl http2;
+    server_name sign.example.com;
+
+    ssl_certificate /path/to/cert.pem;
+    ssl_certificate_key /path/to/key.pem;
+
+    location / {
+        proxy_pass http://localhost:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+```
+
+**Caddy example:**
+
+```
+sign.example.com {
+    reverse_proxy localhost:3000
+}
+```
+
+### Database Backups
+
+Set up automated database backups:
+
+```bash
+# Manual backup
+docker compose exec database pg_dump -U documenso documenso > backup.sql
+
+# Restore from backup
+docker compose exec -T database psql -U documenso documenso < backup.sql
+```
+
+See [Backups](/docs/self-hosting/maintenance/backups) for automated backup strategies.
+
+### Resource Limits
+
+Add resource limits to prevent container resource exhaustion:
+
+```yaml
+services:
+  documenso:
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+```
+
+### External Database
+
+For production, consider using a managed PostgreSQL service:
+
+1. Remove the `database` service from `compose.yml`
+2. Update environment variables:
+
+```bash
+NEXT_PRIVATE_DATABASE_URL=postgresql://user:password@your-db-host:5432/documenso
+NEXT_PRIVATE_DIRECT_DATABASE_URL=postgresql://user:password@your-db-host:5432/documenso
+```
+
+### S3 Storage
+
+For high-volume deployments, configure S3-compatible storage:
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=your-bucket
+NEXT_PRIVATE_UPLOAD_REGION=us-east-1
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-access-key
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-secret-key
+```
+
+See [Storage Configuration](/docs/self-hosting/configuration/storage).
+
+## Troubleshooting
+
+### Container fails to start
+
+Check logs for error messages:
+
+```bash
+docker compose logs documenso
+```
+
+Common causes:
+
+- **Missing environment variables**: Ensure all required variables are in `.env`
+- **Database not ready**: The container waits for database health check
+- **Port conflict**: Change `PORT` in `.env` if 3000 is in use
+
+### Database connection errors
+
+Verify the database is healthy:
+
+```bash
+docker compose ps database
+```
+
+Test the connection:
+
+```bash
+docker compose exec database psql -U documenso -d documenso -c "SELECT 1"
+```
+
+### Certificate errors
+
+Check certificate status:
+
+```bash
+curl http://localhost:3000/api/certificate-status
+```
+
+Common issues:
+
+- **File not found**: Verify volume mount in `compose.yml`
+- **Permission denied**: Run `chown 1001:1001` on the certificate file
+- **No password**: The certificate must have a password
+
+### Emails not sending
+
+Verify SMTP configuration:
+
+1. Check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your setup
+2. Verify host, port, username, and password
+3. Check logs for SMTP errors: `docker compose logs documenso | grep -i smtp`
+
+### Application unreachable
+
+1. Verify containers are running: `docker compose ps`
+2. Check the port mapping matches your `.env`
+3. Test locally: `curl http://localhost:3000/api/health`
+4. Check firewall rules allow traffic on the configured port
+
+### Out of disk space
+
+Check disk usage:
+
+```bash
+docker system df
+```
+
+Clean up unused Docker resources:
+
+```bash
+docker system prune -a
+```
+
+## Next Steps
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Certificate setup details
+- [Email Configuration](/docs/self-hosting/configuration/email) - SMTP and email provider setup
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - S3 storage setup
+- [Backups](/docs/self-hosting/maintenance/backups) - Backup strategies
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Upgrade procedures

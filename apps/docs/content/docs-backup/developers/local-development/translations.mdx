@@ -1,0 +1,89 @@
+---
+title: Translations
+description: Handling translations in code.
+---
+
+# About
+
+Documenso uses the following stack to handle translations:
+
+- [Lingui](https://lingui.dev/) - React i10n library
+- [Crowdin](https://crowdin.com/) - Handles syncing translations
+- [OpenAI](https://openai.com/) - Provides AI translations
+
+Additional reading can be found in the [Lingui documentation](https://lingui.dev/introduction).
+
+## Quick guide
+
+If you require more in-depth information, please see the [Lingui documentation](https://lingui.dev/introduction).
+
+### HTML
+
+Wrap all text to translate in **`<Trans></Trans>`** tags exported from **@lingui/react/macro**.
+
+```html
+<h1>
+  <Trans>Title</Trans>
+</h1>
+```
+
+For text that is broken into elements, but represent a whole sentence, you must wrap it in a Trans tag so ensure the full message is extracted correctly.
+
+```html
+<h1>
+  <Trans>
+    This is one
+    <span className="text-foreground/60">full</span>
+    <a href="https://documenso.com">sentence</a>
+  </Trans>
+</h1>
+```
+
+### Constants outside of react components
+
+```tsx
+import { msg } from '@lingui/core/macro';
+import { useLingui } from '@lingui/react';
+import { Trans } from '@lingui/react/macro';
+
+// Wrap text in msg`text to translate` when it's in a constant here, or another file/package.
+export const CONSTANT_WITH_MSG = {
+  foo: msg`Hello`,
+  bar: msg`World`,
+};
+
+export const SomeComponent = () => {
+  const { _ } = useLingui();
+
+  return (
+    <div>
+      {/* This will render the correct translated text. */}
+      <p>{_(CONSTANT_WITH_MSG.foo)}</p>
+    </div>
+  );
+};
+```
+
+### Plurals
+
+Lingui provides a Plural component to make it easy. See full documentation [here.](https://lingui.dev/ref/macro#plural-1)
+
+```tsx
+// Basic usage.
+<Plural one="1 Recipient" other="# Recipients" value={recipients.length} />
+```
+
+### Dates
+
+Lingui provides a [DateTime instance](https://lingui.dev/ref/core#i18n.date) with the configured locale.
+
+```tsx
+import { Trans } from '@lingui/macro';
+import { useLingui } from '@lingui/react';
+
+export const SomeComponent = () => {
+  const { i18n } = useLingui();
+
+  return <Trans>The current date is {i18n.date(new Date(), { dateStyle: 'short' })}</Trans>;
+};
+```

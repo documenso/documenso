@@ -1,0 +1,181 @@
+---
+title: Authentication
+description: Generate an API key and authenticate your requests.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+The Documenso API uses API tokens for authentication. Include your token in the `Authorization` header of every request to identify your account and authorize access to resources.
+
+## Prerequisites
+
+- A Documenso account (cloud or self-hosted)
+- An active subscription that includes API access (Individual, Team, or Enterprise plans)
+
+<Callout type="warn">
+  Free accounts do not have API access. Upgrade to a paid plan to use the API.
+</Callout>
+
+## Create an API Token
+
+<Steps>
+<Step>
+### Open API Token Settings
+
+1. Log in to your Documenso account
+2. Click your avatar in the top right corner
+3. Select **Settings** from the dropdown menu
+
+![User dropdown menu](/public-api-images/documenso-user-dropdown-menu.webp)
+
+4. Navigate to the **API Tokens** tab
+
+![API tokens page](/public-api-images/api-tokens-page-documenso.webp)
+
+</Step>
+
+<Step>
+### Generate a New Token
+
+1. Click **Create Token**
+2. Enter a descriptive name (e.g., `production-backend`, `zapier-integration`)
+3. Select an expiration period:
+   - Never expires
+   - 7 days
+   - 1 month
+   - 3 months
+   - 6 months
+   - 1 year
+4. Click **Create Token**
+
+</Step>
+
+<Step>
+### Copy Your Token
+
+Your token is displayed once after creation. Copy it immediately and store it securely.
+
+![API key display](/public-api-images/documenso-api-key-blurred.webp)
+
+<Callout type="error">
+  You cannot view the token again after leaving this page. If you lose it, you must create a new
+  token.
+</Callout>
+
+</Step>
+</Steps>
+
+## Using Your Token
+
+Include the token in the `Authorization` header of your HTTP requests.
+
+### cURL
+
+```bash
+curl https://app.documenso.com/api/v2/documents \
+  -H "Authorization: api_xxxxxxxxxxxxxxxx"
+```
+
+### JavaScript / TypeScript
+
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/documents', {
+  method: 'GET',
+  headers: {
+    Authorization: 'api_xxxxxxxxxxxxxxxx',
+  },
+});
+
+const documents = await response.json();
+```
+
+### Using the TypeScript SDK
+
+Documenso provides official SDKs that handle authentication for you:
+
+```typescript
+import { Documenso } from '@documenso/sdk-typescript';
+
+const client = new Documenso({
+  apiKey: 'api_xxxxxxxxxxxxxxxx',
+});
+
+const documents = await client.documents.find();
+```
+
+SDKs are available for [TypeScript](https://github.com/documenso/sdk-typescript), [Python](https://github.com/documenso/sdk-python), and [Go](https://github.com/documenso/sdk-go).
+
+## API Base URLs
+
+| Environment | Base URL                               |
+| ----------- | -------------------------------------- |
+| Production  | `https://app.documenso.com/api/v2`     |
+| Staging     | `https://stg-app.documenso.com/api/v2` |
+| Self-hosted | `https://your-domain.com/api/v2`       |
+
+<Callout type="info">
+  API V1 is deprecated. Use V2 for all new integrations. V1 only works with legacy documents created
+  before the envelope system.
+</Callout>
+
+## Token Security
+
+API tokens grant full access to your account. Follow these practices to keep them secure:
+
+- **Never commit tokens to version control.** Use environment variables instead.
+- **Use descriptive names.** Names like `zapier-prod` or `backend-staging` help you identify token usage.
+- **Set expiration dates.** Shorter expiration periods reduce risk if a token is compromised.
+- **Rotate tokens regularly.** Create new tokens and revoke old ones periodically.
+- **Use separate tokens per integration.** If one is compromised, you only need to revoke that specific token.
+- **Revoke unused tokens.** Delete tokens you no longer need from the API Tokens settings page.
+
+### Environment Variables
+
+Store your token in an environment variable rather than hardcoding it:
+
+```bash
+# .env (do not commit this file)
+DOCUMENSO_API_KEY=api_xxxxxxxxxxxxxxxx
+```
+
+```typescript
+const client = new Documenso({
+  apiKey: process.env.DOCUMENSO_API_KEY,
+});
+```
+
+## Token Scope
+
+API tokens have full access to your account, including:
+
+- Creating, reading, updating, and deleting documents
+- Managing recipients and fields
+- Accessing templates
+- Managing team resources (if the token owner has team access)
+
+There is currently no way to create tokens with limited scopes or permissions.
+
+## Revoking a Token
+
+To revoke a token:
+
+1. Go to **Settings** > **API Tokens**
+2. Find the token you want to revoke
+3. Click the delete icon next to the token
+4. Confirm the deletion
+
+Revoked tokens stop working immediately. Any integrations using that token will receive `401 Unauthorized` errors.
+
+## Troubleshooting
+
+| Error              | Cause                                     | Solution                                                        |
+| ------------------ | ----------------------------------------- | --------------------------------------------------------------- |
+| `401 Unauthorized` | Missing or invalid token                  | Check that you included the token in the `Authorization` header |
+| `401 Unauthorized` | Expired token                             | Create a new token in settings                                  |
+| `403 Forbidden`    | Token doesn't have access to the resource | Ensure you're accessing resources owned by the token's account  |
+
+## Next Steps
+
+- [Make your first API call](/docs/developers/getting-started/first-api-call) - Create a document via the API
+- [API Reference](/docs/developers/api) - Explore available endpoints

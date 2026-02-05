@@ -1,0 +1,11 @@
+{
+  "title": "Documentation",
+  "pages": [
+    "---Users---",
+    "users",
+    "---Developers---",
+    "developers",
+    "---Self-Hosting---",
+    "self-hosting"
+  ]
+}

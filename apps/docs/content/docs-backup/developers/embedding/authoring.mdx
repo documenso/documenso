@@ -1,0 +1,383 @@
+---
+title: Authoring
+description: Learn how to use embedded authoring to create documents and templates in your application
+---
+
+# Embedded Authoring
+
+In addition to embedding signing experiences, Documenso now supports embedded authoring, allowing you to integrate document and template creation and editing directly within your application.
+
+## How Embedded Authoring Works
+
+The embedded authoring feature enables your users to create and edit documents and templates without leaving your application. This process works through secure presign tokens that authenticate the embedding session and manage permissions.
+
+## Available Components
+
+The SDK provides four authoring components:
+
+- **`EmbedCreateDocumentV1`** - Create new documents
+- **`EmbedCreateTemplateV1`** - Create new templates
+- **`EmbedUpdateDocumentV1`** - Edit existing documents
+- **`EmbedUpdateTemplateV1`** - Edit existing templates
+
+React Example:
+
+```jsx
+import {
+  EmbedCreateDocumentV1,
+  EmbedCreateTemplateV1,
+  EmbedUpdateDocumentV1,
+  EmbedUpdateTemplateV1,
+} from '@documenso/embed-react';
+```
+
+## Creating Documents
+
+To implement document creation in your application, use the `EmbedCreateDocumentV1` component:
+
+```jsx
+import { EmbedCreateDocumentV1 } from '@documenso/embed-react';
+
+const DocumentCreator = () => {
+  // You'll need to obtain a presign token using your API key
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateDocument
+        presignToken={presignToken}
+        externalId="order-12345"
+        onDocumentCreated={(data) => {
+          console.log('Document created with ID:', data.documentId);
+          console.log('External reference ID:', data.externalId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## Creating Templates
+
+To create templates, use the `EmbedCreateTemplateV1` component:
+
+```jsx
+import { EmbedCreateTemplateV1 } from '@documenso/embed-react';
+
+const TemplateCreator = () => {
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateTemplate
+        presignToken={presignToken}
+        externalId="template-12345"
+        onTemplateCreated={(data) => {
+          console.log('Template created with ID:', data.templateId);
+          console.log('External reference ID:', data.externalId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## Updating Documents
+
+To edit existing documents, use the `EmbedUpdateDocumentV1` component:
+
+```jsx
+import { EmbedUpdateDocumentV1 } from '@documenso/embed-react';
+
+const DocumentEditor = () => {
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+  const documentId = 123; // The ID of the document to edit
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedUpdateDocument
+        presignToken={presignToken}
+        documentId={documentId}
+        externalId="order-12345"
+        onlyEditFields={false}
+        onDocumentUpdated={(data) => {
+          console.log('Document updated:', data.documentId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## Updating Templates
+
+To edit existing templates, use the `EmbedUpdateTemplateV1` component:
+
+```jsx
+import { EmbedUpdateTemplateV1 } from '@documenso/embed-react';
+
+const TemplateEditor = () => {
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+  const templateId = 456; // The ID of the template to edit
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedUpdateTemplate
+        presignToken={presignToken}
+        templateId={templateId}
+        externalId="template-12345"
+        onlyEditFields={false}
+        onTemplateUpdated={(data) => {
+          console.log('Template updated:', data.templateId);
+        }}
+      />
+    </div>
+  );
+};
+```
+
+## Obtaining a Presign Token
+
+Before using any of the authoring components, you'll need to obtain a presign token from your backend. This token authorizes the embedding session.
+
+You can create a presign token by making a request to:
+
+```
+POST /api/v2/embedding/create-presign-token
+```
+
+This API endpoint requires authentication with your Documenso API key. The token has a default expiration of 1 hour, but you can customize this duration based on your security requirements.
+
+You can find more details on this request at our [API Documentation](https://openapi.documenso.com/reference#tag/embedding)
+
+## Configuration Options
+
+All authoring components accept the following configuration options:
+
+| Option             | Type    | Description                                                                |
+| ------------------ | ------- | -------------------------------------------------------------------------- |
+| `presignToken`     | string  | **Required**. The authentication token for the embedding session.          |
+| `externalId`       | string  | Optional reference ID from your system to link with the document/template. |
+| `host`             | string  | Optional custom host URL. Defaults to `https://app.documenso.com`.         |
+| `css`              | string  | Optional custom CSS to style the embedded component.                       |
+| `cssVars`          | object  | Optional CSS variables for colors, spacing, and more.                      |
+| `darkModeDisabled` | boolean | Optional flag to disable dark mode.                                        |
+| `className`        | string  | Optional CSS class name for the iframe.                                    |
+| `additionalProps`  | object  | Optional additional props to pass to the iframe (for testing features).    |
+| `features`         | object  | Optional feature toggles to customize the authoring experience.            |
+
+### Update Component Specific Props
+
+The `EmbedUpdateDocument` and `EmbedUpdateTemplate` components also accept:
+
+| Option           | Type    | Description                                                                                                    |
+| ---------------- | ------- | -------------------------------------------------------------------------------------------------------------- |
+| `documentId`     | number  | **Required for EmbedUpdateDocument**. The ID of the document to edit.                                          |
+| `templateId`     | number  | **Required for EmbedUpdateTemplate**. The ID of the template to edit.                                          |
+| `onlyEditFields` | boolean | Optional flag to restrict editing to fields only skipping the recipient configuration step (default: `false`). |
+
+## Feature Toggles
+
+You can customize the authoring experience by enabling or disabling specific features:
+
+```jsx
+<EmbedCreateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  features={{
+    allowConfigureSignatureTypes: true,
+    allowConfigureLanguage: true,
+    allowConfigureDateFormat: true,
+    allowConfigureTimezone: true,
+    allowConfigureRedirectUrl: true,
+    allowConfigureCommunication: true,
+  }}
+/>
+```
+
+## Handling Events
+
+Each component provides callbacks for handling completion events:
+
+### Document Events
+
+```jsx
+<EmbedCreateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  externalId="order-12345"
+  onDocumentCreated={(data) => {
+    // Navigate to a success page
+    navigate(`/documents/success?id=${data.documentId}`);
+
+    // Or update your database with the document ID
+    updateOrderDocument(data.externalId, data.documentId);
+  }}
+/>
+
+<EmbedUpdateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  documentId={123}
+  onDocumentUpdated={(data) => {
+    console.log('Document updated:', data.documentId);
+    // Handle document update
+  }}
+/>
+```
+
+### Template Events
+
+```jsx
+<EmbedCreateTemplate
+  presignToken="YOUR_PRESIGN_TOKEN"
+  externalId="template-12345"
+  onTemplateCreated={(data) => {
+    console.log('Template created:', data.templateId);
+    // Handle template creation
+  }}
+/>
+
+<EmbedUpdateTemplate
+  presignToken="YOUR_PRESIGN_TOKEN"
+  templateId={456}
+  onTemplateUpdated={(data) => {
+    console.log('Template updated:', data.templateId);
+    // Handle template update
+  }}
+/>
+```
+
+All event callbacks receive an object with:
+
+- `documentId` or `templateId` - The ID of the created/updated document or template
+- `externalId` - Your external reference ID (if provided)
+
+## Styling the Embedded Component
+
+You can customize the appearance of the embedded component using standard CSS classes, custom CSS, and CSS variables:
+
+```jsx
+<EmbedCreateDocument
+  className="h-screen w-full rounded-lg border-none shadow-md"
+  presignToken="YOUR_PRESIGN_TOKEN"
+  css={`
+    .documenso-embed {
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+  `}
+  cssVars={{
+    primary: '#0000FF',
+    background: '#F5F5F5',
+    radius: '8px',
+  }}
+/>
+```
+
+## Complete Integration Example
+
+Here's a complete example of integrating document creation in a React application:
+
+```tsx
+import { useState } from 'react';
+
+import { EmbedCreateDocumentV1, EmbedUpdateDocumentV1 } from '@documenso/embed-react';
+
+function DocumentManager() {
+  // In a real application, you would fetch this token from your backend
+  // using your API key at /api/v2/embedding/create-presign-token
+  const presignToken = 'YOUR_PRESIGN_TOKEN';
+  const [documentId, setDocumentId] = useState<number | null>(null);
+  const [mode, setMode] = useState<'create' | 'edit'>('create');
+
+  if (documentId && mode === 'create') {
+    return (
+      <div>
+        <h2>Document Created Successfully!</h2>
+        <p>Document ID: {documentId}</p>
+        <div>
+          <button onClick={() => setMode('edit')}>Edit Document</button>
+          <button
+            onClick={() => {
+              setDocumentId(null);
+              setMode('create');
+            }}
+          >
+            Create Another Document
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === 'edit' && documentId) {
+    return (
+      <div style={{ height: '800px', width: '100%' }}>
+        <button onClick={() => setMode('create')}>Back to Create</button>
+        <EmbedUpdateDocument
+          presignToken={presignToken}
+          documentId={documentId}
+          externalId="order-12345"
+          onDocumentUpdated={(data) => {
+            console.log('Document updated:', data.documentId);
+            setMode('create');
+          }}
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div style={{ height: '800px', width: '100%' }}>
+      <EmbedCreateDocument
+        presignToken={presignToken}
+        externalId="order-12345"
+        features={{
+          allowConfigureSignatureTypes: true,
+          allowConfigureLanguage: true,
+          allowConfigureDateFormat: true,
+          allowConfigureTimezone: true,
+          allowConfigureRedirectUrl: true,
+          allowConfigureCommunication: true,
+        }}
+        onDocumentCreated={(data) => {
+          setDocumentId(data.documentId);
+        }}
+      />
+    </div>
+  );
+}
+
+export default DocumentManager;
+```
+
+## Advanced Usage
+
+### Using Additional Props
+
+You can pass additional props to the iframe for testing features before they're officially supported:
+
+```jsx
+<EmbedCreateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  additionalProps={{
+    experimentalFeature: true,
+    customSetting: 'value',
+  }}
+/>
+```
+
+### Restricting To Only Field Editing
+
+When updating documents or templates, you can restrict editing to fields only skipping the recipient configuration step:
+
+```jsx
+<EmbedUpdateDocument
+  presignToken="YOUR_PRESIGN_TOKEN"
+  documentId={123}
+  onlyEditFields={true}
+  onDocumentUpdated={(data) => {
+    console.log('Fields updated:', data.documentId);
+  }}
+/>
+```
+
+With embedded authoring, your users can seamlessly create and edit documents and templates within your application, enhancing the overall user experience and streamlining document workflows.

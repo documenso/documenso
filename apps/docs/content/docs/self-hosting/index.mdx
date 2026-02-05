@@ -1,0 +1,142 @@
+---
+title: Self-Hosting Guide
+description: Deploy and manage your own Documenso instance
+---
+
+# Self-Hosting Guide
+
+Run Documenso on your own infrastructure for complete control over your data, compliance requirements, and customization needs. This section covers everything from initial setup to ongoing maintenance.
+
+---
+
+## Getting Started
+
+<Cards>
+  <Card
+    title="Requirements"
+    description="System requirements and prerequisites."
+    href="/docs/self-hosting/getting-started/requirements"
+  />
+  <Card
+    title="Quick Start"
+    description="Get running with Docker in 5 minutes."
+    href="/docs/self-hosting/getting-started/quick-start"
+  />
+</Cards>
+
+---
+
+## Deployment Options
+
+Choose a deployment method based on your needs:
+
+<Cards>
+  <Card
+    title="Docker"
+    description="Single container for development and testing."
+    href="/docs/self-hosting/deployment/docker"
+  />
+  <Card
+    title="Docker Compose"
+    description="Production-ready setup with all dependencies."
+    href="/docs/self-hosting/deployment/docker-compose"
+  />
+  <Card
+    title="Railway"
+    description="One-click deployment on managed infrastructure."
+    href="/docs/self-hosting/deployment/railway"
+  />
+  <Card
+    title="Kubernetes"
+    description="High availability for enterprise deployments."
+    href="/docs/self-hosting/deployment/kubernetes"
+  />
+</Cards>
+
+---
+
+## Configuration
+
+<Cards>
+  <Card
+    title="Environment Variables"
+    description="Complete reference of all configuration options."
+    href="/docs/self-hosting/configuration/environment"
+  />
+  <Card
+    title="Database"
+    description="PostgreSQL setup and connection."
+    href="/docs/self-hosting/configuration/database"
+  />
+  <Card
+    title="Email"
+    description="SMTP configuration for notifications."
+    href="/docs/self-hosting/configuration/email"
+  />
+  <Card
+    title="Storage"
+    description="S3-compatible file storage setup."
+    href="/docs/self-hosting/configuration/storage"
+  />
+  <Card
+    title="Signing Certificate"
+    description="Digital signature certificate for documents."
+    href="/docs/self-hosting/configuration/signing-certificate"
+  />
+</Cards>
+
+---
+
+## Maintenance
+
+<Cards>
+  <Card
+    title="Upgrades"
+    description="Upgrade to new versions safely."
+    href="/docs/self-hosting/maintenance/upgrades"
+  />
+  <Card
+    title="Backups"
+    description="Backup strategies for your data."
+    href="/docs/self-hosting/maintenance/backups"
+  />
+  <Card
+    title="Troubleshooting"
+    description="Common issues and solutions."
+    href="/docs/self-hosting/maintenance/troubleshooting"
+  />
+</Cards>
+
+---
+
+## Quick Start
+
+Get Documenso running locally in under 5 minutes:
+
+```bash
+git clone https://github.com/documenso/documenso.git
+cd documenso
+cp .env.example .env
+docker compose -f docker/development/compose.yml up -d
+```
+
+Open [http://localhost:3000](http://localhost:3000) to access your instance.
+
+See the [Quick Start guide](/docs/self-hosting/getting-started/quick-start) for detailed instructions and next steps.
+
+---
+
+## Looking for Something Else?
+
+<Cards>
+  <Card
+    title="User Guide"
+    description="Learn how to use Documenso for document signing."
+    href="/docs/users"
+  />
+  <Card
+    title="Developer Guide"
+    description="Integrate Documenso into your applications using the API."
+    href="/docs/developers"
+  />
+</Cards>

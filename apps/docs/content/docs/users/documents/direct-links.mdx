@@ -1,0 +1,187 @@
+---
+title: Direct Links
+description: Share signing links without knowing recipient emails upfront.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+# Direct Links
+
+Direct links let you share a signing URL without knowing the recipient's email address in advance. Recipients can open the link, enter their information, and sign the document.
+
+Use direct links when you:
+
+- Need to collect signatures from people whose emails you don't have
+- Want to embed signing into your website or application
+- Are collecting signatures from a public audience (forms, petitions, agreements)
+
+## Limitations
+
+- Direct links only work with templates, not individual documents
+- You cannot specify recipient details in advance - they enter their own information
+- Each direct link is tied to a single recipient role in the template
+- The template owner receives a notification for each completed signature
+
+---
+
+## Create a Direct Link
+
+Direct links are created from templates. You'll need a template before you can generate a direct link.
+
+<Steps>
+<Step>
+### Go to your template
+
+Navigate to **Templates** in the sidebar and find the template you want to share.
+
+</Step>
+
+<Step>
+### Enable direct link
+
+Click the three-dot menu on the template row and select **Direct link**.
+
+In the modal that appears, click **Enable direct link** to proceed.
+
+![Enable document direct link modal](/direct-links/enable-document-direct-link-modal.webp)
+
+</Step>
+
+<Step>
+### Select the recipient
+
+Choose which recipient in your template will use the direct link:
+
+- **Select an existing recipient** - Pick from recipients already defined in your template
+- **Create one automatically** - Documenso creates a new "Direct Link Recipient" for you
+
+![Choose direct link recipient](/direct-links/choose-direct-link-recipient-documenso.webp)
+
+The person who opens the direct link will fill in this recipient's fields.
+
+<Callout type="warn">
+  The direct link recipient cannot be edited or deleted while the direct link is active. Disable the
+  direct link first if you need to modify this recipient.
+</Callout>
+
+</Step>
+
+<Step>
+### Copy the link
+
+After selecting a recipient, you'll see your direct link:
+
+```
+https://app.documenso.com/d/<unique-token>
+```
+
+![Document direct link](/direct-links/document-direct-link-documenso.webp)
+
+Copy this link and share it however you need - email, website, QR code, or social media.
+
+</Step>
+</Steps>
+
+---
+
+## What Recipients See
+
+When someone opens your direct link:
+
+1. They see the document with all fields assigned to the direct link recipient
+2. They enter their name and email address
+3. They complete any required fields (signature, text, checkboxes, etc.)
+4. After signing, they receive a copy of the completed document via email
+
+If the recipient has a Documenso account with the email they entered, the document also appears in their Documents dashboard.
+
+---
+
+## Manage Direct Links
+
+### Disable a direct link
+
+To temporarily stop accepting signatures:
+
+1. Go to **Templates** and find your template
+2. Click the three-dot menu and select **Direct link**
+3. Toggle the direct link off
+
+The link URL remains the same. You can re-enable it later without generating a new link.
+
+### Delete a direct link
+
+To permanently remove a direct link:
+
+1. Disable the direct link first (see above)
+2. You can now edit or delete the direct link recipient
+3. If you enable direct links again, you'll get a new URL
+
+---
+
+## Add Direct Links to Your Profile
+
+You can showcase templates with direct links on your public Documenso profile:
+
+1. Go to **Settings** > **Public Profile**
+2. Enable your public profile if you haven't already
+3. Templates with active direct links can be added to your profile
+4. Visitors to your profile page can sign documents directly
+
+![Documenso profile with direct links](/direct-links/documenso-profile.webp)
+
+This is useful for freelancers, consultants, or businesses who want clients to easily access common agreements.
+
+---
+
+## Use Cases
+
+### Public forms and agreements
+
+Create a template for documents that anyone can sign:
+
+- Liability waivers
+- NDAs for event attendees
+- Consent forms
+- Petition signatures
+
+Share the direct link on your website, in emails, or via QR codes at physical locations.
+
+### Embedded signing
+
+Add signing capabilities to your website or app by embedding the direct link:
+
+```html
+<a href="https://app.documenso.com/d/your-token">Sign our agreement</a>
+```
+
+Or redirect users to the signing page after they complete another action in your application.
+
+### Self-service contracts
+
+Let customers or partners initiate contracts themselves:
+
+1. Create a template with your standard terms
+2. Share the direct link
+3. Recipients sign and receive their copy automatically
+4. You get notified and the signed document appears in your dashboard
+
+---
+
+## Direct Links vs Standard Document Flow
+
+| Feature                      | Standard Flow          | Direct Links                             |
+| ---------------------------- | ---------------------- | ---------------------------------------- |
+| Know recipient email upfront | Required               | Not required                             |
+| Send email invitation        | Yes                    | No (you share the link)                  |
+| Multiple recipients          | All specified          | One recipient via link, others specified |
+| Recipient enters their info  | No                     | Yes                                      |
+| Works with                   | Documents or Templates | Templates only                           |
+
+---
+
+## Next Steps
+
+- [Create a Template](/docs/users/templates/create-template) - Set up a template to use with direct links
+- [API: Create from Template](/docs/developers/api/templates) - Generate documents from templates programmatically

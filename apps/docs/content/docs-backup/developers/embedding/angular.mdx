@@ -1,0 +1,90 @@
+---
+title: Angular Integration
+description: Learn how to use our embedding SDK within your Angular application.
+---
+
+# Angular Integration
+
+Our Angular SDK provides a simple way to embed a signing experience within your Angular application. It supports both direct link templates and signing tokens.
+
+## Installation
+
+To install the SDK, run the following command:
+
+```bash
+npm install @documenso/embed-angular
+```
+
+## Usage
+
+To embed a signing experience, you'll need to provide the token for the document you want to embed. This can be done in a few different ways, depending on your use case.
+
+### Direct Link Template
+
+If you have a direct link template, you can simply provide the token for the template to the `EmbedDirectTemplate` component.
+
+```typescript
+import { Component } from '@angular/core';
+import { EmbedDirectTemplate } from '@documenso/embed-angular';
+
+@Component({
+  selector: 'app-embedding',
+  template: `
+    <embed-direct-template [token]="token" />
+  `,
+  standalone: true,
+  imports: [EmbedDirectTemplate],
+})
+export class EmbeddingComponent {
+  token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
+}
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| email               | string (optional)   | The email the signer that will be used by default for signing                              |
+| lockEmail           | boolean (optional)  | Whether or not the email field should be locked disallowing modifications                  |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+| onFieldSigned       | function (optional) | A callback function that will be called when a field is signed                             |
+| onFieldUnsigned     | function (optional) | A callback function that will be called when a field is unsigned                           |
+
+### Signing Token
+
+If you have a signing token, you can provide it to the `EmbedSignDocument` component.
+
+```typescript
+import { Component } from '@angular/core';
+import { EmbedSignDocument } from '@documenso/embed-angular';
+
+@Component({
+  selector: 'app-embedding',
+  template: `
+    <embed-sign-document [token]="token" />
+  `,
+  standalone: true,
+  imports: [EmbedSignDocument],
+})
+export class EmbeddingComponent {
+  token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
+}
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |

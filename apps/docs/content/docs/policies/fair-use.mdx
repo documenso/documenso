@@ -1,0 +1,160 @@
+---
+title: Fair Use Policy
+description: Usage guidelines and limits for Documenso services
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+This policy defines fair use guidelines for Documenso Cloud. These guidelines ensure reliable service for all users and prevent abuse. Self-hosted deployments are not subject to these limits.
+
+## Cloud Service Guidelines
+
+Documenso Cloud is designed for standard document signing workflows. The following guidelines apply to all cloud plans:
+
+- Use the service for its intended purpose: sending documents for signature
+- Respect the limits associated with your subscription plan
+- Do not use automated systems to circumvent usage limits
+- Do not share account credentials to bypass per-user limits
+
+Fair use is evaluated based on typical usage patterns for document signing. Occasional spikes in usage are expected and accommodated.
+
+## Rate Limits
+
+API and application requests are rate-limited to protect service availability.
+
+| Endpoint Type     | Limit                  | Window     |
+| ----------------- | ---------------------- | ---------- |
+| API requests      | 100 requests           | Per minute |
+| Document creation | 50 documents           | Per hour   |
+| Email sending     | 200 emails             | Per hour   |
+| Bulk operations   | 20 concurrent requests | Per minute |
+
+Rate limits apply per user or API token. When a limit is reached, requests return a `429 Too Many Requests` response. The response includes a `Retry-After` header indicating when to retry.
+
+<Callout type="info">
+  Rate limits may vary by plan. Enterprise plans include higher limits. Contact sales@documenso.com
+  for details.
+</Callout>
+
+## Storage Limits
+
+Document storage is subject to the following guidelines:
+
+| Plan       | Document Storage | Retention                |
+| ---------- | ---------------- | ------------------------ |
+| Free       | 10 documents     | 60 days after completion |
+| Individual | Unlimited        | Until deleted            |
+| Teams      | Unlimited        | Until deleted            |
+| Enterprise | Unlimited        | Configurable retention   |
+
+### Storage Guidelines
+
+- **Document size**: Maximum 20 MB per PDF file
+- **Page count**: Maximum 500 pages per document
+- **Recipients**: Maximum 50 recipients per document
+- **Fields**: Maximum 500 fields per document
+
+Documents exceeding these limits may fail to upload or process.
+
+## Acceptable Use
+
+The following uses are permitted under fair use:
+
+- Sending contracts, agreements, and forms for signature
+- Using templates for recurring document types
+- Integrating with business applications via the API
+- Automating document workflows within rate limits
+
+### Prohibited Uses
+
+The following uses violate fair use and may result in account action:
+
+- **Bulk email**: Using document signing as a mass email delivery system
+- **Storage abuse**: Uploading documents without intent to sign them
+- **API abuse**: Automated scraping, excessive polling, or denial-of-service patterns
+- **Credential sharing**: Sharing login credentials to exceed per-seat limits
+- **Circumvention**: Using multiple accounts to bypass usage limits
+
+<Callout type="warn">
+  Violation of acceptable use policies may result in rate limiting, account suspension, or
+  termination. See [Terms of Service](/docs/policies/terms) for details.
+</Callout>
+
+## Limit Exceeded Actions
+
+When usage exceeds fair use limits, Documenso may take the following actions:
+
+### Soft Limits
+
+For minor or temporary limit violations:
+
+1. **Warning notification**: Email notification about the exceeded limit
+2. **Temporary throttling**: Reduced rate limits until usage normalizes
+3. **Grace period**: Time to reduce usage or upgrade your plan
+
+### Hard Limits
+
+For significant or repeated violations:
+
+1. **Service restriction**: Affected features are disabled until resolved
+2. **Account review**: Manual review of usage patterns
+3. **Account suspension**: Temporary suspension pending resolution
+4. **Termination**: Permanent account closure for severe or repeated abuse
+
+Before taking action, Documenso will attempt to contact you at your registered email address. You will have an opportunity to explain unusual usage or upgrade your plan.
+
+### Disputing Actions
+
+If you believe an action was taken in error:
+
+1. Reply to the notification email with details about your usage
+2. Provide context for any unusual patterns
+3. Request a review of the decision
+
+Disputes are reviewed within 5 business days.
+
+## Enterprise Options
+
+Enterprise plans include higher limits and custom configurations:
+
+| Feature            | Standard Plans | Enterprise          |
+| ------------------ | -------------- | ------------------- |
+| API rate limits    | Standard       | Custom limits       |
+| Document storage   | Plan limits    | Unlimited           |
+| Document size      | 20 MB          | Up to 100 MB        |
+| Recipients per doc | 50             | Up to 200           |
+| Bulk operations    | Standard       | Priority processing |
+| SLA                | Best effort    | Guaranteed uptime   |
+
+### Custom Limits
+
+Enterprise customers can request custom limits for:
+
+- API request rates
+- Document processing throughput
+- Storage retention policies
+- Concurrent operations
+
+### Dedicated Resources
+
+Enterprise plans can include:
+
+- Dedicated infrastructure
+- Priority processing queues
+- Custom rate limit configurations
+- Direct technical support
+
+Contact sales@documenso.com to discuss enterprise options.
+
+<Callout type="info">
+  Self-hosted deployments have no cloud-imposed limits. You control all limits based on your
+  infrastructure capacity. See [Self-Hosting](/docs/self-hosting) for deployment options.
+</Callout>
+
+## Related
+
+- [Terms of Service](/docs/policies/terms) - Service terms and acceptable use
+- [Privacy Policy](/docs/policies/privacy) - Data handling and retention
+- [Support](/docs/policies/support) - Getting help with usage questions
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial licensing
+- [Self-Hosting](/docs/self-hosting) - Deploy without cloud limits

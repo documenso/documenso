@@ -1,0 +1,84 @@
+---
+title: Developer Documentation
+description: Learn how to integrate Documenso into your applications using our API, SDKs, webhooks, and embeddable components.
+icon: Code
+---
+
+# Developer Documentation
+
+Welcome to the Documenso developer documentation! This guide covers everything you need to integrate Documenso into your applications.
+
+## API & Integration
+
+<Cards>
+  <Card
+    title="Public API"
+    description="RESTful API for programmatic access to Documenso."
+    href="/docs/developers/public-api"
+  />
+  <Card
+    title="Webhooks"
+    description="Receive real-time notifications about document events."
+    href="/docs/developers/webhooks"
+  />
+  <Card
+    title="Embedding"
+    description="Embed Documenso signing experiences in your app."
+    href="/docs/developers/embedding"
+  />
+</Cards>
+
+## Development
+
+<Cards>
+  <Card
+    title="Local Development"
+    description="Set up a local development environment."
+    href="/docs/developers/local-development"
+  />
+  <Card
+    title="Developer Mode"
+    description="Advanced features for development and testing."
+    href="/docs/developers/developer-mode"
+  />
+  <Card
+    title="Contributing"
+    description="Contribute to the Documenso open source project."
+    href="/docs/developers/contributing"
+  />
+</Cards>
+
+## Quick Start
+
+Get started with the Documenso API in minutes:
+
+### 1. Get Your API Key
+
+Generate an API token from your [Documenso dashboard](https://app.documenso.com/settings/tokens).
+
+### 2. Make Your First Request
+
+```bash
+curl -X GET "https://app.documenso.com/api/v1/documents" \
+  -H "Authorization: YOUR_API_TOKEN"
+```
+
+### 3. Create a Document
+
+```bash
+curl -X POST "https://app.documenso.com/api/v1/documents" \
+  -H "Authorization: YOUR_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "title": "My Document",
+    "recipients": [
+      {
+        "email": "signer@example.com",
+        "name": "John Doe",
+        "role": "SIGNER"
+      }
+    ]
+  }'
+```
+
+For detailed API documentation, see the [API Reference](/docs/developers/public-api/reference).

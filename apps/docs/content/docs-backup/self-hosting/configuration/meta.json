@@ -1,0 +1,4 @@
+{
+  "title": "Configuration",
+  "pages": ["signing-certificate", "oauth-providers", "ai-features", "telemetry"]
+}

@@ -1,0 +1,84 @@
+---
+title: Signing Certificates
+description: How documents are digitally signed and verified
+---
+
+# Signing Certificates
+
+When a document is completed in Documenso, it is digitally signed using an X.509 certificate. This cryptographic signature serves as proof that the document is authentic and has not been modified since signing.
+
+## How Documenso Signs Documents
+
+Documenso applies a digital signature to the PDF when all recipients complete their actions. This process:
+
+1. Creates a cryptographic hash of the document content
+2. Signs the hash using the certificate's private key
+3. Embeds the signature and certificate information into the PDF
+
+The signature is applied at the platform level, not by individual signers. Each signer's actions (signature image, text, checkboxes) are recorded and sealed together in the final signed document.
+
+## What the Signature Proves
+
+The digital signature provides two guarantees:
+
+| Guarantee        | Description                                                                |
+| ---------------- | -------------------------------------------------------------------------- |
+| **Integrity**    | The document has not been altered since signing                            |
+| **Authenticity** | The document was signed by the certificate holder (the Documenso instance) |
+
+If anyone modifies the PDF after signing, the signature becomes invalid. PDF readers will display a warning that the document has been changed.
+
+## Timestamps
+
+Documenso can include a trusted timestamp from a Time Stamping Authority (TSA) in the signature. This proves when the document was signed, independent of the signer's system clock. Timestamps are important for:
+
+- Legal evidence of when signing occurred
+- Long-term validation (LTV) of signatures
+- Compliance with archival requirements
+
+## Viewing the Signature in PDF Readers
+
+You can verify a signed document's signature in any PDF reader that supports digital signatures:
+
+**Adobe Acrobat:**
+
+1. Open the signed PDF
+2. Click the signature panel on the left, or click on a signature field
+3. View certificate details, signing time, and validation status
+
+**Other PDF readers** (Preview, Foxit, etc.) also display signature information, though the interface varies.
+
+The signature panel shows:
+
+- Who signed (certificate subject)
+- When it was signed
+- Whether the document has been modified
+- Certificate trust status
+
+## Certificate Trust and Validation
+
+PDF readers validate signatures against their list of trusted Certificate Authorities (CAs). You may see different validation results depending on the certificate type:
+
+| Certificate Type | Validation Result                                                      |
+| ---------------- | ---------------------------------------------------------------------- |
+| **CA-issued**    | Green checkmark in Adobe if the CA is on the Adobe Approved Trust List |
+| **Self-signed**  | Warning that the certificate is not from a trusted source              |
+
+A self-signed certificate still provides integrity verification. The document cannot be modified without invalidating the signature. The warning only indicates that a third-party CA has not verified the certificate issuer's identity.
+
+For most use cases, self-signed certificates are sufficient. The signature still proves the document came from your Documenso instance and has not been tampered with.
+
+## Using Custom Certificates
+
+If you self-host Documenso, you can use your own signing certificate. Options include:
+
+- **Self-signed certificates** - Free, suitable for most use cases
+- **CA-issued certificates** - Provides trusted validation in PDF readers, required for some compliance scenarios
+
+See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) for setup instructions.
+
+## Related
+
+- [Signature Levels](/docs/compliance/signature-levels) - Simple, Advanced, and Qualified electronic signatures
+- [Standards and Regulations](/docs/compliance/standards) - ESIGN, eIDAS, and other compliance frameworks
+- [Signing Certificate Configuration](/docs/self-hosting/configuration/signing-certificate) - Self-hosting certificate setup

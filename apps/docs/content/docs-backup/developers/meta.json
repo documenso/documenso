@@ -1,0 +1,13 @@
+{
+  "title": "Developers",
+  "description": "Integrate and extend Documenso",
+  "root": true,
+  "pages": [
+    "public-api",
+    "webhooks",
+    "embedding",
+    "local-development",
+    "developer-mode",
+    "contributing"
+  ]
+}

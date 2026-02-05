@@ -1,0 +1,111 @@
+---
+title: React Integration
+description: Learn how to use our embedding SDK within your React application.
+---
+
+# React Integration
+
+Our React SDK provides a simple way to embed a signing experience within your React application. It supports both direct link templates and signing tokens.
+
+## Installation
+
+To install the SDK, run the following command:
+
+```bash
+npm install @documenso/embed-react
+```
+
+## Usage
+
+To embed a signing experience, you'll need to provide the token for the document you want to embed. This can be done in a few different ways, depending on your use case.
+
+### Direct Link Template
+
+If you have a direct link template, you can simply provide the token for the template to the `EmbedDirectTemplate` component.
+
+```jsx
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+const MyEmbeddingComponent = () => {
+  const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
+
+  return <EmbedDirectTemplate token={token} />;
+};
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| email               | string (optional)   | The email the signer that will be used by default for signing                              |
+| lockEmail           | boolean (optional)  | Whether or not the email field should be locked disallowing modifications                  |
+| externalId          | string (optional)   | The external ID to be used for the document that will be created upon completion           |
+| css                 | string (optional)   | Custom CSS to style the embedded component (Platform Plan only)                            |
+| cssVars             | object (optional)   | CSS variables for customizing colors, spacing, etc. (Platform Plan only)                   |
+| darkModeDisabled    | boolean (optional)  | Disable dark mode functionality (Platform Plan only)                                       |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+| onFieldSigned       | function (optional) | A callback function that will be called when a field has been signed                       |
+| onFieldUnsigned     | function (optional) | A callback function that will be called when a field has been unsigned                     |
+
+### Signing Token
+
+If you have a signing token, you can provide it to the `EmbedSignDocument` component.
+
+```jsx
+import { EmbedSignDocument } from '@documenso/embed-react';
+
+const MyEmbeddingComponent = () => {
+  const token = 'YOUR_TOKEN_HERE'; // Replace with the actual token
+
+  return <EmbedSignDocument token={token} />;
+};
+```
+
+#### Props
+
+| Prop                | Type                | Description                                                                                |
+| ------------------- | ------------------- | ------------------------------------------------------------------------------------------ |
+| token               | string              | The token for the document you want to embed                                               |
+| host                | string (optional)   | The host to be used for the signing experience, relevant for self-hosters                  |
+| name                | string (optional)   | The name the signer that will be used by default for signing                               |
+| lockName            | boolean (optional)  | Whether or not the name field should be locked disallowing modifications                   |
+| onDocumentReady     | function (optional) | A callback function that will be called when the document is loaded and ready to be signed |
+| onDocumentCompleted | function (optional) | A callback function that will be called when the document has been completed               |
+| onDocumentError     | function (optional) | A callback function that will be called when an error occurs with the document             |
+
+### Styling and Theming (Platform Plan)
+
+Platform customers have access to advanced styling options:
+
+```jsx
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+const MyEmbeddingComponent = () => {
+  return (
+    <EmbedDirectTemplate
+      token="your-token"
+      // Custom CSS
+      css={`
+        .documenso-embed {
+          border-radius: 8px;
+          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+      `}
+      // CSS Variables
+      cssVars={{
+        primary: '#0000FF',
+        background: '#F5F5F5',
+        radius: '8px',
+      }}
+      // Dark Mode Control
+      darkModeDisabled={true}
+    />
+  );
+};
+```

@@ -1,0 +1,4 @@
+{
+  "title": "Embedding",
+  "pages": ["react", "vue", "angular", "svelte", "solid", "preact", "authoring", "css-variables"]
+}

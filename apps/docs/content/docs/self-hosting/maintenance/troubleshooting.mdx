@@ -1,0 +1,906 @@
+---
+title: Troubleshooting
+description: Common issues and solutions for self-hosted instances
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Troubleshooting
+
+This guide covers common issues encountered when running self-hosted Documenso instances and their solutions. Use the sections below to diagnose and resolve problems with your deployment.
+
+## General Debugging
+
+### Checking Application Logs
+
+Application logs are your primary source of debugging information.
+
+**Docker:**
+
+```bash
+docker logs documenso
+```
+
+**Docker Compose:**
+
+```bash
+docker compose logs -f documenso
+```
+
+**Kubernetes:**
+
+```bash
+kubectl logs -l app.kubernetes.io/name=documenso -n documenso -f
+```
+
+### Filtering Logs
+
+Filter logs to find specific errors:
+
+```bash
+# Docker - find errors
+docker logs documenso 2>&1 | grep -i error
+
+# Docker - find warnings
+docker logs documenso 2>&1 | grep -i warn
+
+# Show last 100 lines
+docker logs --tail 100 documenso
+```
+
+### Health Checks
+
+Documenso exposes a health endpoint to verify the application is running:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+A healthy response returns HTTP 200. If the health check fails:
+
+1. Check application logs for startup errors
+2. Verify database connectivity
+3. Confirm environment variables are set correctly
+
+### Container Status
+
+Check if containers are running and healthy:
+
+**Docker:**
+
+```bash
+docker ps -a | grep documenso
+```
+
+**Docker Compose:**
+
+```bash
+docker compose ps
+```
+
+**Kubernetes:**
+
+```bash
+kubectl get pods -n documenso -o wide
+```
+
+### Environment Variable Verification
+
+Verify environment variables are set correctly inside the container:
+
+```bash
+# Docker
+docker exec documenso printenv | grep NEXT
+
+# Docker Compose
+docker compose exec documenso printenv | grep NEXT
+```
+
+<Callout type="warn">
+  Be cautious when printing environment variables as they may contain sensitive information like
+  passwords and API keys.
+</Callout>
+
+---
+
+## Application Issues
+
+### Container Fails to Start
+
+**Symptoms:** Container exits immediately or enters a crash loop.
+
+**Check the exit code:**
+
+```bash
+docker inspect documenso --format='{{.State.ExitCode}}'
+```
+
+| Exit Code | Meaning                    |
+| --------- | -------------------------- |
+| 0         | Normal exit                |
+| 1         | Application error          |
+| 137       | Out of memory (OOM killed) |
+| 139       | Segmentation fault         |
+| 143       | Terminated by SIGTERM      |
+
+**Common causes and solutions:**
+
+| Cause                         | Solution                                              |
+| ----------------------------- | ----------------------------------------------------- |
+| Missing required env variable | Check logs for "required environment variable" errors |
+| Database connection failure   | Verify database URL and connectivity                  |
+| Port already in use           | Change the port mapping or stop conflicting services  |
+| Insufficient memory           | Increase container memory limits                      |
+| Invalid certificate           | Check certificate path and passphrase                 |
+
+### Application Crashes After Startup
+
+**Symptoms:** Application starts but crashes during operation.
+
+**Check for memory issues:**
+
+```bash
+# Docker
+docker stats documenso
+
+# Kubernetes
+kubectl top pod -n documenso
+```
+
+**Solutions:**
+
+1. Increase memory limits in Docker or Kubernetes configuration
+2. Check for memory leaks in custom integrations
+3. Review application logs around the time of crash
+
+### Startup Timeout in Kubernetes
+
+**Symptoms:** Pod marked as unhealthy, enters CrashLoopBackOff.
+
+**Cause:** Startup probe fails before the application is ready.
+
+**Solution:** Increase startup probe timeout in your deployment:
+
+```yaml
+startupProbe:
+  httpGet:
+    path: /api/health
+    port: 3000
+  failureThreshold: 60
+  periodSeconds: 5
+```
+
+This allows up to 5 minutes (60 x 5 seconds) for startup.
+
+### Port Conflicts
+
+**Symptoms:** "Port already in use" error.
+
+**Find what's using the port:**
+
+```bash
+# Linux/macOS
+lsof -i :3000
+
+# Or using netstat
+netstat -tlnp | grep 3000
+```
+
+**Solutions:**
+
+1. Stop the conflicting service
+2. Change Documenso's port mapping: `-p 3001:3000`
+
+---
+
+## Database Issues
+
+### Connection Refused
+
+```
+Error: connect ECONNREFUSED 127.0.0.1:5432
+```
+
+**Causes:**
+
+- PostgreSQL not running
+- Incorrect host in connection string
+- Firewall blocking connection
+- Database container not started yet
+
+**Solutions:**
+
+1. Verify PostgreSQL is running:
+
+```bash
+# Direct PostgreSQL
+pg_isready -h localhost -p 5432
+
+# Docker Compose
+docker compose ps database
+```
+
+2. Check connection string host matches database location
+3. For Docker Compose, ensure the database service is defined and started
+4. Verify network connectivity between containers
+
+### Authentication Failed
+
+```
+Error: password authentication failed for user "documenso"
+```
+
+**Causes:**
+
+- Incorrect password
+- Password contains unescaped special characters
+- User does not exist
+
+**Solutions:**
+
+1. URL-encode special characters in password (`@` becomes `%40`, `#` becomes `%23`)
+2. Verify credentials match database configuration
+3. Reset the password:
+
+```sql
+ALTER USER documenso WITH PASSWORD 'newpassword';
+```
+
+### Database Does Not Exist
+
+```
+Error: database "documenso" does not exist
+```
+
+**Solution:** Create the database:
+
+```sql
+CREATE DATABASE documenso;
+GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
+```
+
+### Too Many Connections
+
+```
+Error: too many connections for role "documenso"
+```
+
+**Causes:**
+
+- Connection pool exhausted
+- Multiple instances without connection pooling
+- Connections not being released
+
+**Solutions:**
+
+1. Reduce connection pool size in connection string:
+
+```
+postgresql://user:password@host:5432/documenso?connection_limit=5
+```
+
+2. Increase PostgreSQL `max_connections`
+3. Implement connection pooling with PgBouncer
+
+### Migration Failures
+
+**Symptoms:** Application fails to start with migration errors.
+
+**Check migration status:**
+
+```sql
+SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
+```
+
+**Common causes:**
+
+| Cause                     | Solution                                      |
+| ------------------------- | --------------------------------------------- |
+| Database locked           | Wait for other processes to complete          |
+| Insufficient disk         | Free up disk space on database server         |
+| Permission denied         | Grant schema modification permissions to user |
+| Connection through pooler | Use direct database connection for migrations |
+
+**Retry failed migration:**
+
+1. Fix the underlying issue
+2. Mark migration as rolled back:
+
+```sql
+UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration';
+```
+
+3. Restart the application
+
+### SSL Required
+
+```
+Error: SSL/TLS required
+```
+
+**Solution:** Add SSL mode to connection string:
+
+```
+postgresql://user:password@host:5432/documenso?sslmode=require
+```
+
+---
+
+## Email Issues
+
+### Emails Not Sending
+
+**Symptoms:** No emails received, no errors in logs.
+
+**Diagnostic steps:**
+
+1. Check email configuration:
+
+```bash
+docker exec documenso printenv | grep SMTP
+```
+
+2. Verify all required variables are set:
+
+| Variable                         | Required |
+| -------------------------------- | -------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT`    | Yes      |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Yes      |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`    | Yes      |
+
+3. Test SMTP connectivity:
+
+```bash
+# Test connection to SMTP server
+telnet smtp.example.com 587
+```
+
+### SMTP Connection Timeout
+
+```
+Error: Connection timeout
+```
+
+**Causes:**
+
+- Incorrect SMTP hostname or port
+- Firewall blocking outbound SMTP
+- SMTP server unreachable
+
+**Solutions:**
+
+1. Verify hostname and port match provider documentation
+2. Check outbound firewall rules for ports 25, 465, 587
+3. Test connectivity from the container:
+
+```bash
+docker exec documenso nc -zv smtp.example.com 587
+```
+
+### SMTP Authentication Failed
+
+```
+Error: Invalid login or authentication failed
+```
+
+**Causes:**
+
+- Incorrect username or password
+- Account requires app-specific password
+- Account security restrictions
+
+**Solutions:**
+
+1. Double-check credentials
+2. For Gmail/Microsoft with 2FA, generate an app password
+3. Check provider for security alerts or blocked sign-ins
+
+### Emails Going to Spam
+
+**Causes:**
+
+- Missing SPF record
+- Missing DKIM signature
+- No DMARC policy
+- Poor sender reputation
+
+**Solutions:**
+
+1. Configure SPF record for your domain
+2. Set up DKIM signing with your email provider
+3. Add a DMARC policy
+4. Use a reputable email provider
+5. Test deliverability at [mail-tester.com](https://www.mail-tester.com)
+
+### From Address Not Authorized
+
+```
+Error: Sender address rejected
+```
+
+**Cause:** The `NEXT_PRIVATE_SMTP_FROM_ADDRESS` is not authorized to send from your email provider.
+
+**Solutions:**
+
+1. Verify the domain in your email provider's settings
+2. Use an email address from a verified domain
+3. Check provider-specific sender authorization requirements
+
+---
+
+## Signing Issues
+
+### No Certificate Found
+
+```
+Error: No certificate found for local signing
+```
+
+**Causes:**
+
+- Certificate path not configured
+- Certificate file not mounted
+- Environment variable not set
+
+**Solutions:**
+
+1. Verify certificate configuration:
+
+```bash
+docker exec documenso printenv | grep SIGNING
+```
+
+2. Check file exists at configured path:
+
+```bash
+docker exec documenso ls -la /opt/documenso/cert.p12
+```
+
+3. Ensure either `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set
+
+### Certificate Permission Denied
+
+```
+Error: EACCES: permission denied, open '/opt/documenso/cert.p12'
+```
+
+**Cause:** Application cannot read the certificate file.
+
+**Solution:** Fix file permissions:
+
+```bash
+# On host before mounting
+sudo chown 1001 certificate.p12
+chmod 400 certificate.p12
+```
+
+### Invalid Certificate Password
+
+```
+Error: mac verify failure
+```
+
+**Cause:** Incorrect passphrase for the certificate.
+
+**Solutions:**
+
+1. Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+2. Check for trailing whitespace or encoding issues
+3. Test the password:
+
+```bash
+openssl pkcs12 -in certificate.p12 -noout
+```
+
+### Failed to Get Private Key
+
+```
+Error: Failed to get private key bags
+```
+
+**Cause:** Certificate has no password or incompatible encryption.
+
+**Solution:** Re-create the certificate with a password and compatible encryption:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+<Callout type="warn">
+  You must set a non-empty password when creating the certificate. Certificates without passwords
+  will fail.
+</Callout>
+
+### Certificate Expired
+
+```
+Error: Certificate has expired
+```
+
+**Solution:**
+
+1. Check expiration date:
+
+```bash
+openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
+```
+
+2. Generate a new certificate or obtain a renewed one from your CA
+3. Update the certificate file and restart Documenso
+
+### Base64 Decode Error
+
+```
+Error: Invalid base64 in NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+```
+
+**Cause:** Incorrect base64 encoding or line breaks in the value.
+
+**Solution:** Encode without line breaks:
+
+```bash
+# macOS
+base64 -i certificate.p12 | tr -d '\n'
+
+# Linux
+base64 -w 0 certificate.p12
+```
+
+---
+
+## Storage Issues
+
+### S3 Access Denied
+
+```
+Error: Access Denied
+```
+
+**Causes:**
+
+- Incorrect IAM credentials
+- Bucket policy doesn't allow operations
+- CORS not configured
+
+**Solutions:**
+
+1. Verify IAM user has required permissions:
+
+```json
+{
+  "Effect": "Allow",
+  "Action": ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"],
+  "Resource": "arn:aws:s3:::your-bucket/*"
+}
+```
+
+2. Configure CORS for presigned URL uploads
+3. Verify credentials are correct and not expired
+
+### S3 Bucket Not Found
+
+```
+Error: The specified bucket does not exist
+```
+
+**Causes:**
+
+- Bucket name typo
+- Bucket in different region
+- Bucket doesn't exist
+
+**Solutions:**
+
+1. Verify bucket exists:
+
+```bash
+aws s3 ls s3://your-bucket
+```
+
+2. Check `NEXT_PRIVATE_UPLOAD_REGION` matches bucket region
+3. Create the bucket if it doesn't exist
+
+### Signature Mismatch
+
+```
+Error: SignatureDoesNotMatch
+```
+
+**Causes:**
+
+- Incorrect secret access key
+- Clock skew between server and S3
+
+**Solutions:**
+
+1. Verify credentials are correct
+2. Synchronize server time using NTP:
+
+```bash
+# Check time
+date
+
+# Sync time (Linux)
+sudo ntpdate pool.ntp.org
+```
+
+### Path-Style Access Required
+
+```
+Error: The bucket you are attempting to access must be addressed using the specified endpoint
+```
+
+**Cause:** S3-compatible service requires path-style URLs.
+
+**Solution:** Enable path-style access:
+
+```bash
+NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
+```
+
+### File Upload Timeout
+
+**Symptoms:** Large file uploads fail or timeout.
+
+**Causes:**
+
+- Upload size exceeds limit
+- Network timeout
+- Reverse proxy timeout
+
+**Solutions:**
+
+1. Check configured upload limit: `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT`
+2. Increase reverse proxy timeout (nginx `client_body_timeout`)
+3. For very large files, verify S3 multipart upload is working
+
+---
+
+## Performance Issues
+
+### Slow Response Times
+
+**Diagnostic steps:**
+
+1. Check container resource usage:
+
+```bash
+docker stats documenso
+```
+
+2. Monitor database performance:
+
+```sql
+SELECT query, calls, mean_time
+FROM pg_stat_statements
+ORDER BY mean_time DESC
+LIMIT 10;
+```
+
+3. Check for memory pressure or CPU throttling
+
+**Common causes and solutions:**
+
+| Cause               | Solution                                      |
+| ------------------- | --------------------------------------------- |
+| Insufficient memory | Increase container memory limits              |
+| Database slow       | Add indexes, increase database resources      |
+| Network latency     | Move database closer to application           |
+| Large documents     | Enable S3 storage instead of database storage |
+
+### High Memory Usage
+
+**Symptoms:** Container OOM killed, slow response times.
+
+**Solutions:**
+
+1. Increase memory limits:
+
+```yaml
+# Docker Compose
+services:
+  documenso:
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+```
+
+2. If using database storage, switch to S3 for large files
+3. Review and optimize any custom integrations
+
+### Database Performance Degradation
+
+**Symptoms:** Slow queries, timeouts.
+
+**Diagnostic queries:**
+
+```sql
+-- Check table sizes
+SELECT relname, pg_size_pretty(pg_total_relation_size(relid))
+FROM pg_catalog.pg_statio_user_tables
+ORDER BY pg_total_relation_size(relid) DESC;
+
+-- Find long-running queries
+SELECT pid, now() - pg_stat_activity.query_start AS duration, query
+FROM pg_stat_activity
+WHERE state != 'idle'
+ORDER BY duration DESC;
+```
+
+**Solutions:**
+
+1. Run VACUUM ANALYZE to update statistics:
+
+```sql
+VACUUM ANALYZE;
+```
+
+2. Check for missing indexes on frequently queried columns
+3. Consider upgrading database resources
+4. Archive old documents and audit logs
+
+### Slow Document Signing
+
+**Symptoms:** Document completion takes a long time.
+
+**Causes:**
+
+- Timestamp server latency
+- Large PDF files
+- Certificate issues
+
+**Solutions:**
+
+1. Use a faster timestamp server or one geographically closer
+2. Optimize PDF file sizes before upload
+3. Verify certificate is valid and not causing retries
+
+---
+
+## Network Issues
+
+### Cannot Reach Application
+
+**Diagnostic steps:**
+
+1. Verify container is running and port is exposed:
+
+```bash
+docker ps | grep documenso
+```
+
+2. Check port binding:
+
+```bash
+netstat -tlnp | grep 3000
+```
+
+3. Test local connectivity:
+
+```bash
+curl http://localhost:3000/api/health
+```
+
+### Reverse Proxy Issues
+
+**Symptoms:** 502 Bad Gateway, connection refused through proxy.
+
+**Solutions:**
+
+1. Verify upstream is reachable from the proxy
+2. Check proxy configuration points to correct port
+3. Ensure headers are forwarded correctly:
+
+```nginx
+proxy_set_header Host $host;
+proxy_set_header X-Real-IP $remote_addr;
+proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+proxy_set_header X-Forwarded-Proto $scheme;
+```
+
+### WebSocket Connection Failures
+
+**Symptoms:** Real-time updates not working.
+
+**Solution:** Configure reverse proxy for WebSocket support:
+
+```nginx
+location / {
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+}
+```
+
+### DNS Resolution Failures
+
+```
+Error: getaddrinfo ENOTFOUND hostname
+```
+
+**Causes:**
+
+- Incorrect hostname
+- DNS not configured in container
+- Network isolation
+
+**Solutions:**
+
+1. Verify hostname is correct
+2. Check DNS configuration:
+
+```bash
+docker exec documenso cat /etc/resolv.conf
+```
+
+3. For Docker Compose, use service names for inter-container communication
+
+---
+
+## Getting Help
+
+### Before Asking for Help
+
+Gather this information before seeking support:
+
+1. **Documenso version:**
+
+```bash
+docker inspect documenso --format='{{.Config.Image}}'
+```
+
+2. **Deployment method:** Docker, Docker Compose, Kubernetes, or other
+3. **Relevant logs:** Filter to show errors around the issue
+4. **Steps to reproduce:** What actions trigger the problem
+5. **Environment:** Cloud provider, OS, database type
+
+### Community Support
+
+- **GitHub Discussions:** [github.com/documenso/documenso/discussions](https://github.com/documenso/documenso/discussions)
+- **Discord:** Join the Documenso community Discord
+- **GitHub Issues:** For confirmed bugs, open an issue at [github.com/documenso/documenso/issues](https://github.com/documenso/documenso/issues)
+
+### Reporting Bugs
+
+When reporting bugs, include:
+
+1. Clear description of the expected vs actual behavior
+2. Steps to reproduce
+3. Documenso version
+4. Relevant logs (redact sensitive information)
+5. Environment details
+
+### Security Issues
+
+For security vulnerabilities, do not open a public issue. Contact security@documenso.com directly.
+
+---
+
+## Troubleshooting Checklist
+
+Use this checklist when diagnosing issues:
+
+- [ ] Check application logs for errors
+- [ ] Verify all required environment variables are set
+- [ ] Confirm database connectivity
+- [ ] Test health endpoint responds
+- [ ] Check container resource usage (CPU, memory)
+- [ ] Verify certificate is valid and accessible
+- [ ] Confirm email configuration
+- [ ] Check network connectivity to external services
+- [ ] Review recent changes (upgrades, config changes)
+
+---
+
+## Next Steps
+
+- [Backups](/docs/self-hosting/maintenance/backups) - Backup and restore procedures
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Upgrade procedures
+- [Database Configuration](/docs/self-hosting/configuration/database) - Database setup reference
+- [Email Configuration](/docs/self-hosting/configuration/email) - Email troubleshooting
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Certificate troubleshooting
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Storage troubleshooting

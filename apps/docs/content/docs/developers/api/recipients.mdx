@@ -1,0 +1,356 @@
+---
+title: Recipients API
+description: Add and manage document recipients via API
+---
+
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
+# Recipients API
+
+Recipients are individuals who need to interact with a document. Each recipient has a role that determines what actions they can take.
+
+---
+
+## Recipient Object
+
+```json
+{
+  "id": 123,
+  "documentId": 456,
+  "email": "signer@example.com",
+  "name": "John Doe",
+  "role": "SIGNER",
+  "signingOrder": 1,
+  "token": "abc123...",
+  "signedAt": "2024-01-15T10:30:00Z",
+  "readStatus": "OPENED",
+  "signingStatus": "SIGNED",
+  "sendStatus": "SENT",
+  "signingUrl": "https://app.documenso.com/sign/abc123..."
+}
+```
+
+| Field           | Type           | Description                           |
+| --------------- | -------------- | ------------------------------------- |
+| `id`            | number         | Unique recipient identifier           |
+| `documentId`    | number         | ID of the associated document         |
+| `email`         | string         | Recipient's email address             |
+| `name`          | string         | Recipient's display name              |
+| `role`          | string         | Recipient role (see below)            |
+| `signingOrder`  | number \| null | Order in sequential signing           |
+| `token`         | string         | Unique token for signing URL          |
+| `signedAt`      | string \| null | ISO timestamp when signed             |
+| `readStatus`    | string         | `NOT_OPENED` or `OPENED`              |
+| `signingStatus` | string         | `NOT_SIGNED`, `SIGNED`, or `REJECTED` |
+| `sendStatus`    | string         | `NOT_SENT` or `SENT`                  |
+| `signingUrl`    | string         | Direct URL for recipient to sign      |
+
+---
+
+## Recipient Roles
+
+| Role        | Description                                                    |
+| ----------- | -------------------------------------------------------------- |
+| `SIGNER`    | Must sign the document. Required fields must be completed.     |
+| `APPROVER`  | Must approve the document before signers can proceed.          |
+| `VIEWER`    | Can view the document but takes no action.                     |
+| `CC`        | Receives a copy of the completed document. No action required. |
+| `ASSISTANT` | Can fill in fields on behalf of another recipient.             |
+
+---
+
+## Create Recipient
+
+Add a recipient to a document.
+
+```
+POST /api/v2/documents/{documentId}/recipients
+```
+
+### Request Body
+
+| Field          | Type   | Required | Description                              |
+| -------------- | ------ | -------- | ---------------------------------------- |
+| `email`        | string | Yes      | Recipient's email address                |
+| `name`         | string | Yes      | Recipient's display name                 |
+| `role`         | string | No       | Recipient role. Default: `SIGNER`        |
+| `signingOrder` | number | No       | Position in sequential signing           |
+| `authOptions`  | object | No       | Authentication requirements (Enterprise) |
+
+### Example
+
+<Tabs items={['cURL', 'TypeScript']}>
+<Tab value="cURL">
+```bash
+curl -X POST "https://app.documenso.com/api/v2/documents/123/recipients" \
+  -H "Authorization: API-KEY your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "signer@example.com",
+    "name": "John Doe",
+    "role": "SIGNER",
+    "signingOrder": 1
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/documents/123/recipients',
+  {
+    method: 'POST',
+    headers: {
+      Authorization: 'API-KEY your_api_key',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      email: 'signer@example.com',
+      name: 'John Doe',
+      role: 'SIGNER',
+      signingOrder: 1,
+    }),
+  }
+);
+
+const recipient = await response.json();
+console.log(recipient.signingUrl);
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+```json
+{
+  "id": 789,
+  "documentId": 123,
+  "email": "signer@example.com",
+  "name": "John Doe",
+  "role": "SIGNER",
+  "signingOrder": 1,
+  "token": "abc123def456",
+  "signedAt": null,
+  "readStatus": "NOT_OPENED",
+  "signingStatus": "NOT_SIGNED",
+  "sendStatus": "NOT_SENT",
+  "signingUrl": "https://app.documenso.com/sign/abc123def456"
+}
+````
+
+---
+
+## Update Recipient
+
+Update a recipient's details. Only available for documents that are not yet completed.
+
+```
+PATCH /api/v2/documents/{documentId}/recipients/{recipientId}
+```
+
+### Request Body
+
+All fields are optional. Only include fields you want to update.
+
+| Field          | Type   | Description                              |
+| -------------- | ------ | ---------------------------------------- |
+| `email`        | string | New email address                        |
+| `name`         | string | New display name                         |
+| `role`         | string | New recipient role                       |
+| `signingOrder` | number | New position in sequential signing       |
+| `authOptions`  | object | Authentication requirements (Enterprise) |
+
+### Example
+
+<Tabs items={['cURL', 'TypeScript']}>
+<Tab value="cURL">
+```bash
+curl -X PATCH "https://app.documenso.com/api/v2/documents/123/recipients/789" \
+  -H "Authorization: API-KEY your_api_key" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Jane Doe",
+    "signingOrder": 2
+  }'
+```
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/documents/123/recipients/789',
+  {
+    method: 'PATCH',
+    headers: {
+      Authorization: 'API-KEY your_api_key',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: 'Jane Doe',
+      signingOrder: 2,
+    }),
+  }
+);
+
+const updatedRecipient = await response.json();
+
+```
+</Tab>
+</Tabs>
+
+### Response
+
+Returns the updated recipient object.
+
+---
+
+## Delete Recipient
+
+Remove a recipient from a document. Only available for documents that are not yet completed.
+
+```
+
+DELETE /api/v2/documents/{documentId}/recipients/{recipientId}
+
+````
+
+### Example
+
+<Tabs items={['cURL', 'TypeScript']}>
+<Tab value="cURL">
+```bash
+curl -X DELETE "https://app.documenso.com/api/v2/documents/123/recipients/789" \
+  -H "Authorization: API-KEY your_api_key"
+````
+
+</Tab>
+<Tab value="TypeScript">
+```typescript
+const response = await fetch(
+  'https://app.documenso.com/api/v2/documents/123/recipients/789',
+  {
+    method: 'DELETE',
+    headers: {
+      Authorization: 'API-KEY your_api_key',
+    },
+  }
+);
+
+const deletedRecipient = await response.json();
+
+````
+</Tab>
+</Tabs>
+
+### Response
+
+Returns the deleted recipient object.
+
+---
+
+## Signing Order
+
+When a document uses sequential signing, recipients sign in a specific order defined by `signingOrder`.
+
+### Setting Signing Order
+
+When creating recipients, assign `signingOrder` values to control the sequence:
+
+```typescript
+// Create document with sequential signing
+const documentResponse = await fetch('https://app.documenso.com/api/v2/documents', {
+  method: 'POST',
+  headers: {
+    Authorization: 'API-KEY your_api_key',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    title: 'Contract.pdf',
+    recipients: [
+      {
+        email: 'first@example.com',
+        name: 'First Signer',
+        role: 'SIGNER',
+        signingOrder: 1,
+      },
+      {
+        email: 'second@example.com',
+        name: 'Second Signer',
+        role: 'SIGNER',
+        signingOrder: 2,
+      },
+      {
+        email: 'approver@example.com',
+        name: 'Approver',
+        role: 'APPROVER',
+        signingOrder: 0, // Approvers typically go first
+      },
+    ],
+    meta: {
+      signingOrder: 'SEQUENTIAL',
+    },
+  }),
+});
+````
+
+### Signing Order Behavior
+
+- Recipients with lower `signingOrder` values sign first
+- Recipients with the same `signingOrder` can sign simultaneously
+- `CC` recipients receive the document after all signing is complete
+- `APPROVER` recipients must approve before signers with higher order values
+
+---
+
+## Authentication Options (Enterprise)
+
+For enhanced security, you can require additional authentication when recipients sign.
+
+```typescript
+const response = await fetch('https://app.documenso.com/api/v2/documents/123/recipients', {
+  method: 'POST',
+  headers: {
+    Authorization: 'API-KEY your_api_key',
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    email: 'signer@example.com',
+    name: 'John Doe',
+    role: 'SIGNER',
+    authOptions: {
+      actionAuth: ['PASSKEY', 'TWO_FACTOR_AUTH'],
+    },
+  }),
+});
+```
+
+Available authentication types:
+
+- `PASSKEY` - Require passkey authentication
+- `TWO_FACTOR_AUTH` - Require 2FA code
+
+---
+
+## Error Responses
+
+| Status | Description                                      |
+| ------ | ------------------------------------------------ |
+| `400`  | Invalid request body or recipient already exists |
+| `400`  | Document is already completed                    |
+| `401`  | Invalid or missing API key                       |
+| `404`  | Document or recipient not found                  |
+| `500`  | Server error                                     |
+
+### Example Error Response
+
+```json
+{
+  "message": "Recipient already exists"
+}
+```
+
+---
+
+## See Also
+
+- [Documents API](/docs/developers/api/documents) - Create and manage documents
+- [Fields API](/docs/developers/api/fields) - Add signature fields for recipients

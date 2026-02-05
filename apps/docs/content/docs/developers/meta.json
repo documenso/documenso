@@ -1,0 +1,6 @@
+{
+  "title": "Developers",
+  "description": "Integrate with Documenso",
+  "root": true,
+  "pages": ["getting-started", "api", "webhooks", "embedding", "examples"]
+}

@@ -1,0 +1,554 @@
+---
+title: Signing Certificate
+description: Configure the certificate used for digital signatures
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+# Signing Certificate
+
+When a document is completed in Documenso, it is digitally signed using an X.509 certificate. This cryptographic signature provides:
+
+- Proof of document authenticity
+- Verification that the document has not been modified since signing
+- Identity information about the signing entity
+
+Self-hosted Documenso instances require a signing certificate. You can generate a self-signed certificate or purchase one from a Certificate Authority (CA).
+
+## Certificate Options
+
+### Self-Signed Certificate
+
+A self-signed certificate is sufficient for most use cases where your industry has no special signing regulations.
+
+**Advantages:**
+
+- Free to create
+- Full control over certificate details
+- Works for internal and business documents
+
+**Limitations:**
+
+- PDF readers like Adobe Acrobat will not show a green checkmark
+- Not recognized by Adobe's trust list
+- Recipients see a warning that the signature cannot be verified
+
+The certificate still includes your organization details and guarantees document integrity.
+
+### CA-Issued Certificate
+
+Purchase a certificate from a Certificate Authority if you need:
+
+- Green checkmark in Adobe PDF readers
+- Industry-specific compliance requirements
+- Third-party signature validation
+
+For Adobe recognition, choose a vendor from the [Adobe Approved Trust List](https://helpx.adobe.com/acrobat/kb/approved-trust-list1.html).
+
+### Google Cloud HSM
+
+For organizations requiring hardware-based key protection, Documenso supports Google Cloud HSM. This provides:
+
+- FIPS 140-2 Level 3 certified key storage
+- Keys never leave the HSM
+- Audit logging of all cryptographic operations
+
+## Generating a Self-Signed Certificate
+
+Create a self-signed certificate using OpenSSL. These commands work on Linux, macOS, and Windows Subsystem for Linux (WSL).
+
+<Steps>
+<Step>
+
+### Generate a Private Key
+
+Create a 2048-bit RSA private key:
+
+```bash
+openssl genrsa -out private.key 2048
+```
+
+</Step>
+<Step>
+
+### Create a Self-Signed Certificate
+
+Generate a certificate valid for one year:
+
+```bash
+openssl req -new -x509 -key private.key -out certificate.crt -days 365
+```
+
+When prompted, enter your organization details:
+
+| Field               | Example                 |
+| ------------------- | ----------------------- |
+| Country Name        | US                      |
+| State or Province   | California              |
+| Locality Name       | San Francisco           |
+| Organization Name   | Your Company Inc        |
+| Organizational Unit | Engineering             |
+| Common Name         | Your Company Signing CA |
+| Email Address       | admin@example.com       |
+
+</Step>
+<Step>
+
+### Create the .p12 Certificate
+
+Combine the private key and certificate into a PKCS#12 (.p12) file:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+<Callout type="warn">
+  You must set a password when prompted. Certificates without passwords cause signing failures with
+  the error "Failed to get private key bags".
+</Callout>
+
+To set the password non-interactively:
+
+```bash
+# Set password securely (won't appear in command history)
+read -s -p "Enter certificate password: " CERT_PASS
+echo
+
+openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.crt \
+    -password env:CERT_PASS \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+</Step>
+<Step>
+
+### Clean Up
+
+Remove the intermediate files:
+
+```bash
+rm private.key certificate.crt
+```
+
+Keep `certificate.p12` and the password secure.
+
+</Step>
+</Steps>
+
+## Using an Existing Certificate
+
+If you have an existing certificate from a CA, convert it to PKCS#12 format.
+
+### From PEM Files
+
+If you have separate certificate and key files:
+
+```bash
+openssl pkcs12 -export -out certificate.p12 \
+    -inkey private.key \
+    -in certificate.crt \
+    -certfile chain.crt \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+Include `-certfile chain.crt` if you have intermediate certificates.
+
+### From Other Formats
+
+**Convert from DER to PEM first:**
+
+```bash
+openssl x509 -inform DER -in certificate.der -out certificate.crt
+openssl rsa -inform DER -in private.der -out private.key
+```
+
+**Convert from PFX (already PKCS#12):**
+
+PFX files are the same format as P12. Rename or re-export with the correct encryption:
+
+```bash
+# Extract, then re-package with compatible encryption
+openssl pkcs12 -in certificate.pfx -out temp.pem -nodes
+openssl pkcs12 -export -in temp.pem -out certificate.p12 \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+rm temp.pem
+```
+
+## Local File Configuration
+
+Configure Documenso to use a local certificate file.
+
+### Environment Variables
+
+| Variable                                   | Description                                                     |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`           | Set to `local` (default).                                       |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`     | Path to the `.p12` certificate file.                            |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` | Base64-encoded `.p12` file contents (alternative to file path). |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`          | Passphrase for the certificate.                                 |
+
+### Using File Path
+
+Mount the certificate file and set the path:
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=local
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+**Docker example:**
+
+```bash
+docker run -d \
+  -v /path/to/certificate.p12:/opt/documenso/cert.p12:ro \
+  -e NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12 \
+  -e NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password" \
+  documenso/documenso:latest
+```
+
+### Using Base64-Encoded Contents
+
+For environments where file mounting is not available (e.g., Railway, Vercel):
+
+```bash
+# Encode the certificate
+base64 -i certificate.p12
+```
+
+Set the encoded string as an environment variable:
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=local
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=MIIKEQIBAzCCCdcGCSqGSIb3DQEHAaCCCcg...
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+<Callout type="info">
+  The `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` variable takes precedence over
+  `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` if both are set.
+</Callout>
+
+### Docker File Permissions
+
+When running in Docker, the application runs as user 1001. The certificate file must be readable:
+
+```bash
+# On the host, before mounting
+sudo chown 1001 certificate.p12
+chmod 400 certificate.p12
+```
+
+Or mount as read-only and ensure group readability:
+
+```bash
+chmod 440 certificate.p12
+```
+
+## Google Cloud HSM Configuration
+
+Google Cloud HSM provides hardware-based key protection. The private key never leaves the HSM.
+
+### Prerequisites
+
+1. Google Cloud project with Cloud KMS enabled
+2. HSM key ring and asymmetric signing key created
+3. Service account with `cloudkms.signerVerifier` role
+4. Public certificate exported from the HSM
+
+### Environment Variables
+
+| Variable                                                       | Description                                           |
+| -------------------------------------------------------------- | ----------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT`                               | Set to `gcloud-hsm`.                                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                     | Full resource path to the HSM key version.            |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH`         | Path to the public certificate file.                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS`     | Base64-encoded public certificate.                    |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` | Base64-encoded Google Cloud service account JSON.     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file.                   |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain.                     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval. |
+
+### Configuration Example
+
+```bash
+NEXT_PRIVATE_SIGNING_TRANSPORT=gcloud-hsm
+NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH=projects/my-project/locations/global/keyRings/documenso/cryptoKeys/signing-key/cryptoKeyVersions/1
+NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH=/opt/documenso/public.crt
+NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS=eyJ0eXBlIjoic2VydmljZV9hY2NvdW50Ii...
+```
+
+### Key Path Format
+
+The HSM key path follows this format:
+
+```
+projects/{project}/locations/{location}/keyRings/{keyring}/cryptoKeys/{key}/cryptoKeyVersions/{version}
+```
+
+Example:
+
+```
+projects/my-company/locations/us-east1/keyRings/document-signing/cryptoKeys/prod-signing/cryptoKeyVersions/1
+```
+
+### Creating an HSM Key
+
+Using gcloud CLI:
+
+```bash
+# Create a key ring
+gcloud kms keyrings create document-signing \
+    --location=us-east1 \
+    --project=my-project
+
+# Create an asymmetric signing key
+gcloud kms keys create prod-signing \
+    --keyring=document-signing \
+    --location=us-east1 \
+    --purpose=asymmetric-signing \
+    --default-algorithm=rsa-sign-pkcs1-2048-sha256 \
+    --protection-level=hsm \
+    --project=my-project
+```
+
+## Certificate Requirements
+
+Documenso requires certificates meeting these specifications:
+
+| Requirement      | Specification            |
+| ---------------- | ------------------------ |
+| Format           | PKCS#12 (.p12)           |
+| Key type         | RSA                      |
+| Minimum key size | 2048 bits                |
+| Password         | Required (non-empty)     |
+| Encryption       | PBE-SHA1-3DES compatible |
+| Validity         | Must not be expired      |
+
+### Certificate Validation
+
+Verify your certificate is valid:
+
+```bash
+# Check certificate details
+openssl pkcs12 -in certificate.p12 -info -nokeys
+
+# Verify password works
+openssl pkcs12 -in certificate.p12 -noout
+```
+
+### Key Usage
+
+For CA-issued certificates, ensure the certificate includes:
+
+- Digital Signature key usage
+- Non-Repudiation key usage (recommended)
+
+## Timestamp Server Configuration
+
+Timestamp servers add a trusted timestamp to signatures, proving when the document was signed. This enables Long-Term Validation (LTV) and archival timestamps.
+
+### Environment Variable
+
+| Variable                                   | Description                                       |
+| ------------------------------------------ | ------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY` | Comma-separated list of timestamp authority URLs. |
+
+### Configuration
+
+```bash
+NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY=http://timestamp.digicert.com,http://timestamp.globalsign.com/tsa/r6advanced1
+```
+
+### Free Timestamp Servers
+
+| Provider   | URL                                               |
+| ---------- | ------------------------------------------------- |
+| DigiCert   | `http://timestamp.digicert.com`                   |
+| GlobalSign | `http://timestamp.globalsign.com/tsa/r6advanced1` |
+| FreeTSA    | `https://freetsa.org/tsr`                         |
+| Sectigo    | `http://timestamp.sectigo.com`                    |
+
+<Callout type="info">
+  Timestamp servers add latency to the signing process. Each server in the list is tried in order
+  until one succeeds.
+</Callout>
+
+### Benefits of Timestamping
+
+- Proves when the document was signed
+- Signature remains valid after certificate expiration
+- Required for some compliance standards
+- Enables long-term archival
+
+## Signature Appearance Customization
+
+### Contact Information
+
+Set contact information embedded in PDF signatures:
+
+```bash
+NEXT_PUBLIC_SIGNING_CONTACT_INFO=support@example.com
+```
+
+If not set, defaults to your `NEXT_PUBLIC_WEBAPP_URL`.
+
+### Legacy Signature Format
+
+For compatibility with older PDF readers, use the legacy signature subfilter:
+
+```bash
+NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER=true
+```
+
+| Subfilter             | Default | Description                   |
+| --------------------- | ------- | ----------------------------- |
+| `ETSI.CAdES.detached` | Yes     | Modern CAdES-based signatures |
+| `adbe.pkcs7.detached` | No      | Legacy PKCS#7 signatures      |
+
+Use the legacy format only if recipients report compatibility issues with older software.
+
+## Troubleshooting
+
+### Failed to get private key bags
+
+```
+Error: Failed to get private key bags
+```
+
+**Cause:** Certificate has no password or incompatible encryption.
+
+**Solution:**
+
+1. Verify the certificate has a password set
+2. Re-create the certificate with a password:
+
+```bash
+openssl pkcs12 -export -out new-certificate.p12 -inkey private.key -in certificate.crt \
+    -keypbe PBE-SHA1-3DES \
+    -certpbe PBE-SHA1-3DES \
+    -macalg sha1
+```
+
+### No certificate found for local signing
+
+```
+Error: No certificate found for local signing
+```
+
+**Cause:** Certificate path or contents not configured.
+
+**Solution:**
+
+1. Verify environment variables are set:
+   - `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or
+   - `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`
+2. Check the file exists at the configured path
+3. Verify file permissions allow reading
+
+### Permission denied reading certificate
+
+```
+Error: EACCES: permission denied, open '/opt/documenso/cert.p12'
+```
+
+**Cause:** Application cannot read the certificate file.
+
+**Solution:**
+
+For Docker deployments:
+
+```bash
+# On host before mounting
+sudo chown 1001 certificate.p12
+chmod 400 certificate.p12
+```
+
+### Invalid password
+
+```
+Error: mac verify failure
+```
+
+**Cause:** Incorrect passphrase provided.
+
+**Solution:**
+
+1. Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
+2. Check for trailing whitespace or special characters
+3. Test the password with OpenSSL:
+
+```bash
+openssl pkcs12 -in certificate.p12 -noout
+```
+
+### Certificate has expired
+
+```
+Error: Certificate has expired
+```
+
+**Cause:** Certificate validity period has ended.
+
+**Solution:**
+
+1. Generate a new certificate or obtain a renewed one from your CA
+2. Update the certificate file and restart Documenso
+
+Check expiration date:
+
+```bash
+openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
+```
+
+### Base64 decode error
+
+```
+Error: Invalid base64 in NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
+```
+
+**Cause:** Incorrect base64 encoding or line breaks in the value.
+
+**Solution:**
+
+Encode without line breaks:
+
+```bash
+# macOS
+base64 -i certificate.p12 | tr -d '\n'
+
+# Linux
+base64 -w 0 certificate.p12
+```
+
+Ensure the entire base64 string is on one line in your environment variable.
+
+### Google Cloud HSM authentication failed
+
+```
+Error: Could not load the default credentials
+```
+
+**Cause:** Google Cloud credentials not configured or invalid.
+
+**Solution:**
+
+1. Verify `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set
+2. Check the service account has `cloudkms.signerVerifier` role
+3. Verify the base64 encoding of the service account JSON
+
+## Next Steps
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
+- [Docker Deployment](/docs/self-hosting/deployment/docker) - Deploy with Docker
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common issues and solutions

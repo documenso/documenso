@@ -1,0 +1,202 @@
+---
+title: Single Sign-On (SSO)
+description: Configure SSO for your team with OIDC providers
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+Single Sign-On (SSO) allows your team members to authenticate using your organization's identity provider instead of managing separate Documenso credentials.
+
+<Callout type="warn">SSO is only available on the Enterprise plan.</Callout>
+
+## Supported Providers
+
+Documenso supports any identity provider that implements the OpenID Connect (OIDC) protocol. Common providers include:
+
+- Microsoft Entra ID (formerly Azure AD)
+- Google Workspace
+- Okta
+- Auth0
+- OneLogin
+- JumpCloud
+
+## Setting Up SSO
+
+<Callout type="info">You must be a team owner, admin, or manager to configure SSO.</Callout>
+
+<Steps>
+<Step>
+### Access SSO Settings
+
+1. Navigate to your team settings
+2. Select **Single Sign-On** from the sidebar
+
+![SSO settings page](/organisations/organisations-sso-settings.webp)
+
+</Step>
+
+<Step>
+### Get Your Redirect URI
+
+At the top of the SSO settings page, you'll find the **Redirect URI** and **Required Scopes**. Copy these values - you'll need them when configuring your identity provider.
+
+</Step>
+
+<Step>
+### Configure Your Identity Provider
+
+In your identity provider's admin console, create a new OIDC application with:
+
+- **Redirect URI**: The value from the Documenso SSO settings page
+- **Scopes**: `openid`, `email`, `profile`
+
+After creating the application, note down:
+
+- Client ID
+- Client Secret
+- OpenID Connect discovery URL (also called "well-known" URL)
+
+</Step>
+
+<Step>
+### Enter SSO Configuration
+
+Back in Documenso, enter the following:
+
+- **Issuer URL**: Your provider's OpenID Connect discovery endpoint
+- **Client ID**: The application client ID from your provider
+- **Client Secret**: The application secret from your provider
+
+</Step>
+
+<Step>
+### Set Allowed Domains and Default Role
+
+Configure which email domains can authenticate and what role new users receive (see sections below).
+
+</Step>
+
+<Step>
+### Enable SSO
+
+Toggle **Enable SSO portal** and click **Update** to activate SSO for your team.
+
+</Step>
+</Steps>
+
+## SSO Configuration Settings
+
+### Issuer URL
+
+The OpenID Connect discovery endpoint for your identity provider. Common formats:
+
+| Provider           | Issuer URL Format                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------- |
+| Google Workspace   | `https://accounts.google.com/.well-known/openid-configuration`                        |
+| Microsoft Entra ID | `https://login.microsoftonline.com/{tenant-id}/v2.0/.well-known/openid-configuration` |
+| Okta               | `https://{your-domain}.okta.com/.well-known/openid-configuration`                     |
+| Auth0              | `https://{your-domain}.auth0.com/.well-known/openid-configuration`                    |
+
+### Client Credentials
+
+- **Client ID**: The unique identifier for your OIDC application
+- **Client Secret**: The secret key used to authenticate your application
+
+<Callout type="warn">
+  Store your client secret securely. If compromised, regenerate it immediately in your identity
+  provider.
+</Callout>
+
+### Default Team Role
+
+The role assigned to users when they first sign in through SSO. Choose from:
+
+- **Member**: Can view and sign documents shared with them
+- **Manager**: Can manage documents and team settings
+- **Admin**: Full access to team configuration
+
+You can change individual user roles after they've joined.
+
+### Allowed Email Domains
+
+Restrict which email domains can authenticate through your SSO portal. Enter domains separated by spaces:
+
+```
+example.com subsidiary.example.com
+```
+
+Leave empty to allow any domain authenticated by your identity provider.
+
+<Callout type="warn">
+  Without domain restrictions, anyone who can authenticate with your identity provider can join your
+  team.
+</Callout>
+
+## User Provisioning
+
+When a user signs in through your SSO portal for the first time:
+
+1. Documenso verifies their identity with your provider
+2. A new account is created (or linked if the email already exists)
+3. The user is added to your team with the default role
+4. They can immediately access team documents
+
+Users provisioned through SSO:
+
+- Cannot change their email address
+- Cannot set a Documenso password (they must use SSO)
+- Are removed from SSO access if removed from your identity provider
+
+## SSO-Only Enforcement
+
+Once SSO is enabled, you can share your team's SSO portal URL with members. The portal URL is displayed at the top of the SSO settings page.
+
+To enforce SSO-only authentication:
+
+1. Share only the SSO portal URL with team members
+2. Restrict allowed email domains to your organization
+3. Remove any team members who signed up with passwords
+
+<Callout type="info">
+  Users who joined before SSO was enabled can still sign in with their original method. To enforce
+  SSO for existing users, remove and re-invite them through the SSO portal.
+</Callout>
+
+## Troubleshooting
+
+### Invalid issuer URL
+
+- Verify the URL is correct and publicly accessible
+- Ensure the URL points to an OpenID Connect discovery document
+- Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
+
+### Client authentication failed
+
+- Verify the client ID and secret match your identity provider exactly
+- Check that the OIDC application hasn't been deleted or disabled
+- Regenerate the client secret if you suspect it's incorrect
+
+### Redirect URI mismatch
+
+- Copy the redirect URI exactly from Documenso's SSO settings
+- Check for trailing slashes - they must match exactly
+- Ensure you're using HTTPS
+
+### User not provisioned
+
+- Verify the user's email domain is in the allowed domains list
+- Check that the user exists in your identity provider
+- Ensure the user's account in your identity provider has an email address
+
+### User already exists
+
+If a user already has a Documenso account with the same email:
+
+- Their existing account will be linked to your team
+- They can sign in through your SSO portal going forward
+
+## Next Steps
+
+- [Manage Members](/docs/users/teams/manage-members) - Configure team member roles and permissions
+- [Create a Team](/docs/users/teams/create-team) - Set up additional teams in your organization

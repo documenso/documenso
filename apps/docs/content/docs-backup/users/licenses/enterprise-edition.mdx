@@ -1,0 +1,57 @@
+---
+title: Enterprise Edition
+description: Learn about the Enterprise Edition of Documenso.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Enterprise Edition
+
+<Callout type="info">
+  The Enterprise Edition requires a paid subscription. [Contact us for a
+  quote](https://documen.so/enterprise).
+</Callout>
+
+The Documenso Enterprise Edition is our license for self-hosters that need the full range of support and compliance.
+
+The following features are included in the Enterprise Edition:
+
+{/* Keep this synced with the packages/ee/FEATURES file */}
+
+- The Stripe Billing Module
+- Organisation Authentication Portal
+- Document Action Reauthentication (Passkeys and 2FA)
+- 21 CFR
+- Email domains
+- Embed authoring
+- Embed authoring white label
+
+In addition, you will receive:
+
+- Premium Support via Slack, Discord and Email.
+- Flexible Licensing (e.g. MIT) for deeper custom integration (if needed).
+- Access to Enterprise-grade compliance and administration features.
+- Permission to self-Host Documenso in any context.
+
+The Enterprise Edition currently has no limitations except custom contract terms.
+
+## Getting a License
+
+To acquire an Enterprise Edition license, please [contact our sales team](https://documen.so/enterprise) for a quote. Our team will work with you to understand your requirements and provide a license that fits your needs.
+
+## Using Your License
+
+Once you have acquired an Enterprise Edition license:
+
+1. Access your license key at [license.documenso.com](https://license.documenso.com)
+2. Set the `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` environment variable in your Documenso instance with your license key
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY="your-license-key-here"
+```
+
+3. You can verify your license status in the Admin Panel under the Stats section.
+
+![Admin License Status](/admin-license-status.webp)
+
+Your license will be verified on startup and periodically to ensure continued access to Enterprise features.

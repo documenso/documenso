@@ -1,0 +1,111 @@
+---
+title: Upload Documents
+description: Supported formats and upload methods
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Upload documents to Documenso to prepare them for signing. This page covers supported formats, file size limits, and upload methods.
+
+## Limitations
+
+Before uploading, be aware of these constraints:
+
+| Limitation        | Value                               |
+| ----------------- | ----------------------------------- |
+| Supported format  | PDF only                            |
+| Maximum file size | 50MB (configurable for self-hosted) |
+| Encrypted PDFs    | Not supported                       |
+
+<Callout type="warn">
+  Documenso does not support password-protected or encrypted PDF files. Remove encryption before
+  uploading.
+</Callout>
+
+## Upload Methods
+
+You can upload documents in two ways:
+
+![Documents dashboard](/document-signing/documenso-documents-dashboard.webp)
+
+### Drag and Drop
+
+1. Go to your [Documents dashboard](https://app.documenso.com/documents)
+2. Drag a PDF file from your computer and drop it anywhere on the page
+3. Wait for the upload to complete
+
+### File Picker
+
+1. Go to your [Documents dashboard](https://app.documenso.com/documents)
+2. Click **Upload Document** in the top right
+3. Select a PDF file from your computer
+4. Wait for the upload to complete
+
+## Uploading Multiple Documents
+
+You can upload multiple PDF files at once to create a single envelope containing multiple documents. The number of files you can upload per envelope depends on your plan.
+
+To upload multiple files:
+
+1. Select multiple PDF files when using the file picker, or
+2. Drag and drop multiple PDF files at once
+
+All files in the same upload become part of the same envelope and share the same recipients and signing workflow.
+
+<Callout type="info">
+  If you need separate signing workflows for each document, upload them individually.
+</Callout>
+
+## What Happens After Upload
+
+When you upload a document:
+
+1. **Processing** - Documenso validates the PDF and extracts page information
+2. **Draft created** - A new document is created in Draft status
+3. **Editor opens** - You're taken to the document editor to add recipients and fields
+
+![Document editor overview](/document-signing/editor-overview.webp)
+
+The document remains in Draft status until you send it. You can close the editor and return later - draft documents are saved automatically.
+
+## Troubleshooting
+
+### "File is larger than 50MB"
+
+Reduce the file size before uploading:
+
+- Compress images within the PDF
+- Remove unnecessary pages
+- Use a PDF compression tool
+
+### "Only PDF files are allowed"
+
+Convert your document to PDF before uploading. Most applications (Word, Google Docs, etc.) can export to PDF format.
+
+### "You cannot upload encrypted PDFs"
+
+The PDF is password-protected or encrypted. Open it in a PDF reader, remove the security settings, and save a new copy.
+
+### "You have reached your document limit"
+
+Your plan has a monthly document limit. Options:
+
+- Wait until your limit resets next month
+- Upgrade to a higher plan
+- Delete unused draft documents (this does not restore quota)
+
+### Upload fails with no error message
+
+Check that:
+
+- Your internet connection is stable
+- The file is a valid PDF (try opening it in a PDF reader)
+- The file is not corrupted
+
+## Next Steps
+
+After uploading, you're ready to prepare your document for signing:
+
+- [Add recipients](/docs/users/documents/add-recipients) - Specify who needs to sign
+- [Add fields](/docs/users/documents/add-fields) - Place signature and other fields on the document
+- [Send and track](/docs/users/documents/send-and-track) - Send the document and monitor progress

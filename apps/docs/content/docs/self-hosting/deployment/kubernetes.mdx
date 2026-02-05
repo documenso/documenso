@@ -1,0 +1,973 @@
+---
+title: Kubernetes
+description: Scalable Kubernetes deployment.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+# Kubernetes Deployment
+
+This guide covers deploying Documenso on Kubernetes for production environments requiring high availability, auto-scaling, and enterprise-grade infrastructure.
+
+## Prerequisites
+
+Before starting, ensure you have:
+
+- A Kubernetes cluster (1.24+) running and accessible
+- `kubectl` configured to communicate with your cluster
+- A PostgreSQL 14+ database (in-cluster or external)
+- SMTP credentials for sending emails
+- A domain name with DNS configured
+- An Ingress controller installed (nginx-ingress, traefik, etc.)
+
+Verify your cluster connection:
+
+```bash
+kubectl cluster-info
+kubectl get nodes
+```
+
+## Architecture Overview
+
+A typical Documenso Kubernetes deployment consists of:
+
+```
+                    ┌─────────────────┐
+                    │     Ingress     │
+                    │  (TLS termination)│
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │     Service     │
+                    │  (ClusterIP)    │
+                    └────────┬────────┘
+                             │
+              ┌──────────────┼──────────────┐
+              │              │              │
+      ┌───────▼───────┐ ┌───────▼───────┐ ┌───────▼───────┐
+      │   Pod (app)   │ │   Pod (app)   │ │   Pod (app)   │
+      └───────┬───────┘ └───────┬───────┘ └───────┬───────┘
+              │              │              │
+              └──────────────┼──────────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   PostgreSQL    │
+                    │   (external or  │
+                    │    in-cluster)  │
+                    └─────────────────┘
+```
+
+## Namespace Setup
+
+Create a dedicated namespace for Documenso:
+
+```yaml
+# namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+```
+
+Apply the namespace:
+
+```bash
+kubectl apply -f namespace.yaml
+```
+
+## Secrets Configuration
+
+Store sensitive configuration in Kubernetes Secrets.
+
+### Generate Secrets
+
+First, generate the required secret values:
+
+```bash
+# Generate NEXTAUTH_SECRET
+openssl rand -base64 32
+
+# Generate encryption keys (minimum 32 characters each)
+openssl rand -base64 32
+openssl rand -base64 32
+```
+
+### Create the Secret
+
+```yaml
+# secret.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: documenso-secrets
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+type: Opaque
+stringData:
+  NEXTAUTH_SECRET: 'your-generated-secret-here'
+  NEXT_PRIVATE_ENCRYPTION_KEY: 'your-encryption-key-min-32-chars'
+  NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: 'your-secondary-key-min-32-chars'
+  NEXT_PRIVATE_DATABASE_URL: 'postgresql://user:password@postgres-host:5432/documenso'
+  NEXT_PRIVATE_DIRECT_DATABASE_URL: 'postgresql://user:password@postgres-host:5432/documenso'
+  NEXT_PRIVATE_SMTP_USERNAME: 'your-smtp-username'
+  NEXT_PRIVATE_SMTP_PASSWORD: 'your-smtp-password'
+  NEXT_PRIVATE_SIGNING_PASSPHRASE: 'your-certificate-passphrase'
+```
+
+<Callout type="warn">
+  Never commit Secret manifests with real values to version control. Use a secrets management tool
+  like Sealed Secrets, External Secrets Operator, or your cloud provider's secret manager.
+</Callout>
+
+Apply the secret:
+
+```bash
+kubectl apply -f secret.yaml
+```
+
+## ConfigMap
+
+Store non-sensitive configuration in a ConfigMap:
+
+```yaml
+# configmap.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: documenso-config
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+data:
+  NEXT_PUBLIC_WEBAPP_URL: 'https://sign.example.com'
+  NEXT_PRIVATE_SMTP_TRANSPORT: 'smtp-auth'
+  NEXT_PRIVATE_SMTP_HOST: 'smtp.example.com'
+  NEXT_PRIVATE_SMTP_PORT: '587'
+  NEXT_PRIVATE_SMTP_FROM_NAME: 'Documenso'
+  NEXT_PRIVATE_SMTP_FROM_ADDRESS: 'noreply@example.com'
+  NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: '/opt/documenso/cert.p12'
+  NEXT_PUBLIC_UPLOAD_TRANSPORT: 'database'
+  DOCUMENSO_DISABLE_TELEMETRY: 'false'
+```
+
+Apply the ConfigMap:
+
+```bash
+kubectl apply -f configmap.yaml
+```
+
+## Deployment
+
+Create the Documenso Deployment:
+
+```yaml
+# deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+    app.kubernetes.io/component: web
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: documenso
+      app.kubernetes.io/component: web
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: documenso
+        app.kubernetes.io/component: web
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: documenso
+          image: documenso/documenso:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: documenso-config
+            - secretRef:
+                name: documenso-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 30
+          volumeMounts:
+            - name: signing-cert
+              mountPath: /opt/documenso/cert.p12
+              subPath: cert.p12
+              readOnly: true
+      volumes:
+        - name: signing-cert
+          secret:
+            secretName: documenso-signing-cert
+            items:
+              - key: cert.p12
+                path: cert.p12
+```
+
+<Callout type="info">
+  Pin to a specific image tag (e.g., `documenso/documenso:1.5.0`) in production instead of `latest`
+  to ensure predictable deployments.
+</Callout>
+
+### Signing Certificate Secret
+
+Create a secret for the signing certificate:
+
+```bash
+kubectl create secret generic documenso-signing-cert \
+  --namespace documenso \
+  --from-file=cert.p12=/path/to/your/cert.p12
+```
+
+Apply the deployment:
+
+```bash
+kubectl apply -f deployment.yaml
+```
+
+## Service
+
+Expose the Deployment with a Service:
+
+```yaml
+# service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+    app.kubernetes.io/component: web
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+      protocol: TCP
+  selector:
+    app.kubernetes.io/name: documenso
+    app.kubernetes.io/component: web
+```
+
+Apply the service:
+
+```bash
+kubectl apply -f service.yaml
+```
+
+## Ingress Configuration
+
+### nginx-ingress
+
+```yaml
+# ingress-nginx.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '50m'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '300'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '300'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - sign.example.com
+      secretName: documenso-tls
+  rules:
+    - host: sign.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: documenso
+                port:
+                  name: http
+```
+
+### Traefik
+
+```yaml
+# ingress-traefik.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: websecure
+    traefik.ingress.kubernetes.io/router.tls: 'true'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+spec:
+  ingressClassName: traefik
+  tls:
+    - hosts:
+        - sign.example.com
+      secretName: documenso-tls
+  rules:
+    - host: sign.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: documenso
+                port:
+                  name: http
+```
+
+Apply your chosen ingress:
+
+```bash
+kubectl apply -f ingress-nginx.yaml
+# or
+kubectl apply -f ingress-traefik.yaml
+```
+
+## Database Options
+
+### External Database (Recommended)
+
+For production, use a managed PostgreSQL service:
+
+- AWS RDS for PostgreSQL
+- Google Cloud SQL
+- Azure Database for PostgreSQL
+- DigitalOcean Managed Databases
+
+Update `NEXT_PRIVATE_DATABASE_URL` in your Secret with the connection string from your provider.
+
+### In-Cluster PostgreSQL
+
+For testing or development, deploy PostgreSQL in the cluster:
+
+```yaml
+# postgres.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-pvc
+  namespace: documenso
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: postgres-secrets
+  namespace: documenso
+type: Opaque
+stringData:
+  POSTGRES_USER: documenso
+  POSTGRES_PASSWORD: your-secure-password
+  POSTGRES_DB: documenso
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+  namespace: documenso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+          resources:
+            requests:
+              cpu: 250m
+              memory: 256Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres
+  namespace: documenso
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app.kubernetes.io/name: postgres
+```
+
+<Callout type="warn">
+  In-cluster PostgreSQL is not recommended for production. It lacks high availability, automated
+  backups, and point-in-time recovery that managed services provide.
+</Callout>
+
+Update your Documenso secret to use the in-cluster database:
+
+```yaml
+NEXT_PRIVATE_DATABASE_URL: 'postgresql://documenso:your-secure-password@postgres.documenso.svc.cluster.local:5432/documenso'
+NEXT_PRIVATE_DIRECT_DATABASE_URL: 'postgresql://documenso:your-secure-password@postgres.documenso.svc.cluster.local:5432/documenso'
+```
+
+## Persistent Storage
+
+Documenso stores documents in the database by default. For high-volume deployments, configure S3-compatible storage.
+
+### S3 Configuration
+
+Add these to your ConfigMap and Secret:
+
+```yaml
+# In configmap.yaml, add:
+data:
+  NEXT_PUBLIC_UPLOAD_TRANSPORT: 's3'
+
+# In secret.yaml, add:
+stringData:
+  NEXT_PRIVATE_UPLOAD_ENDPOINT: 'https://s3.amazonaws.com'
+  NEXT_PRIVATE_UPLOAD_REGION: 'us-east-1'
+  NEXT_PRIVATE_UPLOAD_BUCKET: 'your-documenso-bucket'
+  NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID: 'your-access-key'
+  NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY: 'your-secret-key'
+```
+
+See [Storage Configuration](/docs/self-hosting/configuration/storage) for detailed S3 setup instructions.
+
+## Health Probes
+
+The deployment includes three probe types:
+
+| Probe Type       | Purpose                          | Endpoint      |
+| ---------------- | -------------------------------- | ------------- |
+| `livenessProbe`  | Restart container if unhealthy   | `/api/health` |
+| `readinessProbe` | Remove from service if not ready | `/api/health` |
+| `startupProbe`   | Allow time for initial startup   | `/api/health` |
+
+### Probe Configuration
+
+Adjust probe timings based on your environment:
+
+```yaml
+livenessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 30 # Wait before first check
+  periodSeconds: 10 # Check every 10 seconds
+  timeoutSeconds: 5 # Timeout for each check
+  failureThreshold: 3 # Restart after 3 failures
+
+readinessProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 3
+
+startupProbe:
+  httpGet:
+    path: /api/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 5
+  timeoutSeconds: 3
+  failureThreshold: 30 # 30 * 5s = 150s max startup time
+```
+
+## Scaling
+
+### Horizontal Pod Autoscaler (HPA)
+
+Scale Documenso based on CPU and memory utilization:
+
+```yaml
+# hpa.yaml
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: documenso
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80
+  behavior:
+    scaleDown:
+      stabilizationWindowSeconds: 300
+      policies:
+        - type: Percent
+          value: 10
+          periodSeconds: 60
+    scaleUp:
+      stabilizationWindowSeconds: 0
+      policies:
+        - type: Percent
+          value: 100
+          periodSeconds: 15
+        - type: Pods
+          value: 4
+          periodSeconds: 15
+      selectPolicy: Max
+```
+
+Apply the HPA:
+
+```bash
+kubectl apply -f hpa.yaml
+```
+
+### Pod Disruption Budget
+
+Ensure availability during cluster maintenance:
+
+```yaml
+# pdb.yaml
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: documenso
+      app.kubernetes.io/component: web
+```
+
+Apply the PDB:
+
+```bash
+kubectl apply -f pdb.yaml
+```
+
+## Monitoring
+
+### Prometheus ServiceMonitor
+
+If using Prometheus Operator:
+
+```yaml
+# servicemonitor.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: documenso
+  namespace: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: documenso
+  endpoints:
+    - port: http
+      path: /api/health
+      interval: 30s
+```
+
+### Resource Monitoring
+
+Check current resource usage:
+
+```bash
+# Pod resource usage
+kubectl top pods -n documenso
+
+# Deployment status
+kubectl get deployment documenso -n documenso
+
+# HPA status
+kubectl get hpa documenso -n documenso
+```
+
+### Logging
+
+View application logs:
+
+```bash
+# All pods
+kubectl logs -l app.kubernetes.io/name=documenso -n documenso -f
+
+# Specific pod
+kubectl logs documenso-<pod-id> -n documenso -f
+
+# Previous container (if restarted)
+kubectl logs documenso-<pod-id> -n documenso --previous
+```
+
+## Troubleshooting
+
+### Pods not starting
+
+Check pod status and events:
+
+```bash
+kubectl get pods -n documenso
+kubectl describe pod <pod-name> -n documenso
+```
+
+Common causes:
+
+- **ImagePullBackOff**: Check image name and registry access
+- **CrashLoopBackOff**: Check logs for application errors
+- **Pending**: Check resource requests and node capacity
+
+### Database connection errors
+
+Verify the database is accessible from the cluster:
+
+```bash
+kubectl run postgres-test --rm -it --image=postgres:15-alpine -n documenso -- \
+  psql "postgresql://user:password@host:5432/database" -c "SELECT 1"
+```
+
+### Ingress not working
+
+Check Ingress status and events:
+
+```bash
+kubectl get ingress -n documenso
+kubectl describe ingress documenso -n documenso
+```
+
+Verify the Ingress controller is running:
+
+```bash
+kubectl get pods -n ingress-nginx
+# or
+kubectl get pods -n traefik
+```
+
+### Certificate errors
+
+Check the signing certificate secret:
+
+```bash
+kubectl get secret documenso-signing-cert -n documenso -o yaml
+```
+
+Verify the certificate is mounted correctly:
+
+```bash
+kubectl exec -it <pod-name> -n documenso -- ls -la /opt/documenso/
+```
+
+### Health check failures
+
+Test the health endpoint directly:
+
+```bash
+kubectl port-forward svc/documenso 3000:80 -n documenso
+curl http://localhost:3000/api/health
+```
+
+### Rolling back a deployment
+
+If a deployment fails, rollback to the previous version:
+
+```bash
+# View rollout history
+kubectl rollout history deployment/documenso -n documenso
+
+# Rollback to previous version
+kubectl rollout undo deployment/documenso -n documenso
+
+# Rollback to specific revision
+kubectl rollout undo deployment/documenso -n documenso --to-revision=2
+```
+
+## Complete Example
+
+Here's a combined manifest for reference:
+
+```yaml
+# documenso-complete.yaml
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: documenso
+  labels:
+    app.kubernetes.io/name: documenso
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: documenso-config
+  namespace: documenso
+data:
+  NEXT_PUBLIC_WEBAPP_URL: 'https://sign.example.com'
+  NEXT_PRIVATE_SMTP_TRANSPORT: 'smtp-auth'
+  NEXT_PRIVATE_SMTP_HOST: 'smtp.example.com'
+  NEXT_PRIVATE_SMTP_PORT: '587'
+  NEXT_PRIVATE_SMTP_FROM_NAME: 'Documenso'
+  NEXT_PRIVATE_SMTP_FROM_ADDRESS: 'noreply@example.com'
+  NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH: '/opt/documenso/cert.p12'
+  NEXT_PUBLIC_UPLOAD_TRANSPORT: 'database'
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: documenso-secrets
+  namespace: documenso
+type: Opaque
+stringData:
+  NEXTAUTH_SECRET: 'REPLACE_WITH_GENERATED_SECRET'
+  NEXT_PRIVATE_ENCRYPTION_KEY: 'REPLACE_WITH_32_CHAR_KEY'
+  NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY: 'REPLACE_WITH_32_CHAR_KEY'
+  NEXT_PRIVATE_DATABASE_URL: 'postgresql://user:password@host:5432/documenso'
+  NEXT_PRIVATE_DIRECT_DATABASE_URL: 'postgresql://user:password@host:5432/documenso'
+  NEXT_PRIVATE_SMTP_USERNAME: 'smtp-user'
+  NEXT_PRIVATE_SMTP_PASSWORD: 'smtp-password'
+  NEXT_PRIVATE_SIGNING_PASSPHRASE: 'cert-passphrase'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: documenso
+  namespace: documenso
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: documenso
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: documenso
+    spec:
+      securityContext:
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: documenso
+          image: documenso/documenso:latest
+          ports:
+            - name: http
+              containerPort: 3000
+          envFrom:
+            - configMapRef:
+                name: documenso-config
+            - secretRef:
+                name: documenso-secrets
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            failureThreshold: 30
+          volumeMounts:
+            - name: signing-cert
+              mountPath: /opt/documenso/cert.p12
+              subPath: cert.p12
+              readOnly: true
+      volumes:
+        - name: signing-cert
+          secret:
+            secretName: documenso-signing-cert
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: documenso
+  namespace: documenso
+spec:
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+  selector:
+    app.kubernetes.io/name: documenso
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: documenso
+  namespace: documenso
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: '50m'
+    cert-manager.io/cluster-issuer: 'letsencrypt-prod'
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - sign.example.com
+      secretName: documenso-tls
+  rules:
+    - host: sign.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: documenso
+                port:
+                  name: http
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: documenso
+  namespace: documenso
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: documenso
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: documenso
+  namespace: documenso
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: documenso
+```
+
+## Next Steps
+
+- [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Set up document signing
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Configure S3-compatible storage
+- [Email Configuration](/docs/self-hosting/configuration/email) - Configure SMTP providers
+- [Backups](/docs/self-hosting/maintenance/backups) - Database backup strategies
+- [Upgrades](/docs/self-hosting/maintenance/upgrades) - Upgrade procedures

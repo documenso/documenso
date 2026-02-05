@@ -1,0 +1,58 @@
+---
+title: Webhooks
+description: Receive real-time notifications when documents are signed, completed, or updated.
+---
+
+# Webhooks
+
+Webhooks notify your application when events occur in Documenso, such as when a document is signed or completed.
+
+## How Webhooks Work
+
+1. You configure a webhook URL in Documenso
+2. When an event occurs, Documenso sends an HTTP POST to your URL
+3. Your application processes the event and responds with 200 OK
+
+---
+
+## Getting Started
+
+<Cards>
+  <Card
+    title="Setup"
+    description="Configure webhook endpoints."
+    href="/docs/developers/webhooks/setup"
+  />
+  <Card
+    title="Events"
+    description="Available webhook event types."
+    href="/docs/developers/webhooks/events"
+  />
+  <Card
+    title="Verification"
+    description="Verify webhook signatures for security."
+    href="/docs/developers/webhooks/verification"
+  />
+</Cards>
+
+---
+
+## Example Payload
+
+```json
+{
+  "event": "document.completed",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "documentId": 123,
+    "title": "Contract",
+    "status": "COMPLETED"
+  }
+}
+```
+
+---
+
+## See Also
+
+- [Document Lifecycle](/docs/concepts/document-lifecycle) - Understanding document statuses

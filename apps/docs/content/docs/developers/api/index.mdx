@@ -1,0 +1,67 @@
+---
+title: API Reference
+description: Complete reference for the Documenso REST API.
+---
+
+# API Reference
+
+The Documenso API lets you create, send, and manage documents programmatically.
+
+## Base URL
+
+```
+https://app.documenso.com/api/v2
+```
+
+For self-hosted instances, replace with your instance URL.
+
+---
+
+## Authentication
+
+All requests require an API key in the `Authorization` header:
+
+```
+Authorization: API-KEY your_api_key
+```
+
+See [Authentication](/docs/developers/getting-started/authentication) for details.
+
+---
+
+## Endpoints
+
+<Cards>
+  <Card
+    title="Documents"
+    description="Create, retrieve, update, and delete documents."
+    href="/docs/developers/api/documents"
+  />
+  <Card
+    title="Recipients"
+    description="Manage document recipients and signers."
+    href="/docs/developers/api/recipients"
+  />
+  <Card
+    title="Fields"
+    description="Add and configure signature fields."
+    href="/docs/developers/api/fields"
+  />
+  <Card
+    title="Templates"
+    description="Work with document templates."
+    href="/docs/developers/api/templates"
+  />
+  <Card
+    title="Teams"
+    description="Manage teams and team members."
+    href="/docs/developers/api/teams"
+  />
+</Cards>
+
+---
+
+## See Also
+
+- [First API Call](/docs/developers/getting-started/first-api-call) - Quick start example
+- [Webhooks](/docs/developers/webhooks) - Get notified about document events

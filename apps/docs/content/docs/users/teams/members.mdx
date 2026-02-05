@@ -1,0 +1,119 @@
+---
+title: Team Members
+description: Invite and manage team members
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Teams allow you to collaborate with others in your organization. This page covers team member roles, adding and removing members, and managing access.
+
+## Team member roles
+
+Teams have three roles with different permission levels:
+
+| Role        | Permissions                                                                                            |
+| ----------- | ------------------------------------------------------------------------------------------------------ |
+| **Admin**   | Full access to team settings, can manage all members, delete the team, and control document visibility |
+| **Manager** | Can manage team members (at or below their role level) and access manager-level documents              |
+| **Member**  | Can access team documents shared with all members                                                      |
+
+### Role hierarchy
+
+Higher roles can manage users at or below their level:
+
+- Admins can add, update, or remove Admins, Managers, and Members
+- Managers can add, update, or remove Managers and Members
+- Members cannot manage other team members
+
+## Adding team members
+
+Before adding someone to a team, they must first be a member of your organization.
+
+### Add existing organization members
+
+1. Go to your team settings
+2. Click **Add members**
+3. Select organization members from the list
+4. Click **Next**
+5. Assign a team role to each member
+6. Click **Add Members**
+
+<Callout type="info">
+  If you can't find someone in the member list, they need to be invited to your organization first.
+  You can do this directly from the team member dialog.
+</Callout>
+
+### Invite new organization members
+
+If the person you want to add isn't in your organization yet:
+
+1. In the **Add members** dialog, click **Invite them to the organisation first**
+2. Enter their email address and organization role
+3. Click **Send invite**
+4. Once they accept, return to add them to the team
+
+## Accepting invitations
+
+When someone invites you to an organization:
+
+1. Check your email for the invitation
+2. Click the link in the email
+3. Sign in or create a Documenso account
+4. Accept the invitation
+
+After joining the organization, a team admin or manager can add you to specific teams.
+
+## Changing member roles
+
+To change a team member's role:
+
+1. Go to your team settings
+2. Find the member in the list
+3. Click the actions menu (three dots)
+4. Select **Update role**
+5. Choose the new role
+6. Click **Update**
+
+<Callout type="warn">
+  You can only change roles for members at or below your own role level. For example, managers
+  cannot change an admin's role.
+</Callout>
+
+## Removing members
+
+To remove someone from a team:
+
+1. Go to your team settings
+2. Find the member in the list
+3. Click the actions menu (three dots)
+4. Select **Remove from team**
+5. Confirm the removal
+
+Removing someone from a team doesn't remove them from the organization. They can be re-added to the team later.
+
+## Member limits
+
+The number of members you can have depends on your plan:
+
+- **Free plans** have limited team members
+- **Paid plans** include a set number of seats
+- **Seat-based plans** charge per member
+
+When you invite new members on a seat-based plan, your billing automatically adjusts. Check your organization's billing settings to see your current member count and limits.
+
+## Document visibility
+
+Team documents have visibility settings that control which roles can access them:
+
+| Visibility            | Who can see         |
+| --------------------- | ------------------- |
+| **Admin only**        | Only team admins    |
+| **Manager and above** | Admins and managers |
+| **Everyone**          | All team members    |
+
+Admins can set default visibility for new documents in team settings.
+
+## Next steps
+
+- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your team
+- [Create a Team](/docs/users/teams/create-team) - Set up additional teams

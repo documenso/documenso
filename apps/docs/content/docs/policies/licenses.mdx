@@ -1,0 +1,157 @@
+---
+title: Licenses
+description: Community and Enterprise licensing options
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+Documenso uses a dual licensing model. The software is available under the open-source AGPL-3.0 license (Community Edition) and a commercial license (Enterprise Edition). This page helps you understand both options and choose the right one for your use case.
+
+## Dual Licensing Overview
+
+| Aspect                        | Community Edition                                         | Enterprise Edition                                            |
+| ----------------------------- | --------------------------------------------------------- | ------------------------------------------------------------- |
+| **License**                   | AGPL-3.0                                                  | Commercial                                                    |
+| **Cost**                      | Free                                                      | Paid                                                          |
+| **Source code disclosure**    | Required for network use                                  | Not required                                                  |
+| **Proprietary modifications** | Not permitted                                             | Permitted                                                     |
+| **Support**                   | Community                                                 | Dedicated                                                     |
+| **Use case**                  | Open-source projects, internal tools with AGPL compliance | Commercial products, SaaS offerings, proprietary integrations |
+
+## Community Edition (AGPL-3.0)
+
+The Community Edition is licensed under the GNU Affero General Public License version 3 (AGPL-3.0). This is a copyleft license that preserves software freedom.
+
+### What AGPL-3.0 Allows
+
+- Use Documenso for any purpose, including commercial use
+- Access, study, and modify the source code
+- Distribute copies of the original or modified software
+- Self-host Documenso on your own infrastructure
+
+### What AGPL-3.0 Requires
+
+The AGPL-3.0 has specific requirements that apply when you modify or distribute Documenso:
+
+**Source Code Disclosure**: If you modify Documenso and make it available over a network, you must provide access to the complete source code of your modified version under AGPL-3.0.
+
+**Attribution**: You must keep all copyright notices intact and include a copy of the AGPL-3.0 license with any distribution.
+
+**Same License**: Derivative works must be licensed under AGPL-3.0.
+
+<Callout type="info">
+  The "network clause" is the distinguishing feature of AGPL-3.0. Unlike GPL-3.0, AGPL-3.0 treats
+  network access as distribution. If users interact with your modified Documenso instance over a
+  network, you must provide them access to the source code.
+</Callout>
+
+### When to Use Community Edition
+
+The Community Edition is appropriate when you:
+
+- Are building an open-source project
+- Can comply with AGPL-3.0 requirements
+- Use Documenso internally without modifications
+- Want to contribute to the open-source ecosystem
+- Do not need to keep modifications proprietary
+
+See [Community Edition](/docs/policies/community-edition) for complete details.
+
+## Enterprise Edition (Commercial License)
+
+The Enterprise Edition provides a commercial license that removes the AGPL-3.0 requirements. This allows organizations to use, modify, and integrate Documenso without source code disclosure obligations.
+
+### What the Enterprise License Provides
+
+**No Source Code Disclosure**: Keep your modifications private. You are not required to share changes with users or the public.
+
+**Proprietary Integration**: Integrate Documenso into proprietary products and services without licensing conflicts.
+
+**Commercial Support**: Access to dedicated support channels and SLAs.
+
+**Additional Features**: Enterprise-specific features not available in the Community Edition.
+
+### When to Use Enterprise Edition
+
+The Enterprise Edition is appropriate when you:
+
+- Build commercial products that incorporate Documenso
+- Offer document signing as part of a SaaS platform
+- Cannot or prefer not to open-source your modifications
+- Need to comply with corporate policies that prohibit AGPL software
+- Require dedicated support and SLAs
+
+<Callout type="warn">
+  If you modify Documenso and provide network access to users (internal or external) without
+  complying with AGPL-3.0 source disclosure requirements, you need an Enterprise license.
+</Callout>
+
+See [Enterprise Edition](/docs/policies/enterprise-edition) for complete details and pricing.
+
+## Choosing the Right License
+
+Use this decision tree to determine which license fits your needs:
+
+### Do you modify Documenso?
+
+**No modifications**: Both licenses work. Community Edition is free and sufficient if you run Documenso as-is.
+
+**Yes, with modifications**: Continue to the next question.
+
+### Are your modifications available as open source?
+
+**Yes, under AGPL-3.0**: Community Edition is appropriate. Your modifications must be available to users who access your instance.
+
+**No, modifications are proprietary**: Enterprise Edition is required.
+
+### Are you embedding Documenso in a commercial product?
+
+**Open-source product under AGPL-3.0**: Community Edition is appropriate.
+
+**Proprietary product**: Enterprise Edition is required.
+
+### Internal use only?
+
+Using Documenso internally without providing network access to external users does not trigger AGPL-3.0 distribution requirements. However, if your organization has policies against AGPL software or you make modifications you want to keep private, consider the Enterprise Edition.
+
+## License FAQ
+
+### Can I use the Community Edition for commercial purposes?
+
+Yes. AGPL-3.0 permits commercial use. You must comply with the license terms, including source code disclosure if you modify and distribute or provide network access.
+
+### Does using the Documenso API require a commercial license?
+
+No. Calling the Documenso API from your application does not create a derivative work. Your application remains under your chosen license. However, if you modify Documenso itself and provide network access, AGPL-3.0 requirements apply.
+
+### What counts as a "modification" under AGPL-3.0?
+
+Modifying the source code, forking the repository and making changes, or linking Documenso libraries into your application in a way that creates a combined work. Configuration changes and using Documenso through its API are not modifications.
+
+### Can I white-label Documenso?
+
+You can change branding for your deployment under both licenses. Under AGPL-3.0, you must retain copyright notices and license information in the source code. Under the Enterprise license, you have more flexibility with branding requirements.
+
+### Do signed documents fall under the license?
+
+No. The license applies to the software, not content created with the software. Documents you sign are your property and are not subject to AGPL-3.0.
+
+### What happens if I switch from Community to Enterprise Edition?
+
+Your existing deployments can transition to the Enterprise license. Contact sales@documenso.com to discuss migration.
+
+### Can I contribute to Documenso under the Enterprise license?
+
+Contributions to the main Documenso repository are licensed under AGPL-3.0. The Enterprise license applies only to your private use and modifications.
+
+### Is there a trial for the Enterprise Edition?
+
+Contact sales@documenso.com to discuss evaluation options.
+
+## Related
+
+- [License](/docs/policies/license) - Detailed AGPL-3.0 license explanation
+- [Community Edition](/docs/policies/community-edition) - Open-source edition details
+- [Enterprise Edition](/docs/policies/enterprise-edition) - Commercial license details
+- [Full AGPL-3.0 License Text](https://www.gnu.org/licenses/agpl-3.0.html) - Complete license terms
+- [GitHub Repository](https://github.com/documenso/documenso) - Source code and LICENSE file

@@ -1,0 +1,341 @@
+---
+title: Environment Variables
+description: Complete reference for all configuration options.
+---
+
+# Environment Variables
+
+This page provides a complete reference for all environment variables used to configure a self-hosted Documenso instance.
+
+---
+
+## Required Variables
+
+These variables must be set for Documenso to function:
+
+| Variable                                | Description                                                                                 |
+| --------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32`. |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key for symmetric encryption (minimum 32 characters).                    |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for symmetric encryption (minimum 32 characters).                  |
+| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL of your Documenso instance (e.g., `https://sign.example.com`).                   |
+| `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection URL with connection pooling.                                          |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Email address used as the sender for all outgoing emails.                                   |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`           | Display name for the sender of outgoing emails.                                             |
+
+---
+
+## Server Configuration
+
+| Variable                           | Description                                                   | Default                          |
+| ---------------------------------- | ------------------------------------------------------------- | -------------------------------- |
+| `PORT`                             | Port the server listens on.                                   | `3000`                           |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | Internal URL for the app to request itself (background jobs). | Same as `NEXT_PUBLIC_WEBAPP_URL` |
+
+---
+
+## Database Configuration
+
+Documenso requires PostgreSQL 14 or higher.
+
+| Variable                           | Description                                                                   | Required     |
+| ---------------------------------- | ----------------------------------------------------------------------------- | ------------ |
+| `NEXT_PRIVATE_DATABASE_URL`        | PostgreSQL connection URL. Supports connection pooling (e.g., PgBouncer).     | Yes          |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | Direct PostgreSQL URL for migrations. Required when using connection pooling. | When pooling |
+
+**Connection string format:**
+
+```
+postgres://user:password@host:port/database
+```
+
+For detailed database setup, see [Database Configuration](/docs/self-hosting/configuration/database).
+
+---
+
+## Authentication and Security
+
+### Core Authentication
+
+| Variable                                | Description                                                                |
+| --------------------------------------- | -------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                       | Secret for NextAuth.js session encryption. Must be at least 32 characters. |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary key for encrypting sensitive data. Must be at least 32 characters. |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for key rotation. Must be at least 32 characters. |
+
+### Google OAuth
+
+| Variable                            | Description                 |
+| ----------------------------------- | --------------------------- |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`     | Google OAuth client ID.     |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET` | Google OAuth client secret. |
+
+Callback URL: `https://<your-domain>/api/auth/callback/google`
+
+### Microsoft OAuth
+
+| Variable                               | Description                               |
+| -------------------------------------- | ----------------------------------------- |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_ID`     | Microsoft/Azure AD application client ID. |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET` | Microsoft/Azure AD client secret.         |
+
+Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
+
+### Generic OIDC
+
+| Variable                           | Description                                         | Default |
+| ---------------------------------- | --------------------------------------------------- | ------- |
+| `NEXT_PRIVATE_OIDC_WELL_KNOWN`     | OIDC provider well-known configuration URL.         |         |
+| `NEXT_PRIVATE_OIDC_CLIENT_ID`      | OIDC client ID.                                     |         |
+| `NEXT_PRIVATE_OIDC_CLIENT_SECRET`  | OIDC client secret.                                 |         |
+| `NEXT_PRIVATE_OIDC_PROVIDER_LABEL` | Label displayed on the OIDC sign-in button.         | `OIDC`  |
+| `NEXT_PRIVATE_OIDC_SKIP_VERIFY`    | Skip email verification for OIDC accounts.          | `false` |
+| `NEXT_PRIVATE_OIDC_PROMPT`         | OIDC prompt parameter. Set to empty string to omit. | `login` |
+
+---
+
+## Email Configuration
+
+Documenso supports multiple email transports for sending notifications.
+
+### Transport Selection
+
+| Variable                      | Description                                                            | Default     |
+| ----------------------------- | ---------------------------------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_SMTP_TRANSPORT` | Email transport: `smtp-auth`, `smtp-api`, `resend`, or `mailchannels`. | `smtp-auth` |
+
+### SMTP Authentication (smtp-auth)
+
+| Variable                              | Description                               |
+| ------------------------------------- | ----------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`              | SMTP server hostname.                     |
+| `NEXT_PRIVATE_SMTP_PORT`              | SMTP server port.                         |
+| `NEXT_PRIVATE_SMTP_USERNAME`          | SMTP authentication username.             |
+| `NEXT_PRIVATE_SMTP_PASSWORD`          | SMTP authentication password.             |
+| `NEXT_PRIVATE_SMTP_SECURE`            | Force TLS connection (`true` or `false`). |
+| `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS` | Disable TLS entirely (not recommended).   |
+| `NEXT_PRIVATE_SMTP_SERVICE`           | Nodemailer service name (e.g., `gmail`).  |
+
+### SMTP API (smtp-api)
+
+| Variable                        | Description                           |
+| ------------------------------- | ------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`        | SMTP server hostname.                 |
+| `NEXT_PRIVATE_SMTP_PORT`        | SMTP server port.                     |
+| `NEXT_PRIVATE_SMTP_APIKEY_USER` | API key user for SMTP authentication. |
+| `NEXT_PRIVATE_SMTP_APIKEY`      | API key for SMTP authentication.      |
+
+### Resend
+
+| Variable                      | Description              |
+| ----------------------------- | ------------------------ |
+| `NEXT_PRIVATE_RESEND_API_KEY` | API key from Resend.com. |
+
+### MailChannels
+
+| Variable                                     | Description                                     |
+| -------------------------------------------- | ----------------------------------------------- |
+| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | MailChannels API key.                           |
+| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | Custom MailChannels API endpoint (for proxies). |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | Domain for DKIM signing.                        |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | DKIM selector.                                  |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | DKIM private key.                               |
+
+### Sender Configuration
+
+| Variable                         | Description                      |
+| -------------------------------- | -------------------------------- |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS` | Sender email address (required). |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`    | Sender display name (required).  |
+
+For detailed email setup, see [Email Configuration](/docs/self-hosting/configuration/email).
+
+---
+
+## Storage Configuration
+
+Documenso can store documents in the database or S3-compatible storage.
+
+| Variable                                 | Description                                  | Default    |
+| ---------------------------------------- | -------------------------------------------- | ---------- |
+| `NEXT_PUBLIC_UPLOAD_TRANSPORT`           | Storage backend: `database` or `s3`.         | `database` |
+| `NEXT_PUBLIC_DOCUMENT_SIZE_UPLOAD_LIMIT` | Maximum upload size displayed to users (MB). | `5`        |
+
+### S3 Configuration
+
+Required when `NEXT_PUBLIC_UPLOAD_TRANSPORT` is set to `s3`:
+
+| Variable                                | Description                                     | Default     |
+| --------------------------------------- | ----------------------------------------------- | ----------- |
+| `NEXT_PRIVATE_UPLOAD_BUCKET`            | S3 bucket name.                                 |             |
+| `NEXT_PRIVATE_UPLOAD_REGION`            | S3 region.                                      | `us-east-1` |
+| `NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID`     | S3 access key ID.                               |             |
+| `NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY` | S3 secret access key.                           |             |
+| `NEXT_PRIVATE_UPLOAD_ENDPOINT`          | Custom S3 endpoint for S3-compatible providers. |             |
+| `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE`  | Use path-style URLs instead of virtual hosts.   | `false`     |
+
+### CloudFront Distribution (Optional)
+
+| Variable                                        | Description                      |
+| ----------------------------------------------- | -------------------------------- |
+| `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_DOMAIN`       | CloudFront distribution domain.  |
+| `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_ID`       | CloudFront key pair ID.          |
+| `NEXT_PRIVATE_UPLOAD_DISTRIBUTION_KEY_CONTENTS` | CloudFront private key contents. |
+
+For detailed storage setup, see [Storage Configuration](/docs/self-hosting/configuration/storage).
+
+---
+
+## Signing Certificate Configuration
+
+Documenso requires a certificate to digitally sign documents.
+
+### Transport Selection
+
+| Variable                         | Description                               | Default |
+| -------------------------------- | ----------------------------------------- | ------- |
+| `NEXT_PRIVATE_SIGNING_TRANSPORT` | Signing backend: `local` or `gcloud-hsm`. | `local` |
+
+### Local Signing
+
+| Variable                                   | Description                                                     |
+| ------------------------------------------ | --------------------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`     | Path to the `.p12` certificate file.                            |
+| `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` | Base64-encoded `.p12` file contents (alternative to file path). |
+| `NEXT_PRIVATE_SIGNING_PASSPHRASE`          | Passphrase for the certificate.                                 |
+
+### Google Cloud HSM
+
+| Variable                                                       | Description                                           |
+| -------------------------------------------------------------- | ----------------------------------------------------- |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_KEY_PATH`                     | Google Cloud HSM key path.                            |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_PATH`         | Path to the public certificate file.                  |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_PUBLIC_CRT_FILE_CONTENTS`     | Base64-encoded public certificate.                    |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` | Base64-encoded Google Cloud credentials.              |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_FILE_PATH`         | Path to the certificate chain file.                   |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_CERT_CHAIN_CONTENTS`          | Base64-encoded certificate chain.                     |
+| `NEXT_PRIVATE_SIGNING_GCLOUD_HSM_SECRET_MANAGER_CERT_PATH`     | Google Secret Manager path for certificate retrieval. |
+
+### Signature Options
+
+| Variable                                    | Description                                                  | Default    |
+| ------------------------------------------- | ------------------------------------------------------------ | ---------- |
+| `NEXT_PRIVATE_SIGNING_TIMESTAMP_AUTHORITY`  | Comma-separated timestamp authority URLs for LTV signatures. |            |
+| `NEXT_PUBLIC_SIGNING_CONTACT_INFO`          | Contact info embedded in PDF signatures.                     | Webapp URL |
+| `NEXT_PRIVATE_USE_LEGACY_SIGNING_SUBFILTER` | Use `adbe.pkcs7.detached` instead of `ETSI.CAdES.detached`.  | `false`    |
+
+For detailed certificate setup, see [Signing Certificate](/docs/self-hosting/configuration/signing-certificate).
+
+---
+
+## Feature Flags
+
+| Variable                              | Description                                      | Default |
+| ------------------------------------- | ------------------------------------------------ | ------- |
+| `NEXT_PUBLIC_DISABLE_SIGNUP`          | Disable public user registration.                | `false` |
+| `NEXT_PUBLIC_POSTHOG_KEY`             | PostHog API key for analytics and feature flags. |         |
+| `NEXT_PUBLIC_FEATURE_BILLING_ENABLED` | Enable billing features.                         | `false` |
+
+---
+
+## AI Features
+
+Documenso can use Google Vertex AI for recipient and field detection.
+
+| Variable                   | Description                                     | Default  |
+| -------------------------- | ----------------------------------------------- | -------- |
+| `GOOGLE_VERTEX_PROJECT_ID` | Google Cloud project ID with Vertex AI enabled. |          |
+| `GOOGLE_VERTEX_API_KEY`    | Vertex AI Express API key.                      |          |
+| `GOOGLE_VERTEX_LOCATION`   | Vertex AI region.                               | `global` |
+
+AI features must also be enabled in organization/team settings after configuration.
+
+---
+
+## Background Jobs
+
+| Variable                     | Description                          | Default |
+| ---------------------------- | ------------------------------------ | ------- |
+| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` or `inngest`. | `local` |
+
+### Inngest Configuration
+
+| Variable                         | Description                                   |
+| -------------------------------- | --------------------------------------------- |
+| `NEXT_PRIVATE_INNGEST_EVENT_KEY` | Inngest event key.                            |
+| `INNGEST_EVENT_KEY`              | Alternative Inngest event key.                |
+| `INNGEST_SIGNING_KEY`            | Inngest signing key for webhook verification. |
+| `NEXT_PRIVATE_INNGEST_APP_ID`    | Custom Inngest app ID.                        |
+
+---
+
+## Telemetry
+
+| Variable                      | Description                                   | Default |
+| ----------------------------- | --------------------------------------------- | ------- |
+| `DOCUMENSO_DISABLE_TELEMETRY` | Set to `true` to disable anonymous telemetry. | `false` |
+
+Telemetry collects only: app version, installation ID, and node ID. No personal data is collected.
+
+---
+
+## Debugging and Logging
+
+| Variable                                   | Description                                         |
+| ------------------------------------------ | --------------------------------------------------- |
+| `NEXT_PRIVATE_LOGGER_FILE_PATH`            | File path for log output. Disables stdout when set. |
+| `NEXT_PRIVATE_BROWSERLESS_URL`             | Browserless.io URL for PDF generation.              |
+| `NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS` | Use internal webapp URL in browserless requests.    |
+
+---
+
+## Enterprise Features
+
+| Variable                             | Description                                       |
+| ------------------------------------ | ------------------------------------------------- |
+| `NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY` | License key for enterprise features.              |
+| `NEXT_PRIVATE_STRIPE_API_KEY`        | Stripe API key for billing.                       |
+| `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET` | Stripe webhook secret.                            |
+| `NEXT_PRIVATE_SES_ACCESS_KEY_ID`     | AWS SES access key for email domain verification. |
+| `NEXT_PRIVATE_SES_SECRET_ACCESS_KEY` | AWS SES secret key.                               |
+| `NEXT_PRIVATE_SES_REGION`            | AWS SES region.                                   |
+
+---
+
+## Example .env File
+
+A minimal production configuration:
+
+```bash
+# Required
+NEXTAUTH_SECRET="your-random-secret-at-least-32-chars"
+NEXT_PRIVATE_ENCRYPTION_KEY="your-encryption-key-at-least-32-chars"
+NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY="your-secondary-key-at-least-32-chars"
+NEXT_PUBLIC_WEBAPP_URL="https://sign.example.com"
+
+# Database
+NEXT_PRIVATE_DATABASE_URL="postgres://user:password@localhost:5432/documenso"
+NEXT_PRIVATE_DIRECT_DATABASE_URL="postgres://user:password@localhost:5432/documenso"
+
+# Email
+NEXT_PRIVATE_SMTP_TRANSPORT="smtp-auth"
+NEXT_PRIVATE_SMTP_HOST="smtp.example.com"
+NEXT_PRIVATE_SMTP_PORT=587
+NEXT_PRIVATE_SMTP_USERNAME="your-smtp-user"
+NEXT_PRIVATE_SMTP_PASSWORD="your-smtp-password"
+NEXT_PRIVATE_SMTP_FROM_NAME="Documenso"
+NEXT_PRIVATE_SMTP_FROM_ADDRESS="noreply@example.com"
+
+# Signing (certificate must be configured)
+NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
+```
+
+---
+
+## Next Steps
+
+- [Database Configuration](/docs/self-hosting/configuration/database) - Set up PostgreSQL
+- [Email Configuration](/docs/self-hosting/configuration/email) - Configure email delivery
+- [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up S3 storage
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Configure document signing
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Common configuration issues
