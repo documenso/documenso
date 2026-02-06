@@ -53,6 +53,10 @@ export const FolderGrid = ({ type, parentId }: FolderGridProps) => {
     const rootPath =
       type === FolderType.DOCUMENT ? formatDocumentsPath(team.url) : formatTemplatesPath(team.url);
 
+    if (parentId) {
+      return `${rootPath}/folders?parentId=${parentId}`;
+    }
+
     return `${rootPath}/folders`;
   };
 
