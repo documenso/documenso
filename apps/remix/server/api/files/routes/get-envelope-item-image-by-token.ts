@@ -60,6 +60,7 @@ route.get(
       envelopeItem,
       version,
       pageIndex,
+      cacheStrategy: 'public',
     });
   },
 );

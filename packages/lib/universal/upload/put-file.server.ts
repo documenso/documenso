@@ -79,6 +79,8 @@ export const extractAndStorePdfImages = async (
     pages: pageMetadata,
   } satisfies TDocumentDataMeta);
 
+  // Only update metadata (page dimensions). Never update type, data, or initialData:
+  // DocumentData content is immutable so cache keys (documentDataId) stay valid.
   const updatedDocumentData = await prisma.documentData.update({
     where: { id: documentDataId },
     data: {

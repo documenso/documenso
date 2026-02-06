@@ -9,7 +9,6 @@ import { pdfToImage } from '@documenso/lib/server-only/ai/pdf-to-images';
 import { verifyEmbeddingPresignToken } from '@documenso/lib/server-only/embedding-presign/verify-embedding-presign-token';
 import { getTeamById } from '@documenso/lib/server-only/team/get-team';
 import type { DocumentDataVersion } from '@documenso/lib/types/document-data';
-import { sha256 } from '@documenso/lib/universal/crypto';
 import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { UNSAFE_getS3File } from '@documenso/lib/universal/upload/server-actions';
 import { getEnvelopeItemPageImageS3Key } from '@documenso/lib/utils/envelope-images';
@@ -100,6 +99,7 @@ route.get(
       envelopeItem,
       version,
       pageIndex,
+      cacheStrategy: 'private',
     });
   },
 );
@@ -111,6 +111,15 @@ type HandleEnvelopeItemPageRequestOptions = {
   };
   pageIndex: number;
   version: DocumentDataVersion;
+
+  /**
+   * The type of cache strategy to use.
+   *
+   * For access via tokens, we can use a public cache to allow the CDN to cache it.
+   *
+   * For access via session, we must use a private cache.
+   */
+  cacheStrategy: 'private' | 'public';
 };
 
 export const handleEnvelopeItemPageRequest = async ({
@@ -118,22 +127,14 @@ export const handleEnvelopeItemPageRequest = async ({
   envelopeItem,
   pageIndex,
   version,
+  cacheStrategy,
 }: HandleEnvelopeItemPageRequestOptions) => {
   // Determine which PDF data to use based on version requested.
   const documentDataToUse =
     version === 'current' ? envelopeItem.documentData.data : envelopeItem.documentData.initialData;
 
-  // Generate ETag from document data hash + page index.
-  // Note: This can also be an S3 string.
-  const etag = Buffer.from(sha256(`${documentDataToUse}:${pageIndex}`)).toString('hex');
-
-  c.header('ETag', etag);
-
-  if (c.req.header('If-None-Match') === etag) {
-    return c.body(null, 304);
-  }
-
   c.header('Content-Type', 'image/jpeg');
+  c.header('Cache-Control', `${cacheStrategy}, max-age=31536000, immutable`);
 
   // Return the image if it already exists in S3.
   if (envelopeItem.documentData.type === 'S3_PATH') {
