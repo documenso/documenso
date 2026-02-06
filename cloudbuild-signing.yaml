@@ -38,7 +38,7 @@ steps:
       - '--min-instances=0'
       - '--max-instances=5'
       - '--add-cloudsql-instances=saltwyk-ops:us-west1:saltwyk-ops-db'
-      - '--set-env-vars=NEXT_PUBLIC_WEBAPP_URL=https://signing.saltwyk.com,NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000,PORT=3000'
+      - '--set-env-vars=NEXT_PUBLIC_WEBAPP_URL=https://signing.saltwyk.com,NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000'
       - '--set-secrets=NEXT_PRIVATE_DATABASE_URL=documenso-database-url:latest,NEXT_PRIVATE_DIRECT_DATABASE_URL=documenso-direct-database-url:latest,NEXTAUTH_SECRET=documenso-nextauth-secret:latest,NEXT_PRIVATE_ENCRYPTION_KEY=documenso-encryption-key:latest,NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=documenso-encryption-secondary-key:latest,NEXT_PRIVATE_SMTP_FROM_NAME=documenso-smtp-from-name:latest,NEXT_PRIVATE_SMTP_FROM_ADDRESS=documenso-smtp-from-address:latest,NEXT_PRIVATE_RESEND_API_KEY=resend-api-key:latest'
 
 options:
