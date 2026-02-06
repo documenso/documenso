@@ -38,7 +38,6 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 
 export type DocumentSigningAuthPasskeyProps = {
   actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   open: boolean;
   onOpenChange: (value: boolean) => void;
   onReauthFormSubmit: (values?: TRecipientActionAuth) => Promise<void> | void;
@@ -52,7 +51,6 @@ type TPasskeyAuthFormSchema = z.infer<typeof ZPasskeyAuthFormSchema>;
 
 export const DocumentSigningAuthPasskey = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onReauthFormSubmit,
   open,
   onOpenChange,
@@ -123,15 +121,121 @@ export const DocumentSigningAuthPasskey = ({
     setFormErrorCode(null);
   }, [open, form, preferredPasskeyId]);
 
+  const renderBrowserErrorMessage = () => {
+    switch (recipient.role) {
+      case RecipientRole.SIGNER:
+        if (actionTarget === 'FIELD') {
+          return (
+            <Trans>
+              Your browser does not support passkeys, which is required to sign this field.
+            </Trans>
+          );
+        }
+        return (
+          <Trans>
+            Your browser does not support passkeys, which is required to sign this document.
+          </Trans>
+        );
+
+      case RecipientRole.APPROVER:
+        if (actionTarget === 'FIELD') {
+          return (
+            <Trans>
+              Your browser does not support passkeys, which is required to approve this field.
+            </Trans>
+          );
+        }
+        return (
+          <Trans>
+            Your browser does not support passkeys, which is required to approve this document.
+          </Trans>
+        );
+
+      case RecipientRole.VIEWER:
+        if (actionTarget === 'FIELD') {
+          return (
+            <Trans>
+              Your browser does not support passkeys, which is required to view this field.
+            </Trans>
+          );
+        }
+        return (
+          <Trans>
+            Your browser does not support passkeys, which is required to mark this document as
+            viewed.
+          </Trans>
+        );
+
+      case RecipientRole.CC:
+        if (actionTarget === 'FIELD') {
+          return (
+            <Trans>
+              Your browser does not support passkeys, which is required to view this field.
+            </Trans>
+          );
+        }
+        return (
+          <Trans>
+            Your browser does not support passkeys, which is required to view this document.
+          </Trans>
+        );
+
+      case RecipientRole.ASSISTANT:
+        if (actionTarget === 'FIELD') {
+          return (
+            <Trans>
+              Your browser does not support passkeys, which is required to assist with this field.
+            </Trans>
+          );
+        }
+        return (
+          <Trans>
+            Your browser does not support passkeys, which is required to assist with this document.
+          </Trans>
+        );
+    }
+  };
+
+  const renderSetupMessage = () => {
+    switch (recipient.role) {
+      case RecipientRole.SIGNER:
+        if (actionTarget === 'FIELD') {
+          return <Trans>You need to setup a passkey to sign this field.</Trans>;
+        }
+        return <Trans>You need to setup a passkey to sign this document.</Trans>;
+
+      case RecipientRole.APPROVER:
+        if (actionTarget === 'FIELD') {
+          return <Trans>You need to setup a passkey to approve this field.</Trans>;
+        }
+        return <Trans>You need to setup a passkey to approve this document.</Trans>;
+
+      case RecipientRole.VIEWER:
+        if (actionTarget === 'FIELD') {
+          return <Trans>You need to setup a passkey to view this field.</Trans>;
+        }
+        // Logic preserved: "mark as viewed"
+        return <Trans>You need to setup a passkey to mark this document as viewed.</Trans>;
+
+      case RecipientRole.CC:
+        if (actionTarget === 'FIELD') {
+          return <Trans>You need to setup a passkey to view this field.</Trans>;
+        }
+        return <Trans>You need to setup a passkey to view this document.</Trans>;
+
+      case RecipientRole.ASSISTANT:
+        if (actionTarget === 'FIELD') {
+          return <Trans>You need to setup a passkey to assist with this field.</Trans>;
+        }
+        return <Trans>You need to setup a passkey to assist with this document.</Trans>;
+    }
+  };
+
   if (!browserSupportsWebAuthn()) {
     return (
       <div className="space-y-4">
         <Alert variant="warning">
-          <AlertDescription>
-            {/* Todo: Translate */}
-            Your browser does not support passkeys, which is required to {actionVerb.toLowerCase()}{' '}
-            this {actionTarget.toLowerCase()}.
-          </AlertDescription>
+          <AlertDescription>{renderBrowserErrorMessage()}</AlertDescription>
         </Alert>
 
         <DialogFooter>
@@ -177,12 +281,7 @@ export const DocumentSigningAuthPasskey = ({
     return (
       <div className="space-y-4">
         <Alert variant="warning">
-          <AlertDescription>
-            {/* Todo: Translate */}
-            {recipient.role === RecipientRole.VIEWER && actionTarget === 'DOCUMENT'
-              ? 'You need to setup a passkey to mark this document as viewed.'
-              : `You need to setup a passkey to ${actionVerb.toLowerCase()} this ${actionTarget.toLowerCase()}.`}
-          </AlertDescription>
+          <AlertDescription>{renderSetupMessage()}</AlertDescription>
         </Alert>
 
         <DialogFooter>
@@ -213,7 +312,9 @@ export const DocumentSigningAuthPasskey = ({
               name="passkeyId"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel required>Passkey</FormLabel>
+                  <FormLabel required>
+                    <Trans>Passkey</Trans>
+                  </FormLabel>
 
                   <FormControl>
                     <Select {...field} onValueChange={field.onChange}>
@@ -241,20 +342,24 @@ export const DocumentSigningAuthPasskey = ({
 
             {formErrorCode && (
               <Alert variant="destructive">
-                <AlertTitle>Unauthorized</AlertTitle>
+                <AlertTitle>
+                  <Trans>Unauthorized</Trans>
+                </AlertTitle>
                 <AlertDescription>
-                  We were unable to verify your details. Please try again or contact support
+                  <Trans>
+                    We were unable to verify your details. Please try again or contact support
+                  </Trans>
                 </AlertDescription>
               </Alert>
             )}
 
             <DialogFooter>
               <Button type="button" variant="secondary" onClick={() => onOpenChange(false)}>
-                Cancel
+                <Trans>Cancel</Trans>
               </Button>
 
               <Button type="submit" loading={isCurrentlyAuthenticating}>
-                Sign
+                <Trans>Sign</Trans>
               </Button>
             </DialogFooter>
           </div>
