@@ -494,7 +494,7 @@ const SigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV2Loade
         recipient={recipient}
         user={user}
       >
-        <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
+        <EnvelopeRenderProvider version="current" envelope={envelope} token={recipient.token}>
           <DocumentSigningPageViewV2 />
         </EnvelopeRenderProvider>
       </DocumentSigningAuthProvider>

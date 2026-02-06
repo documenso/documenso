@@ -58,7 +58,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
 
   if (envelope && (envelope.teamId !== team.id || envelope.internalVersion !== 2)) {
     return (
-      <div className="text-foreground flex h-screen w-screen flex-col items-center justify-center gap-2">
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-2 text-foreground">
         <Spinner />
         <Trans>Redirecting</Trans>
       </div>
@@ -67,7 +67,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
 
   if (isLoadingEnvelope) {
     return (
-      <div className="text-foreground flex h-screen w-screen flex-col items-center justify-center gap-2">
+      <div className="flex h-screen w-screen flex-col items-center justify-center gap-2 text-foreground">
         <Spinner />
         <Trans>Loading</Trans>
       </div>
@@ -99,6 +99,7 @@ export default function EnvelopeEditorPage({ params }: Route.ComponentProps) {
   return (
     <EnvelopeEditorProvider initialEnvelope={envelope}>
       <EnvelopeRenderProvider
+        version="current"
         envelope={envelope}
         token={undefined}
         fields={envelope.fields}

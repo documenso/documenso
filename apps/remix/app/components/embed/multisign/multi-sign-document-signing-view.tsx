@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -17,12 +17,12 @@ import type {
 } from '@documenso/trpc/server/field-router/schema';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
 import { FieldToolTip } from '@documenso/ui/components/field/field-tooltip';
+import { PDFViewer } from '@documenso/ui/components/pdf-viewer/pdf-viewer';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
 import { ElementVisible } from '@documenso/ui/primitives/element-visible';
 import { Input } from '@documenso/ui/primitives/input';
 import { Label } from '@documenso/ui/primitives/label';
-import { PDFViewerLazy } from '@documenso/ui/primitives/pdf-viewer/lazy';
 import { SignaturePadDialog } from '@documenso/ui/primitives/signature-pad/signature-pad-dialog';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
@@ -65,6 +65,8 @@ export const MultiSignDocumentSigningView = ({
     useRequiredDocumentSigningContext();
 
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -179,7 +181,11 @@ export const MultiSignDocumentSigningView = ({
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <div id="document-field-portal-root" className="relative h-full w-full overflow-y-auto p-8">
+      <div
+        id="document-field-portal-root"
+        ref={scrollContainerRef}
+        className="relative h-full w-full overflow-y-auto p-8"
+      >
         {match({ isLoading, document })
           .with({ isLoading: true }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
@@ -226,10 +232,11 @@ export const MultiSignDocumentSigningView = ({
                     'md:mx-auto md:max-w-2xl': document.status === DocumentStatus.COMPLETED,
                   })}
                 >
-                  <PDFViewerLazy
+                  <PDFViewer
                     envelopeItem={document.envelopeItems[0]}
                     token={token}
-                    version="signed"
+                    version="current"
+                    scrollParentRef={scrollContainerRef}
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();
