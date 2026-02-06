@@ -1,4 +1,4 @@
 {
   "title": "Deployment",
-  "pages": ["docker", "docker-compose", "railway", "kubernetes"]
+  "pages": ["docker", "docker-compose", "railway", "kubernetes", "manual"]
 }

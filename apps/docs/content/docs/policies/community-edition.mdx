@@ -1,11 +1,9 @@
 ---
 title: Community Edition
-description: Open-source Documenso under AGPL-3.0
+description: The open-source version of Documenso, available under the AGPL-3.0 license. Includes core document signing functionality and can be self-hosted.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
-
-The Community Edition is the open-source version of Documenso, available to everyone under the AGPL-3.0 license. It includes the core document signing functionality and can be self-hosted on your own infrastructure.
 
 ## AGPL-3.0 License Overview
 
@@ -66,6 +64,10 @@ Derivative works must be licensed under AGPL-3.0:
 - Forks must use the same license
 - Modifications cannot be made proprietary
 - Combined works that incorporate Documenso code are subject to AGPL-3.0
+
+### Enterprise Edition Boundary
+
+Features located in the `packages/ee/` directory of the codebase are not licensed under AGPL-3.0 and require an active [Enterprise license](/docs/policies/enterprise-edition) to use. If you are self-hosting the Community Edition, do not enable or use features from the `packages/ee/` folder without an enterprise license.
 
 ## Features Included
 

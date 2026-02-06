@@ -5,10 +5,6 @@ description: System requirements and prerequisites for self-hosting Documenso.
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-# Requirements
-
-Before deploying Documenso, ensure you have the required services and infrastructure. This page covers what you need, what's optional, and what's not supported.
-
 ## What You Need
 
 Documenso requires the following external services:
@@ -74,8 +70,6 @@ These services are not required but improve functionality or scalability:
 | Service               | Purpose                                  |
 | --------------------- | ---------------------------------------- |
 | S3-compatible storage | Store documents externally (recommended) |
-| Redis                 | Background job queues and caching        |
-| Browserless           | PDF generation for certain features      |
 
 ### Document Storage
 
@@ -89,13 +83,11 @@ By default, Documenso stores documents in the PostgreSQL database. For productio
 
 See [Storage Configuration](/docs/self-hosting/configuration/storage) for setup details.
 
-### Redis
+### Background Jobs
 
-Redis enables background job processing and caching. While optional, it improves performance for:
+Documenso processes background jobs (email delivery, document processing) using a PostgreSQL-based queue. No additional services like Redis are required — the job queue is built into the application and uses your existing database.
 
-- Email delivery queues
-- Document processing
-- Session caching
+For high-throughput deployments, Documenso optionally supports [Inngest](https://www.inngest.com/) as an alternative job provider. Set `NEXT_PRIVATE_JOBS_PROVIDER=inngest` and configure `INNGEST_EVENT_KEY` and `INNGEST_SIGNING_KEY`. Most self-hosted instances do not need this.
 
 ---
 
@@ -168,13 +160,14 @@ Before proceeding to deployment, confirm you have:
 
 - [ ] PostgreSQL 14+ database accessible
 - [ ] SMTP credentials or email provider API key
+- [ ] Signing certificate (`.p12`) for document signing — see [Tips](/docs/self-hosting/getting-started/tips)
 - [ ] Domain name for your Documenso instance
 - [ ] SSL certificate (or reverse proxy that handles SSL)
 - [ ] Server meeting minimum hardware requirements
 
 ---
 
-## Next Steps
+## See Also
 
 - [Quick Start](/docs/self-hosting/getting-started/quick-start) - Deploy Documenso with Docker in 5 minutes
 - [Docker Compose](/docs/self-hosting/deployment/docker-compose) - Production setup with Docker Compose

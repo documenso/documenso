@@ -1,11 +1,9 @@
 ---
 title: Send Documents
-description: Send your document for signing and customize email notifications
+description: Send your document for signing, customize email notifications, and manage post-send actions like resending or voiding.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
-
-After adding recipients and placing fields on your document, you can send it for signing. This page covers the sending process, email customization, and post-send actions.
 
 ## Prerequisites
 
@@ -128,6 +126,49 @@ To stop a signing process and remove a document:
 | **Pending**   | Permanently deleted, recipients notified of cancellation |
 | **Completed** | Hidden from your account, recipients keep their copies   |
 
+## Document settings
+
+Access document settings from the **Document Settings** button in the quick actions sidebar of the editor.
+
+### General settings
+
+| Setting                          | Description                                                     |
+| -------------------------------- | --------------------------------------------------------------- |
+| **Language**                     | The language used for emails sent to recipients                 |
+| **Allowed Signature Types**      | Which signature methods recipients can use (draw, type, upload) |
+| **Date Format**                  | The date format used for date fields                            |
+| **Time Zone**                    | The time zone used for date fields                              |
+| **External ID**                  | A custom identifier for integrating with your external systems  |
+| **Redirect URL**                 | Where signers are redirected after completing their actions     |
+| **Document Distribution Method** | Email (sends notifications) or None (generates signing links)   |
+
+### Security settings
+
+Control authentication requirements for accessing and signing the document.
+
+**Document-level access control:**
+
+- **Require account** - The recipient must be signed in to view the document
+- **Require 2FA** - The recipient must use two-factor authentication
+- **None** - The document can be accessed directly via the signing link
+
+**Recipient Authentication** allows you to require additional verification when a recipient signs a signature field:
+
+- **Require passkey** - The recipient must have a passkey configured
+- **Require 2FA** - The recipient must have 2FA enabled
+- **None** - No additional authentication
+
+You can set authentication at the document level and override it per recipient.
+
+<Callout type="info">
+  Recipient Authentication is an Enterprise feature. See the [Enterprise
+  Edition](/docs/policies/enterprise-edition) for details.
+</Callout>
+
+### Attachments
+
+Configure document attachments from the right-hand side of the editor header. Attachments are included with the signed document when it is completed.
+
 ## Distribution without email
 
 If you choose **None** as the distribution method:
@@ -142,8 +183,9 @@ This is useful when you want to:
 - Embed signing links in your own application
 - Control the notification timing yourself
 
-## Next steps
+---
 
-- [Track document progress](/docs/users/documents/send-and-track) - Monitor who has signed
-- [Create templates](/docs/users/templates/create-template) - Save time on documents you send repeatedly
-- [Set up direct links](/docs/users/documents/direct-links) - Let recipients sign without invitations
+## See Also
+
+- [Create Templates](/docs/users/templates/create) - Save time on documents you send repeatedly
+- [Direct Links](/docs/users/documents/direct-links) - Let recipients sign without invitations

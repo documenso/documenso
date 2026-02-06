@@ -1,12 +1,19 @@
 ---
 title: Documents API
-description: Create, retrieve, update, and delete documents.
+description: Create, manage, and send documents for signing via the API.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-The Documents API lets you create, manage, and send documents (called "envelopes" in the API) for signing. Documents are the core resource in Documenso.
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
+
+## Overview
+
+Documents (called "envelopes" in the API) are the core resource in Documenso. You can create documents with recipients and fields, send them for signing, track their status, and retrieve the completed PDFs. Each document contains one or more PDF files, a list of recipients, and the fields they need to fill.
 
 ## Document Object
 
@@ -82,8 +89,6 @@ A document object contains the following properties:
   }
 }
 ```
-
----
 
 ## List Documents
 
@@ -801,7 +806,7 @@ async function getAllPendingDocuments() {
 
 ---
 
-## Related
+## See Also
 
 - [Recipients API](/docs/developers/api/recipients) - Add and manage document recipients
 - [Fields API](/docs/developers/api/fields) - Add signature and form fields

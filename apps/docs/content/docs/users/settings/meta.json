@@ -1,4 +1,4 @@
 {
   "title": "Settings",
-  "pages": ["profile", "security", "branding"]
+  "pages": ["profile", "security", "branding", "email-domains"]
 }

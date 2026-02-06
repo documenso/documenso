@@ -1,6 +1,0 @@
-{
-  "title": "Self-Hosting",
-  "description": "Deploy your own Documenso instance",
-  "root": true,
-  "pages": ["deployments", "configuration"]
-}

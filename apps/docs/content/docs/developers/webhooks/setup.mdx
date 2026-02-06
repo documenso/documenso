@@ -7,6 +7,8 @@ import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+## Overview
+
 Webhooks are HTTP callbacks triggered by specific events in Documenso. When an event occurs (such as a document being signed), Documenso sends an HTTP POST request to your configured URL with details about the event.
 
 Common use cases include:
@@ -217,15 +219,15 @@ When creating a webhook, you can subscribe to one or more events:
 
 | Event | Trigger |
 | ----- | ------- |
-| `document.created` | A new document is created |
-| `document.sent` | A document is sent to recipients |
-| `document.opened` | A recipient opens the document |
-| `document.signed` | A recipient signs the document |
-| `document.completed` | All recipients have signed the document |
-| `document.rejected` | A recipient rejects the document |
-| `document.cancelled` | The document owner cancels the document |
+| `DOCUMENT_CREATED` | A new document is created |
+| `DOCUMENT_SENT` | A document is sent to recipients |
+| `DOCUMENT_OPENED` | A recipient opens the document |
+| `DOCUMENT_SIGNED` | A recipient signs the document |
+| `DOCUMENT_COMPLETED` | All recipients have signed the document |
+| `DOCUMENT_REJECTED` | A recipient rejects the document |
+| `DOCUMENT_CANCELLED` | The document owner cancels the document |
 
-You can subscribe to all events or select specific ones based on your needs. For example, if you only need to know when documents are fully signed, subscribe only to `document.completed`.
+You can subscribe to all events or select specific ones based on your needs. For example, if you only need to know when documents are fully signed, subscribe only to `DOCUMENT_COMPLETED`.
 
 See [Webhook Events](/docs/developers/webhooks/events) for detailed payload information for each event type.
 
@@ -309,7 +311,7 @@ After 5 failed attempts, the webhook is marked as failed and no further automati
 ## Security Best Practices
 
 1. **Use HTTPS**: Always use HTTPS endpoints in production
-2. **Verify signatures**: Use a webhook secret and verify the `X-Documenso-Signature` header (see [Verification](/docs/developers/webhooks/verification))
+2. **Verify signatures**: Use a webhook secret and verify the `X-Documenso-Secret` header (see [Verification](/docs/developers/webhooks/verification))
 3. **Validate payloads**: Validate incoming data before processing
 4. **Respond quickly**: Return 200 OK immediately, then process asynchronously
 5. **Idempotency**: Handle duplicate deliveries gracefully

@@ -1,13 +1,9 @@
 ---
-title: Database
-description: PostgreSQL setup and configuration.
+title: Database Configuration
+description: Configure PostgreSQL connection strings, pooling, SSL, migrations, and performance tuning for your Documenso deployment.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
-
-# Database Configuration
-
-Documenso uses PostgreSQL as its database. This guide covers connection configuration, pooling, SSL setup, migrations, and performance tuning.
 
 ## Supported Databases
 
@@ -510,7 +506,9 @@ GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;
 GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;
 ```
 
-## Next Steps
+---
+
+## See Also
 
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
 - [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up document storage

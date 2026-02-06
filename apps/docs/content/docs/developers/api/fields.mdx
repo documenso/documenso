@@ -1,12 +1,15 @@
 ---
 title: Fields API
-description: Add signature and form fields to documents via API
+description: Add signature and form fields to documents via API.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-Fields define where recipients sign, initial, or enter information on a document. Each field is assigned to a specific recipient and positioned on a page of the document.
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
 
 ## Field Object
 
@@ -76,7 +79,7 @@ Fields define where recipients sign, initial, or enter information on a document
 Retrieve a single field by ID.
 
 ```
-GET /document/field/{fieldId}
+GET /envelope/field/{fieldId}
 ```
 
 ### Path Parameters
@@ -90,14 +93,14 @@ GET /document/field/{fieldId}
 <Tabs items={['curl', 'TypeScript']}>
 <Tab value="curl">
 ```bash
-curl -X GET "https://app.documenso.com/api/v2/document/field/456" \
+curl -X GET "https://app.documenso.com/api/v2/envelope/field/456" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx"
 ```
 </Tab>
 <Tab value="TypeScript">
 ```typescript
 const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/456',
+  'https://app.documenso.com/api/v2/envelope/field/456',
   {
     method: 'GET',
     headers: {
@@ -119,112 +122,13 @@ Returns the field object.
 
 ---
 
-## Create Field
+## Create Fields
 
-Add a single field to a document.
-
-```
-
-POST /document/field/create
-
-````
-
-### Request Body
-
-| Field       | Type   | Required | Description                          |
-| ----------- | ------ | -------- | ------------------------------------ |
-| `documentId`| number | Yes      | The document ID                      |
-| `field`     | object | Yes      | Field configuration (see below)      |
-
-### Field Configuration
-
-| Field         | Type   | Required | Description                              |
-| ------------- | ------ | -------- | ---------------------------------------- |
-| `type`        | string | Yes      | Field type (e.g., `SIGNATURE`, `TEXT`)   |
-| `recipientId` | number | Yes      | ID of the recipient for this field       |
-| `pageNumber`  | number | Yes      | Page number (1-indexed)                  |
-| `pageX`       | number | Yes      | X position as percentage (0-100)         |
-| `pageY`       | number | Yes      | Y position as percentage (0-100)         |
-| `width`       | number | Yes      | Width as percentage (minimum 1)          |
-| `height`      | number | Yes      | Height as percentage (minimum 1)         |
-| `fieldMeta`   | object | No       | Type-specific options                    |
-
-### Code Examples
-
-<Tabs items={['curl', 'TypeScript']}>
-<Tab value="curl">
-```bash
-curl -X POST "https://app.documenso.com/api/v2/document/field/create" \
-  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "documentId": 123,
-    "field": {
-      "type": "SIGNATURE",
-      "recipientId": 456,
-      "pageNumber": 1,
-      "pageX": 10,
-      "pageY": 80,
-      "width": 30,
-      "height": 5,
-      "fieldMeta": {
-        "type": "signature",
-        "required": true
-      }
-    }
-  }'
-````
-
-</Tab>
-<Tab value="TypeScript">
-```typescript
-const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/create',
-  {
-    method: 'POST',
-    headers: {
-      Authorization: 'api_xxxxxxxxxxxxxxxx',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      documentId: 123,
-      field: {
-        type: 'SIGNATURE',
-        recipientId: 456,
-        pageNumber: 1,
-        pageX: 10,
-        pageY: 80,
-        width: 30,
-        height: 5,
-        fieldMeta: {
-          type: 'signature',
-          required: true,
-        },
-      },
-    }),
-  }
-);
-
-const field = await response.json();
-console.log('Created field:', field.id);
-
-```
-</Tab>
-</Tabs>
-
-### Response
-
-Returns the created field object.
-
----
-
-## Create Multiple Fields
-
-Add multiple fields to a document in a single request.
+Add one or more fields to a document.
 
 ```
 
-POST /document/field/create-many
+POST /envelope/field/create-many
 
 ````
 
@@ -240,7 +144,7 @@ POST /document/field/create-many
 <Tabs items={['curl', 'TypeScript']}>
 <Tab value="curl">
 ```bash
-curl -X POST "https://app.documenso.com/api/v2/document/field/create-many" \
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/create-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -287,7 +191,7 @@ curl -X POST "https://app.documenso.com/api/v2/document/field/create-many" \
 <Tab value="TypeScript">
 ```typescript
 const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/create-many',
+  'https://app.documenso.com/api/v2/envelope/field/create-many',
   {
     method: 'POST',
     headers: {
@@ -383,120 +287,29 @@ console.log(`Created ${fields.length} fields`);
 
 ---
 
-## Update Field
+## Update Fields
 
-Update a single field's properties.
+Update one or more fields in a single request.
 
 ```
-POST /document/field/update
+
+POST /envelope/field/update-many
+
 ```
 
 ### Request Body
-
-| Field        | Type   | Required | Description       |
-| ------------ | ------ | -------- | ----------------- |
-| `documentId` | number | Yes      | The document ID   |
-| `field`      | object | Yes      | Field update data |
-
-### Field Update Data
 
 | Field        | Type   | Required | Description                   |
 | ------------ | ------ | -------- | ----------------------------- |
-| `id`         | number | Yes      | The field ID to update        |
-| `type`       | string | Yes      | Field type                    |
-| `pageNumber` | number | No       | New page number               |
-| `pageX`      | number | No       | New X position                |
-| `pageY`      | number | No       | New Y position                |
-| `width`      | number | No       | New width                     |
-| `height`     | number | No       | New height                    |
-| `fieldMeta`  | object | No       | Updated type-specific options |
+| `documentId` | number | Yes      | The document ID               |
+| `fields`     | array  | Yes      | Array of field update objects |
 
 ### Code Examples
 
 <Tabs items={['curl', 'TypeScript']}>
 <Tab value="curl">
 ```bash
-curl -X POST "https://app.documenso.com/api/v2/document/field/update" \
-  -H "Authorization: api_xxxxxxxxxxxxxxxx" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "documentId": 123,
-    "field": {
-      "id": 456,
-      "type": "TEXT",
-      "pageX": 20,
-      "pageY": 75,
-      "fieldMeta": {
-        "type": "text",
-        "label": "Updated Label",
-        "required": true
-      }
-    }
-  }'
-```
-</Tab>
-<Tab value="TypeScript">
-```typescript
-const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/update',
-  {
-    method: 'POST',
-    headers: {
-      Authorization: 'api_xxxxxxxxxxxxxxxx',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      documentId: 123,
-      field: {
-        id: 456,
-        type: 'TEXT',
-        pageX: 20,
-        pageY: 75,
-        fieldMeta: {
-          type: 'text',
-          label: 'Updated Label',
-          required: true,
-        },
-      },
-    }),
-  }
-);
-
-const updatedField = await response.json();
-
-```
-</Tab>
-</Tabs>
-
-### Response
-
-Returns the updated field object.
-
----
-
-## Update Multiple Fields
-
-Update multiple fields in a single request.
-
-```
-
-POST /document/field/update-many
-
-````
-
-### Request Body
-
-| Field       | Type   | Required | Description                     |
-| ----------- | ------ | -------- | ------------------------------- |
-| `documentId`| number | Yes      | The document ID                 |
-| `fields`    | array  | Yes      | Array of field update objects   |
-
-### Code Examples
-
-<Tabs items={['curl', 'TypeScript']}>
-<Tab value="curl">
-```bash
-curl -X POST "https://app.documenso.com/api/v2/document/field/update-many" \
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/update-many" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -520,7 +333,7 @@ curl -X POST "https://app.documenso.com/api/v2/document/field/update-many" \
 <Tab value="TypeScript">
 ```typescript
 const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/update-many',
+  'https://app.documenso.com/api/v2/envelope/field/update-many',
   {
     method: 'POST',
     headers: {
@@ -561,7 +374,7 @@ const { fields } = await response.json();
 Remove a field from a document.
 
 ```
-POST /document/field/delete
+POST /envelope/field/delete
 ```
 
 ### Request Body
@@ -575,7 +388,7 @@ POST /document/field/delete
 <Tabs items={['curl', 'TypeScript']}>
 <Tab value="curl">
 ```bash
-curl -X POST "https://app.documenso.com/api/v2/document/field/delete" \
+curl -X POST "https://app.documenso.com/api/v2/envelope/field/delete" \
   -H "Authorization: api_xxxxxxxxxxxxxxxx" \
   -H "Content-Type: application/json" \
   -d '{
@@ -586,7 +399,7 @@ curl -X POST "https://app.documenso.com/api/v2/document/field/delete" \
 <Tab value="TypeScript">
 ```typescript
 const response = await fetch(
-  'https://app.documenso.com/api/v2/document/field/delete',
+  'https://app.documenso.com/api/v2/envelope/field/delete',
   {
     method: 'POST',
     headers: {
@@ -654,6 +467,16 @@ const field = {
   height: 8, // 8% of page height
 };
 ```
+
+---
+
+## Placeholder-Based Field Positioning
+
+Instead of specifying exact coordinates, you can position fields using placeholder text embedded in your PDF. Include placeholder markers such as `{{signature, r1}}` in your document, and Documenso will create fields at those locations when the document is uploaded.
+
+This approach is useful when generating PDFs programmatically or using templates with consistent layouts.
+
+See the [PDF Placeholders](/docs/users/documents/pdf-placeholders) guide for the full placeholder format reference, including supported field types, recipient identifiers, and field options.
 
 ---
 
@@ -880,7 +703,7 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
     },
   ];
 
-  const response = await fetch('https://app.documenso.com/api/v2/document/field/create-many', {
+  const response = await fetch('https://app.documenso.com/api/v2/envelope/field/create-many', {
     method: 'POST',
     headers: {
       Authorization: 'api_xxxxxxxxxxxxxxxx',
@@ -911,7 +734,7 @@ async function addSignatureBlock(documentId: number, recipientId: number) {
 
 ---
 
-## Related
+## See Also
 
 - [Documents API](/docs/developers/api/documents) - Create and manage documents
 - [Recipients API](/docs/developers/api/recipients) - Add signers to documents

@@ -1,11 +1,9 @@
 ---
 title: Enterprise Edition
-description: Commercial license for organizations
+description: Commercial license that removes AGPL-3.0 source code disclosure requirements, allowing organizations to integrate Documenso into proprietary products.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
-
-The Enterprise Edition is a commercial license for Documenso that removes the AGPL-3.0 source code disclosure requirements. It allows organizations to use, modify, and integrate Documenso into proprietary products without open-source obligations.
 
 ## When You Need Enterprise
 
@@ -47,14 +45,33 @@ The Enterprise license grants:
 
 Enterprise licenses include access to features not available in the Community Edition:
 
-- Single Sign-On (SSO) with SAML and OIDC providers
-- Advanced audit logging
+- Stripe Billing Module
+- Organisation Authentication Portal (SSO with SAML and OIDC)
+- Document Action Reauthentication (Passkeys and 2FA)
+- 21 CFR Part 11 Compliance
+- Email Domains (custom sender addresses)
+- Embed Authoring
+- Embed Authoring White Label
 - Custom signing certificates
 - Priority feature requests
 
 <Callout type="info">
-  Feature availability varies by plan. Contact sales@documenso.com for current feature details.
+  The canonical list of enterprise-gated features is maintained in the `packages/ee/FEATURES` file
+  in the codebase. Features in the `packages/ee/` directory require an active Enterprise license.
 </Callout>
+
+### License Setup
+
+1. Acquire a license by contacting [sales](https://documen.so/enterprise)
+2. Access your license key at [license.documenso.com](https://license.documenso.com)
+3. Set the environment variable:
+
+```bash
+NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY="your-license-key-here"
+```
+
+4. Restart your Documenso instance
+5. Verify the license is active in the **Admin Panel** under the **Stats** section
 
 ## Licensing Terms
 
@@ -93,7 +110,7 @@ Enterprise pricing is based on:
 
 ### Pricing Tiers
 
-Contact sales@documenso.com for current pricing. Enterprise agreements typically include:
+Contact [sales](https://documen.so/enterprise) for current pricing. Enterprise agreements typically include:
 
 - Annual subscription billing
 - Volume discounts for larger deployments
@@ -141,7 +158,7 @@ Determine if you need the Enterprise Edition:
 
 Reach out to discuss your needs:
 
-- Email: sales@documenso.com
+- Email: [sales@documenso.com](https://documen.so/enterprise)
 - Include: Organization name, use case, estimated user count, deployment preference (self-hosted or cloud)
 
 ### 3. Evaluation
@@ -171,7 +188,7 @@ Once terms are agreed:
 
 ### Can I switch from Community to Enterprise?
 
-Yes. Your existing deployment can transition to the Enterprise license. Contact sales@documenso.com to discuss migration.
+Yes. Your existing deployment can transition to the Enterprise license. Contact [sales](https://documen.so/enterprise) to discuss migration.
 
 ### Does the Enterprise license include Documenso Cloud?
 
@@ -187,7 +204,7 @@ No. Enterprise-only features require an active Enterprise license. The Community
 
 ### Is there a trial period?
 
-Contact sales@documenso.com to discuss evaluation options for your organization.
+Contact [sales](https://documen.so/enterprise) to discuss evaluation options for your organization.
 
 ## Related
 

@@ -1,12 +1,10 @@
 ---
 title: Common Workflows
-description: End-to-end examples for common integration patterns
+description: Complete code examples for common document signing workflows, with error handling that can be adapted for your specific use case.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
-
-This page provides complete code examples for common document signing workflows. Each example includes error handling and can be adapted for your specific use case.
 
 ## Workflow 1: Send a Document for Signature
 
@@ -650,7 +648,6 @@ type WebhookPayload = {
 
 app.post('/webhooks/documenso', (req, res) => {
   // Verify webhook signature
-  const signature = req.headers['x-documenso-signature'] as string;
   const secret = req.headers['x-documenso-secret'] as string;
 
   if (secret !== WEBHOOK_SECRET) {
@@ -706,33 +703,16 @@ app.listen(3000, () => console.log('Webhook server running on port 3000'));
 
 ### Step 2: Register the Webhook
 
-Register your endpoint in the Documenso dashboard under Team Settings > Webhooks, or use the API:
+Register your endpoint in the Documenso dashboard:
 
-```typescript
-const registerWebhook = async () => {
-  const response = await fetch(`${BASE_URL}/webhook/create`, {
-    method: 'POST',
-    headers: {
-      Authorization: API_TOKEN,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      webhookUrl: 'https://your-app.com/webhooks/documenso',
-      eventTriggers: [
-        'DOCUMENT_SENT',
-        'DOCUMENT_OPENED',
-        'DOCUMENT_SIGNED',
-        'DOCUMENT_COMPLETED',
-        'DOCUMENT_REJECTED',
-      ],
-      secret: WEBHOOK_SECRET,
-    }),
-  });
+1. Go to **Team Settings** > **Webhooks**
+2. Click **Create Webhook**
+3. Enter your webhook URL (e.g., `https://your-app.com/webhooks/documenso`)
+4. Select which events to subscribe to: `DOCUMENT_SENT`, `DOCUMENT_OPENED`, `DOCUMENT_SIGNED`, `DOCUMENT_COMPLETED`, `DOCUMENT_REJECTED`
+5. Enter your webhook secret (the same value stored in `DOCUMENSO_WEBHOOK_SECRET`)
+6. Click **Create Webhook**
 
-  const webhook = await response.json();
-  console.log('Webhook registered:', webhook.id);
-};
-```
+See [Webhook Setup](/docs/developers/webhooks/setup) for detailed instructions.
 
 ### Step 3: Poll as Fallback
 
@@ -1097,7 +1077,7 @@ function validatePdfFile(buffer: Buffer, maxSizeMb = 10) {
 
 ---
 
-## Related
+## See Also
 
 - [API Reference](https://openapi.documenso.com/) - Full endpoint documentation
 - [Documents API](/docs/developers/api/documents) - Document operations

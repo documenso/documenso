@@ -6,6 +6,8 @@ description: Verify webhook signatures for security.
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
+## Overview
+
 Verifying webhook requests ensures that incoming payloads originate from Documenso and have not been tampered with. Without verification, attackers could forge requests to your endpoint and trigger unintended actions.
 
 ## How Documenso Signs Webhooks
@@ -267,7 +269,7 @@ app.post('/webhooks/documenso', webhookLimiter, (req, res) => {
 });
 ```
 
-## Related
+## See Also
 
 - [Webhook Setup](/docs/developers/webhooks/setup) - Configure webhook endpoints and secrets
 - [Webhook Events](/docs/developers/webhooks/events) - Event types and payload structure

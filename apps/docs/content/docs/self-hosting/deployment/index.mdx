@@ -3,23 +3,17 @@ title: Deployment
 description: Deploy Documenso using Docker, Docker Compose, Railway, or Kubernetes.
 ---
 
-# Deployment
-
-Choose a deployment method based on your needs.
-
-| Method                                                         | Best For                      | Difficulty |
-| -------------------------------------------------------------- | ----------------------------- | ---------- |
-| [Docker](/docs/self-hosting/deployment/docker)                 | Development, testing          | Easy       |
-| [Docker Compose](/docs/self-hosting/deployment/docker-compose) | Production, small teams       | Easy       |
-| [Railway](/docs/self-hosting/deployment/railway)               | Quick deployment, managed     | Very Easy  |
-| [Kubernetes](/docs/self-hosting/deployment/kubernetes)         | Enterprise, high availability | Advanced   |
-
----
+| Method                                                         | Best For                            | Difficulty |
+| -------------------------------------------------------------- | ----------------------------------- | ---------- |
+| [Docker](/docs/self-hosting/deployment/docker)                 | Single container, external database | Easy       |
+| [Docker Compose](/docs/self-hosting/deployment/docker-compose) | Self-contained setup, small teams   | Easy       |
+| [Railway](/docs/self-hosting/deployment/railway)               | Quick deployment, managed           | Very Easy  |
+| [Kubernetes](/docs/self-hosting/deployment/kubernetes)         | Enterprise, high availability       | Advanced   |
 
 <Cards>
   <Card
     title="Docker"
-    description="Single container deployment."
+    description="Single container with external database."
     href="/docs/self-hosting/deployment/docker"
   />
   <Card
@@ -38,8 +32,6 @@ Choose a deployment method based on your needs.
     href="/docs/self-hosting/deployment/kubernetes"
   />
 </Cards>
-
----
 
 ## See Also
 

@@ -1,11 +1,9 @@
 ---
 title: Field Types
-description: Signatures, text, dates, checkboxes, and more.
+description: Placeholder types for capturing signatures, text, dates, and selections during signing.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
-
-Fields are placeholders you add to documents that recipients fill in during signing. Each field type serves a specific purpose, from capturing signatures to collecting text input.
 
 ## Field Types Overview
 
@@ -144,6 +142,14 @@ The text field accepts free-form text input from recipients. Use this for any in
 | Line height     | Spacing between lines of text              |
 | Letter spacing  | Spacing between characters                 |
 
+### Rules
+
+- A field cannot be both required and read-only at the same time
+- A read-only field must have a default text value (it cannot be empty)
+- The field is inserted automatically into the document if there is a default text value
+- The text field character count cannot exceed the character limit
+- The signer cannot modify a read-only field
+
 ### Common Use Cases
 
 - Address input
@@ -169,6 +175,15 @@ The number field accepts numeric input with optional validation constraints.
 | Number format  | Display format for the number                |
 | Text alignment | Left, center, or right alignment             |
 
+### Rules
+
+- The value must be a number
+- A field cannot be both required and read-only at the same time
+- A read-only field must have a default number value
+- If a default number and a maximum value are set, the default must be less than the maximum
+- If a default number and a minimum value are set, the default must be greater than the minimum
+- The value must match the number format if a number format is set
+
 ### Common Use Cases
 
 - Quantities
@@ -190,6 +205,14 @@ The radio field presents a list of options where the recipient can select exactl
 | Options           | List of selectable values                |
 | Default selection | Pre-selected option                      |
 | Direction         | Vertical or horizontal layout            |
+
+### Rules
+
+- A field cannot be both required and read-only at the same time
+- A read-only field must have at least one option
+- The field auto-signs if there is a default value
+- The signer cannot select a value not in the options list
+- Only one option can be selected at a time
 
 ### Common Use Cases
 
@@ -216,6 +239,14 @@ The checkbox field presents a list of options where the recipient can select mul
 | Validation rule    | Rules for minimum/maximum selections        |
 | Direction          | Vertical or horizontal layout               |
 
+### Rules
+
+- A field cannot be both required and read-only at the same time
+- A read-only field must have at least one checked option
+- The field auto-signs if there are default values
+- The validation rule enforces selection counts: "At least", "At most", or "Exactly" a specified number of options
+- The signer cannot select a value not in the options list
+
 ### Common Use Cases
 
 - Terms and conditions acceptance
@@ -238,6 +269,14 @@ The dropdown field presents a list of options in a collapsible menu. Recipients 
 | Label         | Display text shown above the field       |
 | Options       | List of selectable values                |
 | Default value | Pre-selected option                      |
+
+### Rules
+
+- A field cannot be both required and read-only at the same time
+- A read-only field must have a default value
+- The default value must be one of the options
+- The field auto-signs if there is a default value
+- The signer cannot select a value not in the options list
 
 ### Common Use Cases
 
@@ -267,8 +306,6 @@ Fields validate input based on their type and configuration:
 - **Checkbox fields** can enforce a minimum or maximum number of selections
 
 If validation fails, the recipient sees an error message and must correct the input before proceeding.
-
----
 
 ## Related
 

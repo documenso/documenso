@@ -1,39 +1,224 @@
 ---
 title: Embedding
-description: Embed document signing experiences directly in your application.
+description: Embed document signing experiences directly in your application using official SDKs.
 ---
 
-# Embedding
+import { Callout } from 'fumadocs-ui/components/callout';
 
-Embed Documenso's signing experience into your application for a seamless user experience.
+Documenso provides official embedding SDKs for all popular JavaScript frameworks. Install the package for your framework and embed document signing with a few lines of code.
 
-## Embedding Options
+## Availability
+
+Embedding is available on **Teams Plan** and above, as well as for **Early Adopters** within a team (Early Adopters can create a team for free).
+
+The **Platform Plan** adds enhanced customization:
+
+- Custom CSS and styling variables
+- Dark mode controls
+- Removal of Documenso branding
+
+---
+
+## How It Works
+
+There are two ways to embed signing, each using a different component and token type.
+
+### Direct Templates
+
+Direct templates are evergreen - each time a user completes signing, a new document is created from the template. This is the recommended approach for most use cases.
+
+Use the `EmbedDirectTemplate` component with a template token:
+
+```jsx
+import { EmbedDirectTemplate } from '@documenso/embed-react';
+
+<EmbedDirectTemplate
+  token="your-template-token"
+  onDocumentCompleted={(data) => {
+    console.log('Signed:', data.documentId);
+  }}
+/>;
+```
+
+### Signing Tokens
+
+For advanced integrations where you create documents via the API, you can embed the signing experience for a specific recipient using their signing token.
+
+Use the `EmbedSignDocument` component with the recipient's token:
+
+```jsx
+import { EmbedSignDocument } from '@documenso/embed-react';
+
+<EmbedSignDocument
+  token="recipient-signing-token"
+  onDocumentCompleted={(data) => {
+    console.log('Signed:', data.documentId);
+  }}
+/>;
+```
+
+<Callout type="info">
+  For most use cases, direct templates are the way to go. Use signing tokens when you need
+  programmatic control over document creation via the API.
+</Callout>
+
+---
+
+## Getting Your Token
+
+### Direct Template Token
+
+1. Navigate to your team's templates in Documenso
+
+![Team Templates](/embedding/team-templates.png)
+
+2. Click on a direct link template to copy its URL. The token is the last segment of the URL.
+
+For example, `https://app.documenso.com/d/-WoSwWVT-fYOERS2MI37k` has the token `-WoSwWVT-fYOERS2MI37k`.
+
+If your template is not a direct link template yet, select **Direct Link** from the three-dot menu on the templates table to enable it.
+
+![Enable Direct Link Template](/embedding/enable-direct-link.png)
+
+### Signing Token
+
+Signing tokens are returned in API responses when distributing a document. You can also get one manually by hovering over a recipient's avatar on a document you own and clicking their email.
+
+![Copy Recipient Token](/embedding/copy-recipient-token.png)
+
+---
+
+## Framework SDKs
+
+Pick your framework to get started:
+
+<Cards>
+  <Card
+    title="React"
+    description="@documenso/embed-react"
+    href="/docs/developers/embedding/sdks/react"
+  />
+  <Card title="Vue" description="@documenso/embed-vue" href="/docs/developers/embedding/sdks/vue" />
+  <Card
+    title="Svelte"
+    description="@documenso/embed-svelte"
+    href="/docs/developers/embedding/sdks/svelte"
+  />
+  <Card
+    title="Angular"
+    description="@documenso/embed-angular"
+    href="/docs/developers/embedding/sdks/angular"
+  />
+  <Card
+    title="Solid"
+    description="@documenso/embed-solid"
+    href="/docs/developers/embedding/sdks/solid"
+  />
+  <Card
+    title="Preact"
+    description="@documenso/embed-preact"
+    href="/docs/developers/embedding/sdks/preact"
+  />
+</Cards>
+
+A [Web Components](https://developer.mozilla.org/en-US/docs/Web/API/Web_components) SDK (`@documenso/embed-webcomponent`) is also available for use outside of JavaScript frameworks. It works in any environment that supports custom elements.
+
+If you prefer not to use any SDK, you can embed signing using [Direct Links](/docs/developers/embedding/direct-links) with a plain iframe or redirect.
+
+---
+
+## Props
+
+### EmbedDirectTemplate
+
+| Prop                  | Type       | Description                                                      |
+| --------------------- | ---------- | ---------------------------------------------------------------- |
+| `token`               | `string`   | **Required.** The direct template token.                         |
+| `host`                | `string`   | Documenso instance URL. Defaults to `https://app.documenso.com`. |
+| `name`                | `string`   | Pre-fill the signer's name.                                      |
+| `lockName`            | `boolean`  | Prevent the signer from changing their name.                     |
+| `email`               | `string`   | Pre-fill the signer's email.                                     |
+| `lockEmail`           | `boolean`  | Prevent the signer from changing their email.                    |
+| `externalId`          | `string`   | Your reference ID, stored with the created document.             |
+| `css`                 | `string`   | Custom CSS string (Platform Plan).                               |
+| `cssVars`             | `object`   | CSS variable overrides for theming (Platform Plan).              |
+| `darkModeDisabled`    | `boolean`  | Disable dark mode in the embed (Platform Plan).                  |
+| `onDocumentReady`     | `function` | Called when the document is loaded and ready.                    |
+| `onDocumentCompleted` | `function` | Called when signing is completed.                                |
+| `onDocumentError`     | `function` | Called when an error occurs.                                     |
+| `onFieldSigned`       | `function` | Called when a field is signed.                                   |
+| `onFieldUnsigned`     | `function` | Called when a field value is cleared.                            |
+
+### EmbedSignDocument
+
+| Prop                  | Type       | Description                                                      |
+| --------------------- | ---------- | ---------------------------------------------------------------- |
+| `token`               | `string`   | **Required.** The recipient's signing token.                     |
+| `host`                | `string`   | Documenso instance URL. Defaults to `https://app.documenso.com`. |
+| `name`                | `string`   | Pre-fill the signer's name.                                      |
+| `lockName`            | `boolean`  | Prevent the signer from changing their name.                     |
+| `onDocumentReady`     | `function` | Called when the document is loaded and ready.                    |
+| `onDocumentCompleted` | `function` | Called when signing is completed.                                |
+| `onDocumentError`     | `function` | Called when an error occurs.                                     |
+
+---
+
+## Event Callbacks
+
+### onDocumentCompleted
+
+Receives an object with:
+
+| Field         | Type     | Description                    |
+| ------------- | -------- | ------------------------------ |
+| `token`       | `string` | The token used for signing.    |
+| `documentId`  | `number` | The ID of the signed document. |
+| `recipientId` | `number` | The ID of the recipient.       |
+
+### onFieldSigned
+
+Receives an object with:
+
+| Field      | Type      | Description                                  |
+| ---------- | --------- | -------------------------------------------- |
+| `fieldId`  | `number`  | The ID of the field.                         |
+| `value`    | `string`  | The field value.                             |
+| `isBase64` | `boolean` | Whether the value is a base64 encoded image. |
+
+### onFieldUnsigned
+
+Receives an object with:
+
+| Field     | Type     | Description          |
+| --------- | -------- | -------------------- |
+| `fieldId` | `number` | The ID of the field. |
+
+---
+
+## More
 
 <Cards>
   <Card
     title="Direct Links"
-    description="Use signing URLs in your application."
+    description="Embed with iframes or redirects, no SDK required."
     href="/docs/developers/embedding/direct-links"
   />
   <Card
-    title="React Components"
-    description="Embed with React components."
-    href="/docs/developers/embedding/react"
+    title="CSS Variables"
+    description="Customize colors, spacing, and theming."
+    href="/docs/developers/embedding/css-variables"
+  />
+  <Card
+    title="Authoring"
+    description="Embed document and template creation."
+    href="/docs/developers/embedding/authoring"
   />
 </Cards>
 
 ---
 
-## Which Option to Choose?
-
-| Option           | Best For                      | Complexity |
-| ---------------- | ----------------------------- | ---------- |
-| Direct Links     | Simple redirects, email links | Low        |
-| React Components | Full integration, custom UI   | Medium     |
-
----
-
 ## See Also
 
-- [Documents API](/docs/developers/api/documents) - Create documents to embed
-- [Signing Workflow](/docs/concepts/signing-workflow) - The signing experience
+- [Documents API](/docs/developers/api/documents) - Create documents programmatically
+- [Templates API](/docs/developers/api/templates) - Manage templates via API
+- [Webhooks](/docs/developers/webhooks) - Receive server-side signing notifications

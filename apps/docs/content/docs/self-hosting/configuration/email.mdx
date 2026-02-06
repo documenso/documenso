@@ -5,10 +5,6 @@ description: Configure email delivery for notifications and document signing inv
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-# Email Configuration
-
-Email delivery is essential for Documenso. The platform sends emails for document signing invitations, completion notifications, password resets, and team management. Without properly configured email, recipients cannot receive signing requests.
-
 ## Supported Email Transports
 
 Documenso supports four email transport methods:
@@ -421,7 +417,9 @@ Start with `p=none` to monitor, then move to stricter policies once deliverabili
 2. Keep `NEXT_PRIVATE_SMTP_SECURE="false"` for port 587 (STARTTLS)
 3. As a last resort, set `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS="true"` (not recommended for production)
 
-## Next Steps
+---
+
+## See Also
 
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
 - [Storage Configuration](/docs/self-hosting/configuration/storage) - Set up document storage

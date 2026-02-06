@@ -1,12 +1,12 @@
 ---
 title: Signing Certificate
-description: Configure the certificate used for digital signatures
+description: Configure the X.509 signing certificate used for digital signatures in self-hosted Documenso.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# Signing Certificate
+## Overview
 
 When a document is completed in Documenso, it is digitally signed using an X.509 certificate. This cryptographic signature provides:
 
@@ -547,7 +547,9 @@ Error: Could not load the default credentials
 2. Check the service account has `cloudkms.signerVerifier` role
 3. Verify the base64 encoding of the service account JSON
 
-## Next Steps
+---
+
+## See Also
 
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Complete configuration reference
 - [Docker Deployment](/docs/self-hosting/deployment/docker) - Deploy with Docker

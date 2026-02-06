@@ -6,6 +6,8 @@ description: Build reusable document templates for contracts, agreements, and ot
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
+## Overview
+
 Templates are reusable document configurations that save you from recreating the same setup every time you send a similar document. A template stores your PDF, recipient roles, field placements, and settings so you can generate new documents with a few clicks.
 
 Use templates when you:
@@ -14,8 +16,6 @@ Use templates when you:
 - Need consistent field placement across documents
 - Want to pre-configure recipients and signing workflows
 - Plan to use [direct links](/docs/users/documents/direct-links) for public signing
-
----
 
 ## Create a Template from Scratch
 
@@ -72,35 +72,6 @@ Click **Save Template** to finish. Your template appears in the Templates list, 
 
 ---
 
-## Convert a Document to a Template
-
-If you've already set up a document with recipients and fields, you can save it as a template instead of starting over.
-
-<Steps>
-<Step>
-### Open the document
-
-Go to **Documents** and find the draft document you want to convert. Click to open it in the editor.
-
-<Callout type="info">
-  You can only convert draft documents to templates. Documents that have already been sent cannot be
-  converted.
-</Callout>
-
-</Step>
-
-<Step>
-### Convert to template
-
-Click the three-dot menu in the document editor and select **Convert to template**.
-
-The document, recipients, and all field placements are copied to a new template.
-
-</Step>
-</Steps>
-
----
-
 ## Placeholder Recipients
 
 Templates often need placeholder recipients - people whose actual email addresses you won't know until you use the template. For example, a sales contract template might have:
@@ -116,7 +87,7 @@ Use any email format that's clearly a placeholder:
 - `signer1@example.com`
 - `recipient@documenso.com`
 
-When you [use the template](/docs/users/templates/use-template), you'll replace these placeholders with actual recipient emails.
+When you [use the template](/docs/users/templates/use), you'll replace these placeholders with actual recipient emails.
 
 ### When to use real emails
 
@@ -238,12 +209,8 @@ To delete a template:
 
 ---
 
-## Next Steps
+## See Also
 
-Now that you have a template:
-
-![Using a template](/templates/documenso-use-template.webp)
-
-- [Use a Template](/docs/users/templates/use-template) - Create documents from your template
+- [Use a Template](/docs/users/templates/use) - Create documents from your template
 - [Direct Links](/docs/users/documents/direct-links) - Share a signing link without knowing recipient emails
 - [API: Templates](/docs/developers/api/templates) - Create and use templates programmatically

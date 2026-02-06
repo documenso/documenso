@@ -1,4 +1,0 @@
-{
-  "title": "Public API",
-  "pages": ["authentication", "reference", "rate-limits", "versioning"]
-}

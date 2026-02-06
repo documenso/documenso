@@ -1,27 +1,21 @@
 ---
 title: Environment Variables
-description: Complete reference for all configuration options.
----
-
-# Environment Variables
-
-This page provides a complete reference for all environment variables used to configure a self-hosted Documenso instance.
-
+description: Complete reference for all environment variables used to configure a self-hosted Documenso instance.
 ---
 
 ## Required Variables
 
 These variables must be set for Documenso to function:
 
-| Variable                                | Description                                                                                 |
-| --------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `NEXTAUTH_SECRET`                       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32`. |
-| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary encryption key for symmetric encryption (minimum 32 characters).                    |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for symmetric encryption (minimum 32 characters).                  |
-| `NEXT_PUBLIC_WEBAPP_URL`                | Public URL of your Documenso instance (e.g., `https://sign.example.com`).                   |
-| `NEXT_PRIVATE_DATABASE_URL`             | PostgreSQL connection URL with connection pooling.                                          |
-| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | Email address used as the sender for all outgoing emails.                                   |
-| `NEXT_PRIVATE_SMTP_FROM_NAME`           | Display name for the sender of outgoing emails.                                             |
+| Variable                                | Default | Description                                                                                 |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                       | -       | Secret key for NextAuth.js encryption and signing. Generate with `openssl rand -base64 32`. |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | -       | Primary encryption key for symmetric encryption (minimum 32 characters).                    |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | -       | Secondary encryption key for symmetric encryption (minimum 32 characters).                  |
+| `NEXT_PUBLIC_WEBAPP_URL`                | -       | Public URL of your Documenso instance (e.g., `https://sign.example.com`).                   |
+| `NEXT_PRIVATE_DATABASE_URL`             | -       | PostgreSQL connection URL with connection pooling.                                          |
+| `NEXT_PRIVATE_SMTP_FROM_ADDRESS`        | -       | Email address used as the sender for all outgoing emails.                                   |
+| `NEXT_PRIVATE_SMTP_FROM_NAME`           | -       | Display name for the sender of outgoing emails.                                             |
 
 ---
 
@@ -38,10 +32,10 @@ These variables must be set for Documenso to function:
 
 Documenso requires PostgreSQL 14 or higher.
 
-| Variable                           | Description                                                                   | Required     |
-| ---------------------------------- | ----------------------------------------------------------------------------- | ------------ |
-| `NEXT_PRIVATE_DATABASE_URL`        | PostgreSQL connection URL. Supports connection pooling (e.g., PgBouncer).     | Yes          |
-| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | Direct PostgreSQL URL for migrations. Required when using connection pooling. | When pooling |
+| Variable                           | Required     | Default                     | Description                                                               |
+| ---------------------------------- | ------------ | --------------------------- | ------------------------------------------------------------------------- |
+| `NEXT_PRIVATE_DATABASE_URL`        | Yes          | -                           | PostgreSQL connection URL. Supports connection pooling (e.g., PgBouncer). |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | When pooling | `NEXT_PRIVATE_DATABASE_URL` | Direct PostgreSQL URL for migrations.                                     |
 
 **Connection string format:**
 
@@ -57,40 +51,40 @@ For detailed database setup, see [Database Configuration](/docs/self-hosting/con
 
 ### Core Authentication
 
-| Variable                                | Description                                                                |
-| --------------------------------------- | -------------------------------------------------------------------------- |
-| `NEXTAUTH_SECRET`                       | Secret for NextAuth.js session encryption. Must be at least 32 characters. |
-| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Primary key for encrypting sensitive data. Must be at least 32 characters. |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Secondary encryption key for key rotation. Must be at least 32 characters. |
+| Variable                                | Required | Default | Description                                                                |
+| --------------------------------------- | -------- | ------- | -------------------------------------------------------------------------- |
+| `NEXTAUTH_SECRET`                       | Yes      | -       | Secret for NextAuth.js session encryption. Must be at least 32 characters. |
+| `NEXT_PRIVATE_ENCRYPTION_KEY`           | Yes      | -       | Primary key for encrypting sensitive data. Must be at least 32 characters. |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Yes      | -       | Secondary encryption key for key rotation. Must be at least 32 characters. |
 
 ### Google OAuth
 
-| Variable                            | Description                 |
-| ----------------------------------- | --------------------------- |
-| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`     | Google OAuth client ID.     |
-| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET` | Google OAuth client secret. |
+| Variable                            | Required | Default | Description                 |
+| ----------------------------------- | -------- | ------- | --------------------------- |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_ID`     | No       | -       | Google OAuth client ID.     |
+| `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET` | No       | -       | Google OAuth client secret. |
 
 Callback URL: `https://<your-domain>/api/auth/callback/google`
 
 ### Microsoft OAuth
 
-| Variable                               | Description                               |
-| -------------------------------------- | ----------------------------------------- |
-| `NEXT_PRIVATE_MICROSOFT_CLIENT_ID`     | Microsoft/Azure AD application client ID. |
-| `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET` | Microsoft/Azure AD client secret.         |
+| Variable                               | Required | Default | Description                               |
+| -------------------------------------- | -------- | ------- | ----------------------------------------- |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_ID`     | No       | -       | Microsoft/Azure AD application client ID. |
+| `NEXT_PRIVATE_MICROSOFT_CLIENT_SECRET` | No       | -       | Microsoft/Azure AD client secret.         |
 
 Callback URL: `https://<your-domain>/api/auth/callback/microsoft`
 
 ### Generic OIDC
 
-| Variable                           | Description                                         | Default |
-| ---------------------------------- | --------------------------------------------------- | ------- |
-| `NEXT_PRIVATE_OIDC_WELL_KNOWN`     | OIDC provider well-known configuration URL.         |         |
-| `NEXT_PRIVATE_OIDC_CLIENT_ID`      | OIDC client ID.                                     |         |
-| `NEXT_PRIVATE_OIDC_CLIENT_SECRET`  | OIDC client secret.                                 |         |
-| `NEXT_PRIVATE_OIDC_PROVIDER_LABEL` | Label displayed on the OIDC sign-in button.         | `OIDC`  |
-| `NEXT_PRIVATE_OIDC_SKIP_VERIFY`    | Skip email verification for OIDC accounts.          | `false` |
-| `NEXT_PRIVATE_OIDC_PROMPT`         | OIDC prompt parameter. Set to empty string to omit. | `login` |
+| Variable                           | Default | Description                                         |
+| ---------------------------------- | ------- | --------------------------------------------------- |
+| `NEXT_PRIVATE_OIDC_WELL_KNOWN`     | -       | OIDC provider well-known configuration URL.         |
+| `NEXT_PRIVATE_OIDC_CLIENT_ID`      | -       | OIDC client ID.                                     |
+| `NEXT_PRIVATE_OIDC_CLIENT_SECRET`  | -       | OIDC client secret.                                 |
+| `NEXT_PRIVATE_OIDC_PROVIDER_LABEL` | `OIDC`  | Label displayed on the OIDC sign-in button.         |
+| `NEXT_PRIVATE_OIDC_SKIP_VERIFY`    | `false` | Skip email verification for OIDC accounts.          |
+| `NEXT_PRIVATE_OIDC_PROMPT`         | `login` | OIDC prompt parameter. Set to empty string to omit. |
 
 ---
 
@@ -106,24 +100,24 @@ Documenso supports multiple email transports for sending notifications.
 
 ### SMTP Authentication (smtp-auth)
 
-| Variable                              | Description                               |
-| ------------------------------------- | ----------------------------------------- |
-| `NEXT_PRIVATE_SMTP_HOST`              | SMTP server hostname.                     |
-| `NEXT_PRIVATE_SMTP_PORT`              | SMTP server port.                         |
-| `NEXT_PRIVATE_SMTP_USERNAME`          | SMTP authentication username.             |
-| `NEXT_PRIVATE_SMTP_PASSWORD`          | SMTP authentication password.             |
-| `NEXT_PRIVATE_SMTP_SECURE`            | Force TLS connection (`true` or `false`). |
-| `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS` | Disable TLS entirely (not recommended).   |
-| `NEXT_PRIVATE_SMTP_SERVICE`           | Nodemailer service name (e.g., `gmail`).  |
+| Variable                              | Default     | Description                               |
+| ------------------------------------- | ----------- | ----------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`              | `127.0.0.1` | SMTP server hostname.                     |
+| `NEXT_PRIVATE_SMTP_PORT`              | `587`       | SMTP server port.                         |
+| `NEXT_PRIVATE_SMTP_USERNAME`          | -           | SMTP authentication username.             |
+| `NEXT_PRIVATE_SMTP_PASSWORD`          | -           | SMTP authentication password.             |
+| `NEXT_PRIVATE_SMTP_SECURE`            | `false`     | Force TLS connection (`true` or `false`). |
+| `NEXT_PRIVATE_SMTP_UNSAFE_IGNORE_TLS` | `false`     | Disable TLS entirely (not recommended).   |
+| `NEXT_PRIVATE_SMTP_SERVICE`           | -           | Nodemailer service name (e.g., `gmail`).  |
 
 ### SMTP API (smtp-api)
 
-| Variable                        | Description                           |
-| ------------------------------- | ------------------------------------- |
-| `NEXT_PRIVATE_SMTP_HOST`        | SMTP server hostname.                 |
-| `NEXT_PRIVATE_SMTP_PORT`        | SMTP server port.                     |
-| `NEXT_PRIVATE_SMTP_APIKEY_USER` | API key user for SMTP authentication. |
-| `NEXT_PRIVATE_SMTP_APIKEY`      | API key for SMTP authentication.      |
+| Variable                        | Default  | Description                           |
+| ------------------------------- | -------- | ------------------------------------- |
+| `NEXT_PRIVATE_SMTP_HOST`        | -        | SMTP server hostname.                 |
+| `NEXT_PRIVATE_SMTP_PORT`        | `587`    | SMTP server port.                     |
+| `NEXT_PRIVATE_SMTP_APIKEY_USER` | `apikey` | API key user for SMTP authentication. |
+| `NEXT_PRIVATE_SMTP_APIKEY`      | -        | API key for SMTP authentication.      |
 
 ### Resend
 
@@ -133,13 +127,13 @@ Documenso supports multiple email transports for sending notifications.
 
 ### MailChannels
 
-| Variable                                     | Description                                     |
-| -------------------------------------------- | ----------------------------------------------- |
-| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | MailChannels API key.                           |
-| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | Custom MailChannels API endpoint (for proxies). |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | Domain for DKIM signing.                        |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | DKIM selector.                                  |
-| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | DKIM private key.                               |
+| Variable                                     | Default                                   | Description                                     |
+| -------------------------------------------- | ----------------------------------------- | ----------------------------------------------- |
+| `NEXT_PRIVATE_MAILCHANNELS_API_KEY`          | -                                         | MailChannels API key.                           |
+| `NEXT_PRIVATE_MAILCHANNELS_ENDPOINT`         | `https://api.mailchannels.net/tx/v1/send` | Custom MailChannels API endpoint (for proxies). |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_DOMAIN`      | -                                         | Domain for DKIM signing.                        |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_SELECTOR`    | -                                         | DKIM selector.                                  |
+| `NEXT_PRIVATE_MAILCHANNELS_DKIM_PRIVATE_KEY` | -                                         | DKIM private key.                               |
 
 ### Sender Configuration
 
@@ -254,9 +248,11 @@ AI features must also be enabled in organization/team settings after configurati
 
 ## Background Jobs
 
-| Variable                     | Description                          | Default |
-| ---------------------------- | ------------------------------------ | ------- |
-| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` or `inngest`. | `local` |
+Documenso uses a PostgreSQL-based job queue by default. Jobs (email delivery, document processing, webhook dispatch) are stored in the `BackgroundJob` table and processed via internal HTTP requests. No external queue service like Redis is required.
+
+| Variable                     | Description                                                                    | Default |
+| ---------------------------- | ------------------------------------------------------------------------------ | ------- |
+| `NEXT_PRIVATE_JOBS_PROVIDER` | Jobs provider: `local` (PostgreSQL-based queue) or `inngest` (managed service) | `local` |
 
 ### Inngest Configuration
 
@@ -332,7 +328,7 @@ NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password"
 
 ---
 
-## Next Steps
+## See Also
 
 - [Database Configuration](/docs/self-hosting/configuration/database) - Set up PostgreSQL
 - [Email Configuration](/docs/self-hosting/configuration/email) - Configure email delivery

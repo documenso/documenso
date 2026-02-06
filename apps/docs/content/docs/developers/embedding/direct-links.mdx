@@ -1,12 +1,10 @@
 ---
-title: Direct Link Embedding
-description: Embed document signing using direct links
+title: Direct Links
+description: Share a URL or embed an iframe to let users sign documents without email invitations.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
-
-Direct links provide a simple way to embed document signing into your application without building complex integrations. Share a URL or embed it in an iframe, and users can sign documents directly.
 
 ## What Are Direct Links?
 
@@ -30,8 +28,6 @@ When someone uses a direct link, Documenso creates a new document from the templ
 - Only work with templates, not individual documents
 - Each link is tied to one recipient role in the template
 - Recipients enter their own information (you cannot prefill recipient details)
-
----
 
 ## Creating Direct Link Templates
 
@@ -379,22 +375,25 @@ Enterprise plans support white-label embedding with the "Powered by Documenso" b
 
 Set up webhooks to receive notifications when documents are signed:
 
-```typescript
-// Webhook payload for DOCUMENT_SIGNED event
+```json
 {
   "event": "DOCUMENT_SIGNED",
-  "data": {
-    "id": "envelope_xyz789",
-    "status": "COMPLETED",
+  "payload": {
+    "id": 123,
     "externalId": "order-12345",
-    "recipients": [
+    "title": "contract.pdf",
+    "status": "COMPLETED",
+    "Recipient": [
       {
         "email": "signer@example.com",
         "name": "John Doe",
-        "signingStatus": "SIGNED"
+        "signingStatus": "SIGNED",
+        "signedAt": "2024-01-15T10:30:00.000Z"
       }
     ]
-  }
+  },
+  "createdAt": "2024-01-15T10:30:00.000Z",
+  "webhookEndpoint": "https://your-endpoint.com/webhook"
 }
 ```
 
@@ -475,9 +474,9 @@ document.getElementById('signer-frame').src = embedUrl;
 
 ---
 
-## Related
+## See Also
 
-- [React Components](/docs/developers/embedding/react) - For deeper React integration
+- [SDKs](/docs/developers/embedding/sdks) - Framework SDK integration
 - [Templates API](/docs/developers/api/templates) - Template management
 - [Webhooks](/docs/developers/webhooks) - Event notifications
 - [Direct Links (User Guide)](/docs/users/documents/direct-links) - End-user documentation

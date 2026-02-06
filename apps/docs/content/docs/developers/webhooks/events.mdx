@@ -1,12 +1,6 @@
 ---
 title: Webhook Events
-description: Reference for all webhook event types and payloads
----
-
-# Webhook Events
-
-Documenso sends webhook events when documents and recipients reach specific states in the signing workflow. Each event includes the full document payload with recipient information.
-
+description: Reference for all webhook event types and payloads.
 ---
 
 ## Event Payload Structure
@@ -35,53 +29,64 @@ All webhook events share a common structure:
 
 ### Payload Fields
 
-| Field          | Type      | Description                                            |
-| -------------- | --------- | ------------------------------------------------------ |
-| `id`           | number    | Document ID                                            |
-| `externalId`   | string?   | External identifier for integration                    |
-| `userId`       | number    | Owner's user ID                                        |
-| `title`        | string    | Document title                                         |
-| `status`       | string    | Current status: `DRAFT`, `PENDING`, `COMPLETED`        |
-| `visibility`   | string    | Document visibility setting                            |
-| `createdAt`    | datetime  | Document creation timestamp                            |
-| `updatedAt`    | datetime  | Last modification timestamp                            |
-| `completedAt`  | datetime? | Completion timestamp (when all recipients have signed) |
-| `deletedAt`    | datetime? | Deletion timestamp                                     |
-| `teamId`       | number?   | Team ID if document belongs to a team                  |
-| `templateId`   | number?   | Template ID if created from a template                 |
-| `source`       | string    | Source: `DOCUMENT` or `TEMPLATE`                       |
-| `documentMeta` | object    | Document metadata (subject, message, signing options)  |
-| `Recipient`    | array     | List of recipient objects                              |
+| Field            | Type      | Description                                            |
+| ---------------- | --------- | ------------------------------------------------------ |
+| `id`             | number    | Document ID                                            |
+| `externalId`     | string?   | External identifier for integration                    |
+| `userId`         | number    | Owner's user ID                                        |
+| `authOptions`    | object?   | Document-level authentication options                  |
+| `formValues`     | object?   | PDF form values associated with the document           |
+| `title`          | string    | Document title                                         |
+| `status`         | string    | Current status: `DRAFT`, `PENDING`, `COMPLETED`        |
+| `documentDataId` | string    | Reference to the document's PDF data                   |
+| `visibility`     | string    | Document visibility setting                            |
+| `createdAt`      | datetime  | Document creation timestamp                            |
+| `updatedAt`      | datetime  | Last modification timestamp                            |
+| `completedAt`    | datetime? | Completion timestamp (when all recipients have signed) |
+| `deletedAt`      | datetime? | Deletion timestamp                                     |
+| `teamId`         | number?   | Team ID if document belongs to a team                  |
+| `templateId`     | number?   | Template ID if created from a template                 |
+| `source`         | string    | Source: `DOCUMENT` or `TEMPLATE`                       |
+| `documentMeta`   | object    | Document metadata (subject, message, signing options)  |
+| `Recipient`      | array     | List of recipient objects                              |
 
 ### Document Metadata Fields
 
-| Field                   | Type    | Description                          |
-| ----------------------- | ------- | ------------------------------------ |
-| `subject`               | string? | Email subject line                   |
-| `message`               | string? | Email message body                   |
-| `timezone`              | string  | Timezone for date display            |
-| `dateFormat`            | string  | Date format string                   |
-| `redirectUrl`           | string? | URL to redirect after signing        |
-| `signingOrder`          | string  | `PARALLEL` or `SEQUENTIAL`           |
-| `typedSignatureEnabled` | boolean | Whether typed signatures are allowed |
-| `language`              | string  | Document language code               |
-| `distributionMethod`    | string  | How document is distributed          |
+| Field                   | Type    | Description                             |
+| ----------------------- | ------- | --------------------------------------- |
+| `id`                    | string  | Metadata record identifier              |
+| `subject`               | string? | Email subject line                      |
+| `message`               | string? | Email message body                      |
+| `timezone`              | string  | Timezone for date display               |
+| `password`              | string? | Document access password (if set)       |
+| `dateFormat`            | string  | Date format string                      |
+| `redirectUrl`           | string? | URL to redirect after signing           |
+| `signingOrder`          | string  | `PARALLEL` or `SEQUENTIAL`              |
+| `typedSignatureEnabled` | boolean | Whether typed signatures are allowed    |
+| `language`              | string  | Document language code                  |
+| `distributionMethod`    | string  | How document is distributed             |
+| `emailSettings`         | object? | Custom email settings for this document |
 
 ### Recipient Fields
 
-| Field             | Type      | Description                                |
-| ----------------- | --------- | ------------------------------------------ |
-| `id`              | number    | Recipient ID                               |
-| `email`           | string    | Recipient email address                    |
-| `name`            | string    | Recipient name                             |
-| `token`           | string    | Unique signing token                       |
-| `role`            | string    | Role: `SIGNER`, `VIEWER`, `APPROVER`, `CC` |
-| `signingOrder`    | number?   | Position in signing sequence               |
-| `readStatus`      | string    | `NOT_OPENED` or `OPENED`                   |
-| `signingStatus`   | string    | `NOT_SIGNED`, `SIGNED`, or `REJECTED`      |
-| `sendStatus`      | string    | `NOT_SENT` or `SENT`                       |
-| `signedAt`        | datetime? | When recipient signed                      |
-| `rejectionReason` | string?   | Reason if recipient rejected               |
+| Field               | Type      | Description                                |
+| ------------------- | --------- | ------------------------------------------ |
+| `id`                | number    | Recipient ID                               |
+| `documentId`        | number    | Parent document ID                         |
+| `templateId`        | number?   | Template ID if created from a template     |
+| `email`             | string    | Recipient email address                    |
+| `name`              | string    | Recipient name                             |
+| `token`             | string    | Unique signing token                       |
+| `documentDeletedAt` | datetime? | When the document was deleted (if deleted) |
+| `expired`           | boolean?  | Whether the recipient's link has expired   |
+| `signedAt`          | datetime? | When recipient signed                      |
+| `authOptions`       | object?   | Per-recipient authentication options       |
+| `role`              | string    | Role: `SIGNER`, `VIEWER`, `APPROVER`, `CC` |
+| `signingOrder`      | number?   | Position in signing sequence               |
+| `readStatus`        | string    | `NOT_OPENED` or `OPENED`                   |
+| `signingStatus`     | string    | `NOT_SIGNED`, `SIGNED`, or `REJECTED`      |
+| `sendStatus`        | string    | `NOT_SENT` or `SENT`                       |
+| `rejectionReason`   | string?   | Reason if recipient rejected               |
 
 ---
 
@@ -655,7 +660,7 @@ app.post('/webhook', (req, res) => {
 
 ---
 
-## Related
+## See Also
 
 - [Webhook Setup](/docs/developers/webhooks/setup) - Configure webhook endpoints
 - [Webhook Verification](/docs/developers/webhooks/verification) - Verify webhook signatures

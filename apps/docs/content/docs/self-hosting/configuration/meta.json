@@ -1,4 +1,13 @@
 {
   "title": "Configuration",
-  "pages": ["environment", "database", "email", "storage", "signing-certificate"]
+  "pages": [
+    "environment",
+    "database",
+    "email",
+    "storage",
+    "signing-certificate",
+    "oauth-providers",
+    "ai-features",
+    "telemetry"
+  ]
 }

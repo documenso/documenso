@@ -1,11 +1,25 @@
 ---
 title: Team Members
-description: Invite and manage team members
+description: Manage team member roles, invite and remove members, and configure access permissions.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 
-Teams allow you to collaborate with others in your organization. This page covers team member roles, adding and removing members, and managing access.
+## Organisation roles
+
+Organisation members have different permission levels that determine what they can do across the organisation:
+
+| Role        | Manage Settings | Manage Teams | Manage Members | Billing | Delete Organisation |
+| ----------- | --------------- | ------------ | -------------- | ------- | ------------------- |
+| **Owner**   | Yes             | Yes          | Yes            | Yes     | Yes                 |
+| **Admin**   | Yes             | Yes          | Yes            | Yes     | Yes                 |
+| **Manager** | Yes             | Yes          | Yes            | No      | No                  |
+| **Member**  | No              | No           | No             | No      | No                  |
+
+<Callout type="info">
+  Organisation Admins and Managers automatically receive Team Admin access to all teams in the
+  organisation.
+</Callout>
 
 ## Team member roles
 
@@ -47,10 +61,20 @@ Before adding someone to a team, they must first be a member of your organizatio
 
 If the person you want to add isn't in your organization yet:
 
-1. In the **Add members** dialog, click **Invite them to the organisation first**
+1. In the **Add members** dialog, click **Invite them to the organization first**
 2. Enter their email address and organization role
 3. Click **Send invite**
 4. Once they accept, return to add them to the team
+
+### Bulk invite via CSV
+
+You can invite multiple members at once by uploading a CSV file. The CSV should have the following structure:
+
+| Email address       | Role    |
+| ------------------- | ------- |
+| admin@example.com   | Admin   |
+| manager@example.com | Manager |
+| member@example.com  | Member  |
 
 ## Accepting invitations
 
@@ -93,11 +117,12 @@ Removing someone from a team doesn't remove them from the organization. They can
 
 ## Member limits
 
-The number of members you can have depends on your plan:
+The Teams plan includes 5 organisation members. Additional members beyond 5 are charged per seat according to your plan's pricing.
 
-- **Free plans** have limited team members
-- **Paid plans** include a set number of seats
-- **Seat-based plans** charge per member
+| Plan           | Included Members | Additional Members |
+| -------------- | ---------------- | ------------------ |
+| **Teams**      | 5                | Per-seat pricing   |
+| **Enterprise** | Custom           | Per agreement      |
 
 When you invite new members on a seat-based plan, your billing automatically adjusts. Check your organization's billing settings to see your current member count and limits.
 
@@ -113,7 +138,9 @@ Team documents have visibility settings that control which roles can access them
 
 Admins can set default visibility for new documents in team settings.
 
-## Next steps
+---
 
-- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your team
+## See Also
+
+- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your organization
 - [Create a Team](/docs/users/teams/create-team) - Set up additional teams

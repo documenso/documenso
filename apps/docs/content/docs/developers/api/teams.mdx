@@ -1,12 +1,15 @@
 ---
 title: Teams API
-description: Access team resources via API
+description: Manage team resources, documents, and templates with team-scoped API tokens.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-Teams allow you to organize documents, templates, and members within your organization. API tokens are scoped to a specific team, so all operations performed with that token automatically access team resources.
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
 
 ## Team Object
 
@@ -35,8 +38,6 @@ A team object contains the following properties:
   "currentTeamRole": "ADMIN"
 }
 ```
-
----
 
 ## Team-Scoped API Tokens
 
@@ -69,8 +70,6 @@ Your API token inherits permissions based on your role in the team:
 | `ADMIN`   | Full access to all team resources and settings   |
 | `MANAGER` | Create, edit, and delete documents and templates |
 | `MEMBER`  | Create and manage own documents                  |
-
----
 
 ## Working with Team Documents
 
@@ -170,8 +169,6 @@ console.log(`Found ${pagination.totalItems} team documents`);
 ````
 </Tab>
 </Tabs>
-
----
 
 ## Working with Team Templates
 
@@ -282,8 +279,6 @@ console.log('Team templates:', data);
 </Tab>
 </Tabs>
 
----
-
 ## Team Member Roles
 
 | Role      | Description                                                         |
@@ -313,8 +308,6 @@ const payload = {
 };
 ````
 
----
-
 ## Multi-Team Workflow
 
 To work with multiple teams, create and manage separate API tokens for each team.
@@ -342,8 +335,6 @@ console.log(`Sales team: ${salesDocs.pagination.totalItems} pending`);
 console.log(`Legal team: ${legalDocs.pagination.totalItems} completed`);
 ```
 
----
-
 ## Error Responses
 
 | Status | Description                                       |
@@ -365,9 +356,7 @@ console.log(`Legal team: ${legalDocs.pagination.totalItems} completed`);
   resources from another team returns a 403 or 404 error.
 </Callout>
 
----
-
-## Related
+## See Also
 
 - [Documents API](/docs/developers/api/documents) - Create and manage documents
 - [Templates API](/docs/developers/api/templates) - Work with document templates

@@ -1,14 +1,10 @@
 ---
 title: Security Settings
-description: Password, two-factor authentication, passkeys, and account security.
+description: Manage your password, enable two-factor authentication (2FA), configure passkeys, and monitor account activity.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-
-The Security settings page lets you manage your password, enable two-factor authentication (2FA), configure passkeys, and monitor account activity. Access it by clicking your avatar, selecting **Settings**, and navigating to the **Security** tab.
-
-![Security settings page](/get-started-images/documenso-account-security-page.webp)
 
 ## Change Your Password
 
@@ -41,6 +37,8 @@ If you signed up with email and password (not Google or another provider), you c
 </Callout>
 
 ## Two-Factor Authentication (2FA)
+
+Two-factor authentication (2FA) and passkeys are used for high-security and high-compliance signatures in addition to account login.
 
 Two-factor authentication adds a second layer of security by requiring a code from an authenticator app when you sign in or sign documents.
 
@@ -76,6 +74,17 @@ Two-factor authentication adds a second layer of security by requiring a code fr
 
 </Step>
 </Steps>
+
+<Callout type="info">
+  Logging in with Google does not require a 2FA code. As an authentication provider, your Google
+  account is considered secure (e.g. you can configure 2FA on your Google account separately).
+</Callout>
+
+<Callout type="info">
+  Logging in with a passkey does not require a 2FA code. Passkeys are considered two-factor by
+  design — the passkey itself is the first factor, and access to the device that holds it is the
+  second factor.
+</Callout>
 
 ### Disable 2FA
 
@@ -237,3 +246,11 @@ Follow these recommendations to keep your account secure:
 - **Monitor security activity.** Check for unexpected sign-ins or changes.
 - **Use separate API tokens per integration.** If one is compromised, revoke only that token.
 - **Set expiration dates on API tokens.** Shorter lifespans reduce risk if a token is leaked.
+
+---
+
+## See Also
+
+- [Profile Settings](/docs/users/settings/profile) - Update your name, email, and signature
+- [Branding](/docs/users/settings/branding) - Customize emails and signing pages
+- [Create an Account](/docs/users/getting-started/create-account) - Initial account setup

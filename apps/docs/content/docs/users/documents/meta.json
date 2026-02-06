@@ -1,4 +1,16 @@
 {
   "title": "Documents",
-  "pages": ["upload", "add-recipients", "add-fields", "send", "direct-links"]
+  "pages": [
+    "upload",
+    "add-recipients",
+    "add-fields",
+    "send",
+    "direct-links",
+    "pdf-placeholders",
+    "ai-detection",
+    "default-recipients",
+    "document-visibility",
+    "document-preferences",
+    "email-preferences"
+  ]
 }

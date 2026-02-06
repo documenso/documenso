@@ -3,9 +3,12 @@ title: API Reference
 description: Complete reference for the Documenso REST API.
 ---
 
-# API Reference
+import { Callout } from 'fumadocs-ui/components/callout';
 
-The Documenso API lets you create, send, and manage documents programmatically.
+<Callout type="warn">
+  The guides below cover common API patterns but may not reflect the latest endpoints or parameters.
+  For an always up-to-date reference, see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
 
 ## Base URL
 
@@ -22,7 +25,7 @@ For self-hosted instances, replace with your instance URL.
 All requests require an API key in the `Authorization` header:
 
 ```
-Authorization: API-KEY your_api_key
+Authorization: api_xxxxxxxxxxxxxxxx
 ```
 
 See [Authentication](/docs/developers/getting-started/authentication) for details.

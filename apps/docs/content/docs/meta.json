@@ -1,4 +1,13 @@
 {
   "title": "Documentation",
-  "pages": ["users", "developers", "self-hosting", "concepts", "compliance", "policies"]
+  "pages": [
+    "---Guides---",
+    "users",
+    "developers",
+    "self-hosting",
+    "---Resources---",
+    "concepts",
+    "compliance",
+    "policies"
+  ]
 }

@@ -6,7 +6,10 @@ description: Create documents from reusable templates via API.
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-The Templates API lets you create, manage, and use document templates. Templates are reusable document configurations with predefined recipients, fields, and settings.
+<Callout type="warn">
+  This guide may not reflect the latest endpoints or parameters. For an always up-to-date reference,
+  see the [OpenAPI Reference](https://openapi.documenso.com).
+</Callout>
 
 ## Template Object
 
@@ -85,8 +88,6 @@ A template object contains the following properties:
   "directLink": null
 }
 ```
-
----
 
 ## List Templates
 
@@ -896,6 +897,21 @@ const { success } = await response.json();
 
 ---
 
+## Custom Document Data
+
+When creating a document from a template, you can replace the template's PDF with a custom PDF by using the `customDocumentData` parameter. This is useful when you need to generate the PDF dynamically while reusing the template's recipient and field configuration.
+
+To use custom document data:
+
+1. Retrieve the template to get the `envelopeItemId` of the PDF you want to replace
+2. Include `customDocumentData` in your `template/use` request, mapping each `envelopeItemId` to a new file
+
+The field positions from the template are preserved on the new PDF. Ensure the replacement PDF has the same page layout to maintain accurate field placement.
+
+See the [OpenAPI Reference](https://openapi.documenso.com) for the full request schema.
+
+---
+
 ## Template Types
 
 | Type      | Description                                                        |
@@ -1007,7 +1023,7 @@ console.log('Signing URL:', result.signingUrl);
 
 ---
 
-## Related
+## See Also
 
 - [Documents API](/docs/developers/api/documents) - Work with created documents
 - [Recipients API](/docs/developers/api/recipients) - Manage document recipients

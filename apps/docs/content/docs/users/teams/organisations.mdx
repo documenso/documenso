@@ -1,0 +1,86 @@
+---
+title: Organisations
+description: Organisations are the top-level entity in Documenso, containing teams, members, and shared settings.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+
+## What are Organisations?
+
+Organisations are the top-level entity in Documenso's hierarchy. Each organisation can contain multiple teams, and each team can have multiple members.
+
+![Organisations diagram](/organisations/organisations-basic-diagram.webp)
+
+This structure provides:
+
+- **Centralized Management** - Control multiple teams from a single organisational dashboard
+- **Unified Billing** - Manage billing and subscriptions at the organisation level
+- **Access Control** - Define roles and groups across the entire organisation
+- **Group Management** - Create custom groups to organise members and control team access
+- **Global Settings** - Apply consistent settings across all teams in your organisation
+
+## Create a New Organisation
+
+<Callout type="info">
+  You can create multiple organisations, but each organisation is billed separately.
+</Callout>
+
+<Steps>
+
+<Step>
+### Open organisation creation
+
+Navigate to the organisation section and click **Create Organisation**.
+
+![Create organisation in Documenso dashboard](/organisations/organisations-create.webp)
+
+</Step>
+
+<Step>
+### Select your plan
+
+Choose a plan for your new organisation. If you want to upgrade an existing organisation, go to your organisation's billing settings.
+
+</Step>
+
+<Step>
+### Name your organisation
+
+Enter an **Organisation Name** as the display name for your organisation.
+
+</Step>
+
+</Steps>
+
+Once created, you can create teams to organise your work. Each team operates independently but inherits organisation-level settings and branding.
+
+## Organisation vs Team Settings
+
+Teams inherit settings from their parent organisation by default. You can override these at the team level:
+
+| Setting                  | Organisation Level         | Team Level              |
+| ------------------------ | -------------------------- | ----------------------- |
+| **Branding**             | Sets default for all teams | Can override or inherit |
+| **Document Preferences** | Sets default for all teams | Can override or inherit |
+| **Email Preferences**    | Sets default for all teams | Can override or inherit |
+| **Document Visibility**  | Sets default for all teams | Can override or inherit |
+| **Billing**              | Managed centrally          | Not applicable          |
+| **SSO**                  | Configured centrally       | Not applicable          |
+| **Members**              | Managed at org level       | Assigned per team       |
+
+## Best Practices
+
+1. **Use groups effectively** - Leverage groups to simplify permission management across teams
+2. **Set organisation-wide defaults** - Configure document preferences, branding, and email settings at the organisation level for consistency
+3. **Assign roles carefully** - Organisation Admins and Managers automatically receive Team Admin access to all teams
+
+---
+
+## See Also
+
+- [Create a Team](/docs/users/teams/create-team) - Set up a team within your organisation
+- [Team Members](/docs/users/teams/members) - Manage member roles at the organisation and team level
+- [Groups](/docs/users/teams/groups) - Organise members into groups for bulk team access
+- [Billing](/docs/users/teams/billing) - Manage organisation billing and subscriptions
+- [Document Preferences](/docs/users/documents/document-preferences) - Configure default document settings

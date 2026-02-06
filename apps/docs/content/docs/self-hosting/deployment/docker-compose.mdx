@@ -1,16 +1,10 @@
 ---
 title: Docker Compose
-description: Production-ready multi-container setup.
+description: Deploy Documenso with Docker Compose, including PostgreSQL. This production-ready setup is suitable for most self-hosted deployments.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-
-# Docker Compose Deployment
-
-This guide covers deploying Documenso with Docker Compose, including PostgreSQL and the Documenso application. This setup is production-ready and suitable for most self-hosted deployments.
-
-For a standalone Docker container (when you manage the database separately), see [Docker Deployment](/docs/self-hosting/deployment/docker).
 
 ## Prerequisites
 
@@ -553,7 +547,9 @@ Clean up unused Docker resources:
 docker system prune -a
 ```
 
-## Next Steps
+---
+
+## See Also
 
 - [Environment Variables](/docs/self-hosting/configuration/environment) - Full configuration reference
 - [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Certificate setup details

@@ -1,17 +1,15 @@
 ---
 title: Create a Team
-description: Set up a new team for your organization.
+description: Set up a new team to collaborate on documents, templates, and settings within your organization.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-Teams let you collaborate with others by sharing documents, templates, and settings. Each team has its own workspace with separate documents and member access.
-
 ## Prerequisites
 
-- An organisation. Teams exist within organisations.
-- Organisation Admin or Manager role to create teams.
+- An organization. Teams exist within organizations.
+- Organization Admin or Manager role to create teams.
 
 ## Limitations
 
@@ -27,10 +25,10 @@ Teams let you collaborate with others by sharing documents, templates, and setti
 <Step>
 ### Open the create team dialog
 
-1. Go to your organisation page
+1. Go to your organization page
 2. Click **Create team**
 
-![Team creation button on the organisation page](/teams/team-create.webp)
+![Team creation button on the organization page](/teams/team-create.webp)
 
 </Step>
 
@@ -51,10 +49,10 @@ The Team URL is automatically generated from your team name, but you can customi
 <Step>
 ### Configure member access
 
-Choose whether to allow all organisation members to access this team:
+Choose whether to allow all organization members to access this team:
 
-- **Checked** - All current and future organisation members can access team documents
-- **Unchecked** - Only organisation admins and managers are added initially; you control member access manually
+- **Checked** - All current and future organization members can access team documents
+- **Unchecked** - Only organization admins and managers are added initially; you control member access manually
 
 <Callout type="info">You can change member access settings later from team settings.</Callout>
 
@@ -77,20 +75,20 @@ After creating a team, you can configure additional settings from **Team Setting
 - **Team Name** - Update the display name
 - **Team URL** - Change the URL identifier (this changes all team links)
 - **Team Avatar** - Upload an image to identify your team
-- **Team Email** - Add an email address to associate documents with the team
+- **Team Email** - Add an email address for your team (see [Team Email](#team-email) below)
 
 ### Branding
 
 Customize how your team's documents appear to recipients:
 
-- **Enable Custom Branding** - Turn branding on/off, or inherit from organisation settings
+- **Enable Custom Branding** - Turn branding on/off, or inherit from organization settings
 - **Branding Logo** - Upload your logo (max 5MB, JPG, PNG, or WebP) to display on signing pages
 - **Brand Website** - Link your logo to your website
 - **Brand Details** - Additional information shown at the bottom of emails
 
 <Callout type="info">
-  Team branding settings can inherit from your organisation. Select "Inherit from organisation" to
-  use organisation-level branding, or configure team-specific branding.
+  Team branding settings can inherit from your organization. Select "Inherit from organization" to
+  use organization-level branding, or configure team-specific branding.
 </Callout>
 
 ### Other Settings
@@ -103,8 +101,30 @@ Customize how your team's documents appear to recipients:
 
 ![Document visibility settings in team preferences](/teams/document-visibility-settings.webp)
 
-## Next Steps
+## Team Email
 
-- [Manage Members](/docs/users/teams/manage-members) - Add team members and configure their roles
-- [Create Templates](/docs/users/templates/create-template) - Set up reusable document templates for your team
-- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your organisation
+Adding a team email address enables several capabilities:
+
+- **Team Inbox** - View signing requests sent to this email address
+- **Send on behalf of the team** - Documents sent from the team appear to come from the team email rather than your personal email
+- **Track team documents** - See documents sent from this email in the team's document list
+- **Consistent branding** - Recipients see the team identity rather than individual sender details
+
+To configure a team email:
+
+1. Go to **Team Settings** > **General**
+2. Enter the email address in the **Team Email** field
+3. Click **Update** to save
+
+<Callout type="info">
+  The team email is used as the sender identity for documents sent from the team. Recipients will
+  see this email address in signing notifications.
+</Callout>
+
+---
+
+## See Also
+
+- [Manage Members](/docs/users/teams/members) - Add team members and configure their roles
+- [Create Templates](/docs/users/templates/create) - Set up reusable document templates for your team
+- [Single Sign-On](/docs/users/teams/single-sign-on) - Configure SSO for your organization

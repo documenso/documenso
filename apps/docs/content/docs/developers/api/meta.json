@@ -1,4 +1,13 @@
 {
   "title": "API Reference",
-  "pages": ["documents", "recipients", "fields", "templates", "teams"]
+  "pages": [
+    "documents",
+    "recipients",
+    "fields",
+    "templates",
+    "teams",
+    "rate-limits",
+    "versioning",
+    "developer-mode"
+  ]
 }

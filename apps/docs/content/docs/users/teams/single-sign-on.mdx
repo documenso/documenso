@@ -1,12 +1,10 @@
 ---
 title: Single Sign-On (SSO)
-description: Configure SSO for your team with OIDC providers
+description: Configure Single Sign-On for your team using any OpenID Connect (OIDC) identity provider.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-
-Single Sign-On (SSO) allows your team members to authenticate using your organization's identity provider instead of managing separate Documenso credentials.
 
 <Callout type="warn">SSO is only available on the Enterprise plan.</Callout>
 
@@ -23,13 +21,13 @@ Documenso supports any identity provider that implements the OpenID Connect (OID
 
 ## Setting Up SSO
 
-<Callout type="info">You must be a team owner, admin, or manager to configure SSO.</Callout>
+<Callout type="info">You must be an organization admin or manager to configure SSO.</Callout>
 
 <Steps>
 <Step>
 ### Access SSO Settings
 
-1. Navigate to your team settings
+1. Navigate to your organization settings
 2. Select **Single Sign-On** from the sidebar
 
 ![SSO settings page](/organisations/organisations-sso-settings.webp)
@@ -108,13 +106,13 @@ The OpenID Connect discovery endpoint for your identity provider. Common formats
   provider.
 </Callout>
 
-### Default Team Role
+### Default Organization Role
 
 The role assigned to users when they first sign in through SSO. Choose from:
 
 - **Member**: Can view and sign documents shared with them
-- **Manager**: Can manage documents and team settings
-- **Admin**: Full access to team configuration
+- **Manager**: Can manage documents and organization settings
+- **Admin**: Full access to organization configuration
 
 You can change individual user roles after they've joined.
 
@@ -139,8 +137,8 @@ When a user signs in through your SSO portal for the first time:
 
 1. Documenso verifies their identity with your provider
 2. A new account is created (or linked if the email already exists)
-3. The user is added to your team with the default role
-4. They can immediately access team documents
+3. The user is added to your organization with the default role
+4. They can immediately access organization documents
 
 Users provisioned through SSO:
 
@@ -150,13 +148,13 @@ Users provisioned through SSO:
 
 ## SSO-Only Enforcement
 
-Once SSO is enabled, you can share your team's SSO portal URL with members. The portal URL is displayed at the top of the SSO settings page.
+Once SSO is enabled, you can share your organization's SSO portal URL with members. The portal URL is displayed at the top of the SSO settings page.
 
 To enforce SSO-only authentication:
 
-1. Share only the SSO portal URL with team members
+1. Share only the SSO portal URL with organization members
 2. Restrict allowed email domains to your organization
-3. Remove any team members who signed up with passwords
+3. Remove any organization members who signed up with passwords
 
 <Callout type="info">
   Users who joined before SSO was enabled can still sign in with their original method. To enforce
@@ -196,7 +194,21 @@ If a user already has a Documenso account with the same email:
 - Their existing account will be linked to your team
 - They can sign in through your SSO portal going forward
 
-## Next Steps
+## Testing Your SSO Portal
 
-- [Manage Members](/docs/users/teams/manage-members) - Configure team member roles and permissions
+After configuring SSO, verify it works correctly:
+
+1. Navigate to your portal URL (found at the top of the organisation SSO settings page)
+2. Sign in with a test account from your configured domain
+3. Verify the user is provisioned with the correct organisation role
+
+### Custom Subdomain
+
+To reduce friction for your users, create a custom subdomain that redirects to your SSO portal link. For example, `documenso.your-organisation.com` can redirect to the portal URL shown in your SSO settings.
+
+---
+
+## See Also
+
+- [Manage Members](/docs/users/teams/members) - Configure team member roles and permissions
 - [Create a Team](/docs/users/teams/create-team) - Set up additional teams in your organization

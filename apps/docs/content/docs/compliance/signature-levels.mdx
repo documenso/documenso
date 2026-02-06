@@ -1,13 +1,36 @@
 ---
 title: Signature Levels
-description: Understanding SES, AES, and QES signature types
+description: Understand the three eIDAS signature levels — SES, AES, and QES — their requirements, legal effect, and when to use each.
 ---
 
-# Signature Levels
+import { Callout } from 'fumadocs-ui/components/callout';
 
-Electronic signature regulations, particularly the EU's eIDAS framework, define three levels of electronic signatures. Each level has different technical requirements, legal implications, and use cases. Understanding these levels helps you choose the appropriate signature type for your documents.
+<Callout type="info">
+  Documenso seals all signed documents cryptographically, regardless of signature level, to prevent
+  any alterations after signing.
+</Callout>
 
----
+## U.S. ESIGN Act
+
+<Callout type="info">Status: Compliant</Callout>
+
+The Electronic Signatures in Global and National Commerce Act (ESIGN Act) is a U.S. federal law that ensures the legal validity and enforceability of electronic signatures and records in commerce.
+
+### Main Requirements
+
+- **Intent to Sign** - Parties must demonstrate their intent to sign
+- **Consent** - All parties must consent to the use of electronic signatures and records
+- **Consumer Disclosures** - Financial institutions must provide clear statements informing consumers before obtaining consent
+- **Record Retention** - Electronic records must be maintained for later access by signers
+- **Security** - Parties must take reasonable steps to ensure the security and integrity of electronic signatures and records
+
+## UETA (Uniform Electronic Transactions Act)
+
+<Callout type="info">Status: Compliant</Callout>
+
+The Uniform Electronic Transactions Act provides a legal framework for the use of electronic signatures and records in electronic transactions, ensuring they have the same validity and enforceability as paper documents and handwritten signatures.
+
+UETA shares the same core requirements as the [ESIGN Act](#us-esign-act).
 
 ## Simple Electronic Signatures (SES)
 
@@ -59,6 +82,20 @@ Under eIDAS, an AES must satisfy four criteria:
 | **Legal Status**           | Higher evidentiary weight than SES; stronger presumption of validity       |
 | **Implementation**         | Typically requires identity verification service and personal certificates |
 
+### Compliance Status
+
+<Callout type="warn">
+  Status: [Planned](https://github.com/documenso/backlog/issues/9) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
+
+Current AES progress:
+
+- Cryptographic signature sealing the document against tampering
+- Signing using dedicated hardware (Hardware Security Module)
+- Embedding signer identity in the cryptographic signature (planned)
+- Being a government-audited trusted qualified services provider (planned)
+
 ### When AES Is Appropriate
 
 AES is used when stronger proof of identity and intent is needed:
@@ -92,6 +129,13 @@ QES must meet all AES requirements plus:
 | **Identity Verification**  | Strict verification by a Qualified Trust Service Provider             |
 | **Legal Status**           | Equivalent to handwritten signature across all EU member states       |
 | **Implementation**         | Requires integration with a QTSP; typically involves external service |
+
+### Compliance Status
+
+<Callout type="warn">
+  Status: [Planned](https://github.com/documenso/backlog/issues/32) via third party until [Let's
+  Sign](https://github.com/documenso/backlog/issues/21) is realized.
+</Callout>
 
 ### When QES Is Required
 
@@ -156,6 +200,14 @@ Documenso supports Simple Electronic Signatures (SES) with features that enhance
 | **Qualified Certificates**                | Not issued; would require QTSP status                     |
 
 For transactions requiring AES or QES, you would need to integrate with external identity verification services or Qualified Trust Service Providers.
+
+---
+
+## ZertES (Swiss Federal Law)
+
+<Callout type="warn">Status: [Planned](https://github.com/documenso/backlog/issues/34)</Callout>
+
+ZertES is a Swiss federal law that regulates electronic signature compliance. It defines requirements similar to eIDAS for qualified electronic signatures within Switzerland.
 
 ---
 

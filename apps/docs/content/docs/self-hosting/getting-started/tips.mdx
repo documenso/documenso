@@ -1,0 +1,182 @@
+---
+title: Tips & Common Pitfalls
+description: Practical advice for running Documenso in production.
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+
+## Always Configure a Signing Certificate
+
+<Callout type="error">
+  This is the single most common issue when self-hosting Documenso. Without a signing certificate,
+  the application starts normally but document signing fails.
+</Callout>
+
+Documenso does **not** bundle a signing certificate in the Docker image. You must provide one yourself using one of two methods:
+
+### Volume Mount (Recommended)
+
+Mount your `.p12` certificate file into the container at the default path:
+
+```bash
+docker run -d \
+  -v /path/to/your/cert.p12:/opt/documenso/cert.p12:ro \
+  -e NEXT_PRIVATE_SIGNING_PASSPHRASE="your-certificate-password" \
+  documenso/documenso:latest
+```
+
+The default certificate path inside the container is `/opt/documenso/cert.p12`. You can change this with `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH`.
+
+### Base64 Environment Variable
+
+For platforms that don't support volume mounts (Railway, Render, etc.), encode the certificate and pass it as an environment variable:
+
+```bash
+# Encode the certificate (no line breaks)
+base64 -w 0 certificate.p12  # Linux
+base64 -i certificate.p12    # macOS
+```
+
+Then set:
+
+```bash
+NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS=<base64-encoded-string>
+NEXT_PRIVATE_SIGNING_PASSPHRASE=your-certificate-password
+```
+
+<Callout type="info">
+  `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` takes precedence over
+  `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` if both are set.
+</Callout>
+
+### Verify Your Certificate
+
+After starting Documenso, check the certificate status endpoint:
+
+```bash
+curl http://localhost:3000/api/certificate-status
+```
+
+The startup script also checks for the certificate and prints a warning if it's missing.
+
+---
+
+## Certificate Password is Required
+
+Certificates without a password cause signing to fail with:
+
+```
+Error: Failed to get private key bags
+```
+
+Always set a password when creating your `.p12` certificate. When using OpenSSL, set the password during the export step and provide it to Documenso via `NEXT_PRIVATE_SIGNING_PASSPHRASE`.
+
+---
+
+## Use the Health Check Endpoints
+
+Documenso exposes two endpoints for monitoring:
+
+| Endpoint                  | Purpose                              |
+| ------------------------- | ------------------------------------ |
+| `/api/health`             | Returns 200 if the application is up |
+| `/api/certificate-status` | Detailed signing certificate status  |
+
+Use `/api/health` for container orchestration health checks (Docker, Kubernetes). Use `/api/certificate-status` to debug signing issues — it reports whether a certificate is configured, its type, and any errors.
+
+---
+
+## Pin Your Docker Image Version
+
+Use a specific version tag in production:
+
+```bash
+# Good — predictable, reproducible
+docker pull documenso/documenso:1.8.0
+
+# Risky — may pull breaking changes
+docker pull documenso/documenso:latest
+```
+
+Check the [GitHub releases](https://github.com/documenso/documenso/releases) page for available versions.
+
+---
+
+## Migrations Run Automatically on Startup
+
+The Docker container runs `prisma migrate deploy` every time it starts. This means:
+
+- **Upgrades are simple** — pull the new image, restart the container, and migrations apply automatically.
+- **Always back up your database before upgrading** — if a migration fails, you need a way to restore.
+- **First startup takes longer** — the initial migration creates all tables.
+
+---
+
+## Set NEXT_PRIVATE_INTERNAL_WEBAPP_URL for Background Jobs
+
+Background jobs work by Documenso sending HTTP requests to itself. If your reverse proxy or network setup causes issues with the app reaching its own public URL, set the internal URL:
+
+```bash
+NEXT_PRIVATE_INTERNAL_WEBAPP_URL=http://localhost:3000
+```
+
+This tells the job system to use the internal address instead of `NEXT_PUBLIC_WEBAPP_URL` for self-requests.
+
+---
+
+## Database Storage vs S3
+
+Documents are stored in PostgreSQL by default (`NEXT_PUBLIC_UPLOAD_TRANSPORT=database`). This works well for small-to-medium deployments and keeps your infrastructure simple.
+
+For high-volume deployments, switch to S3-compatible storage to keep your database lean:
+
+```bash
+NEXT_PUBLIC_UPLOAD_TRANSPORT=s3
+NEXT_PRIVATE_UPLOAD_BUCKET=documenso-documents
+NEXT_PRIVATE_UPLOAD_REGION=us-east-1
+NEXT_PRIVATE_UPLOAD_ACCESS_KEY_ID=your-key
+NEXT_PRIVATE_UPLOAD_SECRET_ACCESS_KEY=your-secret
+```
+
+Any S3-compatible provider works: AWS S3, MinIO, Cloudflare R2, DigitalOcean Spaces.
+
+See [Storage Configuration](/docs/self-hosting/configuration/storage) for full setup details.
+
+---
+
+## Background Jobs Don't Need Redis
+
+Documenso uses a PostgreSQL-based job queue by default. No Redis, no external message broker. The job system uses your existing database to store and process background tasks like email delivery and document processing.
+
+For high-throughput deployments, Documenso optionally supports [Inngest](https://www.inngest.com/) as an alternative job provider:
+
+```bash
+NEXT_PRIVATE_JOBS_PROVIDER=inngest
+INNGEST_EVENT_KEY=your-event-key
+INNGEST_SIGNING_KEY=your-signing-key
+```
+
+Most self-hosted instances do not need Inngest.
+
+---
+
+## Docker File Permissions
+
+The Documenso container runs as a non-root user (UID 1001). If you mount files into the container (certificates, configuration), ensure they're readable:
+
+```bash
+# On the host, before mounting
+chmod 644 cert.p12
+chown 1001:1001 cert.p12
+```
+
+If you see `EACCES: permission denied` errors, this is almost always the cause.
+
+---
+
+## See Also
+
+- [Requirements](/docs/self-hosting/getting-started/requirements) - What you need before deploying
+- [Quick Start](/docs/self-hosting/getting-started/quick-start) - Get running in 5 minutes
+- [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Full certificate setup guide
+- [Troubleshooting](/docs/self-hosting/maintenance/troubleshooting) - Detailed error resolution

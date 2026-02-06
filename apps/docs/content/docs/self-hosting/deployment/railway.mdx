@@ -1,16 +1,10 @@
 ---
 title: Railway
-description: One-click deployment on Railway.
+description: Deploy Documenso on Railway with automatic builds from Git, managed PostgreSQL, and built-in networking. Use the one-click template or manual setup.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
-
-# Railway Deployment
-
-Railway is a cloud platform that simplifies deploying and managing applications. It provides automatic builds from Git, managed PostgreSQL databases, and built-in networking with minimal configuration.
-
-This guide covers deploying Documenso on Railway using either the one-click template or manual setup.
 
 ## Prerequisites
 
@@ -394,7 +388,19 @@ Verify SMTP configuration:
 - Check database query performance in Railway's metrics
 - Consider upgrading to a larger PostgreSQL instance
 
-## Next Steps
+## Other One-Click Deployment Options
+
+### Render
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/documenso/documenso)
+
+### Koyeb
+
+[![Deploy to Koyeb](https://www.koyeb.com/static/images/deploy/button.svg)](https://app.koyeb.com/deploy?type=git&repository=github.com/documenso/documenso&branch=main&name=documenso-app&builder=dockerfile&dockerfile=/docker/Dockerfile)
+
+---
+
+## See Also
 
 - [Email Configuration](/docs/self-hosting/configuration/email) - Configure email providers
 - [Signing Certificate](/docs/self-hosting/configuration/signing-certificate) - Set up document signing

@@ -6,8 +6,6 @@ description: Generate an API key and authenticate your requests.
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-The Documenso API uses API tokens for authentication. Include your token in the `Authorization` header of every request to identify your account and authorize access to resources.
-
 ## Prerequisites
 
 - A Documenso account (cloud or self-hosted)
@@ -116,7 +114,13 @@ SDKs are available for [TypeScript](https://github.com/documenso/sdk-typescript)
 
 <Callout type="info">
   API V1 is deprecated. Use V2 for all new integrations. V1 only works with legacy documents created
-  before the envelope system.
+  before the envelope system. If you need V1 documentation for migration purposes, see the [V1
+  OpenAPI reference](https://app.documenso.com/api/v1/openapi).
+</Callout>
+
+<Callout type="info">
+  The API is available on Individual, Team, and Enterprise plans. [Fair
+  Use](/docs/policies/fair-use) applies to all API usage.
 </Callout>
 
 ## Token Security
