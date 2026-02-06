@@ -102,6 +102,8 @@ ENV NEXT_PRIVATE_TELEMETRY_HOST="$NEXT_PRIVATE_TELEMETRY_HOST"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nodejs
 
+RUN mkdir -p /app && chown nodejs:nodejs /app
+
 USER nodejs
 
 WORKDIR /app
