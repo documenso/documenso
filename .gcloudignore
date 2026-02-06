@@ -1,0 +1,10 @@
+# Custom gcloudignore for Cloud Build
+# Include .gitignore files (needed by Docker build)
+.gcloudignore
+.git
+
+# Exclude large/unnecessary directories
+node_modules/
+.turbo/
+apps/documentation/
+apps/openpage-api/
