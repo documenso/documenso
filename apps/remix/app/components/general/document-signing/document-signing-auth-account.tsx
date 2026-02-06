@@ -13,13 +13,11 @@ import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-p
 
 export type DocumentSigningAuthAccountProps = {
   actionTarget?: 'FIELD' | 'DOCUMENT';
-  actionVerb?: string;
   onOpenChange: (value: boolean) => void;
 };
 
 export const DocumentSigningAuthAccount = ({
   actionTarget = 'FIELD',
-  actionVerb = 'sign',
   onOpenChange,
 }: DocumentSigningAuthAccountProps) => {
   const { recipient, isDirectTemplate } = useRequiredDocumentSigningAuthContext();
@@ -51,36 +49,108 @@ export const DocumentSigningAuthAccount = ({
     }
   };
 
+  const renderAuthMessage = () => {
+    switch (recipient.role) {
+      case RecipientRole.SIGNER:
+        if (actionTarget === 'FIELD') {
+          return isDirectTemplate ? (
+            <Trans>To sign this field, you need to be logged in.</Trans>
+          ) : (
+            <Trans>
+              To sign this field, you need to be logged in as <strong>{recipient.email}</strong>
+            </Trans>
+          );
+        }
+        return isDirectTemplate ? (
+          <Trans>To sign this document, you need to be logged in.</Trans>
+        ) : (
+          <Trans>
+            To sign this document, you need to be logged in as <strong>{recipient.email}</strong>
+          </Trans>
+        );
+
+      case RecipientRole.APPROVER:
+        if (actionTarget === 'FIELD') {
+          return isDirectTemplate ? (
+            <Trans>To approve this field, you need to be logged in.</Trans>
+          ) : (
+            <Trans>
+              To approve this field, you need to be logged in as <strong>{recipient.email}</strong>
+            </Trans>
+          );
+        }
+        return isDirectTemplate ? (
+          <Trans>To approve this document, you need to be logged in.</Trans>
+        ) : (
+          <Trans>
+            To approve this document, you need to be logged in as <strong>{recipient.email}</strong>
+          </Trans>
+        );
+
+      case RecipientRole.VIEWER:
+        if (actionTarget === 'FIELD') {
+          return isDirectTemplate ? (
+            <Trans>To view this field, you need to be logged in.</Trans>
+          ) : (
+            <Trans>
+              To view this field, you need to be logged in as <strong>{recipient.email}</strong>
+            </Trans>
+          );
+        }
+        return isDirectTemplate ? (
+          <Trans>To mark this document as viewed, you need to be logged in.</Trans>
+        ) : (
+          <Trans>
+            To mark this document as viewed, you need to be logged in as{' '}
+            <strong>{recipient.email}</strong>
+          </Trans>
+        );
+
+      case RecipientRole.CC:
+        if (actionTarget === 'FIELD') {
+          return isDirectTemplate ? (
+            <Trans>To view this field, you need to be logged in.</Trans>
+          ) : (
+            <Trans>
+              To view this field, you need to be logged in as <strong>{recipient.email}</strong>
+            </Trans>
+          );
+        }
+        return isDirectTemplate ? (
+          <Trans>To view this document, you need to be logged in.</Trans>
+        ) : (
+          <Trans>
+            To view this document, you need to be logged in as <strong>{recipient.email}</strong>
+          </Trans>
+        );
+
+      case RecipientRole.ASSISTANT:
+        if (actionTarget === 'FIELD') {
+          return isDirectTemplate ? (
+            <Trans>To assist with this field, you need to be logged in.</Trans>
+          ) : (
+            <Trans>
+              To assist with this field, you need to be logged in as{' '}
+              <strong>{recipient.email}</strong>
+            </Trans>
+          );
+        }
+        return isDirectTemplate ? (
+          <Trans>To assist with this document, you need to be logged in.</Trans>
+        ) : (
+          <Trans>
+            To assist with this document, you need to be logged in as{' '}
+            <strong>{recipient.email}</strong>
+          </Trans>
+        );
+    }
+  };
+
   return (
     <fieldset disabled={isSigningOut} className="space-y-4">
       <Alert variant="warning">
         <AlertDescription>
-          {actionTarget === 'DOCUMENT' && recipient.role === RecipientRole.VIEWER ? (
-            <span>
-              {isDirectTemplate ? (
-                <Trans>To mark this document as viewed, you need to be logged in.</Trans>
-              ) : (
-                <Trans>
-                  To mark this document as viewed, you need to be logged in as{' '}
-                  <strong>{recipient.email}</strong>
-                </Trans>
-              )}
-            </span>
-          ) : (
-            <span>
-              {isDirectTemplate ? (
-                <Trans>
-                  To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be
-                  logged in.
-                </Trans>
-              ) : (
-                <Trans>
-                  To {actionVerb.toLowerCase()} this {actionTarget.toLowerCase()}, you need to be
-                  logged in as <strong>{recipient.email}</strong>
-                </Trans>
-              )}
-            </span>
-          )}
+          <span>{renderAuthMessage()}</span>
         </AlertDescription>
       </Alert>
 
