@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
@@ -65,6 +65,8 @@ export const MultiSignDocumentSigningView = ({
     useRequiredDocumentSigningContext();
 
   const [hasDocumentLoaded, setHasDocumentLoaded] = useState(false);
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -179,7 +181,11 @@ export const MultiSignDocumentSigningView = ({
 
   return (
     <div className="min-h-screen overflow-hidden bg-background">
-      <div id="document-field-portal-root" className="relative h-full w-full overflow-y-auto p-8">
+      <div
+        id="document-field-portal-root"
+        ref={scrollContainerRef}
+        className="relative h-full w-full overflow-y-auto p-8"
+      >
         {match({ isLoading, document })
           .with({ isLoading: true }, () => (
             <div className="flex min-h-[400px] w-full items-center justify-center">
@@ -230,6 +236,7 @@ export const MultiSignDocumentSigningView = ({
                     envelopeItem={document.envelopeItems[0]}
                     token={token}
                     version="current"
+                    scrollParentRef={scrollContainerRef}
                     onDocumentLoad={() => {
                       setHasDocumentLoaded(true);
                       onDocumentReady?.();

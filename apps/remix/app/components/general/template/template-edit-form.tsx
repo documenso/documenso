@@ -317,6 +317,7 @@ export const TemplateEditForm = ({
             envelopeItem={template.envelopeItems[0]}
             token={undefined}
             version="current"
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

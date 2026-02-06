@@ -15,6 +15,7 @@ import type { TGetEnvelopeItemsMetaResponse } from '@documenso/remix/server/api/
 
 import { cn } from '../../lib/utils';
 import { useToast } from '../../primitives/use-toast';
+import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 import { useVirtualList } from '../virtual-list/use-virtual-list';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 
@@ -49,6 +50,16 @@ export type PDFViewerProps = {
   token: string | undefined;
   presignToken?: string | undefined;
   version: DocumentDataVersion;
+
+  /**
+   * Ref to the scrollable parent container that handles scrolling.
+   *
+   * This must point to an element with `overflow-y: auto` or `overflow-y: scroll`
+   * that is an ancestor of this component, or `'window'` to use the browser
+   * window as the scroll container.
+   */
+  scrollParentRef: ScrollTarget;
+
   onDocumentLoad?: () => void;
   overrideImages?: OverrideImage[];
 } & React.HTMLAttributes<HTMLDivElement>;
@@ -59,6 +70,7 @@ export const PDFViewer = ({
   token,
   presignToken,
   version,
+  scrollParentRef,
   onDocumentLoad,
   overrideImages,
   ...props
@@ -168,7 +180,7 @@ export const PDFViewer = ({
   const hasError = loadingState === 'error';
 
   return (
-    <div ref={$el} className={cn('h-full w-full overflow-hidden', className)} {...props}>
+    <div ref={$el} className={cn('w-full', className)} {...props}>
       {/* Loading State */}
       {isLoading && <PdfViewerLoadingState />}
 
@@ -178,7 +190,7 @@ export const PDFViewer = ({
       {/* Loaded State */}
       {loadingState === 'loaded' && numPages > 0 && (
         <VirtualizedPageList
-          scrollParentRef={$el}
+          scrollParentRef={scrollParentRef}
           constraintRef={$el}
           numPages={numPages}
           pages={derivedPages}
@@ -189,7 +201,7 @@ export const PDFViewer = ({
 };
 
 type VirtualizedPageListProps = {
-  scrollParentRef: React.RefObject<HTMLDivElement>;
+  scrollParentRef: ScrollTarget;
   constraintRef: React.RefObject<HTMLDivElement>;
   pages: PageMeta[];
   numPages: number;
@@ -203,9 +215,12 @@ const VirtualizedPageList = ({
   pages,
   numPages,
 }: VirtualizedPageListProps) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const { virtualItems, totalSize, constraintWidth } = useVirtualList({
     scrollRef: scrollParentRef,
     constraintRef,
+    contentRef,
     itemCount: numPages,
     itemSize: (index, width) => {
       const pageMeta = pages[index];
@@ -222,6 +237,7 @@ const VirtualizedPageList = ({
 
   return (
     <div
+      ref={contentRef}
       style={{
         height: `${totalSize}px`,
         width: '100%',

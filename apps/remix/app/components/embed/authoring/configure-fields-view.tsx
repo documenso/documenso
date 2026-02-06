@@ -551,6 +551,7 @@ export const ConfigureFieldsView = ({
                   envelopeItem={normalizedEnvelopeItem}
                   token={undefined}
                   version="current"
+                  scrollParentRef="window"
                 />
 
                 <ElementVisible

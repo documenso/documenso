@@ -1,8 +1,23 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+export type ScrollTarget = React.RefObject<HTMLElement | null> | 'window';
 
 export type VirtualListOptions = {
-  scrollRef: React.RefObject<HTMLElement | null>;
+  scrollRef: ScrollTarget;
   constraintRef?: React.RefObject<HTMLElement | null>;
+
+  /**
+   * Ref to the element that contains the virtual list content.
+   *
+   * Used to calculate the offset between the scroll container and the virtual
+   * list when the scroll container is a parent element higher in the DOM tree.
+   *
+   * When the virtual list is not at the top of the scroll container (e.g. there
+   * are headers, alerts, or other content above it), this offset ensures the
+   * scroll position is correctly adjusted for virtualization calculations.
+   */
+  contentRef?: React.RefObject<HTMLElement | null>;
+
   itemCount: number;
   itemSize: number | ((index: number, constraintWidth: number) => number);
   overscan?: number;
@@ -28,11 +43,19 @@ export type VirtualListResult = {
  * @returns Virtual items to render, total size, and constraint width
  */
 export const useVirtualList = (options: VirtualListOptions): VirtualListResult => {
-  const { scrollRef, constraintRef, itemCount, itemSize, overscan = 3 } = options;
+  const { scrollRef, constraintRef, contentRef, itemCount, itemSize, overscan = 3 } = options;
 
   const [scrollTop, setScrollTop] = useState(0);
   const [viewportHeight, setViewportHeight] = useState(0);
   const [constraintWidth, setConstraintWidth] = useState(0);
+
+  /**
+   * The offset of the content element relative to the scroll container.
+   *
+   * This is recalculated on scroll to handle cases where dynamic content
+   * above the virtual list changes size.
+   */
+  const contentOffsetRef = useRef(0);
 
   // Track constraint element width with ResizeObserver
   useEffect(() => {
@@ -60,6 +83,19 @@ export const useVirtualList = (options: VirtualListOptions): VirtualListResult =
 
   // Track scroll container dimensions with ResizeObserver
   useEffect(() => {
+    if (scrollRef === 'window') {
+      const handleResize = () => {
+        setViewportHeight(window.innerHeight);
+      };
+
+      window.addEventListener('resize', handleResize);
+
+      // Set initial height
+      setViewportHeight(window.innerHeight);
+
+      return () => window.removeEventListener('resize', handleResize);
+    }
+
     const el = scrollRef.current;
 
     if (!el) {
@@ -82,25 +118,78 @@ export const useVirtualList = (options: VirtualListOptions): VirtualListResult =
     return () => observer.disconnect();
   }, [scrollRef]);
 
-  // Handle scroll events
+  // Handle scroll events and calculate content offset
   useEffect(() => {
-    const el = scrollRef.current;
+    if (scrollRef === 'window') {
+      const calculateOffset = () => {
+        const contentEl = contentRef?.current;
 
-    if (!el) {
+        if (!contentEl) {
+          contentOffsetRef.current = 0;
+          return;
+        }
+
+        // For window scrolling, the offset is the distance from the top of the
+        // content element to the top of the document, which is its bounding rect
+        // top plus the current scroll position.
+        contentOffsetRef.current = contentEl.getBoundingClientRect().top + window.scrollY;
+      };
+
+      const handleScroll = () => {
+        calculateOffset();
+
+        const adjustedScrollTop = Math.max(0, window.scrollY - contentOffsetRef.current);
+        setScrollTop(adjustedScrollTop);
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+
+      // Set initial values
+      calculateOffset();
+      const adjustedScrollTop = Math.max(0, window.scrollY - contentOffsetRef.current);
+      setScrollTop(adjustedScrollTop);
+
+      return () => window.removeEventListener('scroll', handleScroll);
+    }
+
+    const scrollEl = scrollRef.current;
+
+    if (!scrollEl) {
       return;
     }
 
-    const handleScroll = () => {
-      setScrollTop(el.scrollTop);
+    const calculateOffset = () => {
+      const contentEl = contentRef?.current;
+
+      if (!contentEl) {
+        contentOffsetRef.current = 0;
+        return;
+      }
+
+      const scrollRect = scrollEl.getBoundingClientRect();
+      const contentRect = contentEl.getBoundingClientRect();
+
+      // The offset is the distance from the top of the content element to
+      // the top of the scroll container, adjusted for current scroll position.
+      contentOffsetRef.current = contentRect.top - scrollRect.top + scrollEl.scrollTop;
     };
 
-    el.addEventListener('scroll', handleScroll, { passive: true });
+    const handleScroll = () => {
+      calculateOffset();
 
-    // Set initial scroll position
-    setScrollTop(el.scrollTop);
+      const adjustedScrollTop = Math.max(0, scrollEl.scrollTop - contentOffsetRef.current);
+      setScrollTop(adjustedScrollTop);
+    };
 
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, [scrollRef]);
+    scrollEl.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Set initial values
+    calculateOffset();
+    const adjustedScrollTop = Math.max(0, scrollEl.scrollTop - contentOffsetRef.current);
+    setScrollTop(adjustedScrollTop);
+
+    return () => scrollEl.removeEventListener('scroll', handleScroll);
+  }, [scrollRef, contentRef]);
 
   // Get item size helper
   const getItemSize = useCallback(

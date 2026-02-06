@@ -345,6 +345,7 @@ export const EmbedDirectTemplateClientPage = ({
             envelopeItem={envelopeItems[0]}
             token={recipient.token}
             version="current"
+            scrollParentRef="window"
             onDocumentLoad={() => setHasDocumentLoaded(true)}
           />
         </div>

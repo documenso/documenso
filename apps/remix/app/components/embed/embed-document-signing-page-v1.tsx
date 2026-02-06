@@ -291,6 +291,7 @@ export const EmbedSignDocumentV1ClientPage = ({
               envelopeItem={envelopeItems[0]}
               token={token}
               version="current"
+              scrollParentRef="window"
               onDocumentLoad={() => setHasDocumentLoaded(true)}
             />
           </div>

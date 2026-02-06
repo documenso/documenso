@@ -156,6 +156,7 @@ export const DirectTemplatePageView = ({
             envelopeItem={template.envelopeItems[0]}
             token={directTemplateRecipient.token}
             version="current"
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

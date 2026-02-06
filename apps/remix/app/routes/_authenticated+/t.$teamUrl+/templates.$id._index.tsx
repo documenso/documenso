@@ -191,6 +191,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 <CardContent className="p-2">
                   <EnvelopePdfViewer
                     customPageRenderer={EnvelopeGenericPageRenderer}
+                    scrollParentRef="window"
                     errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
                   />
                 </CardContent>
@@ -217,6 +218,7 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
                 token={undefined}
                 version="current"
                 key={envelope.envelopeItems[0].id}
+                scrollParentRef="window"
               />
             </CardContent>
           </Card>

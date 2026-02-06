@@ -1,3 +1,5 @@
+import { useRef } from 'react';
+
 import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
@@ -37,6 +39,8 @@ export const DocumentDuplicateDialog = ({
   const { _ } = useLingui();
 
   const team = useCurrentTeam();
+
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const { data: envelopeItemsPayload, isLoading: isLoadingEnvelopeItems } =
     trpcReact.envelope.item.getManyByToken.useQuery(
@@ -95,12 +99,13 @@ export const DocumentDuplicateDialog = ({
             </h1>
           </div>
         ) : (
-          <div className="p-2 [&>div]:h-[50vh] [&>div]:overflow-y-scroll">
+          <div ref={scrollContainerRef} className="h-[50vh] overflow-y-scroll p-2">
             <PDFViewer
               key={envelopeItems[0].id}
               envelopeItem={envelopeItems[0]}
               token={undefined}
               version="initial"
+              scrollParentRef={scrollContainerRef}
             />
           </div>
         )}

@@ -1,4 +1,4 @@
-import { lazy, useEffect, useMemo, useState } from 'react';
+import { lazy, useEffect, useMemo, useRef, useState } from 'react';
 
 import { faker } from '@faker-js/faker/locale/en';
 import { Trans } from '@lingui/react/macro';
@@ -33,6 +33,8 @@ export const EnvelopeEditorPreviewPage = () => {
   const { envelope, editorFields } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem, fields } = useCurrentEnvelopeRender();
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   const [selectedPreviewMode, setSelectedPreviewMode] = useState<'recipient' | 'signed'>(
     'recipient',
@@ -214,7 +216,7 @@ export const EnvelopeEditorPreviewPage = () => {
       }}
     >
       <div className="relative flex h-full">
-        <div className="flex w-full flex-col overflow-y-auto">
+        <div className="flex w-full flex-col overflow-y-auto" ref={scrollableContainerRef}>
           {/* Horizontal envelope item selector */}
           <EnvelopeRendererFileSelector fields={editorFields.localFields} />
 
@@ -232,6 +234,7 @@ export const EnvelopeEditorPreviewPage = () => {
             {currentEnvelopeItem !== null ? (
               <EnvelopePdfViewer
                 customPageRenderer={EnvelopeGenericPageRenderer}
+                scrollParentRef={scrollableContainerRef}
                 errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
               />
             ) : (

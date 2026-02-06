@@ -279,6 +279,7 @@ export const DocumentSigningPageViewV1 = ({
                   envelopeItem={document.envelopeItems[0]}
                   token={recipient.token}
                   version="current"
+                  scrollParentRef="window"
                 />
               </CardContent>
             </Card>

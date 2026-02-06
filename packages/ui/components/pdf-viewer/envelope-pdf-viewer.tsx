@@ -13,12 +13,22 @@ import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i
 import { cn } from '@documenso/ui/lib/utils';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
 
+import type { ScrollTarget } from '../virtual-list/use-virtual-list';
 import { useVirtualList } from '../virtual-list/use-virtual-list';
 import { PdfViewerErrorState, PdfViewerLoadingState } from './pdf-viewer-states';
 
 export type EnvelopePdfViewerProps = {
   className?: string;
-  scrollParentRef?: React.RefObject<HTMLDivElement>;
+
+  /**
+   * Ref to the scrollable parent container that handles scrolling.
+   *
+   * This must point to an element with `overflow-y: auto` or `overflow-y: scroll`
+   * that is an ancestor of this component, or `'window'` to use the browser
+   * window as the scroll container.
+   */
+  scrollParentRef: ScrollTarget;
+
   onDocumentLoad?: () => void;
 
   /**
@@ -101,7 +111,7 @@ export const EnvelopePdfViewer = ({
         currentItemMeta &&
         numPages > 0 && (
           <VirtualizedPageList
-            scrollParentRef={scrollParentRef ?? $el}
+            scrollParentRef={scrollParentRef}
             constraintRef={$el}
             pages={currentItemMeta}
             envelopeItemId={currentEnvelopeItem.id}
@@ -127,7 +137,7 @@ export const EnvelopePdfViewer = ({
 };
 
 type VirtualizedPageListProps = {
-  scrollParentRef: React.RefObject<HTMLDivElement>;
+  scrollParentRef: ScrollTarget;
   constraintRef: React.RefObject<HTMLDivElement>;
   pages: BasePageRenderData[];
   envelopeItemId: string;
@@ -144,9 +154,12 @@ const VirtualizedPageList = ({
   numPages,
   CustomPageRenderer,
 }: VirtualizedPageListProps) => {
+  const contentRef = useRef<HTMLDivElement>(null);
+
   const { virtualItems, totalSize, constraintWidth } = useVirtualList({
     scrollRef: scrollParentRef,
     constraintRef,
+    contentRef,
     itemCount: numPages,
     itemSize: (index, width) => {
       const pageMeta = pages[index];
@@ -163,6 +176,7 @@ const VirtualizedPageList = ({
 
   return (
     <div
+      ref={contentRef}
       style={{
         height: `${totalSize}px`,
         width: '100%',

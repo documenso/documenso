@@ -445,6 +445,7 @@ export const DocumentEditForm = ({
             envelopeItem={document.envelopeItems[0]}
             token={undefined}
             version="current"
+            scrollParentRef="window"
             onDocumentLoad={() => setIsDocumentPdfLoaded(true)}
           />
         </CardContent>

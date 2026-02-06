@@ -1,4 +1,4 @@
-import { lazy, useEffect, useState } from 'react';
+import { lazy, useEffect, useRef, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
 import { type DocumentData, DocumentStatus, type EnvelopeItem, EnvelopeType } from '@prisma/client';
@@ -157,6 +157,7 @@ export const DocumentCertificateQRView = ({
               envelopeItem={envelopeItems[0]}
               token={token}
               version="current"
+              scrollParentRef="window"
             />
           </div>
         </>
@@ -179,6 +180,8 @@ const DocumentCertificateQrV2 = ({
   token,
 }: DocumentCertificateQrV2Props) => {
   const { envelopeItems } = useCurrentEnvelopeRender();
+
+  const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="flex min-h-screen flex-col items-start">
@@ -210,11 +213,12 @@ const DocumentCertificateQrV2 = ({
         />
       </div>
 
-      <div className="mt-12 w-full">
+      <div className="mt-12 max-h-[80vh] w-full overflow-y-auto" ref={scrollableContainerRef}>
         <EnvelopeRendererFileSelector className="mb-4 p-0" fields={[]} secondaryOverride={''} />
 
         <EnvelopePdfViewer
           customPageRenderer={EnvelopeGenericPageRenderer}
+          scrollParentRef={scrollableContainerRef}
           errorMessage={PDF_VIEWER_ERROR_MESSAGES.preview}
         />
       </div>
