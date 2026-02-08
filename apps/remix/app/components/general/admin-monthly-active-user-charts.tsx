@@ -17,7 +17,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<ValueType, NameT
     return (
       <div className="z-100 w-60 space-y-1 rounded-md border border-solid bg-white p-2 px-3">
         <p>{label}</p>
-        <p className="text-documenso">
+        <p className="text-brand">
           {payload[0].name === 'cume_count' ? 'Cumulative MAU' : 'Monthly Active Users'}:{' '}
           <span className="text-black">{Number(payload[0].value).toLocaleString('en-US')}</span>
         </p>
@@ -44,7 +44,7 @@ export const MonthlyActiveUsersChart = ({
 
   return (
     <div className={className}>
-      <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2">
+      <div className="flex flex-1 flex-col justify-center rounded-2xl border border-border p-6 pl-2">
         <div className="mb-6 flex px-4">
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>

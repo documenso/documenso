@@ -180,10 +180,10 @@ export const DocumentSigningFieldContainer = ({
               className={cn(
                 'absolute -top-16 left-0 right-0 rounded-md p-2 text-center text-xs text-gray-700',
                 {
-                  'bg-foreground/5 border-border border': !field.inserted,
+                  'border border-border bg-foreground/5': !field.inserted,
                 },
                 {
-                  'bg-documenso-200 border-primary border': field.inserted,
+                  'border border-primary bg-brand-200': field.inserted,
                 },
               )}
             >

@@ -27,7 +27,7 @@ export const OrganisationLeaveEmailTemplate = ({
   const { _ } = useLingui();
   const branding = useBranding();
 
-  const previewText = msg`A member has left your organisation on Documenso`;
+  const previewText = msg`A member has left your organisation on RJUSL Signing`;
 
   return (
     <Html>

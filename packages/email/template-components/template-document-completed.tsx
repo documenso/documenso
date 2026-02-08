@@ -27,7 +27,7 @@ export const TemplateDocumentCompleted = ({
       <Section>
         <Section className="mb-4">
           <Column align="center">
-            <Text className="text-base font-semibold text-[#7AC455]">
+            <Text className="text-base font-semibold text-[#4599d0]">
               <Img
                 src={getAssetUrl('/static/completed.png')}
                 className="-mt-0.5 mr-2 inline h-7 w-7 align-middle"
@@ -37,7 +37,7 @@ export const TemplateDocumentCompleted = ({
           </Column>
         </Section>
 
-        <Text className="text-primary mb-0 text-center text-lg font-semibold">
+        <Text className="mb-0 text-center text-lg font-semibold text-primary">
           {customBody || <Trans>“{documentName}” was signed by all signers</Trans>}
         </Text>
 

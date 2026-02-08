@@ -70,7 +70,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
   if (isLoading || state === null) {
     return (
       <div className="relative">
-        <Loader className="text-documenso h-8 w-8 animate-spin" />
+        <Loader className="h-8 w-8 animate-spin text-brand" />
       </div>
     );
   }
@@ -88,7 +88,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
               <Trans>Something went wrong</Trans>
             </h2>
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>
                 We were unable to verify your email. If your email is not verified already, please
                 try again.
@@ -108,7 +108,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
       <div className="w-screen max-w-lg px-4">
         <div className="flex w-full items-start">
           <div className="mr-4 mt-1 hidden md:block">
-            <XCircle className="text-destructive h-10 w-10" strokeWidth={2} />
+            <XCircle className="h-10 w-10 text-destructive" strokeWidth={2} />
           </div>
 
           <div>
@@ -116,7 +116,7 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
               <Trans>Your token has expired!</Trans>
             </h2>
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>
                 It seems that the provided token has expired. We've just sent you another token,
                 please check your email and try again.
@@ -144,10 +144,10 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
               <Trans>Email Confirmed!</Trans>
             </h2>
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>
-                Your email has been successfully confirmed! You can now use all features of
-                Documenso.
+                Your email has been successfully confirmed! You can now use all features of RJUSL
+                Signing.
               </Trans>
             </p>
 
@@ -172,9 +172,10 @@ export default function VerifyEmailPage({ loaderData }: Route.ComponentProps) {
               <Trans>Email already confirmed</Trans>
             </h2>
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>
-                Your email has already been confirmed. You can now use all features of Documenso.
+                Your email has already been confirmed. You can now use all features of RJUSL
+                Signing.
               </Trans>
             </p>
 

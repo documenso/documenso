@@ -29,7 +29,7 @@ const pdfViewerOptions = {
 
 const PDFLoader = () => (
   <>
-    <Loader className="h-12 w-12 animate-spin text-documenso" />
+    <Loader className="h-12 w-12 animate-spin text-brand" />
 
     <p className="mt-4 text-muted-foreground">
       <Trans>Loading document...</Trans>

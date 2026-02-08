@@ -1,6 +1,6 @@
 {
-  "name": "Documenso",
-  "short_name": "Documenso",
+  "name": "RJUSL Signing",
+  "short_name": "RJUSL",
   "icons": [
     {
       "src": "/android-chrome-192x192.png",
@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "theme_color": "#A2E771",
+  "theme_color": "#4599d0",
   "background_color": "#FFFFFF",
   "display": "standalone"
 }

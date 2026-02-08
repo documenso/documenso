@@ -141,7 +141,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                       </FormControl>
 
                       <FormDescription>
-                        <Trans>The URL for Documenso to send webhook events to.</Trans>
+                        <Trans>The URL to send webhook events to.</Trans>
                       </FormDescription>
 
                       <FormMessage />
@@ -219,7 +219,7 @@ export const WebhookCreateDialog = ({ trigger, ...props }: WebhookCreateDialogPr
                     <FormDescription>
                       <Trans>
                         A secret that will be sent to your URL so you can verify that the request
-                        has been sent by Documenso.
+                        has been sent by RJUSL Signing.
                       </Trans>
                     </FormDescription>
                     <FormMessage />

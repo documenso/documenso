@@ -58,19 +58,19 @@ export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardP
 
   return (
     <Link to={formatPath()} data-folder-id={folder.id} data-folder-name={folder.name}>
-      <Card className="hover:bg-muted/50 border-border h-full border transition-all">
+      <Card className="h-full border border-border transition-all hover:bg-muted/50">
         <CardContent className="p-4">
           <div className="flex min-w-0 items-center gap-3">
-            <FolderIcon className="text-documenso h-6 w-6 flex-shrink-0" />
+            <FolderIcon className="h-6 w-6 flex-shrink-0 text-brand" />
 
             <div className="flex w-full min-w-0 items-center justify-between">
               <div className="min-w-0 flex-1">
                 <h3 className="flex min-w-0 items-center gap-2 font-medium">
                   <span className="truncate">{folder.name}</span>
-                  {folder.pinned && <PinIcon className="text-documenso h-3 w-3 flex-shrink-0" />}
+                  {folder.pinned && <PinIcon className="h-3 w-3 flex-shrink-0 text-brand" />}
                 </h3>
 
-                <div className="text-muted-foreground mt-1 flex space-x-2 truncate text-xs">
+                <div className="mt-1 flex space-x-2 truncate text-xs text-muted-foreground">
                   <span>
                     {folder.type === FolderType.TEMPLATE ? (
                       <Plural
@@ -143,17 +143,17 @@ export const FolderCard = ({ folder, onMove, onSettings, onDelete }: FolderCardP
 
 export const FolderCardEmpty = ({ type }: { type: FolderType }) => {
   return (
-    <Card className="hover:bg-muted/50 border-border h-full border transition-all">
+    <Card className="h-full border border-border transition-all hover:bg-muted/50">
       <CardContent className="p-4">
         <div className="flex items-center gap-3">
-          <FolderPlusIcon className="text-muted-foreground/60 h-6 w-6" />
+          <FolderPlusIcon className="h-6 w-6 text-muted-foreground/60" />
 
           <div>
-            <h3 className="text-muted-foreground flex items-center gap-2 font-medium">
+            <h3 className="flex items-center gap-2 font-medium text-muted-foreground">
               <Trans>Create folder</Trans>
             </h3>
 
-            <div className="text-muted-foreground/60 mt-1 flex space-x-2 truncate text-xs">
+            <div className="mt-1 flex space-x-2 truncate text-xs text-muted-foreground/60">
               {type === FolderType.DOCUMENT ? (
                 <Trans>Organise your documents</Trans>
               ) : (

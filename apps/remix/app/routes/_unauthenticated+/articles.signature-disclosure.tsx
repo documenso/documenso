@@ -17,8 +17,8 @@ export default function SignatureDisclosure() {
         </h2>
         <p>
           <Trans>
-            Thank you for using Documenso to perform your electronic document signing. The purpose
-            of this disclosure is to inform you about the process, legality, and your rights
+            Thank you for using RJUSL Signing to perform your electronic document signing. The
+            purpose of this disclosure is to inform you about the process, legality, and your rights
             regarding the use of electronic signatures on our platform. By opting to use an
             electronic signature, you are agreeing to the terms and conditions outlined below.
           </Trans>
@@ -135,10 +135,10 @@ export default function SignatureDisclosure() {
         </h2>
         <p>
           <Trans>
-            By proceeding to use the electronic signature service provided by Documenso, you affirm
-            that you have read and understood this disclosure. You agree to all terms and conditions
-            related to the use of electronic signatures and electronic transactions as outlined
-            herein.
+            By proceeding to use the electronic signature service provided by RJUSL Signing, you
+            affirm that you have read and understood this disclosure. You agree to all terms and
+            conditions related to the use of electronic signatures and electronic transactions as
+            outlined herein.
           </Trans>
         </p>
 

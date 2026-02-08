@@ -127,14 +127,14 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
       <div className="w-screen max-w-lg px-4">
         <div className="flex items-start">
           <div className="mr-4 mt-1 hidden md:block">
-            <MailsIcon className="text-primary h-10 w-10" strokeWidth={2} />
+            <MailsIcon className="h-10 w-10 text-primary" strokeWidth={2} />
           </div>
           <div className="">
             <h2 className="text-2xl font-bold md:text-4xl">
               <Trans>Confirmation email sent</Trans>
             </h2>
 
-            <p className="text-muted-foreground mt-4">
+            <p className="mt-4 text-muted-foreground">
               <Trans>
                 To gain access to your account, please confirm your email address by clicking on the
                 confirmation link from your inbox.
@@ -156,12 +156,12 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
 
   return (
     <div className="w-screen max-w-lg px-4">
-      <div className="border-border dark:bg-background z-10 rounded-xl border bg-neutral-100 p-6">
+      <div className="z-10 rounded-xl border border-border bg-neutral-100 p-6 dark:bg-background">
         <h1 className="text-2xl font-semibold">
           <Trans>Welcome to {organisationName}</Trans>
         </h1>
 
-        <p className="text-muted-foreground mt-2 text-sm">
+        <p className="mt-2 text-sm text-muted-foreground">
           <Trans>Sign in to your account</Trans>
         </p>
 
@@ -177,7 +177,7 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
           />
 
           <label
-            className="text-muted-foreground ml-2 flex flex-row items-center text-sm"
+            className="ml-2 flex flex-row items-center text-sm text-muted-foreground"
             htmlFor={`flag-3rd-party-service`}
           >
             <Trans>
@@ -191,7 +191,7 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
           type="button"
           size="lg"
           variant="outline"
-          className="bg-background w-full"
+          className="w-full bg-background"
           loading={isSubmitting}
           disabled={!isConfirmationChecked}
           onClick={onSignInWithOIDCClick}
@@ -200,16 +200,16 @@ export default function OrganisationSignIn({ loaderData }: Route.ComponentProps)
         </Button>
 
         <div className="relative mt-2 flex items-center justify-center gap-x-4 py-2 text-xs uppercase">
-          <div className="bg-border h-px flex-1" />
-          <span className="text-muted-foreground bg-transparent">
+          <div className="h-px flex-1 bg-border" />
+          <span className="bg-transparent text-muted-foreground">
             <Trans>OR</Trans>
           </span>
-          <div className="bg-border h-px flex-1" />
+          <div className="h-px flex-1 bg-border" />
         </div>
 
-        <div className="text-muted-foreground mt-1 flex items-center justify-center text-xs">
+        <div className="mt-1 flex items-center justify-center text-xs text-muted-foreground">
           <Link to="/signin">
-            <Trans>Return to Documenso sign in page here</Trans>
+            <Trans>Return to sign in page here</Trans>
           </Link>
         </div>
       </div>

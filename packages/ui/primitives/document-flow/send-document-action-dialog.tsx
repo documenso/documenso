@@ -30,7 +30,7 @@ export const SendDocumentActionDialog = ({
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button type="button" className={className}>
-          {loading && <Loader className="text-documenso mr-2 h-5 w-5 animate-spin" />}
+          {loading && <Loader className="mr-2 h-5 w-5 animate-spin text-brand" />}
           <Trans>Send</Trans>
         </Button>
       </DialogTrigger>
@@ -50,7 +50,7 @@ export const SendDocumentActionDialog = ({
 
         <DialogFooter className="mt-4 flex items-center gap-x-4">
           <Button
-            className="dark:bg-muted dark:hover:bg-muted/80 dark:focus-visible:ring-muted/80 flex-1 border-none bg-black/5 hover:bg-black/10 focus-visible:ring-black/10"
+            className="flex-1 border-none bg-black/5 hover:bg-black/10 focus-visible:ring-black/10 dark:bg-muted dark:hover:bg-muted/80 dark:focus-visible:ring-muted/80"
             type="button"
             variant="secondary"
             onClick={() => setOpen(false)}

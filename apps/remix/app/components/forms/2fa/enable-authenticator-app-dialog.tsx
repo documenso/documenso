@@ -122,7 +122,7 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
       });
 
       downloadFile({
-        filename: 'documenso-2FA-recovery-codes.txt',
+        filename: 'rjusl-2FA-recovery-codes.txt',
         data: blob,
       });
     }
@@ -216,18 +216,18 @@ export const EnableAuthenticatorAppDialog = ({ onSuccess }: EnableAuthenticatorA
                       }}
                     />
 
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       <Trans>
                         If your authenticator app does not support QR codes, you can use the
                         following code instead:
                       </Trans>
                     </p>
 
-                    <p className="bg-muted/60 text-muted-foreground rounded-lg p-2 text-center font-mono tracking-widest">
+                    <p className="rounded-lg bg-muted/60 p-2 text-center font-mono tracking-widest text-muted-foreground">
                       {setup2FAData?.secret}
                     </p>
 
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-sm text-muted-foreground">
                       <Trans>
                         Once you have scanned the QR code or entered the code manually, enter the
                         code provided by your authenticator app below.

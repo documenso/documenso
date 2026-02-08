@@ -253,9 +253,9 @@ export const OrganisationMemberInviteDialog = ({
 
   const downloadTemplate = () => {
     const data = [
-      { email: 'admin@documenso.com', role: 'Admin' },
-      { email: 'manager@documenso.com', role: 'Manager' },
-      { email: 'member@documenso.com', role: 'Member' },
+      { email: 'admin@example.com', role: 'Admin' },
+      { email: 'manager@example.com', role: 'Manager' },
+      { email: 'member@example.com', role: 'Member' },
     ];
 
     const csvContent =
@@ -266,7 +266,7 @@ export const OrganisationMemberInviteDialog = ({
     });
 
     downloadFile({
-      filename: 'documenso-organisation-member-invites-template.csv',
+      filename: 'rjusl-organisation-member-invites-template.csv',
       data: blob,
     });
   };
@@ -329,12 +329,12 @@ export const OrganisationMemberInviteDialog = ({
             onValueChange={(value) => setInvitationType(value as TabTypes)}
           >
             <TabsList className="w-full">
-              <TabsTrigger value="INDIVIDUAL" className="hover:text-foreground w-full">
+              <TabsTrigger value="INDIVIDUAL" className="w-full hover:text-foreground">
                 <MailIcon size={20} className="mr-2" />
                 <Trans>Invite Members</Trans>
               </TabsTrigger>
 
-              <TabsTrigger value="BULK" className="hover:text-foreground w-full">
+              <TabsTrigger value="BULK" className="w-full hover:text-foreground">
                 <UsersIcon size={20} className="mr-2" /> <Trans>Bulk Import</Trans>
               </TabsTrigger>
             </TabsList>
@@ -382,7 +382,7 @@ export const OrganisationMemberInviteDialog = ({
                                 )}
                                 <FormControl>
                                   <Select {...field} onValueChange={field.onChange}>
-                                    <SelectTrigger className="text-muted-foreground max-w-[200px]">
+                                    <SelectTrigger className="max-w-[200px] text-muted-foreground">
                                       <SelectValue />
                                     </SelectTrigger>
 
@@ -447,7 +447,7 @@ export const OrganisationMemberInviteDialog = ({
               <div className="mt-4 space-y-4">
                 <Card gradient className="h-32">
                   <CardContent
-                    className="text-muted-foreground/80 hover:text-muted-foreground/90 flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 transition-colors"
+                    className="flex h-full cursor-pointer flex-col items-center justify-center rounded-lg p-0 text-muted-foreground/80 transition-colors hover:text-muted-foreground/90"
                     onClick={() => fileInputRef.current?.click()}
                   >
                     <Upload className="h-5 w-5" />

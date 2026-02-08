@@ -122,7 +122,7 @@ export const RadioFieldAdvancedSettings = ({
           </Label>
           <Input
             id="label"
-            className="bg-background mt-2"
+            className="mt-2 bg-background"
             placeholder={_(msg`Field label`)}
             value={fieldState.label}
             onChange={(e) => handleFieldChange('label', e.target.value)}
@@ -150,7 +150,7 @@ export const RadioFieldAdvancedSettings = ({
         </div>
       </div>
       <Button
-        className="bg-foreground/10 hover:bg-foreground/5 border-foreground/10 mt-2 border"
+        className="mt-2 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
         variant="outline"
         onClick={() => setShowValidation((prev) => !prev)}
       >
@@ -167,7 +167,7 @@ export const RadioFieldAdvancedSettings = ({
           {values.map((value) => (
             <div key={value.id} className="mt-2 flex items-center gap-4">
               <Checkbox
-                className="data-[state=checked]:bg-documenso border-foreground/30 data-[state=checked]:ring-primary dark:data-[state=checked]:ring-offset-background h-5 w-5 rounded-full data-[state=checked]:ring-1 data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white"
+                className="h-5 w-5 rounded-full border-foreground/30 data-[state=checked]:bg-brand data-[state=checked]:ring-1 data-[state=checked]:ring-primary data-[state=checked]:ring-offset-2 data-[state=checked]:ring-offset-white dark:data-[state=checked]:ring-offset-background"
                 checked={value.checked}
                 onCheckedChange={(checked) => handleCheckedChange(Boolean(checked), value.id)}
               />
@@ -186,7 +186,7 @@ export const RadioFieldAdvancedSettings = ({
             </div>
           ))}
           <Button
-            className="bg-foreground/10 hover:bg-foreground/5 border-foreground/10 ml-9 mt-4 border"
+            className="ml-9 mt-4 border border-foreground/10 bg-foreground/10 hover:bg-foreground/5"
             variant="outline"
             onClick={addValue}
           >

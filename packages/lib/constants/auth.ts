@@ -4,7 +4,7 @@ import { NEXT_PUBLIC_WEBAPP_URL } from './app';
 export const SALT_ROUNDS = 12;
 
 export const IDENTITY_PROVIDER_NAME: Record<string, string> = {
-  DOCUMENSO: 'Documenso',
+  DOCUMENSO: 'RJUSL Signing',
   GOOGLE: 'Google',
   MICROSOFT: 'Microsoft',
   OIDC: 'OIDC',

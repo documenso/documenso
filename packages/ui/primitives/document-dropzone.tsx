@@ -87,7 +87,7 @@ export const DocumentDropzone = ({
       <Card
         role="button"
         className={cn(
-          'focus-visible:ring-ring ring-offset-background group flex flex-1 cursor-pointer flex-col items-center justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+          'group flex flex-1 cursor-pointer flex-col items-center justify-center ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
           className,
         )}
         gradient={!disabled}
@@ -96,77 +96,77 @@ export const DocumentDropzone = ({
         {...getRootProps()}
         {...props}
       >
-        <CardContent className="text-muted-foreground/40 flex flex-col items-center justify-center p-6">
+        <CardContent className="flex flex-col items-center justify-center p-6 text-muted-foreground/40">
           {disabled ? (
             // Disabled State
             <div className="flex">
               <motion.div
-                className="group-hover:bg-destructive/2 border-muted-foreground/20 group-hover:border-destructive/10 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="group-hover:bg-destructive/2 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10 dark:bg-muted/80"
                 variants={DocumentDropzoneDisabledCardLeftVariants}
               >
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
+                <div className="h-2 w-5/6 rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
               </motion.div>
               <motion.div
-                className="group-hover:bg-destructive/5 border-muted-foreground/20 group-hover:border-destructive/50 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/50 group-hover:bg-destructive/5 dark:bg-muted/80"
                 variants={DocumentDropzoneDisabledCardCenterVariants}
               >
                 <AlertTriangle
                   strokeWidth="2px"
-                  className="text-muted-foreground/20 group-hover:text-destructive h-12 w-12"
+                  className="h-12 w-12 text-muted-foreground/20 group-hover:text-destructive"
                 />
               </motion.div>
               <motion.div
-                className="group-hover:bg-destructive/2 border-muted-foreground/20 group-hover:border-destructive/10 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="group-hover:bg-destructive/2 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-destructive/10 dark:bg-muted/80"
                 variants={DocumentDropzoneDisabledCardRightVariants}
               >
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/10 group-hover:bg-destructive/10 h-2 w-full rounded-[2px]" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
+                <div className="h-2 w-5/6 rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/10 group-hover:bg-destructive/10" />
               </motion.div>
             </div>
           ) : (
             // Non Disabled State
             <div className="flex">
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="a z-10 flex aspect-[3/4] w-24 origin-top-right -rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-brand/80 dark:bg-muted/80"
                 variants={DocumentDropzoneCardLeftVariants}
               >
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
+                <div className="h-2 w-5/6 rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
               </motion.div>
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="z-20 flex aspect-[3/4] w-24 flex-col items-center justify-center gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-brand/80 dark:bg-muted/80"
                 variants={DocumentDropzoneCardCenterVariants}
               >
                 <Plus
                   strokeWidth="2px"
-                  className="text-muted-foreground/20 group-hover:text-documenso h-12 w-12"
+                  className="h-12 w-12 text-muted-foreground/20 group-hover:text-brand"
                 />
               </motion.div>
               <motion.div
-                className="border-muted-foreground/20 group-hover:border-documenso/80 dark:bg-muted/80 z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border bg-white/80 px-2 py-4 backdrop-blur-sm"
+                className="z-10 flex aspect-[3/4] w-24 origin-top-left rotate-[22deg] flex-col gap-y-1 rounded-lg border border-muted-foreground/20 bg-white/80 px-2 py-4 backdrop-blur-sm group-hover:border-brand/80 dark:bg-muted/80"
                 variants={DocumentDropzoneCardRightVariants}
               >
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-5/6 rounded-[2px]" />
-                <div className="bg-muted-foreground/20 group-hover:bg-documenso h-2 w-full rounded-[2px]" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
+                <div className="h-2 w-5/6 rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
+                <div className="h-2 w-full rounded-[2px] bg-muted-foreground/20 group-hover:bg-brand" />
               </motion.div>
             </div>
           )}
 
           <input {...getInputProps()} />
 
-          <p className="text-foreground mt-6 font-medium">{_(heading[type])}</p>
+          <p className="mt-6 font-medium text-foreground">{_(heading[type])}</p>
 
-          <p className="text-muted-foreground/80 mt-1 text-center text-sm">
+          <p className="mt-1 text-center text-sm text-muted-foreground/80">
             {_(disabled ? disabledMessage : msg`Drag & drop your PDF here.`)}
           </p>
 
           {disabled && IS_BILLING_ENABLED() && (
-            <Button className="hover:bg-warning/80 bg-warning mt-4 w-32" asChild>
+            <Button className="mt-4 w-32 bg-warning hover:bg-warning/80" asChild>
               <Link to={`/o/${organisation.url}/settings/billing`}>
                 <Trans>Upgrade</Trans>
               </Link>

@@ -81,8 +81,8 @@ export const DocumentCertificateQRView = ({
 
               <DialogDescription>
                 <Trans>
-                  This document is available in your Documenso account. You can view more details,
-                  recipients, and audit logs there.
+                  This document is available in your RJUSL Signing account. You can view more
+                  details, recipients, and audit logs there.
                 </Trans>
               </DialogDescription>
             </DialogHeader>

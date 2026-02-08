@@ -23,7 +23,7 @@ const CustomTooltip = ({
     return (
       <div className="z-100 w-60 space-y-1 rounded-md border border-solid bg-white p-2 px-3">
         <p className="">{label}</p>
-        <p className="text-documenso">
+        <p className="text-brand">
           {`${tooltip} : `}
           <span className="text-black">{payload[0].value}</span>
         </p>
@@ -60,7 +60,7 @@ export const AdminStatsUsersWithDocumentsChart = ({
 
   return (
     <div className={className}>
-      <div className="border-border flex flex-1 flex-col justify-center rounded-2xl border p-6 pl-2">
+      <div className="flex flex-1 flex-col justify-center rounded-2xl border border-border p-6 pl-2">
         <div className="mb-6 flex h-12 px-4">
           <h3 className="text-lg font-semibold">{title}</h3>
         </div>

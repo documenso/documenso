@@ -357,9 +357,9 @@ const BillingPlanForm = ({
         <button
           onClick={() => onChange('')}
           className={cn(
-            'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
+            'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
             {
-              'ring-primary/10 border-primary ring-2 ring-offset-1': '' === value,
+              'border-primary ring-2 ring-primary/10 ring-offset-1': '' === value,
             },
           )}
           disabled={!canCreateFreeOrganisation}
@@ -390,9 +390,9 @@ const BillingPlanForm = ({
             key={plan[billingPeriod]?.id}
             onClick={() => onChange(plan[billingPeriod]?.id ?? '')}
             className={cn(
-              'hover:border-primary flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:shadow-sm',
+              'flex cursor-pointer items-center space-x-2 rounded-md border p-4 transition-all hover:border-primary hover:shadow-sm',
               {
-                'ring-primary/10 border-primary ring-2 ring-offset-1':
+                'border-primary ring-2 ring-primary/10 ring-offset-1':
                   plan[billingPeriod]?.id === value,
               },
             )}
@@ -403,7 +403,7 @@ const BillingPlanForm = ({
             </div>
             <div className="whitespace-nowrap text-right text-sm font-medium">
               <p>{plan[billingPeriod]?.friendlyPrice}</p>
-              <span className="text-muted-foreground text-xs">
+              <span className="text-xs text-muted-foreground">
                 {billingPeriod === 'monthlyPrice' ? (
                   <Trans>per month</Trans>
                 ) : (
@@ -417,13 +417,13 @@ const BillingPlanForm = ({
         <Link
           to="https://documen.so/enterprise-cta"
           target="_blank"
-          className="bg-muted/30 flex items-center space-x-2 rounded-md border p-4"
+          className="flex items-center space-x-2 rounded-md border bg-muted/30 p-4"
         >
           <div className="flex-1 font-normal">
-            <p className="text-muted-foreground font-medium">
+            <p className="font-medium text-muted-foreground">
               <Trans>Enterprise</Trans>
             </p>
-            <p className="text-muted-foreground flex flex-row items-center gap-1">
+            <p className="flex flex-row items-center gap-1 text-muted-foreground">
               <Trans>Contact sales here</Trans>
               <ExternalLinkIcon className="h-4 w-4" />
             </p>
@@ -433,8 +433,8 @@ const BillingPlanForm = ({
 
       <div className="mt-6 text-center">
         <Link
-          to="https://documenso.com/pricing"
-          className="text-primary hover:text-primary/80 flex items-center justify-center gap-1 text-sm hover:underline"
+          to="/pricing"
+          className="flex items-center justify-center gap-1 text-sm text-primary hover:text-primary/80 hover:underline"
           target="_blank"
         >
           <Trans>Compare all plans and features in detail</Trans>
