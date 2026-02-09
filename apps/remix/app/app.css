@@ -1,4 +1,5 @@
 @import '@documenso/ui/styles/theme.css';
+@import 'react-pdf/dist/Page/AnnotationLayer.css';
 
 /* Inter Variable Fonts */
 @font-face {
@@ -68,4 +69,25 @@
     --font-signature: 'Caveat';
     --font-noto: 'Noto Sans', 'Noto Sans Korean', 'Noto Sans Japanese', 'Noto Sans Chinese';
   }
+}
+
+/*
+ * PDF annotation layer overrides for embedded links.
+ *
+ * The Konva overlay used for signing fields has z-index: 10,
+ * so we raise the annotation layer above it. We also disable
+ * pointer-events on all annotation sections except links, to
+ * avoid interfering with the Konva field interactions.
+ */
+ .react-pdf__Page .annotationLayer {
+  z-index: 20;
+}
+
+.react-pdf__Page .annotationLayer section {
+  pointer-events: none;
+}
+
+.react-pdf__Page .annotationLayer .linkAnnotation {
+  pointer-events: auto;
+  cursor: pointer;
 }

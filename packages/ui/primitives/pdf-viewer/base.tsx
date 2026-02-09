@@ -265,7 +265,7 @@ export const PDFViewer = ({
                     <PDFPage
                       pageNumber={i + 1}
                       width={width}
-                      renderAnnotationLayer={false}
+                      renderAnnotationLayer={true}
                       renderTextLayer={false}
                       loading={() => ''}
                       renderMode={customPageRenderer ? 'custom' : 'canvas'}
