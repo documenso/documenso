@@ -81,7 +81,7 @@ export const TeamGroupDeleteDialog = ({
           </DialogTitle>
 
           <DialogDescription className="mt-4">
-            <Trans>
+            <Trans context="Removing group from team">
               You are about to remove the following group from{' '}
               <span className="font-semibold">{team.name}</span>.
             </Trans>
