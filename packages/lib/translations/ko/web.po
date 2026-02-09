@@ -8,7 +8,7 @@ msgstr ""
 "Language: ko\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-13 10:04\n"
+"PO-Revision-Date: 2026-02-09 03:02\n"
 "Last-Translator: \n"
 "Language-Team: Korean\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -21,6 +21,11 @@ msgstr ""
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 msgstr ".PDF 문서만 허용됩니다(최대 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)."
+
+#. placeholder {0}: invalidEmails[0].value
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "\"{0}\" is not a valid email address."
+msgstr "\"{0}\"은(는) 올바른 이메일 주소가 아닙니다."
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
@@ -100,6 +105,17 @@ msgstr "{0, plural, other {#개의 필드}}"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "{0, plural, one {# folder} other {# folders}}"
 msgstr "{0, plural, other {폴더 #개}}"
+
+#. placeholder {0}: result.deletedCount
+#. placeholder {1}: result.failedIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {# item deleted.} other {# items deleted.}} {1, plural, one {# item could not be deleted.} other {# items could not be deleted.}}"
+msgstr "{0, plural, other {#개 항목이 삭제되었습니다.}} {1, plural, other {#개 항목을 삭제하지 못했습니다.}}"
+
+#. placeholder {0}: result.deletedCount
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {# item has been deleted.} other {# items have been deleted.}}"
+msgstr "{0, plural, other {#개 항목이 삭제되었습니다.}}"
 
 #. placeholder {0}: detectedRecipients.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -182,12 +198,12 @@ msgstr "{0, plural, other {수신자 추가됨}}"
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "{0, plural, one {Select a folder to move the selected document to.} other {Select a folder to move the # selected documents to.}}"
-msgstr ""
+msgstr "{0, plural, other {선택한 문서를 이동할 폴더를 선택하세요.}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "{0, plural, one {Select a folder to move the selected template to.} other {Select a folder to move the # selected templates to.}}"
-msgstr ""
+msgstr "{0, plural, other {선택한 템플릿을 이동할 폴더를 선택하세요.}}"
 
 #. placeholder {0}: pendingRecipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
@@ -207,12 +223,12 @@ msgstr "{0, plural, other {문서에서 수신자 #명을 발견했습니다.}}"
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "{0, plural, one {You are about to delete the selected document.} other {You are about to delete # documents.}}"
-msgstr ""
+msgstr "{0, plural, other {선택한 문서를 삭제하려고 합니다.}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "{0, plural, one {You are about to delete the selected template.} other {You are about to delete # templates.}}"
-msgstr ""
+msgstr "{0, plural, other {선택한 템플릿을 삭제하려고 합니다.}}"
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
@@ -242,17 +258,6 @@ msgstr "{0}에서 \"{1}\" 문서에 대해 귀하께 {recipientActionVerb}하도
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0}이(가) 귀하께 문서에 {recipientActionVerb}하도록 초대했습니다."
-
-#. placeholder {0}: result.deletedCount
-#. placeholder {1}: result.failedIds.length
-#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
-msgid "{0} item(s) deleted. {1} item(s) could not be deleted."
-msgstr ""
-
-#. placeholder {0}: result.deletedCount
-#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
-msgid "{0} item(s) have been deleted."
-msgstr ""
 
 #. placeholder {0}: remaining.documents
 #. placeholder {1}: quota.documents
@@ -346,110 +351,6 @@ msgstr "{MAXIMUM_PASSKEYS, plural, other {패스키는 #개를 초과하여 가�
 msgid "{maximumEnvelopeItemCount, plural, one {You cannot upload more than # item per envelope.} other {You cannot upload more than # items per envelope.}}"
 msgstr "{maximumEnvelopeItemCount, plural, other {하나의 봉투에는 최대 #개의 항목만 업로드할 수 있습니다.}}"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} added a field"
-msgstr "{prefix}님이 필드를 추가했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} added a recipient"
-msgstr "{prefix}님이 수신자를 추가했습니다."
-
-#. placeholder {0}: data.envelopeItemTitle
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} created an envelope item with title {0}"
-msgstr "{prefix}님이 제목이 {0}인 봉투 항목을 생성했습니다"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} created the document"
-msgstr "{prefix}님이 문서를 생성했습니다."
-
-#. placeholder {0}: data.envelopeItemTitle
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} deleted an envelope item with title {0}"
-msgstr "{prefix}님이 제목이 {0}인 봉투 항목을 삭제했습니다"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} deleted the document"
-msgstr "{prefix}님이 문서를 삭제했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} moved the document to team"
-msgstr "{prefix}님이 문서를 팀으로 이동했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} opened the document"
-msgstr "{prefix}님이 문서를 열었습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} prefilled a field"
-msgstr "{prefix}님이 필드를 미리 채웠습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} removed a field"
-msgstr "{prefix}님이 필드를 제거했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} removed a recipient"
-msgstr "{prefix}님이 수신자를 제거했습니다."
-
-#. placeholder {0}: data.recipientEmail
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} resent an email to {0}"
-msgstr "{prefix}님이 {0}(으)로 이메일을 다시 보냈습니다."
-
-#. placeholder {0}: data.recipientEmail
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} sent an email to {0}"
-msgstr "{prefix}님이 {0}(으)로 이메일을 보냈습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} sent the document"
-msgstr "{prefix}님이 문서를 발송했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} signed a field"
-msgstr "{prefix}님이 필드에 서명했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} unsigned a field"
-msgstr "{prefix}님이 필드 서명을 취소했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated a field"
-msgstr "{prefix}님이 필드를 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated a recipient"
-msgstr "{prefix}님이 수신자를 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document"
-msgstr "{prefix}님이 문서를 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document access auth requirements"
-msgstr "{prefix}님이 문서 접근 인증 요구 사항을 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document external ID"
-msgstr "{prefix}님이 문서 외부 ID를 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document signing auth requirements"
-msgstr "{prefix}님이 문서 서명 인증 요구 사항을 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document title"
-msgstr "{prefix}님이 문서 제목을 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document visibility"
-msgstr "{prefix}님이 문서 공개 범위를 업데이트했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} viewed the document"
-msgstr "{prefix}님이 문서를 열람했습니다."
-
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
 msgstr "{recipientActionVerb} 문서"
@@ -495,7 +396,7 @@ msgstr "{remaningLength, plural, other {#자 남음}}"
 
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 msgid "{selectedCount} selected"
-msgstr ""
+msgstr "{selectedCount}개 선택함"
 
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -510,46 +411,147 @@ msgstr "{teamName}이(가) 문서 \"{documentName}\"에 대해 귀하께 {0}하�
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName}이(가) 귀하께 {action} {documentName} 문서를 요청했습니다."
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} added a field"
+msgstr "{user}님이 필드를 추가했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} added a recipient"
+msgstr "{user}님이 수신자를 추가했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} approved the document"
+msgstr "{user}님이 문서를 승인했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} CC'd the document"
+msgstr "{user}님이 문서에 참조(CC)를 추가했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} completed their task"
+msgstr "{user}님이 자신의 작업을 완료했습니다."
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} created an envelope item with title {0}"
+msgstr "{user}님이 제목이 {0}인 봉투 항목을 생성했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} created the document"
+msgstr "{user}님이 문서를 생성했습니다."
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} deleted an envelope item with title {0}"
+msgstr "{user}님이 제목이 {0}인 봉투 항목을 삭제했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} deleted the document"
+msgstr "{user}님이 문서를 삭제했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} failed to validate a 2FA token for the document"
+msgstr "{user}님이 문서에 대한 2FA 토큰을 검증하지 못했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} moved the document to team"
+msgstr "{user}님이 문서를 팀으로 이동했습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} opened the document"
+msgstr "{user}님이 문서를 열었습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} prefilled a field"
+msgstr "{user}가 필드를 미리 채웠습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} rejected the document"
+msgstr "{user}가 문서를 거부했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} removed a field"
+msgstr "{user}가 필드를 제거했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} removed a recipient"
+msgstr "{user}가 수신자를 제거했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} requested a 2FA token for the document"
+msgstr "{user}가 문서에 대한 2FA 토큰을 요청했습니다"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} resent an email to {0}"
+msgstr "{user}가 {0}(으)로 이메일을 다시 보냈습니다"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} sent an email to {0}"
+msgstr "{user}가 {0}(으)로 이메일을 보냈습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} sent the document"
+msgstr "{user}가 문서를 보냈습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} signed a field"
+msgstr "{user}가 필드에 서명했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} signed the document"
+msgstr "{user}가 문서에 서명했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} unsigned a field"
+msgstr "{user}가 필드 서명을 취소했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated a field"
+msgstr "{user}가 필드를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated a recipient"
+msgstr "{user}가 수신자를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document"
+msgstr "{user}가 문서를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document access auth requirements"
+msgstr "{user}가 문서 액세스 인증 요구 사항을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document external ID"
+msgstr "{user}가 문서 외부 ID를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document signing auth requirements"
+msgstr "{user}가 문서 서명 인증 요구 사항을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document title"
+msgstr "{user}가 문서 제목을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document visibility"
+msgstr "{user}가 문서 공개 범위를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} validated a 2FA token for the document"
+msgstr "{user}가 문서에 대한 2FA 토큰을 검증했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} viewed the document"
+msgstr "{user}가 문서를 조회했습니다"
+
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "{userAgent}"
 msgstr "{userAgent}"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} approved the document"
-msgstr "{userName}님이 문서를 승인했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} CC'd the document"
-msgstr "{userName}님이 문서를 참조(CC)했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} completed their task"
-msgstr "{userName}님이 담당 작업을 완료했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} failed to validate a 2FA token for the document"
-msgstr "{userName}님이 문서에 대한 2단계 인증 토큰 검증에 실패했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} rejected the document"
-msgstr "{userName}님이 문서를 거부했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} requested a 2FA token for the document"
-msgstr "{userName}님이 문서에 대한 2단계 인증 토큰을 요청했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} signed the document"
-msgstr "{userName}님이 문서에 서명했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} validated a 2FA token for the document"
-msgstr "{userName}님이 문서에 대한 2단계 인증 토큰을 검증했습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} viewed the document"
-msgstr "{userName}님이 문서를 열람했습니다."
 
 #: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 msgid "{validationLength, plural, one {Select at least # option} other {Select at least # options}}"
@@ -1084,6 +1086,7 @@ msgstr "동작"
 msgid "Active"
 msgstr "활성"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgctxt "Subscription status"
 msgid "Active"
@@ -1258,6 +1261,10 @@ msgstr "수신자 추가"
 msgid "Add Recipients"
 msgstr "수신자 추가"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Add recipients to your document"
+msgstr "문서에 수신자를 추가하세요"
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -1399,7 +1406,7 @@ msgstr "삽입된 모든 서명이 무효화됩니다"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "All items must be of the same type."
-msgstr ""
+msgstr "모든 항목은 동일한 유형이어야 합니다."
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
@@ -1570,7 +1577,7 @@ msgstr "웹훅을 생성하는 중 오류가 발생했습니다. 다시 시도�
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "An error occurred while deleting the items."
-msgstr ""
+msgstr "항목을 삭제하는 동안 오류가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "An error occurred while deleting the user."
@@ -1606,7 +1613,7 @@ msgstr "문서를 이동하는 중 오류가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "An error occurred while moving the items."
-msgstr ""
+msgstr "항목을 이동하는 동안 오류가 발생했습니다."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the template."
@@ -2197,6 +2204,10 @@ msgstr "전자 서명 기능을 사용함으로써 귀하는 거래를 전자적
 msgid "Can prepare"
 msgstr "준비 가능"
 
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Can't find someone?"
+msgstr "누군가를 찾을 수 없나요?"
+
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
@@ -2359,7 +2370,9 @@ msgstr "차트"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Checkbox"
 msgstr "체크박스"
 
@@ -2424,7 +2437,7 @@ msgstr "필터 지우기"
 
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 msgid "Clear selection"
-msgstr ""
+msgstr "선택 해제"
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
@@ -2516,7 +2529,6 @@ msgstr "모든 요금제와 기능을 자세히 비교합니다."
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Complete"
@@ -2864,6 +2876,7 @@ msgstr "지원 티켓 생성"
 msgid "Create a team to collaborate with your team members."
 msgstr "팀원과 협업할 수 있는 팀을 생성하세요."
 
+#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 #: packages/email/template-components/template-document-self-signed.tsx
 msgid "Create account"
@@ -3271,7 +3284,7 @@ msgstr "문서 삭제"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Documents"
-msgstr ""
+msgstr "문서 삭제"
 
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "Delete email"
@@ -3324,7 +3337,7 @@ msgstr "템플릿 삭제"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Templates"
-msgstr ""
+msgstr "템플릿 삭제하기"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
@@ -3465,7 +3478,7 @@ msgstr "직접 링크 템플릿에는 하나의 동적 수신자 플레이스홀
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Direct links associated with templates will be removed"
-msgstr ""
+msgstr "템플릿과 연결된 직접 링크가 제거됩니다"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Direct template link deleted"
@@ -3562,6 +3575,10 @@ msgstr "이 템플릿을 삭제하시겠습니까?"
 msgid "Do you want to duplicate this template?"
 msgstr "이 템플릿을 복제하시겠습니까?"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Documenso License"
+msgstr "Documenso 라이선스"
+
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 msgstr "Documenso는 <0>모든 문서</0>와 완료된 문서, 서명, 계정에 속한 모든 리소스를 삭제합니다."
@@ -3629,6 +3646,7 @@ msgstr "문서가 취소됨"
 msgid "Document completed"
 msgstr "문서 완료됨"
 
+#: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -3768,11 +3786,6 @@ msgstr "문서를 더 이상 서명할 수 없습니다"
 msgctxt "Audit log format"
 msgid "Document opened"
 msgstr "문서가 열렸습니다."
-
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
-msgid "Document ownership delegated"
-msgstr "문서 소유권이 위임됨"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
@@ -3942,11 +3955,11 @@ msgstr "템플릿에서 생성된 문서"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Documents deleted"
-msgstr ""
+msgstr "문서가 삭제되었습니다"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Documents partially deleted"
-msgstr ""
+msgstr "문서가 일부만 삭제되었습니다"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Documents Received"
@@ -4270,8 +4283,9 @@ msgid "Email preferences updated"
 msgstr "이메일 기본 설정이 업데이트되었습니다."
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Email resent"
-msgstr "이메일 다시 전송"
+msgstr "이메일이 다시 전송되었습니다"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -4281,8 +4295,9 @@ msgid "Email Sender"
 msgstr "이메일 발신자"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Email sent"
-msgstr "이메일 전송됨"
+msgstr "이메일이 전송되었습니다"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Email sent!"
@@ -4526,12 +4541,14 @@ msgid "Envelope Item Count"
 msgstr "봉투 항목 수"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Envelope item created"
-msgstr "봉투 항목 생성됨"
+msgstr "봉투 항목이 생성되었습니다"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Envelope item deleted"
-msgstr "봉투 항목 삭제됨"
+msgstr "봉투 항목이 삭제되었습니다"
 
 #: apps/remix/app/components/dialogs/envelope-redistribute-dialog.tsx
 msgid "Envelope resent"
@@ -4669,6 +4686,15 @@ msgstr "시간 초과됨"
 msgid "Expired"
 msgstr "만료됨"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgctxt "Subscription status"
+msgid "Expired"
+msgstr "만료됨"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Expires"
+msgstr "만료일"
+
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
@@ -4742,6 +4768,10 @@ msgstr "설정을 저장하지 못했습니다."
 msgid "Failed to sign out all sessions"
 msgstr "모든 세션에서 로그아웃하지 못했습니다."
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Failed to sync license"
+msgstr "라이선스 동기화에 실패했습니다"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Failed to unlink account"
 msgstr "계정 연결을 해제하지 못했습니다"
@@ -4779,6 +4809,10 @@ msgstr "실패: {failedCount}"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Feature Flags"
 msgstr "기능 플래그"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Features"
+msgstr "기능"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -5335,7 +5369,9 @@ msgstr "상속된 구독 클레임"
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Initials"
 msgstr "이니셜"
 
@@ -5363,10 +5399,19 @@ msgstr "코드가 올바르지 않습니다. 다시 시도해 주세요."
 msgid "Invalid domains"
 msgstr "잘못된 도메인"
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: packages/lib/types/recipient.ts
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "유효한 이메일이 아닙니다."
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Invalid License Key"
+msgstr "잘못된 라이선스 키"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "Invalid License Type - Your Documenso instance is using features that are not part of your license."
+msgstr "잘못된 라이선스 유형 - 현재 Documenso 인스턴스에서 사용 중인 기능은 보유한 라이선스에 포함되지 않습니다."
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
@@ -5419,12 +5464,17 @@ msgid "Invite Members"
 msgstr "구성원 초대"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Invite organisation members"
 msgstr "조직 구성원 초대"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Invite team members to collaborate"
 msgstr "팀 구성원을 초대하여 협업하세요."
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Invite them to the organisation first"
+msgstr "먼저 해당 사용자를 조직에 초대하세요."
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Invited At"
@@ -5570,6 +5620,12 @@ msgstr "마지막 사용"
 msgid "Last Year"
 msgstr "지난해"
 
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/components/general/admin-license-card.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Learn more"
+msgstr "자세히 알아보기"
+
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Leave"
@@ -5602,6 +5658,27 @@ msgstr "자간"
 msgid "Letter Spacing"
 msgstr "자간"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License"
+msgstr "라이선스"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "License Expired - Please renew your license to continue using enterprise features."
+msgstr "라이선스 만료 - 엔터프라이즈 기능을 계속 사용하려면 라이선스를 갱신해 주세요."
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License Key"
+msgstr "라이선스 키"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "License Payment Overdue - Please update your payment to avoid service disruptions."
+msgstr "라이선스 결제 연체 - 서비스 중단을 방지하려면 결제 정보를 업데이트해 주세요."
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License synced"
+msgstr "라이선스가 동기화되었습니다"
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Light Mode"
 msgstr "라이트 모드"
@@ -5627,6 +5704,7 @@ msgid "Link expires in 30 minutes."
 msgstr "링크는 30분 안에 만료됩니다."
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
+msgctxt "Action button to link template to public profile"
 msgid "Link template"
 msgstr "템플릿 연결"
 
@@ -5677,6 +5755,7 @@ msgstr "문서 로딩 중..."
 msgid "Loading suggestions..."
 msgstr "제안 불러오는 중..."
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Loading..."
 msgstr "로딩 중..."
@@ -5954,6 +6033,10 @@ msgstr "가운데"
 msgid "Min"
 msgstr "최소"
 
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "Missing License - Your Documenso instance is using features that require a license."
+msgstr "라이선스 누락 - 현재 Documenso 인스턴스에서 사용하는 기능에는 라이선스가 필요합니다."
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Missing Recipients"
 msgstr "수신자 누락"
@@ -5998,7 +6081,7 @@ msgstr "문서를 폴더로 이동"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Documents to Folder"
-msgstr ""
+msgstr "문서를 폴더로 이동"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Move Folder"
@@ -6010,7 +6093,7 @@ msgstr "템플릿을 폴더로 이동"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
-msgstr ""
+msgstr "템플릿을 폴더로 이동"
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6027,6 +6110,7 @@ msgid "My Folder"
 msgstr "내 폴더"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "N/A"
 msgstr "해당 없음"
@@ -6145,6 +6229,10 @@ msgstr "문서를 찾을 수 없습니다"
 msgid "No email detected"
 msgstr "이메일이 감지되지 않았습니다."
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "No features enabled"
+msgstr "활성화된 기능이 없습니다"
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "No fields were detected in your document."
 msgstr "문서에서 감지된 필드가 없습니다."
@@ -6164,6 +6252,18 @@ msgstr "\"{searchTerm}\"과(와) 일치하는 폴더가 없습니다."
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 msgid "No further action is required from you at this time."
 msgstr "현재 추가로 수행해야 할 작업은 없습니다."
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "No License Configured"
+msgstr "라이선스가 구성되지 않았습니다"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "No members selected"
+msgstr "선택된 구성원이 없습니다."
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "No organisation members available"
+msgstr "사용 가능한 조직 구성원이 없습니다."
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -6665,6 +6765,7 @@ msgstr "비밀번호가 업데이트되었습니다"
 msgid "Password updated!"
 msgstr "비밀번호가 업데이트되었습니다!"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgctxt "Subscription status"
 msgid "Past Due"
@@ -6705,7 +6806,7 @@ msgstr "보류 중인 문서"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Pending documents will have their signing process cancelled"
-msgstr ""
+msgstr "보류 중인 문서는 서명 절차가 취소됩니다"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
@@ -6935,6 +7036,10 @@ msgstr "서명 전에 문서를 검토해 주세요."
 msgid "Please select a PDF file"
 msgstr "PDF 파일을 선택해 주세요."
 
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Please select at least one member to add to the team."
+msgstr "팀에 추가할 구성원을 최소 한 명 이상 선택하세요."
+
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Please select how you'd like to receive your verification code."
 msgstr "인증 코드를 받을 방식을 선택하세요."
@@ -7091,7 +7196,9 @@ msgstr "빠른 작업"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Radio"
 msgstr "라디오"
 
@@ -7176,11 +7283,6 @@ msgstr "최근 문서"
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient"
 msgstr "수신자"
 
@@ -7201,13 +7303,41 @@ msgstr "수신자 {0}"
 msgid "Recipient action authentication"
 msgstr "수신자 액션 인증"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient approved the document"
+msgstr "수신자가 문서를 승인했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient CC'd the document"
+msgstr "수신자가 문서의 참조(CC) 수신자가 되었습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient completed their task"
+msgstr "수신자가 자신의 작업을 완료했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient failed to validate a 2FA token for the document"
+msgstr "수신자가 문서에 대한 2FA 토큰 검증에 실패했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient rejected the document"
+msgstr "수신자가 문서를 거부했습니다"
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient removed email"
 msgstr "수신자 제거 이메일"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient requested a 2FA token for the document"
+msgstr "수신자가 문서에 대한 2FA 토큰을 요청했습니다"
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signed email"
 msgstr "수신자 서명 완료 이메일"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient signed the document"
+msgstr "수신자가 문서에 서명했습니다"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
@@ -7217,10 +7347,20 @@ msgstr "수신자 서명 요청 이메일"
 msgid "Recipient updated"
 msgstr "수신자가 업데이트되었습니다"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient validated a 2FA token for the document"
+msgstr "수신자가 문서에 대한 2FA 토큰을 검증했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient viewed the document"
+msgstr "수신자가 문서를 조회했습니다"
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Recipients"
@@ -7725,6 +7865,10 @@ msgstr "보안"
 msgid "Security activity"
 msgstr "보안 활동"
 
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "See Documentation"
+msgstr "문서 보기"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "See the background jobs tab for the status"
 msgstr "상태는 백그라운드 작업 탭에서 확인하세요"
@@ -7779,7 +7923,7 @@ msgstr "접근 방식 선택"
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Select all"
-msgstr ""
+msgstr "전체 선택"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
@@ -7853,19 +7997,22 @@ msgstr "옵션 선택"
 msgid "Select Options"
 msgstr "옵션 선택"
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select or add recipients"
+msgstr "수신자를 선택하거나 추가하세요."
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select or enter email address"
+msgstr "이메일 주소를 선택하거나 입력하세요."
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "패스키 선택"
 
-#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
-#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
-msgid "Select recipients"
-msgstr "수신인 선택"
-
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Select row"
-msgstr ""
+msgstr "행 선택"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -7915,11 +8062,11 @@ msgstr "공개 범위 선택"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Selected documents will be permanently deleted"
-msgstr ""
+msgstr "선택한 문서는 영구적으로 삭제됩니다"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Selected items have been moved."
-msgstr ""
+msgstr "선택한 항목이 이동되었습니다."
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
@@ -7928,7 +8075,7 @@ msgstr "선택된 수신자"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Selected templates will be permanently deleted"
-msgstr ""
+msgstr "선택한 템플릿은 영구적으로 삭제됩니다"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -8217,6 +8364,7 @@ msgstr "OIDC로 가입"
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/field-selector.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Signature"
 msgstr "서명"
@@ -8681,10 +8829,12 @@ msgstr "이메일 도메인 동기화"
 msgid "Sync failed, changes not saved"
 msgstr "동기화에 실패하여 변경 사항이 저장되지 않았습니다"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgid "System auto inserted fields"
-msgstr "시스템이 자동으로 필드를 삽입함"
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Sync license from server"
+msgstr "서버에서 라이선스 동기화"
 
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "System auto inserted fields"
@@ -8933,11 +9083,11 @@ msgstr "템플릿"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Templates deleted"
-msgstr ""
+msgstr "템플릿이 삭제되었습니다"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Templates partially deleted"
-msgstr ""
+msgstr "템플릿이 일부만 삭제되었습니다"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
@@ -9075,8 +9225,9 @@ msgstr "문서 소유자에게 귀하의 결정이 이미 전달되었습니다.
 #. placeholder {0}: data.delegatedOwnerName || data.delegatedOwnerEmail
 #. placeholder {1}: data.teamName
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr "문서 소유권이 {1}을(를) 대신해 {0}에게 위임되었습니다"
+msgstr "문서 소유권이 {1}를 대신하여 {0}에게 위임되었습니다"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -9138,7 +9289,7 @@ msgstr "문서를 이동하려는 폴더가 존재하지 않습니다."
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "The folder you are trying to move the items to does not exist."
-msgstr ""
+msgstr "이 항목들을 이동하려는 폴더가 존재하지 않습니다."
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the template to does not exist."
@@ -9697,6 +9848,10 @@ msgid "To accept this invitation you must create an account."
 msgstr "이 초대를 수락하려면 계정을 생성해야 합니다."
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "To add members to this team, you must first add them to the organisation."
+msgstr "이 팀에 구성원을 추가하려면 먼저 그들을 조직에 추가해야 합니다."
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "To be able to add members to a team, you must first add them to the organisation. For more information, please see the <0>documentation</0>."
 msgstr "팀에 구성원을 추가하려면 먼저 조직에 구성원을 추가해야 합니다. 자세한 내용은 <0>문서</0>를 참고하세요."
 
@@ -9885,6 +10040,10 @@ msgstr "입력"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Type a command or search..."
 msgstr "명령을 입력하거나 검색하세요..."
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Type an email address to add a recipient"
+msgstr "수신자를 추가하려면 이메일 주소를 입력하세요."
 
 #: packages/ui/primitives/signature-pad/signature-pad-type.tsx
 msgid "Type your signature"
@@ -10371,10 +10530,6 @@ msgstr "검증 실패"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Value"
 msgstr "값"
-
-#: packages/lib/types/field-meta.ts
-msgid "Value must be a number"
-msgstr "값은 숫자여야 합니다"
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "Verification Code Required"
@@ -11115,6 +11270,18 @@ msgstr "예"
 msgid "You"
 msgstr "나"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You added a field"
+msgstr "필드를 추가했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You added a recipient"
+msgstr "수신자를 추가했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You approved the document"
+msgstr "문서를 승인했습니다"
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "You are about to complete approving the following document"
 msgstr "다음 문서에 대한 승인을 완료하려고 합니다"
@@ -11179,11 +11346,16 @@ msgid "You are about to remove the following email from <0>{0}</0>."
 msgstr "곧 다음 이메일을 <0>{0}</0>에서 제거하려고 합니다."
 
 #. placeholder {0}: organisation.name
-#. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
+msgctxt "Removing group from organisation"
 msgid "You are about to remove the following group from <0>{0}</0>."
-msgstr "곧 다음 그룹을 <0>{0}</0>에서 제거하려고 합니다."
+msgstr "다음 그룹을 <0>{0}</0>에서 제거하려고 합니다."
+
+#. placeholder {0}: team.name
+#: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
+msgctxt "Removing group from team"
+msgid "You are about to remove the following group from <0>{0}</0>."
+msgstr "다음 그룹을 <0>{0}</0>에서 제거하려고 합니다."
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
@@ -11236,7 +11408,7 @@ msgstr "현재 <0>{teamGroupName}</0> 팀 그룹을 업데이트하고 있습니
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "You are not allowed to move these items."
-msgstr ""
+msgstr "이 항목들을 이동할 권한이 없습니다."
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "You are not allowed to move this document."
@@ -11361,6 +11533,23 @@ msgstr "현재는 문서를 업로드할 수 없습니다."
 msgid "You cannot upload encrypted PDFs."
 msgstr "암호화된 PDF는 업로드할 수 없습니다."
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You CC'd the document"
+msgstr "문서의 참조(CC) 수신자가 되었습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You completed your task"
+msgstr "작업을 완료했습니다"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You created an envelope item with title {0}"
+msgstr "제목이 {0}인 봉투 항목을 생성했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You created the document"
+msgstr "문서를 생성했습니다"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription"
 msgstr "현재 비활성 상태인 <0>{currentProductName}</0> 구독이 있습니다."
@@ -11368,6 +11557,15 @@ msgstr "현재 비활성 상태인 <0>{currentProductName}</0> 구독이 있습�
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
 msgstr "현재 이 조직 내 어느 팀에도 접근 권한이 없습니다. 액세스를 요청하려면 조직 관리자에게 문의해 주세요."
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You deleted an envelope item with title {0}"
+msgstr "제목이 {0}인 봉투 항목을 삭제했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You deleted the document"
+msgstr "문서를 삭제했습니다"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "You do not have permission to create a token for this team."
@@ -11380,6 +11578,10 @@ msgstr "결제를 관리하는 조직이 없습니다."
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "You don't need to sign it anymore."
 msgstr "더 이상 이 문서에 서명할 필요가 없습니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You failed to validate a 2FA token for the document"
+msgstr "문서에 대한 2FA 토큰 검증에 실패했습니다"
 
 #. placeholder {0}: data.organisationName
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
@@ -11543,6 +11745,10 @@ msgstr "팀 그룹을 업데이트했습니다."
 msgid "You have verified your email address for <0>{0}</0>."
 msgstr "<0>{0}</0> 팀의 이메일 주소를 성공적으로 인증했습니다."
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You moved the document to team"
+msgstr "문서를 팀으로 이동했습니다"
+
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -11583,6 +11789,97 @@ msgstr "이 페이지를 보려면 로그인해야 합니다."
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "이 문서를 열람 처리하려면 2단계 인증을 설정해야 합니다."
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You opened the document"
+msgstr "문서를 열었습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You prefilled a field"
+msgstr "필드를 미리 채웠습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You rejected the document"
+msgstr "문서를 거부했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You removed a field"
+msgstr "필드를 제거했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You removed a recipient"
+msgstr "수신자를 제거했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You requested a 2FA token for the document"
+msgstr "문서에 대한 2FA 토큰을 요청했습니다"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You resent an email to {0}"
+msgstr "{0}(으)로 이메일을 다시 보냈습니다"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You sent an email to {0}"
+msgstr "{0}(으)로 이메일을 보냈습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You sent the document"
+msgstr "문서를 보냈습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You signed a field"
+msgstr "필드에 서명했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You signed the document"
+msgstr "문서에 서명했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You unsigned a field"
+msgstr "필드 서명을 취소했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated a field"
+msgstr "필드를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated a recipient"
+msgstr "수신자를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document"
+msgstr "문서를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document access auth requirements"
+msgstr "문서 액세스 인증 요구 사항을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document external ID"
+msgstr "문서 외부 ID를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document signing auth requirements"
+msgstr "문서 서명 인증 요구 사항을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document title"
+msgstr "문서 제목을 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document visibility"
+msgstr "문서 공개 범위를 업데이트했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You validated a 2FA token for the document"
+msgstr "문서에 대한 2FA 토큰을 검증했습니다"
+
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You viewed the document"
+msgstr "문서를 조회했습니다"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "You will need to configure any claims or subscription after creating this organisation"
@@ -11641,6 +11938,11 @@ msgstr "템플릿 \"{templateName}\"에 대한 대량 발송 작업이 완료되
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "Your current {currentProductName} plan is past due. Please update your payment information."
 msgstr "현재 {currentProductName} 요금제 결제가 연체되었습니다. 결제 정보를 업데이트해 주세요."
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Your current license does not include these features."
+msgstr "현재 라이선스에는 이 기능들이 포함되어 있지 않습니다."
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Your current plan includes the following support channels:"
@@ -11889,3 +12191,4 @@ msgstr "인증 코드:"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+

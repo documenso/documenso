@@ -8,7 +8,7 @@ msgstr ""
 "Language: zh\n"
 "Project-Id-Version: documenso-app\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-01-13 10:04\n"
+"PO-Revision-Date: 2026-02-09 03:02\n"
 "Last-Translator: \n"
 "Language-Team: Chinese Simplified\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
@@ -21,6 +21,11 @@ msgstr ""
 #: apps/remix/app/components/embed/authoring/configure-document-upload.tsx
 msgid ".PDF documents accepted (max {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB)"
 msgstr "仅接受 .PDF 文档（最大 {APP_DOCUMENT_UPLOAD_SIZE_LIMIT}MB）"
+
+#. placeholder {0}: invalidEmails[0].value
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "\"{0}\" is not a valid email address."
+msgstr "\"{0}\" 不是有效的电子邮箱地址。"
 
 #. placeholder {0}: field.customText
 #. placeholder {1}: timezone || ''
@@ -100,6 +105,17 @@ msgstr "{0, plural, other {# 个字段}}"
 #: apps/remix/app/components/general/folder/folder-card.tsx
 msgid "{0, plural, one {# folder} other {# folders}}"
 msgstr "{0, plural, other {# 个文件夹}}"
+
+#. placeholder {0}: result.deletedCount
+#. placeholder {1}: result.failedIds.length
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {# item deleted.} other {# items deleted.}} {1, plural, one {# item could not be deleted.} other {# items could not be deleted.}}"
+msgstr "{0, plural, other {已删除 # 个项目。}} {1, plural, other {有 # 个项目无法删除。}}"
+
+#. placeholder {0}: result.deletedCount
+#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
+msgid "{0, plural, one {# item has been deleted.} other {# items have been deleted.}}"
+msgstr "{0, plural, other {已删除 # 个项目。}}"
 
 #. placeholder {0}: detectedRecipients.length
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
@@ -182,12 +198,12 @@ msgstr "{0, plural, other {已添加收件人}}"
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "{0, plural, one {Select a folder to move the selected document to.} other {Select a folder to move the # selected documents to.}}"
-msgstr ""
+msgstr "{0, plural, other {选择一个文件夹，将 # 个已选文档移动到此处。}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "{0, plural, one {Select a folder to move the selected template to.} other {Select a folder to move the # selected templates to.}}"
-msgstr ""
+msgstr "{0, plural, other {选择一个文件夹，将 # 个已选模板移动到此处。}}"
 
 #. placeholder {0}: pendingRecipients.length
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id._index.tsx
@@ -207,12 +223,12 @@ msgstr "{0, plural, other {我们在您的文档中找到了 # 位收件人。}}
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "{0, plural, one {You are about to delete the selected document.} other {You are about to delete # documents.}}"
-msgstr ""
+msgstr "{0, plural, other {你即将删除 # 个文档。}}"
 
 #. placeholder {0}: envelopeIds.length
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "{0, plural, one {You are about to delete the selected template.} other {You are about to delete # templates.}}"
-msgstr ""
+msgstr "{0, plural, other {你即将删除 # 个模板。}}"
 
 #. placeholder {0}: _(FRIENDLY_FIELD_TYPE[fieldType as FieldType])
 #. placeholder {0}: route.label
@@ -242,17 +258,6 @@ msgstr "{0} 已邀请您 {recipientActionVerb} 文档“{1}”。"
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
 msgid "{0} invited you to {recipientActionVerb} a document"
 msgstr "{0} 邀请您 {recipientActionVerb} 一个文档"
-
-#. placeholder {0}: result.deletedCount
-#. placeholder {1}: result.failedIds.length
-#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
-msgid "{0} item(s) deleted. {1} item(s) could not be deleted."
-msgstr ""
-
-#. placeholder {0}: result.deletedCount
-#: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
-msgid "{0} item(s) have been deleted."
-msgstr ""
 
 #. placeholder {0}: remaining.documents
 #. placeholder {1}: quota.documents
@@ -346,110 +351,6 @@ msgstr "{MAXIMUM_PASSKEYS, plural, other {您不能拥有超过 # 个通行密�
 msgid "{maximumEnvelopeItemCount, plural, one {You cannot upload more than # item per envelope.} other {You cannot upload more than # items per envelope.}}"
 msgstr "{maximumEnvelopeItemCount, plural, other {每个信封最多只能上传 # 个项目。}}"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} added a field"
-msgstr "{prefix} 添加了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} added a recipient"
-msgstr "{prefix} 添加了一个收件人"
-
-#. placeholder {0}: data.envelopeItemTitle
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} created an envelope item with title {0}"
-msgstr "{prefix} 创建了标题为 {0} 的信封条目"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} created the document"
-msgstr "{prefix} 创建了文档"
-
-#. placeholder {0}: data.envelopeItemTitle
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} deleted an envelope item with title {0}"
-msgstr "{prefix} 删除了标题为 {0} 的信封条目"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} deleted the document"
-msgstr "{prefix} 删除了文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} moved the document to team"
-msgstr "{prefix} 将文档移动到团队"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} opened the document"
-msgstr "{prefix} 打开了文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} prefilled a field"
-msgstr "{prefix} 预填充了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} removed a field"
-msgstr "{prefix} 删除了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} removed a recipient"
-msgstr "{prefix} 删除了一个收件人"
-
-#. placeholder {0}: data.recipientEmail
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} resent an email to {0}"
-msgstr "{prefix} 重新向 {0} 发送了电子邮件"
-
-#. placeholder {0}: data.recipientEmail
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} sent an email to {0}"
-msgstr "{prefix} 向 {0} 发送了电子邮件"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} sent the document"
-msgstr "{prefix} 发送了文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} signed a field"
-msgstr "{prefix} 签署了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} unsigned a field"
-msgstr "{prefix} 取消签署了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated a field"
-msgstr "{prefix} 更新了一个字段"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated a recipient"
-msgstr "{prefix} 更新了一个收件人"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document"
-msgstr "{prefix} 更新了文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document access auth requirements"
-msgstr "{prefix} 更新了文档访问认证要求"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document external ID"
-msgstr "{prefix} 更新了文档外部 ID"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document signing auth requirements"
-msgstr "{prefix} 更新了文档签署认证要求"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document title"
-msgstr "{prefix} 更新了文档标题"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} updated the document visibility"
-msgstr "{prefix} 更新了文档可见性"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{prefix} viewed the document"
-msgstr "{prefix} 查看了文档"
-
 #: apps/remix/app/components/general/direct-template/direct-template-page.tsx
 msgid "{recipientActionVerb} document"
 msgstr "{recipientActionVerb} 文档"
@@ -495,7 +396,7 @@ msgstr "{remaningLength, plural, other {# 个字符剩余}}"
 
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 msgid "{selectedCount} selected"
-msgstr ""
+msgstr "已选择 {selectedCount} 个"
 
 #: packages/email/template-components/template-document-rejected.tsx
 msgid "{signerName} has rejected the document \"{documentName}\"."
@@ -510,46 +411,147 @@ msgstr "{teamName} 已邀请您 {0}<0/>“{documentName}”"
 msgid "{teamName} has invited you to {action} {documentName}"
 msgstr "{teamName} 已邀请您 {action} {documentName}"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} added a field"
+msgstr "{user} 添加了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} added a recipient"
+msgstr "{user} 添加了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} approved the document"
+msgstr "{user} 已批准该文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} CC'd the document"
+msgstr "{user} 已对该文档添加抄送"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} completed their task"
+msgstr "{user} 已完成其任务"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} created an envelope item with title {0}"
+msgstr "{user} 创建了一个标题为 {0} 的信封项目"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} created the document"
+msgstr "{user} 创建了该文档"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} deleted an envelope item with title {0}"
+msgstr "{user} 删除了一个标题为 {0} 的信封项目"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} deleted the document"
+msgstr "{user} 删除了该文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} failed to validate a 2FA token for the document"
+msgstr "{user} 未能为该文档验证 2FA 令牌"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} moved the document to team"
+msgstr "{user} 已将该文档移动到团队"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} opened the document"
+msgstr "{user} 打开了该文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} prefilled a field"
+msgstr "{user} 预填了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} rejected the document"
+msgstr "{user} 拒绝了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} removed a field"
+msgstr "{user} 移除了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} removed a recipient"
+msgstr "{user} 移除了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} requested a 2FA token for the document"
+msgstr "{user} 请求了此文档的双重验证 (2FA) 令牌"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} resent an email to {0}"
+msgstr "{user} 向 {0} 重新发送了一封电子邮件"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} sent an email to {0}"
+msgstr "{user} 向 {0} 发送了一封电子邮件"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} sent the document"
+msgstr "{user} 发送了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} signed a field"
+msgstr "{user} 在一个字段上签了名"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} signed the document"
+msgstr "{user} 签署了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} unsigned a field"
+msgstr "{user} 撤销了一个字段上的签名"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated a field"
+msgstr "{user} 更新了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated a recipient"
+msgstr "{user} 更新了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document"
+msgstr "{user} 更新了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document access auth requirements"
+msgstr "{user} 更新了此文档的访问认证要求"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document external ID"
+msgstr "{user} 更新了此文档的外部 ID"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document signing auth requirements"
+msgstr "{user} 更新了此文档的签署认证要求"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document title"
+msgstr "{user} 更新了此文档的标题"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} updated the document visibility"
+msgstr "{user} 更新了此文档的可见性"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} validated a 2FA token for the document"
+msgstr "{user} 验证了此文档的双重验证 (2FA) 令牌"
+
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "{user} viewed the document"
+msgstr "{user} 查看了此文档"
+
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "{userAgent}"
 msgstr "{userAgent}"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} approved the document"
-msgstr "{userName} 已审批该文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} CC'd the document"
-msgstr "{userName} 已抄送该文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} completed their task"
-msgstr "{userName} 已完成其任务"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} failed to validate a 2FA token for the document"
-msgstr "{userName} 验证文档 2FA 令牌失败"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} rejected the document"
-msgstr "{userName} 已拒签该文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} requested a 2FA token for the document"
-msgstr "{userName} 请求了文档的 2FA 令牌"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} signed the document"
-msgstr "{userName} 已签署该文档"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} validated a 2FA token for the document"
-msgstr "{userName} 验证了文档的 2FA 令牌"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgid "{userName} viewed the document"
-msgstr "{userName} 已查看该文档"
 
 #: apps/remix/app/components/dialogs/sign-field-checkbox-dialog.tsx
 msgid "{validationLength, plural, one {Select at least # option} other {Select at least # options}}"
@@ -1084,6 +1086,7 @@ msgstr "操作"
 msgid "Active"
 msgstr "启用"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgctxt "Subscription status"
 msgid "Active"
@@ -1258,6 +1261,10 @@ msgstr "添加收件人"
 msgid "Add Recipients"
 msgstr "添加收件人"
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
+msgid "Add recipients to your document"
+msgstr "向文档添加收件人"
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
@@ -1399,7 +1406,7 @@ msgstr "所有已插入的签名将被作废"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "All items must be of the same type."
-msgstr ""
+msgstr "所有项目必须为同一类型。"
 
 #: apps/remix/app/routes/_recipient+/sign.$token+/complete.tsx
 msgid "All recipients have signed. The document is being processed and you will receive an email copy shortly."
@@ -1570,7 +1577,7 @@ msgstr "创建 Webhook 时发生错误。请重试。"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "An error occurred while deleting the items."
-msgstr ""
+msgstr "删除项目时发生错误。"
 
 #: apps/remix/app/components/dialogs/admin-user-delete-dialog.tsx
 msgid "An error occurred while deleting the user."
@@ -1606,7 +1613,7 @@ msgstr "移动文档时发生错误。"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "An error occurred while moving the items."
-msgstr ""
+msgstr "移动项目时发生错误。"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "An error occurred while moving the template."
@@ -2197,6 +2204,10 @@ msgstr "使用电子签名功能，即表示你同意以电子方式进行交易
 msgid "Can prepare"
 msgstr "可预填"
 
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Can't find someone?"
+msgstr "找不到某个人？"
+
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 #: apps/remix/app/components/dialogs/admin-organisation-member-update-dialog.tsx
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
@@ -2359,7 +2370,9 @@ msgstr "图表"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Checkbox"
 msgstr "复选框"
 
@@ -2424,7 +2437,7 @@ msgstr "清除筛选条件"
 
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
 msgid "Clear selection"
-msgstr ""
+msgstr "清除选择"
 
 #: packages/ui/primitives/signature-pad/signature-pad-draw.tsx
 msgid "Clear Signature"
@@ -2516,7 +2529,6 @@ msgstr "详细比较所有套餐和功能"
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 #: apps/remix/app/components/embed/multisign/multi-sign-document-signing-view.tsx
-#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "Complete"
@@ -2864,6 +2876,7 @@ msgstr "创建支持工单"
 msgid "Create a team to collaborate with your team members."
 msgstr "创建一个团队，与团队成员协作。"
 
+#: apps/remix/app/components/forms/signup.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 #: packages/email/template-components/template-document-self-signed.tsx
 msgid "Create account"
@@ -3271,7 +3284,7 @@ msgstr "删除文档"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Documents"
-msgstr ""
+msgstr "删除文档"
 
 #: apps/remix/app/components/dialogs/organisation-email-delete-dialog.tsx
 msgid "Delete email"
@@ -3324,7 +3337,7 @@ msgstr "删除模板"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Delete Templates"
-msgstr ""
+msgstr "删除模板"
 
 #: apps/remix/app/components/dialogs/admin-document-delete-dialog.tsx
 msgid "Delete the document. This action is irreversible so proceed with caution."
@@ -3465,7 +3478,7 @@ msgstr "直接链接模板包含一个动态收件人占位符。任何获得此
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Direct links associated with templates will be removed"
-msgstr ""
+msgstr "与模板关联的直接链接将被移除"
 
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 msgid "Direct template link deleted"
@@ -3562,6 +3575,10 @@ msgstr "要删除此模板吗？"
 msgid "Do you want to duplicate this template?"
 msgstr "要复制此模板吗？"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Documenso License"
+msgstr "Documenso 许可证"
+
 #: apps/remix/app/components/dialogs/account-delete-dialog.tsx
 msgid "Documenso will delete <0>all of your documents</0>, along with all of your completed documents, signatures, and all other resources belonging to your Account."
 msgstr "Documenso 将删除<0>你所有的文档</0>，包括所有已完成的文档、签名以及属于你账号的其他所有资源。"
@@ -3629,6 +3646,7 @@ msgstr "文档已取消"
 msgid "Document completed"
 msgstr "文档已完成"
 
+#: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
@@ -3768,11 +3786,6 @@ msgstr "文档已不再可供签署"
 msgctxt "Audit log format"
 msgid "Document opened"
 msgstr "文档已打开"
-
-#: packages/lib/utils/document-audit-logs.ts
-msgctxt "Audit log format"
-msgid "Document ownership delegated"
-msgstr "文档所有权已被委派"
 
 #: apps/remix/app/components/general/document/document-status.tsx
 msgid "Document pending"
@@ -3942,11 +3955,11 @@ msgstr "由模板创建的文档"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Documents deleted"
-msgstr ""
+msgstr "文档已删除"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Documents partially deleted"
-msgstr ""
+msgstr "文档已部分删除"
 
 #: apps/remix/app/routes/_authenticated+/admin+/stats.tsx
 msgid "Documents Received"
@@ -4270,8 +4283,9 @@ msgid "Email preferences updated"
 msgstr "邮件偏好已更新"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Email resent"
-msgstr "邮件已重新发送"
+msgstr "电子邮件已重新发送"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-settings-dialog.tsx
@@ -4281,8 +4295,9 @@ msgid "Email Sender"
 msgstr "邮件发件人"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Email sent"
-msgstr "邮件已发送"
+msgstr "电子邮件已发送"
 
 #: apps/remix/app/routes/_unauthenticated+/check-email.tsx
 msgid "Email sent!"
@@ -4526,10 +4541,12 @@ msgid "Envelope Item Count"
 msgstr "信封条目数量"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Envelope item created"
 msgstr "信封条目已创建"
 
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "Envelope item deleted"
 msgstr "信封条目已删除"
 
@@ -4669,6 +4686,15 @@ msgstr "超时"
 msgid "Expired"
 msgstr "已过期"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgctxt "Subscription status"
+msgid "Expired"
+msgstr "已过期"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Expires"
+msgstr "到期时间"
+
 #. placeholder {0}: DateTime.fromMillis(Math.max(millisecondsRemaining, 0)).toFormat( 'mm:ss', )
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Expires in {0}"
@@ -4742,6 +4768,10 @@ msgstr "保存设置失败。"
 msgid "Failed to sign out all sessions"
 msgstr "注销所有会话失败"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Failed to sync license"
+msgstr "许可证同步失败"
+
 #: apps/remix/app/routes/_authenticated+/settings+/security.linked-accounts.tsx
 msgid "Failed to unlink account"
 msgstr "取消关联账户失败"
@@ -4779,6 +4809,10 @@ msgstr "失败：{failedCount}"
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 msgid "Feature Flags"
 msgstr "功能开关"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Features"
+msgstr "功能"
 
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/text-field.tsx
 msgid "Field character limit"
@@ -5335,7 +5369,9 @@ msgstr "继承的订阅声明"
 #: apps/remix/app/components/general/document-signing/document-signing-initials-field.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Initials"
 msgstr "首字母缩写"
 
@@ -5363,10 +5399,19 @@ msgstr "验证码无效。请重试。"
 msgid "Invalid domains"
 msgstr "无效的域名"
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: packages/lib/types/recipient.ts
 #: packages/ui/primitives/document-flow/add-signers.types.ts
 msgid "Invalid email"
 msgstr "邮箱无效"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Invalid License Key"
+msgstr "许可证密钥无效"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "Invalid License Type - Your Documenso instance is using features that are not part of your license."
+msgstr "许可证类型无效 - 您的 Documenso 实例正在使用不在当前许可证范围内的功能。"
 
 #: apps/remix/app/routes/_unauthenticated+/team.verify.email.$token.tsx
 msgid "Invalid link"
@@ -5419,12 +5464,17 @@ msgid "Invite Members"
 msgstr "邀请成员"
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "Invite organisation members"
 msgstr "邀请组织成员"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "Invite team members to collaborate"
 msgstr "邀请团队成员协作"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Invite them to the organisation first"
+msgstr "请先将他们邀请到组织中"
 
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 msgid "Invited At"
@@ -5570,6 +5620,12 @@ msgstr "上次使用"
 msgid "Last Year"
 msgstr "去年"
 
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/components/general/admin-license-card.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Learn more"
+msgstr "了解详情"
+
 #: apps/remix/app/components/dialogs/organisation-leave-dialog.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 msgid "Leave"
@@ -5602,6 +5658,27 @@ msgstr "字间距"
 msgid "Letter Spacing"
 msgstr "字间距"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License"
+msgstr "许可证"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "License Expired - Please renew your license to continue using enterprise features."
+msgstr "许可证已过期 - 请续订您的许可证以继续使用企业功能。"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License Key"
+msgstr "许可证密钥"
+
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "License Payment Overdue - Please update your payment to avoid service disruptions."
+msgstr "许可证付款逾期 - 请更新您的付款信息以避免服务中断。"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "License synced"
+msgstr "许可证已同步"
+
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Light Mode"
 msgstr "浅色模式"
@@ -5627,6 +5704,7 @@ msgid "Link expires in 30 minutes."
 msgstr "链接将在 30 分钟后失效。"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
+msgctxt "Action button to link template to public profile"
 msgid "Link template"
 msgstr "链接模板"
 
@@ -5677,6 +5755,7 @@ msgstr "正在加载文档..."
 msgid "Loading suggestions..."
 msgstr "正在加载建议…"
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Loading..."
 msgstr "正在加载..."
@@ -5954,6 +6033,10 @@ msgstr "垂直居中"
 msgid "Min"
 msgstr "最小值"
 
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "Missing License - Your Documenso instance is using features that require a license."
+msgstr "缺少许可证 - 您的 Documenso 实例正在使用需要许可证的功能。"
+
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 msgid "Missing Recipients"
 msgstr "缺少收件人"
@@ -5998,7 +6081,7 @@ msgstr "将文档移动到文件夹"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Documents to Folder"
-msgstr ""
+msgstr "将文档移动到文件夹"
 
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 msgid "Move Folder"
@@ -6010,7 +6093,7 @@ msgstr "将模板移动到文件夹"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Move Templates to Folder"
-msgstr ""
+msgstr "将模板移动到文件夹"
 
 #: apps/remix/app/components/tables/documents-table-action-dropdown.tsx
 #: apps/remix/app/components/tables/envelopes-table-bulk-action-bar.tsx
@@ -6027,6 +6110,7 @@ msgid "My Folder"
 msgstr "我的文件夹"
 
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
+#: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "N/A"
 msgstr "N/A"
@@ -6145,6 +6229,10 @@ msgstr "未找到文档"
 msgid "No email detected"
 msgstr "未检测到电子邮件"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "No features enabled"
+msgstr "未启用任何功能"
+
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 msgid "No fields were detected in your document."
 msgstr "在您的文档中未检测到任何字段。"
@@ -6164,6 +6252,18 @@ msgstr "未找到与“{searchTerm}”匹配的文件夹"
 #: apps/remix/app/routes/_recipient+/sign.$token+/rejected.tsx
 msgid "No further action is required from you at this time."
 msgstr "目前您无需再执行任何操作。"
+
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "No License Configured"
+msgstr "未配置许可证"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "No members selected"
+msgstr "未选择任何成员"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "No organisation members available"
+msgstr "没有可用的组织成员"
 
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 msgid "No organisations found"
@@ -6665,6 +6765,7 @@ msgstr "密码已更新"
 msgid "Password updated!"
 msgstr "密码已更新！"
 
+#: apps/remix/app/components/general/admin-license-card.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 msgctxt "Subscription status"
 msgid "Past Due"
@@ -6705,7 +6806,7 @@ msgstr "待处理文档数量"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Pending documents will have their signing process cancelled"
-msgstr ""
+msgstr "待处理文档的签署流程将被取消"
 
 #: apps/remix/app/components/general/organisations/organisation-invitations.tsx
 msgid "Pending invitations"
@@ -6935,6 +7036,10 @@ msgstr "签署前请先审阅文档。"
 msgid "Please select a PDF file"
 msgstr "请选择一个 PDF 文件"
 
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "Please select at least one member to add to the team."
+msgstr "请至少选择一名成员添加到团队。"
+
 #: apps/remix/app/components/general/document-signing/access-auth-2fa-form.tsx
 msgid "Please select how you'd like to receive your verification code."
 msgstr "请选择您希望接收验证码的方式。"
@@ -7091,7 +7196,9 @@ msgstr "快速操作"
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-drag-drop.tsx
 #: packages/lib/utils/fields.ts
+#: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Radio"
 msgstr "单选"
 
@@ -7176,11 +7283,6 @@ msgstr "最近文档"
 #: apps/remix/app/components/general/template/template-page-view-documents-table.tsx
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/inbox-table.tsx
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
-#: packages/lib/utils/document-audit-logs.ts
 msgid "Recipient"
 msgstr "收件人"
 
@@ -7201,13 +7303,41 @@ msgstr "收件人 {0}"
 msgid "Recipient action authentication"
 msgstr "收件人操作认证"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient approved the document"
+msgstr "收件人已批准此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient CC'd the document"
+msgstr "收件人已将此文档加入抄送"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient completed their task"
+msgstr "收件人已完成其任务"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient failed to validate a 2FA token for the document"
+msgstr "收件人未能验证此文档的双重验证 (2FA) 令牌"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient rejected the document"
+msgstr "收件人已拒绝此文档"
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient removed email"
 msgstr "收件人移除邮件"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient requested a 2FA token for the document"
+msgstr "收件人请求了此文档的双重验证 (2FA) 令牌"
+
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signed email"
 msgstr "收件人签署邮件"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient signed the document"
+msgstr "收件人已签署此文档"
 
 #: packages/ui/components/document/document-email-checkboxes.tsx
 msgid "Recipient signing request email"
@@ -7217,10 +7347,20 @@ msgstr "收件人签署请求邮件"
 msgid "Recipient updated"
 msgstr "收件人已更新"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient validated a 2FA token for the document"
+msgstr "收件人已验证此文档的双重验证 (2FA) 令牌"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "Recipient viewed the document"
+msgstr "收件人已查看此文档"
+
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/general/document/document-page-view-recipients.tsx
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-recipient-form.tsx
 #: apps/remix/app/components/general/template/template-page-view-recipients.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.$id.logs.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
 msgid "Recipients"
@@ -7725,6 +7865,10 @@ msgstr "安全"
 msgid "Security activity"
 msgstr "安全活动"
 
+#: apps/remix/app/components/general/admin-license-status-banner.tsx
+msgid "See Documentation"
+msgstr "查看文档"
+
 #: apps/remix/app/routes/_authenticated+/admin+/documents.$id.tsx
 msgid "See the background jobs tab for the status"
 msgstr "状态请查看后台作业选项卡"
@@ -7779,7 +7923,7 @@ msgstr "选择访问方式"
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Select all"
-msgstr ""
+msgstr "全选"
 
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
 msgid "Select an event type"
@@ -7853,19 +7997,22 @@ msgstr "选择选项"
 msgid "Select Options"
 msgstr "选择选项"
 
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select or add recipients"
+msgstr "选择或添加收件人"
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Select or enter email address"
+msgstr "选择或输入电子邮箱地址"
+
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Select passkey"
 msgstr "选择通行密钥"
 
-#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
-#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
-msgid "Select recipients"
-msgstr "选择收件人"
-
 #: apps/remix/app/components/tables/documents-table.tsx
 #: apps/remix/app/components/tables/templates-table.tsx
 msgid "Select row"
-msgstr ""
+msgstr "选择行"
 
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/document-preferences-form.tsx
@@ -7915,11 +8062,11 @@ msgstr "选择可见性"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Selected documents will be permanently deleted"
-msgstr ""
+msgstr "选中的文档将被永久删除"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "Selected items have been moved."
-msgstr ""
+msgstr "选中的项目已被移动。"
 
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
 #: apps/remix/app/components/general/envelope-editor/envelope-editor-preview-page.tsx
@@ -7928,7 +8075,7 @@ msgstr "选定收件人"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Selected templates will be permanently deleted"
-msgstr ""
+msgstr "选中的模板将被永久删除"
 
 #: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/webhook-test-dialog.tsx
@@ -8217,6 +8364,7 @@ msgstr "使用 OIDC 注册"
 #: packages/lib/utils/fields.ts
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/types.ts
+#: packages/ui/primitives/field-selector.tsx
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 msgid "Signature"
 msgstr "签名"
@@ -8681,10 +8829,12 @@ msgstr "同步邮箱域名"
 msgid "Sync failed, changes not saved"
 msgstr "同步失败，更改未保存"
 
-#: packages/lib/utils/document-audit-logs.ts
-msgid "System auto inserted fields"
-msgstr "系统自动插入了字段"
+#: apps/remix/app/components/general/admin-license-card.tsx
+msgid "Sync license from server"
+msgstr "从服务器同步许可证"
 
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
 #: packages/lib/utils/document-audit-logs.ts
 msgctxt "Audit log format"
 msgid "System auto inserted fields"
@@ -8933,11 +9083,11 @@ msgstr "模板"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Templates deleted"
-msgstr ""
+msgstr "模板已删除"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-delete-dialog.tsx
 msgid "Templates partially deleted"
-msgstr ""
+msgstr "模板已部分删除"
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.webhooks.$id._index.tsx
 msgid "Test"
@@ -9075,8 +9225,9 @@ msgstr "文档所有者已收到您的决定通知。如有需要，他们可能
 #. placeholder {0}: data.delegatedOwnerName || data.delegatedOwnerEmail
 #. placeholder {1}: data.teamName
 #: packages/lib/utils/document-audit-logs.ts
+msgctxt "Audit log format"
 msgid "The document ownership was delegated to {0} on behalf of {1}"
-msgstr "已代表 {1} 将该文档所有权委派给 {0}"
+msgstr "此文档的所有权已代表 {1} 委派给 {0}"
 
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
 msgid "The document was created but could not be sent to recipients."
@@ -9138,7 +9289,7 @@ msgstr "您尝试移动文档到的文件夹不存在。"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "The folder you are trying to move the items to does not exist."
-msgstr ""
+msgstr "你要移动项目到的文件夹不存在。"
 
 #: apps/remix/app/components/dialogs/template-move-to-folder-dialog.tsx
 msgid "The folder you are trying to move the template to does not exist."
@@ -9697,6 +9848,10 @@ msgid "To accept this invitation you must create an account."
 msgstr "要接受此邀请，你必须创建一个账号。"
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
+msgid "To add members to this team, you must first add them to the organisation."
+msgstr "要向此团队添加成员，必须先将他们添加到组织中。"
+
+#: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "To be able to add members to a team, you must first add them to the organisation. For more information, please see the <0>documentation</0>."
 msgstr "要向团队添加成员，必须先将他们添加到组织中。更多信息请参阅<0>文档</0>。"
 
@@ -9885,6 +10040,10 @@ msgstr "键入"
 #: apps/remix/app/components/general/app-command-menu.tsx
 msgid "Type a command or search..."
 msgstr "输入命令或搜索..."
+
+#: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
+msgid "Type an email address to add a recipient"
+msgstr "输入电子邮箱地址以添加收件人"
 
 #: packages/ui/primitives/signature-pad/signature-pad-type.tsx
 msgid "Type your signature"
@@ -10371,10 +10530,6 @@ msgstr "验证失败"
 #: packages/ui/primitives/document-flow/field-items-advanced-settings/number-field.tsx
 msgid "Value"
 msgstr "值"
-
-#: packages/lib/types/field-meta.ts
-msgid "Value must be a number"
-msgstr "值必须为数字"
 
 #: packages/email/template-components/template-access-auth-2fa.tsx
 msgid "Verification Code Required"
@@ -11115,6 +11270,18 @@ msgstr "是"
 msgid "You"
 msgstr "你"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You added a field"
+msgstr "你添加了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You added a recipient"
+msgstr "你添加了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You approved the document"
+msgstr "你已批准此文档"
+
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
 msgid "You are about to complete approving the following document"
 msgstr "您即将完成以下文档的批准"
@@ -11179,11 +11346,16 @@ msgid "You are about to remove the following email from <0>{0}</0>."
 msgstr "您即将从 <0>{0}</0> 中移除以下邮箱。"
 
 #. placeholder {0}: organisation.name
-#. placeholder {0}: team.name
 #: apps/remix/app/components/dialogs/organisation-group-delete-dialog.tsx
-#: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
+msgctxt "Removing group from organisation"
 msgid "You are about to remove the following group from <0>{0}</0>."
-msgstr "您即将从 <0>{0}</0> 中移除以下组。"
+msgstr "您即将从<0>{0}</0>中移除以下群组。"
+
+#. placeholder {0}: team.name
+#: apps/remix/app/components/dialogs/team-group-delete-dialog.tsx
+msgctxt "Removing group from team"
+msgid "You are about to remove the following group from <0>{0}</0>."
+msgstr "您即将从<0>{0}</0>中移除以下群组。"
 
 #. placeholder {0}: organisation.name
 #: apps/remix/app/components/dialogs/organisation-member-delete-dialog.tsx
@@ -11236,7 +11408,7 @@ msgstr "您当前正在更新 <0>{teamGroupName}</0> 团队组。"
 
 #: apps/remix/app/components/dialogs/envelopes-bulk-move-dialog.tsx
 msgid "You are not allowed to move these items."
-msgstr ""
+msgstr "你无权移动这些项目。"
 
 #: apps/remix/app/components/dialogs/document-move-to-folder-dialog.tsx
 msgid "You are not allowed to move this document."
@@ -11361,6 +11533,23 @@ msgstr "您目前无法上传文档。"
 msgid "You cannot upload encrypted PDFs."
 msgstr "你无法上传已加密的 PDF。"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You CC'd the document"
+msgstr "你已将此文档加入抄送"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You completed your task"
+msgstr "你已完成你的任务"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You created an envelope item with title {0}"
+msgstr "你创建了一个标题为 {0} 的信封条目"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You created the document"
+msgstr "你创建了此文档"
+
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "You currently have an inactive <0>{currentProductName}</0> subscription"
 msgstr "您当前有一个非激活的 <0>{currentProductName}</0> 订阅"
@@ -11368,6 +11557,15 @@ msgstr "您当前有一个非激活的 <0>{currentProductName}</0> 订阅"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "You currently have no access to any teams within this organisation. Please contact your organisation to request access."
 msgstr "您当前对该组织内的任何团队都没有访问权限。请联系您的组织以申请访问。"
+
+#. placeholder {0}: data.envelopeItemTitle
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You deleted an envelope item with title {0}"
+msgstr "你删除了一个标题为 {0} 的信封条目"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You deleted the document"
+msgstr "你删除了此文档"
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "You do not have permission to create a token for this team."
@@ -11380,6 +11578,10 @@ msgstr "您目前未为任何组织管理计费。"
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "You don't need to sign it anymore."
 msgstr "您不再需要签署该文档。"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You failed to validate a 2FA token for the document"
+msgstr "你未能验证此文档的双重验证 (2FA) 令牌"
 
 #. placeholder {0}: data.organisationName
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
@@ -11543,6 +11745,10 @@ msgstr "您已更新该团队组。"
 msgid "You have verified your email address for <0>{0}</0>."
 msgstr "你已验证在 <0>{0}</0> 的邮箱地址。"
 
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You moved the document to team"
+msgstr "你已将此文档移动到团队"
+
 #: apps/remix/app/components/dialogs/organisation-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/team-delete-dialog.tsx
 #: apps/remix/app/components/dialogs/token-delete-dialog.tsx
@@ -11583,6 +11789,97 @@ msgstr "你需要登录才能查看此页面。"
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "你需要设置双重验证才能将此文档标记为已查看。"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You opened the document"
+msgstr "你打开了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You prefilled a field"
+msgstr "你预填了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You rejected the document"
+msgstr "你拒绝了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You removed a field"
+msgstr "你移除了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You removed a recipient"
+msgstr "你移除了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You requested a 2FA token for the document"
+msgstr "你请求了此文档的双重验证 (2FA) 令牌"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You resent an email to {0}"
+msgstr "你向 {0} 重新发送了一封电子邮件"
+
+#. placeholder {0}: data.recipientEmail
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You sent an email to {0}"
+msgstr "你向 {0} 发送了一封电子邮件"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You sent the document"
+msgstr "你发送了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You signed a field"
+msgstr "你在一个字段上签了名"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You signed the document"
+msgstr "你签署了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You unsigned a field"
+msgstr "你撤销了一个字段上的签名"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated a field"
+msgstr "你更新了一个字段"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated a recipient"
+msgstr "你更新了一个收件人"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document"
+msgstr "你更新了此文档"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document access auth requirements"
+msgstr "你更新了此文档的访问认证要求"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document external ID"
+msgstr "你更新了此文档的外部 ID"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document signing auth requirements"
+msgstr "你更新了此文档的签署认证要求"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document title"
+msgstr "你更新了此文档的标题"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You updated the document visibility"
+msgstr "你更新了此文档的可见性"
+
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You validated a 2FA token for the document"
+msgstr "你验证了此文档的双重验证 (2FA) 令牌"
+
+#: packages/lib/utils/document-audit-logs.ts
+#: packages/lib/utils/document-audit-logs.ts
+msgid "You viewed the document"
+msgstr "你查看了此文档"
 
 #: apps/remix/app/components/dialogs/admin-organisation-create-dialog.tsx
 msgid "You will need to configure any claims or subscription after creating this organisation"
@@ -11641,6 +11938,11 @@ msgstr "您针对模板“{templateName}”的批量发送操作已完成。"
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.billing.tsx
 msgid "Your current {currentProductName} plan is past due. Please update your payment information."
 msgstr "您当前的 {currentProductName} 套餐已逾期。请更新您的支付信息。"
+
+#: apps/remix/app/components/forms/subscription-claim-form.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "Your current license does not include these features."
+msgstr "您当前的许可证不包含这些功能。"
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.support.tsx
 msgid "Your current plan includes the following support channels:"
@@ -11889,3 +12191,4 @@ msgstr "您的验证码："
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "your-domain.com another-domain.com"
 msgstr "your-domain.com another-domain.com"
+
