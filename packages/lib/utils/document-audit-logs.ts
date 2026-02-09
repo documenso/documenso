@@ -584,11 +584,13 @@ export const formatDocumentAuditLogAction = (
     })
     .exhaustive();
 
-  const selectedDescription = (() => {
-    if (isCurrentUser) return description.you;
-    if (user) return description.user;
-    return description.anonymous;
-  })();
+  let selectedDescription = description.anonymous;
+
+  if (isCurrentUser) {
+    selectedDescription = description.you;
+  } else if (user) {
+    selectedDescription = description.user;
+  }
 
   return {
     prefix,
