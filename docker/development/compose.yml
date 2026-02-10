@@ -1,20 +1,20 @@
-name: documenso-development
+name: signing-development
 
 services:
   database:
     image: postgres:15
     container_name: database
     volumes:
-      - documenso_database:/var/lib/postgresql/data
+      - signing_database:/var/lib/postgresql/data
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER}']
       interval: 10s
       timeout: 5s
       retries: 5
     environment:
-      - POSTGRES_USER=documenso
+      - POSTGRES_USER=signing
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=documenso
+      - POSTGRES_DB=signing
     ports:
       - 54320:5432
 
@@ -35,11 +35,11 @@ services:
     volumes:
       - minio:/data
     environment:
-      MINIO_ROOT_USER: documenso
+      MINIO_ROOT_USER: signing
       MINIO_ROOT_PASSWORD: password
     entrypoint: sh
-    command: -c 'mkdir -p /data/documenso && minio server /data --console-address ":9001" --address ":9002"'
+    command: -c 'mkdir -p /data/signing && minio server /data --console-address ":9001" --address ":9002"'
 
 volumes:
   minio:
-  documenso_database:
+  signing_database:

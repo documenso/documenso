@@ -1,14 +1,14 @@
-name: documenso-test
+name: signing-test
 
 services:
   database:
     image: postgres:15
     environment:
-      - POSTGRES_USER=documenso
+      - POSTGRES_USER=signing
       - POSTGRES_PASSWORD=password
-      - POSTGRES_DB=documenso
+      - POSTGRES_DB=signing
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U documenso']
+      test: ['CMD-SHELL', 'pg_isready -U signing']
       interval: 1s
       timeout: 5s
       retries: 5
@@ -22,7 +22,7 @@ services:
       - 2500:2500
       - 1100:1100
 
-  documenso:
+  signing:
     build:
       context: ../../
       dockerfile: docker/Dockerfile
@@ -37,18 +37,18 @@ services:
       - NEXTAUTH_SECRET=secret
       - NEXT_PRIVATE_ENCRYPTION_KEY=CAFEBABE
       - NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY=DEADBEEF
-      - NEXT_PRIVATE_DATABASE_URL=postgres://documenso:password@database:5432/documenso
-      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgres://documenso:password@database:5432/documenso
+      - NEXT_PRIVATE_DATABASE_URL=postgres://signing:password@database:5432/signing
+      - NEXT_PRIVATE_DIRECT_DATABASE_URL=postgres://signing:password@database:5432/signing
       - NEXT_PUBLIC_UPLOAD_TRANSPORT=database
       - NEXT_PRIVATE_SMTP_TRANSPORT=smtp-auth
       - NEXT_PRIVATE_SMTP_HOST=inbucket
       - NEXT_PRIVATE_SMTP_PORT=2500
-      - NEXT_PRIVATE_SMTP_USERNAME=documenso
+      - NEXT_PRIVATE_SMTP_USERNAME=signing
       - NEXT_PRIVATE_SMTP_PASSWORD=password
-      - NEXT_PRIVATE_SMTP_FROM_NAME="No Reply @ Documenso"
-      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@documenso.com
-      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/documenso/cert.p12
+      - NEXT_PRIVATE_SMTP_FROM_NAME="No Reply @ Saltwyk Signing"
+      - NEXT_PRIVATE_SMTP_FROM_ADDRESS=noreply@saltwyk.com
+      - NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH=/opt/signing/cert.p12
     ports:
       - 3000:3000
     volumes:
-      - ../../apps/remix/example/cert.p12:/opt/documenso/cert.p12
+      - ../../apps/remix/example/cert.p12:/opt/signing/cert.p12
