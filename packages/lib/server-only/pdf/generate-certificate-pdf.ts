@@ -100,6 +100,7 @@ export const generateCertificatePdf = async (options: GenerateCertificatePdfOpti
       let authLevel = match(actionAuthMethod)
         .with('ACCOUNT', () => i18n._(msg`Account Re-Authentication`))
         .with('TWO_FACTOR_AUTH', () => i18n._(msg`Two-Factor Re-Authentication`))
+        .with('EXTERNAL_TWO_FACTOR_AUTH', () => i18n._(msg`External Two-Factor Re-Authentication`))
         .with('PASSWORD', () => i18n._(msg`Password Re-Authentication`))
         .with('PASSKEY', () => i18n._(msg`Passkey Re-Authentication`))
         .with('EXPLICIT_NONE', () => i18n._(msg`Email`))

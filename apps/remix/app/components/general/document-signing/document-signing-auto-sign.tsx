@@ -114,8 +114,12 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
           }))
           .with(undefined, () => undefined)
           .with(
-            P.union(DocumentAuth.PASSKEY, DocumentAuth.TWO_FACTOR_AUTH, DocumentAuth.PASSWORD),
-            // This is a bit dirty, but the sentinel value used here is incredibly short-lived.
+            P.union(
+              DocumentAuth.PASSKEY,
+              DocumentAuth.TWO_FACTOR_AUTH,
+              DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH,
+              DocumentAuth.PASSWORD,
+            ),
             () => 'NOT_SUPPORTED' as const,
           )
           .exhaustive();
@@ -165,7 +169,7 @@ export const DocumentSigningAutoSign = ({ recipient, fields }: DocumentSigningAu
           <DialogTitle>Automatically sign fields</DialogTitle>
         </DialogHeader>
 
-        <div className="text-muted-foreground max-w-[50ch]">
+        <div className="max-w-[50ch] text-muted-foreground">
           <p>
             <Trans>
               When you sign a document, we can automatically fill in and sign the following fields

@@ -177,6 +177,7 @@ export const signFieldWithToken = async ({
     field,
     userId,
     authOptions,
+    recipientToken: token,
   });
 
   const documentMeta = await prisma.documentMeta.findFirst({
