@@ -46,6 +46,16 @@ export const appMiddleware = async (c: Context, next: Next) => {
 
   const pathname = path.replace('.data', '');
 
+  const signingPathRegex = /^\/(sign|d)\//;
+
+  if (signingPathRegex.test(pathname)) {
+    c.header('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+    c.header('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet');
+    c.header('X-Frame-Options', 'DENY');
+    c.header('Content-Security-Policy', "frame-ancestors 'none'");
+    c.header('Referrer-Policy', 'no-referrer');
+  }
+
   // Set the preferred team url cookie if user accesses a team page.
   if (pathname.startsWith('/t/')) {
     debug.log('Setting preferred team url cookie');
