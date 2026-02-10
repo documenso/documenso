@@ -35,3 +35,12 @@ export const DOCUMENT_AUTH_TYPES: Record<string, DocumentAuthTypeData> = {
     value: msg`None (Overrides global settings)`,
   },
 } satisfies Record<TDocumentAuth, DocumentAuthTypeData>;
+
+export const SIGNING_2FA_VERIFY_REASON_CODES = {
+  TWO_FA_TOKEN_INVALID: 'TWO_FA_TOKEN_INVALID',
+  TWO_FA_TOKEN_EXPIRED: 'TWO_FA_TOKEN_EXPIRED',
+  TWO_FA_TOKEN_REVOKED: 'TWO_FA_TOKEN_REVOKED',
+  TWO_FA_TOKEN_CONSUMED: 'TWO_FA_TOKEN_CONSUMED',
+  TWO_FA_ATTEMPT_LIMIT_REACHED: 'TWO_FA_ATTEMPT_LIMIT_REACHED',
+  TWO_FA_NOT_ISSUED: 'TWO_FA_NOT_ISSUED',
+} as const;

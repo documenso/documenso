@@ -1,20 +1,14 @@
 import { prisma } from '@documenso/prisma';
 
+import { SIGNING_2FA_VERIFY_REASON_CODES } from '../../constants/document-auth';
 import { AppError, AppErrorCode } from '../../errors/app-error';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../types/document-audit-logs';
 import { createDocumentAuditLogData } from '../../utils/document-audit-logs';
 import { verifyTokenHash } from './token-utils';
 
-const PROOF_TTL_MINUTES = 10;
+export { SIGNING_2FA_VERIFY_REASON_CODES };
 
-export const SIGNING_2FA_VERIFY_REASON_CODES = {
-  TWO_FA_TOKEN_INVALID: 'TWO_FA_TOKEN_INVALID',
-  TWO_FA_TOKEN_EXPIRED: 'TWO_FA_TOKEN_EXPIRED',
-  TWO_FA_TOKEN_REVOKED: 'TWO_FA_TOKEN_REVOKED',
-  TWO_FA_TOKEN_CONSUMED: 'TWO_FA_TOKEN_CONSUMED',
-  TWO_FA_ATTEMPT_LIMIT_REACHED: 'TWO_FA_ATTEMPT_LIMIT_REACHED',
-  TWO_FA_NOT_ISSUED: 'TWO_FA_NOT_ISSUED',
-} as const;
+const PROOF_TTL_MINUTES = 10;
 
 export type VerifySigningTwoFactorTokenOptions = {
   recipientId: number;

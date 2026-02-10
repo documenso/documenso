@@ -5,8 +5,8 @@ import { Trans } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
+import { SIGNING_2FA_VERIFY_REASON_CODES } from '@documenso/lib/constants/document-auth';
 import { AppError } from '@documenso/lib/errors/app-error';
-import { SIGNING_2FA_VERIFY_REASON_CODES } from '@documenso/lib/server-only/signing-2fa/verify-signing-two-factor-token';
 import { DocumentAuth, type TRecipientActionAuth } from '@documenso/lib/types/document-auth';
 import { trpc } from '@documenso/trpc/react';
 import { Alert, AlertDescription, AlertTitle } from '@documenso/ui/primitives/alert';
