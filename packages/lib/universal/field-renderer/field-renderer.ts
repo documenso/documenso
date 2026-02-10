@@ -19,7 +19,7 @@ export type FieldToRender = Pick<
   positionX: number;
   positionY: number;
   fieldMeta?: TFieldMetaSchema | null;
-  signature?: Signature | null;
+  signature?: Pick<Signature, 'signatureImageAsBase64' | 'typedSignature'> | null;
 };
 
 export type RenderFieldElementOptions = {

@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import type { DropResult } from '@hello-pangea/dnd';
-import { msg } from '@lingui/core/macro';
+import { msg, plural } from '@lingui/core/macro';
 import { Trans, useLingui } from '@lingui/react/macro';
 import { DocumentStatus } from '@prisma/client';
 import { FileWarningIcon, GripVerticalIcon, Loader2 } from 'lucide-react';
@@ -18,9 +18,9 @@ import {
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { APP_DOCUMENT_UPLOAD_SIZE_LIMIT } from '@documenso/lib/constants/app';
 import { nanoid } from '@documenso/lib/universal/id';
-import { putPdfFile } from '@documenso/lib/universal/upload/put-file';
 import { canEnvelopeItemsBeModified } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
+import type { TCreateEnvelopeItemsPayload } from '@documenso/trpc/server/envelope-router/create-envelope-items.types';
 import { Button } from '@documenso/ui/primitives/button';
 import {
   Card,
@@ -49,7 +49,7 @@ export const EnvelopeEditorUploadPage = () => {
   const organisation = useCurrentOrganisation();
 
   const { t } = useLingui();
-  const { envelope, setLocalEnvelope, relativePath } = useCurrentEnvelopeEditor();
+  const { envelope, setLocalEnvelope, relativePath, editorFields } = useCurrentEnvelopeEditor();
   const { maximumEnvelopeItemCount, remaining } = useLimits();
   const { toast } = useToast();
 
@@ -67,8 +67,8 @@ export const EnvelopeEditorUploadPage = () => {
 
   const { mutateAsync: createEnvelopeItems, isPending: isCreatingEnvelopeItems } =
     trpc.envelope.item.createMany.useMutation({
-      onSuccess: (data) => {
-        const createdEnvelopes = data.createdEnvelopeItems.filter(
+      onSuccess: ({ data }) => {
+        const createdEnvelopes = data.filter(
           (item) => !envelope.envelopeItems.find((envelopeItem) => envelopeItem.id === item.id),
         );
 
@@ -79,10 +79,10 @@ export const EnvelopeEditorUploadPage = () => {
     });
 
   const { mutateAsync: updateEnvelopeItems } = trpc.envelope.item.updateMany.useMutation({
-    onSuccess: (data) => {
+    onSuccess: ({ data }) => {
       setLocalEnvelope({
         envelopeItems: envelope.envelopeItems.map((originalItem) => {
-          const updatedItem = data.updatedEnvelopeItems.find((item) => item.id === originalItem.id);
+          const updatedItem = data.find((item) => item.id === originalItem.id);
 
           if (updatedItem) {
             return {
@@ -114,36 +114,19 @@ export const EnvelopeEditorUploadPage = () => {
 
     setLocalFiles((prev) => [...prev, ...newUploadingFiles]);
 
-    const result = await Promise.all(
-      files.map(async (file, index) => {
-        try {
-          const response = await putPdfFile(file);
-
-          // Mark as uploaded (remove from uploading state)
-          return {
-            title: file.name,
-            documentDataId: response.id,
-          };
-        } catch (_error) {
-          setLocalFiles((prev) =>
-            prev.map((uploadingFile) =>
-              uploadingFile.id === newUploadingFiles[index].id
-                ? { ...uploadingFile, isError: true, isUploading: false }
-                : uploadingFile,
-            ),
-          );
-        }
-      }),
-    );
-
-    const envelopeItemsToCreate = result.filter(
-      (item): item is { title: string; documentDataId: string } => item !== undefined,
-    );
-
-    const { createdEnvelopeItems } = await createEnvelopeItems({
+    const payload = {
       envelopeId: envelope.id,
-      items: envelopeItemsToCreate,
-    }).catch((error) => {
+    } satisfies TCreateEnvelopeItemsPayload;
+
+    const formData = new FormData();
+
+    formData.append('payload', JSON.stringify(payload));
+
+    for (const file of files) {
+      formData.append('files', file);
+    }
+
+    const { data } = await createEnvelopeItems(formData).catch((error) => {
       console.error(error);
 
       // Set error state on files in batch upload.
@@ -165,7 +148,7 @@ export const EnvelopeEditorUploadPage = () => {
       );
 
       return filteredFiles.concat(
-        createdEnvelopeItems.map((item) => ({
+        data.map((item) => ({
           id: item.id,
           envelopeItemId: item.id,
           title: item.title,
@@ -182,9 +165,17 @@ export const EnvelopeEditorUploadPage = () => {
   const onFileDelete = (envelopeItemId: string) => {
     setLocalFiles((prev) => prev.filter((uploadingFile) => uploadingFile.id !== envelopeItemId));
 
+    const fieldsWithoutDeletedItem = envelope.fields.filter(
+      (field) => field.envelopeItemId !== envelopeItemId,
+    );
+
     setLocalEnvelope({
       envelopeItems: envelope.envelopeItems.filter((item) => item.id !== envelopeItemId),
+      fields: envelope.fields.filter((field) => field.envelopeItemId !== envelopeItemId),
     });
+
+    // Reset editor fields.
+    editorFields.resetForm(fieldsWithoutDeletedItem);
   };
 
   /**
@@ -203,7 +194,6 @@ export const EnvelopeEditorUploadPage = () => {
     debouncedUpdateEnvelopeItems(items);
   };
 
-  // Todo: Envelopes - Sync into envelopes data
   const debouncedUpdateEnvelopeItems = useDebounceFunction((files: LocalFile[]) => {
     void updateEnvelopeItems({
       envelopeId: envelope.id,
@@ -236,7 +226,12 @@ export const EnvelopeEditorUploadPage = () => {
     }
 
     if (maximumEnvelopeItemCount <= localFiles.length) {
-      return msg`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`;
+      return msg({
+        message: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
+      });
     }
 
     return null;
@@ -250,7 +245,10 @@ export const EnvelopeEditorUploadPage = () => {
 
     if (maxItemsReached) {
       toast({
-        title: t`You cannot upload more than ${maximumEnvelopeItemCount} items per envelope.`,
+        title: plural(maximumEnvelopeItemCount, {
+          one: `You cannot upload more than # item per envelope.`,
+          other: `You cannot upload more than # items per envelope.`,
+        }),
         duration: 5000,
         variant: 'destructive',
       });
@@ -308,7 +306,7 @@ export const EnvelopeEditorUploadPage = () => {
                             ref={provided.innerRef}
                             {...provided.draggableProps}
                             style={provided.draggableProps.style}
-                            className={`bg-accent/50 flex items-center justify-between rounded-lg p-3 transition-shadow ${
+                            className={`flex items-center justify-between rounded-lg bg-accent/50 p-3 transition-shadow ${
                               snapshot.isDragging ? 'shadow-md' : ''
                             }`}
                           >
@@ -334,7 +332,7 @@ export const EnvelopeEditorUploadPage = () => {
                                   <p className="text-sm font-medium">{localFile.title}</p>
                                 )}
 
-                                <div className="text-muted-foreground text-xs">
+                                <div className="text-xs text-muted-foreground">
                                   {localFile.isUploading ? (
                                     <Trans>Uploading</Trans>
                                   ) : localFile.isError ? (
@@ -347,13 +345,13 @@ export const EnvelopeEditorUploadPage = () => {
                             <div className="flex items-center space-x-2">
                               {localFile.isUploading && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+                                  <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                                 </div>
                               )}
 
                               {localFile.isError && (
                                 <div className="flex h-6 w-10 items-center justify-center">
-                                  <FileWarningIcon className="text-destructive h-4 w-4" />
+                                  <FileWarningIcon className="h-4 w-4 text-destructive" />
                                 </div>
                               )}
 

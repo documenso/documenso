@@ -282,18 +282,6 @@ export const OrgMenuSwitcher = () => {
                 </DropdownMenuItem>
               )}
 
-              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                <Link to="/inbox">
-                  <Trans>Personal Inbox</Trans>
-                </Link>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
-                <Link to="/settings/profile">
-                  <Trans>Account</Trans>
-                </Link>
-              </DropdownMenuItem>
-
               {currentOrganisation &&
                 canExecuteOrganisationAction(
                   'MANAGE_ORGANISATION',
@@ -313,6 +301,18 @@ export const OrgMenuSwitcher = () => {
                   </Link>
                 </DropdownMenuItem>
               )}
+
+              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+                <Link to="/inbox">
+                  <Trans>Personal Inbox</Trans>
+                </Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem className="text-muted-foreground px-4 py-2" asChild>
+                <Link to="/settings/profile">
+                  <Trans>Account</Trans>
+                </Link>
+              </DropdownMenuItem>
 
               <DropdownMenuItem
                 className="text-muted-foreground px-4 py-2"

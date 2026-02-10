@@ -32,7 +32,7 @@ export const ZUpdateEmbeddingDocumentRequestSchema = z.object({
   recipients: z.array(
     z.object({
       id: z.number().optional(),
-      email: z.string().toLowerCase().email().min(1),
+      email: z.string().email(),
       name: z.string(),
       role: z.nativeEnum(RecipientRole),
       signingOrder: z.number().optional(),

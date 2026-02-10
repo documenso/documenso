@@ -9,7 +9,7 @@ import type { FieldToRender, RenderFieldElementOptions } from './field-renderer'
 import { calculateFieldPosition } from './field-renderer';
 
 export const konvaTextFontFamily =
-  'Noto Sans, Noto Sans Japanese, Noto Sans Chinese, Noto Sans Korean, sans-serif';
+  '"Noto Sans", "Noto Sans Japanese", "Noto Sans Chinese", "Noto Sans Korean", sans-serif';
 export const konvaTextFill = 'black';
 
 export const upsertFieldGroup = (
@@ -153,6 +153,11 @@ export const createFieldHoverInteraction = ({
   const hoverColor = RECIPIENT_COLOR_STYLES[options.color].baseRingHover;
 
   fieldGroup.on('mouseover', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -161,6 +166,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('mouseout', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -169,6 +179,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('transformstart', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,
@@ -177,6 +192,11 @@ export const createFieldHoverInteraction = ({
   });
 
   fieldGroup.on('transformend', () => {
+    const layer = fieldRect.getLayer();
+    if (!layer) {
+      return;
+    }
+
     new Konva.Tween({
       node: fieldRect,
       duration: 0.3,

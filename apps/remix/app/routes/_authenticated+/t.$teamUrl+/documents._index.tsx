@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { Trans } from '@lingui/react/macro';
+import { EnvelopeType } from '@prisma/client';
 import { FolderType, OrganisationType } from '@prisma/client';
 import { useParams, useSearchParams } from 'react-router';
 import { Link } from 'react-router';
 import { z } from 'zod';
 
+import { useSessionStorage } from '@documenso/lib/client-only/hooks/use-session-storage';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
 import { formatAvatarUrl } from '@documenso/lib/utils/avatars';
 import { parseToIntegerArray } from '@documenso/lib/utils/params';
@@ -15,17 +17,21 @@ import { trpc } from '@documenso/trpc/react';
 import type { TFindDocumentsInternalResponse } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { ZFindDocumentsInternalRequestSchema } from '@documenso/trpc/server/document-router/find-documents-internal.types';
 import { Avatar, AvatarFallback, AvatarImage } from '@documenso/ui/primitives/avatar';
+import type { RowSelectionState } from '@documenso/ui/primitives/data-table';
 import { Tabs, TabsList, TabsTrigger } from '@documenso/ui/primitives/tabs';
 
 import { DocumentMoveToFolderDialog } from '~/components/dialogs/document-move-to-folder-dialog';
-import { DocumentDropZoneWrapper } from '~/components/general/document/document-drop-zone-wrapper';
+import { EnvelopesBulkDeleteDialog } from '~/components/dialogs/envelopes-bulk-delete-dialog';
+import { EnvelopesBulkMoveDialog } from '~/components/dialogs/envelopes-bulk-move-dialog';
 import { DocumentSearch } from '~/components/general/document/document-search';
 import { DocumentStatus } from '~/components/general/document/document-status';
+import { EnvelopeDropZoneWrapper } from '~/components/general/envelope/envelope-drop-zone-wrapper';
 import { FolderGrid } from '~/components/general/folder/folder-grid';
 import { PeriodSelector } from '~/components/general/period-selector';
 import { DocumentsTable } from '~/components/tables/documents-table';
 import { DocumentsTableEmptyState } from '~/components/tables/documents-table-empty-state';
 import { DocumentsTableSenderFilter } from '~/components/tables/documents-table-sender-filter';
+import { EnvelopesTableBulkActionBar } from '~/components/tables/envelopes-table-bulk-action-bar';
 import { useCurrentTeam } from '~/providers/team';
 import { appMetaTags } from '~/utils/meta';
 
@@ -52,6 +58,17 @@ export default function DocumentsPage() {
 
   const [isMovingDocument, setIsMovingDocument] = useState(false);
   const [documentToMove, setDocumentToMove] = useState<number | null>(null);
+
+  const [rowSelection, setRowSelection] = useSessionStorage<RowSelectionState>(
+    'documents-bulk-selection',
+    {},
+  );
+  const [isBulkMoveDialogOpen, setIsBulkMoveDialogOpen] = useState(false);
+  const [isBulkDeleteDialogOpen, setIsBulkDeleteDialogOpen] = useState(false);
+
+  const selectedEnvelopeIds = useMemo(() => {
+    return Object.keys(rowSelection).filter((id) => rowSelection[id]);
+  }, [rowSelection]);
 
   const [stats, setStats] = useState<TFindDocumentsInternalResponse['stats']>({
     [ExtendedDocumentStatus.DRAFT]: 0,
@@ -108,17 +125,16 @@ export default function DocumentsPage() {
     }
   }, [data?.stats]);
 
-  // Todo: Envelopes - Change the dropzone wrapper to create to V2 documents after we're ready.
   return (
-    <DocumentDropZoneWrapper>
+    <EnvelopeDropZoneWrapper type={EnvelopeType.DOCUMENT}>
       <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
         <FolderGrid type={FolderType.DOCUMENT} parentId={folderId ?? null} />
 
         <div className="mt-8 flex flex-wrap items-center justify-between gap-x-4 gap-y-8">
           <div className="flex flex-row items-center">
-            <Avatar className="dark:border-border mr-3 h-12 w-12 border-2 border-solid border-white">
+            <Avatar className="mr-3 h-12 w-12 border-2 border-solid border-white dark:border-border">
               {team.avatarImageId && <AvatarImage src={formatAvatarUrl(team.avatarImageId)} />}
-              <AvatarFallback className="text-muted-foreground text-xs">
+              <AvatarFallback className="text-xs text-muted-foreground">
                 {team.name.slice(0, 1)}
               </AvatarFallback>
             </Avatar>
@@ -148,7 +164,7 @@ export default function DocumentsPage() {
                   .map((value) => (
                     <TabsTrigger
                       key={value}
-                      className="hover:text-foreground min-w-[60px]"
+                      className="min-w-[60px] hover:text-foreground"
                       value={value}
                       asChild
                     >
@@ -190,6 +206,9 @@ export default function DocumentsPage() {
                   setDocumentToMove(documentId);
                   setIsMovingDocument(true);
                 }}
+                enableSelection
+                rowSelection={rowSelection}
+                onRowSelectionChange={setRowSelection}
               />
             )}
           </div>
@@ -209,7 +228,31 @@ export default function DocumentsPage() {
             }}
           />
         )}
+
+        <EnvelopesTableBulkActionBar
+          selectedCount={selectedEnvelopeIds.length}
+          onMoveClick={() => setIsBulkMoveDialogOpen(true)}
+          onDeleteClick={() => setIsBulkDeleteDialogOpen(true)}
+          onClearSelection={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkMoveDialog
+          envelopeIds={selectedEnvelopeIds}
+          envelopeType={EnvelopeType.DOCUMENT}
+          open={isBulkMoveDialogOpen}
+          currentFolderId={folderId}
+          onOpenChange={setIsBulkMoveDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
+
+        <EnvelopesBulkDeleteDialog
+          envelopeIds={selectedEnvelopeIds}
+          envelopeType={EnvelopeType.DOCUMENT}
+          open={isBulkDeleteDialogOpen}
+          onOpenChange={setIsBulkDeleteDialogOpen}
+          onSuccess={() => setRowSelection({})}
+        />
       </div>
-    </DocumentDropZoneWrapper>
+    </EnvelopeDropZoneWrapper>
   );
 }

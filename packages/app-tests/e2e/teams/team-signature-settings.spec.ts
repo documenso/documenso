@@ -87,9 +87,7 @@ test('[TEAMS]: check signature modes can be disabled', async ({ page }) => {
     await page.getByRole('button', { name: 'Update' }).first().click();
 
     // Wait for the update to complete
-    const toast = page.locator('li[role="status"][data-state="open"]').first();
-    await expect(toast).toBeVisible();
-    await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
+    await expect(page.getByText('Document preferences updated', { exact: true })).toBeVisible();
 
     const document = await seedTeamDocumentWithMeta(team);
 
@@ -154,9 +152,7 @@ test('[TEAMS]: check signature modes work for templates', async ({ page }) => {
     await page.getByRole('button', { name: 'Update' }).first().click();
 
     // Wait for finish
-    const toast = page.locator('li[role="status"][data-state="open"]').first();
-    await expect(toast).toBeVisible();
-    await expect(toast.getByText('Document preferences updated', { exact: true })).toBeVisible();
+    await expect(page.getByText('Document preferences updated', { exact: true })).toBeVisible();
 
     const template = await seedTeamTemplateWithMeta(team);
 

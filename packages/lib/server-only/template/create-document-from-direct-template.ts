@@ -82,6 +82,7 @@ type CreatedDirectRecipientField = {
 
 export const ZCreateDocumentFromDirectTemplateResponseSchema = z.object({
   token: z.string(),
+  envelopeId: z.string(),
   documentId: z.number(),
   recipientId: z.number(),
 });
@@ -184,7 +185,7 @@ export const createDocumentFromDirectTemplate = async ({
       documentAuth: directTemplateEnvelope.authOptions,
     });
 
-  const directRecipientName = user?.name || initialDirectRecipientName;
+  let directRecipientName = user?.name || initialDirectRecipientName;
 
   // Ensure typesafety when we add more options.
   const isAccessAuthValid = match(derivedRecipientAccessAuth.at(0))
@@ -214,6 +215,12 @@ export const createDocumentFromDirectTemplate = async ({
   const fieldsToProcess = directTemplateRecipient.fields.filter((templateField) => {
     const signedFieldValue = signedFieldValues.find((value) => value.fieldId === templateField.id);
 
+    // Custom logic for V2 to include all fields, since v1 excludes read only
+    // and prefilled fields.
+    if (directTemplateEnvelope.internalVersion === 2) {
+      return true;
+    }
+
     // Include if it's required or has a signed value
     return isRequiredField(templateField) || signedFieldValue !== undefined;
   });
@@ -231,7 +238,7 @@ export const createDocumentFromDirectTemplate = async ({
       }
 
       if (templateField.type === FieldType.NAME && directRecipientName === undefined) {
-        directRecipientName === signedFieldValue?.value;
+        directRecipientName = signedFieldValue?.value;
       }
 
       const derivedRecipientActionAuth = await validateFieldAuth({
@@ -467,19 +474,28 @@ export const createDocumentFromDirectTemplate = async ({
         signingOrder: directTemplateRecipient.signingOrder,
         fields: {
           createMany: {
-            data: directTemplateNonSignatureFields.map(({ templateField, customText }) => ({
-              envelopeId: createdEnvelope.id,
-              envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
-              type: templateField.type,
-              page: templateField.page,
-              positionX: templateField.positionX,
-              positionY: templateField.positionY,
-              width: templateField.width,
-              height: templateField.height,
-              customText: customText ?? '',
-              inserted: true,
-              fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
-            })),
+            data: directTemplateNonSignatureFields.map(({ templateField, customText }) => {
+              let inserted = true;
+
+              // Custom logic for V2 to only insert if values exist.
+              if (directTemplateEnvelope.internalVersion === 2) {
+                inserted = customText !== '';
+              }
+
+              return {
+                envelopeId: createdEnvelope.id,
+                envelopeItemId: oldEnvelopeItemToNewEnvelopeItemIdMap[templateField.envelopeItemId],
+                type: templateField.type,
+                page: templateField.page,
+                positionX: templateField.positionX,
+                positionY: templateField.positionY,
+                width: templateField.width,
+                height: templateField.height,
+                customText: customText ?? '',
+                inserted,
+                fieldMeta: templateField.fieldMeta || Prisma.JsonNull,
+              };
+            }),
           },
         },
       },
@@ -815,6 +831,7 @@ export const createDocumentFromDirectTemplate = async ({
 
   return {
     token,
+    envelopeId: createdEnvelope.id,
     documentId: incrementedDocumentId.documentId,
     recipientId,
   };

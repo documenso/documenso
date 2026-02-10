@@ -1,18 +1,34 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 
-import { flattenAnnotations } from './flatten-annotations';
-import { flattenForm, removeOptionalContentGroups } from './flatten-form';
+import { AppError } from '../../errors/app-error';
 
-export const normalizePdf = async (pdf: Buffer) => {
-  const pdfDoc = await PDFDocument.load(pdf).catch(() => null);
+export const normalizePdf = async (pdf: Buffer, options: { flattenForm?: boolean } = {}) => {
+  const shouldFlattenForm = options.flattenForm ?? true;
 
-  if (!pdfDoc) {
-    return pdf;
+  const pdfDoc = await PDF.load(pdf).catch((e) => {
+    console.error(`PDF normalization error: ${e.message}`);
+
+    throw new AppError('INVALID_DOCUMENT_FILE', {
+      message: 'The document is not a valid PDF',
+    });
+  });
+
+  if (pdfDoc.isEncrypted) {
+    throw new AppError('INVALID_DOCUMENT_FILE', {
+      message: 'The document is encrypted',
+    });
   }
 
-  removeOptionalContentGroups(pdfDoc);
-  await flattenForm(pdfDoc);
-  flattenAnnotations(pdfDoc);
+  pdfDoc.flattenLayers();
 
-  return Buffer.from(await pdfDoc.save());
+  const form = pdfDoc.getForm();
+
+  if (shouldFlattenForm && form) {
+    form.flatten();
+    pdfDoc.flattenAnnotations();
+  }
+
+  const normalizedPdfBytes = await pdfDoc.save();
+
+  return Buffer.from(normalizedPdfBytes);
 };

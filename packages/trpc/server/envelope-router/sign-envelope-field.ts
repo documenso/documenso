@@ -133,6 +133,49 @@ export const signEnvelopeFieldRoute = procedure
 
     const insertionValues = extractFieldInsertionValues({ fieldValue, field, documentMeta });
 
+    // Early return for uninserting fields.
+    if (!insertionValues.inserted) {
+      return await prisma.$transaction(async (tx) => {
+        const updatedField = await tx.field.update({
+          where: {
+            id: field.id,
+          },
+          data: {
+            customText: '',
+            inserted: false,
+          },
+        });
+
+        await tx.signature.deleteMany({
+          where: {
+            fieldId: field.id,
+          },
+        });
+
+        if (recipient.role !== RecipientRole.ASSISTANT) {
+          await tx.documentAuditLog.create({
+            data: createDocumentAuditLogData({
+              type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_FIELD_UNINSERTED,
+              envelopeId: envelope.id,
+              user: {
+                name: recipient.name,
+                email: recipient.email,
+              },
+              requestMetadata: metadata.requestMetadata,
+              data: {
+                field: field.type,
+                fieldId: field.secondaryId,
+              },
+            }),
+          });
+        }
+
+        return {
+          signedField: updatedField,
+        };
+      });
+    }
+
     const derivedRecipientActionAuth = await validateFieldAuth({
       documentAuthOptions: envelope.authOptions,
       recipient,

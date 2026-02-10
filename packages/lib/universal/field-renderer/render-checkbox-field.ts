@@ -3,6 +3,7 @@ import { match } from 'ts-pattern';
 
 import { DEFAULT_STANDARD_FONT_SIZE } from '../../constants/pdf';
 import type { TCheckboxFieldMeta } from '../../types/field-meta';
+import { parseCheckboxCustomText } from '../../utils/fields';
 import {
   createFieldHoverInteraction,
   konvaTextFill,
@@ -25,7 +26,7 @@ export const renderCheckboxFieldElement = (
   field: FieldToRender,
   options: RenderFieldElementOptions,
 ) => {
-  const { pageWidth, pageHeight, pageLayer, mode } = options;
+  const { pageWidth, pageHeight, pageLayer, mode, color } = options;
 
   const { fieldWidth, fieldHeight } = calculateFieldPosition(field, pageWidth, pageHeight);
 
@@ -62,16 +63,15 @@ export const renderCheckboxFieldElement = (
     const rectWidth = fieldRect.width() * groupScaleX;
     const rectHeight = fieldRect.height() * groupScaleY;
 
-    // Todo: Envelopes - check sorting more than 10
-    // arr.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-
     const squares = fieldGroup
       .find('.checkbox-square')
-      .sort((a, b) => a.id().localeCompare(b.id()));
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
     const checkmarks = fieldGroup
       .find('.checkbox-checkmark')
-      .sort((a, b) => a.id().localeCompare(b.id()));
-    const text = fieldGroup.find('.checkbox-text').sort((a, b) => a.id().localeCompare(b.id()));
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
+    const text = fieldGroup
+      .find('.checkbox-text')
+      .sort((a, b) => a.id().localeCompare(b.id(), undefined, { numeric: true }));
 
     const groupedItems = squares.map((square, i) => ({
       squareElement: square,
@@ -130,7 +130,7 @@ export const renderCheckboxFieldElement = (
     pageLayer.batchDraw();
   });
 
-  const checkedValues: number[] = field.customText ? JSON.parse(field.customText) : [];
+  const checkedValues: number[] = field.customText ? parseCheckboxCustomText(field.customText) : [];
 
   checkboxValues.forEach(({ value, checked }, index) => {
     const isCheckboxChecked = match(mode)
@@ -170,7 +170,7 @@ export const renderCheckboxFieldElement = (
       width: itemSize,
       height: itemSize,
       stroke: '#374151',
-      strokeWidth: 2,
+      strokeWidth: 1.5,
       cornerRadius: 2,
       fill: 'white',
     });
@@ -210,7 +210,9 @@ export const renderCheckboxFieldElement = (
     fieldGroup.add(text);
   });
 
-  createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  if (color !== 'readOnly' && mode !== 'export') {
+    createFieldHoverInteraction({ fieldGroup, fieldRect, options });
+  }
 
   return {
     fieldGroup,

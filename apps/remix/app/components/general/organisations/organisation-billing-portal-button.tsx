@@ -3,6 +3,8 @@ import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
+import { useSession } from '@documenso/lib/client-only/providers/session';
+import { isPersonalLayout } from '@documenso/lib/utils/organisations';
 import { canExecuteOrganisationAction } from '@documenso/lib/utils/organisations';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -15,6 +17,8 @@ export type OrganisationBillingPortalButtonProps = {
 export const OrganisationBillingPortalButton = ({
   buttonProps,
 }: OrganisationBillingPortalButtonProps) => {
+  const { organisations } = useSession();
+
   const organisation = useCurrentOrganisation();
 
   const { _ } = useLingui();
@@ -30,7 +34,10 @@ export const OrganisationBillingPortalButton = ({
 
   const handleCreatePortal = async () => {
     try {
-      const { redirectUrl } = await manageSubscription({ organisationId: organisation.id });
+      const { redirectUrl } = await manageSubscription({
+        organisationId: organisation.id,
+        isPersonalLayoutMode: isPersonalLayout(organisations),
+      });
 
       window.open(redirectUrl, '_blank');
     } catch (err) {

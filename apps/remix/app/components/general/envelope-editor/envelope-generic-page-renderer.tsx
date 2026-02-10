@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
+import { DocumentStatus, type Recipient, SigningStatus } from '@prisma/client';
 import type Konva from 'konva';
 
 import { usePageRenderer } from '@documenso/lib/client-only/hooks/use-page-renderer';
@@ -8,11 +9,24 @@ import { useCurrentEnvelopeRender } from '@documenso/lib/client-only/providers/e
 import type { TEnvelope } from '@documenso/lib/types/envelope';
 import { renderField } from '@documenso/lib/universal/field-renderer/render-field';
 import { getClientSideFieldTranslations } from '@documenso/lib/utils/fields';
+import { EnvelopeRecipientFieldTooltip } from '@documenso/ui/components/document/envelope-recipient-field-tooltip';
+
+type GenericLocalField = TEnvelope['fields'][number] & {
+  recipient: Pick<Recipient, 'id' | 'name' | 'email' | 'signingStatus'>;
+};
 
 export default function EnvelopeGenericPageRenderer() {
   const { i18n } = useLingui();
 
-  const { currentEnvelopeItem, fields, getRecipientColorKey } = useCurrentEnvelopeRender();
+  const {
+    envelopeStatus,
+    currentEnvelopeItem,
+    fields,
+    recipients,
+    getRecipientColorKey,
+    setRenderError,
+    overrideSettings,
+  } = useCurrentEnvelopeRender();
 
   const {
     stage,
@@ -28,20 +42,46 @@ export default function EnvelopeGenericPageRenderer() {
 
   const { _className, scale } = pageContext;
 
-  const localPageFields = useMemo(
-    () =>
-      fields.filter(
+  const localPageFields = useMemo((): GenericLocalField[] => {
+    if (envelopeStatus === DocumentStatus.COMPLETED) {
+      return [];
+    }
+
+    return fields
+      .filter(
         (field) =>
           field.page === pageContext.pageNumber && field.envelopeItemId === currentEnvelopeItem?.id,
-      ),
-    [fields, pageContext.pageNumber],
-  );
+      )
+      .map((field) => {
+        const recipient = recipients.find((recipient) => recipient.id === field.recipientId);
 
-  const renderFieldOnLayer = (field: TEnvelope['fields'][number]) => {
+        if (!recipient) {
+          throw new Error(`Recipient not found for field ${field.id}`);
+        }
+
+        const isInserted = recipient.signingStatus === SigningStatus.SIGNED && field.inserted;
+
+        return {
+          ...field,
+          inserted: isInserted,
+          customText: isInserted ? field.customText : '',
+          recipient,
+        };
+      })
+      .filter(
+        ({ inserted, fieldMeta, recipient }) =>
+          (recipient.signingStatus === SigningStatus.SIGNED ? inserted : true) ||
+          fieldMeta?.readOnly,
+      );
+  }, [fields, pageContext.pageNumber, currentEnvelopeItem?.id, recipients]);
+
+  const unsafeRenderFieldOnLayer = (field: GenericLocalField) => {
     if (!pageLayer.current) {
       console.error('Layer not loaded yet');
       return;
     }
+
+    const fieldTranslations = getClientSideFieldTranslations(i18n);
 
     renderField({
       scale,
@@ -49,21 +89,32 @@ export default function EnvelopeGenericPageRenderer() {
       field: {
         renderId: field.id.toString(),
         ...field,
-        customText: '',
         width: Number(field.width),
         height: Number(field.height),
         positionX: Number(field.positionX),
         positionY: Number(field.positionY),
-        inserted: false,
         fieldMeta: field.fieldMeta,
+        signature: {
+          signatureImageAsBase64: '',
+          typedSignature: fieldTranslations.SIGNATURE,
+        },
       },
-      translations: getClientSideFieldTranslations(i18n),
+      translations: fieldTranslations,
       pageWidth: unscaledViewport.width,
       pageHeight: unscaledViewport.height,
       color: getRecipientColorKey(field.recipientId),
       editable: false,
-      mode: 'sign',
+      mode: overrideSettings?.mode ?? 'edit',
     });
+  };
+
+  const renderFieldOnLayer = (field: GenericLocalField) => {
+    try {
+      unsafeRenderFieldOnLayer(field);
+    } catch (err) {
+      console.error(err);
+      setRenderError(true);
+    }
   };
 
   /**
@@ -113,6 +164,16 @@ export default function EnvelopeGenericPageRenderer() {
       className="relative w-full"
       key={`${currentEnvelopeItem.id}-renderer-${pageContext.pageNumber}`}
     >
+      {overrideSettings?.showRecipientTooltip &&
+        localPageFields.map((field) => (
+          <EnvelopeRecipientFieldTooltip
+            key={field.id}
+            field={field}
+            showFieldStatus={overrideSettings?.showRecipientSigningStatus}
+            showRecipientTooltip={overrideSettings?.showRecipientTooltip}
+          />
+        ))}
+
       {/* The element Konva will inject it's canvas into. */}
       <div className="konva-container absolute inset-0 z-10 w-full" ref={konvaContainer}></div>
 

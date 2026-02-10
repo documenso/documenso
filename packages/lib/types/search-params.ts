@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export type DateRange = 'last30days' | 'last90days' | 'lastYear' | 'allTime';
+
 /**
  * Backend only schema is used for find search params.
  *

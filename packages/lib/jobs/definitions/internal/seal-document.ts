@@ -18,6 +18,7 @@ export const SEAL_DOCUMENT_JOB_DEFINITION = {
   id: SEAL_DOCUMENT_JOB_DEFINITION_ID,
   name: 'Seal Document',
   version: '1.0.0',
+  optimizeParallelism: true,
   trigger: {
     name: SEAL_DOCUMENT_JOB_DEFINITION_ID,
     schema: SEAL_DOCUMENT_JOB_DEFINITION_SCHEMA,

@@ -9,11 +9,11 @@ Documenso uses API keys for authentication. An API key is a unique token that is
 
 ## Creating an API Key
 
-To create an API key, navigate to the user settings page. Click on your avatar in the top right corner of the dashboard and select "**[User settings](https://app.documenso.com/settings)**" from the dropdown menu.
+To create an API key, navigate to the user settings page. Click on your avatar in the top right corner of the dashboard and select "Team Settings" from the dropdown menu.
 
 ![A screenshot of the Documenso's dashboard that shows the dropdown menu when you click on your user avatar](/public-api-images/documenso-user-dropdown-menu.webp)
 
-Once you're on the user settings page, navigate to the "**[API Tokens](https://app.documenso.com/settings/tokens)**" tab. The "API Token" page lists your existing keys and enables you to create new ones.
+Once you're on the settings page, navigate to the **API Tokens** tab. This page lists your existing keys and enables you to create new ones.
 
 ![A screenshot of the Documenso's user settings page that shows the API Tokens page](/public-api-images/api-tokens-page-documenso.webp)
 
@@ -37,31 +37,17 @@ You must include the API key in the `Authorization` request header to authentica
 Here's a sample API request using cURL:
 
 ```bash
-curl --location 'https://app.documenso.com/api/v1/documents?page=1&perPage=1' \
---header 'Authorization: api_xxxxxxxxxxxxxxxx'
+curl --location 'https://app.documenso.com/api/v2/envelope/create' \
+--header 'Authorization: api_xxxxxxxxxxxxxxxx' \
+--form 'payload={ "title": "Some Title", "type": "DOCUMENT" }'
 ```
 
 Here's a sample response from the API based on the above cURL request:
 
 ```json
 {
-  "documents": [
-    {
-      "id": 11,
-      "userId": 2,
-      "teamId": null,
-      "title": "documenso",
-      "status": "PENDING",
-      "documentDataId": "ab2ecm1npk11rt5sp398waf7h",
-      "createdAt": "2024-04-25T11:05:18.420Z",
-      "updatedAt": "2024-04-25T11:05:36.328Z",
-      "completedAt": null
-    }
-  ],
-  "totalPages": 1
+  "id": "envelope_xxxxxxxxxxxxx"
 }
 ```
 
-![A screenshot of a cURL request to the Documenso public API with the API key in the Authorization header](/public-api-images/documenso-api-authorization.webp)
-
-The API key has access to your account and all its resources. Please keep it secure and do not share it with others. If you suspect your key has been compromised, you can revoke it from the "API Tokens" page in your user settings.
+The API key has access to your account and all its resources. Please keep it secure and do not share it with others. If you suspect your key has been compromised, you can revoke it from the same page you created it from.

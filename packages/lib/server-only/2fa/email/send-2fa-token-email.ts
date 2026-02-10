@@ -5,6 +5,7 @@ import { EnvelopeType } from '@prisma/client';
 
 import { mailer } from '@documenso/email/mailer';
 import { AccessAuth2FAEmailTemplate } from '@documenso/email/templates/access-auth-2fa';
+import { isRecipientEmailValidForSending } from '@documenso/lib/utils/recipients';
 import { prisma } from '@documenso/prisma';
 
 import { getI18nInstance } from '../../../client-only/providers/i18n-server';
@@ -66,6 +67,12 @@ export const send2FATokenEmail = async ({ token, envelopeId }: Send2FATokenEmail
   if (!recipient) {
     throw new AppError(AppErrorCode.NOT_FOUND, {
       message: 'Recipient not found',
+    });
+  }
+
+  if (!isRecipientEmailValidForSending(recipient)) {
+    throw new AppError(AppErrorCode.INVALID_REQUEST, {
+      message: 'Recipient is missing email address',
     });
   }
 

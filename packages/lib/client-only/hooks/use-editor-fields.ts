@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import type { Recipient } from '@prisma/client';
+import type { Field, Recipient } from '@prisma/client';
 import { FieldType } from '@prisma/client';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -63,6 +63,8 @@ type UseEditorFieldsResponse = {
   // Selected recipient
   selectedRecipient: Recipient | null;
   setSelectedRecipient: (recipientId: number | null) => void;
+
+  resetForm: (fields?: Field[]) => void;
 };
 
 export const useEditorFields = ({
@@ -72,24 +74,30 @@ export const useEditorFields = ({
   const [selectedFieldFormId, setSelectedFieldFormId] = useState<string | null>(null);
   const [selectedRecipientId, setSelectedRecipientId] = useState<number | null>(null);
 
+  const generateDefaultValues = (fields?: Field[]) => {
+    const formFields = (fields || envelope.fields).map(
+      (field): TLocalField => ({
+        id: field.id,
+        formId: nanoid(),
+        envelopeItemId: field.envelopeItemId,
+        page: field.page,
+        type: field.type,
+        positionX: Number(field.positionX),
+        positionY: Number(field.positionY),
+        width: Number(field.width),
+        height: Number(field.height),
+        recipientId: field.recipientId,
+        fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
+      }),
+    );
+
+    return {
+      fields: formFields,
+    };
+  };
+
   const form = useForm<TEditorFieldsFormSchema>({
-    defaultValues: {
-      fields: envelope.fields.map(
-        (field): TLocalField => ({
-          id: field.id,
-          formId: nanoid(),
-          envelopeItemId: field.envelopeItemId,
-          page: field.page,
-          type: field.type,
-          positionX: Number(field.positionX),
-          positionY: Number(field.positionY),
-          width: Number(field.width),
-          height: Number(field.height),
-          recipientId: field.recipientId,
-          fieldMeta: field.fieldMeta ? ZFieldMetaSchema.parse(field.fieldMeta) : undefined,
-        }),
-      ),
-    },
+    defaultValues: generateDefaultValues(),
     resolver: zodResolver(ZEditorFieldsFormSchema),
   });
 
@@ -162,11 +170,13 @@ export const useEditorFields = ({
   );
 
   const setFieldId = (formId: string, id: number) => {
-    const index = localFields.findIndex((field) => field.formId === formId);
+    const { fields } = form.getValues();
+
+    const index = fields.findIndex((field) => field.formId === formId);
 
     if (index !== -1) {
       update(index, {
-        ...localFields[index],
+        ...fields[index],
         id,
       });
     }
@@ -275,6 +285,10 @@ export const useEditorFields = ({
     setSelectedRecipientId(foundRecipient?.id ?? null);
   };
 
+  const resetForm = (fields?: Field[]) => {
+    form.reset(generateDefaultValues(fields));
+  };
+
   return {
     // Core state
     localFields,
@@ -298,6 +312,8 @@ export const useEditorFields = ({
     // Selected recipient
     selectedRecipient,
     setSelectedRecipient,
+
+    resetForm,
   };
 };
 

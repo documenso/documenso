@@ -25,9 +25,11 @@ import { ConfigureDocumentUpload } from './configure-document-upload';
 import {
   type TConfigureEmbedFormSchema,
   ZConfigureEmbedFormSchema,
+  ZConfigureTemplateEmbedFormSchema,
 } from './configure-document-view.types';
 
 export interface ConfigureDocumentViewProps {
+  type?: 'document' | 'template';
   onSubmit: (data: TConfigureEmbedFormSchema) => void | Promise<void>;
   defaultValues?: Partial<TConfigureEmbedFormSchema>;
   disableUpload?: boolean;
@@ -35,6 +37,7 @@ export interface ConfigureDocumentViewProps {
 }
 
 export const ConfigureDocumentView = ({
+  type = 'document',
   onSubmit,
   defaultValues,
   disableUpload,
@@ -42,14 +45,16 @@ export const ConfigureDocumentView = ({
   const { isTemplate } = useConfigureDocument();
 
   const form = useForm<TConfigureEmbedFormSchema>({
-    resolver: zodResolver(ZConfigureEmbedFormSchema),
+    resolver: zodResolver(
+      type === 'template' ? ZConfigureTemplateEmbedFormSchema : ZConfigureEmbedFormSchema,
+    ),
     defaultValues: {
       title: defaultValues?.title || '',
       signers: defaultValues?.signers || [
         {
           formId: nanoid(8),
-          name: isTemplate ? `Recipient ${1}` : '',
-          email: isTemplate ? `recipient.${1}@document.com` : '',
+          name: '',
+          email: '',
           role: RecipientRole.SIGNER,
           signingOrder: 1,
           disabled: false,

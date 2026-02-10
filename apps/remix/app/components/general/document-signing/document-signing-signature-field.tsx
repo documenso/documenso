@@ -56,8 +56,11 @@ export const DocumentSigningSignatureField = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const [fontSize, setFontSize] = useState(2);
 
-  const { signature: providedSignature, setSignature: setProvidedSignature } =
-    useRequiredDocumentSigningContext();
+  const {
+    fullName,
+    signature: providedSignature,
+    setSignature: setProvidedSignature,
+  } = useRequiredDocumentSigningContext();
 
   const { executeActionAuthProcedure } = useRequiredDocumentSigningAuthContext();
 
@@ -236,13 +239,13 @@ export const DocumentSigningSignatureField = ({
       type="Signature"
     >
       {isLoading && (
-        <div className="bg-background absolute inset-0 flex items-center justify-center rounded-md">
-          <Loader className="text-primary h-5 w-5 animate-spin md:h-8 md:w-8" />
+        <div className="absolute inset-0 flex items-center justify-center rounded-md bg-background">
+          <Loader className="h-5 w-5 animate-spin text-primary md:h-8 md:w-8" />
         </div>
       )}
 
       {state === 'empty' && (
-        <p className="group-hover:text-primary font-signature text-muted-foreground group-hover:text-recipient-green text-[clamp(0.575rem,25cqw,1.2rem)] text-xl duration-200">
+        <p className="font-signature text-[clamp(0.575rem,25cqw,1.2rem)] text-xl text-muted-foreground duration-200 group-hover:text-primary group-hover:text-recipient-green">
           <Trans>Signature</Trans>
         </p>
       )}
@@ -259,7 +262,7 @@ export const DocumentSigningSignatureField = ({
         <div ref={containerRef} className="flex h-full w-full items-center justify-center p-2">
           <p
             ref={signatureRef}
-            className="font-signature text-muted-foreground w-full overflow-hidden break-all text-center leading-tight duration-200"
+            className="w-full overflow-hidden break-all text-center font-signature leading-tight text-muted-foreground duration-200"
             style={{ fontSize: `${fontSize}rem` }}
           >
             {signature?.typedSignature}
@@ -272,12 +275,13 @@ export const DocumentSigningSignatureField = ({
           <DialogTitle>
             <Trans>
               Sign as {recipient.name}{' '}
-              <div className="text-muted-foreground h-5">({recipient.email})</div>
+              <div className="h-5 text-muted-foreground">({recipient.email})</div>
             </Trans>
           </DialogTitle>
 
           <SignaturePad
             className="mt-2"
+            fullName={fullName}
             value={localSignature ?? ''}
             onChange={({ value }) => setLocalSignature(value)}
             typedSignatureEnabled={typedSignatureEnabled}

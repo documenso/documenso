@@ -2,11 +2,10 @@ import { useState } from 'react';
 
 import { useLingui } from '@lingui/react/macro';
 import { Trans } from '@lingui/react/macro';
-import { type DocumentData, DocumentStatus, type EnvelopeItem } from '@prisma/client';
+import { DocumentStatus, type EnvelopeItem } from '@prisma/client';
 import { DownloadIcon, FileTextIcon } from 'lucide-react';
 
-import { downloadFile } from '@documenso/lib/client-only/download-file';
-import { getFile } from '@documenso/lib/universal/upload/get-file';
+import { downloadPDF } from '@documenso/lib/client-only/download-pdf';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
 import {
@@ -20,9 +19,7 @@ import {
 import { Skeleton } from '@documenso/ui/primitives/skeleton';
 import { useToast } from '@documenso/ui/primitives/use-toast';
 
-type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'title' | 'order'> & {
-  documentData: DocumentData;
-};
+type EnvelopeItemToDownload = Pick<EnvelopeItem, 'id' | 'envelopeId' | 'title' | 'order'>;
 
 type EnvelopeDownloadDialogProps = {
   envelopeId: string;
@@ -64,12 +61,12 @@ export const EnvelopeDownloadDialog = ({
         access: token ? { type: 'recipient', token } : { type: 'user' },
       },
       {
-        initialData: initialEnvelopeItems ? { envelopeItems: initialEnvelopeItems } : undefined,
+        initialData: initialEnvelopeItems ? { data: initialEnvelopeItems } : undefined,
         enabled: open,
       },
     );
 
-  const envelopeItems = envelopeItemsPayload?.envelopeItems || [];
+  const envelopeItems = envelopeItemsPayload?.data || [];
 
   const onDownload = async (
     envelopeItem: EnvelopeItemToDownload,
@@ -87,25 +84,11 @@ export const EnvelopeDownloadDialog = ({
     }));
 
     try {
-      const data = await getFile({
-        type: envelopeItem.documentData.type,
-        data:
-          version === 'signed'
-            ? envelopeItem.documentData.data
-            : envelopeItem.documentData.initialData,
-      });
-
-      const blob = new Blob([data], {
-        type: 'application/pdf',
-      });
-
-      const baseTitle = envelopeItem.title.replace(/\.pdf$/, '');
-      const suffix = version === 'signed' ? '_signed.pdf' : '.pdf';
-      const filename = `${baseTitle}${suffix}`;
-
-      downloadFile({
-        filename,
-        data: blob,
+      await downloadPDF({
+        envelopeItem,
+        token,
+        fileName: envelopeItem.title,
+        version,
       });
 
       setIsDownloadingState((prev) => ({
@@ -143,10 +126,10 @@ export const EnvelopeDownloadDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex w-full flex-col gap-4 overflow-hidden">
           {isLoadingEnvelopeItems ? (
             <>
-              {Array.from({ length: 2 }).map((_, index) => (
+              {Array.from({ length: 1 }).map((_, index) => (
                 <div
                   key={index}
                   className="border-border bg-card flex items-center gap-2 rounded-lg border p-4"
@@ -175,7 +158,10 @@ export const EnvelopeDownloadDialog = ({
                 </div>
 
                 <div className="min-w-0 flex-1">
-                  <h4 className="text-foreground truncate text-sm font-medium">{item.title}</h4>
+                  {/* Todo: Envelopes - Fix overflow */}
+                  <h4 className="text-foreground truncate text-sm font-medium" title={item.title}>
+                    {item.title}
+                  </h4>
                   <p className="text-muted-foreground mt-0.5 text-xs">
                     <Trans>PDF Document</Trans>
                   </p>
@@ -192,7 +178,7 @@ export const EnvelopeDownloadDialog = ({
                     {!isDownloadingState[generateDownloadKey(item.id, 'original')] && (
                       <DownloadIcon className="mr-2 h-4 w-4" />
                     )}
-                    <Trans>Original</Trans>
+                    <Trans context="Original document (adjective)">Original</Trans>
                   </Button>
 
                   {envelopeStatus === DocumentStatus.COMPLETED && (
@@ -206,7 +192,7 @@ export const EnvelopeDownloadDialog = ({
                       {!isDownloadingState[generateDownloadKey(item.id, 'signed')] && (
                         <DownloadIcon className="mr-2 h-4 w-4" />
                       )}
-                      <Trans>Signed</Trans>
+                      <Trans context="Signed document (adjective)">Signed</Trans>
                     </Button>
                   )}
                 </div>

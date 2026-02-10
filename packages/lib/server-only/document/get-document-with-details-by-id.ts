@@ -63,5 +63,8 @@ export const getDocumentWithDetailsById = async ({
       documentId: legacyDocumentId,
       password: null,
     },
+    envelopeItems: envelope.envelopeItems.map((envelopeItem) => ({
+      ...envelopeItem,
+    })),
   };
 };

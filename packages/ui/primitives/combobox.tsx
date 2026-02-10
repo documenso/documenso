@@ -58,7 +58,7 @@ const Combobox = ({
         </Button>
       </PopoverTrigger>
 
-      <PopoverContent className="p-0" side="bottom" align="start">
+      <PopoverContent className="z-[1001] p-0" side="bottom" align="start">
         <Command>
           <CommandInput placeholder={value || placeholderValue} />
 

@@ -31,6 +31,7 @@ import {
 } from '../../types/webhook-payload';
 import { isDocumentCompleted } from '../../utils/document';
 import type { EnvelopeIdOptions } from '../../utils/envelope';
+import { isRecipientEmailValidForSending } from '../../utils/recipients';
 import { renderEmailWithI18N } from '../../utils/render-email-with-i18n';
 import { getEmailContext } from '../email/get-email-context';
 import { getEnvelopeWhereInput } from '../envelope/get-envelope-by-id';
@@ -50,7 +51,7 @@ export const resendDocument = async ({
   recipients,
   teamId,
   requestMetadata,
-}: ResendDocumentOptions): Promise<void> => {
+}: ResendDocumentOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
       id: userId,
@@ -109,7 +110,7 @@ export const resendDocument = async ({
   ).recipientSigningRequest;
 
   if (!isRecipientSigningRequestEmailEnabled) {
-    return;
+    return envelope;
   }
 
   const { branding, emailLanguage, organisationType, senderEmail, replyToEmail } =
@@ -124,7 +125,7 @@ export const resendDocument = async ({
 
   await Promise.all(
     recipientsToRemind.map(async (recipient) => {
-      if (recipient.role === RecipientRole.CC) {
+      if (recipient.role === RecipientRole.CC || !isRecipientEmailValidForSending(recipient)) {
         return;
       }
 
@@ -243,4 +244,6 @@ export const resendDocument = async ({
     userId: envelope.userId,
     teamId: envelope.teamId,
   });
+
+  return envelope;
 };

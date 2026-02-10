@@ -8,7 +8,7 @@ import { SignFieldNumberDialog } from '~/components/dialogs/sign-field-number-di
 
 type HandleNumberFieldClickOptions = {
   field: TFieldNumber;
-  number: number | null;
+  number: string | null;
 };
 
 export const handleNumberFieldClick = async (

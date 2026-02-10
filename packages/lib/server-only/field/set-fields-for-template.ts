@@ -129,7 +129,7 @@ export const setFieldsForTemplate = async ({
       if (field.type === FieldType.NUMBER && field.fieldMeta) {
         const numberFieldParsedMeta = ZNumberFieldMeta.parse(field.fieldMeta);
         const errors = validateNumberField(
-          String(numberFieldParsedMeta.value),
+          String(numberFieldParsedMeta.value || ''),
           numberFieldParsedMeta,
         );
         if (errors.length > 0) {

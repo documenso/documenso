@@ -50,6 +50,6 @@ export const getEnvelopeItemsRoute = authenticatedProcedure
     }
 
     return {
-      envelopeItems: envelope.envelopeItems,
+      data: envelope.envelopeItems,
     };
   });

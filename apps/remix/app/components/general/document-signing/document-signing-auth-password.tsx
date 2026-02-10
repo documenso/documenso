@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Trans } from '@lingui/react/macro';
+import { Trans, useLingui } from '@lingui/react/macro';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -46,6 +46,8 @@ export const DocumentSigningAuthPassword = ({
   open,
   onOpenChange,
 }: DocumentSigningAuthPasswordProps) => {
+  const { t } = useLingui();
+
   const { recipient, isCurrentlyAuthenticating, setIsCurrentlyAuthenticating } =
     useRequiredDocumentSigningAuthContext();
 
@@ -120,7 +122,7 @@ export const DocumentSigningAuthPassword = ({
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter your password"
+                      placeholder={t`Enter your password`}
                       {...field}
                       autoComplete="current-password"
                     />

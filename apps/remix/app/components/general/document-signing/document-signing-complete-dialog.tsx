@@ -34,6 +34,7 @@ import {
 } from '@documenso/ui/primitives/form/form';
 import { Input } from '@documenso/ui/primitives/input';
 
+import { useEmbedSigningContext } from '~/components/embed/embed-signing-context';
 import { AccessAuth2FAForm } from '~/components/general/document-signing/access-auth-2fa-form';
 import { DocumentSigningDisclosure } from '~/components/general/document-signing/document-signing-disclosure';
 
@@ -56,12 +57,13 @@ export type DocumentSigningCompleteDialogProps = {
     name: string;
     email: string;
   };
-  directTemplatePayload?: {
+  recipientPayload?: {
     name: string;
     email: string;
   };
   buttonSize?: 'sm' | 'lg';
   position?: 'start' | 'end' | 'center';
+  disableNameInput?: boolean;
 };
 
 const ZNextSignerFormSchema = z.object({
@@ -88,10 +90,11 @@ export const DocumentSigningCompleteDialog = ({
   recipient,
   disabled = false,
   allowDictateNextSigner = false,
-  directTemplatePayload,
+  recipientPayload,
   defaultNextSigner,
   buttonSize = 'lg',
   position,
+  disableNameInput = false,
 }: DocumentSigningCompleteDialogProps) => {
   const { t } = useLingui();
 
@@ -102,6 +105,8 @@ export const DocumentSigningCompleteDialog = ({
 
   const { derivedRecipientAccessAuth } = useRequiredDocumentSigningAuthContext();
 
+  const { isNameLocked, isEmailLocked } = useEmbedSigningContext() || {};
+
   const form = useForm<TNextSignerFormSchema>({
     resolver: allowDictateNextSigner ? zodResolver(ZNextSignerFormSchema) : undefined,
     defaultValues: {
@@ -110,11 +115,11 @@ export const DocumentSigningCompleteDialog = ({
     },
   });
 
-  const directRecipientForm = useForm<TDirectRecipientFormSchema>({
+  const recipientForm = useForm<TDirectRecipientFormSchema>({
     resolver: zodResolver(ZDirectRecipientFormSchema),
     defaultValues: {
-      name: directTemplatePayload?.name ?? '',
-      email: directTemplatePayload?.email ?? '',
+      name: recipientPayload?.name ?? '',
+      email: recipientPayload?.email ?? '',
     },
   });
 
@@ -142,16 +147,16 @@ export const DocumentSigningCompleteDialog = ({
 
   const onFormSubmit = async (data: TNextSignerFormSchema) => {
     try {
-      let directRecipient: { name: string; email: string } | undefined;
+      let recipientOverridePayload: { name: string; email: string } | undefined;
 
-      if (directTemplatePayload && !directTemplatePayload.email) {
-        const isFormValid = await directRecipientForm.trigger();
+      if (recipientPayload && !recipientPayload.email) {
+        const isFormValid = await recipientForm.trigger();
 
         if (!isFormValid) {
           return;
         }
 
-        directRecipient = directRecipientForm.getValues();
+        recipientOverridePayload = recipientForm.getValues();
       }
 
       // Check if 2FA is required
@@ -165,7 +170,7 @@ export const DocumentSigningCompleteDialog = ({
           ? { name: data.name, email: data.email }
           : undefined;
 
-      await onSignatureComplete(nextSigner, data.accessAuthOptions, directRecipient);
+      await onSignatureComplete(nextSigner, data.accessAuthOptions, recipientOverridePayload);
     } catch (error) {
       const err = AppError.parseError(error);
 
@@ -219,7 +224,7 @@ export const DocumentSigningCompleteDialog = ({
             <Trans>Are you sure?</Trans>
           </DialogTitle>
           <DialogDescription>
-            <div className="text-muted-foreground max-w-[50ch]">
+            <div className="max-w-[50ch] text-muted-foreground">
               {match(recipient.role)
                 .with(RecipientRole.VIEWER, () => (
                   <span className="inline-flex flex-wrap">
@@ -247,19 +252,19 @@ export const DocumentSigningCompleteDialog = ({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="border-border bg-muted/50 rounded-lg border p-4 text-center">
-          <p className="text-muted-foreground text-sm font-medium">{documentTitle}</p>
+        <div className="rounded-lg border border-border bg-muted/50 p-4 text-center">
+          <p className="text-sm font-medium text-muted-foreground">{documentTitle}</p>
         </div>
 
         {!showTwoFactorForm && (
           <>
             <fieldset disabled={form.formState.isSubmitting} className="border-none p-0">
-              {directTemplatePayload && !directTemplatePayload.email && (
-                <Form {...directRecipientForm}>
+              {recipientPayload && !recipientPayload.email && (
+                <Form {...recipientForm}>
                   <div className="mb-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-4 md:flex-row">
                       <FormField
-                        control={directRecipientForm.control}
+                        control={recipientForm.control}
                         name="name"
                         render={({ field }) => (
                           <FormItem className="flex-1">
@@ -267,7 +272,12 @@ export const DocumentSigningCompleteDialog = ({
                               <Trans>Your Name</Trans>
                             </FormLabel>
                             <FormControl>
-                              <Input {...field} className="mt-2" placeholder={t`Enter your name`} />
+                              <Input
+                                {...field}
+                                className="mt-2"
+                                placeholder={t`Enter your name`}
+                                disabled={isNameLocked || disableNameInput}
+                              />
                             </FormControl>
 
                             <FormMessage />
@@ -276,7 +286,7 @@ export const DocumentSigningCompleteDialog = ({
                       />
 
                       <FormField
-                        control={directRecipientForm.control}
+                        control={recipientForm.control}
                         name="email"
                         render={({ field }) => (
                           <FormItem className="flex-1">
@@ -289,6 +299,7 @@ export const DocumentSigningCompleteDialog = ({
                                 type="email"
                                 className="mt-2"
                                 placeholder={t`Enter your email`}
+                                disabled={!!field.value && isEmailLocked}
                               />
                             </FormControl>
                             <FormMessage />

@@ -57,7 +57,7 @@ export const AdminDocumentRecipientItemTable = ({ recipient }: RecipientItemProp
   const columns = useMemo(() => {
     return [
       {
-        header: 'ID',
+        header: _(msg`ID`),
         accessorKey: 'id',
         cell: ({ row }) => <div>{row.original.id}</div>,
       },

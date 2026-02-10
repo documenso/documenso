@@ -1,4 +1,4 @@
-import { PDFDocument } from '@cantoo/pdf-lib';
+import { PDF } from '@libpdf/core';
 import { DocumentDataType } from '@prisma/client';
 import { base64 } from '@scure/base';
 import { match } from 'ts-pattern';
@@ -7,6 +7,7 @@ import { env } from '@documenso/lib/utils/env';
 
 import { AppError } from '../../errors/app-error';
 import { createDocumentData } from '../../server-only/document-data/create-document-data';
+import { normalizePdf } from '../../server-only/pdf/normalize-pdf';
 import { uploadS3File } from './server-actions';
 
 type File = {
@@ -24,7 +25,7 @@ export const putPdfFileServerSide = async (file: File) => {
 
   const arrayBuffer = await file.arrayBuffer();
 
-  const pdf = await PDFDocument.load(arrayBuffer).catch((e) => {
+  const pdf = await PDF.load(new Uint8Array(arrayBuffer)).catch((e) => {
     console.error(`PDF upload parse error: ${e.message}`);
 
     throw new AppError('INVALID_DOCUMENT_FILE');
@@ -41,6 +42,31 @@ export const putPdfFileServerSide = async (file: File) => {
   const { type, data } = await putFileServerSide(file);
 
   return await createDocumentData({ type, data });
+};
+
+/**
+ * Uploads a pdf file and normalizes it.
+ */
+export const putNormalizedPdfFileServerSide = async (
+  file: File,
+  options: { flattenForm?: boolean } = {},
+) => {
+  const buffer = Buffer.from(await file.arrayBuffer());
+
+  const normalized = await normalizePdf(buffer, options);
+
+  const fileName = file.name.endsWith('.pdf') ? file.name : `${file.name}.pdf`;
+
+  const documentData = await putFileServerSide({
+    name: fileName,
+    type: 'application/pdf',
+    arrayBuffer: async () => Promise.resolve(normalized),
+  });
+
+  return await createDocumentData({
+    type: documentData.type,
+    data: documentData.data,
+  });
 };
 
 /**

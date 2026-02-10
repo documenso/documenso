@@ -8,7 +8,7 @@ export const ZGetEnvelopeItemsRequestSchema = z.object({
 });
 
 export const ZGetEnvelopeItemsResponseSchema = z.object({
-  envelopeItems: EnvelopeItemSchema.pick({
+  data: EnvelopeItemSchema.pick({
     id: true,
     title: true,
     order: true,

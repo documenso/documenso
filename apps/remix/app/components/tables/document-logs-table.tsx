@@ -19,6 +19,7 @@ import { TableCell } from '@documenso/ui/primitives/table';
 
 export type DocumentLogsTableProps = {
   documentId: number;
+  userId?: number;
 };
 
 const dateFormat: DateTimeFormatOptions = {
@@ -26,7 +27,7 @@ const dateFormat: DateTimeFormatOptions = {
   hourCycle: 'h12',
 };
 
-export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
+export const DocumentLogsTable = ({ documentId, userId }: DocumentLogsTableProps) => {
   const { _, i18n } = useLingui();
 
   const [searchParams] = useSearchParams();
@@ -93,14 +94,16 @@ export const DocumentLogsTable = ({ documentId }: DocumentLogsTableProps) => {
       {
         header: _(msg`Action`),
         accessorKey: 'type',
-        cell: ({ row }) => <span>{formatDocumentAuditLogAction(_, row.original).description}</span>,
+        cell: ({ row }) => (
+          <span>{formatDocumentAuditLogAction(i18n, row.original, userId).description}</span>
+        ),
       },
       {
-        header: 'IP Address',
+        header: _(msg`IP Address`),
         accessorKey: 'ipAddress',
       },
       {
-        header: 'Browser',
+        header: _(msg`Browser`),
         cell: ({ row }) => {
           if (!row.original.userAgent) {
             return 'N/A';

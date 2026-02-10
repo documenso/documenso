@@ -191,7 +191,7 @@ export const SettingsSecurityPasskeyTableActions = ({
 
             <DialogDescription className="mt-4">
               <Trans>
-                Are you sure you want to remove the <strong>{passkeyName}</strong> passkey.
+                Are you sure you want to remove the <strong>{passkeyName}</strong> passkey?
               </Trans>
             </DialogDescription>
           </DialogHeader>
