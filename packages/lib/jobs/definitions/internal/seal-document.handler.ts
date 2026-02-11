@@ -20,7 +20,6 @@ import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
 import { NEXT_PRIVATE_USE_PLAYWRIGHT_PDF } from '../../../constants/app';
-import { PDF_SIZE_A4_72PPI } from '../../../constants/pdf';
 import { AppError, AppErrorCode } from '../../../errors/app-error';
 import { sendCompletedEmail } from '../../../server-only/document/send-completed-email';
 import { getAuditLogsPdf } from '../../../server-only/htmltopdf/get-audit-logs-pdf';
@@ -247,11 +246,7 @@ export const run = async ({
         throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
       }
 
-      const dims = dimensionsByItemId.get(envelopeItem.id) ?? {
-        width: PDF_SIZE_A4_72PPI.width,
-        height: PDF_SIZE_A4_72PPI.height,
-      };
-
+      const dims = dimensionsByItemId.get(envelopeItem.id)!;
       const sizeKey = `${dims.width}x${dims.height}`;
       const docs = certAuditBySize.get(sizeKey);
 
