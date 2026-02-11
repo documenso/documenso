@@ -1,21 +1,19 @@
+# Deploy Documenso to Render. Database: Supabase only (no Render Postgres).
+# Set NEXT_PRIVATE_DATABASE_URL and NEXT_PRIVATE_DIRECT_DATABASE_URL in the Render dashboard (Supabase URLs).
+# Production URL: https://sign.pinogy.com (add as custom domain in Render).
 services:
   - type: web
     runtime: node
     name: documenso-app
     plan: free
-    buildCommand: npm i && npm run build
+    buildCommand: npm ci && npm run build
     startCommand: npx prisma migrate deploy --schema packages/prisma/schema.prisma && npx turbo run start --filter=@documenso/remix
     healthCheckPath: /api/health
 
     envVars:
-      # Node Version
       - key: NODE_VERSION
-        value: 18.17.0
+        value: "22"
 
-      - key: PORT
-        value: 10000
-
-      # Auth
       - key: NEXTAUTH_URL
         fromService:
           name: documenso-app
@@ -24,25 +22,22 @@ services:
       - key: NEXTAUTH_SECRET
         generateValue: true
 
-      # Database
+      # Database (required). Set these in Render dashboard when using Supabase or external Postgres.
       - key: NEXT_PRIVATE_DATABASE_URL
-        fromDatabase:
-          name: documenso-db
-          property: connectionString
-
+        sync: false
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
-        fromDatabase:
-          name: documenso-db
-          property: connectionString
+        sync: false
 
-      # URLs
       - key: NEXT_PUBLIC_WEBAPP_URL
         fromService:
           name: documenso-app
           type: web
           envVarKey: RENDER_EXTERNAL_URL
       - key: NEXT_PRIVATE_INTERNAL_WEBAPP_URL
-        value: 'http://localhost:10000'
+        fromService:
+          name: documenso-app
+          type: web
+          envVarKey: RENDER_EXTERNAL_URL
 
       # SMTP
       - key: NEXT_PRIVATE_SMTP_TRANSPORT
@@ -157,7 +152,3 @@ services:
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
         sync: false
-
-databases:
-  - name: documenso-db
-    plan: free
