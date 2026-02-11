@@ -1,1 +1,4 @@
-/* /.netlify/functions/server  200
+# SPA fallback: serve index.html for all routes so client-side routing works.
+# Note: This app needs a Node server for full functionality (auth, loaders, API).
+# For a fully working deployment use Render/Railway; see render.yaml.
+/*    /index.html   200

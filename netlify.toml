@@ -1,0 +1,8 @@
+# Documenso is a Remix/React Router app (not Next.js). Disable the Next.js plugin.
+[build]
+  command = "npm run build"
+  publish = "apps/remix/build/client"
+
+[build.environment]
+  NODE_VERSION = "22"
+  NETLIFY_NEXT_PLUGIN_SKIP = "true"
