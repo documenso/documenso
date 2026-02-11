@@ -1,0 +1,13 @@
+diff --git a/node_modules/zod-prisma-types/dist/classes/directoryHelper.js b/node_modules/zod-prisma-types/dist/classes/directoryHelper.js
+index e0bb07c..ff79b7d 100644
+--- a/node_modules/zod-prisma-types/dist/classes/directoryHelper.js
++++ b/node_modules/zod-prisma-types/dist/classes/directoryHelper.js
+@@ -22,7 +22,7 @@ class DirectoryHelper {
+         if (!this.pathOrDirExists(path))
+             return;
+         try {
+-            fs_1.default.rmdirSync(path, { recursive: true });
++            fs_1.default.rmSync(path, { recursive: true, force: true });
+         }
+         catch (err) {
+             if (err instanceof Error)
