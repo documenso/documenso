@@ -281,6 +281,7 @@ export const recipientRouter = router({
           documentId,
         },
       });
+      const filteredRecipients = recipients.filter((recipient) => recipient.email.trim() !== '');
 
       return await setDocumentRecipients({
         userId: ctx.user.id,
@@ -289,7 +290,7 @@ export const recipientRouter = router({
           type: 'documentId',
           id: documentId,
         },
-        recipients: recipients.map((recipient) => ({
+        recipients: filteredRecipients.map((recipient) => ({
           id: recipient.id,
           email: recipient.email,
           name: recipient.name,
