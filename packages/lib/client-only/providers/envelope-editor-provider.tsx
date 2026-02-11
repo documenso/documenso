@@ -180,16 +180,23 @@ export const EnvelopeEditorProvider = ({
       setAutosaveError(false);
     },
     onError: (err) => {
-      console.error(err);
+      const isValidationEmailError =
+        err.message.includes('Email cannot be empty') ||
+        err.message.includes('Invalid email address');
 
-      setAutosaveError(true);
+      if (isValidationEmailError) {
+        return;
+      } else {
+        console.error(err);
 
-      toast({
-        title: t`Save failed`,
-        description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
-        variant: 'destructive',
-        duration: 7500,
-      });
+        setAutosaveError(true);
+        toast({
+          title: t`Save failed`,
+          description: t`We encountered an error while attempting to save your changes. Your changes cannot be saved at this time.`,
+          variant: 'destructive',
+          duration: 7500,
+        });
+      }
     },
   });
 

@@ -894,6 +894,7 @@ export const EnvelopeEditorRecipientForm = () => {
                                         {!showAdvancedSettings && index === 0 && (
                                           <FormLabel>
                                             <Trans>Email</Trans>
+                                            <span className="text-red-500">*</span>
                                           </FormLabel>
                                         )}
 
@@ -908,6 +909,24 @@ export const EnvelopeEditorRecipientForm = () => {
                                               !canRecipientBeModified(signer.id) ||
                                               isDirectRecipient
                                             }
+                                            onBlur={() => {
+                                              if (!field.value) {
+                                                const originalRecipient = recipients.find(
+                                                  (r) => r.id === signer.id,
+                                                );
+                                                if (originalRecipient) {
+                                                  form.setValue(
+                                                    `signers.${index}.email`,
+                                                    originalRecipient.email,
+                                                  );
+                                                  form.setValue(
+                                                    `signers.${index}.name`,
+                                                    originalRecipient.name || '',
+                                                  );
+                                                }
+                                              }
+                                              field.onBlur();
+                                            }}
                                             options={recipientSuggestions}
                                             onSelect={(suggestion) =>
                                               handleRecipientAutoCompleteSelect(index, suggestion)
