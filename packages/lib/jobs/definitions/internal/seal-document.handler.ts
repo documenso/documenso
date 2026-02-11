@@ -15,6 +15,7 @@ import { groupBy } from 'remeda';
 import { addRejectionStampToPdf } from '@documenso/lib/server-only/pdf/add-rejection-stamp-to-pdf';
 import { generateAuditLogPdf } from '@documenso/lib/server-only/pdf/generate-audit-log-pdf';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
+import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
 import { prisma } from '@documenso/prisma';
 import { signPdf } from '@documenso/signing';
 
@@ -169,51 +170,70 @@ export const run = async ({
       });
     }
 
-    let certificateDoc: PDF | null = null;
-    let auditLogDoc: PDF | null = null;
+    const itemDimensions = await Promise.all(
+      envelopeItems.map(async (envelopeItem) => {
+        const pdfData = await getFileServerSide(envelopeItem.documentData);
+        const pdfDoc = await PDF.load(pdfData);
+        const { width, height } = getLastPageDimensions(pdfDoc);
+
+        return { envelopeItemId: envelopeItem.id, width, height };
+      }),
+    );
+
+    const dimensionsByItemId = new Map(
+      itemDimensions.map((d) => [d.envelopeItemId, { width: d.width, height: d.height }]),
+    );
+
+    const uniqueSizeKeys = [...new Set(itemDimensions.map((d) => `${d.width}x${d.height}`))];
+
+    type CertAuditDocs = { certificateDoc: PDF | null; auditLogDoc: PDF | null };
+    const certAuditBySize = new Map<string, CertAuditDocs>();
 
     if (settings.includeSigningCertificate || settings.includeAuditLog) {
-      const certificatePayload = {
-        envelope,
-        recipients: envelope.recipients, // Need to use the recipients from envelope which contains ALL recipients.
-        fields,
-        language: envelope.documentMeta.language,
-        envelopeOwner: {
-          email: envelope.user.email,
-          name: envelope.user.name || '',
-        },
-        envelopeItems: envelopeItems.map((item) => item.title),
-        pageWidth: PDF_SIZE_A4_72PPI.width,
-        pageHeight: PDF_SIZE_A4_72PPI.height,
-      };
-
-      // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
-      // This is a temporary toggle while we validate the Konva-based approach.
       const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
-      const makeCertificatePdf = async () =>
-        usePlaywrightPdf
-          ? getCertificatePdf({
-              documentId,
-              language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDF.load(buffer))
-          : generateCertificatePdf(certificatePayload);
+      await Promise.all(
+        uniqueSizeKeys.map(async (sizeKey) => {
+          const [w, h] = sizeKey.split('x').map(Number);
 
-      const makeAuditLogPdf = async () =>
-        usePlaywrightPdf
-          ? getAuditLogsPdf({
-              documentId,
-              language: envelope.documentMeta.language,
-            }).then(async (buffer) => PDF.load(buffer))
-          : generateAuditLogPdf(certificatePayload);
+          const certificatePayload = {
+            envelope,
+            recipients: envelope.recipients,
+            fields,
+            language: envelope.documentMeta.language,
+            envelopeOwner: {
+              email: envelope.user.email,
+              name: envelope.user.name || '',
+            },
+            envelopeItems: envelopeItems.map((item) => item.title),
+            pageWidth: w,
+            pageHeight: h,
+          };
 
-      const [createdCertificatePdf, createdAuditLogPdf] = await Promise.all([
-        settings.includeSigningCertificate ? makeCertificatePdf() : null,
-        settings.includeAuditLog ? makeAuditLogPdf() : null,
-      ]);
+          const makeCertificatePdf = async () =>
+            usePlaywrightPdf
+              ? getCertificatePdf({
+                  documentId,
+                  language: envelope.documentMeta.language,
+                }).then(async (buffer) => PDF.load(buffer))
+              : generateCertificatePdf(certificatePayload);
 
-      certificateDoc = createdCertificatePdf;
-      auditLogDoc = createdAuditLogPdf;
+          const makeAuditLogPdf = async () =>
+            usePlaywrightPdf
+              ? getAuditLogsPdf({
+                  documentId,
+                  language: envelope.documentMeta.language,
+                }).then(async (buffer) => PDF.load(buffer))
+              : generateAuditLogPdf(certificatePayload);
+
+          const [certificateDoc, auditLogDoc] = await Promise.all([
+            settings.includeSigningCertificate ? makeCertificatePdf() : null,
+            settings.includeAuditLog ? makeAuditLogPdf() : null,
+          ]);
+
+          certAuditBySize.set(sizeKey, { certificateDoc, auditLogDoc });
+        }),
+      );
     }
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
@@ -227,14 +247,22 @@ export const run = async ({
         throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
       }
 
+      const dims = dimensionsByItemId.get(envelopeItem.id) ?? {
+        width: PDF_SIZE_A4_72PPI.width,
+        height: PDF_SIZE_A4_72PPI.height,
+      };
+
+      const sizeKey = `${dims.width}x${dims.height}`;
+      const docs = certAuditBySize.get(sizeKey);
+
       const result = await decorateAndSignPdf({
         envelope,
         envelopeItem,
         envelopeItemFields,
         isRejected,
         rejectionReason,
-        certificateDoc,
-        auditLogDoc,
+        certificateDoc: docs?.certificateDoc ?? null,
+        auditLogDoc: docs?.auditLogDoc ?? null,
       });
 
       newDocumentData.push(result);

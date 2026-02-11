@@ -1,9 +1,12 @@
+import { PDF } from '@libpdf/core';
 import { EnvelopeType } from '@prisma/client';
 
 import { PDF_SIZE_A4_72PPI } from '@documenso/lib/constants/pdf';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
 import { getEnvelopeWhereInput } from '@documenso/lib/server-only/envelope/get-envelope-by-id';
 import { generateCertificatePdf } from '@documenso/lib/server-only/pdf/generate-certificate-pdf';
+import { getLastPageDimensions } from '@documenso/lib/server-only/pdf/get-page-size';
+import { getFileServerSide } from '@documenso/lib/universal/upload/get-file.server';
 import { isDocumentCompleted } from '@documenso/lib/utils/document';
 import { prisma } from '@documenso/prisma';
 
@@ -45,6 +48,14 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
             signature: true,
           },
         },
+        envelopeItems: {
+          include: {
+            documentData: true,
+          },
+          orderBy: {
+            order: 'asc',
+          },
+        },
         documentMeta: true,
         user: {
           select: {
@@ -65,6 +76,20 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
       throw new AppError('DOCUMENT_NOT_COMPLETE');
     }
 
+    let pageWidth = PDF_SIZE_A4_72PPI.width;
+    let pageHeight = PDF_SIZE_A4_72PPI.height;
+
+    const firstItem = envelope.envelopeItems[0];
+
+    if (firstItem) {
+      const pdfData = await getFileServerSide(firstItem.documentData);
+      const pdfDoc = await PDF.load(pdfData);
+      const dims = getLastPageDimensions(pdfDoc);
+
+      pageWidth = dims.width;
+      pageHeight = dims.height;
+    }
+
     const certificatePdf = await generateCertificatePdf({
       envelope,
       recipients: envelope.recipients,
@@ -74,8 +99,8 @@ export const downloadDocumentCertificateRoute = authenticatedProcedure
         email: envelope.user.email,
         name: envelope.user.name || '',
       },
-      pageWidth: PDF_SIZE_A4_72PPI.width,
-      pageHeight: PDF_SIZE_A4_72PPI.height,
+      pageWidth,
+      pageHeight,
     });
 
     const result = await certificatePdf.save();
