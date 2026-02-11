@@ -1,13 +1,18 @@
-# Deploy Documenso to Render. Database: Supabase only (no Render Postgres).
-# Set NEXT_PRIVATE_DATABASE_URL and NEXT_PRIVATE_DIRECT_DATABASE_URL in the Render dashboard (Supabase URLs).
+# Deploy Documenso to Render with Render Postgres.
 # Production URL: https://sign.pinogy.com (add as custom domain in Render).
+databases:
+  - name: documenso-db
+    plan: free
+    region: oregon
+
 services:
   - type: web
     runtime: node
     name: documenso-app
     plan: free
     buildCommand: npm ci && npm run build
-    startCommand: npx prisma migrate deploy --schema packages/prisma/schema.prisma && npx turbo run start --filter=@documenso/remix
+    # Run migrations from root, then start server from apps/remix (turbo runs start from root so main.js path would be wrong)
+    startCommand: npx prisma migrate deploy --schema packages/prisma/schema.prisma && (cd apps/remix && node build/server/main.js)
     healthCheckPath: /api/health
 
     envVars:
@@ -22,11 +27,15 @@ services:
       - key: NEXTAUTH_SECRET
         generateValue: true
 
-      # Database (required). Set these in Render dashboard when using Supabase or external Postgres.
+      # Database: auto-injected from Render Postgres above.
       - key: NEXT_PRIVATE_DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
       - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
 
       - key: NEXT_PUBLIC_WEBAPP_URL
         fromService:
@@ -152,3 +161,25 @@ services:
         sync: false
       - key: NEXT_PUBLIC_USE_INTERNAL_URL_BROWSERLESS
         sync: false
+
+  - type: web
+    runtime: node
+    name: token-exchange
+    plan: free
+    buildCommand: npm ci && npm run build --filter=@documenso/token-exchange
+    startCommand: cd apps/token-exchange && npm run start
+    healthCheckPath: /api/health
+
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: TOKEN_EXCHANGE_SECRET
+        sync: false
+      - key: NEXT_PRIVATE_DATABASE_URL
+        fromDatabase:
+          name: documenso-db
+          property: connectionString
+      - key: NEXT_PRIVATE_DIRECT_DATABASE_URL
+        fromDatabase:
+          name: documenso-db
+          property: connectionString

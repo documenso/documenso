@@ -1,0 +1,24 @@
+{
+  "name": "@documenso/token-exchange",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3004",
+    "build": "next build",
+    "start": "next start",
+    "lint:fix": "next lint --fix",
+    "clean": "rimraf .next && rimraf node_modules"
+  },
+  "dependencies": {
+    "@documenso/lib": "*",
+    "@documenso/prisma": "*",
+    "@sindresorhus/slugify": "^3.0.0",
+    "next": "15.5.9",
+    "zod": "^3.25.76"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "18.3.27",
+    "typescript": "5.6.2"
+  }
+}

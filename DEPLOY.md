@@ -1,42 +1,50 @@
-# Deploying Documenso to Render (Supabase only)
+# Deploying Documenso to Render (Render Postgres)
 
-This guide deploys Documenso to Render using **Supabase** as the database. Render’s Postgres is not used.
+This guide deploys Documenso to Render using **Render Postgres** as the database. The Blueprint creates the database and wires it to both the main app and token-exchange service.
 
 **Production URL:** `https://sign.pinogy.com`
 
-## 1. Create a Web Service on Render
+## 1. Deploy with the Blueprint (Recommended)
 
-1. In the [Render Dashboard](https://dashboard.render.com/), click **New +** → **Web Service**.
+1. In the [Render Dashboard](https://dashboard.render.com/), click **New +** → **Blueprint**.
 2. Connect your GitHub account if needed, then select the **documenso** repository.
-3. Configure the service:
-   - **Name**: e.g. `documenso-app` (or leave the default).
-   - **Region**: Choose one close to your users.
-   - **Branch**: `main` (or your default branch).
-   - **Root Directory**: leave blank (repo root).
-   - **Runtime**: **Node**.
-   - **Build Command**: `npm ci && npm run build`
-   - **Start Command**: `npx prisma migrate deploy --schema packages/prisma/schema.prisma && npx turbo run start --filter=@documenso/remix`
-   - **Instance Type**: Free (or paid if you prefer).
+3. Render reads `render.yaml` and creates:
+   - **documenso-db** – Render Postgres (free tier)
+   - **documenso-app** – Main web app
+   - **token-exchange** – API token exchange service for mobile apps
 
-4. Click **Advanced** and set:
-   - **Health Check Path**: `/api/health` (optional but recommended).
+4. Database URLs are injected automatically. In the **documenso-app** Environment tab, set:
+   - `NEXTAUTH_URL` → `https://sign.pinogy.com` (or your service URL until domain is set)
+   - `NEXT_PUBLIC_WEBAPP_URL` → same
+   - `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` → same
+   - All other required vars from step 2 below.
 
-## 2. Environment Variables
+5. Click **Apply** to create the resources.
 
-In the **Environment** section, add these variables. Use `https://sign.pinogy.com` for all URL vars once the custom domain is set (see step 4).
+## 2. Required Environment Variables
 
-### Required
+Set these in the **Environment** section of each service. Use `https://sign.pinogy.com` for all URL vars once the custom domain is set.
+
+### documenso-app (main app)
+
+| Key | Value | Notes |
+|-----|--------|------|
+| `NEXTAUTH_SECRET` | A long random string | Generate with `openssl rand -base64 32` |
+| `NEXTAUTH_URL` | `https://sign.pinogy.com` | Set after custom domain |
+| `NEXT_PUBLIC_WEBAPP_URL` | `https://sign.pinogy.com` | |
+| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | `https://sign.pinogy.com` | |
+| `NEXT_PRIVATE_DATABASE_URL` | *(auto from Blueprint)* | Injected from documenso-db |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | *(auto from Blueprint)* | Injected from documenso-db |
+| `NEXT_PRIVATE_ENCRYPTION_KEY` | Random string, at least 32 chars | |
+| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Another random string, 32+ chars | |
+
+### token-exchange (optional, for mobile apps)
 
 | Key | Value |
 |-----|--------|
-| `NEXTAUTH_SECRET` | A long random string (e.g. generate with `openssl rand -base64 32`). |
-| `NEXTAUTH_URL` | `https://sign.pinogy.com` |
-| `NEXT_PUBLIC_WEBAPP_URL` | `https://sign.pinogy.com` |
-| `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` | `https://sign.pinogy.com` |
-| `NEXT_PRIVATE_DATABASE_URL` | Your Supabase **connection pooler** URL (Transaction mode, port 6543). Use the **Session** pooler URL if you prefer. |
-| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | Your Supabase **direct** URL (Session mode pooler, port 5432) for migrations. **Important:** URL-encode any special characters in the password (e.g. `$` → `%24`). |
-| `NEXT_PRIVATE_ENCRYPTION_KEY` | Random string, at least 32 characters. |
-| `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` | Another random string, at least 32 characters. |
+| `TOKEN_EXCHANGE_SECRET` | Generate with `openssl rand -base64 32` |
+| `NEXT_PRIVATE_DATABASE_URL` | *(auto from Blueprint)* |
+| `NEXT_PRIVATE_DIRECT_DATABASE_URL` | *(auto from Blueprint)* |
 
 ### Optional (can add later)
 
@@ -44,34 +52,45 @@ In the **Environment** section, add these variables. Use `https://sign.pinogy.co
 - **Google OAuth**: `NEXT_PRIVATE_GOOGLE_CLIENT_ID`, `NEXT_PRIVATE_GOOGLE_CLIENT_SECRET`.
 - **Stripe** (billing): `NEXT_PRIVATE_STRIPE_API_KEY`, `NEXT_PRIVATE_STRIPE_WEBHOOK_SECRET`.
 
-Leave other vars from `.env.example` unset unless you need them.
+## 3. Deployment Flow
 
-## 3. Deploy
+1. Blueprint creates **documenso-db** (Render Postgres) first.
+2. Migrations run via the start command: `npx prisma migrate deploy`.
+3. The app starts and connects to the database over Render’s internal network.
 
-1. Click **Create Web Service**.
-2. Render will clone the repo, run `npm ci && npm run build`, then start the app. The first deploy can take several minutes.
-3. When the build finishes, open your service URL. You may need to run migrations on first run (the start command runs them automatically).
-
-## 4. Custom domain (sign.pinogy.com)
+## 4. Custom Domain (sign.pinogy.com)
 
 1. In Render: **Settings** → **Custom Domains** → **Add Custom Domain**.
 2. Enter `sign.pinogy.com` and follow Render’s instructions (add the CNAME or A record they show).
-3. Ensure **NEXTAUTH_URL**, **NEXT_PUBLIC_WEBAPP_URL**, and **NEXT_PRIVATE_INTERNAL_WEBAPP_URL** are all `https://sign.pinogy.com` in **Environment**.
+3. Ensure `NEXTAUTH_URL`, `NEXT_PUBLIC_WEBAPP_URL`, and `NEXT_PRIVATE_INTERNAL_WEBAPP_URL` are all `https://sign.pinogy.com` in **Environment**.
 4. Run **Manual Deploy** (Deploys → Deploy latest commit) so the app uses the correct URL.
 
-## 5. Using the Blueprint (render.yaml) Instead
+## 5. Using a Manual Setup Instead of Blueprint
 
-The repo includes a `render.yaml` Blueprint. It does **not** create a Render Postgres database; you use Supabase only.
+If you prefer not to use the Blueprint:
 
-1. **New +** → **Blueprint**.
-2. Connect the same repository.
-3. Render creates one web service. In the service **Environment** tab, set `NEXT_PRIVATE_DATABASE_URL` and `NEXT_PRIVATE_DIRECT_DATABASE_URL` to your Supabase URLs.
-4. Set the three URL vars to `https://sign.pinogy.com` and add the rest of the required env vars as in step 2.
-5. Add the custom domain `sign.pinogy.com` under Settings → Custom Domains.
+1. **New +** → **PostgreSQL**.
+2. Create a database (e.g. `documenso-db`), plan **Free**.
+3. **New +** → **Web Service**.
+4. Connect the repo, set:
+   - **Build Command**: `npm ci && npm run build`
+   - **Start Command**: `npx prisma migrate deploy --schema packages/prisma/schema.prisma && (cd apps/remix && node build/server/main.js)`
+   - **Health Check Path**: `/api/health`
+5. In Environment, add:
+   - `NEXT_PRIVATE_DATABASE_URL` → **Internal Database URL** from the Postgres Connect menu
+   - `NEXT_PRIVATE_DIRECT_DATABASE_URL` → same
+   - `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, `NEXT_PUBLIC_WEBAPP_URL`, `NEXT_PRIVATE_INTERNAL_WEBAPP_URL`
+   - `NEXT_PRIVATE_ENCRYPTION_KEY`, `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
 
-## Troubleshooting
+6. For **token-exchange**, create another Web Service and set:
+   - Build: `npm ci && npm run build --filter=@documenso/token-exchange`
+   - Start: `cd apps/token-exchange && npm run start`
+   - Same database URLs as the main app.
+
+## 6. Troubleshooting
 
 - **Build fails**: Ensure **Build Command** is exactly `npm ci && npm run build` and **Root Directory** is empty.
-- **Migrations fail**: Check that `NEXT_PRIVATE_DIRECT_DATABASE_URL` is the Supabase **direct** URL (port 5432) and that the password is URL-encoded (e.g. `$` → `%24`).
-- **502 / app not starting**: Check the **Logs** tab for errors. Confirm all required env vars are set, especially `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and both database URLs.
+- **Migrations fail**: Confirm the database is running and the URL is the **Internal Database URL** (not external) for the same region.
+- **502 / app not starting**: Check the **Logs** tab. Ensure all required env vars are set, especially `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, and both database URLs.
 - **Free instance sleeps**: On the free plan, the service sleeps after inactivity. The first request after sleep can take 30–60 seconds to respond.
+- **Connection pool**: Render Postgres free tier has limited connections. The app uses `connection_limit=5` by default; if you hit limits, set `DATABASE_CONNECTION_LIMIT=3` in the environment.
