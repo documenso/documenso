@@ -13,6 +13,7 @@
     "dev:remix": "turbo run dev --filter=@documenso/remix",
     "dev:docs": "turbo run dev --filter=@documenso/documentation",
     "dev:openpage-api": "turbo run dev --filter=@documenso/openpage-api",
+    "dev:token-exchange": "turbo run dev --filter=@documenso/token-exchange",
     "start": "turbo run start --filter=@documenso/remix --filter=@documenso/documentation --filter=@documenso/openpage-api",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint:fix",

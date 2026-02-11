@@ -12,5 +12,5 @@ module.exports = {
       rootDir: ['apps/*/'],
     },
   },
-  ignorePatterns: ['lingui.config.ts', 'packages/lib/translations/**/*.js'],
+  ignorePatterns: ['lingui.config.ts', 'packages/lib/translations/**/*.js', '**/next-env.d.ts'],
 };
