@@ -180,7 +180,10 @@ export const run = async ({
     );
 
     const dimensionsByItemId = new Map(
-      itemDimensions.map((d) => [d.envelopeItemId, { width: d.width, height: d.height }]),
+      itemDimensions.map(({ envelopeItemId, width, height }) => [
+        envelopeItemId,
+        { width, height },
+      ]),
     );
 
     const uniqueSizeKeys = [...new Set(itemDimensions.map((d) => `${d.width}x${d.height}`))];

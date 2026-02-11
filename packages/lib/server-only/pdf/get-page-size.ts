@@ -27,14 +27,14 @@ export const getLastPageDimensions = (pdfDoc: PDF): { width: number; height: num
   const lastPage = pdfDoc.getPage(pdfDoc.getPageCount() - 1);
 
   if (!lastPage) {
-    return { width: PDF_SIZE_A4_72PPI.width, height: PDF_SIZE_A4_72PPI.height };
+    return PDF_SIZE_A4_72PPI;
   }
 
   const width = Math.round(lastPage.width);
   const height = Math.round(lastPage.height);
 
   if (width < MIN_CERT_PAGE_WIDTH || height < MIN_CERT_PAGE_HEIGHT) {
-    return { width: PDF_SIZE_A4_72PPI.width, height: PDF_SIZE_A4_72PPI.height };
+    return PDF_SIZE_A4_72PPI;
   }
 
   return { width, height };
