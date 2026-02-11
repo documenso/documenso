@@ -79,6 +79,7 @@ export const AddSubjectFormPartial = ({
   const { _ } = useLingui();
 
   const organisation = useCurrentOrganisation();
+  const hasOrganisationEmailDomains = Boolean(organisation.organisationClaim?.flags.emailDomains);
 
   const form = useForm<TAddSubjectFormSchema>({
     defaultValues: {
@@ -106,10 +107,15 @@ export const AddSubjectFormPartial = ({
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+    trpc.enterprise.organisation.email.find.useQuery(
+      {
+        organisationId: organisation.id,
+        perPage: 100,
+      },
+      {
+        enabled: hasOrganisationEmailDomains,
+      },
+    );
 
   const emails = emailData?.data || [];
 
@@ -212,7 +218,7 @@ export const AddSubjectFormPartial = ({
                     className="flex flex-col gap-y-4 rounded-lg border p-4"
                     disabled={form.formState.isSubmitting}
                   >
-                    {organisation.organisationClaim.flags.emailDomains && (
+                    {hasOrganisationEmailDomains && (
                       <FormField
                         control={form.control}
                         name="meta.emailId"

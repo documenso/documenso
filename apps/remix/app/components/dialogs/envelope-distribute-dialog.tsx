@@ -82,6 +82,7 @@ export const EnvelopeDistributeDialog = ({
   onDistribute,
 }: EnvelopeDistributeDialogProps) => {
   const organisation = useCurrentOrganisation();
+  const hasOrganisationEmailDomains = Boolean(organisation.organisationClaim?.flags.emailDomains);
 
   const { envelope, syncEnvelope, isAutosaving, autosaveError } = useCurrentEnvelopeEditor();
 
@@ -116,10 +117,15 @@ export const EnvelopeDistributeDialog = ({
   } = form;
 
   const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+    trpc.enterprise.organisation.email.find.useQuery(
+      {
+        organisationId: organisation.id,
+        perPage: 100,
+      },
+      {
+        enabled: isOpen && hasOrganisationEmailDomains,
+      },
+    );
 
   const emails = emailData?.data || [];
 
@@ -268,7 +274,7 @@ export const EnvelopeDistributeDialog = ({
 
                 <div
                   className={cn('min-h-72', {
-                    'min-h-[23rem]': organisation.organisationClaim.flags.emailDomains,
+                    'min-h-[23rem]': hasOrganisationEmailDomains,
                   })}
                 >
                   <AnimatePresence initial={false} mode="wait">
@@ -293,7 +299,7 @@ export const EnvelopeDistributeDialog = ({
                             className="mt-2 flex flex-col gap-y-4 rounded-lg"
                             disabled={form.formState.isSubmitting}
                           >
-                            {organisation.organisationClaim.flags.emailDomains && (
+                            {hasOrganisationEmailDomains && (
                               <FormField
                                 control={form.control}
                                 name="meta.emailId"
