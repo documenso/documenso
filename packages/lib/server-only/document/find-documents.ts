@@ -29,6 +29,7 @@ export type FindDocumentsOptions = {
   senderIds?: number[];
   query?: string;
   folderId?: string;
+  skipFolderFilter?: boolean;
 };
 
 export const findDocuments = async ({
@@ -44,6 +45,7 @@ export const findDocuments = async ({
   senderIds,
   query = '',
   folderId,
+  skipFolderFilter,
 }: FindDocumentsOptions) => {
   const user = await prisma.user.findFirstOrThrow({
     where: {
@@ -219,10 +221,12 @@ export const findDocuments = async ({
     };
   }
 
-  if (folderId !== undefined) {
-    whereClause.folderId = folderId;
-  } else {
-    whereClause.folderId = null;
+  if (!skipFolderFilter) {
+    if (folderId !== undefined) {
+      whereClause.folderId = folderId;
+    } else {
+      whereClause.folderId = null;
+    }
   }
 
   const [data, count] = await Promise.all([

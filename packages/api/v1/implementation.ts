@@ -67,6 +67,8 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
       perPage,
       userId: user.id,
       teamId: team.id,
+      folderId: args.query.folderId,
+      skipFolderFilter: args.query.folderId === undefined,
     });
 
     return {
@@ -77,6 +79,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           externalId: document.externalId,
           userId: document.userId,
           teamId: document.teamId,
+          folderId: document.folderId,
           title: document.title,
           status: document.status,
           createdAt: document.createdAt,
@@ -164,6 +167,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           externalId: envelope.externalId,
           userId: envelope.userId,
           teamId: envelope.teamId,
+          folderId: envelope.folderId,
           title: envelope.title,
           status: envelope.status,
           createdAt: envelope.createdAt,

@@ -35,6 +35,12 @@ export const ZNoBodyMutationSchema = null;
 export const ZGetDocumentsQuerySchema = z.object({
   page: z.coerce.number().min(1).optional().default(1),
   perPage: z.coerce.number().min(1).optional().default(10),
+  folderId: z
+    .string()
+    .describe(
+      'Filter documents by folder ID. When omitted, returns all documents regardless of folder.',
+    )
+    .optional(),
 });
 
 export type TGetDocumentsQuerySchema = z.infer<typeof ZGetDocumentsQuerySchema>;
@@ -48,6 +54,7 @@ export const ZSuccessfulDocumentResponseSchema = z.object({
   externalId: z.string().nullish(),
   userId: z.number(),
   teamId: z.number().nullish(),
+  folderId: z.string().nullish(),
   title: z.string(),
   status: z.string(),
   createdAt: z.date(),
