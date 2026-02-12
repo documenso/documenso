@@ -22,7 +22,7 @@ The `render.yaml` Blueprint is the recommended way to deploy. It is **reproducib
 3. Render reads `render.yaml` and creates:
    - **documenso-db** – Render Postgres (free tier)
    - **documenso-app** – Main web app
-   - **token-exchange** – Token exchange API at `https://sign-token.pinogy.com` (set custom domain in step 4)
+   - **token-exchange** – API token exchange service for mobile apps (e.g. `https://sign-token.pinogy.com`—set custom domain in step 4)
 
 4. Database URLs are injected automatically. In the **documenso-app** Environment tab, set:
    - `NEXTAUTH_URL` → `https://sign.pinogy.com` (or your service URL until domain is set)

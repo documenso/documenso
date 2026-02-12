@@ -11,7 +11,7 @@ services:
   - type: web
     runtime: node
     name: documenso-app
-    plan: free
+    plan: standard
     buildCommand: npm ci && npm run build
     # Run migrations from root, then start server from apps/remix (turbo runs start from root so main.js path would be wrong)
     startCommand: npx prisma migrate deploy --schema packages/prisma/schema.prisma && (cd apps/remix && node build/server/main.js)

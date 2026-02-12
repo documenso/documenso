@@ -3,7 +3,7 @@
 A separate service that exchanges third-party credentials for Documenso team API keys. Use this from mobile apps (e.g. Flutter) to provision signing access without requiring users to log in to Documenso directly.
 
 **Main app:** https://sign.pinogy.com  
-**Token Exchange:** https://sign-token.pinogy.com
+**Token Exchange:** https://sign-token.pinogy.com (or deploy as a separate Render service with a custom domain)
 
 ## Flow
 
@@ -69,7 +69,7 @@ If credentials are valid and the team already exists in the organisation, the se
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const tokenExchangeUrl = 'https://sign-token.pinogy.com';
+const tokenExchangeUrl = 'https://sign-token.pinogy.com';  // or your Render URL
 const documensoUrl = 'https://sign.pinogy.com';
 const tokenExchangeSecret = 'your-TOKEN_EXCHANGE_SECRET';
 
