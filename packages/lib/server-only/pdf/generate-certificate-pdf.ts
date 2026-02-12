@@ -7,8 +7,6 @@ import { FieldType } from '@prisma/client';
 import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 
-import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
-
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
@@ -39,7 +37,6 @@ export type GenerateCertificatePdfOptions = {
   language?: string;
   pageWidth: number;
   pageHeight: number;
-  envelopeCompletedAuditLog?: CreateDocumentAuditLogDataResponse;
 };
 
 export const generateCertificatePdf = async (options: GenerateCertificatePdfOptions) => {

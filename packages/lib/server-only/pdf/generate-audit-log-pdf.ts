@@ -13,6 +13,7 @@ import { renderAuditLogs } from './render-audit-logs';
 
 type GenerateAuditLogPdfOptions = GenerateCertificatePdfOptions & {
   envelopeItems: string[];
+  additionalAuditLogs?: TDocumentAuditLog[];
 };
 
 export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) => {
@@ -24,7 +25,7 @@ export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) =
     language,
     pageWidth,
     pageHeight,
-    envelopeCompletedAuditLog,
+    additionalAuditLogs = [],
   } = options;
 
   const documentLanguage = ZSupportedLanguageCodeSchema.parse(language);
@@ -40,16 +41,7 @@ export const generateAuditLogPdf = async (options: GenerateAuditLogPdfOptions) =
     messages,
   });
 
-  const auditLogs: TDocumentAuditLog[] = [...partialAuditLogs];
-
-  if (envelopeCompletedAuditLog) {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    auditLogs.unshift({
-      ...envelopeCompletedAuditLog,
-      id: '',
-      createdAt: new Date(),
-    } satisfies Omit<TDocumentAuditLog, 'type'> as TDocumentAuditLog);
-  }
+  const auditLogs: TDocumentAuditLog[] = [...additionalAuditLogs, ...partialAuditLogs];
 
   const auditLogPages = await renderAuditLogs({
     envelope,

@@ -29,6 +29,7 @@ import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
+import type { TDocumentAuditLog } from '../../../types/document-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
@@ -169,16 +170,21 @@ export const run = async ({
       });
     }
 
-    const envelopeCompletedAuditLog = createDocumentAuditLogData({
-      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-      envelopeId: envelope.id,
-      requestMetadata,
-      user: null,
-      data: {
-        transactionId: nanoid(),
-        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-      },
-    });
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const envelopeCompletedAuditLog = {
+      ...createDocumentAuditLogData({
+        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+        envelopeId: envelope.id,
+        requestMetadata,
+        user: null,
+        data: {
+          transactionId: nanoid(),
+          ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+        },
+      }),
+      createdAt: new Date(),
+      id: '', // This will be set by the database, but is required for type compatibility.
+    } satisfies Omit<TDocumentAuditLog, 'type'> as TDocumentAuditLog;
 
     const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
 
@@ -201,7 +207,7 @@ export const run = async ({
         envelopeItems: envelopeItems.map((item) => item.title),
         pageWidth: PDF_SIZE_A4_72PPI.width,
         pageHeight: PDF_SIZE_A4_72PPI.height,
-        envelopeCompletedAuditLog,
+        additionalAuditLogs: [envelopeCompletedAuditLog],
       };
 
       // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
