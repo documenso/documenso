@@ -169,78 +169,24 @@ export const run = async ({
       });
     }
 
-    const itemDimensions = await Promise.all(
+    // Pre-fetch all PDF data so we can read dimensions and pass it
+    // to decorateAndSignPdf without fetching again.
+    const prefetchedItems = await Promise.all(
       envelopeItems.map(async (envelopeItem) => {
         const pdfData = await getFileServerSide(envelopeItem.documentData);
-        const pdfDoc = await PDF.load(pdfData);
-        const { width, height } = getLastPageDimensions(pdfDoc);
 
-        return { envelopeItemId: envelopeItem.id, width, height };
+        return { envelopeItem, pdfData };
       }),
     );
 
-    const dimensionsByItemId = new Map(
-      itemDimensions.map(({ envelopeItemId, width, height }) => [
-        envelopeItemId,
-        { width, height },
-      ]),
-    );
+    const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
 
-    const uniqueSizeKeys = [...new Set(itemDimensions.map((d) => `${d.width}x${d.height}`))];
-
-    type CertAuditDocs = { certificateDoc: PDF | null; auditLogDoc: PDF | null };
-    const certAuditBySize = new Map<string, CertAuditDocs>();
-
-    if (settings.includeSigningCertificate || settings.includeAuditLog) {
-      const usePlaywrightPdf = NEXT_PRIVATE_USE_PLAYWRIGHT_PDF();
-
-      await Promise.all(
-        uniqueSizeKeys.map(async (sizeKey) => {
-          const [w, h] = sizeKey.split('x').map(Number);
-
-          const certificatePayload = {
-            envelope,
-            recipients: envelope.recipients,
-            fields,
-            language: envelope.documentMeta.language,
-            envelopeOwner: {
-              email: envelope.user.email,
-              name: envelope.user.name || '',
-            },
-            envelopeItems: envelopeItems.map((item) => item.title),
-            pageWidth: w,
-            pageHeight: h,
-          };
-
-          const makeCertificatePdf = async () =>
-            usePlaywrightPdf
-              ? getCertificatePdf({
-                  documentId,
-                  language: envelope.documentMeta.language,
-                }).then(async (buffer) => PDF.load(buffer))
-              : generateCertificatePdf(certificatePayload);
-
-          const makeAuditLogPdf = async () =>
-            usePlaywrightPdf
-              ? getAuditLogsPdf({
-                  documentId,
-                  language: envelope.documentMeta.language,
-                }).then(async (buffer) => PDF.load(buffer))
-              : generateAuditLogPdf(certificatePayload);
-
-          const [certificateDoc, auditLogDoc] = await Promise.all([
-            settings.includeSigningCertificate ? makeCertificatePdf() : null,
-            settings.includeAuditLog ? makeAuditLogPdf() : null,
-          ]);
-
-          certAuditBySize.set(sizeKey, { certificateDoc, auditLogDoc });
-        }),
-      );
-    }
+    const needsCertificate = settings.includeSigningCertificate;
+    const needsAuditLog = settings.includeAuditLog;
 
     const newDocumentData: Array<{ oldDocumentDataId: string; newDocumentDataId: string }> = [];
 
-    for (const envelopeItem of envelopeItems) {
+    for (const { envelopeItem, pdfData } of prefetchedItems) {
       const envelopeItemFields = envelope.envelopeItems.find(
         (item) => item.id === envelopeItem.id,
       )?.field;
@@ -249,9 +195,49 @@ export const run = async ({
         throw new Error(`Envelope item fields not found for envelope item ${envelopeItem.id}`);
       }
 
-      const dims = dimensionsByItemId.get(envelopeItem.id)!;
-      const sizeKey = `${dims.width}x${dims.height}`;
-      const docs = certAuditBySize.get(sizeKey);
+      let certificateDoc: PDF | null = null;
+      let auditLogDoc: PDF | null = null;
+
+      if (needsCertificate || needsAuditLog) {
+        const pdfDoc = await PDF.load(pdfData);
+
+        const { width: pageWidth, height: pageHeight } = getLastPageDimensions(pdfDoc);
+
+        const certificatePayload = {
+          envelope,
+          recipients: envelope.recipients,
+          fields,
+          language: envelope.documentMeta.language,
+          envelopeOwner: {
+            email: envelope.user.email,
+            name: envelope.user.name || '',
+          },
+          envelopeItems: envelopeItems.map((item) => item.title),
+          pageWidth,
+          pageHeight,
+        };
+
+        const makeCertificatePdf = async () =>
+          usePlaywrightPdf
+            ? getCertificatePdf({
+                documentId,
+                language: envelope.documentMeta.language,
+              }).then(async (buffer) => PDF.load(buffer))
+            : generateCertificatePdf(certificatePayload);
+
+        const makeAuditLogPdf = async () =>
+          usePlaywrightPdf
+            ? getAuditLogsPdf({
+                documentId,
+                language: envelope.documentMeta.language,
+              }).then(async (buffer) => PDF.load(buffer))
+            : generateAuditLogPdf(certificatePayload);
+
+        [certificateDoc, auditLogDoc] = await Promise.all([
+          needsCertificate ? makeCertificatePdf() : null,
+          needsAuditLog ? makeAuditLogPdf() : null,
+        ]);
+      }
 
       const result = await decorateAndSignPdf({
         envelope,
@@ -259,8 +245,9 @@ export const run = async ({
         envelopeItemFields,
         isRejected,
         rejectionReason,
-        certificateDoc: docs?.certificateDoc ?? null,
-        auditLogDoc: docs?.auditLogDoc ?? null,
+        pdfData,
+        certificateDoc,
+        auditLogDoc,
       });
 
       newDocumentData.push(result);
@@ -356,12 +343,13 @@ type DecorateAndSignPdfOptions = {
   envelopeItemFields: Field[];
   isRejected: boolean;
   rejectionReason: string;
+  pdfData: Uint8Array;
   certificateDoc: PDF | null;
   auditLogDoc: PDF | null;
 };
 
 /**
- * Fetch, normalize, flatten and insert fields into a PDF document.
+ * Normalize, flatten and insert fields into a PDF document.
  */
 const decorateAndSignPdf = async ({
   envelope,
@@ -369,11 +357,10 @@ const decorateAndSignPdf = async ({
   envelopeItemFields,
   isRejected,
   rejectionReason,
+  pdfData,
   certificateDoc,
   auditLogDoc,
 }: DecorateAndSignPdfOptions) => {
-  const pdfData = await getFileServerSide(envelopeItem.documentData);
-
   let pdfDoc = await PDF.load(pdfData);
 
   // Normalize and flatten layers that could cause issues with the signature
