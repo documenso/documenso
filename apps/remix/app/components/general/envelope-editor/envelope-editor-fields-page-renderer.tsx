@@ -458,7 +458,6 @@ export default function EnvelopeEditorFieldsPageRenderer() {
     const fieldGroups = nodes.filter(
       (node) =>
         node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     ) as Konva.Group[];
 
     interactiveTransformer.current?.nodes(fieldGroups);
