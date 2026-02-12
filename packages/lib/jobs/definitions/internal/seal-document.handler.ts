@@ -169,6 +169,20 @@ export const run = async ({
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const envelopeCompletedAuditLog = createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      envelopeId: envelope.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+      },
+    });
+
+    const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
+
     // Pre-fetch all PDF data so we can read dimensions and pass it
     // to decorateAndSignPdf without fetching again.
     const prefetchedItems = await Promise.all(
@@ -276,22 +290,13 @@ export const run = async ({
           id: envelope.id,
         },
         data: {
-          status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
+          status: finalEnvelopeStatus,
           completedAt: new Date(),
         },
       });
 
       await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-          envelopeId: envelope.id,
-          requestMetadata,
-          user: null,
-          data: {
-            transactionId: nanoid(),
-            ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-          },
-        }),
+        data: envelopeCompletedAuditLog,
       });
     });
 
