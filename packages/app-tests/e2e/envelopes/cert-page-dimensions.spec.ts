@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type APIRequestContext, type Page, expect, test } from '@playwright/test';
 import { DocumentStatus, EnvelopeType, FieldType } from '@prisma/client';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -21,12 +21,25 @@ import { apiSignin } from '../fixtures/authentication';
 const WEBAPP_BASE_URL = NEXT_PUBLIC_WEBAPP_URL();
 const baseUrl = `${WEBAPP_BASE_URL}/api/v2`;
 
-const LETTER_WIDTH = 612;
-const LETTER_HEIGHT = 792;
-
 test.describe.configure({ mode: 'parallel', timeout: 60000 });
 
-test('cert and audit log pages match document page dimensions', async ({ page, request }) => {
+const signAndVerifyPageDimensions = async ({
+  page,
+  request,
+  pdfFile,
+  identifier,
+  title,
+  expectedWidth,
+  expectedHeight,
+}: {
+  page: Page;
+  request: APIRequestContext;
+  pdfFile: string;
+  identifier: string;
+  title: string;
+  expectedWidth: number;
+  expectedHeight: number;
+}) => {
   const { user, team } = await seedUser();
 
   const { token } = await createApiToken({
@@ -36,13 +49,13 @@ test('cert and audit log pages match document page dimensions', async ({ page, r
     expiresIn: null,
   });
 
-  const letterPdf = fs.readFileSync(path.join(__dirname, '../../../../assets/letter-size.pdf'));
+  const pdfBuffer = fs.readFileSync(path.join(__dirname, `../../../../assets/${pdfFile}`));
 
   const formData = new FormData();
 
   const createEnvelopePayload: TCreateEnvelopePayload = {
     type: EnvelopeType.DOCUMENT,
-    title: 'Letter Size Dimension Test',
+    title,
     recipients: [
       {
         email: user.email,
@@ -50,14 +63,14 @@ test('cert and audit log pages match document page dimensions', async ({ page, r
         role: RecipientRole.SIGNER,
         fields: [
           {
-            identifier: 'letter-doc',
+            identifier,
             type: FieldType.SIGNATURE,
             fieldMeta: { type: 'signature' },
             page: 1,
-            positionX: 0.1,
-            positionY: 0.1,
-            width: 0.3,
-            height: 0.05,
+            positionX: 10,
+            positionY: 10,
+            width: 40,
+            height: 10,
           },
         ],
       },
@@ -65,7 +78,7 @@ test('cert and audit log pages match document page dimensions', async ({ page, r
   };
 
   formData.append('payload', JSON.stringify(createEnvelopePayload));
-  formData.append('files', new File([letterPdf], 'letter-doc', { type: 'application/pdf' }));
+  formData.append('files', new File([pdfBuffer], identifier, { type: 'application/pdf' }));
 
   const createResponse = await request.post(`${baseUrl}/envelope/create`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -87,6 +100,26 @@ test('cert and audit log pages match document page dimensions', async ({ page, r
   });
 
   expect(distributeResponse.ok()).toBeTruthy();
+
+  // Pre-insert all fields via Prisma so we can skip the UI field interaction.
+  const fields = await prisma.field.findMany({
+    where: { envelopeId: envelope.id, inserted: false },
+  });
+
+  for (const field of fields) {
+    await prisma.field.update({
+      where: { id: field.id },
+      data: {
+        inserted: true,
+        signature: {
+          create: {
+            recipientId: envelope.recipients[0].id,
+            typedSignature: 'Test Signature',
+          },
+        },
+      },
+    });
+  }
 
   const recipientToken = envelope.recipients[0].token;
   const signUrl = `/sign/${recipientToken}`;
@@ -139,8 +172,47 @@ test('cert and audit log pages match document page dimensions', async ({ page, r
       const pdfPage = await pdf.getPage(i);
       const viewport = pdfPage.getViewport({ scale: 1 });
 
-      expect(Math.round(viewport.width)).toBe(LETTER_WIDTH);
-      expect(Math.round(viewport.height)).toBe(LETTER_HEIGHT);
+      expect(Math.round(viewport.width)).toBe(expectedWidth);
+      expect(Math.round(viewport.height)).toBe(expectedHeight);
     }
   }
+};
+
+test('cert and audit log pages match letter page dimensions', async ({ page, request }) => {
+  await signAndVerifyPageDimensions({
+    page,
+    request,
+    pdfFile: 'letter-size.pdf',
+    identifier: 'letter-doc',
+    title: 'Letter Size Dimension Test',
+    expectedWidth: 612,
+    expectedHeight: 792,
+  });
+});
+
+test('cert and audit log pages match A4 page dimensions', async ({ page, request }) => {
+  await signAndVerifyPageDimensions({
+    page,
+    request,
+    pdfFile: 'a4-size.pdf',
+    identifier: 'a4-doc',
+    title: 'A4 Size Dimension Test',
+    expectedWidth: 595,
+    expectedHeight: 842,
+  });
+});
+
+test('cert and audit log pages match tabloid landscape page dimensions', async ({
+  page,
+  request,
+}) => {
+  await signAndVerifyPageDimensions({
+    page,
+    request,
+    pdfFile: 'tabloid-landscape.pdf',
+    identifier: 'tabloid-doc',
+    title: 'Tabloid Landscape Dimension Test',
+    expectedWidth: 1224,
+    expectedHeight: 792,
+  });
 });
