@@ -21,7 +21,7 @@ import { useDebouncedValue } from '@documenso/lib/client-only/hooks/use-debounce
 import { ZEditorRecipientsFormSchema } from '@documenso/lib/client-only/hooks/use-editor-recipients';
 import { useCurrentEnvelopeEditor } from '@documenso/lib/client-only/providers/envelope-editor-provider';
 import { useCurrentOrganisation } from '@documenso/lib/client-only/providers/organisation';
-import { useSession } from '@documenso/lib/client-only/providers/session';
+import { useOptionalSession } from '@documenso/lib/client-only/providers/session';
 import type { TDetectedRecipientSchema } from '@documenso/lib/server-only/ai/envelope/detect-recipients/schema';
 import { ZRecipientAuthOptionsSchema } from '@documenso/lib/types/document-auth';
 import { nanoid } from '@documenso/lib/universal/id';
@@ -63,8 +63,14 @@ import { AiRecipientDetectionDialog } from '~/components/dialogs/ai-recipient-de
 import { useCurrentTeam } from '~/providers/team';
 
 export const EnvelopeEditorRecipientForm = () => {
-  const { envelope, setRecipientsDebounced, updateEnvelope, editorRecipients } =
-    useCurrentEnvelopeEditor();
+  const {
+    envelope,
+    setRecipientsDebounced,
+    updateEnvelope,
+    editorRecipients,
+    isEmbedded,
+    editorConfig,
+  } = useCurrentEnvelopeEditor();
 
   const organisation = useCurrentOrganisation();
   const team = useCurrentTeam();
@@ -72,7 +78,9 @@ export const EnvelopeEditorRecipientForm = () => {
   const { t } = useLingui();
   const { toast } = useToast();
   const { remaining } = useLimits();
-  const { user } = useSession();
+  const { sessionData } = useOptionalSession();
+
+  const user = sessionData?.user;
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [recipientSearchQuery, setRecipientSearchQuery] = useState('');
@@ -603,37 +611,41 @@ export const EnvelopeEditorRecipientForm = () => {
         </div>
 
         <div className="flex flex-row items-center space-x-2">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                type="button"
-                size="sm"
-                disabled={isSubmitting}
-                onClick={onDetectRecipientsClick}
-              >
-                <SparklesIcon className="h-4 w-4" />
-              </Button>
-            </TooltipTrigger>
+          {editorConfig.recipients?.allowAIDetection && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  type="button"
+                  size="sm"
+                  disabled={isSubmitting}
+                  onClick={onDetectRecipientsClick}
+                >
+                  <SparklesIcon className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
 
-            <TooltipContent>
-              {team.preferences.aiFeaturesEnabled ? (
-                <Trans>Detect recipients with AI</Trans>
-              ) : (
-                <Trans>Enable AI detection</Trans>
-              )}
-            </TooltipContent>
-          </Tooltip>
+              <TooltipContent>
+                {team.preferences.aiFeaturesEnabled ? (
+                  <Trans>Detect recipients with AI</Trans>
+                ) : (
+                  <Trans>Enable AI detection</Trans>
+                )}
+              </TooltipContent>
+            </Tooltip>
+          )}
 
-          <Button
-            variant="outline"
-            className="flex flex-row items-center"
-            size="sm"
-            disabled={isSubmitting || isUserAlreadyARecipient}
-            onClick={() => onAddSelfSigner()}
-          >
-            <Trans>Add Myself</Trans>
-          </Button>
+          {!isEmbedded && (
+            <Button
+              variant="outline"
+              className="flex flex-row items-center"
+              size="sm"
+              disabled={isSubmitting || isUserAlreadyARecipient}
+              onClick={() => onAddSelfSigner()}
+            >
+              <Trans>Add Myself</Trans>
+            </Button>
+          )}
 
           <Button
             variant="outline"
@@ -652,7 +664,13 @@ export const EnvelopeEditorRecipientForm = () => {
       <CardContent>
         <AnimateGenericFadeInOut motionKey={showAdvancedSettings ? 'Show' : 'Hide'}>
           <Form {...form}>
-            <div className="-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4">
+            <div
+              className={cn('-mt-2 mb-2 space-y-4 rounded-md bg-accent/50 p-4', {
+                hidden:
+                  !editorConfig.recipients?.allowConfigureSigningOrder &&
+                  !organisation.organisationClaim.flags.cfr21,
+              })}
+            >
               {organisation.organisationClaim.flags.cfr21 && (
                 <div className="flex flex-row items-center">
                   <Checkbox
@@ -670,64 +688,66 @@ export const EnvelopeEditorRecipientForm = () => {
                 </div>
               )}
 
-              <FormField
-                control={form.control}
-                name="signingOrder"
-                render={({ field }) => (
-                  <FormItem className="flex flex-row items-center space-x-2 space-y-0">
-                    <FormControl>
-                      <Checkbox
-                        {...field}
-                        id="signingOrder"
-                        checked={field.value === DocumentSigningOrder.SEQUENTIAL}
-                        onCheckedChange={(checked) => {
-                          if (!checked && hasAssistantRole) {
-                            setShowSigningOrderConfirmation(true);
-                            return;
-                          }
+              {editorConfig.recipients?.allowConfigureSigningOrder && (
+                <FormField
+                  control={form.control}
+                  name="signingOrder"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-center space-x-2 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          {...field}
+                          id="signingOrder"
+                          checked={field.value === DocumentSigningOrder.SEQUENTIAL}
+                          onCheckedChange={(checked) => {
+                            if (!checked && hasAssistantRole) {
+                              setShowSigningOrderConfirmation(true);
+                              return;
+                            }
 
-                          field.onChange(
-                            checked
-                              ? DocumentSigningOrder.SEQUENTIAL
-                              : DocumentSigningOrder.PARALLEL,
-                          );
+                            field.onChange(
+                              checked
+                                ? DocumentSigningOrder.SEQUENTIAL
+                                : DocumentSigningOrder.PARALLEL,
+                            );
 
-                          // If sequential signing is turned off, disable dictate next signer
-                          if (!checked) {
-                            form.setValue('allowDictateNextSigner', false, {
-                              shouldValidate: true,
-                              shouldDirty: true,
-                            });
-                          }
-                        }}
-                        disabled={isSubmitting || hasDocumentBeenSent}
-                      />
-                    </FormControl>
+                            // If sequential signing is turned off, disable dictate next signer
+                            if (!checked) {
+                              form.setValue('allowDictateNextSigner', false, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              });
+                            }
+                          }}
+                          disabled={isSubmitting || hasDocumentBeenSent}
+                        />
+                      </FormControl>
 
-                    <div className="flex items-center text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      <FormLabel
-                        htmlFor="signingOrder"
-                        className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        <Trans>Enable signing order</Trans>
-                      </FormLabel>
+                      <div className="flex items-center text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        <FormLabel
+                          htmlFor="signingOrder"
+                          className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                        >
+                          <Trans>Enable signing order</Trans>
+                        </FormLabel>
 
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <span className="ml-1 cursor-help text-muted-foreground">
-                            <HelpCircleIcon className="h-3.5 w-3.5" />
-                          </span>
-                        </TooltipTrigger>
-                        <TooltipContent className="max-w-80 p-4">
-                          <p>
-                            <Trans>Add 2 or more signers to enable signing order.</Trans>
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </div>
-                  </FormItem>
-                )}
-              />
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="ml-1 cursor-help text-muted-foreground">
+                              <HelpCircleIcon className="h-3.5 w-3.5" />
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-80 p-4">
+                            <p>
+                              <Trans>Add 2 or more signers to enable signing order.</Trans>
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              )}
 
               {isSigningOrderSequential && (
                 <FormField
@@ -987,6 +1007,16 @@ export const EnvelopeEditorRecipientForm = () => {
                                         <FormControl>
                                           <RecipientRoleSelect
                                             {...field}
+                                            hideAssistantRole={
+                                              !editorConfig.recipients?.allowAssistantRole
+                                            }
+                                            hideCCerRole={!editorConfig.recipients?.allowCCerRole}
+                                            hideViewerRole={
+                                              !editorConfig.recipients?.allowViewerRole
+                                            }
+                                            hideApproverRole={
+                                              !editorConfig.recipients?.allowApproverRole
+                                            }
                                             isAssistantEnabled={isSigningOrderSequential}
                                             onValueChange={(value) => {
                                               // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -1083,13 +1113,15 @@ export const EnvelopeEditorRecipientForm = () => {
           onConfirm={handleSigningOrderDisable}
         />
 
-        <AiRecipientDetectionDialog
-          open={isAiDialogOpen}
-          onOpenChange={onAiDialogOpenChange}
-          onComplete={onAiDetectionComplete}
-          envelopeId={envelope.id}
-          teamId={envelope.teamId}
-        />
+        {editorConfig.recipients?.allowAIDetection && (
+          <AiRecipientDetectionDialog
+            open={isAiDialogOpen}
+            onOpenChange={onAiDialogOpenChange}
+            onComplete={onAiDetectionComplete}
+            envelopeId={envelope.id}
+            teamId={envelope.teamId}
+          />
+        )}
 
         <AiFeaturesEnableDialog
           open={isAiEnableDialogOpen}

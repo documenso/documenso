@@ -30,21 +30,56 @@ import { EnvelopeItemTitleInput } from './envelope-editor-title-input';
 export default function EnvelopeEditorHeader() {
   const { t } = useLingui();
 
-  const { envelope, isDocument, isTemplate, updateEnvelope, autosaveError, relativePath } =
-    useCurrentEnvelopeEditor();
+  const {
+    envelope,
+    isDocument,
+    isTemplate,
+    isEmbedded,
+    updateEnvelope,
+    autosaveError,
+    relativePath,
+    editorConfig,
+    flushAutosave,
+  } = useCurrentEnvelopeEditor();
+
+  const {
+    embeded,
+    general: { allowConfigureEnvelopeTitle },
+    actions: { allowAttachments, allowDistributing },
+  } = editorConfig;
+
+  const handleCreateEmbeddedEnvelope = async () => {
+    const latestEnvelope = await flushAutosave();
+
+    embeded?.onCreate?.(latestEnvelope);
+  };
+
+  const handleUpdateEmbeddedEnvelope = async () => {
+    const latestEnvelope = await flushAutosave();
+
+    embeded?.onUpdate?.(latestEnvelope);
+  };
 
   return (
     <nav className="w-full border-b border-border bg-background px-4 py-3 md:px-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
-          <Link to="/">
-            <BrandingLogo className="h-6 w-auto" />
-          </Link>
+          {editorConfig.embeded?.customBrandingLogo ? (
+            <img
+              src={`/api/branding/logo/team/${envelope.teamId}`}
+              alt="Logo"
+              className="h-6 w-auto"
+            />
+          ) : (
+            <Link to="/">
+              <BrandingLogo className="h-6 w-auto" />
+            </Link>
+          )}
           <Separator orientation="vertical" className="h-6" />
 
           <div className="flex items-center space-x-2">
             <EnvelopeItemTitleInput
-              disabled={envelope.status !== DocumentStatus.DRAFT}
+              disabled={envelope.status !== DocumentStatus.DRAFT || !allowConfigureEnvelopeTitle}
               value={envelope.title}
               onChange={(title) => {
                 updateEnvelope({
@@ -127,53 +162,71 @@ export default function EnvelopeEditorHeader() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" />
-
-          <EnvelopeEditorSettingsDialog
-            trigger={
-              <Button variant="outline" size="sm">
-                <SettingsIcon className="h-4 w-4" />
-              </Button>
-            }
-          />
-
-          {isDocument && (
-            <>
-              <EnvelopeDistributeDialog
-                documentRootPath={relativePath.documentRootPath}
-                trigger={
-                  <Button size="sm">
-                    <SendIcon className="mr-2 h-4 w-4" />
-                    <Trans>Send Document</Trans>
-                  </Button>
-                }
-              />
-
-              <EnvelopeRedistributeDialog
-                envelope={envelope}
-                trigger={
-                  <Button size="sm">
-                    <SendIcon className="mr-2 h-4 w-4" />
-                    <Trans>Resend Document</Trans>
-                  </Button>
-                }
-              />
-            </>
+          {allowAttachments && (
+            <DocumentAttachmentsPopover envelopeId={envelope.id} buttonSize="sm" />
           )}
 
-          {isTemplate && (
-            <TemplateUseDialog
-              envelopeId={envelope.id}
-              templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
-              templateSigningOrder={envelope.documentMeta?.signingOrder}
-              recipients={envelope.recipients}
-              documentRootPath={relativePath.documentRootPath}
+          {editorConfig.settings && (
+            <EnvelopeEditorSettingsDialog
               trigger={
-                <Button size="sm">
-                  <Trans>Use Template</Trans>
+                <Button variant="outline" size="sm">
+                  <SettingsIcon className="h-4 w-4" />
                 </Button>
               }
             />
+          )}
+
+          {match({ isEmbedded, isDocument, isTemplate, allowDistributing })
+            .with({ isEmbedded: false, isDocument: true, allowDistributing: true }, () => (
+              <>
+                <EnvelopeDistributeDialog
+                  documentRootPath={relativePath.documentRootPath}
+                  trigger={
+                    <Button size="sm">
+                      <SendIcon className="mr-2 h-4 w-4" />
+                      <Trans>Send Document</Trans>
+                    </Button>
+                  }
+                />
+
+                <EnvelopeRedistributeDialog
+                  envelope={envelope}
+                  trigger={
+                    <Button size="sm">
+                      <SendIcon className="mr-2 h-4 w-4" />
+                      <Trans>Resend Document</Trans>
+                    </Button>
+                  }
+                />
+              </>
+            ))
+            .with({ isEmbedded: false, isTemplate: true, allowDistributing: true }, () => (
+              <TemplateUseDialog
+                envelopeId={envelope.id}
+                templateId={mapSecondaryIdToTemplateId(envelope.secondaryId)}
+                templateSigningOrder={envelope.documentMeta?.signingOrder}
+                recipients={envelope.recipients}
+                documentRootPath={relativePath.documentRootPath}
+                trigger={
+                  <Button size="sm">
+                    <Trans>Use Template</Trans>
+                  </Button>
+                }
+              />
+            ))
+
+            .otherwise(() => null)}
+
+          {embeded?.mode === 'create' && (
+            <Button size="sm" onClick={handleCreateEmbeddedEnvelope}>
+              {isDocument ? <Trans>Create Document</Trans> : <Trans>Create Template</Trans>}
+            </Button>
+          )}
+
+          {embeded?.mode === 'edit' && (
+            <Button size="sm" onClick={handleUpdateEmbeddedEnvelope}>
+              {isDocument ? <Trans>Update Document</Trans> : <Trans>Update Template</Trans>}
+            </Button>
           )}
         </div>
       </div>

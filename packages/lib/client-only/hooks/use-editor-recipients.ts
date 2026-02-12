@@ -11,9 +11,8 @@ import {
   ZRecipientActionAuthTypesSchema,
   ZRecipientAuthOptionsSchema,
 } from '@documenso/lib/types/document-auth';
+import type { TEditorEnvelope } from '@documenso/lib/types/envelope-editor';
 import { ZRecipientEmailSchema } from '@documenso/lib/types/recipient';
-
-import type { TEnvelope } from '../../types/envelope';
 
 const LocalRecipientSchema = z.object({
   formId: z.string().min(1),
@@ -36,12 +35,12 @@ export const ZEditorRecipientsFormSchema = z.object({
 export type TEditorRecipientsFormSchema = z.infer<typeof ZEditorRecipientsFormSchema>;
 
 type EditorRecipientsProps = {
-  envelope: TEnvelope;
+  envelope: TEditorEnvelope;
 };
 
 type ResetFormOptions = {
   recipients?: Recipient[];
-  documentMeta?: TEnvelope['documentMeta'];
+  documentMeta?: TEditorEnvelope['documentMeta'];
 };
 
 type UseEditorRecipientsResponse = {

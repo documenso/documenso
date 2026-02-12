@@ -75,7 +75,7 @@ export const EnvelopeEditorFieldsPage = () => {
 
   const scrollableContainerRef = useRef<HTMLDivElement>(null);
 
-  const { envelope, editorFields, relativePath } = useCurrentEnvelopeEditor();
+  const { envelope, editorFields, relativePath, editorConfig } = useCurrentEnvelopeEditor();
 
   const { currentEnvelopeItem } = useCurrentEnvelopeRender();
 
@@ -97,14 +97,10 @@ export const EnvelopeEditorFieldsPage = () => {
 
     const isMetaSame = isDeepEqual(selectedField.fieldMeta, fieldMeta);
 
-    // Todo: Envelopes - Clean up console logs.
     if (!isMetaSame) {
-      console.log('TRIGGER UPDATE');
       editorFields.updateFieldByFormId(selectedField.formId, {
         fieldMeta,
       });
-    } else {
-      console.log('DATA IS SAME, NO UPDATE');
     }
   };
 
@@ -250,36 +246,40 @@ export const EnvelopeEditorFieldsPage = () => {
               selectedEnvelopeItemId={currentEnvelopeItem?.id ?? null}
             />
 
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-4 w-full"
-              onClick={onDetectClick}
-              disabled={envelope.status !== DocumentStatus.DRAFT}
-              title={
-                envelope.status !== DocumentStatus.DRAFT
-                  ? _(msg`You can only detect fields in draft envelopes`)
-                  : undefined
-              }
-            >
-              <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
-              <Trans>Detect with AI</Trans>
-            </Button>
+            {editorConfig.fields?.allowAIDetection && (
+              <>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mt-4 w-full"
+                  onClick={onDetectClick}
+                  disabled={envelope.status !== DocumentStatus.DRAFT}
+                  title={
+                    envelope.status !== DocumentStatus.DRAFT
+                      ? _(msg`You can only detect fields in draft envelopes`)
+                      : undefined
+                  }
+                >
+                  <SparklesIcon className="-ml-1 mr-2 h-4 w-4" />
+                  <Trans>Detect with AI</Trans>
+                </Button>
 
-            <AiFieldDetectionDialog
-              open={isAiFieldDialogOpen}
-              onOpenChange={setIsAiFieldDialogOpen}
-              onComplete={onFieldDetectionComplete}
-              envelopeId={envelope.id}
-              teamId={envelope.teamId}
-            />
+                <AiFieldDetectionDialog
+                  open={isAiFieldDialogOpen}
+                  onOpenChange={setIsAiFieldDialogOpen}
+                  onComplete={onFieldDetectionComplete}
+                  envelopeId={envelope.id}
+                  teamId={envelope.teamId}
+                />
 
-            <AiFeaturesEnableDialog
-              open={isAiEnableDialogOpen}
-              onOpenChange={setIsAiEnableDialogOpen}
-              onEnabled={onAiFeaturesEnabled}
-            />
+                <AiFeaturesEnableDialog
+                  open={isAiEnableDialogOpen}
+                  onOpenChange={setIsAiEnableDialogOpen}
+                  onEnabled={onAiFeaturesEnabled}
+                />
+              </>
+            )}
           </section>
 
           {/* Field details section. */}

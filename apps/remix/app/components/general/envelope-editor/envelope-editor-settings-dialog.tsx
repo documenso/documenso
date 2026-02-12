@@ -28,6 +28,7 @@ import {
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
 import { DEFAULT_DOCUMENT_TIME_ZONE, TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { AppError } from '@documenso/lib/errors/app-error';
 import {
   ZDocumentAccessAuthTypesSchema,
@@ -174,7 +175,9 @@ export const EnvelopeEditorSettingsDialog = ({
   const { t, i18n } = useLingui();
   const { toast } = useToast();
 
-  const { envelope, updateEnvelopeAsync } = useCurrentEnvelopeEditor();
+  const { envelope, updateEnvelopeAsync, editorConfig } = useCurrentEnvelopeEditor();
+
+  const { settings } = editorConfig;
 
   const team = useCurrentTeam();
   const organisation = useCurrentOrganisation();
@@ -223,10 +226,15 @@ export const EnvelopeEditorSettingsDialog = ({
   const emailSettings = form.watch('meta.emailSettings');
 
   const { data: emailData, isLoading: isLoadingEmails } =
-    trpc.enterprise.organisation.email.find.useQuery({
-      organisationId: organisation.id,
-      perPage: 100,
-    });
+    trpc.enterprise.organisation.email.find.useQuery(
+      {
+        organisationId: organisation.id,
+        perPage: 100,
+      },
+      {
+        ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+      },
+    );
 
   const emails = emailData?.data || [];
 
@@ -319,7 +327,7 @@ export const EnvelopeEditorSettingsDialog = ({
 
   const selectedTab = tabs.find((tab) => tab.id === activeTab);
 
-  if (!selectedTab) {
+  if (!selectedTab || !settings) {
     return null;
   }
 
@@ -347,19 +355,25 @@ export const EnvelopeEditorSettingsDialog = ({
           </DialogHeader>
 
           <nav className="col-span-12 mb-8 flex flex-wrap items-center justify-start gap-x-2 gap-y-4 px-4 md:col-span-3 md:w-full md:flex-col md:items-start md:gap-y-2">
-            {tabs.map((tab) => (
-              <Button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                variant="ghost"
-                className={cn('w-full justify-start', {
-                  'bg-secondary': activeTab === tab.id,
-                })}
-              >
-                <tab.icon className="mr-2 h-5 w-5" />
-                {t(tab.title)}
-              </Button>
-            ))}
+            {tabs.map((tab) => {
+              if (tab.id === 'email' && !settings.allowConfigureDistribution) {
+                return null;
+              }
+
+              return (
+                <Button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  variant="ghost"
+                  className={cn('w-full justify-start', {
+                    'bg-secondary': activeTab === tab.id,
+                  })}
+                >
+                  <tab.icon className="mr-2 h-5 w-5" />
+                  {t(tab.title)}
+                </Button>
+              );
+            })}
           </nav>
         </div>
 
@@ -377,137 +391,151 @@ export const EnvelopeEditorSettingsDialog = ({
                 disabled={form.formState.isSubmitting}
                 key={activeTab}
               >
-                {match(activeTab)
-                  .with('general', () => (
+                {match({ activeTab, settings })
+                  .with({ activeTab: 'general' }, () => (
                     <>
-                      <FormField
-                        control={form.control}
-                        name="meta.language"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="inline-flex items-center">
-                              <Trans>Language</Trans>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="mx-2 h-4 w-4" />
-                                </TooltipTrigger>
+                      {settings.allowConfigureLanguage && (
+                        <FormField
+                          control={form.control}
+                          name="meta.language"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="inline-flex items-center">
+                                <Trans>Language</Trans>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <InfoIcon className="mx-2 h-4 w-4" />
+                                  </TooltipTrigger>
 
-                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
-                                  <Trans>
-                                    Controls the language for the document, including the language
-                                    to be used for email notifications, and the final certificate
-                                    that is generated and attached to the document.
-                                  </Trans>
-                                </TooltipContent>
-                              </Tooltip>
-                            </FormLabel>
+                                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                                    <Trans>
+                                      Controls the language for the document, including the language
+                                      to be used for email notifications, and the final certificate
+                                      that is generated and attached to the document.
+                                    </Trans>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </FormLabel>
 
-                            <FormControl>
-                              <Select
-                                value={field.value}
-                                disabled={field.disabled}
-                                onValueChange={field.onChange}
-                              >
-                                <SelectTrigger className="bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
+                              <FormControl>
+                                <Select
+                                  value={field.value}
+                                  disabled={field.disabled}
+                                  onValueChange={field.onChange}
+                                >
+                                  <SelectTrigger className="bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
 
-                                <SelectContent>
-                                  {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
-                                    <SelectItem key={code} value={code}>
-                                      {language.full}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="meta.signatureTypes"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex flex-row items-center">
-                              <Trans>Allowed Signature Types</Trans>
-                              <DocumentSignatureSettingsTooltip />
-                            </FormLabel>
+                                  <SelectContent>
+                                    {Object.entries(SUPPORTED_LANGUAGES).map(([code, language]) => (
+                                      <SelectItem key={code} value={code}>
+                                        {language.full}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
-                            <FormControl>
-                              <MultiSelectCombobox
-                                options={Object.values(DOCUMENT_SIGNATURE_TYPES).map((option) => ({
-                                  label: t(option.label),
-                                  value: option.value,
-                                }))}
-                                selectedValues={field.value}
-                                onChange={field.onChange}
-                                className="w-full bg-background"
-                                emptySelectionPlaceholder="Select signature types"
-                              />
-                            </FormControl>
+                      {settings.allowConfigureSignatureTypes && (
+                        <FormField
+                          control={form.control}
+                          name="meta.signatureTypes"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Allowed Signature Types</Trans>
+                                <DocumentSignatureSettingsTooltip />
+                              </FormLabel>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="meta.dateFormat"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              <Trans>Date Format</Trans>
-                            </FormLabel>
+                              <FormControl>
+                                <MultiSelectCombobox
+                                  options={Object.values(DOCUMENT_SIGNATURE_TYPES).map(
+                                    (option) => ({
+                                      label: t(option.label),
+                                      value: option.value,
+                                    }),
+                                  )}
+                                  selectedValues={field.value}
+                                  onChange={field.onChange}
+                                  className="w-full bg-background"
+                                  emptySelectionPlaceholder="Select signature types"
+                                />
+                              </FormControl>
 
-                            <FormControl>
-                              <Select
-                                value={field.value}
-                                onValueChange={field.onChange}
-                                disabled={envelopeHasBeenSent}
-                              >
-                                <SelectTrigger className="bg-background">
-                                  <SelectValue />
-                                </SelectTrigger>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
 
-                                <SelectContent>
-                                  {DATE_FORMATS.map((format) => (
-                                    <SelectItem key={format.key} value={format.value}>
-                                      {format.label}
-                                    </SelectItem>
-                                  ))}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
+                      {settings.allowConfigureDateFormat && (
+                        <FormField
+                          control={form.control}
+                          name="meta.dateFormat"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>Date Format</Trans>
+                              </FormLabel>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="meta.timezone"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              <Trans>Time Zone</Trans>
-                            </FormLabel>
+                              <FormControl>
+                                <Select
+                                  value={field.value}
+                                  onValueChange={field.onChange}
+                                  disabled={envelopeHasBeenSent}
+                                >
+                                  <SelectTrigger className="bg-background">
+                                    <SelectValue />
+                                  </SelectTrigger>
 
-                            <FormControl>
-                              <Combobox
-                                className="bg-background"
-                                options={TIME_ZONES}
-                                value={field.value}
-                                onChange={(value) => value && field.onChange(value)}
-                                disabled={envelopeHasBeenSent}
-                              />
-                            </FormControl>
+                                  <SelectContent>
+                                    {DATE_FORMATS.map((format) => (
+                                      <SelectItem key={format.key} value={format.value}>
+                                        {format.label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
+                      {settings.allowConfigureTimezone && (
+                        <FormField
+                          control={form.control}
+                          name="meta.timezone"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>Time Zone</Trans>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Combobox
+                                  className="bg-background"
+                                  options={TIME_ZONES}
+                                  value={field.value}
+                                  onChange={(value) => value && field.onChange(value)}
+                                  disabled={envelopeHasBeenSent}
+                                />
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      )}
+
                       <FormField
                         control={form.control}
                         name="externalId"
@@ -538,143 +566,29 @@ export const EnvelopeEditorSettingsDialog = ({
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="meta.redirectUrl"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex flex-row items-center">
-                              <Trans>Redirect URL</Trans>{' '}
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="mx-2 h-4 w-4" />
-                                </TooltipTrigger>
-
-                                <TooltipContent className="max-w-xs text-muted-foreground">
-                                  <Trans>
-                                    Add a URL to redirect the user to once the document is signed
-                                  </Trans>
-                                </TooltipContent>
-                              </Tooltip>
-                            </FormLabel>
-
-                            <FormControl>
-                              <Input className="bg-background" {...field} />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={form.control}
-                        name="meta.distributionMethod"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex flex-row items-center">
-                              <Trans>Document Distribution Method</Trans>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="mx-2 h-4 w-4" />
-                                </TooltipTrigger>
-
-                                <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
-                                  <h2>
-                                    <strong>
-                                      <Trans>Document Distribution Method</Trans>
-                                    </strong>
-                                  </h2>
-
-                                  <p>
-                                    <Trans>
-                                      This is how the document will reach the recipients once the
-                                      document is ready for signing.
-                                    </Trans>
-                                  </p>
-
-                                  <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
-                                    <li>
-                                      <Trans>
-                                        <strong>Email</strong> - The recipient will be emailed the
-                                        document to sign, approve, etc.
-                                      </Trans>
-                                    </li>
-                                    <li>
-                                      <Trans>
-                                        <strong>None</strong> - We will generate links which you can
-                                        send to the recipients manually.
-                                      </Trans>
-                                    </li>
-                                  </ul>
-
-                                  <Trans>
-                                    <strong>Note</strong> - If you use Links in combination with
-                                    direct templates, you will need to manually send the links to
-                                    the remaining recipients.
-                                  </Trans>
-                                </TooltipContent>
-                              </Tooltip>
-                            </FormLabel>
-
-                            <FormControl>
-                              <Select {...field} onValueChange={field.onChange}>
-                                <SelectTrigger className="bg-background text-muted-foreground">
-                                  <SelectValue data-testid="documentDistributionMethodSelectValue" />
-                                </SelectTrigger>
-
-                                <SelectContent position="popper">
-                                  {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
-                                    ({ value, description }) => (
-                                      <SelectItem key={value} value={value}>
-                                        {i18n._(description)}
-                                      </SelectItem>
-                                    ),
-                                  )}
-                                </SelectContent>
-                              </Select>
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                    </>
-                  ))
-                  .with('email', () => (
-                    <>
-                      {organisation.organisationClaim.flags.emailDomains && (
+                      {settings.allowConfigureRedirectUrl && (
                         <FormField
                           control={form.control}
-                          name="meta.emailId"
+                          name="meta.redirectUrl"
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>
-                                <Trans>Email Sender</Trans>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Redirect URL</Trans>{' '}
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <InfoIcon className="mx-2 h-4 w-4" />
+                                  </TooltipTrigger>
+
+                                  <TooltipContent className="max-w-xs text-muted-foreground">
+                                    <Trans>
+                                      Add a URL to redirect the user to once the document is signed
+                                    </Trans>
+                                  </TooltipContent>
+                                </Tooltip>
                               </FormLabel>
 
                               <FormControl>
-                                <Select
-                                  {...field}
-                                  value={field.value === null ? '-1' : field.value}
-                                  onValueChange={(value) =>
-                                    field.onChange(value === '-1' ? null : value)
-                                  }
-                                >
-                                  <SelectTrigger
-                                    loading={isLoadingEmails}
-                                    className="bg-background"
-                                  >
-                                    <SelectValue />
-                                  </SelectTrigger>
-
-                                  <SelectContent>
-                                    {emails.map((email) => (
-                                      <SelectItem key={email.id} value={email.id}>
-                                        {email.email}
-                                      </SelectItem>
-                                    ))}
-
-                                    <SelectItem value={'-1'}>Documenso</SelectItem>
-                                  </SelectContent>
-                                </Select>
+                                <Input className="bg-background" {...field} />
                               </FormControl>
 
                               <FormMessage />
@@ -683,82 +597,204 @@ export const EnvelopeEditorSettingsDialog = ({
                         />
                       )}
 
-                      <FormField
-                        control={form.control}
-                        name="meta.emailReplyTo"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              <Trans>
-                                Reply To Email{' '}
-                                <span className="text-muted-foreground">(Optional)</span>
-                              </Trans>
-                            </FormLabel>
+                      {settings.allowConfigureDistribution && (
+                        <FormField
+                          control={form.control}
+                          name="meta.distributionMethod"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>Document Distribution Method</Trans>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <InfoIcon className="mx-2 h-4 w-4" />
+                                  </TooltipTrigger>
 
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
+                                  <TooltipContent className="max-w-md space-y-2 p-4 text-foreground">
+                                    <h2>
+                                      <strong>
+                                        <Trans>Document Distribution Method</Trans>
+                                      </strong>
+                                    </h2>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                    <p>
+                                      <Trans>
+                                        This is how the document will reach the recipients once the
+                                        document is ready for signing.
+                                      </Trans>
+                                    </p>
 
-                      <FormField
-                        control={form.control}
-                        name="meta.subject"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>
-                              <Trans>
-                                Subject <span className="text-muted-foreground">(Optional)</span>
-                              </Trans>
-                            </FormLabel>
+                                    <ul className="ml-3.5 list-outside list-disc space-y-0.5 py-2">
+                                      <li>
+                                        <Trans>
+                                          <strong>Email</strong> - The recipient will be emailed the
+                                          document to sign, approve, etc.
+                                        </Trans>
+                                      </li>
+                                      <li>
+                                        <Trans>
+                                          <strong>None</strong> - We will generate links which you
+                                          can send to the recipients manually.
+                                        </Trans>
+                                      </li>
+                                    </ul>
 
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
+                                    <Trans>
+                                      <strong>Note</strong> - If you use Links in combination with
+                                      direct templates, you will need to manually send the links to
+                                      the remaining recipients.
+                                    </Trans>
+                                  </TooltipContent>
+                                </Tooltip>
+                              </FormLabel>
 
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                              <FormControl>
+                                <Select {...field} onValueChange={field.onChange}>
+                                  <SelectTrigger className="bg-background text-muted-foreground">
+                                    <SelectValue data-testid="documentDistributionMethodSelectValue" />
+                                  </SelectTrigger>
 
-                      <FormField
-                        control={form.control}
-                        name="meta.message"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel className="flex flex-row items-center">
-                              <Trans>
-                                Message <span className="text-muted-foreground">(Optional)</span>
-                              </Trans>
-                              <Tooltip>
-                                <TooltipTrigger>
-                                  <InfoIcon className="mx-2 h-4 w-4" />
-                                </TooltipTrigger>
-                                <TooltipContent className="p-4 text-muted-foreground">
-                                  <DocumentSendEmailMessageHelper />
-                                </TooltipContent>
-                              </Tooltip>
-                            </FormLabel>
-
-                            <FormControl>
-                              <Textarea className="h-16 resize-none bg-background" {...field} />
-                            </FormControl>
-
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <DocumentEmailCheckboxes
-                        value={emailSettings}
-                        onChange={(value) => form.setValue('meta.emailSettings', value)}
-                      />
+                                  <SelectContent position="popper">
+                                    {Object.values(DOCUMENT_DISTRIBUTION_METHODS).map(
+                                      ({ value, description }) => (
+                                        <SelectItem key={value} value={value}>
+                                          {i18n._(description)}
+                                        </SelectItem>
+                                      ),
+                                    )}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      )}
                     </>
                   ))
-                  .with('security', () => (
+                  .with(
+                    { activeTab: 'email', settings: { allowConfigureDistribution: true } },
+                    () => (
+                      <>
+                        {organisation.organisationClaim.flags.emailDomains && (
+                          <FormField
+                            control={form.control}
+                            name="meta.emailId"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>
+                                  <Trans>Email Sender</Trans>
+                                </FormLabel>
+
+                                <FormControl>
+                                  <Select
+                                    {...field}
+                                    value={field.value === null ? '-1' : field.value}
+                                    onValueChange={(value) =>
+                                      field.onChange(value === '-1' ? null : value)
+                                    }
+                                  >
+                                    <SelectTrigger
+                                      loading={isLoadingEmails}
+                                      className="bg-background"
+                                    >
+                                      <SelectValue />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                      {emails.map((email) => (
+                                        <SelectItem key={email.id} value={email.id}>
+                                          {email.email}
+                                        </SelectItem>
+                                      ))}
+
+                                      <SelectItem value={'-1'}>Documenso</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormControl>
+
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        )}
+
+                        <FormField
+                          control={form.control}
+                          name="meta.emailReplyTo"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>
+                                  Reply To Email{' '}
+                                  <span className="text-muted-foreground">(Optional)</span>
+                                </Trans>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="meta.subject"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>
+                                <Trans>
+                                  Subject <span className="text-muted-foreground">(Optional)</span>
+                                </Trans>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Input {...field} />
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="meta.message"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel className="flex flex-row items-center">
+                                <Trans>
+                                  Message <span className="text-muted-foreground">(Optional)</span>
+                                </Trans>
+                                <Tooltip>
+                                  <TooltipTrigger>
+                                    <InfoIcon className="mx-2 h-4 w-4" />
+                                  </TooltipTrigger>
+                                  <TooltipContent className="p-4 text-muted-foreground">
+                                    <DocumentSendEmailMessageHelper />
+                                  </TooltipContent>
+                                </Tooltip>
+                              </FormLabel>
+
+                              <FormControl>
+                                <Textarea className="h-16 resize-none bg-background" {...field} />
+                              </FormControl>
+
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <DocumentEmailCheckboxes
+                          value={emailSettings}
+                          onChange={(value) => form.setValue('meta.emailSettings', value)}
+                        />
+                      </>
+                    ),
+                  )
+                  .with({ activeTab: 'security' }, () => (
                     <>
                       {organisation.organisationClaim.flags.cfr21 && (
                         <FormField
@@ -827,7 +863,7 @@ export const EnvelopeEditorSettingsDialog = ({
                       />
                     </>
                   ))
-                  .exhaustive()}
+                  .otherwise(() => null)}
               </fieldset>
 
               <div className="flex flex-row justify-end gap-4 p-6">
