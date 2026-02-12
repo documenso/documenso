@@ -55,7 +55,7 @@ const WebhookSearchParamsSchema = ZUrlSearchParamsSchema.extend({
 });
 
 export function meta() {
-  return appMetaTags('Webhooks');
+  return appMetaTags(msg`Webhooks`);
 }
 
 export default function WebhookPage({ params }: Route.ComponentProps) {
