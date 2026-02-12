@@ -171,20 +171,16 @@ export const run = async ({
     }
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const envelopeCompletedAuditLog = {
-      ...createDocumentAuditLogData({
-        type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-        envelopeId: envelope.id,
-        requestMetadata,
-        user: null,
-        data: {
-          transactionId: nanoid(),
-          ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-        },
-      }),
-      createdAt: new Date(),
-      id: '', // This will be set by the database, but is required for type compatibility.
-    } satisfies Omit<TDocumentAuditLog, 'type'> as TDocumentAuditLog;
+    const envelopeCompletedAuditLog = createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      envelopeId: envelope.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+      },
+    });
 
     const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
 
@@ -192,6 +188,15 @@ export const run = async ({
     let auditLogDoc: PDF | null = null;
 
     if (settings.includeSigningCertificate || settings.includeAuditLog) {
+      const additionalAuditLogs = [
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        {
+          ...envelopeCompletedAuditLog,
+          id: '',
+          createdAt: new Date(),
+        } as TDocumentAuditLog,
+      ];
+
       const certificatePayload = {
         envelope: {
           ...envelope,
@@ -207,7 +212,7 @@ export const run = async ({
         envelopeItems: envelopeItems.map((item) => item.title),
         pageWidth: PDF_SIZE_A4_72PPI.width,
         pageHeight: PDF_SIZE_A4_72PPI.height,
-        additionalAuditLogs: [envelopeCompletedAuditLog],
+        additionalAuditLogs,
       };
 
       // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
