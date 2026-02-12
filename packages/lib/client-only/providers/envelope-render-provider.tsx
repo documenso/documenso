@@ -169,20 +169,22 @@ export const EnvelopeRenderProvider = ({
     [envelopeItemsFromProps, envelope.id, token, version, presignToken],
   );
 
-  const [currentItem, setCurrentItem] = useState<EnvelopeRenderItem | null>(
-    envelopeItems[0] ?? null,
-  );
+  const [currentItemId, setCurrentItemId] = useState<string | null>(envelopeItems[0]?.id ?? null);
+
+  const currentItem = useMemo((): EnvelopeRenderItem | null => {
+    return envelopeItems.find((item) => item.id === currentItemId) ?? null;
+  }, [currentItemId, envelopeItems]);
 
   const setCurrentEnvelopeItem = (envelopeItemId: string) => {
     const foundItem = envelopeItems.find((item) => item.id === envelopeItemId);
 
-    setCurrentItem(foundItem ?? null);
+    setCurrentItemId(foundItem?.id ?? null);
   };
 
   // Set the selected item to the first item if none is set.
   useEffect(() => {
     if (currentItem && !envelopeItems.some((item) => item.id === currentItem.id)) {
-      setCurrentItem(null);
+      setCurrentItemId(null);
     }
 
     if (!currentItem && envelopeItems.length > 0) {

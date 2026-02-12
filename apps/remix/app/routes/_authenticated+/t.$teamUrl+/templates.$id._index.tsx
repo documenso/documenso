@@ -7,8 +7,9 @@ import { Link, useNavigate } from 'react-router';
 import { EnvelopeRenderProvider } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { useSession } from '@documenso/lib/client-only/providers/session';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
+import { DO_NOT_INVALIDATE_QUERY_ON_MUTATION } from '@documenso/lib/constants/trpc';
 import { mapSecondaryIdToTemplateId } from '@documenso/lib/utils/envelope';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath, formatTemplatesPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { DocumentReadOnlyFields } from '@documenso/ui/components/document/document-read-only-fields';
@@ -47,9 +48,14 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
     data: envelope,
     isLoading: isLoadingEnvelope,
     isError: isErrorEnvelope,
-  } = trpc.envelope.get.useQuery({
-    envelopeId: params.id,
-  });
+  } = trpc.envelope.get.useQuery(
+    {
+      envelopeId: params.id,
+    },
+    {
+      ...DO_NOT_INVALIDATE_QUERY_ON_MUTATION,
+    },
+  );
 
   if (isLoadingEnvelope) {
     return (
@@ -211,15 +217,15 @@ export default function TemplatePage({ params }: Route.ComponentProps) {
               />
 
               <PDFViewer
-                data={getDocumentDataUrl({
+                data={getDocumentDataUrlForPdfViewer({
                   envelopeId: envelope.id,
-                  envelopeItemId: envelope.envelopeItems[0].id,
-                  documentDataId: envelope.envelopeItems[0].documentDataId,
+                  envelopeItemId: envelope.envelopeItems[0]?.id,
+                  documentDataId: envelope.envelopeItems[0]?.documentDataId,
                   version: 'current',
                   token: undefined,
                   presignToken: undefined,
                 })}
-                key={envelope.envelopeItems[0].id}
+                key={envelope.envelopeItems[0]?.id}
                 scrollParentRef="window"
               />
             </CardContent>

@@ -22,7 +22,7 @@ import {
 } from '@documenso/lib/types/field-meta';
 import type { CompletedField } from '@documenso/lib/types/fields';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
 import type { FieldWithSignatureAndFieldMeta } from '@documenso/prisma/types/field-with-signature-and-fieldmeta';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -274,11 +274,11 @@ export const DocumentSigningPageViewV1 = ({
             <Card className="rounded-xl before:rounded-xl" gradient>
               <CardContent className="p-2">
                 <PDFViewer
-                  key={document.envelopeItems[0].id}
-                  data={getDocumentDataUrl({
+                  key={document.envelopeItems[0]?.id}
+                  data={getDocumentDataUrlForPdfViewer({
                     envelopeId: document.envelopeId,
-                    envelopeItemId: document.envelopeItems[0].id,
-                    documentDataId: document.envelopeItems[0].documentData.id,
+                    envelopeItemId: document.envelopeItems[0]?.id,
+                    documentDataId: document.envelopeItems[0]?.documentData.id,
                     version: 'current',
                     token: recipient.token,
                     presignToken: undefined,

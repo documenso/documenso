@@ -23,7 +23,7 @@ import {
   isFieldUnsignedAndRequired,
   isRequiredField,
 } from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
@@ -341,10 +341,10 @@ export const EmbedDirectTemplateClientPage = ({
         {/* Viewer */}
         <div className="flex-1">
           <PDFViewer
-            data={getDocumentDataUrl({
-              envelopeId: envelopeItems[0].envelopeId,
-              envelopeItemId: envelopeItems[0].id,
-              documentDataId: envelopeItems[0].documentDataId,
+            data={getDocumentDataUrlForPdfViewer({
+              envelopeId: envelopeItems[0]?.envelopeId,
+              envelopeItemId: envelopeItems[0]?.id,
+              documentDataId: envelopeItems[0]?.documentDataId,
               version: 'current',
               token: recipient.token,
               presignToken: undefined,

@@ -10,7 +10,7 @@ import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition, validateFieldsInserted } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
@@ -289,10 +289,10 @@ export const EmbedSignDocumentV1ClientPage = ({
           {/* Viewer */}
           <div className="embed--DocumentViewer flex-1">
             <PDFViewer
-              data={getDocumentDataUrl({
-                envelopeId: envelopeItems[0].envelopeId,
-                envelopeItemId: envelopeItems[0].id,
-                documentDataId: envelopeItems[0].documentData.id,
+              data={getDocumentDataUrlForPdfViewer({
+                envelopeId: envelopeItems[0]?.envelopeId,
+                envelopeItemId: envelopeItems[0]?.id,
+                documentDataId: envelopeItems[0]?.documentData.id,
                 version: 'current',
                 token: token,
                 presignToken: undefined,

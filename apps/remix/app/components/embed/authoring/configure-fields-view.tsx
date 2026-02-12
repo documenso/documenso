@@ -15,7 +15,7 @@ import { PDF_VIEWER_PAGE_SELECTOR, getPdfPagesCount } from '@documenso/lib/const
 import { type TFieldMetaSchema, ZFieldMetaSchema } from '@documenso/lib/types/field-meta';
 import { nanoid } from '@documenso/lib/universal/id';
 import { ADVANCED_FIELD_TYPES_WITH_OPTIONAL_SETTING } from '@documenso/lib/utils/advanced-fields-helpers';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { useRecipientColors } from '@documenso/ui/lib/recipient-colors';
 import { cn } from '@documenso/ui/lib/utils';
 import { Button } from '@documenso/ui/primitives/button';
@@ -87,7 +87,7 @@ export const ConfigureFieldsView = ({
 
   const normalizedDocumentData = useMemo(() => {
     if (envelopeItem) {
-      return getDocumentDataUrl({
+      return getDocumentDataUrlForPdfViewer({
         envelopeId: envelopeItem.envelopeId,
         envelopeItemId: envelopeItem.id,
         documentDataId: envelopeItem.documentDataId,

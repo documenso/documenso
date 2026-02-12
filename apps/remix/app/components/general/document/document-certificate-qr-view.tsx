@@ -10,7 +10,7 @@ import {
   useCurrentEnvelopeRender,
 } from '@documenso/lib/client-only/providers/envelope-render-provider';
 import { PDF_VIEWER_ERROR_MESSAGES } from '@documenso/lib/constants/pdf-viewer-i18n';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { Button } from '@documenso/ui/primitives/button';
@@ -151,11 +151,11 @@ export const DocumentCertificateQRView = ({
 
           <div className="mt-12 w-full">
             <PDFViewer
-              key={envelopeItems[0].id}
-              data={getDocumentDataUrl({
-                envelopeId: envelopeItems[0].envelopeId,
-                envelopeItemId: envelopeItems[0].id,
-                documentDataId: envelopeItems[0].documentDataId,
+              key={envelopeItems[0]?.id}
+              data={getDocumentDataUrlForPdfViewer({
+                envelopeId: envelopeItems[0]?.envelopeId,
+                envelopeItemId: envelopeItems[0]?.id,
+                documentDataId: envelopeItems[0]?.documentDataId,
                 version: 'current',
                 token,
                 presignToken: undefined,

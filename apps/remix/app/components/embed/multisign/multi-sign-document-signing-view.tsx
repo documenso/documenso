@@ -9,7 +9,7 @@ import { P, match } from 'ts-pattern';
 
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { AppError, AppErrorCode } from '@documenso/lib/errors/app-error';
-import { getDocumentDataUrl } from '@documenso/lib/utils/envelope-download';
+import { getDocumentDataUrlForPdfViewer } from '@documenso/lib/utils/envelope-download';
 import { sortFieldsByPosition } from '@documenso/lib/utils/fields';
 import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import { trpc } from '@documenso/trpc/react';
@@ -230,9 +230,9 @@ export const MultiSignDocumentSigningView = ({
                   })}
                 >
                   <PDFViewer
-                    data={getDocumentDataUrl({
+                    data={getDocumentDataUrlForPdfViewer({
                       envelopeId: document.envelopeId,
-                      envelopeItemId: document.envelopeItems[0].id,
+                      envelopeItemId: document.envelopeItems[0]?.id,
                       documentDataId: document.documentData.id,
                       version: 'current',
                       token,

@@ -32,6 +32,7 @@ export const ZCssVarsSchema = z
     ring: z.string().optional().describe('Focus ring color'),
     radius: z.string().optional().describe('Border radius size in REM units'),
     warning: z.string().optional().describe('Warning/alert color'),
+    envelopeEditorBackground: z.string().optional().describe('Envelope editor background color'),
   })
   .describe('Custom CSS variables for theming');
 
