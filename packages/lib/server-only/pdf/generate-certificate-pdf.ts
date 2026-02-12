@@ -7,6 +7,8 @@ import { FieldType } from '@prisma/client';
 import { prop, sortBy } from 'remeda';
 import { match } from 'ts-pattern';
 
+import type { CreateDocumentAuditLogDataResponse } from '@documenso/lib/utils/document-audit-logs';
+
 import { ZSupportedLanguageCodeSchema } from '../../constants/i18n';
 import type { TDocumentAuditLogBaseSchema } from '../../types/document-audit-logs';
 import { extractDocumentAuthMethods } from '../../utils/document-auth';
@@ -16,7 +18,14 @@ import { getOrganisationClaimByTeamId } from '../organisation/get-organisation-c
 import { renderCertificate } from './render-certificate';
 
 export type GenerateCertificatePdfOptions = {
-  envelope: Envelope & {
+  /**
+   * Note: completedAt is not included since it's not real at this point in time.
+   *
+   * If we actually need it here in the future, we will need to preserve the
+   * completedAt value and pass it to the final `envelope.update` function when
+   * the document is initially sealed.
+   */
+  envelope: Omit<Envelope, 'completedAt'> & {
     documentMeta: DocumentMeta;
   };
   envelopeOwner: {
@@ -30,6 +39,7 @@ export type GenerateCertificatePdfOptions = {
   language?: string;
   pageWidth: number;
   pageHeight: number;
+  envelopeCompletedAuditLog?: CreateDocumentAuditLogDataResponse;
 };
 
 export const generateCertificatePdf = async (options: GenerateCertificatePdfOptions) => {

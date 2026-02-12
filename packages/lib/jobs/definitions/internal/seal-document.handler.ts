@@ -169,12 +169,28 @@ export const run = async ({
       });
     }
 
+    const envelopeCompletedAuditLog = createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      envelopeId: envelope.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+      },
+    });
+
+    const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
+
     let certificateDoc: PDF | null = null;
     let auditLogDoc: PDF | null = null;
 
     if (settings.includeSigningCertificate || settings.includeAuditLog) {
       const certificatePayload = {
-        envelope,
+        envelope: {
+          ...envelope,
+          status: finalEnvelopeStatus,
+        },
         recipients: envelope.recipients, // Need to use the recipients from envelope which contains ALL recipients.
         fields,
         language: envelope.documentMeta.language,
@@ -185,6 +201,7 @@ export const run = async ({
         envelopeItems: envelopeItems.map((item) => item.title),
         pageWidth: PDF_SIZE_A4_72PPI.width,
         pageHeight: PDF_SIZE_A4_72PPI.height,
+        envelopeCompletedAuditLog,
       };
 
       // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
@@ -263,22 +280,13 @@ export const run = async ({
           id: envelope.id,
         },
         data: {
-          status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
+          status: finalEnvelopeStatus,
           completedAt: new Date(),
         },
       });
 
       await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-          envelopeId: envelope.id,
-          requestMetadata,
-          user: null,
-          data: {
-            transactionId: nanoid(),
-            ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-          },
-        }),
+        data: envelopeCompletedAuditLog,
       });
     });
 
