@@ -387,9 +387,11 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
     column.add(naText);
   }
 
+  const relevantLog = isRejected ? recipient.logs.rejected : recipient.logs.completed;
+
   const ipLabelAndText = renderLabelAndText({
     label: i18n._(msg`IP Address`),
-    text: recipient.logs.completed?.ipAddress ?? i18n._(msg`Unknown`),
+    text: relevantLog?.ipAddress ?? i18n._(msg`Unknown`),
     width,
     y: column.getClientRect().height + 6,
   });
@@ -397,7 +399,7 @@ const renderColumnTwo = (options: RenderColumnOptions) => {
 
   const deviceLabelAndText = renderLabelAndText({
     label: i18n._(msg`Device`),
-    text: getDevice(recipient.logs.completed?.userAgent),
+    text: getDevice(relevantLog?.userAgent),
     width,
     y: column.getClientRect().height + 6,
   });
