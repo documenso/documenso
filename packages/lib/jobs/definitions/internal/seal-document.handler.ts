@@ -29,7 +29,10 @@ import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
-import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
+import {
+  DOCUMENT_AUDIT_LOG_TYPE,
+  type TDocumentAuditLog,
+} from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
   mapEnvelopeToWebhookDocumentPayload,
@@ -217,8 +220,20 @@ export const run = async ({
 
         const { width: pageWidth, height: pageHeight } = getLastPageDimensions(pdfDoc);
 
+        const additionalAuditLogs = [
+          // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+          {
+            ...envelopeCompletedAuditLog,
+            id: '',
+            createdAt: new Date(),
+          } as TDocumentAuditLog,
+        ];
+
         const certificatePayload = {
-          envelope,
+          envelope: {
+            ...envelope,
+            status: finalEnvelopeStatus,
+          },
           recipients: envelope.recipients,
           fields,
           language: envelope.documentMeta.language,
@@ -229,6 +244,7 @@ export const run = async ({
           envelopeItems: envelopeItems.map((item) => item.title),
           pageWidth,
           pageHeight,
+          additionalAuditLogs,
         };
 
         const makeCertificatePdf = async () =>
