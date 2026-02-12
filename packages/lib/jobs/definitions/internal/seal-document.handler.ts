@@ -29,6 +29,7 @@ import { insertFieldInPDFV2 } from '../../../server-only/pdf/insert-field-in-pdf
 import { legacy_insertFieldInPDF } from '../../../server-only/pdf/legacy-insert-field-in-pdf';
 import { getTeamSettings } from '../../../server-only/team/get-team-settings';
 import { triggerWebhook } from '../../../server-only/webhooks/trigger/trigger-webhook';
+import type { TDocumentAuditLog } from '../../../types/document-audit-logs';
 import { DOCUMENT_AUDIT_LOG_TYPE } from '../../../types/document-audit-logs';
 import {
   ZWebhookDocumentSchema,
@@ -169,12 +170,38 @@ export const run = async ({
       });
     }
 
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const envelopeCompletedAuditLog = createDocumentAuditLogData({
+      type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
+      envelopeId: envelope.id,
+      requestMetadata,
+      user: null,
+      data: {
+        transactionId: nanoid(),
+        ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
+      },
+    });
+
+    const finalEnvelopeStatus = isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED;
+
     let certificateDoc: PDF | null = null;
     let auditLogDoc: PDF | null = null;
 
     if (settings.includeSigningCertificate || settings.includeAuditLog) {
+      const additionalAuditLogs = [
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        {
+          ...envelopeCompletedAuditLog,
+          id: '',
+          createdAt: new Date(),
+        } as TDocumentAuditLog,
+      ];
+
       const certificatePayload = {
-        envelope,
+        envelope: {
+          ...envelope,
+          status: finalEnvelopeStatus,
+        },
         recipients: envelope.recipients, // Need to use the recipients from envelope which contains ALL recipients.
         fields,
         language: envelope.documentMeta.language,
@@ -185,6 +212,7 @@ export const run = async ({
         envelopeItems: envelopeItems.map((item) => item.title),
         pageWidth: PDF_SIZE_A4_72PPI.width,
         pageHeight: PDF_SIZE_A4_72PPI.height,
+        additionalAuditLogs,
       };
 
       // Use Playwright-based PDF generation if enabled, otherwise use Konva-based generation.
@@ -263,22 +291,13 @@ export const run = async ({
           id: envelope.id,
         },
         data: {
-          status: isRejected ? DocumentStatus.REJECTED : DocumentStatus.COMPLETED,
+          status: finalEnvelopeStatus,
           completedAt: new Date(),
         },
       });
 
       await tx.documentAuditLog.create({
-        data: createDocumentAuditLogData({
-          type: DOCUMENT_AUDIT_LOG_TYPE.DOCUMENT_COMPLETED,
-          envelopeId: envelope.id,
-          requestMetadata,
-          user: null,
-          data: {
-            transactionId: nanoid(),
-            ...(isRejected ? { isRejected: true, rejectionReason: rejectionReason } : {}),
-          },
-        }),
+        data: envelopeCompletedAuditLog,
       });
     });
 
