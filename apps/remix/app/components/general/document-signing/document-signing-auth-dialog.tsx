@@ -21,6 +21,7 @@ import {
 
 import { DocumentSigningAuth2FA } from './document-signing-auth-2fa';
 import { DocumentSigningAuthAccount } from './document-signing-auth-account';
+import { DocumentSigningAuthExternal2FA } from './document-signing-auth-external-2fa';
 import { DocumentSigningAuthPasskey } from './document-signing-auth-passkey';
 import { DocumentSigningAuthPassword } from './document-signing-auth-password';
 import { useRequiredDocumentSigningAuthContext } from './document-signing-auth-provider';
@@ -69,15 +70,8 @@ export const DocumentSigningAuthDialog = ({
       return;
     }
 
-    // Reset selected auth type when dialog closes
     if (!value) {
-      setSelectedAuthType(() => {
-        if (validAuthTypes.length === 1) {
-          return validAuthTypes[0];
-        }
-
-        return null;
-      });
+      setSelectedAuthType(validAuthTypes.length === 1 ? validAuthTypes[0] : null);
     }
 
     onOpenChange(value);
@@ -123,7 +117,7 @@ export const DocumentSigningAuthDialog = ({
         {/* Show chooser if no auth type is selected and there are multiple options */}
         {!selectedAuthType && validAuthTypes.length > 1 && (
           <div className="space-y-4">
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm text-muted-foreground">
               <Trans>Choose your preferred authentication method:</Trans>
             </p>
             <div className="grid gap-2">
@@ -141,11 +135,14 @@ export const DocumentSigningAuthDialog = ({
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Account</Trans>)
                         .with(DocumentAuth.PASSKEY, () => <Trans>Passkey</Trans>)
                         .with(DocumentAuth.TWO_FACTOR_AUTH, () => <Trans>2FA</Trans>)
+                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => (
+                          <Trans>Verification code</Trans>
+                        ))
                         .with(DocumentAuth.PASSWORD, () => <Trans>Password</Trans>)
                         .exhaustive()}
                     </div>
 
-                    <div className="text-muted-foreground text-sm">
+                    <div className="text-sm text-muted-foreground">
                       {match(authType)
                         .with(DocumentAuth.ACCOUNT, () => <Trans>Sign in to your account</Trans>)
                         .with(DocumentAuth.PASSKEY, () => (
@@ -153,6 +150,9 @@ export const DocumentSigningAuthDialog = ({
                         ))
                         .with(DocumentAuth.TWO_FACTOR_AUTH, () => (
                           <Trans>Enter your 2FA code</Trans>
+                        ))
+                        .with(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH, () => (
+                          <Trans>Enter the verification code provided to you</Trans>
                         ))
                         .with(DocumentAuth.PASSWORD, () => <Trans>Enter your password</Trans>)
                         .exhaustive()}
@@ -192,6 +192,13 @@ export const DocumentSigningAuthDialog = ({
             ))
             .with({ documentAuthType: DocumentAuth.PASSWORD }, () => (
               <DocumentSigningAuthPassword
+                open={open}
+                onOpenChange={onOpenChange}
+                onReauthFormSubmit={onReauthFormSubmit}
+              />
+            ))
+            .with({ documentAuthType: DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH }, () => (
+              <DocumentSigningAuthExternal2FA
                 open={open}
                 onOpenChange={onOpenChange}
                 onReauthFormSubmit={onReauthFormSubmit}

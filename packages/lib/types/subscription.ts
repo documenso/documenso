@@ -32,6 +32,8 @@ export const ZClaimFlagsSchema = z.object({
   authenticationPortal: z.boolean().optional(),
 
   allowLegacyEnvelopes: z.boolean().optional(),
+
+  externalSigning2fa: z.boolean().optional(),
 });
 
 export type TClaimFlags = z.infer<typeof ZClaimFlagsSchema>;
@@ -93,6 +95,11 @@ export const SUBSCRIPTION_CLAIM_FEATURE_FLAGS: Record<
   allowLegacyEnvelopes: {
     key: 'allowLegacyEnvelopes',
     label: 'Allow Legacy Envelopes',
+  },
+  externalSigning2fa: {
+    key: 'externalSigning2fa',
+    label: 'External signing 2FA',
+    isEnterprise: true,
   },
 };
 

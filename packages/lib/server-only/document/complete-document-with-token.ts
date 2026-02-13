@@ -155,11 +155,27 @@ export const completeDocumentWithToken = async ({
     });
   }
 
-  // Check ACCESS AUTH 2FA validation during document completion
-  const { derivedRecipientAccessAuth } = extractDocumentAuthMethods({
+  const { derivedRecipientAccessAuth, derivedRecipientActionAuth } = extractDocumentAuthMethods({
     documentAuth: envelope.authOptions,
     recipientAuth: recipient.authOptions,
   });
+
+  if (derivedRecipientActionAuth.includes(DocumentAuth.EXTERNAL_TWO_FACTOR_AUTH)) {
+    const validProof = await prisma.signingSessionTwoFactorProof.findFirst({
+      where: {
+        sessionId: token,
+        envelopeId: envelope.id,
+        expiresAt: { gt: new Date() },
+      },
+    });
+
+    if (!validProof) {
+      throw new AppError(AppErrorCode.UNAUTHORIZED, {
+        message: 'External 2FA verification required before completing document',
+        statusCode: 403,
+      });
+    }
+  }
 
   if (derivedRecipientAccessAuth.includes(DocumentAuth.TWO_FACTOR_AUTH)) {
     if (!accessAuthOptions) {

@@ -582,6 +582,48 @@ export const formatDocumentAuditLogAction = (
         user: message,
       };
     })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_ISSUED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA token issued for recipient ${data.recipientEmail}`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_ISSUE_DENIED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA token issuance denied for recipient ${data.recipientEmail}: ${data.reasonCode}`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_VERIFY_SUCCEEDED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA verification succeeded for recipient ${data.recipientEmail}`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_VERIFY_FAILED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA verification failed for recipient ${data.recipientEmail}: ${data.reasonCode} (attempt ${data.attemptsUsed}/${data.attemptLimit})`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_CONSUMED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA token consumed for recipient ${data.recipientEmail}`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
+    .with({ type: DOCUMENT_AUDIT_LOG_TYPE.EXTERNAL_2FA_TOKEN_REVOKED }, ({ data }) => {
+      const message = msg({
+        message: `External 2FA token revoked for recipient ${data.recipientEmail}`,
+        context: `Audit log format`,
+      });
+      return { anonymous: message, you: message, user: message };
+    })
     .exhaustive();
 
   let selectedDescription = description.anonymous;

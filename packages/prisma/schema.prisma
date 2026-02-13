@@ -430,6 +430,9 @@ model Envelope {
 
   envelopeAttachments EnvelopeAttachment[]
 
+  signingTwoFactorTokens       SigningTwoFactorToken[]
+  signingSessionTwoFactorProofs SigningSessionTwoFactorProof[]
+
   @@index([type])
   @@index([status])
   @@index([userId])
@@ -587,6 +590,9 @@ model Recipient {
   envelope          Envelope      @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
   fields            Field[]
   signatures        Signature[]
+
+  signingTwoFactorTokens       SigningTwoFactorToken[]
+  signingSessionTwoFactorProofs SigningSessionTwoFactorProof[]
 
   @@index([token])
   @@index([email])
@@ -1075,4 +1081,56 @@ model OrganisationAuthenticationPortal {
 model Counter {
   id    String @id
   value Int
+}
+
+enum SigningTwoFactorTokenStatus {
+  ACTIVE
+  CONSUMED
+  REVOKED
+  EXPIRED
+}
+
+model SigningTwoFactorToken {
+  id String @id @default(cuid())
+
+  recipientId Int
+  envelopeId  String
+
+  tokenHash String
+  tokenSalt String
+
+  status       SigningTwoFactorTokenStatus @default(ACTIVE)
+  expiresAt    DateTime
+  consumedAt   DateTime?
+  revokedAt    DateTime?
+  attempts     Int                         @default(0)
+  attemptLimit Int                         @default(5)
+
+  issuedByApiTokenId Int?
+
+  createdAt DateTime @default(now())
+
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  envelope  Envelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, envelopeId, status])
+  @@index([envelopeId])
+}
+
+model SigningSessionTwoFactorProof {
+  id String @id @default(cuid())
+
+  sessionId   String
+  recipientId Int
+  envelopeId  String
+
+  verifiedAt DateTime @default(now())
+  expiresAt  DateTime
+
+  recipient Recipient @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+  envelope  Envelope  @relation(fields: [envelopeId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, recipientId, envelopeId])
+  @@index([recipientId, envelopeId])
+  @@index([expiresAt])
 }

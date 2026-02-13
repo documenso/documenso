@@ -11,6 +11,7 @@ export type ValidateFieldAuthOptions = {
   field: Field;
   userId?: number;
   authOptions?: TRecipientActionAuth;
+  recipientToken?: string;
 };
 
 /**
@@ -24,6 +25,7 @@ export const validateFieldAuth = async ({
   field,
   userId,
   authOptions,
+  recipientToken,
 }: ValidateFieldAuthOptions) => {
   // Override all non-signature fields to not require any auth.
   if (field.type !== FieldType.SIGNATURE) {
@@ -36,6 +38,7 @@ export const validateFieldAuth = async ({
     recipient,
     userId,
     authOptions,
+    recipientToken,
   });
 
   if (!isValid) {
