@@ -616,6 +616,13 @@ export const createEnvelope = async ({
         userId,
         teamId,
       });
+    } else if (type === EnvelopeType.TEMPLATE) {
+      await triggerWebhook({
+        event: WebhookTriggerEvents.TEMPLATE_CREATED,
+        data: ZWebhookDocumentSchema.parse(mapEnvelopeToWebhookDocumentPayload(createdEnvelope)),
+        userId,
+        teamId,
+      });
     }
 
     return createdEnvelope;

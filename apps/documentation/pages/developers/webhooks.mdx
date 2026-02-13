@@ -22,6 +22,15 @@ Documenso supports Webhooks and allows you to subscribe to the following events:
 - `document.completed`
 - `document.rejected`
 - `document.cancelled`
+- `document.viewed`
+- `document.recipient.completed`
+- `document.downloaded`
+- `document.reminder.sent`
+- `template.created`
+- `template.updated`
+- `template.deleted`
+- `template.used`
+- `recipient.authentication.failed`
 
 ## Create a webhook subscription
 
@@ -38,7 +47,7 @@ Clicking on the "**Create Webhook**" button opens a modal to create a new webhoo
 To create a new webhook subscription, you need to provide the following information:
 
 - Enter the webhook URL that will receive the event payload.
-- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`, `document.cancelled`.
+- Select the event(s) you want to subscribe to: `document.created`, `document.sent`, `document.opened`, `document.signed`, `document.completed`, `document.rejected`, `document.cancelled`, `document.viewed`, `document.recipient.completed`, `document.downloaded`, `document.reminder.sent`, `template.created`, `template.updated`, `template.deleted`, `template.used`, `recipient.authentication.failed`.
 - Optionally, you can provide a secret key that will be used to sign the payload. This key will be included in the `X-Documenso-Secret` header of the request.
 
 ![A screenshot of the Create Webhook modal that shows the URL input field and the event checkboxes](/webhook-images/create-webhook-dialog.webp)
@@ -630,6 +639,591 @@ Example payload for the `document.cancelled` event:
     ]
   },
   "createdAt": "2025-01-27T11:03:27.730Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.viewed` event:
+
+```json
+{
+  "event": "DOCUMENT_VIEWED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "John Doe",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:50:26.174Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.recipient.completed` event:
+
+```json
+{
+  "event": "DOCUMENT_RECIPIENT_COMPLETED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:51:10.055Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 50,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer1@documenso.com",
+        "name": "Signer 1",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:51:10.055Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      },
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer2@documenso.com",
+        "name": "Signer 2",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 2,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:51:10.577Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.downloaded` event:
+
+```json
+{
+  "event": "DOCUMENT_DOWNLOADED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "COMPLETED",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:52:05.708Z",
+    "completedAt": "2024-04-22T11:52:05.707Z",
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 51,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "Signer",
+        "token": "HkrptwS42ZBXdRKj1TyUo",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": "2024-04-22T11:52:05.688Z",
+        "authOptions": {
+          "accessAuth": null,
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:53:18.577Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `document.reminder.sent` event:
+
+```json
+{
+  "event": "DOCUMENT_REMINDER_SENT",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "Signer",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T12:00:00.000Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `template.created` event:
+
+```json
+{
+  "event": "TEMPLATE_CREATED",
+  "payload": {
+    "id": 5,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "employment_contract.pdf",
+    "status": "DRAFT",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:44:43.341Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": 2,
+    "templateId": 5,
+    "source": "TEMPLATE",
+    "documentMeta": {
+      "id": "doc_meta_456",
+      "subject": "Employment Contract",
+      "message": "Please review and sign your employment contract.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 25,
+        "documentId": null,
+        "templateId": 5,
+        "email": "employee@company.com",
+        "name": "Employee",
+        "token": "TemplateToken123",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:44:44.779Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `template.updated` event:
+
+```json
+{
+  "event": "TEMPLATE_UPDATED",
+  "payload": {
+    "id": 5,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "employment_contract_v2.pdf",
+    "status": "DRAFT",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T12:30:00.000Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": 2,
+    "templateId": 5,
+    "source": "TEMPLATE",
+    "documentMeta": {
+      "id": "doc_meta_456",
+      "subject": "Employment Contract - Updated",
+      "message": "Please review and sign your employment contract.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 25,
+        "documentId": null,
+        "templateId": 5,
+        "email": "employee@company.com",
+        "name": "Employee",
+        "token": "TemplateToken123",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T12:30:01.000Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `template.deleted` event:
+
+```json
+{
+  "event": "TEMPLATE_DELETED",
+  "payload": {
+    "id": 5,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "employment_contract.pdf",
+    "status": "DRAFT",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:44:43.341Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": 2,
+    "templateId": 5,
+    "source": "TEMPLATE",
+    "documentMeta": {
+      "id": "doc_meta_456",
+      "subject": "Employment Contract",
+      "message": "Please review and sign your employment contract.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 25,
+        "documentId": null,
+        "templateId": 5,
+        "email": "employee@company.com",
+        "name": "Employee",
+        "token": "TemplateToken123",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T13:00:00.000Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `template.used` event:
+
+```json
+{
+  "event": "TEMPLATE_USED",
+  "payload": {
+    "id": 15,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "employment_contract.pdf",
+    "status": "DRAFT",
+    "documentDataId": "new_doc_data_123",
+    "createdAt": "2024-04-22T14:00:00.000Z",
+    "updatedAt": "2024-04-22T14:00:00.000Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": 2,
+    "templateId": 5,
+    "source": "TEMPLATE",
+    "documentMeta": {
+      "id": "doc_meta_789",
+      "subject": "Employment Contract",
+      "message": "Please review and sign your employment contract.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 60,
+        "documentId": 15,
+        "templateId": 5,
+        "email": "newemployee@company.com",
+        "name": "New Employee",
+        "token": "DocToken456",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": null,
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "NOT_SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T14:00:01.000Z",
+  "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
+}
+```
+
+Example payload for the `recipient.authentication.failed` event:
+
+```json
+{
+  "event": "RECIPIENT_AUTHENTICATION_FAILED",
+  "payload": {
+    "id": 10,
+    "externalId": null,
+    "userId": 1,
+    "authOptions": null,
+    "formValues": null,
+    "visibility": "EVERYONE",
+    "title": "documenso.pdf",
+    "status": "PENDING",
+    "documentDataId": "hs8qz1ktr9204jn7mg6c5dxy0",
+    "createdAt": "2024-04-22T11:44:43.341Z",
+    "updatedAt": "2024-04-22T11:48:07.569Z",
+    "completedAt": null,
+    "deletedAt": null,
+    "teamId": null,
+    "templateId": null,
+    "source": "DOCUMENT",
+    "documentMeta": {
+      "id": "doc_meta_123",
+      "subject": "Please sign this document",
+      "message": "Hello, please review and sign this document.",
+      "timezone": "UTC",
+      "password": null,
+      "dateFormat": "MM/DD/YYYY",
+      "redirectUrl": null,
+      "signingOrder": "PARALLEL",
+      "typedSignatureEnabled": true,
+      "language": "en",
+      "distributionMethod": "EMAIL",
+      "emailSettings": null
+    },
+    "Recipient": [
+      {
+        "id": 52,
+        "documentId": 10,
+        "templateId": null,
+        "email": "signer@documenso.com",
+        "name": "Signer",
+        "token": "vbT8hi3jKQmrFP_LN1WcS",
+        "documentDeletedAt": null,
+        "expired": null,
+        "signedAt": null,
+        "authOptions": {
+          "accessAuth": "TWO_FACTOR_AUTH",
+          "actionAuth": null
+        },
+        "signingOrder": 1,
+        "rejectionReason": null,
+        "role": "SIGNER",
+        "readStatus": "NOT_OPENED",
+        "signingStatus": "NOT_SIGNED",
+        "sendStatus": "SENT"
+      }
+    ]
+  },
+  "createdAt": "2024-04-22T11:49:00.000Z",
   "webhookEndpoint": "https://mywebhooksite.com/mywebhook"
 }
 ```
