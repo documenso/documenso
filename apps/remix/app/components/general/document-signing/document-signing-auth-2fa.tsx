@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Trans } from '@lingui/react/macro';
 import { RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -93,46 +94,45 @@ export const DocumentSigningAuth2FA = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const renderAuthMessage = () => {
-    switch (recipient.role) {
-      case RecipientRole.SIGNER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup 2FA to sign this field.</Trans>;
-        }
-        return <Trans>You need to setup 2FA to sign this document.</Trans>;
-
-      case RecipientRole.APPROVER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup 2FA to approve this field.</Trans>;
-        }
-        return <Trans>You need to setup 2FA to approve this document.</Trans>;
-
-      case RecipientRole.VIEWER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup 2FA to view this field.</Trans>;
-        }
-        return <Trans>You need to setup 2FA to mark this document as viewed.</Trans>;
-
-      case RecipientRole.CC:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup 2FA to view this field.</Trans>;
-        }
-        return <Trans>You need to setup 2FA to view this document.</Trans>;
-
-      case RecipientRole.ASSISTANT:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup 2FA to assist with this field.</Trans>;
-        }
-        return <Trans>You need to setup 2FA to assist with this document.</Trans>;
-    }
-  };
-
   if (!user?.twoFactorEnabled && !is2FASetupSuccessful) {
     return (
       <div className="space-y-4">
         <Alert variant="warning">
           <AlertDescription>
-            <p>{renderAuthMessage()}</p>
+            <p>
+              {match({ role: recipient.role, actionTarget })
+                .with({ role: RecipientRole.SIGNER, actionTarget: 'FIELD' }, () => (
+                  <Trans>You need to setup 2FA to sign this field.</Trans>
+                ))
+                .with({ role: RecipientRole.SIGNER, actionTarget: 'DOCUMENT' }, () => (
+                  <Trans>You need to setup 2FA to sign this document.</Trans>
+                ))
+                .with({ role: RecipientRole.APPROVER, actionTarget: 'FIELD' }, () => (
+                  <Trans>You need to setup 2FA to approve this field.</Trans>
+                ))
+                .with({ role: RecipientRole.APPROVER, actionTarget: 'DOCUMENT' }, () => (
+                  <Trans>You need to setup 2FA to approve this document.</Trans>
+                ))
+                .with({ role: RecipientRole.VIEWER, actionTarget: 'FIELD' }, () => (
+                  <Trans>You need to setup 2FA to view this field.</Trans>
+                ))
+                .with({ role: RecipientRole.VIEWER, actionTarget: 'DOCUMENT' }, () => (
+                  <Trans>You need to setup 2FA to mark this document as viewed.</Trans>
+                ))
+                .with({ role: RecipientRole.CC, actionTarget: 'FIELD' }, () => (
+                  <Trans>You need to setup 2FA to view this field.</Trans>
+                ))
+                .with({ role: RecipientRole.CC, actionTarget: 'DOCUMENT' }, () => (
+                  <Trans>You need to setup 2FA to view this document.</Trans>
+                ))
+                .with({ role: RecipientRole.ASSISTANT, actionTarget: 'FIELD' }, () => (
+                  <Trans>You need to setup 2FA to assist with this field.</Trans>
+                ))
+                .with({ role: RecipientRole.ASSISTANT, actionTarget: 'DOCUMENT' }, () => (
+                  <Trans>You need to setup 2FA to assist with this document.</Trans>
+                ))
+                .exhaustive()}
+            </p>
             <p className="mt-2">
               <Trans>
                 By enabling 2FA, you will be required to enter a code from your authenticator app

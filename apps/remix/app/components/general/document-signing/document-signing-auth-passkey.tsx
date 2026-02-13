@@ -8,6 +8,7 @@ import { RecipientRole } from '@prisma/client';
 import { browserSupportsWebAuthn, startAuthentication } from '@simplewebauthn/browser';
 import { Loader } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { match } from 'ts-pattern';
 import { z } from 'zod';
 
 import { AppError } from '@documenso/lib/errors/app-error';
@@ -121,121 +122,68 @@ export const DocumentSigningAuthPasskey = ({
     setFormErrorCode(null);
   }, [open, form, preferredPasskeyId]);
 
-  const renderBrowserErrorMessage = () => {
-    switch (recipient.role) {
-      case RecipientRole.SIGNER:
-        if (actionTarget === 'FIELD') {
-          return (
-            <Trans>
-              Your browser does not support passkeys, which is required to sign this field.
-            </Trans>
-          );
-        }
-        return (
-          <Trans>
-            Your browser does not support passkeys, which is required to sign this document.
-          </Trans>
-        );
-
-      case RecipientRole.APPROVER:
-        if (actionTarget === 'FIELD') {
-          return (
-            <Trans>
-              Your browser does not support passkeys, which is required to approve this field.
-            </Trans>
-          );
-        }
-        return (
-          <Trans>
-            Your browser does not support passkeys, which is required to approve this document.
-          </Trans>
-        );
-
-      case RecipientRole.VIEWER:
-        if (actionTarget === 'FIELD') {
-          return (
-            <Trans>
-              Your browser does not support passkeys, which is required to view this field.
-            </Trans>
-          );
-        }
-        return (
-          <Trans>
-            Your browser does not support passkeys, which is required to mark this document as
-            viewed.
-          </Trans>
-        );
-
-      case RecipientRole.CC:
-        if (actionTarget === 'FIELD') {
-          return (
-            <Trans>
-              Your browser does not support passkeys, which is required to view this field.
-            </Trans>
-          );
-        }
-        return (
-          <Trans>
-            Your browser does not support passkeys, which is required to view this document.
-          </Trans>
-        );
-
-      case RecipientRole.ASSISTANT:
-        if (actionTarget === 'FIELD') {
-          return (
-            <Trans>
-              Your browser does not support passkeys, which is required to assist with this field.
-            </Trans>
-          );
-        }
-        return (
-          <Trans>
-            Your browser does not support passkeys, which is required to assist with this document.
-          </Trans>
-        );
-    }
-  };
-
-  const renderSetupMessage = () => {
-    switch (recipient.role) {
-      case RecipientRole.SIGNER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup a passkey to sign this field.</Trans>;
-        }
-        return <Trans>You need to setup a passkey to sign this document.</Trans>;
-
-      case RecipientRole.APPROVER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup a passkey to approve this field.</Trans>;
-        }
-        return <Trans>You need to setup a passkey to approve this document.</Trans>;
-
-      case RecipientRole.VIEWER:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup a passkey to view this field.</Trans>;
-        }
-        // Logic preserved: "mark as viewed"
-        return <Trans>You need to setup a passkey to mark this document as viewed.</Trans>;
-
-      case RecipientRole.CC:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup a passkey to view this field.</Trans>;
-        }
-        return <Trans>You need to setup a passkey to view this document.</Trans>;
-
-      case RecipientRole.ASSISTANT:
-        if (actionTarget === 'FIELD') {
-          return <Trans>You need to setup a passkey to assist with this field.</Trans>;
-        }
-        return <Trans>You need to setup a passkey to assist with this document.</Trans>;
-    }
-  };
-
   if (!browserSupportsWebAuthn()) {
     return (
       <div className="space-y-4">
         <Alert variant="warning">
-          <AlertDescription>{renderBrowserErrorMessage()}</AlertDescription>
+          <AlertDescription>
+            {match({ role: recipient.role, actionTarget })
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'FIELD' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to sign this field.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to sign this document.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'FIELD' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to approve this field.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to approve this
+                  document.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'FIELD' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to view this field.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to mark this document as
+                  viewed.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'FIELD' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to view this field.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to view this document.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'FIELD' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to assist with this
+                  field.
+                </Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>
+                  Your browser does not support passkeys, which is required to assist with this
+                  document.
+                </Trans>
+              ))
+              .exhaustive()}
+          </AlertDescription>
         </Alert>
 
         <DialogFooter>
@@ -281,7 +229,40 @@ export const DocumentSigningAuthPasskey = ({
     return (
       <div className="space-y-4">
         <Alert variant="warning">
-          <AlertDescription>{renderSetupMessage()}</AlertDescription>
+          <AlertDescription>
+            {match({ role: recipient.role, actionTarget })
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to sign this field.</Trans>
+              ))
+              .with({ role: RecipientRole.SIGNER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to sign this document.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to approve this field.</Trans>
+              ))
+              .with({ role: RecipientRole.APPROVER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to approve this document.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.VIEWER, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to mark this document as viewed.</Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to view this field.</Trans>
+              ))
+              .with({ role: RecipientRole.CC, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to view this document.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'FIELD' }, () => (
+                <Trans>You need to setup a passkey to assist with this field.</Trans>
+              ))
+              .with({ role: RecipientRole.ASSISTANT, actionTarget: 'DOCUMENT' }, () => (
+                <Trans>You need to setup a passkey to assist with this document.</Trans>
+              ))
+              .exhaustive()}
+          </AlertDescription>
         </Alert>
 
         <DialogFooter>
