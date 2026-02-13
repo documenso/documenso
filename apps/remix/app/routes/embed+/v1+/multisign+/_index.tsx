@@ -1,5 +1,6 @@
 import { useEffect, useLayoutEffect, useState } from 'react';
 
+import { Trans } from '@lingui/react/macro';
 import { SigningStatus } from '@prisma/client';
 import { useRevalidator } from 'react-router';
 
@@ -283,7 +284,9 @@ export default function MultisignPage() {
 
         {!hidePoweredBy && (
           <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-            <span>Powered by</span>
+            <span>
+              <Trans>Powered by</Trans>
+            </span>
             <BrandingLogo className="ml-2 inline-block h-[14px]" />
           </div>
         )}
@@ -298,7 +301,9 @@ export default function MultisignPage() {
 
       {!hidePoweredBy && (
         <div className="bg-primary text-primary-foreground fixed bottom-0 left-0 z-40 rounded-tr px-2 py-1 text-xs font-medium opacity-60 hover:opacity-100">
-          <span>Powered by</span>
+          <span>
+            <Trans>Powered by</Trans>
+          </span>
           <BrandingLogo className="ml-2 inline-block h-[14px]" />
         </div>
       )}

@@ -208,7 +208,9 @@ export default function OrganisationGroupSettingsPage({
                 {SUBSCRIPTION_STATUS_MAP[organisation.subscription.status]} subscription found
               </span>
             ) : (
-              <span>No subscription found</span>
+              <span>
+                <Trans>No subscription found</Trans>
+              </span>
             )}
           </AlertDescription>
         </div>
