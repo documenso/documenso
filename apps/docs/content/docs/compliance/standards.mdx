@@ -1,0 +1,108 @@
+---
+title: Standards & Regulations
+description: Key technical standards that ensure digital signatures are secure, interoperable, and valid long-term.
+---
+
+## PDF/A for Archival
+
+PDF/A is an ISO-standardized version of PDF designed for long-term archival of electronic documents. Unlike standard PDFs, PDF/A files are self-contained and do not rely on external resources.
+
+Key characteristics:
+
+- All fonts must be embedded
+- No external content references allowed
+- No encryption that would prevent future access
+- Metadata must be embedded in XMP format
+- Color spaces must be device-independent or include ICC profiles
+
+PDF/A has several conformance levels (PDF/A-1, PDF/A-2, PDF/A-3) with increasing capabilities. PDF/A-3, for example, allows embedding of arbitrary file formats as attachments.
+
+For signed documents intended for long-term storage, PDF/A ensures the document remains readable and verifiable years or decades after signing.
+
+## PAdES (PDF Advanced Electronic Signatures)
+
+PAdES is a set of standards (ETSI EN 319 142) that defines profiles for electronic signatures in PDF documents. It builds on the PDF signature capabilities defined in ISO 32000 and adds requirements for long-term validity.
+
+PAdES defines several signature profiles:
+
+| Profile   | Description                                          |
+| --------- | ---------------------------------------------------- |
+| PAdES-B   | Basic signature with signing certificate             |
+| PAdES-T   | Adds a trusted timestamp                             |
+| PAdES-LT  | Adds validation data (certificates, revocation info) |
+| PAdES-LTA | Adds long-term archival timestamps                   |
+
+Each level builds upon the previous, with PAdES-LTA providing the strongest guarantees for long-term signature validity. The inclusion of validation data and archival timestamps allows signatures to be verified even after certificates expire or CAs cease operations.
+
+## ISO 32000 (PDF Standard)
+
+ISO 32000 is the international standard that defines the PDF format. It specifies the technical foundation for digital signatures in PDF documents.
+
+Relevant signature capabilities defined in ISO 32000:
+
+- Signature field dictionaries and appearance streams
+- Cryptographic signature handlers
+- Certificate and timestamp embedding
+- Incremental updates for signature preservation
+- Document modification detection
+
+ISO 32000-2 (PDF 2.0) introduced additional features including support for more signature algorithms and improved encryption options.
+
+## X.509 Certificates
+
+X.509 is the standard format for public key certificates used in digital signatures. These certificates bind a public key to an identity and are issued by Certificate Authorities (CAs).
+
+A typical X.509 certificate contains:
+
+- Subject (identity information)
+- Issuer (the CA that issued the certificate)
+- Public key
+- Validity period (not before / not after dates)
+- Serial number
+- Signature algorithm
+- Extensions (key usage, policies, etc.)
+
+For document signing, certificates typically include the "digital signature" key usage extension. Qualified certificates under eIDAS regulations have additional requirements and provide higher levels of assurance.
+
+Certificate validation involves checking:
+
+1. The certificate chain up to a trusted root CA
+2. That no certificate in the chain has expired
+3. Revocation status via CRL or OCSP
+
+## RFC 3161 (Timestamping)
+
+RFC 3161 defines the Internet X.509 Public Key Infrastructure Time-Stamp Protocol (TSP). Timestamps prove that a document existed in a specific state at a particular point in time.
+
+A timestamp token contains:
+
+- Hash of the signed data
+- Time of issuance (from a trusted time source)
+- Identifier of the Time Stamping Authority (TSA)
+- TSA's digital signature
+
+Timestamps serve two purposes in document signing:
+
+1. **Proof of existence**: Demonstrates the document was signed before a certain time
+2. **Signature validity extension**: Allows signature verification after the signing certificate expires
+
+Without a trusted timestamp, a signature can only be verified while the signing certificate remains valid. With a timestamp, the signature remains verifiable as long as the timestamp can be validated.
+
+## What Documenso Implements
+
+Documenso implements digital signatures with the following characteristics:
+
+- **PDF signatures**: Documents are signed using the PDF signature capabilities defined in ISO 32000
+- **X.509 certificates**: Signatures use X.509 certificates for signer identification
+- **Timestamps**: RFC 3161 timestamps can be applied to signatures
+- **Signature visualization**: Signed documents include visual signature representations
+
+For specific implementation details and configuration options, refer to the [signing certificates](/signing-certificates/overview) documentation.
+
+Self-hosted deployments can configure their own signing certificates and timestamp authorities to meet specific compliance requirements.
+
+## Related
+
+- [Legal Validity](/compliance/legal-validity) - Legal frameworks for electronic signatures
+- [Signing Certificates Overview](/signing-certificates/overview) - Certificate configuration
+- [Audit Log](/features/audit-log) - Document activity tracking
