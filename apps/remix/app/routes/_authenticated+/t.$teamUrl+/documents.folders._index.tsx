@@ -1,14 +1,13 @@
 import { useState } from 'react';
 
 import { Trans, useLingui } from '@lingui/react/macro';
-import { HomeIcon, Loader2, SearchIcon } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { FolderIcon, HomeIcon, Loader2, SearchIcon } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router';
 
 import { FolderType } from '@documenso/lib/types/folder-type';
 import { formatDocumentsPath } from '@documenso/lib/utils/teams';
 import { trpc } from '@documenso/trpc/react';
 import { type TFolderWithSubfolders } from '@documenso/trpc/server/folder-router/schema';
-import { Button } from '@documenso/ui/primitives/button';
 import { Input } from '@documenso/ui/primitives/input';
 
 import { FolderCreateDialog } from '~/components/dialogs/folder-create-dialog';
@@ -26,8 +25,10 @@ export function meta() {
 export default function DocumentsFoldersPage() {
   const { t } = useLingui();
 
-  const navigate = useNavigate();
   const team = useCurrentTeam();
+  const [searchParams] = useSearchParams();
+
+  const parentId = searchParams.get('parentId');
 
   const [isMovingFolder, setIsMovingFolder] = useState(false);
   const [folderToMove, setFolderToMove] = useState<TFolderWithSubfolders | null>(null);
@@ -39,44 +40,51 @@ export default function DocumentsFoldersPage() {
 
   const { data: foldersData, isLoading: isFoldersLoading } = trpc.folder.getFolders.useQuery({
     type: FolderType.DOCUMENT,
-    parentId: null,
+    parentId: parentId,
   });
-
-  const navigateToFolder = (folderId?: string | null) => {
-    const documentsPath = formatDocumentsPath(team.url);
-
-    if (folderId) {
-      void navigate(`${documentsPath}/f/${folderId}`);
-    } else {
-      void navigate(documentsPath);
-    }
-  };
 
   const isFolderMatchingSearch = (folder: TFolderWithSubfolders) =>
     folder.name.toLowerCase().includes(searchTerm.toLowerCase());
 
+  const formatBreadCrumbPath = (folderId: string) => {
+    const documentsPath = formatDocumentsPath(team.url);
+
+    return `${documentsPath}/f/${folderId}`;
+  };
+
   return (
     <div className="mx-auto w-full max-w-screen-xl px-4 md:px-8">
       <div className="flex w-full items-center justify-between">
-        <div className="flex flex-1 items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="flex items-center space-x-2 pl-0 hover:bg-transparent"
-            onClick={() => navigateToFolder(null)}
+        <div className="flex flex-1 items-center text-sm font-medium text-muted-foreground">
+          <Link
+            to={formatDocumentsPath(team.url)}
+            className="flex items-center hover:text-muted-foreground/80"
           >
-            <HomeIcon className="h-4 w-4" />
-            <span>Home</span>
-          </Button>
+            <HomeIcon className="mr-2 h-4 w-4" />
+            <Trans>Home</Trans>
+          </Link>
+
+          {foldersData?.breadcrumbs.map((folder) => (
+            <div key={folder.id} className="flex items-center">
+              <span className="px-3">/</span>
+              <Link
+                to={formatBreadCrumbPath(folder.id)}
+                className="flex items-center hover:text-muted-foreground/80"
+              >
+                <FolderIcon className="mr-2 h-4 w-4" />
+                <span>{folder.name}</span>
+              </Link>
+            </div>
+          ))}
         </div>
 
         <div className="flex flex-col gap-y-4 sm:flex-row sm:justify-end sm:gap-x-4">
-          <FolderCreateDialog type={FolderType.DOCUMENT} />
+          <FolderCreateDialog type={FolderType.DOCUMENT} parentFolderId={parentId} />
         </div>
       </div>
 
       <div className="relative w-full max-w-md py-6">
-        <SearchIcon className="text-muted-foreground absolute left-2 top-9 h-4 w-4" />
+        <SearchIcon className="absolute left-2 top-9 h-4 w-4 text-muted-foreground" />
         <Input
           placeholder={t`Search folders...`}
           value={searchTerm}
@@ -91,7 +99,7 @@ export default function DocumentsFoldersPage() {
 
       {isFoldersLoading ? (
         <div className="mt-6 flex justify-center">
-          <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
         </div>
       ) : (
         <>
@@ -126,14 +134,14 @@ export default function DocumentsFoldersPage() {
 
           <div>
             {searchTerm && foldersData?.folders.filter(isFolderMatchingSearch).length === 0 && (
-              <div className="text-muted-foreground mt-6 text-center">
+              <div className="mt-6 text-center text-muted-foreground">
                 <Trans>No folders found matching "{searchTerm}"</Trans>
               </div>
             )}
 
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {foldersData?.folders
-                .filter((folder) => !folder.pinned)
+                .filter((folder) => !folder.pinned && isFolderMatchingSearch(folder))
                 .map((folder) => (
                   <FolderCard
                     key={folder.id}
