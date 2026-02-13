@@ -3,6 +3,7 @@ title: Kubernetes
 description: Deploy Documenso on Kubernetes for production environments requiring high availability, auto-scaling, and enterprise-grade infrastructure.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## Prerequisites
@@ -697,84 +698,26 @@ kubectl logs documenso-<pod-id> -n documenso --previous
 
 ## Troubleshooting
 
-### Pods not starting
-
-Check pod status and events:
-
-```bash
-kubectl get pods -n documenso
-kubectl describe pod <pod-name> -n documenso
-```
-
-Common causes:
-
-- **ImagePullBackOff**: Check image name and registry access
-- **CrashLoopBackOff**: Check logs for application errors
-- **Pending**: Check resource requests and node capacity
-
-### Database connection errors
-
-Verify the database is accessible from the cluster:
-
-```bash
-kubectl run postgres-test --rm -it --image=postgres:15-alpine -n documenso -- \
-  psql "postgresql://user:password@host:5432/database" -c "SELECT 1"
-```
-
-### Ingress not working
-
-Check Ingress status and events:
-
-```bash
-kubectl get ingress -n documenso
-kubectl describe ingress documenso -n documenso
-```
-
-Verify the Ingress controller is running:
-
-```bash
-kubectl get pods -n ingress-nginx
-# or
-kubectl get pods -n traefik
-```
-
-### Certificate errors
-
-Check the signing certificate secret:
-
-```bash
-kubectl get secret documenso-signing-cert -n documenso -o yaml
-```
-
-Verify the certificate is mounted correctly:
-
-```bash
-kubectl exec -it <pod-name> -n documenso -- ls -la /opt/documenso/
-```
-
-### Health check failures
-
-Test the health endpoint directly:
-
-```bash
-kubectl port-forward svc/documenso 3000:80 -n documenso
-curl http://localhost:3000/api/health
-```
-
-### Rolling back a deployment
-
-If a deployment fails, rollback to the previous version:
-
-```bash
-# View rollout history
-kubectl rollout history deployment/documenso -n documenso
-
-# Rollback to previous version
-kubectl rollout undo deployment/documenso -n documenso
-
-# Rollback to specific revision
-kubectl rollout undo deployment/documenso -n documenso --to-revision=2
-```
+<Accordions type="multiple">
+  <Accordion title="Pods not starting">
+    Check pod status: `kubectl get pods -n documenso` and `kubectl describe pod <pod-name> -n documenso`. Common causes: ImagePullBackOff (check image name and registry access), CrashLoopBackOff (check logs for application errors), Pending (check resource requests and node capacity).
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Verify the database is accessible from the cluster: `kubectl run postgres-test --rm -it --image=postgres:15-alpine -n documenso -- psql "postgresql://user:password@host:5432/database" -c "SELECT 1"`.
+  </Accordion>
+  <Accordion title="Ingress not working">
+    Check Ingress status: `kubectl get ingress -n documenso` and `kubectl describe ingress documenso -n documenso`. Verify the Ingress controller is running: `kubectl get pods -n ingress-nginx` or `kubectl get pods -n traefik`.
+  </Accordion>
+  <Accordion title="Certificate errors">
+    Check the signing certificate secret: `kubectl get secret documenso-signing-cert -n documenso -o yaml`. Verify the certificate is mounted correctly: `kubectl exec -it <pod-name> -n documenso -- ls -la /opt/documenso/`.
+  </Accordion>
+  <Accordion title="Health check failures">
+    Test the health endpoint: `kubectl port-forward svc/documenso 3000:80 -n documenso` then `curl http://localhost:3000/api/health`.
+  </Accordion>
+  <Accordion title="Rolling back a deployment">
+    If a deployment fails, rollback: `kubectl rollout history deployment/documenso -n documenso` to view history, `kubectl rollout undo deployment/documenso -n documenso` for previous version, or `--to-revision=2` for a specific revision.
+  </Accordion>
+</Accordions>
 
 ## Complete Example
 

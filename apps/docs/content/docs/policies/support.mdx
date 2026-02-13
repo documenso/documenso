@@ -4,6 +4,8 @@ description: Support channels and options available depending on your needs and 
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Support Channels
 
@@ -17,31 +19,34 @@ import { Callout } from 'fumadocs-ui/components/callout';
 
 Community support is available to all users, including those on free plans and self-hosted deployments.
 
-### Discord
+<Tabs items={['Discord', 'GitHub']}>
+  <Tab value="Discord">
+    Join the Documenso Discord server to:
 
-Join the Documenso Discord server to:
+    - Ask questions and get help from the community
+    - Share feedback and feature requests
+    - Connect with other Documenso users
+    - Stay updated on announcements
 
-- Ask questions and get help from the community
-- Share feedback and feature requests
-- Connect with other Documenso users
-- Stay updated on announcements
+    Discord is best for general questions and discussions. Response times vary based on community availability.
 
-Discord is best for general questions and discussions. Response times vary based on community availability.
+  </Tab>
+  <Tab value="GitHub">
+    Use GitHub for technical discussions and bug reports:
 
-### GitHub
+    - **[GitHub Discussions](https://github.com/documenso/documenso/discussions)**: Ask questions, share ideas, and discuss features
+    - **[GitHub Issues](https://github.com/documenso/documenso/issues)**: Report confirmed bugs with reproducible steps
 
-Use GitHub for technical discussions and bug reports:
+    When opening an issue, include:
 
-- **[GitHub Discussions](https://github.com/documenso/documenso/discussions)**: Ask questions, share ideas, and discuss features
-- **[GitHub Issues](https://github.com/documenso/documenso/issues)**: Report confirmed bugs with reproducible steps
+    1. Documenso version
+    2. Deployment method (Cloud, self-hosted Docker, Kubernetes, etc.)
+    3. Steps to reproduce the problem
+    4. Expected vs actual behavior
+    5. Relevant logs (with sensitive information redacted)
 
-When opening an issue, include:
-
-1. Documenso version
-2. Deployment method (Cloud, self-hosted Docker, Kubernetes, etc.)
-3. Steps to reproduce the problem
-4. Expected vs actual behavior
-5. Relevant logs (with sensitive information redacted)
+  </Tab>
+</Tabs>
 
 <Callout type="warn">
   Do not report security vulnerabilities through public GitHub issues. See the [Security
@@ -52,39 +57,42 @@ When opening an issue, include:
 
 Paid plans include access to direct support from the Documenso team.
 
-### Standard Support
+<Tabs items={['Standard Support', 'Platform and Above', 'Enterprise Support']}>
+  <Tab value="Standard Support">
+    Available on paid subscription plans:
 
-Available on paid subscription plans:
+    - Email support at support@documenso.com
+    - Account and billing assistance
+    - Technical guidance for Documenso Cloud usage
+    - Response during business hours
 
-- Email support at support@documenso.com
-- Account and billing assistance
-- Technical guidance for Documenso Cloud usage
-- Response during business hours
+  </Tab>
+  <Tab value="Platform and Above">
+    Available on Platform plans and above:
 
-### Platform and Above Support
+    - All standard support channels
+    - Private Discord channel for direct communication with the Documenso team
+    - Private Slack workspace for closer collaboration
 
-Available on Platform plans and above:
+  </Tab>
+  <Tab value="Enterprise Support">
+    Available with Enterprise subscriptions:
 
-- All standard support channels
-- Private Discord channel for direct communication with the Documenso team
-- Private Slack workspace for closer collaboration
+    - All Platform support channels
+    - Priority response times
+    - Dedicated support contact
+    - Assistance with deployment and integration
+    - Custom configuration guidance
+    - Scheduled calls for complex issues
+
+    Contact [sales](https://documen.so/enterprise) for Enterprise support options.
+
+  </Tab>
+</Tabs>
 
 <Callout type="info">
   If you prefer Discord or Slack, contact support to be invited to a private channel or workspace.
 </Callout>
-
-### Enterprise Support
-
-Available with Enterprise subscriptions:
-
-- All Platform support channels
-- Priority response times
-- Dedicated support contact
-- Assistance with deployment and integration
-- Custom configuration guidance
-- Scheduled calls for complex issues
-
-Contact [sales](https://documen.so/enterprise) for Enterprise support options.
 
 ## Self-Hosted Support
 
@@ -113,22 +121,18 @@ Response times are targets, not guarantees. Actual times may vary based on issue
 
 ## What's Included
 
-### Included in Support
-
-- Guidance on Documenso features and functionality
-- Help with configuration and settings
-- Troubleshooting application errors
-- Account and billing questions (paid plans)
-- Bug reports and issue investigation
-- Upgrade assistance
-
-### Not Included in Standard Support
-
-- Custom development or code modifications
-- Third-party integration development
-- Infrastructure setup (servers, databases, networking)
-- Training sessions (available separately)
-- Support for modified or forked versions
+<Tabs items={['Included', 'Not included']}>
+  <Tab value="Included">
+    - Guidance on Documenso features and functionality - Help with configuration and settings -
+    Troubleshooting application errors - Account and billing questions (paid plans) - Bug reports
+    and issue investigation - Upgrade assistance
+  </Tab>
+  <Tab value="Not included">
+    - Custom development or code modifications - Third-party integration development -
+    Infrastructure setup (servers, databases, networking) - Training sessions (available separately)
+    - Support for modified or forked versions
+  </Tab>
+</Tabs>
 
 <Callout type="info">
   Professional services for custom development, training, and dedicated implementation support are
@@ -139,10 +143,32 @@ Response times are targets, not guarantees. Actual times may vary based on issue
 
 If your issue is not resolved through initial support channels:
 
-1. **Community support**: If you don't receive a response on Discord or GitHub within a reasonable time, try the other channel or provide additional details
-2. **Email support**: Reply to your existing support thread with additional information. Avoid opening duplicate tickets
-3. **Request escalation**: For urgent issues on paid plans, request escalation in your support email
-4. **Enterprise customers**: Contact your dedicated support representative directly
+<Steps>
+  <Step>
+    ### Community support
+
+    If you don't receive a response on Discord or GitHub within a reasonable time, try the other channel or provide additional details.
+
+  </Step>
+  <Step>
+    ### Email support
+
+    Reply to your existing support thread with additional information. Avoid opening duplicate tickets.
+
+  </Step>
+  <Step>
+    ### Request escalation
+
+    For urgent issues on paid plans, request escalation in your support email.
+
+  </Step>
+  <Step>
+    ### Enterprise customers
+
+    Contact your dedicated support representative directly.
+
+  </Step>
+</Steps>
 
 For billing disputes or account issues, email support@documenso.com with your account details.
 
@@ -150,12 +176,32 @@ For billing disputes or account issues, email support@documenso.com with your ac
 
 Do not report security vulnerabilities through public channels (GitHub Issues, Discord, etc.).
 
-To report a security issue:
+<Steps>
+  <Step>
+    ### Email the security team
 
-1. Email security@documenso.com
-2. Include a detailed description of the vulnerability
-3. Provide steps to reproduce if possible
-4. Allow time for investigation before public disclosure
+    Email security@documenso.com.
+
+  </Step>
+  <Step>
+    ### Include details
+
+    Include a detailed description of the vulnerability.
+
+  </Step>
+  <Step>
+    ### Provide steps to reproduce
+
+    Provide steps to reproduce if possible.
+
+  </Step>
+  <Step>
+    ### Allow time for investigation
+
+    Allow time for investigation before public disclosure.
+
+  </Step>
+</Steps>
 
 Documenso follows responsible disclosure practices. Security researchers who report valid vulnerabilities responsibly will be acknowledged.
 

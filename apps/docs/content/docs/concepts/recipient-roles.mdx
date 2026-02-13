@@ -4,6 +4,7 @@ description: Signers, approvers, viewers, assistants, and CC recipients.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Role Overview
 
@@ -15,7 +16,10 @@ import { Callout } from 'fumadocs-ui/components/callout';
 | Assistant | Yes             | No       | Can pre-fill fields for other recipients |
 | CC        | No              | No       | Receives a copy after completion         |
 
-## Signer
+## Role Details
+
+<Tabs items={['Signer', 'Approver', 'Viewer', 'Assistant', 'CC']}>
+  <Tab value="Signer">
 
 Signers are the primary recipients of a document. They must complete all signature fields assigned to them before the document can be finalized.
 
@@ -36,7 +40,8 @@ Signers are the primary recipients of a document. They must complete all signatu
 - Agreements where the recipient must formally consent
 - Any document that requires a signature to be valid
 
-## Approver
+</Tab>
+  <Tab value="Approver">
 
 Approvers must review and approve the document, but signing is optional. The document cannot be completed until all approvers have given their approval.
 
@@ -58,7 +63,8 @@ Approvers must review and approve the document, but signing is optional. The doc
 - Workflows where review is required before final signatures
 - Compliance processes requiring sign-off from multiple parties
 
-## Viewer
+</Tab>
+  <Tab value="Viewer">
 
 Viewers must acknowledge that they have viewed the document. They cannot add signatures but must confirm they have reviewed the content.
 
@@ -80,7 +86,8 @@ Viewers must acknowledge that they have viewed the document. They cannot add sig
 - Policies or disclosures that recipients must review
 - Documents where you need proof of receipt without a signature
 
-## Assistant
+</Tab>
+  <Tab value="Assistant">
 
 Assistants can prepare the document by pre-filling fields on behalf of other signers. This role is only available when sequential signing is enabled.
 
@@ -107,7 +114,8 @@ Assistants can prepare the document by pre-filling fields on behalf of other sig
   recipients sign in parallel.
 </Callout>
 
-## CC (Carbon Copy)
+</Tab>
+  <Tab value="CC">
 
 CC recipients receive a copy of the completed document but do not need to take any action. They are notified when the document is fully signed.
 
@@ -128,15 +136,20 @@ CC recipients receive a copy of the completed document but do not need to take a
 - Sending copies to legal or compliance teams
 - Archiving completed documents with relevant parties
 
+</Tab>
+</Tabs>
+
 ## Signing Order
 
 You can control the sequence in which recipients receive and act on a document by enabling signing order.
 
-### Parallel Signing (Default)
+<Tabs items={['Parallel signing (default)', 'Sequential signing']}>
+  <Tab value="Parallel signing (default)">
 
 All recipients receive the document simultaneously and can act in any order. The document is completed when all required recipients have finished their actions.
 
-### Sequential Signing
+</Tab>
+  <Tab value="Sequential signing">
 
 Recipients receive the document one at a time, in the order you specify. Each recipient must complete their action before the next recipient is notified.
 
@@ -148,6 +161,9 @@ To enable sequential signing:
 4. The document proceeds to the next order number only when all recipients at the current level have completed their actions
 
 <Callout type="info">Sequential signing is required if you want to use the Assistant role.</Callout>
+
+</Tab>
+</Tabs>
 
 ## Related
 

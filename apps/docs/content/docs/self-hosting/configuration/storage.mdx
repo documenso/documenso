@@ -3,6 +3,7 @@ title: Storage Configuration
 description: Configure file storage for uploaded documents and signed PDFs using database storage (default) or S3-compatible object storage.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## Storage Options
@@ -404,88 +405,30 @@ Ensure your infrastructure supports the configured limit:
 
 ## Troubleshooting
 
-### Access Denied when uploading
-
-```
-Error: Access Denied
-```
-
-**Causes:**
-
-- Incorrect IAM credentials
-- Bucket policy doesn't allow the required operations
-- CORS not configured for presigned URL uploads
-
-**Solutions:**
-
-1. Verify IAM user has `s3:PutObject` permission
-2. Check bucket policy allows writes
-3. Configure CORS to allow your domain
-
-### Invalid endpoint
-
-```
-Error: getaddrinfo ENOTFOUND your-bucket.s3.amazonaws.com
-```
-
-**Causes:**
-
-- Incorrect region configuration
-- Bucket doesn't exist
-- Network connectivity issues
-
-**Solutions:**
-
-1. Verify the bucket exists in the specified region
-2. Check the endpoint URL is correct
-3. Verify network access to S3
-
-### SignatureDoesNotMatch
-
-```
-Error: The request signature we calculated does not match the signature you provided
-```
-
-**Causes:**
-
-- Incorrect secret access key
-- Clock skew between server and S3
-
-**Solutions:**
-
-1. Verify credentials are correct and not expired
-2. Ensure server time is synchronized (use NTP)
-
-### Path-style access required
-
-```
-Error: The bucket you are attempting to access must be addressed using the specified endpoint
-```
-
-**Solution:**
-
-Set path-style access for S3-compatible services:
-
-```bash
-NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true
-```
-
-### CloudFront signed URL errors
-
-```
-Error: Missing required key 'Key' in params
-```
-
-**Causes:**
-
-- Key pair not configured correctly
-- Private key format invalid
-
-**Solutions:**
-
-1. Verify the key pair ID matches the CloudFront configuration
-2. Ensure the private key is in PEM format
-3. Check for whitespace or encoding issues in the key contents
+<Accordions type="multiple">
+  <Accordion title="Access Denied when uploading">
+    Causes: incorrect IAM credentials, bucket policy doesn't allow required operations, CORS not
+    configured for presigned URL uploads. Solutions: verify IAM user has `s3:PutObject` permission,
+    check bucket policy allows writes, configure CORS to allow your domain.
+  </Accordion>
+  <Accordion title="Invalid endpoint (getaddrinfo ENOTFOUND)">
+    Causes: incorrect region configuration, bucket doesn't exist, network connectivity issues.
+    Solutions: verify the bucket exists in the specified region, check the endpoint URL is correct,
+    verify network access to S3.
+  </Accordion>
+  <Accordion title="SignatureDoesNotMatch">
+    Causes: incorrect secret access key, clock skew between server and S3. Solutions: verify
+    credentials are correct and not expired, ensure server time is synchronized (use NTP).
+  </Accordion>
+  <Accordion title="Path-style access required">
+    Set path-style access for S3-compatible services: `NEXT_PRIVATE_UPLOAD_FORCE_PATH_STYLE=true`.
+  </Accordion>
+  <Accordion title="CloudFront signed URL errors (Missing required key 'Key')">
+    Causes: key pair not configured correctly, private key format invalid. Solutions: verify the key
+    pair ID matches the CloudFront configuration, ensure the private key is in PEM format, check for
+    whitespace or encoding issues in the key contents.
+  </Accordion>
+</Accordions>
 
 ---
 

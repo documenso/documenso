@@ -3,6 +3,7 @@ title: Authentication
 description: Generate an API key and authenticate your requests.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -12,52 +13,50 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 - A Documenso account on any plan (Free, Individual, Team, or Enterprise)
 
 <Callout type="info">
-  Free accounts include API access with a limit of 5 documents per month. Upgrade to a paid plan for
-  higher limits.
+  Free accounts include API access with a limit of 5 documents per month. [Upgrade to a paid
+  plan](https://documen.so/pricing) for higher limits.
 </Callout>
 
 ## Create an API Token
 
 <Steps>
 <Step>
-### Open API Token Settings
+### Open settings
 
-1. Log in to your Documenso account
-2. Click your avatar in the top right corner
-3. Select **Settings** from the dropdown menu
+- Log in to your Documenso account
+- Click your avatar in the top right corner
+- Select **Settings** from the dropdown menu
 
 ![User dropdown menu](/public-api-images/documenso-user-dropdown-menu.webp)
 
-4. Navigate to the **API Tokens** tab
+</Step>
+
+<Step>
+### Navigate to the API Tokens tab
+
+Go to **Settings** and open the **API Tokens** tab.
 
 ![API tokens page](/public-api-images/api-tokens-page-documenso.webp)
 
 </Step>
 
 <Step>
-### Generate a New Token
+### Generate a new token
 
-1. Click **Create Token**
-2. Enter a descriptive name (e.g., `production-backend`, `zapier-integration`)
-3. Select an expiration period:
-   - Never expires
-   - 7 days
-   - 1 month
-   - 3 months
-   - 6 months
-   - 1 year
-4. Click **Create Token**
-
-</Step>
+- Click **Create Token**
+- Enter a descriptive name (e.g., `production-backend`, `zapier-integration`)
+- Select an expiration period: never expires, 7 days, 1 month, 3 months, 6 months, or 1 year
+- Click **Create Token**
+  </Step>
 
 <Step>
-### Copy Your Token
+### Copy your token
 
 Your token is displayed once after creation. Copy it immediately and store it securely.
 
 ![API key display](/public-api-images/documenso-api-key-blurred.webp)
 
-<Callout type="error">
+<Callout type="warn">
   You cannot view the token again after leaving this page. If you lose it, you must create a new
   token.
 </Callout>
@@ -174,11 +173,15 @@ Revoked tokens stop working immediately. Any integrations using that token will 
 
 ## Troubleshooting
 
-| Error              | Cause                                     | Solution                                                        |
-| ------------------ | ----------------------------------------- | --------------------------------------------------------------- |
-| `401 Unauthorized` | Missing or invalid token                  | Check that you included the token in the `Authorization` header |
-| `401 Unauthorized` | Expired token                             | Create a new token in settings                                  |
-| `403 Forbidden`    | Token doesn't have access to the resource | Ensure you're accessing resources owned by the token's account  |
+<Accordions type="multiple">
+  <Accordion title="401 Unauthorized — Missing or invalid token">
+    Check that you included the token in the `Authorization` header.
+  </Accordion>
+  <Accordion title="401 Unauthorized — Expired token">Create a new token in settings.</Accordion>
+  <Accordion title="403 Forbidden — Token doesn't have access to the resource">
+    Ensure you're accessing resources owned by the token's account.
+  </Accordion>
+</Accordions>
 
 ## Next Steps
 

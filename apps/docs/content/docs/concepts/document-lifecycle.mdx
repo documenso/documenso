@@ -3,6 +3,8 @@ title: Document Lifecycle
 description: Track document progress through draft, pending, completed, and rejected states.
 ---
 
+import { Callout } from 'fumadocs-ui/components/callout';
+
 ## Document States
 
 A document can be in one of four states:
@@ -54,7 +56,9 @@ While pending, you can:
 - Resend notifications to recipients
 - Void the document (cancels all pending actions)
 
-You cannot modify the document content, recipients, or fields while it is pending.
+<Callout type="info">
+  You cannot modify the document content, recipients, or fields while it is pending.
+</Callout>
 
 **Transitions:**
 
@@ -75,7 +79,9 @@ At completion:
 - The document is sealed with a digital certificate
 - An audit log is attached showing all actions taken
 
-Completed documents cannot be modified. You can download the signed PDF or view the audit trail.
+<Callout type="info">
+  Completed documents cannot be modified. You can download the signed PDF or view the audit trail.
+</Callout>
 
 ## Rejected
 
@@ -85,7 +91,10 @@ If you enable document rejection in settings, recipients can reject instead of s
 - Other pending recipients can no longer act on the document
 - The document owner is notified
 
-Rejected documents cannot be modified or reactivated. To proceed, you need to create a new document.
+<Callout type="info">
+  Rejected documents cannot be modified or reactivated. To proceed, you need to create a new
+  document.
+</Callout>
 
 ## Related Concepts
 

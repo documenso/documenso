@@ -13,7 +13,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
-Documents (called "envelopes" in the API) are the core resource in Documenso. You can create documents with recipients and fields, send them for signing, track their status, and retrieve the completed PDFs. Each document contains one or more PDF files, a list of recipients, and the fields they need to fill.
+[Documents](/docs/users/documents) (called "envelopes" in the API) are the core resource in Documenso. You can create documents with recipients and fields, send them for signing, track their status, and retrieve the completed PDFs. Each document contains one or more PDF files, a list of recipients, and the fields they need to fill.
 
 ## Document Object
 
@@ -718,7 +718,7 @@ const response = await fetch('https://app.documenso.com/api/v2/envelope/get-many
 
 const documents = await response.json();
 
-```
+````
 </Tab>
 </Tabs>
 
@@ -735,11 +735,9 @@ const documents = await response.json();
 
 ### Status Transitions
 
-```
-
+```text
 DRAFT → PENDING → COMPLETED
 ↘ REJECTED
-
 ````
 
 - **DRAFT to PENDING**: Call the distribute endpoint
@@ -756,25 +754,25 @@ DRAFT → PENDING → COMPLETED
 
 ### Pagination Parameters
 
-| Parameter | Type | Default | Description |
-| --- | --- | --- | --- |
-| `page` | integer | 1 | Page number |
-| `perPage` | integer | 10 | Results per page (max: 100) |
+| Parameter | Type    | Default | Description                 |
+| --------- | ------- | ------- | --------------------------- |
+| `page`    | integer | 1       | Page number                 |
+| `perPage` | integer | 10      | Results per page (max: 100) |
 
 ### Filter Parameters
 
-| Parameter | Values | Description |
-| --- | --- | --- |
-| `type` | `DOCUMENT`, `TEMPLATE` | Filter by envelope type |
-| `status` | `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED` | Filter by status |
-| `source` | `DOCUMENT`, `TEMPLATE`, `API` | Filter by creation source |
-| `folderId` | string | Filter by folder |
+| Parameter  | Values                                      | Description               |
+| ---------- | ------------------------------------------- | ------------------------- |
+| `type`     | `DOCUMENT`, `TEMPLATE`                      | Filter by envelope type   |
+| `status`   | `DRAFT`, `PENDING`, `COMPLETED`, `REJECTED` | Filter by status          |
+| `source`   | `DOCUMENT`, `TEMPLATE`, `API`               | Filter by creation source |
+| `folderId` | string                                      | Filter by folder          |
 
 ### Sorting
 
-| Parameter | Values | Description |
-| --- | --- | --- |
-| `orderByColumn` | `createdAt` | Field to sort by |
+| Parameter          | Values        | Description                      |
+| ------------------ | ------------- | -------------------------------- |
+| `orderByColumn`    | `createdAt`   | Field to sort by                 |
 | `orderByDirection` | `asc`, `desc` | Sort direction (default: `desc`) |
 
 ### Example: Fetch All Pending Documents
@@ -790,7 +788,7 @@ async function getAllPendingDocuments() {
       `https://app.documenso.com/api/v2/envelope?status=PENDING&page=${page}&perPage=100`,
       {
         headers: { Authorization: 'api_xxxxxxxxxxxxxxxx' },
-      }
+      },
     );
 
     const { data, pagination } = await response.json();
@@ -802,7 +800,7 @@ async function getAllPendingDocuments() {
 
   return documents;
 }
-````
+```
 
 ---
 

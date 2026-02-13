@@ -12,7 +12,7 @@ import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 Before starting, you need:
 
 - A Documenso account (cloud or self-hosted)
-- An API token ([create one in Team Settings > API Tokens](/docs/developers/getting-started/authentication))
+- An API token ([create one in team settings](/docs/developers/getting-started/authentication))
 - A PDF file to send for signing
 
 <Callout type="warn">
@@ -178,7 +178,7 @@ contentType: 'application/pdf',
 const response = await fetch('https://app.documenso.com/api/v2/envelope/create', {
 method: 'POST',
 headers: {
-'Authorization': 'YOUR_API_TOKEN',
+Authorization: 'YOUR_API_TOKEN',
 },
 body: form,
 });
@@ -215,6 +215,10 @@ Field positions use percentage values (0-100) relative to the PDF page dimension
 | `APPROVER` | Must approve before signers can sign |
 | `CC` | Receives a copy but doesn't sign |
 | `VIEWER` | Can view the document but takes no action |
+
+<Callout type="info">
+  See the [recipient roles](/docs/concepts/recipient-roles) page for more information.
+</Callout>
 
 ## Example 3: Send the Document for Signing
 

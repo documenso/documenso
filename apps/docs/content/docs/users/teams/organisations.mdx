@@ -3,6 +3,7 @@ title: Organisations
 description: Organisations are the top-level entity in Documenso, containing teams, members, and shared settings.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -71,9 +72,18 @@ Teams inherit settings from their parent organisation by default. You can overri
 
 ## Best Practices
 
-1. **Use groups effectively** - Leverage groups to simplify permission management across teams
-2. **Set organisation-wide defaults** - Configure document preferences, branding, and email settings at the organisation level for consistency
-3. **Assign roles carefully** - Organisation Admins and Managers automatically receive Team Admin access to all teams
+<Accordions type="multiple">
+  <Accordion title="Use groups effectively">
+    Leverage groups to simplify permission management across teams.
+  </Accordion>
+  <Accordion title="Set organisation-wide defaults">
+    Configure document preferences, branding, and email settings at the organisation level for
+    consistency.
+  </Accordion>
+  <Accordion title="Assign roles carefully">
+    Organisation Admins and Managers automatically receive Team Admin access to all teams.
+  </Accordion>
+</Accordions>
 
 ---
 

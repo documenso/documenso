@@ -5,8 +5,9 @@ description: Create documents from your templates by filling in recipient detail
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-## Create a document from a template
+## Create a Document from a Template
 
 <Steps>
 <Step>
@@ -19,7 +20,7 @@ Navigate to **Templates** in the sidebar and find the template you want to use. 
 </Step>
 
 <Step>
-### Click Use Template
+### Click use template
 
 From the template detail page, click the **Use Template** button. A dialog opens where you configure the document.
 
@@ -42,24 +43,28 @@ If the template has pre-filled recipient information, those fields appear with t
 <Step>
 ### Choose how to create the document
 
-You have two options:
-
-- **Create as draft** - Creates the document without sending. You can review and edit it before sending.
-- **Create and send** - Creates the document and immediately sends it to recipients.
-
-Check the **Send document** checkbox to send immediately, or leave it unchecked to create a draft.
+<Tabs items={['Create as draft', 'Create and send']}>
+  <Tab value="Create as draft">
+    Creates the document without sending. You can review and edit it before sending. Leave the
+    **Send document** checkbox unchecked.
+  </Tab>
+  <Tab value="Create and send">
+    Creates the document and immediately sends it to recipients. Check the **Send document**
+    checkbox to send immediately.
+  </Tab>
+</Tabs>
 
 </Step>
 
 <Step>
-### Click Create
+### New document
 
-Click **Create as draft** or **Create and send** depending on your selection. You're redirected to the new document.
+Click **Create as draft** or **Create and send** depending on what you want to do. You are then redirected to the new document.
 
 </Step>
 </Steps>
 
-## Upload a custom document
+## Upload a Custom Document
 
 You can replace the template's PDF with a different document when creating from a template. This keeps all the field positions and recipient settings but uses your uploaded file.
 
@@ -73,13 +78,13 @@ You can replace the template's PDF with a different document when creating from 
   document should have a similar layout.
 </Callout>
 
-## Sequential signing
+## Sequential Signing
 
 If the template uses sequential signing, recipients receive the document in order. The signing order displays next to each recipient in the dialog and cannot be changed when using the template.
 
 To modify the signing order, edit the template itself before creating documents from it.
 
-## Distribution methods
+## Distribution Methods
 
 How recipients receive the document depends on the template's distribution method:
 
@@ -90,7 +95,7 @@ How recipients receive the document depends on the template's distribution metho
 
 When using a template with no email distribution and selecting **Create as pending**, you're redirected to the document page where signing links are displayed for you to copy and share.
 
-## Template vs document differences
+## Template vs Document Differences
 
 When you create a document from a template, the document becomes independent. Changes you make to the document don't affect the template, and changes to the template don't affect existing documents.
 
@@ -103,7 +108,7 @@ When you create a document from a template, the document becomes independent. Ch
 
 Documents created from a template are tracked on the template's detail page under **Documents created from template**.
 
-## Bulk send
+## Bulk Send
 
 To create multiple documents from one template with different recipients, use bulk send:
 

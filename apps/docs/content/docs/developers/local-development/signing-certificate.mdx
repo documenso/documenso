@@ -19,7 +19,7 @@ Follow the steps below to create a free, self-signed certificate for local devel
 <Steps>
 
 <Step>
-### Generate Private Key
+### Generate private key
 
 Generate a private key using OpenSSL by running the following command:
 
@@ -32,7 +32,7 @@ This command generates a 2048-bit RSA key.
 </Step>
 
 <Step>
-### Generate Self-Signed Certificate
+### Generate self-signed certificate
 
 Using the private key, generate a self-signed certificate by running the following command:
 
@@ -45,7 +45,7 @@ You will be prompted to enter some information, such as the certificate's Common
 </Step>
 
 <Step>
-### Create `p12` Certificate
+### Create `p12` certificate
 
 Combine the private key and the self-signed certificate to create a `.p12` certificate. Use the following command:
 
@@ -66,7 +66,7 @@ sudo chown 1001 certificate.p12
 </Step>
 
 <Step>
-### `p12` Certificate Password
+### `p12` certificate password
 
 When you create the `.p12` certificate, you will be prompted to enter a password. Enter a strong password and keep it secure. Remember this password, as it will be required when using the certificate.
 
@@ -75,7 +75,7 @@ Note that for local development, the password can be left empty.
 </Step>
 
 <Step>
-### Add Certificate to the Project
+### Add certificate to the project
 
 Use the `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` environment variable to point at the certificate you created.
 

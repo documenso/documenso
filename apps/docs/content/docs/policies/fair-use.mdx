@@ -3,7 +3,9 @@ title: Fair Use Policy
 description: Fair use guidelines for Documenso Cloud to ensure reliable service for all users. Self-hosted deployments are not subject to these limits.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Cloud Service Guidelines
 
@@ -56,22 +58,27 @@ Documents exceeding these limits may fail to upload or process.
 
 ## Acceptable Use
 
-The following uses are permitted under fair use:
+<Tabs items={['Permitted', 'Prohibited']}>
+  <Tab value="Permitted">
+    The following uses are permitted under fair use:
 
-- Sending contracts, agreements, and forms for signature
-- Using templates for recurring document types
-- Integrating with business applications via the API
-- Automating document workflows within rate limits
+    - Sending contracts, agreements, and forms for signature
+    - Using templates for recurring document types
+    - Integrating with business applications via the API
+    - Automating document workflows within rate limits
 
-### Prohibited Uses
+  </Tab>
+  <Tab value="Prohibited">
+    The following uses violate fair use and may result in account action:
 
-The following uses violate fair use and may result in account action:
+    - **Bulk email**: Using document signing as a mass email delivery system
+    - **Storage abuse**: Uploading documents without intent to sign them
+    - **API abuse**: Automated scraping, excessive polling, or denial-of-service patterns
+    - **Credential sharing**: Sharing login credentials to exceed per-seat limits
+    - **Circumvention**: Using multiple accounts to bypass usage limits
 
-- **Bulk email**: Using document signing as a mass email delivery system
-- **Storage abuse**: Uploading documents without intent to sign them
-- **API abuse**: Automated scraping, excessive polling, or denial-of-service patterns
-- **Credential sharing**: Sharing login credentials to exceed per-seat limits
-- **Circumvention**: Using multiple accounts to bypass usage limits
+  </Tab>
+</Tabs>
 
 <Callout type="warn">
   Violation of acceptable use policies may result in rate limiting, account suspension, or
@@ -82,34 +89,37 @@ The following uses violate fair use and may result in account action:
 
 When usage exceeds fair use limits, Documenso may take the following actions:
 
-### Soft Limits
+<Accordions type="multiple">
+  <Accordion title="Soft Limits">
+    For minor or temporary limit violations:
 
-For minor or temporary limit violations:
+    1. **Warning notification**: Email notification about the exceeded limit
+    2. **Temporary throttling**: Reduced rate limits until usage normalizes
+    3. **Grace period**: Time to reduce usage or upgrade your plan
 
-1. **Warning notification**: Email notification about the exceeded limit
-2. **Temporary throttling**: Reduced rate limits until usage normalizes
-3. **Grace period**: Time to reduce usage or upgrade your plan
+  </Accordion>
+  <Accordion title="Hard Limits">
+    For significant or repeated violations:
 
-### Hard Limits
+    1. **Service restriction**: Affected features are disabled until resolved
+    2. **Account review**: Manual review of usage patterns
+    3. **Account suspension**: Temporary suspension pending resolution
+    4. **Termination**: Permanent account closure for severe or repeated abuse
 
-For significant or repeated violations:
+    Before taking action, Documenso will attempt to contact you at your registered email address. You will have an opportunity to explain unusual usage or upgrade your plan.
 
-1. **Service restriction**: Affected features are disabled until resolved
-2. **Account review**: Manual review of usage patterns
-3. **Account suspension**: Temporary suspension pending resolution
-4. **Termination**: Permanent account closure for severe or repeated abuse
+  </Accordion>
+  <Accordion title="Disputing Actions">
+    If you believe an action was taken in error:
 
-Before taking action, Documenso will attempt to contact you at your registered email address. You will have an opportunity to explain unusual usage or upgrade your plan.
+    1. Reply to the notification email with details about your usage
+    2. Provide context for any unusual patterns
+    3. Request a review of the decision
 
-### Disputing Actions
+    Disputes are reviewed within 5 business days.
 
-If you believe an action was taken in error:
-
-1. Reply to the notification email with details about your usage
-2. Provide context for any unusual patterns
-3. Request a review of the decision
-
-Disputes are reviewed within 5 business days.
+  </Accordion>
+</Accordions>
 
 ## Enterprise Options
 
@@ -124,23 +134,26 @@ Enterprise plans include higher limits and custom configurations:
 | Bulk operations    | Standard       | Priority processing |
 | SLA                | Best effort    | Guaranteed uptime   |
 
-### Custom Limits
+<Accordions type="multiple">
+  <Accordion title="Custom Limits">
+    Enterprise customers can request custom limits for:
 
-Enterprise customers can request custom limits for:
+    - API request rates
+    - Document processing throughput
+    - Storage retention policies
+    - Concurrent operations
 
-- API request rates
-- Document processing throughput
-- Storage retention policies
-- Concurrent operations
+  </Accordion>
+  <Accordion title="Dedicated Resources">
+    Enterprise plans can include:
 
-### Dedicated Resources
+    - Dedicated infrastructure
+    - Priority processing queues
+    - Custom rate limit configurations
+    - Direct technical support
 
-Enterprise plans can include:
-
-- Dedicated infrastructure
-- Priority processing queues
-- Custom rate limit configurations
-- Direct technical support
+  </Accordion>
+</Accordions>
 
 Contact [sales](https://documen.so/enterprise) to discuss enterprise options.
 

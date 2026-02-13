@@ -3,6 +3,7 @@ title: Upgrades
 description: Upgrade your self-hosted Documenso installation to get the latest features, security patches, and bug fixes.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -129,7 +130,7 @@ See [Backups](/docs/self-hosting/maintenance/backups) for automated backup strat
 
 <Steps>
 <Step>
-### Pull the New Image
+### Pull the new image
 
 ```bash
 docker pull documenso/documenso:1.6.0
@@ -139,7 +140,7 @@ Replace `1.6.0` with your target version.
 
 </Step>
 <Step>
-### Stop the Current Container
+### Stop the current container
 
 ```bash
 docker stop documenso
@@ -148,7 +149,7 @@ docker rm documenso
 
 </Step>
 <Step>
-### Start with the New Image
+### Start with the new image
 
 ```bash
 docker run -d \
@@ -161,7 +162,7 @@ docker run -d \
 
 </Step>
 <Step>
-### Verify the Upgrade
+### Verify the upgrade
 
 ```bash
 docker logs -f documenso
@@ -182,7 +183,7 @@ curl http://localhost:3000/api/health
 
 <Steps>
 <Step>
-### Update the Image Tag
+### Update the image tag
 
 Edit `compose.yml` or your `.env` file to specify the new version:
 
@@ -208,7 +209,7 @@ services:
 
 </Step>
 <Step>
-### Pull the New Image
+### Pull the new image
 
 ```bash
 docker compose pull
@@ -216,7 +217,7 @@ docker compose pull
 
 </Step>
 <Step>
-### Apply the Update
+### Apply the update
 
 ```bash
 docker compose --env-file .env up -d
@@ -226,7 +227,7 @@ Docker Compose recreates containers that have changed images.
 
 </Step>
 <Step>
-### Verify the Upgrade
+### Verify the upgrade
 
 ```bash
 docker compose ps
@@ -242,7 +243,7 @@ Confirm the container is running and healthy.
 
 <Steps>
 <Step>
-### Update the Deployment Image
+### Update the deployment image
 
 Edit the deployment directly:
 
@@ -271,7 +272,7 @@ kubectl apply -f deployment.yaml
 
 </Step>
 <Step>
-### Monitor the Rollout
+### Monitor the rollout
 
 ```bash
 kubectl rollout status deployment/documenso -n documenso
@@ -285,7 +286,7 @@ kubectl get pods -n documenso -w
 
 </Step>
 <Step>
-### Verify the Upgrade
+### Verify the upgrade
 
 Check the new pods are running:
 
@@ -456,67 +457,26 @@ psql "postgresql://user:password@host:5432/documenso" < backup-20240115-120000.s
 
 ## Troubleshooting Upgrades
 
-### Container Fails to Start After Upgrade
+<Accordions type="multiple">
+  <Accordion title="Container fails to start after upgrade">
+    Check logs for error messages: `docker logs documenso`
 
-Check logs for error messages:
+Common causes: Missing env variable (check release notes for new required variables), database connection error (verify database is accessible and credentials are valid), migration failure (check logs for specific migration error), certificate error (verify certificate mount and passphrase).
 
-```bash
-docker logs documenso
-```
-
-Common causes:
-
-| Issue                     | Solution                                                |
-| ------------------------- | ------------------------------------------------------- |
-| Missing env variable      | Check release notes for new required variables          |
-| Database connection error | Verify database is accessible and credentials are valid |
-| Migration failure         | Check logs for specific migration error                 |
-| Certificate error         | Verify certificate mount and passphrase                 |
-
-### Migration Errors
-
-If migrations fail:
-
-1. Check the specific error in the logs
-2. Verify database connectivity
-3. Ensure the database user has ALTER permissions
-4. Check for sufficient disk space on the database server
-
-```bash
-# Test database connectivity
-docker run --rm postgres:15 psql "postgresql://user:password@host:5432/documenso" -c "SELECT 1"
-```
-
-### Application Errors After Upgrade
-
-If the application starts but behaves unexpectedly:
-
-1. Clear browser cache and cookies
-2. Check for new environment variables in release notes
-3. Verify all environment variables are correctly set
-4. Check application logs for warnings
-
-```bash
-docker logs documenso 2>&1 | grep -i -E "(warn|error)"
-```
-
-### Performance Issues After Upgrade
-
-If performance degrades after upgrading:
-
-1. Check for any new indexes being created (normal, temporary slowdown)
-2. Monitor database CPU and memory usage
-3. Review release notes for known performance impacts
-4. Allow time for database query plans to stabilize
-
-### Rollback Failed
-
-If rollback also fails:
-
-1. Verify the old image tag exists and is accessible
-2. Check that your backup is valid and complete
-3. Review environment configuration for any changes
-4. Consider restoring to a clean database from backup
+  </Accordion>
+  <Accordion title="Migration errors">
+    If migrations fail: check the specific error in the logs, verify database connectivity, ensure the database user has ALTER permissions, and check for sufficient disk space on the database server. Test connectivity with: `docker run --rm postgres:15 psql "postgresql://user:password@host:5432/documenso" -c "SELECT 1"`
+  </Accordion>
+  <Accordion title="Application errors after upgrade">
+    If the application starts but behaves unexpectedly: clear browser cache and cookies, check for new environment variables in release notes, verify all environment variables are correctly set, and check application logs for warnings with: `docker logs documenso 2>&1 | grep -i -E "(warn|error)"`
+  </Accordion>
+  <Accordion title="Performance issues after upgrade">
+    If performance degrades: check for any new indexes being created (normal, temporary slowdown), monitor database CPU and memory usage, review release notes for known performance impacts, and allow time for database query plans to stabilize.
+  </Accordion>
+  <Accordion title="Rollback failed">
+    If rollback also fails: verify the old image tag exists and is accessible, check that your backup is valid and complete, review environment configuration for any changes, and consider restoring to a clean database from backup.
+  </Accordion>
+</Accordions>
 
 ## Upgrade Checklist
 

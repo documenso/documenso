@@ -3,6 +3,7 @@ title: Branding
 description: Customize how your documents appear to recipients by adding your logo to signing pages and company details in email notifications.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -17,18 +18,20 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 ## What You Can Customize
 
-Branding settings include:
-
-- **Logo** - Displayed on signing pages when recipients view and sign your documents
-- **Website URL** - Makes your logo clickable, linking to your website
-- **Brand Details** - Text shown at the bottom of email notifications (address, company info, etc.)
+| Setting           | Description                                                                   |
+| ----------------- | ----------------------------------------------------------------------------- |
+| **Logo**          | Displayed on signing pages when recipients view and sign your documents       |
+| **Website URL**   | Makes your logo clickable, linking to your website                            |
+| **Brand Details** | Text shown at the bottom of email notifications (address, company info, etc.) |
 
 ## Limitations
 
-- Logo file size: Maximum 5MB
-- Supported formats: JPG, PNG, or WebP
-- Brand details: Maximum 500 characters
-- Website URL must be a valid URL (e.g., `https://example.com`)
+| Item              | Limit / Requirement                               |
+| ----------------- | ------------------------------------------------- |
+| Logo file size    | Maximum 5MB                                       |
+| Supported formats | JPG, PNG, or WebP                                 |
+| Brand details     | Maximum 500 characters                            |
+| Website URL       | Must be a valid URL (e.g., `https://example.com`) |
 
 ## Configure Branding
 
@@ -88,10 +91,10 @@ Click **Update** to save your branding settings.
 
 ## Where Branding Appears
 
-Your branding is applied to:
-
-- **Signing pages** - Recipients see your logo when viewing and signing documents
-- **Email notifications** - Brand details appear at the bottom of signing request emails
+| Location                | Effect                                                       |
+| ----------------------- | ------------------------------------------------------------ |
+| **Signing pages**       | Recipients see your logo when viewing and signing documents  |
+| **Email notifications** | Brand details appear at the bottom of signing request emails |
 
 ## Organization vs Team Branding
 
@@ -120,18 +123,21 @@ For individual branding fields (logo, URL, details), leaving them blank also inh
 
 ## Troubleshooting
 
-### Logo not appearing
+<Accordions type="multiple">
+  <Accordion title="Logo not appearing">
+    - Verify custom branding is enabled (set to **Yes**)
+    - Check that the image file is under 5MB
+    - Ensure the file format is JPG, PNG, or WebP
+    - Wait a few minutes for changes to propagate
 
-- Verify custom branding is enabled (set to **Yes**)
-- Check that the image file is under 5MB
-- Ensure the file format is JPG, PNG, or WebP
-- Wait a few minutes for changes to propagate
+  </Accordion>
+  <Accordion title="Brand details not in emails">
+    - Confirm the **Brand Details** field is filled in
+    - Verify branding is enabled
+    - Check that you saved changes by clicking **Update**
 
-### Brand details not in emails
-
-- Confirm the **Brand Details** field is filled in
-- Verify branding is enabled
-- Check that you saved changes by clicking **Update**
+  </Accordion>
+</Accordions>
 
 ---
 

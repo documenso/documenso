@@ -3,6 +3,7 @@ title: Railway
 description: Deploy Documenso on Railway with automatic builds from Git, managed PostgreSQL, and built-in networking. Use the one-click template or manual setup.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -347,46 +348,23 @@ See [Signing Certificate Configuration](/docs/self-hosting/configuration/signing
 
 ## Troubleshooting
 
-### Build fails
-
-Check the build logs in Railway for specific errors. Common causes:
-
-- **Out of memory**: Increase the build memory limit in service settings
-- **Docker build timeout**: Railway has a 20-minute build timeout; ensure your build completes within this limit
-
-### Application crashes on startup
-
-View the deployment logs:
-
-1. Click on your service
-2. Go to "Deployments"
-3. Click on the failed deployment to view logs
-
-Common issues:
-
-- **Missing environment variables**: Verify all required variables are set
-- **Database connection failed**: Check `NEXT_PRIVATE_DATABASE_URL` references the correct PostgreSQL service
-- **Invalid encryption keys**: Ensure keys are at least 32 characters
-
-### Emails not sending
-
-Verify SMTP configuration:
-
-- Check `NEXT_PRIVATE_SMTP_TRANSPORT` is set to `smtp-auth`
-- Verify SMTP credentials are correct
-- Ensure your SMTP provider allows connections from Railway's IP addresses
-
-### Database connection errors
-
-- Verify PostgreSQL service is running
-- Check the variable reference syntax: `${{Postgres.DATABASE_URL}}`
-- Try redeploying the application
-
-### Slow performance
-
-- Increase memory allocation for the service
-- Check database query performance in Railway's metrics
-- Consider upgrading to a larger PostgreSQL instance
+<Accordions type="multiple">
+  <Accordion title="Build fails">
+    Check the build logs in Railway for specific errors. Common causes: out of memory (increase the build memory limit in service settings), Docker build timeout (Railway has a 20-minute build timeout; ensure your build completes within this limit).
+  </Accordion>
+  <Accordion title="Application crashes on startup">
+    View the deployment logs: click your service, go to Deployments, click the failed deployment. Common issues: missing environment variables (verify all required variables are set), database connection failed (check `NEXT_PRIVATE_DATABASE_URL` references the correct PostgreSQL service), invalid encryption keys (ensure keys are at least 32 characters).
+  </Accordion>
+  <Accordion title="Emails not sending">
+    Verify SMTP configuration: check `NEXT_PRIVATE_SMTP_TRANSPORT` is set to `smtp-auth`, verify SMTP credentials are correct, ensure your SMTP provider allows connections from Railway's IP addresses.
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Verify PostgreSQL service is running, check the variable reference syntax `${{Postgres.DATABASE_URL}}`, try redeploying the application.
+  </Accordion>
+  <Accordion title="Slow performance">
+    Increase memory allocation for the service, check database query performance in Railway's metrics, consider upgrading to a larger PostgreSQL instance.
+  </Accordion>
+</Accordions>
 
 ## Other One-Click Deployment Options
 

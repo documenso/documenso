@@ -3,8 +3,10 @@ title: Security Settings
 description: Manage your password, enable two-factor authentication (2FA), configure passkeys, and monitor account activity.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Change Your Password
 
@@ -12,21 +14,19 @@ If you signed up with email and password (not Google or another provider), you c
 
 <Steps>
 <Step>
-### Go to Security Settings
+### Go to security settings
 
-1. Click your avatar in the top right corner
-2. Select **Settings** from the dropdown
-3. Click the **Security** tab
+Click on your avatar in the top right corner, then navigate to **Settings** > **Security** tab.
 
 </Step>
 
 <Step>
-### Update Your Password
+### Update your password
 
-1. Enter your current password
-2. Enter your new password
-3. Re-enter your new password to confirm
-4. Click **Update password**
+- Enter your current password
+- Enter your new password
+- Confirm the new password
+- Click **Update password**
 
 </Step>
 </Steps>
@@ -48,29 +48,25 @@ Two-factor authentication adds a second layer of security by requiring a code fr
 
 <Steps>
 <Step>
-### Open the 2FA Setup
+### Open the 2FA setup
 
-1. Go to **Settings** > **Security**
-2. Find the **Two factor authentication** section
-3. Click **Enable 2FA**
+Go to **Settings** > **Security**, find the Two factor authentication section, then click **Enable 2FA**.
 
 </Step>
 
 <Step>
-### Scan the QR Code
+### Scan the QR code
 
-1. Open your authenticator app (Google Authenticator, Authy, 1Password, etc.)
-2. Scan the QR code displayed on screen
-3. If you cannot scan, click to reveal the setup key and enter it manually
+Open your authenticator app (Google Authenticator, Authy, 1Password, etc.), then scan the QR code displayed on screen. If you cannot scan, click to reveal the setup key and enter it manually.
 
 </Step>
 
 <Step>
-### Verify and Confirm
+### Verify and confirm
 
-1. Enter the 6-digit code from your authenticator app
-2. Click **Enable**
-3. Save your recovery codes (see [Recovery Codes](#recovery-codes) below)
+- Enter the 6-digit code from your authenticator app
+- Click **Enable**
+- Save your recovery codes (see [Recovery Codes](#recovery-codes) below)
 
 </Step>
 </Steps>
@@ -88,10 +84,23 @@ Two-factor authentication adds a second layer of security by requiring a code fr
 
 ### Disable 2FA
 
-1. Go to **Settings** > **Security**
-2. Click **Disable 2FA**
-3. Enter a code from your authenticator app to confirm
-4. Click **Disable**
+<Steps>
+<Step>
+### Open security settings
+
+Navigate to **Settings** > **Security**.
+
+</Step>
+
+<Step>
+### Disable 2FA
+
+- Click **Disable 2FA**
+- Enter a code from your authenticator app to confirm
+- Click **Disable**
+
+</Step>
+</Steps>
 
 ## Recovery Codes
 
@@ -99,10 +108,21 @@ Recovery codes let you access your account if you lose access to your authentica
 
 ### View Recovery Codes
 
-1. Go to **Settings** > **Security**
-2. Click **View Codes** in the Recovery codes section
-3. Enter a code from your authenticator app
-4. Your recovery codes are displayed
+<Steps>
+<Step>
+### Open recovery codes
+
+Go to **Settings** > **Security**, then click **View Codes** in the Recovery codes section.
+
+</Step>
+
+<Step>
+### Verify and view
+
+Enter a code from your authenticator app. Your recovery codes are displayed.
+
+</Step>
+</Steps>
 
 ### Store Recovery Codes Safely
 
@@ -123,11 +143,23 @@ Passkeys provide passwordless authentication using biometrics, hardware security
 
 ### Add a Passkey
 
-1. Go to **Settings** > **Security**
-2. Click **Manage passkeys**
-3. Click **Add passkey**
-4. Enter a name for the passkey (e.g., "MacBook Touch ID", "YubiKey")
-5. Follow your browser's prompts to complete registration
+<Steps>
+<Step>
+### Open passkeys
+
+Navigate to **Settings** > **Security**, then click **Manage passkeys**.
+
+</Step>
+
+<Step>
+### Add passkey
+
+- Click **Add passkey**
+- Enter a name (e.g. "MacBook Touch ID", "YubiKey")
+- Follow your browser's prompts to complete registration
+
+</Step>
+</Steps>
 
 ![Add passkey dialog](/get-started-images/documenso-add-passkey-box.webp)
 
@@ -148,58 +180,63 @@ View and manage all devices currently logged into your account.
 
 ### View Sessions
 
-1. Go to **Settings** > **Security**
-2. Click **Manage sessions**
+Go to **Settings** > **Security**, then click **Manage sessions**.
 
-The sessions table shows:
+The sessions table shows events:
 
-- **Device**: Browser and operating system
-- **IP Address**: The IP address of the session
-- **Last Active**: When the session was last used
-- **Created**: When the session started
+| Column      | Description                    |
+| ----------- | ------------------------------ |
+| Device      | Browser and operating system   |
+| IP Address  | The IP address of the session  |
+| Last Active | When the session was last used |
+| Created     | When the session started       |
 
 Your current session is marked with a "Current" badge.
 
 ### Revoke a Session
 
-To log out a specific device:
-
-1. Find the session in the list
-2. Click **Revoke**
-
-To log out all other devices:
-
-1. Click **Log out all** at the top of the page
-2. Confirm the action
-
-This keeps your current session active but terminates all others.
+<Tabs items={['Revoke one session', 'Log out all']}>
+  <Tab value="Revoke one session">Find the session in the list and click **Revoke**.</Tab>
+  <Tab value="Log out all">
+    Click **Log out all** at the top of the page and confirm. Your current session stays active; all
+    others are terminated.
+  </Tab>
+</Tabs>
 
 ## Security Activity
 
-Monitor recent security-related events on your account.
+Monitor recent security-related events on your account. Go to **Settings** > **Security**, then click **View activity**.
 
-1. Go to **Settings** > **Security**
-2. Click **View activity**
+The activity log shows the events that have occurred on your account. Examples include:
 
-The activity log shows events like:
-
-- Sign-in attempts
-- Password changes
-- 2FA changes
-- Session changes
+| Event            | Description                           |
+| ---------------- | ------------------------------------- |
+| Sign-in attempts | Login attempts to your account        |
+| Password changes | When your password was changed        |
+| 2FA changes      | When 2FA was enabled or disabled      |
+| Session changes  | When sessions were created or revoked |
 
 ## Linked Accounts
 
-View and manage login methods connected to your account (Google, email/password, etc.).
-
-1. Go to **Settings** > **Security**
-2. Click **Manage linked accounts**
+View and manage login methods connected to your account (Google, email/password, etc.). Go to **Settings** > **Security** and click **Manage linked accounts**.
 
 To remove a login method:
 
-1. Find the provider in the list
-2. Click **Unlink**
-3. Confirm the action
+<Steps>
+<Step>
+### Find the provider
+
+Find the provider in the list.
+
+</Step>
+
+<Step>
+### Unlink
+
+Click **Unlink** and confirm the action.
+
+</Step>
+</Steps>
 
 <Callout type="warn">
   Ensure you have at least one login method available before unlinking an account.
@@ -223,11 +260,29 @@ Account deletion permanently removes all your data, including documents, signatu
 
 ### Delete Your Account
 
-1. Go to **Settings** > **Profile**
-2. Scroll to the **Delete Account** section
-3. Click **Delete Account**
-4. Type your email address to confirm
-5. Click **Confirm Deletion**
+<Steps>
+<Step>
+### Open profile
+
+Go to **Settings** > **Profile**, then scroll to the **Delete Account** section.
+
+</Step>
+
+<Step>
+### Delete account
+
+Click **Delete Account**.
+
+</Step>
+
+<Step>
+### Confirm
+
+- Type your email address to confirm
+- Click **Confirm Deletion**
+
+</Step>
+</Steps>
 
 <Callout type="error">
   Account deletion is permanent and irreversible. All documents, signatures, and account data will
@@ -236,16 +291,30 @@ Account deletion permanently removes all your data, including documents, signatu
 
 ## Security Best Practices
 
-Follow these recommendations to keep your account secure:
-
-- **Use a strong, unique password.** Avoid reusing passwords from other services.
-- **Enable two-factor authentication.** 2FA significantly reduces the risk of unauthorized access.
-- **Store recovery codes securely.** Keep them in a password manager or other secure location.
-- **Add passkeys on trusted devices.** Passkeys provide phishing-resistant authentication.
-- **Review active sessions regularly.** Revoke any sessions you don't recognize.
-- **Monitor security activity.** Check for unexpected sign-ins or changes.
-- **Use separate API tokens per integration.** If one is compromised, revoke only that token.
-- **Set expiration dates on API tokens.** Shorter lifespans reduce risk if a token is leaked.
+<Accordions type="multiple">
+  <Accordion title="Use a strong, unique password">
+    Avoid reusing passwords from other services.
+  </Accordion>
+  <Accordion title="Enable two-factor authentication">
+    2FA significantly reduces the risk of unauthorized access.
+  </Accordion>
+  <Accordion title="Store recovery codes securely">
+    Keep them in a password manager or other secure location.
+  </Accordion>
+  <Accordion title="Add passkeys on trusted devices">
+    Passkeys provide phishing-resistant authentication.
+  </Accordion>
+  <Accordion title="Review active sessions regularly">
+    Revoke any sessions you don't recognize.
+  </Accordion>
+  <Accordion title="Monitor security activity">Check for unexpected sign-ins or changes.</Accordion>
+  <Accordion title="Use separate API tokens per integration">
+    If one is compromised, revoke only that token.
+  </Accordion>
+  <Accordion title="Set expiration dates on API tokens">
+    Shorter lifespans reduce risk if a token is leaked.
+  </Accordion>
+</Accordions>
 
 ---
 

@@ -3,12 +3,23 @@ title: Signature Levels
 description: Understand the three eIDAS signature levels — SES, AES, and QES — their requirements, legal effect, and when to use each.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 <Callout type="info">
   Documenso seals all signed documents cryptographically, regardless of signature level, to prevent
   any alterations after signing.
 </Callout>
+
+### Compliance Status Overview
+
+| Regulation   | Status    |
+| ------------ | --------- |
+| ESIGN / UETA | Compliant |
+| eIDAS SES    | Compliant |
+| eIDAS AES    | Planned   |
+| eIDAS QES    | Planned   |
+| ZertES       | Planned   |
 
 ## U.S. ESIGN Act
 
@@ -215,36 +226,36 @@ ZertES is a Swiss federal law that regulates electronic signature compliance. It
 
 Consider using AES or QES when:
 
-### Legal Requirements
+<Accordions type="multiple">
+  <Accordion title="Legal Requirements">
+    - National law requires a handwritten signature (QES may substitute)
+    - Regulations specify signature requirements (e.g., certain financial or healthcare documents)
+    - Cross-border enforceability is critical
+  </Accordion>
+  <Accordion title="Risk Factors">
+    - High contract value or significant liability
+    - Higher likelihood of disputes
+    - Need for stronger non-repudiation
+    - Counterparty or regulatory requirements specify higher levels
+  </Accordion>
+  <Accordion title="Industry Standards">
+    - Financial services with regulatory oversight
+    - Healthcare with patient consent requirements
+    - Government or public sector contracts
+    - Real estate transactions in regulated markets
+  </Accordion>
+  <Accordion title="Evaluating Your Needs">
+    Most business transactions do not require AES or QES. Consider:
 
-- National law requires a handwritten signature (QES may substitute)
-- Regulations specify signature requirements (e.g., certain financial or healthcare documents)
-- Cross-border enforceability is critical
+    1. What does your jurisdiction require for this document type?
+    2. What do your counterparties or customers expect?
+    3. What is the risk if the signature is disputed?
+    4. Does your industry have specific requirements?
 
-### Risk Factors
+    When in doubt, consult with legal counsel to determine the appropriate signature level for your specific use case.
 
-- High contract value or significant liability
-- Higher likelihood of disputes
-- Need for stronger non-repudiation
-- Counterparty or regulatory requirements specify higher levels
-
-### Industry Standards
-
-- Financial services with regulatory oversight
-- Healthcare with patient consent requirements
-- Government or public sector contracts
-- Real estate transactions in regulated markets
-
-### Evaluating Your Needs
-
-Most business transactions do not require AES or QES. Consider:
-
-1. What does your jurisdiction require for this document type?
-2. What do your counterparties or customers expect?
-3. What is the risk if the signature is disputed?
-4. Does your industry have specific requirements?
-
-When in doubt, consult with legal counsel to determine the appropriate signature level for your specific use case.
+  </Accordion>
+</Accordions>
 
 ---
 

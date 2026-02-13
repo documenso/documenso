@@ -4,8 +4,9 @@ description: Learn how to control the visibility of your team documents.
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
-# Document Visibility
+## Overview
 
 The default document visibility option allows you to control who can view and access the documents uploaded within a team.
 
@@ -13,30 +14,39 @@ This value can either be set in the [document preferences](/docs/users/documents
 
 ## Document Visibility Options
 
-The document visibility can be set to one of the following options:
+In **Default Document Visibility** (under document preferences), you can choose:
 
-- **Everyone** - The document is visible to all team members.
-- **Managers and above** - The document is visible to team members with the role of _Manager or above_ and _Admin_.
-- **Admin only** - The document is only visible to the team's admins.
+<Tabs items={['Everyone', 'Managers and above', 'Admins only', 'Inherit']}>
+  <Tab value="Everyone">All team members can access and view the document.</Tab>
+  <Tab value="Managers and above">Only managers and admins can access and view the document.</Tab>
+  <Tab value="Admins only">Only admins can access and view the document.</Tab>
+  <Tab value="Inherit">Use the organisation's default. Available for team-level settings only.</Tab>
+</Tabs>
 
-The default document visibility is set to "_EVERYONE_" by default. You can change this setting by going to the [document preferences page](/docs/users/documents/document-preferences) and selecting a different visibility option.
+The default is Everyone. Change it in document preferences.
 
 ![Document visibility preference](/organisations/organisation-document-visibility.webp)
 
-## How it works
+## How It Works
 
-- If a user with the "_Member_" role creates a document and the default document visibility is set to "_Everyone_", the document's visibility is set to "_EVERYONE_".
-  - The user can't change the visibility of the document in the document editor.
-- If a user with the "_Member_" role creates a document and the default document visibility is set to "_Admin_" or "_Managers and above_", the document's visibility is set to the default document visibility ("_Admin_" or "_Managers and above_" in this case).
-  - The user can't change the visibility of the document in the document editor.
-- If a user with the "_Manager_" role creates a document and the default document visibility is set to "_Everyone_" or "_Managers and above_", the document's visibility is set to the default document visibility ("_Everyone_" or "_Managers and above_" in this case).
-  - The user can change the visibility of the document to any of these options, except "_Admin_", in the document editor.
-- If a user with the "_Manager_" role creates a document and the default document visibility is set to "_Admin_", the document's visibility is set to "_Admin_".
-  - The user can't change the visibility of the document in the document editor.
-- If a user with the "_Admin_" role creates a document, and the default document visibility is set to "_Everyone_", "_Managers and above_", or "_Admin_", the document's visibility is set to the default document visibility.
-  - The user can change the visibility of the document to any of these options in the document editor.
+When you create a document, its visibility depends on your role and the team's default. Select your role:
 
-You can change the visibility of a document at any time by editing the document and selecting a different visibility option.
+<Tabs items={['Member', 'Manager', 'Admin']}>
+  <Tab value="Member">
+    New documents use the team's default visibility. You cannot change the visibility in the document editor.
+  </Tab>
+  <Tab value="Manager">
+    **If the default is "Everyone" or "Managers and above":** New documents use that setting. You can change it in the editor to "Everyone" or "Managers and above" (not "Admins only").
+
+    **If the default is "Admins only":** New documents are admins-only. You cannot change it.
+
+  </Tab>
+  <Tab value="Admin">
+    New documents use the team's default. You can change the visibility to any option in the document editor.
+  </Tab>
+</Tabs>
+
+You can change visibility at any time by editing the document and choosing a different option.
 
 ![A screenshot of the Documenso's document editor page where you can update the document visibility](/teams/document-visibility-settings.webp)
 

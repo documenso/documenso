@@ -5,6 +5,7 @@ description: Place signature, text, date, and other fields on your document.
 
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Overview
 
@@ -27,16 +28,31 @@ In the document editor, select the recipient you want to assign fields to from t
 
 Click and drag a field type from the field palette onto your document. Available field types include:
 
-- **Signature** - Captures the recipient's legally binding signature
-- **Initials** - Abbreviated signature for acknowledging pages or clauses
-- **Name** - Recipient's full name (auto-filled when available)
-- **Email** - Recipient's email address (auto-filled)
-- **Date** - Date the field was completed (auto-filled)
-- **Text** - Free-form text input
-- **Number** - Numeric input with optional validation
-- **Checkbox** - Multiple selections from options
-- **Radio** - Single selection from options
-- **Dropdown** - Single selection from a menu
+<Tabs
+  items={[
+    'Signature',
+    'Initials',
+    'Name',
+    'Email',
+    'Date',
+    'Text',
+    'Number',
+    'Checkbox',
+    'Radio',
+    'Dropdown',
+  ]}
+>
+  <Tab value="Signature">Captures the recipient's legally binding signature</Tab>
+  <Tab value="Initials">Abbreviated signature for acknowledging pages or clauses</Tab>
+  <Tab value="Name">Recipient's full name (auto-filled when available)</Tab>
+  <Tab value="Email">Recipient's email address (auto-filled)</Tab>
+  <Tab value="Date">Date the field was completed (auto-filled)</Tab>
+  <Tab value="Text">Free-form text input</Tab>
+  <Tab value="Number">Numeric input with optional validation</Tab>
+  <Tab value="Checkbox">Multiple selections from options</Tab>
+  <Tab value="Radio">Single selection from options</Tab>
+  <Tab value="Dropdown">Single selection from a menu</Tab>
+</Tabs>
 
 </Step>
 
@@ -70,11 +86,11 @@ When you have multiple recipients, make sure each one has the appropriate fields
 
 ## Position and Resize Fields
 
-### Moving fields
+### Moving Fields
 
 Click and drag any field to reposition it on the document. Fields snap to help with alignment.
 
-### Resizing fields
+### Resizing Fields
 
 Click a field to select it, then drag the corner handles to resize. This is useful for:
 
@@ -82,7 +98,7 @@ Click a field to select it, then drag the corner handles to resize. This is usef
 - Expanding text fields to accommodate longer input
 - Fitting fields into existing form areas on your PDF
 
-### Multi-page documents
+### Multi-Page Documents
 
 Navigate between pages using the page controls. Fields placed on a page stay on that page. You can place fields on any page of your document.
 
@@ -90,7 +106,7 @@ Navigate between pages using the page controls. Fields placed on a page stay on 
 
 Click on any field to open its properties panel. Available options vary by field type.
 
-### Common properties
+### Common Properties
 
 | Property  | Description                                                   |
 | --------- | ------------------------------------------------------------- |
@@ -99,7 +115,7 @@ Click on any field to open its properties panel. Available options vary by field
 | Label     | Text displayed above the field                                |
 | Font size | Size of text in the field (8-96px)                            |
 
-### Text field properties
+### Text Field Properties
 
 | Property        | Description                                |
 | --------------- | ------------------------------------------ |
@@ -108,7 +124,7 @@ Click on any field to open its properties panel. Available options vary by field
 | Character limit | Maximum characters allowed                 |
 | Text alignment  | Left, center, or right                     |
 
-### Number field properties
+### Number Field Properties
 
 | Property      | Description                   |
 | ------------- | ----------------------------- |
@@ -116,7 +132,7 @@ Click on any field to open its properties panel. Available options vary by field
 | Maximum value | Highest allowed number        |
 | Number format | Display format for the number |
 
-### Selection field properties (Checkbox, Radio, Dropdown)
+### Selection Field Properties (Checkbox, Radio, Dropdown)
 
 | Property          | Description                                         |
 | ----------------- | --------------------------------------------------- |
@@ -130,7 +146,7 @@ For detailed information on all field types, see [Field Types](/docs/concepts/fi
 
 ## Common Field Patterns
 
-### Signature block
+### Signature Block
 
 A typical signature block includes:
 
@@ -142,7 +158,7 @@ A typical signature block includes:
 
 Place these fields together at the bottom of your document or wherever signature lines appear.
 
-### Terms acceptance
+### Terms Acceptance
 
 For documents requiring explicit agreement to terms:
 
@@ -150,7 +166,7 @@ For documents requiring explicit agreement to terms:
 2. Mark the field as **Required**
 3. Place it near the terms text
 
-### Information collection
+### Information Collection
 
 When gathering additional information from signers:
 
@@ -159,7 +175,7 @@ When gathering additional information from signers:
 3. Use **Dropdown** fields for selections like country or department
 4. Set **Placeholder** text to guide what information you need
 
-### Multiple signers
+### Multiple Signers
 
 When you have multiple people signing the same document:
 
@@ -170,17 +186,20 @@ When you have multiple people signing the same document:
 
 ## Edit or Delete Fields
 
-### Edit a field
-
-Click on any field to select it and open its properties panel. Make your changes and they save automatically.
-
-### Delete a field
-
-Select the field and press **Delete** or **Backspace** on your keyboard. Alternatively, click the delete icon in the field properties panel.
-
-### Duplicate a field
-
-Select a field and copy it (Ctrl+C or Cmd+C), then paste (Ctrl+V or Cmd+V) to create a duplicate. This is useful when you need multiple similar fields.
+<Tabs items={['Edit', 'Delete', 'Duplicate']}>
+  <Tab value="Edit">
+    Click on any field to select it and open its properties panel. Make your changes and they save
+    automatically.
+  </Tab>
+  <Tab value="Delete">
+    Select the field and press **Delete** or **Backspace** on your keyboard. Alternatively, click
+    the delete icon in the field properties panel.
+  </Tab>
+  <Tab value="Duplicate">
+    Select a field and copy it (**Ctrl+C** or **Cmd+C**), then paste (**Ctrl+V** or **Cmd+V**) to
+    create a duplicate. This is useful when you need multiple similar fields.
+  </Tab>
+</Tabs>
 
 ---
 

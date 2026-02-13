@@ -3,9 +3,10 @@ title: PDF Placeholders
 description: Learn how to use placeholder text in your PDFs for automatic field placement in Documenso.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
-# PDF Placeholders
+## Overview
 
 Documenso can automatically detect placeholder text in your PDF documents and create fields at those locations. This allows you to prepare documents in your preferred editing tool (Word, Google Docs, etc.) with placeholders that become signature fields when uploaded.
 
@@ -161,22 +162,24 @@ When uploaded, this creates:
 
 ## Troubleshooting
 
-### Placeholders Not Detected
+<Accordions type="multiple">
+  <Accordion title="Placeholders Not Detected">
+    - Ensure placeholders use double curly braces: `{{...}}`
+    - Check that the placeholder includes a recipient identifier (e.g., `r1`)
+    - Verify the field type is spelled correctly
+    - Try using a standard font in your source document
+  </Accordion>
 
-- Ensure placeholders use double curly braces: `{{...}}`
-- Check that the placeholder includes a recipient identifier (e.g., `r1`)
-- Verify the field type is spelled correctly
-- Try using a standard font in your source document
+<Accordion title="Wrong Field Position">
+  - The field is placed at the exact location of the placeholder text - If the position seems off,
+  check that your PDF wasn't scaled or reformatted when exported
+</Accordion>
 
-### Wrong Field Position
-
-- The field is placed at the exact location of the placeholder text
-- If the position seems off, check that your PDF wasn't scaled or reformatted when exported
-
-### Placeholder Text Still Visible
-
-- Placeholder text is covered with a white rectangle after field creation
-- If you see the text, try re-uploading the document
+  <Accordion title="Placeholder Text Still Visible">
+    - Placeholder text is covered with a white rectangle after field creation
+    - If you see the text, try re-uploading the document
+  </Accordion>
+</Accordions>
 
 ## See Also
 

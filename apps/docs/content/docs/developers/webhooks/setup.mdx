@@ -3,6 +3,7 @@ title: Webhook Setup
 description: Configure webhooks to receive real-time notifications about document events.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
@@ -118,23 +119,22 @@ http.Error(w, "Invalid payload", http.StatusBadRequest)
 return
 }
 
-    fmt.Printf("Received event: %s\n", data.Event)
-    fmt.Printf("Document ID: %v\n", data.Payload["id"])
-    fmt.Printf("Document title: %v\n", data.Payload["title"])
+fmt.Printf("Received event: %s\n", data.Event)
+fmt.Printf("Document ID: %v\n", data.Payload["id"])
+fmt.Printf("Document title: %v\n", data.Payload["title"])
 
-    // Process the webhook event
-    switch data.Event {
-    case "DOCUMENT_COMPLETED":
-    	// Handle completed document
-    case "DOCUMENT_SIGNED":
-    	// Handle signed document
-    }
+// Process the webhook event
+switch data.Event {
+case "DOCUMENT_COMPLETED":
+// Handle completed document
+case "DOCUMENT_SIGNED":
+// Handle signed document
+}
 
-    // Respond with 200 OK to acknowledge receipt
-    w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusOK)
-    json.NewEncoder(w).Encode(map[string]bool{"received": true})
-
+// Respond with 200 OK to acknowledge receipt
+w.Header().Set("Content-Type", "application/json")
+w.WriteHeader(http.StatusOK)
+json.NewEncoder(w).Encode(map[string]bool{"received": true})
 }
 
 func main() {
@@ -157,13 +157,13 @@ http.ListenAndServe(":3000", nil)
 
 <Steps>
 <Step>
-### Navigate to Team Settings
+### Navigate to team settings
 
 Click your avatar in the top right corner and select **Team settings** from the dropdown menu.
 </Step>
 
 <Step>
-### Open the Webhooks Tab
+### Open the webhooks tab
 
 Navigate to the **Webhooks** tab in the team settings sidebar.
 
@@ -171,7 +171,7 @@ Navigate to the **Webhooks** tab in the team settings sidebar.
 </Step>
 
 <Step>
-### Create a New Webhook
+### Create a new webhook
 
 Click the **Create Webhook** button to open the configuration dialog.
 
@@ -179,7 +179,7 @@ Click the **Create Webhook** button to open the configuration dialog.
 </Step>
 
 <Step>
-### Configure the Webhook
+### Configure the webhook
 
 Fill in the following fields:
 
@@ -191,7 +191,7 @@ Fill in the following fields:
 </Step>
 
 <Step>
-### Save the Webhook
+### Save the webhook
 
 Click **Create Webhook** to save your configuration. The webhook is now active and will receive events.
 </Step>
@@ -237,7 +237,7 @@ Documenso provides a built-in testing feature to verify your webhook endpoint wo
 
 <Steps>
 <Step>
-### Navigate to Webhook Details
+### Navigate to webhook details
 
 Go to **Team Settings > Webhooks** and click on the webhook you want to test.
 
@@ -245,19 +245,19 @@ Go to **Team Settings > Webhooks** and click on the webhook you want to test.
 </Step>
 
 <Step>
-### Click Test
+### Click test
 
 Click the **Test** button in the webhook details page.
 </Step>
 
 <Step>
-### Select an Event Type
+### Select an event type
 
 Choose which event type you want to simulate from the dropdown.
 </Step>
 
 <Step>
-### Send Test Payload
+### Send test payload
 
 Click **Send** to dispatch a test webhook with sample data to your endpoint.
 
@@ -310,11 +310,23 @@ After 5 failed attempts, the webhook is marked as failed and no further automati
 
 ## Security Best Practices
 
-1. **Use HTTPS**: Always use HTTPS endpoints in production
-2. **Verify signatures**: Use a webhook secret and verify the `X-Documenso-Secret` header (see [Verification](/docs/developers/webhooks/verification))
-3. **Validate payloads**: Validate incoming data before processing
-4. **Respond quickly**: Return 200 OK immediately, then process asynchronously
-5. **Idempotency**: Handle duplicate deliveries gracefully
+<Accordions type="multiple">
+  <Accordion title="Use HTTPS">
+    Always use HTTPS endpoints in production.
+  </Accordion>
+  <Accordion title="Verify signatures">
+    Use a webhook secret and verify the `X-Documenso-Secret` header (see [Verification](/docs/developers/webhooks/verification)).
+  </Accordion>
+  <Accordion title="Validate payloads">
+    Validate incoming data before processing.
+  </Accordion>
+  <Accordion title="Respond quickly">
+    Return 200 OK immediately, then process asynchronously.
+  </Accordion>
+  <Accordion title="Idempotency">
+    Handle duplicate deliveries gracefully.
+  </Accordion>
+</Accordions>
 
 ## Next Steps
 

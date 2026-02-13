@@ -3,6 +3,7 @@ title: Docker Compose
 description: Deploy Documenso with Docker Compose, including PostgreSQL. This production-ready setup is suitable for most self-hosted deployments.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -27,7 +28,7 @@ docker compose version
 
 <Steps>
 <Step>
-### Download the Compose File
+### Download the compose file
 
 Download the production Docker Compose file:
 
@@ -46,7 +47,7 @@ cd documenso/docker/production
 </Step>
 
 <Step>
-### Create Environment File
+### Create environment file
 
 Create a `.env` file in the same directory as `compose.yml`:
 
@@ -476,76 +477,34 @@ See [Storage Configuration](/docs/self-hosting/configuration/storage).
 
 ## Troubleshooting
 
-### Container fails to start
-
-Check logs for error messages:
-
-```bash
-docker compose logs documenso
-```
-
-Common causes:
-
-- **Missing environment variables**: Ensure all required variables are in `.env`
-- **Database not ready**: The container waits for database health check
-- **Port conflict**: Change `PORT` in `.env` if 3000 is in use
-
-### Database connection errors
-
-Verify the database is healthy:
-
-```bash
-docker compose ps database
-```
-
-Test the connection:
-
-```bash
-docker compose exec database psql -U documenso -d documenso -c "SELECT 1"
-```
-
-### Certificate errors
-
-Check certificate status:
-
-```bash
-curl http://localhost:3000/api/certificate-status
-```
-
-Common issues:
-
-- **File not found**: Verify volume mount in `compose.yml`
-- **Permission denied**: Run `chown 1001:1001` on the certificate file
-- **No password**: The certificate must have a password
-
-### Emails not sending
-
-Verify SMTP configuration:
-
-1. Check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your setup
-2. Verify host, port, username, and password
-3. Check logs for SMTP errors: `docker compose logs documenso | grep -i smtp`
-
-### Application unreachable
-
-1. Verify containers are running: `docker compose ps`
-2. Check the port mapping matches your `.env`
-3. Test locally: `curl http://localhost:3000/api/health`
-4. Check firewall rules allow traffic on the configured port
-
-### Out of disk space
-
-Check disk usage:
-
-```bash
-docker system df
-```
-
-Clean up unused Docker resources:
-
-```bash
-docker system prune -a
-```
+<Accordions type="multiple">
+  <Accordion title="Container fails to start">
+    Check logs: `docker compose logs documenso`. Common causes: missing environment variables
+    (ensure all required variables are in `.env`), database not ready (the container waits for
+    database health check), port conflict (change `PORT` in `.env` if 3000 is in use).
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Verify the database is healthy: `docker compose ps database`. Test: `docker compose exec
+    database psql -U documenso -d documenso -c "SELECT 1"`.
+  </Accordion>
+  <Accordion title="Certificate errors">
+    Check certificate status: `curl http://localhost:3000/api/certificate-status`. Common issues:
+    file not found (verify volume mount in `compose.yml`), permission denied (run `chown 1001:1001`
+    on the certificate file), no password (the certificate must have a password).
+  </Accordion>
+  <Accordion title="Emails not sending">
+    Check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your setup, verify host, port, username, and
+    password, check logs: `docker compose logs documenso | grep -i smtp`.
+  </Accordion>
+  <Accordion title="Application unreachable">
+    Verify containers are running: `docker compose ps`; check the port mapping matches your `.env`;
+    test locally: `curl http://localhost:3000/api/health`; check firewall rules allow traffic on the
+    configured port.
+  </Accordion>
+  <Accordion title="Out of disk space">
+    Check disk usage: `docker system df`. Clean up: `docker system prune -a`.
+  </Accordion>
+</Accordions>
 
 ---
 

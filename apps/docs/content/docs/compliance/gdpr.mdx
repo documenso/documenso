@@ -3,6 +3,9 @@ title: GDPR
 description: Understand how Documenso handles GDPR compliance for data processing and storage.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+
 ## Documenso's Role
 
 When using Documenso for document signing, two distinct data processing roles apply:
@@ -48,25 +51,28 @@ Data is processed for the following purposes:
 
 Where your data is stored depends on how you use Documenso:
 
-### Documenso Cloud
+<Tabs items={['Documenso Cloud', 'Self-Hosted']}>
+  <Tab value="Documenso Cloud">
+    For the hosted cloud service:
 
-For the hosted cloud service:
+    - Application data is stored in data centers within the European Union
+    - Document storage uses EU-based infrastructure
+    - Backups are maintained in geographically separate EU locations
 
-- Application data is stored in data centers within the European Union
-- Document storage uses EU-based infrastructure
-- Backups are maintained in geographically separate EU locations
+    Contact Documenso for specific information about sub-processors and data center locations.
 
-Contact Documenso for specific information about sub-processors and data center locations.
+  </Tab>
+  <Tab value="Self-Hosted">
+    When you self-host Documenso:
 
-### Self-Hosted
+    - You control all data storage locations
+    - No data is transmitted to Documenso's infrastructure
+    - You choose your own database, file storage, and backup locations
 
-When you self-host Documenso:
+    Self-hosting provides complete control over data residency, which may be required for certain compliance scenarios.
 
-- You control all data storage locations
-- No data is transmitted to Documenso's infrastructure
-- You choose your own database, file storage, and backup locations
-
-Self-hosting provides complete control over data residency, which may be required for certain compliance scenarios.
+  </Tab>
+</Tabs>
 
 ## Data Subject Rights
 
@@ -91,27 +97,28 @@ When you receive a data subject request, you can:
 
 Documenso supports data deletion to help fulfill erasure requests:
 
-**User Account Deletion**
+<Accordions type="multiple">
+  <Accordion title="User Account Deletion">
+    - Users can delete their own accounts
+    - Account deletion removes profile data and authentication credentials
+    - Team owners can remove members from teams
+  </Accordion>
+  <Accordion title="Document Deletion">
+    - Document owners can delete documents in draft state
+    - Completed documents can be deleted by the owner
+    - Deletion removes the document, recipient data, and associated audit logs
+  </Accordion>
+  <Accordion title="Retention Considerations">
+    For signed documents, you may need to balance deletion requests against:
 
-- Users can delete their own accounts
-- Account deletion removes profile data and authentication credentials
-- Team owners can remove members from teams
+    - Legal requirements to retain signed contracts
+    - Your organization's record-keeping policies
+    - The rights of other parties to the signed document
 
-**Document Deletion**
+    Consult with legal counsel to establish appropriate retention policies.
 
-- Document owners can delete documents in draft state
-- Completed documents can be deleted by the owner
-- Deletion removes the document, recipient data, and associated audit logs
-
-**Retention Considerations**
-
-For signed documents, you may need to balance deletion requests against:
-
-- Legal requirements to retain signed contracts
-- Your organization's record-keeping policies
-- The rights of other parties to the signed document
-
-Consult with legal counsel to establish appropriate retention policies.
+  </Accordion>
+</Accordions>
 
 ## Self-Hosting for GDPR Compliance
 
@@ -128,13 +135,16 @@ See the [Self-Hosting Guide](/docs/self-hosting) for deployment options.
 
 A Data Processing Agreement (DPA) is a contract required by GDPR when a data controller engages a data processor.
 
-For Documenso Cloud users:
-
-- A DPA is available upon request
-- Contact [support@documenso.com](mailto:support@documenso.com) to request a DPA
-- The DPA covers Documenso's obligations as a data processor
-
-For self-hosted deployments, no DPA with Documenso is required since no personal data is processed by Documenso.
+<Tabs items={['Documenso Cloud', 'Self-Hosted']}>
+  <Tab value="Documenso Cloud">
+    - A DPA is available upon request - Contact
+    [support@documenso.com](mailto:support@documenso.com) to request a DPA - The DPA covers
+    Documenso's obligations as a data processor
+  </Tab>
+  <Tab value="Self-Hosted">
+    No DPA with Documenso is required since no personal data is processed by Documenso.
+  </Tab>
+</Tabs>
 
 ---
 

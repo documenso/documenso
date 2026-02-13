@@ -3,6 +3,7 @@ title: CSS Variables
 description: Customize the appearance of embedded signing experiences with CSS variables and class targets.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 <Callout type="info">Custom CSS and CSS variables are available on the **Platform Plan**.</Callout>
@@ -187,10 +188,20 @@ Fields expose data attributes for state-based styling:
 
 ## Best Practices
 
-1. **Maintain contrast** - Ensure sufficient contrast between background and foreground colors for accessibility.
-2. **Test dark mode** - If dark mode is not disabled, verify your variables work in both modes.
-3. **Match your brand** - Align `primary` and `accent` colors with your brand for a cohesive look.
-4. **Consistent radius** - Use a border radius that matches your application's design system.
+<Accordions type="multiple">
+  <Accordion title="Maintain contrast">
+    Ensure sufficient contrast between background and foreground colors for accessibility.
+  </Accordion>
+  <Accordion title="Test dark mode">
+    If dark mode is not disabled, verify your variables work in both modes.
+  </Accordion>
+  <Accordion title="Match your brand">
+    Align `primary` and `accent` colors with your brand for a cohesive look.
+  </Accordion>
+  <Accordion title="Consistent radius">
+    Use a border radius that matches your application's design system.
+  </Accordion>
+</Accordions>
 
 ---
 

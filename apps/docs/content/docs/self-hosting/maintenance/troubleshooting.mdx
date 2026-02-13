@@ -3,6 +3,7 @@ title: Troubleshooting
 description: Diagnose and resolve common issues with your self-hosted Documenso instance, organized by component.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## General Debugging
@@ -880,15 +881,40 @@ For security vulnerabilities, do not open a public issue. Contact security@docum
 
 Use this checklist when diagnosing issues:
 
-- [ ] Check application logs for errors
-- [ ] Verify all required environment variables are set
-- [ ] Confirm database connectivity
-- [ ] Test health endpoint responds
-- [ ] Check container resource usage (CPU, memory)
-- [ ] Verify certificate is valid and accessible
-- [ ] Confirm email configuration
-- [ ] Check network connectivity to external services
-- [ ] Review recent changes (upgrades, config changes)
+<Accordions type="multiple">
+  <Accordion title="Check application logs for errors">
+    Run `docker logs documenso` or `docker compose logs documenso` (or `kubectl logs` for
+    Kubernetes) and look for error messages.
+  </Accordion>
+  <Accordion title="Verify all required environment variables are set">
+    Compare your `.env` or configuration against [Environment
+    Variables](/docs/self-hosting/configuration/environment).
+  </Accordion>
+  <Accordion title="Confirm database connectivity">
+    Test the connection string with `psql` or the database CLI. Ensure the database is running and
+    reachable.
+  </Accordion>
+  <Accordion title="Test health endpoint responds">
+    Run `curl http://localhost:3000/api/health` and verify it returns a successful response.
+  </Accordion>
+  <Accordion title="Check container resource usage (CPU, memory)">
+    Use `docker stats` or your container runtime's monitoring to ensure adequate resources.
+  </Accordion>
+  <Accordion title="Verify certificate is valid and accessible">
+    Check `curl http://localhost:3000/api/certificate-status` and ensure file permissions are
+    correct.
+  </Accordion>
+  <Accordion title="Confirm email configuration">
+    Verify SMTP settings in [Email Configuration](/docs/self-hosting/configuration/email) and check
+    logs for delivery errors.
+  </Accordion>
+  <Accordion title="Check network connectivity to external services">
+    Ensure outbound connections to SMTP, S3, and other external services are allowed.
+  </Accordion>
+  <Accordion title="Review recent changes (upgrades, config changes)">
+    Check release notes and compare your configuration before and after the change.
+  </Accordion>
+</Accordions>
 
 ---
 

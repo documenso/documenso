@@ -3,10 +3,11 @@ title: Email Domains
 description: Learn how to create and manage email domains in Documenso.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# Email Domains
+## Overview
 
 Email Domains allow you to send emails to recipients from your own domain instead of the default Documenso email address.
 
@@ -25,7 +26,7 @@ Before setting up email domains, ensure you have:
 <Steps>
 
 <Step>
-### Access Email Domains Settings
+### Access email domains settings
 
 Navigate to your Organisation email domains settings page and click the "Add Email Domain" button.
 
@@ -34,7 +35,7 @@ Navigate to your Organisation email domains settings page and click the "Add Ema
 </Step>
 
 <Step>
-### Configure DNS Records
+### Configure DNS records
 
 After adding your domain, Documenso will provide you with the following required DNS records that need to be configured on your domain:
 
@@ -53,9 +54,10 @@ Configure these records in your domain's DNS settings according to their specifi
 </Step>
 
 <Step>
-### Verify Domain Configuration
+### Verify domain configuration
 
 Once you've added the DNS records, return to the Documenso email domains settings page and click the "Verify" button.
+
 This will trigger a verification process which will check if the DNS records are properly configured. If successful, the domain will be marked as "Active".
 
 ![Domain verification process](/email-domains/email-domain-sync.webp)
@@ -74,7 +76,7 @@ Once your email domain has been configured, you can create multiple email addres
 <Steps>
 
 <Step>
-### Select the Email Domain You Want to Use
+### Select the email domain you want to use
 
 Navigate to the email domains settings page and click "Manage" on the domain you want to use.
 
@@ -83,7 +85,7 @@ Navigate to the email domains settings page and click "Manage" on the domain you
 </Step>
 
 <Step>
-### Add a New Email
+### Add a new email
 
 Click on the "Add Email" button to begin the setup process.
 
@@ -92,7 +94,7 @@ Click on the "Add Email" button to begin the setup process.
 </Step>
 
 <Step>
-### Use Email
+### Use email
 
 Once you have added an email, you can configure it to be the default email on either the:
 
@@ -114,19 +116,20 @@ You can also configure the email address directly on the document to override th
 
 ## Troubleshooting
 
-### Common Issues
+<Accordions type="multiple">
+  <Accordion title="DNS Verification Fails">
+    - Double-check all DNS record values
+    - Ensure records are added to the correct domain
+    - Wait for DNS propagation (up to 48 hours)
 
-**DNS Verification Fails**
+  </Accordion>
+  <Accordion title="Emails Not Delivering">
+    - Check domain reputation and blacklist status
+    - Verify SPF, DKIM, and DMARC records
+    - Review bounce and spam reports
 
-- Double-check all DNS record values
-- Ensure records are added to the correct domain
-- Wait for DNS propagation (up to 48 hours)
-
-**Emails Not Delivering**
-
-- Check domain reputation and blacklist status
-- Verify SPF, DKIM, and DMARC records
-- Review bounce and spam reports
+  </Accordion>
+</Accordions>
 
 <Callout type="info">
   For additional support with Email Domains configuration, contact our support team at

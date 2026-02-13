@@ -3,6 +3,7 @@ title: AI Recipient & Field Detection (Self-hosting)
 description: Configure Google Vertex AI so Documenso can detect recipients and fields automatically.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -10,7 +11,7 @@ import { Step, Steps } from 'fumadocs-ui/components/steps';
 
 This guide covers how to enable the AI recipient and field detection features when you self-host Documenso.
 
-## What this enables
+## What This Enables
 
 - Detect recipients from uploaded PDFs (roles, names, emails when present).
 - Detect and place fields (signature, initials, name, email, date, text, number, radio, checkbox) onto draft envelopes.
@@ -22,7 +23,7 @@ This guide covers how to enable the AI recipient and field detection features wh
 - A **Vertex AI Express API key** with access to Gemini models (create via the [Vertex AI Express flow](https://cloud.google.com/vertex-ai/generative-ai/docs/start/express-mode/overview) and manage keys in [API keys](https://cloud.google.com/vertex-ai/generative-ai/docs/start/api-keys)).
 - Documenso version that includes the AI detection feature and the corresponding database migration.
 
-## Configure environment variables
+## Configure Environment Variables
 
 Add these variables to your deployment `.env` (or secret manager):
 
@@ -39,13 +40,13 @@ GOOGLE_VERTEX_LOCATION="global"
   if a model is unavailable, switch to a supported region.
 </Callout>
 
-## Deploy with the published container
+## Deploy with the Published Container
 
 - Use the official Documenso image (DockerHub or GHCR) and supply the Vertex env vars above.
 - Ensure migrations run on startup (the container runs `prisma migrate deploy` in production mode).
 - Restart the container after adding or changing Vertex env vars.
 
-## Enable the feature in Documenso
+## Enable the Feature in Documenso
 
 Once the service is running with the Vertex env vars:
 
@@ -76,9 +77,19 @@ Open a draft envelope. In **Recipients**, you should see the sparkle button for 
 
 ## Troubleshooting
 
-- **Too many requests**: Wait a minute or two and retry (rate limit is 3/min per IP).
-- **AI options hidden**: Ensure the env vars are set, the server was restarted after setting them, and `aiFeaturesEnabled` is enabled at organisation/team level.
-- **Detection fails immediately**: Confirm the Vertex API key is valid and the project has Vertex AI enabled. Check server logs for status codes from Vertex.
+<Accordions type="multiple">
+  <Accordion title="Too many requests">
+    Wait a minute or two and retry (rate limit is 3/min per IP).
+  </Accordion>
+  <Accordion title="AI options hidden">
+    Ensure the env vars are set, the server was restarted after setting them, and
+    `aiFeaturesEnabled` is enabled at organisation/team level.
+  </Accordion>
+  <Accordion title="Detection fails immediately">
+    Confirm the Vertex API key is valid and the project has Vertex AI enabled. Check server logs for
+    status codes from Vertex.
+  </Accordion>
+</Accordions>
 
 If issues persist, recheck env vars, restart the service, and confirm the Prisma migration was applied.
 

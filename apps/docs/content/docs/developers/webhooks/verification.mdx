@@ -3,6 +3,7 @@ title: Webhook Verification
 description: Verify webhook signatures for security.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
@@ -190,18 +191,18 @@ app.post('/webhooks/documenso', (req, res) => {
 
 ## Security Best Practices
 
-### Use Strong Secrets
-
-Generate a cryptographically secure random string for your webhook secret:
+<Accordions type="multiple">
+  <Accordion title="Use strong secrets">
+    Generate a cryptographically secure random string for your webhook secret:
 
 ```bash
 # Generate a 32-byte random secret
 openssl rand -hex 32
 ```
 
-### Store Secrets Securely
-
-Never hardcode secrets in your source code. Use environment variables or a secrets manager:
+  </Accordion>
+  <Accordion title="Store secrets securely">
+    Never hardcode secrets in your source code. Use environment variables or a secrets manager:
 
 ```javascript
 // Good: Environment variable
@@ -211,18 +212,17 @@ const WEBHOOK_SECRET = process.env.DOCUMENSO_WEBHOOK_SECRET;
 const WEBHOOK_SECRET = 'my-secret-key'; // Never do this
 ```
 
-### Rotate Secrets Periodically
-
-Update your webhook secret periodically:
+  </Accordion>
+  <Accordion title="Rotate secrets periodically">
+    Update your webhook secret periodically:
 
 1. Generate a new secret
 2. Update your server to accept both old and new secrets temporarily
 3. Update the webhook configuration in Documenso
 4. Remove the old secret from your server
-
-### Validate Payload Structure
-
-After verifying the signature, validate the payload structure before processing:
+   </Accordion>
+<Accordion title="Validate payload structure">
+  After verifying the signature, validate the payload structure before processing:
 
 ```javascript
 const { event, payload, createdAt } = req.body;
@@ -247,13 +247,12 @@ if (!validEvents.includes(event)) {
 }
 ```
 
-### Use HTTPS
-
-Always use HTTPS endpoints in production to encrypt data in transit, including the secret header.
-
-### Implement Rate Limiting
-
-Protect your endpoint from abuse with rate limiting:
+  </Accordion>
+  <Accordion title="Use HTTPS">
+    Always use HTTPS endpoints in production to encrypt data in transit, including the secret header.
+  </Accordion>
+  <Accordion title="Implement rate limiting">
+    Protect your endpoint from abuse with rate limiting:
 
 ```javascript
 const rateLimit = require('express-rate-limit');
@@ -268,6 +267,9 @@ app.post('/webhooks/documenso', webhookLimiter, (req, res) => {
   // Handle webhook...
 });
 ```
+
+  </Accordion>
+</Accordions>
 
 ## See Also
 

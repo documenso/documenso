@@ -3,23 +3,27 @@ title: Security
 description: Security practices for Documenso Cloud and self-hosted deployments, along with our vulnerability disclosure process.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Security Practices
 
-### Development Security
-
-- **Code review**: All code changes require review before merging
-- **Dependency management**: Dependencies are regularly updated and monitored for vulnerabilities
-- **Static analysis**: Automated security scanning is part of the CI/CD pipeline
-- **Open source**: The codebase is publicly available for security review at [github.com/documenso/documenso](https://github.com/documenso/documenso)
-
-### Access Controls
-
-- **Role-based access**: Teams support member, manager, and admin roles with distinct permissions
-- **API token scoping**: API tokens can be scoped to specific teams and set with expiration dates
-- **Session management**: Users can view and revoke active sessions
-- **Audit logging**: Document actions are logged with timestamps and IP addresses
+<Accordions type="multiple">
+  <Accordion title="Development Security">
+    - **Code review**: All code changes require review before merging - **Dependency management**:
+    Dependencies are regularly updated and monitored for vulnerabilities - **Static analysis**:
+    Automated security scanning is part of the CI/CD pipeline - **Open source**: The codebase is
+    publicly available for security review at
+    [github.com/documenso/documenso](https://github.com/documenso/documenso)
+  </Accordion>
+  <Accordion title="Access Controls">
+    - **Role-based access**: Teams support member, manager, and admin roles with distinct
+    permissions - **API token scoping**: API tokens can be scoped to specific teams and set with
+    expiration dates - **Session management**: Users can view and revoke active sessions - **Audit
+    logging**: Document actions are logged with timestamps and IP addresses
+  </Accordion>
+</Accordions>
 
 ## Infrastructure Security
 
@@ -42,32 +46,35 @@ Self-hosted deployments are responsible for their own infrastructure security. S
 
 ## Data Encryption
 
-### Encryption in Transit
+<Accordions type="multiple">
+  <Accordion title="Encryption in Transit">
+    All data transmitted to and from Documenso is encrypted using TLS 1.2 or higher. This includes:
 
-All data transmitted to and from Documenso is encrypted using TLS 1.2 or higher. This includes:
+    - Web application traffic
+    - API requests
+    - Email delivery (when supported by the receiving server)
+    - Webhook payloads
 
-- Web application traffic
-- API requests
-- Email delivery (when supported by the receiving server)
-- Webhook payloads
+  </Accordion>
+  <Accordion title="Encryption at Rest">
+    For Documenso Cloud:
 
-### Encryption at Rest
+    - Database contents are encrypted at rest
+    - Document storage uses encrypted object storage
+    - Backups are encrypted
 
-For Documenso Cloud:
+    For self-hosted deployments, encryption at rest depends on your infrastructure configuration.
 
-- Database contents are encrypted at rest
-- Document storage uses encrypted object storage
-- Backups are encrypted
+  </Accordion>
+  <Accordion title="Application-Level Encryption">
+    Documenso encrypts sensitive data at the application level:
 
-For self-hosted deployments, encryption at rest depends on your infrastructure configuration.
+    - Encryption keys are configured via `NEXT_PRIVATE_ENCRYPTION_KEY` and `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
+    - Session tokens are signed using `NEXTAUTH_SECRET`
+    - Passwords are hashed using bcrypt
 
-### Application-Level Encryption
-
-Documenso encrypts sensitive data at the application level:
-
-- Encryption keys are configured via `NEXT_PRIVATE_ENCRYPTION_KEY` and `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
-- Session tokens are signed using `NEXTAUTH_SECRET`
-- Passwords are hashed using bcrypt
+  </Accordion>
+</Accordions>
 
 ## Authentication Security
 
@@ -98,50 +105,56 @@ Documenso encrypts sensitive data at the application level:
 
 Documenso operates a responsible disclosure process for security vulnerabilities.
 
-### Reporting a Vulnerability
+<Accordions type="multiple">
+  <Accordion title="Reporting a Vulnerability">
+    If you discover a security vulnerability, please report it by emailing:
 
-If you discover a security vulnerability, please report it by emailing:
+    **security@documenso.com**
 
-**security@documenso.com**
+    Include the following information:
 
-Include the following information:
+    - Description of the vulnerability
+    - Steps to reproduce
+    - Potential impact
+    - Any suggested fixes (optional)
 
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Any suggested fixes (optional)
+  </Accordion>
+  <Accordion title="Response Timeline">
+    | Stage                 | Timeline            |
+    | --------------------- | ------------------- |
+    | **Acknowledgment**    | Within 48 hours     |
+    | **Initial triage**    | Within 5 days       |
+    | **Status update**     | Within 10 days      |
+    | **Resolution target** | Depends on severity |
+  </Accordion>
+  <Accordion title="Scope">
+    <Tabs items={['In scope', 'Out of scope']}>
+      <Tab value="In scope">
+        The following are in scope for vulnerability reports:
 
-### Response Timeline
+        - Documenso application code
+        - Authentication and authorization flaws
+        - Data exposure vulnerabilities
+        - Injection vulnerabilities
+        - Cross-site scripting (XSS)
+        - Cross-site request forgery (CSRF)
+      </Tab>
+      <Tab value="Out of scope">
+        The following are out of scope:
 
-| Stage                 | Timeline            |
-| --------------------- | ------------------- |
-| **Acknowledgment**    | Within 48 hours     |
-| **Initial triage**    | Within 5 days       |
-| **Status update**     | Within 10 days      |
-| **Resolution target** | Depends on severity |
+        - Social engineering attacks
+        - Denial of service attacks
+        - Issues in third-party dependencies (report to the upstream project)
+        - Issues requiring physical access to a user's device
+        - Theoretical vulnerabilities without proof of concept
+      </Tab>
+    </Tabs>
 
-### Scope
-
-The following are in scope for vulnerability reports:
-
-- Documenso application code
-- Authentication and authorization flaws
-- Data exposure vulnerabilities
-- Injection vulnerabilities
-- Cross-site scripting (XSS)
-- Cross-site request forgery (CSRF)
-
-The following are out of scope:
-
-- Social engineering attacks
-- Denial of service attacks
-- Issues in third-party dependencies (report to the upstream project)
-- Issues requiring physical access to a user's device
-- Theoretical vulnerabilities without proof of concept
-
-### Recognition
-
-We acknowledge security researchers who responsibly disclose vulnerabilities. With your permission, we will credit you when the fix is released.
+  </Accordion>
+  <Accordion title="Recognition">
+    We acknowledge security researchers who responsibly disclose vulnerabilities. With your permission, we will credit you when the fix is released.
+  </Accordion>
+</Accordions>
 
 <Callout type="warn">
   Do not publicly disclose vulnerabilities until they have been addressed. Public disclosure of
@@ -177,34 +190,28 @@ See [Upgrades](/docs/self-hosting/maintenance/upgrades) for update procedures.
 
 When self-hosting Documenso, you are responsible for the security of your deployment. The following recommendations apply:
 
-### Infrastructure
-
-- **Use HTTPS**: Configure TLS certificates for all traffic
-- **Firewall rules**: Restrict access to necessary ports only
-- **Network isolation**: Place the database on a private network
-- **Regular updates**: Keep the host OS and dependencies updated
-
-### Configuration
-
-- **Strong secrets**: Generate cryptographically random values for:
-  - `NEXTAUTH_SECRET`
-  - `NEXT_PRIVATE_ENCRYPTION_KEY`
-  - `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY`
-- **Database security**: Use strong passwords and restrict database access
-- **Environment variables**: Store secrets securely (do not commit to version control)
-
-### Operations
-
-- **Backups**: Implement regular encrypted backups
-- **Monitoring**: Set up logging and alerting for security events
-- **Access control**: Limit who has access to the server and database
-- **Incident response**: Have a plan for responding to security incidents
-
-### Signing Certificates
-
-- Store signing certificates securely
-- Use hardware security modules (HSM) for high-security requirements
-- Rotate certificates according to your security policy
+<Accordions type="multiple">
+  <Accordion title="Infrastructure">
+    - **Use HTTPS**: Configure TLS certificates for all traffic - **Firewall rules**: Restrict
+    access to necessary ports only - **Network isolation**: Place the database on a private network
+    - **Regular updates**: Keep the host OS and dependencies updated
+  </Accordion>
+  <Accordion title="Configuration">
+    - **Strong secrets**: Generate cryptographically random values for: - `NEXTAUTH_SECRET` -
+    `NEXT_PRIVATE_ENCRYPTION_KEY` - `NEXT_PRIVATE_ENCRYPTION_SECONDARY_KEY` - **Database security**:
+    Use strong passwords and restrict database access - **Environment variables**: Store secrets
+    securely (do not commit to version control)
+  </Accordion>
+  <Accordion title="Operations">
+    - **Backups**: Implement regular encrypted backups - **Monitoring**: Set up logging and alerting
+    for security events - **Access control**: Limit who has access to the server and database -
+    **Incident response**: Have a plan for responding to security incidents
+  </Accordion>
+  <Accordion title="Signing Certificates">
+    - Store signing certificates securely - Use hardware security modules (HSM) for high-security
+    requirements - Rotate certificates according to your security policy
+  </Accordion>
+</Accordions>
 
 See [Environment Variables](/docs/self-hosting/configuration/environment) for security-related configuration options.
 

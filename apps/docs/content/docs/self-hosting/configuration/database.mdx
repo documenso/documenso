@@ -3,6 +3,7 @@ title: Database Configuration
 description: Configure PostgreSQL connection strings, pooling, SSL, migrations, and performance tuning for your Documenso deployment.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## Supported Databases
@@ -208,27 +209,18 @@ npx prisma migrate deploy
 
 ### Troubleshooting Migrations
 
-**Migration failed midway:**
-
-Check the `_prisma_migrations` table for failed migrations:
-
-```sql
-SELECT * FROM _prisma_migrations WHERE finished_at IS NULL;
-```
-
-To retry a failed migration:
-
-1. Fix the underlying issue (disk space, permissions, etc.)
-2. Mark the migration as rolled back: `UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name = 'failed_migration_name';`
-3. Run migrations again
-
-**Connection timeout during migration:**
-
-Use the direct database URL and increase timeout:
-
-```bash
-NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"
-```
+<Accordions type="multiple">
+  <Accordion title="Migration failed midway">
+    Check the `_prisma_migrations` table: `SELECT * FROM _prisma_migrations WHERE finished_at IS
+    NULL;`. To retry: fix the underlying issue (disk space, permissions, etc.), mark as rolled back:
+    `UPDATE _prisma_migrations SET rolled_back_at = NOW() WHERE migration_name =
+    'failed_migration_name';`, run migrations again.
+  </Accordion>
+  <Accordion title="Connection timeout during migration">
+    Use the direct database URL and increase timeout:
+    `NEXT_PRIVATE_DIRECT_DATABASE_URL="postgresql://user:password@host:5432/documenso?connect_timeout=60"`.
+  </Accordion>
+</Accordions>
 
 ## Managed Database Services
 
@@ -408,103 +400,33 @@ Monitor these metrics:
 
 ## Troubleshooting
 
-### Connection refused
-
-```
-Error: connect ECONNREFUSED 127.0.0.1:5432
-```
-
-**Causes:**
-
-- PostgreSQL is not running
-- Incorrect host or port
-- Firewall blocking the connection
-
-**Solutions:**
-
-1. Verify PostgreSQL is running: `pg_isready -h host -p 5432`
-2. Check the connection string host and port
-3. Verify firewall rules allow the connection
-
-### Authentication failed
-
-```
-Error: password authentication failed for user "documenso"
-```
-
-**Causes:**
-
-- Incorrect password
-- User doesn't exist
-- Password contains special characters that need encoding
-
-**Solutions:**
-
-1. Verify credentials in `pg_hba.conf`
-2. URL-encode special characters in the password
-3. Reset the password: `ALTER USER documenso WITH PASSWORD 'newpassword';`
-
-### SSL connection required
-
-```
-Error: SSL/TLS required
-```
-
-**Solution:**
-
-Add SSL mode to your connection string:
-
-```
-postgresql://user:password@host:5432/documenso?sslmode=require
-```
-
-### Too many connections
-
-```
-Error: too many connections for role "documenso"
-```
-
-**Causes:**
-
-- Connection pool exhausted
-- Connections not being released
-- Multiple application instances exceeding limits
-
-**Solutions:**
-
-1. Reduce `connection_limit` in the connection string
-2. Increase `max_connections` in PostgreSQL
-3. Implement connection pooling with PgBouncer
-
-### Database does not exist
-
-```
-Error: database "documenso" does not exist
-```
-
-**Solution:**
-
-Create the database:
-
-```sql
-CREATE DATABASE documenso;
-GRANT ALL PRIVILEGES ON DATABASE documenso TO documenso;
-```
-
-### Permission denied
-
-```
-Error: permission denied for table users
-```
-
-**Solution:**
-
-Grant necessary permissions:
-
-```sql
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;
-```
+<Accordions type="multiple">
+  <Accordion title="Connection refused">
+    Causes: PostgreSQL not running, incorrect host or port, firewall blocking. Solutions: verify
+    with `pg_isready -h host -p 5432`, check the connection string, verify firewall rules.
+  </Accordion>
+  <Accordion title="Authentication failed">
+    Causes: incorrect password, user doesn't exist, password contains special characters. Solutions:
+    verify credentials in `pg_hba.conf`, URL-encode special characters, reset: `ALTER USER documenso
+    WITH PASSWORD 'newpassword';`.
+  </Accordion>
+  <Accordion title="SSL connection required">
+    Add SSL mode to your connection string:
+    `postgresql://user:password@host:5432/documenso?sslmode=require`.
+  </Accordion>
+  <Accordion title="Too many connections">
+    Causes: connection pool exhausted, connections not released, multiple instances exceeding
+    limits. Solutions: reduce `connection_limit`, increase `max_connections`, implement PgBouncer.
+  </Accordion>
+  <Accordion title="Database does not exist">
+    Create the database: `CREATE DATABASE documenso;` and `GRANT ALL PRIVILEGES ON DATABASE
+    documenso TO documenso;`.
+  </Accordion>
+  <Accordion title="Permission denied">
+    Grant permissions: `GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO documenso;` and
+    `GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO documenso;`.
+  </Accordion>
+</Accordions>
 
 ---
 

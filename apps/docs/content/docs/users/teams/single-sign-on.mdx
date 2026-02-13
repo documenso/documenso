@@ -3,8 +3,10 @@ title: Single Sign-On (SSO)
 description: Configure Single Sign-On for your team using any OpenID Connect (OIDC) identity provider.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 <Callout type="warn">SSO is only available on the Enterprise plan.</Callout>
 
@@ -25,7 +27,7 @@ Documenso supports any identity provider that implements the OpenID Connect (OID
 
 <Steps>
 <Step>
-### Access SSO Settings
+### Access SSO settings
 
 1. Navigate to your organization settings
 2. Select **Single Sign-On** from the sidebar
@@ -35,14 +37,14 @@ Documenso supports any identity provider that implements the OpenID Connect (OID
 </Step>
 
 <Step>
-### Get Your Redirect URI
+### Get your redirect URI
 
 At the top of the SSO settings page, you'll find the **Redirect URI** and **Required Scopes**. Copy these values - you'll need them when configuring your identity provider.
 
 </Step>
 
 <Step>
-### Configure Your Identity Provider
+### Configure your identity provider
 
 In your identity provider's admin console, create a new OIDC application with:
 
@@ -58,7 +60,7 @@ After creating the application, note down:
 </Step>
 
 <Step>
-### Enter SSO Configuration
+### Enter SSO configuration
 
 Back in Documenso, enter the following:
 
@@ -69,7 +71,7 @@ Back in Documenso, enter the following:
 </Step>
 
 <Step>
-### Set Allowed Domains and Default Role
+### Set allowed domains and default role
 
 Configure which email domains can authenticate and what role new users receive (see sections below).
 
@@ -87,7 +89,7 @@ Toggle **Enable SSO portal** and click **Update** to activate SSO for your team.
 
 ### Issuer URL
 
-The OpenID Connect discovery endpoint for your identity provider. Common formats:
+The OpenID Connect discovery endpoint for your identity provider.
 
 | Provider           | Issuer URL Format                                                                     |
 | ------------------ | ------------------------------------------------------------------------------------- |
@@ -108,13 +110,13 @@ The OpenID Connect discovery endpoint for your identity provider. Common formats
 
 ### Default Organization Role
 
-The role assigned to users when they first sign in through SSO. Choose from:
+The role assigned to users when they first sign in through SSO. You can change individual roles after they've joined.
 
-- **Member**: Can view and sign documents shared with them
-- **Manager**: Can manage documents and organization settings
-- **Admin**: Full access to organization configuration
-
-You can change individual user roles after they've joined.
+<Tabs items={['Member', 'Manager', 'Admin']}>
+  <Tab value="Member">Can view and sign documents shared with them.</Tab>
+  <Tab value="Manager">Can manage documents and organization settings.</Tab>
+  <Tab value="Admin">Full access to organization configuration.</Tab>
+</Tabs>
 
 ### Allowed Email Domains
 
@@ -135,10 +137,32 @@ Leave empty to allow any domain authenticated by your identity provider.
 
 When a user signs in through your SSO portal for the first time:
 
-1. Documenso verifies their identity with your provider
-2. A new account is created (or linked if the email already exists)
-3. The user is added to your organization with the default role
-4. They can immediately access organization documents
+<Steps>
+<Step>
+### Verify identity
+
+Documenso verifies their identity with your provider.
+
+</Step>
+<Step>
+### Create or link account
+
+A new account is created, or linked if the email already exists.
+
+</Step>
+<Step>
+### Add to organization
+
+The user is added to your organization with the default role.
+
+</Step>
+<Step>
+### Grant access
+
+They can immediately access organization documents.
+
+</Step>
+</Steps>
 
 Users provisioned through SSO:
 
@@ -148,13 +172,28 @@ Users provisioned through SSO:
 
 ## SSO-Only Enforcement
 
-Once SSO is enabled, you can share your organization's SSO portal URL with members. The portal URL is displayed at the top of the SSO settings page.
+Once SSO is enabled, you can share your organization's SSO portal URL with members (displayed at the top of the SSO settings page). To enforce SSO-only authentication:
 
-To enforce SSO-only authentication:
+<Steps>
+<Step>
+### Share portal URL only
 
-1. Share only the SSO portal URL with organization members
-2. Restrict allowed email domains to your organization
-3. Remove any organization members who signed up with passwords
+Share only the SSO portal URL with organization members (not the main Documenso login).
+
+</Step>
+<Step>
+### Restrict domains
+
+Restrict allowed email domains to your organization.
+
+</Step>
+<Step>
+### Remove password users
+
+Remove any organization members who signed up with passwords, then re-invite them through the SSO portal.
+
+</Step>
+</Steps>
 
 <Callout type="info">
   Users who joined before SSO was enabled can still sign in with their original method. To enforce
@@ -163,44 +202,60 @@ To enforce SSO-only authentication:
 
 ## Troubleshooting
 
-### Invalid issuer URL
+<Accordions type="multiple">
+  <Accordion title="Invalid issuer URL">
+    - Verify the URL is correct and publicly accessible
+    
+    - Ensure the URL points to an OpenID Connect discovery document
+    
+    - Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
+  </Accordion>
 
-- Verify the URL is correct and publicly accessible
-- Ensure the URL points to an OpenID Connect discovery document
-- Check that the URL includes the full path (usually ending in `/.well-known/openid-configuration`)
+<Accordion title="Client authentication failed">
+  - Verify the client ID and secret match your identity provider exactly - Check that the OIDC
+  application hasn't been deleted or disabled - Regenerate the client secret if you suspect it's
+  incorrect
+</Accordion>
 
-### Client authentication failed
+<Accordion title="Redirect URI mismatch">
+  - Copy the redirect URI exactly from Documenso's SSO settings - Check for trailing slashes - they
+  must match exactly - Ensure you're using HTTPS
+</Accordion>
 
-- Verify the client ID and secret match your identity provider exactly
-- Check that the OIDC application hasn't been deleted or disabled
-- Regenerate the client secret if you suspect it's incorrect
+<Accordion title="User not provisioned">
+  - Verify the user's email domain is in the allowed domains list - Check that the user exists in
+  your identity provider - Ensure the user's account in your identity provider has an email address
+</Accordion>
 
-### Redirect URI mismatch
-
-- Copy the redirect URI exactly from Documenso's SSO settings
-- Check for trailing slashes - they must match exactly
-- Ensure you're using HTTPS
-
-### User not provisioned
-
-- Verify the user's email domain is in the allowed domains list
-- Check that the user exists in your identity provider
-- Ensure the user's account in your identity provider has an email address
-
-### User already exists
-
-If a user already has a Documenso account with the same email:
-
-- Their existing account will be linked to your team
-- They can sign in through your SSO portal going forward
+  <Accordion title="User already exists">
+    If a user already has a Documenso account with the same email, their existing account will be linked to your team and they can sign in through your SSO portal going forward.
+  </Accordion>
+</Accordions>
 
 ## Testing Your SSO Portal
 
 After configuring SSO, verify it works correctly:
 
-1. Navigate to your portal URL (found at the top of the organisation SSO settings page)
-2. Sign in with a test account from your configured domain
-3. Verify the user is provisioned with the correct organisation role
+<Steps>
+<Step>
+### Open portal
+
+Navigate to your portal URL (found at the top of the organisation SSO settings page).
+
+</Step>
+<Step>
+### Sign in
+
+Sign in with a test account from your configured domain.
+
+</Step>
+<Step>
+### Verify provisioning
+
+Verify the user is provisioned with the correct organisation role.
+
+</Step>
+</Steps>
 
 ### Custom Subdomain
 

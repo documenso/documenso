@@ -3,7 +3,10 @@ title: Enterprise Edition
 description: Commercial license that removes AGPL-3.0 source code disclosure requirements, allowing organizations to integrate Documenso into proprietary products.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## When You Need Enterprise
 
@@ -32,69 +35,73 @@ The Enterprise Edition is required when you:
 
 ## Features and Benefits
 
-### License Rights
+<Accordions type="multiple">
+  <Accordion title="License Rights">
+    The Enterprise license grants:
 
-The Enterprise license grants:
+    - **No source disclosure**: Keep your modifications private. No obligation to share code with users or the public.
+    - **Proprietary integration**: Embed Documenso in closed-source products without licensing conflicts.
+    - **Sublicensing options**: Distribute Documenso as part of your product to your customers (terms vary by agreement).
+    - **Perpetual use**: License terms that allow continued use of the licensed version.
 
-- **No source disclosure**: Keep your modifications private. No obligation to share code with users or the public.
-- **Proprietary integration**: Embed Documenso in closed-source products without licensing conflicts.
-- **Sublicensing options**: Distribute Documenso as part of your product to your customers (terms vary by agreement).
-- **Perpetual use**: License terms that allow continued use of the licensed version.
+  </Accordion>
+  <Accordion title="Enterprise-Only Features">
+    Enterprise licenses include access to features not available in the Community Edition:
 
-### Enterprise-Only Features
+    - Stripe Billing Module
+    - Organisation Authentication Portal (SSO with SAML and OIDC)
+    - Document Action Reauthentication (Passkeys and 2FA)
+    - 21 CFR Part 11 Compliance
+    - Email Domains (custom sender addresses)
+    - Embed Authoring
+    - Embed Authoring White Label
+    - Custom signing certificates
+    - Priority feature requests
 
-Enterprise licenses include access to features not available in the Community Edition:
+    <Callout type="info">
+      The canonical list of enterprise-gated features is maintained in the `packages/ee/FEATURES` file
+      in the codebase. Features in the `packages/ee/` directory require an active Enterprise license.
+    </Callout>
 
-- Stripe Billing Module
-- Organisation Authentication Portal (SSO with SAML and OIDC)
-- Document Action Reauthentication (Passkeys and 2FA)
-- 21 CFR Part 11 Compliance
-- Email Domains (custom sender addresses)
-- Embed Authoring
-- Embed Authoring White Label
-- Custom signing certificates
-- Priority feature requests
+  </Accordion>
+  <Accordion title="License Setup">
+    1. Acquire a license by contacting [sales](https://documen.so/enterprise)
+    2. Access your license key at [license.documenso.com](https://license.documenso.com)
+    3. Set the environment variable:
 
-<Callout type="info">
-  The canonical list of enterprise-gated features is maintained in the `packages/ee/FEATURES` file
-  in the codebase. Features in the `packages/ee/` directory require an active Enterprise license.
-</Callout>
+    ```bash
+    NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY="your-license-key-here"
+    ```
 
-### License Setup
+    4. Restart your Documenso instance
+    5. Verify the license is active in the **Admin Panel** under the **Stats** section
 
-1. Acquire a license by contacting [sales](https://documen.so/enterprise)
-2. Access your license key at [license.documenso.com](https://license.documenso.com)
-3. Set the environment variable:
-
-```bash
-NEXT_PRIVATE_DOCUMENSO_LICENSE_KEY="your-license-key-here"
-```
-
-4. Restart your Documenso instance
-5. Verify the license is active in the **Admin Panel** under the **Stats** section
+  </Accordion>
+</Accordions>
 
 ## Licensing Terms
 
-### Grant of License
+<Accordions type="multiple">
+  <Accordion title="Grant of License">
+    The Enterprise license is a commercial agreement between your organization and Documenso. Key terms include:
 
-The Enterprise license is a commercial agreement between your organization and Documenso. Key terms include:
+    - **Scope**: License to use, modify, and distribute Documenso as specified in your agreement
+    - **Exclusions**: The license does not grant rights to Documenso trademarks beyond what's specified
+    - **Termination**: License remains valid as long as subscription is active and terms are followed
 
-- **Scope**: License to use, modify, and distribute Documenso as specified in your agreement
-- **Exclusions**: The license does not grant rights to Documenso trademarks beyond what's specified
-- **Termination**: License remains valid as long as subscription is active and terms are followed
-
-### What the License Covers
-
-- Documenso application code
-- Self-hosted deployments
-- Modifications and derivative works
-- Internal and external distribution (per agreement terms)
-
-### What the License Does Not Cover
-
-- Third-party dependencies (these retain their original licenses)
-- Documenso Cloud service (separate subscription)
-- Professional services (available separately)
+  </Accordion>
+  <Accordion title="What the License Covers">
+    - Documenso application code
+    - Self-hosted deployments
+    - Modifications and derivative works
+    - Internal and external distribution (per agreement terms)
+  </Accordion>
+  <Accordion title="What the License Does Not Cover">
+    - Third-party dependencies (these retain their original licenses)
+    - Documenso Cloud service (separate subscription)
+    - Professional services (available separately)
+  </Accordion>
+</Accordions>
 
 ## Pricing Model
 
@@ -125,86 +132,105 @@ Contact [sales](https://documen.so/enterprise) for current pricing. Enterprise a
 
 Enterprise licenses include dedicated support beyond community channels.
 
-### Standard Enterprise Support
+<Tabs items={['Standard Enterprise Support', 'Premium Support Options']}>
+  <Tab value="Standard Enterprise Support">
+    - Email support with priority response
+    - Target response time within 4-8 business hours
+    - Deployment and configuration assistance
+    - Access to technical account resources
+  </Tab>
+  <Tab value="Premium Support Options">
+    Available as add-ons or with higher-tier plans:
 
-- Email support with priority response
-- Target response time within 4-8 business hours
-- Deployment and configuration assistance
-- Access to technical account resources
+    - Dedicated support contact
+    - Scheduled calls for complex issues
+    - Implementation guidance
+    - Custom SLA agreements
+    - On-call support for critical issues
 
-### Premium Support Options
-
-Available as add-ons or with higher-tier plans:
-
-- Dedicated support contact
-- Scheduled calls for complex issues
-- Implementation guidance
-- Custom SLA agreements
-- On-call support for critical issues
+  </Tab>
+</Tabs>
 
 See [Support](/docs/policies/support) for complete support options.
 
 ## How to Get Started
 
-### 1. Evaluate Your Requirements
+<Steps>
+  <Step>
+    ### Evaluate your requirements
 
-Determine if you need the Enterprise Edition:
+    Determine if you need the Enterprise Edition:
 
-- Review the [license comparison](/docs/policies/licenses) to understand AGPL-3.0 vs commercial license
-- Identify your use case from the scenarios above
-- List any enterprise features you require
+    - Review the [license comparison](/docs/policies/licenses) to understand AGPL-3.0 vs commercial license
+    - Identify your use case from the scenarios above
+    - List any enterprise features you require
 
-### 2. Contact Sales
+  </Step>
+  <Step>
+    ### Contact sales
 
-Reach out to discuss your needs:
+    Reach out to discuss your needs:
 
-- Email: [sales@documenso.com](https://documen.so/enterprise)
-- Include: Organization name, use case, estimated user count, deployment preference (self-hosted or cloud)
+    - Email: [sales@documenso.com](https://documen.so/enterprise)
+    - Include: Organization name, use case, estimated user count, deployment preference (self-hosted or cloud)
 
-### 3. Evaluation
+  </Step>
+  <Step>
+    ### Evaluation
 
-Options for evaluating Documenso before purchase:
+    Options for evaluating Documenso before purchase:
 
-- Test with the Community Edition (same codebase, AGPL-3.0 license)
-- Request an evaluation license for Enterprise features
-- Schedule a demo with the sales team
+    - Test with the Community Edition (same codebase, AGPL-3.0 license)
+    - Request an evaluation license for Enterprise features
+    - Schedule a demo with the sales team
 
-### 4. Agreement and Deployment
+  </Step>
+  <Step>
+    ### Agreement and deployment
 
-Once terms are agreed:
+    Once terms are agreed:
 
-1. Sign the Enterprise license agreement
-2. Receive license key and access credentials
-3. Deploy using [self-hosting guides](/docs/self-hosting) or access Documenso Cloud
-4. Configure Enterprise features with support assistance
+    1. Sign the Enterprise license agreement
+    2. Receive license key and access credentials
+    3. Deploy using [self-hosting guides](/docs/self-hosting) or access Documenso Cloud
+    4. Configure Enterprise features with support assistance
 
-### 5. Ongoing
+  </Step>
+  <Step>
+    ### Ongoing
 
-- Renew subscription annually (or per agreement terms)
-- Access support channels for assistance
-- Receive updates and new features per your agreement
+    - Renew subscription annually (or per agreement terms)
+    - Access support channels for assistance
+    - Receive updates and new features per your agreement
+
+  </Step>
+</Steps>
 
 ## Frequently Asked Questions
 
-### Can I switch from Community to Enterprise?
-
-Yes. Your existing deployment can transition to the Enterprise license. Contact [sales](https://documen.so/enterprise) to discuss migration.
-
-### Does the Enterprise license include Documenso Cloud?
-
-The license and cloud service are separate. Enterprise cloud plans include both the commercial license and hosted service. Self-hosted Enterprise licenses cover only the license rights.
-
-### What happens if I don't renew?
-
-If you don't renew, you lose access to support and updates. Depending on your agreement terms, you may continue using the last licensed version or need to transition to the Community Edition (with AGPL-3.0 compliance).
-
-### Can I use Enterprise features with the Community Edition?
-
-No. Enterprise-only features require an active Enterprise license. The Community Edition includes core document signing functionality.
-
-### Is there a trial period?
-
-Contact [sales](https://documen.so/enterprise) to discuss evaluation options for your organization.
+<Accordions type="multiple">
+  <Accordion title="Can I switch from Community to Enterprise?">
+    Yes. Your existing deployment can transition to the Enterprise license. Contact
+    [sales](https://documen.so/enterprise) to discuss migration.
+  </Accordion>
+  <Accordion title="Does the Enterprise license include Documenso Cloud?">
+    The license and cloud service are separate. Enterprise cloud plans include both the commercial
+    license and hosted service. Self-hosted Enterprise licenses cover only the license rights.
+  </Accordion>
+  <Accordion title="What happens if I don't renew?">
+    If you don't renew, you lose access to support and updates. Depending on your agreement terms,
+    you may continue using the last licensed version or need to transition to the Community Edition
+    (with AGPL-3.0 compliance).
+  </Accordion>
+  <Accordion title="Can I use Enterprise features with the Community Edition?">
+    No. Enterprise-only features require an active Enterprise license. The Community Edition
+    includes core document signing functionality.
+  </Accordion>
+  <Accordion title="Is there a trial period?">
+    Contact [sales](https://documen.so/enterprise) to discuss evaluation options for your
+    organization.
+  </Accordion>
+</Accordions>
 
 ## Related
 

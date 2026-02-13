@@ -4,6 +4,7 @@ description: Send your document for signing, customize email notifications, and 
 ---
 
 import { Callout } from 'fumadocs-ui/components/callout';
+import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
 
 ## Prerequisites
 
@@ -13,7 +14,7 @@ Before sending, ensure your document has:
 - Signature fields assigned to each signer
 - Required email addresses for recipients with authentication enabled
 
-## Send a document
+## Send a Document
 
 1. Click **Send Document** in the document editor
 2. Choose the distribution method:
@@ -24,11 +25,15 @@ Before sending, ensure your document has:
 
 Once sent, the document status changes from **Draft** to **Pending**.
 
-## Email customization
+## Email Customization
 
-When sending via email, you can customize what recipients receive.
+When sending via email, you can customize the email that recipients receive. There are 2 ways to customize the email.
+
+You can customize it before sending the document, after pressing the **Send** button.
 
 ![Document email settings](/document-signing/documenso-document-email-settings.webp)
+
+Or you can customize it before sending the document, by clicking on the **Document Settings** button in the editor sidebar. On this page, you can also customize what emails are sent to the recipients.
 
 ![Editor email settings](/document-signing/documenso-editor-email-settings.webp)
 
@@ -40,9 +45,11 @@ Set a reply-to address so recipient replies go to a specific email instead of th
 
 Customize the email subject line. If left blank, recipients see a default subject based on their role:
 
-- Signers: "Please sign this document"
-- Approvers: "Please approve this document"
-- Viewers: "Please view this document"
+<Tabs items={['Signers', 'Approvers', 'Viewers']}>
+  <Tab value="Signers">"Please sign this document"</Tab>
+  <Tab value="Approvers">"Please approve this document"</Tab>
+  <Tab value="Viewers">"Please view this document"</Tab>
+</Tabs>
 
 For team documents, the subject includes the team name.
 
@@ -61,7 +68,7 @@ If left blank, a default message is generated based on the recipient's role and 
   settings.
 </Callout>
 
-## What recipients receive
+## What Recipients Receive
 
 ![Email recipient receives](/document-signing/documenso-sign-email.webp)
 
@@ -74,7 +81,7 @@ Each recipient receives an email containing:
 
 The email includes a unique signing link specific to that recipient. This link expires once the document is completed or deleted.
 
-## Document status after sending
+## Document Status After Sending
 
 After sending, your document moves through these statuses:
 
@@ -86,7 +93,7 @@ After sending, your document moves through these statuses:
 
 You can track progress from the document detail page, which shows each recipient's signing status.
 
-## Resend to recipients
+## Resend to Recipients
 
 If a recipient hasn't acted on the document, you can send them a reminder:
 
@@ -103,7 +110,7 @@ Reminders are only available for:
 
 The reminder email includes "Reminder:" prefixed to the subject line and uses the same message from the original send.
 
-## Delete a pending document
+## Delete a Pending Document
 
 To stop a signing process and remove a document:
 
@@ -118,7 +125,7 @@ To stop a signing process and remove a document:
   are voided, and recipients receive a cancellation email.
 </Callout>
 
-### Delete behavior by status
+### Delete Behavior by Status
 
 | Status        | What happens                                             |
 | ------------- | -------------------------------------------------------- |
@@ -126,11 +133,11 @@ To stop a signing process and remove a document:
 | **Pending**   | Permanently deleted, recipients notified of cancellation |
 | **Completed** | Hidden from your account, recipients keep their copies   |
 
-## Document settings
+## Document Settings
 
 Access document settings from the **Document Settings** button in the quick actions sidebar of the editor.
 
-### General settings
+### General Settings
 
 | Setting                          | Description                                                     |
 | -------------------------------- | --------------------------------------------------------------- |
@@ -142,7 +149,7 @@ Access document settings from the **Document Settings** button in the quick acti
 | **Redirect URL**                 | Where signers are redirected after completing their actions     |
 | **Document Distribution Method** | Email (sends notifications) or None (generates signing links)   |
 
-### Security settings
+### Security Settings
 
 Control authentication requirements for accessing and signing the document.
 
@@ -169,7 +176,7 @@ You can set authentication at the document level and override it per recipient.
 
 Configure document attachments from the right-hand side of the editor header. Attachments are included with the signed document when it is completed.
 
-## Distribution without email
+## Distribution Without Email
 
 If you choose **None** as the distribution method:
 

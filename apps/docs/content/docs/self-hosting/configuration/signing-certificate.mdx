@@ -3,6 +3,7 @@ title: Signing Certificate
 description: Configure the X.509 signing certificate used for digital signatures in self-hosted Documenso.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
@@ -61,7 +62,7 @@ Create a self-signed certificate using OpenSSL. These commands work on Linux, ma
 <Steps>
 <Step>
 
-### Generate a Private Key
+### Generate a private key
 
 Create a 2048-bit RSA private key:
 
@@ -72,7 +73,7 @@ openssl genrsa -out private.key 2048
 </Step>
 <Step>
 
-### Create a Self-Signed Certificate
+### Create a self-signed certificate
 
 Generate a certificate valid for one year:
 
@@ -95,7 +96,7 @@ When prompted, enter your organization details:
 </Step>
 <Step>
 
-### Create the .p12 Certificate
+### Create the .p12 certificate
 
 Combine the private key and certificate into a PKCS#12 (.p12) file:
 
@@ -128,7 +129,7 @@ openssl pkcs12 -export -out certificate.p12 -inkey private.key -in certificate.c
 </Step>
 <Step>
 
-### Clean Up
+### Clean up
 
 Remove the intermediate files:
 
@@ -420,132 +421,42 @@ Use the legacy format only if recipients report compatibility issues with older 
 
 ## Troubleshooting
 
-### Failed to get private key bags
-
-```
-Error: Failed to get private key bags
-```
-
-**Cause:** Certificate has no password or incompatible encryption.
-
-**Solution:**
-
-1. Verify the certificate has a password set
-2. Re-create the certificate with a password:
-
-```bash
-openssl pkcs12 -export -out new-certificate.p12 -inkey private.key -in certificate.crt \
-    -keypbe PBE-SHA1-3DES \
-    -certpbe PBE-SHA1-3DES \
-    -macalg sha1
-```
-
-### No certificate found for local signing
-
-```
-Error: No certificate found for local signing
-```
-
-**Cause:** Certificate path or contents not configured.
-
-**Solution:**
-
-1. Verify environment variables are set:
-   - `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or
-   - `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS`
-2. Check the file exists at the configured path
-3. Verify file permissions allow reading
-
-### Permission denied reading certificate
-
-```
-Error: EACCES: permission denied, open '/opt/documenso/cert.p12'
-```
-
-**Cause:** Application cannot read the certificate file.
-
-**Solution:**
-
-For Docker deployments:
-
-```bash
-# On host before mounting
-sudo chown 1001 certificate.p12
-chmod 400 certificate.p12
-```
-
-### Invalid password
-
-```
-Error: mac verify failure
-```
-
-**Cause:** Incorrect passphrase provided.
-
-**Solution:**
-
-1. Verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the certificate password
-2. Check for trailing whitespace or special characters
-3. Test the password with OpenSSL:
-
-```bash
-openssl pkcs12 -in certificate.p12 -noout
-```
-
-### Certificate has expired
-
-```
-Error: Certificate has expired
-```
-
-**Cause:** Certificate validity period has ended.
-
-**Solution:**
-
-1. Generate a new certificate or obtain a renewed one from your CA
-2. Update the certificate file and restart Documenso
-
-Check expiration date:
-
-```bash
-openssl pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates
-```
-
-### Base64 decode error
-
-```
-Error: Invalid base64 in NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS
-```
-
-**Cause:** Incorrect base64 encoding or line breaks in the value.
-
-**Solution:**
-
-Encode without line breaks:
-
-```bash
-# macOS
-base64 -i certificate.p12 | tr -d '\n'
-
-# Linux
-base64 -w 0 certificate.p12
-```
-
-Ensure the entire base64 string is on one line in your environment variable.
-
-### Google Cloud HSM authentication failed
-
-```
-Error: Could not load the default credentials
-```
-
-**Cause:** Google Cloud credentials not configured or invalid.
-
-**Solution:**
-
-1. Verify `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set
-2. Check the service account has `cloudkms.signerVerifier` role
-3. Verify the base64 encoding of the service account JSON
+<Accordions type="multiple">
+  <Accordion title="Failed to get private key bags">
+    Cause: certificate has no password or incompatible encryption. Solution: verify the certificate
+    has a password set, re-create with `openssl pkcs12 -export -out new-certificate.p12 -inkey
+    private.key -in certificate.crt -keypbe PBE-SHA1-3DES -certpbe PBE-SHA1-3DES -macalg sha1`.
+  </Accordion>
+  <Accordion title="No certificate found for local signing">
+    Cause: certificate path or contents not configured. Solution: verify
+    `NEXT_PRIVATE_SIGNING_LOCAL_FILE_PATH` or `NEXT_PRIVATE_SIGNING_LOCAL_FILE_CONTENTS` is set,
+    check the file exists at the configured path, verify file permissions allow reading.
+  </Accordion>
+  <Accordion title="Permission denied reading certificate">
+    Cause: application cannot read the certificate file. Solution: for Docker, run `sudo chown 1001
+    certificate.p12` and `chmod 400 certificate.p12` on the host before mounting.
+  </Accordion>
+  <Accordion title="Invalid password (mac verify failure)">
+    Cause: incorrect passphrase. Solution: verify `NEXT_PRIVATE_SIGNING_PASSPHRASE` matches the
+    certificate password, check for trailing whitespace, test with `openssl pkcs12 -in
+    certificate.p12 -noout`.
+  </Accordion>
+  <Accordion title="Certificate has expired">
+    Cause: certificate validity period has ended. Solution: generate a new certificate or obtain a
+    renewed one, update the certificate file and restart Documenso. Check expiration: `openssl
+    pkcs12 -in certificate.p12 -nokeys | openssl x509 -noout -dates`.
+  </Accordion>
+  <Accordion title="Base64 decode error">
+    Cause: incorrect base64 encoding or line breaks. Solution: encode without line breaks (macOS:
+    `base64 -i certificate.p12 | tr -d '\n'`; Linux: `base64 -w 0 certificate.p12`). Ensure the
+    entire base64 string is on one line.
+  </Accordion>
+  <Accordion title="Google Cloud HSM authentication failed">
+    Cause: Google Cloud credentials not configured or invalid. Solution: verify
+    `NEXT_PRIVATE_SIGNING_GCLOUD_APPLICATION_CREDENTIALS_CONTENTS` is set, check the service account
+    has `cloudkms.signerVerifier` role, verify the base64 encoding of the service account JSON.
+  </Accordion>
+</Accordions>
 
 ---
 

@@ -6,7 +6,7 @@ description: Learn how to configure Microsoft Entra ID (Azure AD) for your organ
 import { Callout } from 'fumadocs-ui/components/callout';
 import { Step, Steps } from 'fumadocs-ui/components/steps';
 
-# Microsoft Entra ID Configuration
+## Overview
 
 Microsoft Entra ID (formerly Azure Active Directory) is a popular identity provider for enterprise SSO. This guide will walk you through creating an app registration and configuring it for use with your Documenso SSO portal.
 
@@ -21,7 +21,7 @@ Microsoft Entra ID (formerly Azure Active Directory) is a popular identity provi
 
 <Steps>
 <Step>
-### Access Azure Portal
+### Access Azure portal
 
 1. Navigate to the Azure Portal
 2. Sign in with your Microsoft Entra ID administrator account
@@ -31,7 +31,7 @@ Microsoft Entra ID (formerly Azure Active Directory) is a popular identity provi
 </Step>
 
 <Step>
-### Create App Registration
+### Create app registration
 
 1. In the left sidebar, click on "App registrations"
 2. Click the "New registration" button
@@ -39,7 +39,7 @@ Microsoft Entra ID (formerly Azure Active Directory) is a popular identity provi
 </Step>
 
 <Step>
-### Configure App Registration
+### Configure app registration
 
 Fill in the registration form with the following details:
 
@@ -52,14 +52,14 @@ Click "Register" to create the app registration.
 </Step>
 
 <Step>
-### Get Client ID
+### Get client ID
 
 After registration, you'll be taken to the app's overview page. The **Application (client) ID** is displayed prominently - this is your Client ID for Documenso.
 
 </Step>
 
 <Step>
-### Create Client Secret
+### Create client secret
 
 1. In the left sidebar, click on "Certificates & secrets"
 2. Click "New client secret"
@@ -67,17 +67,42 @@ After registration, you'll be taken to the app's overview page. The **Applicatio
 4. Choose an expiration period (recommended 12-24 months)
 5. Click "Add"
 
-Make sure you copy the "Secret value", not the "Secret ID", you won't be able to access it again after you leave the page.
+<Callout type="info">
+  Copy the **Secret value**, not the **Secret ID**. You won't be able to access it again after you
+  leave the page.
+</Callout>
 
 </Step>
 </Steps>
 
 ## Getting Your OpenID Configuration URL
 
-1. In the Azure portal, go to "Microsoft Entra ID"
-2. Click on "Overview" in the left sidebar
-3. Click the "Endpoints" in the horizontal tab
-4. Copy the "OpenID Connect metadata document" value
+<Steps>
+<Step>
+### Open Microsoft Entra ID
+
+In the Azure portal, go to **Microsoft Entra ID**.
+
+</Step>
+<Step>
+### Go to overview
+
+Click **Overview** in the left sidebar.
+
+</Step>
+<Step>
+### Open endpoints
+
+Click **Endpoints** in the horizontal tab.
+
+</Step>
+<Step>
+### Copy the URL
+
+Copy the **OpenID Connect metadata document** value.
+
+</Step>
+</Steps>
 
 ## Configure Documenso SSO Portal
 

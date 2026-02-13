@@ -3,6 +3,7 @@ title: Docker
 description: Run Documenso as a standalone Docker container with an external database. Ideal for container platforms like AWS ECS, Google Cloud Run, or Azure Container Instances.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## Prerequisites
@@ -293,68 +294,34 @@ See [Storage Configuration](/docs/self-hosting/configuration/storage) for S3 set
 
 ## Troubleshooting
 
-### Container fails to start
-
-Check the container logs:
-
-```bash
-docker logs documenso
-```
-
-Common causes:
-
-- **Missing required environment variables**: Ensure all required variables are set
-- **Database connection failed**: Verify the database URL and network connectivity
-- **Port already in use**: Change the host port or stop the conflicting service
-
-### Database connection errors
-
-Test connectivity from the Docker host:
-
-```bash
-docker run --rm postgres:15 psql "postgresql://user:password@host:5432/database" -c "SELECT 1"
-```
-
-If using Docker networks, ensure the container can reach the database:
-
-```bash
-docker run --rm --network your-network postgres:15 psql "postgresql://user:password@db-host:5432/database" -c "SELECT 1"
-```
-
-### Certificate errors
-
-Check certificate status:
-
-```bash
-curl http://localhost:3000/api/certificate-status
-```
-
-Common issues:
-
-- **File not found**: Verify the volume mount path
-- **Permission denied**: Ensure the file is readable (UID 1001 inside the container)
-- **No password**: The certificate must have a password set
-
-Fix permissions on the host:
-
-```bash
-chmod 644 /path/to/cert.p12
-chown 1001:1001 /path/to/cert.p12
-```
-
-### Emails not sending
-
-Verify SMTP configuration:
-
-- Check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your configuration
-- For `smtp-auth`, ensure host, port, username, and password are correct
-- Check if your SMTP provider requires TLS (`NEXT_PRIVATE_SMTP_SECURE=true`)
-
-### Container runs but application is inaccessible
-
-- Verify port mapping: `-p 3000:3000`
-- Check if `NEXT_PUBLIC_WEBAPP_URL` matches how you're accessing the application
-- Ensure no firewall is blocking the port
+<Accordions type="multiple">
+  <Accordion title="Container fails to start">
+    Check the container logs: `docker logs documenso`. Common causes: missing required environment
+    variables (ensure all required variables are set), database connection failed (verify the
+    database URL and network connectivity), port already in use (change the host port or stop the
+    conflicting service).
+  </Accordion>
+  <Accordion title="Database connection errors">
+    Test connectivity: `docker run --rm postgres:15 psql
+    "postgresql://user:password@host:5432/database" -c "SELECT 1"`. If using Docker networks, ensure
+    the container can reach the database.
+  </Accordion>
+  <Accordion title="Certificate errors">
+    Check certificate status: `curl http://localhost:3000/api/certificate-status`. Common issues:
+    file not found (verify the volume mount path), permission denied (ensure the file is readable,
+    UID 1001 inside the container), no password (the certificate must have a password set). Fix
+    permissions: `chmod 644 /path/to/cert.p12` and `chown 1001:1001 /path/to/cert.p12`.
+  </Accordion>
+  <Accordion title="Emails not sending">
+    Verify SMTP configuration: check `NEXT_PRIVATE_SMTP_TRANSPORT` matches your configuration, for
+    `smtp-auth` ensure host, port, username, and password are correct, check if your SMTP provider
+    requires TLS (`NEXT_PRIVATE_SMTP_SECURE=true`).
+  </Accordion>
+  <Accordion title="Container runs but application is inaccessible">
+    Verify port mapping `-p 3000:3000`, check if `NEXT_PUBLIC_WEBAPP_URL` matches how you're
+    accessing the application, ensure no firewall is blocking the port.
+  </Accordion>
+</Accordions>
 
 ---
 

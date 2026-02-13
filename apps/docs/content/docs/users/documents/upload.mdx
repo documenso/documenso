@@ -3,17 +3,17 @@ title: Upload Documents
 description: Upload documents to Documenso to prepare them for signing. Covers supported formats, file size limits, and upload methods.
 ---
 
+import { Accordion, Accordions } from 'fumadocs-ui/components/accordion';
 import { Callout } from 'fumadocs-ui/components/callout';
 
 ## Limitations
 
-Before uploading, be aware of these constraints:
-
-| Limitation        | Value                               |
-| ----------------- | ----------------------------------- |
-| Supported format  | PDF only                            |
-| Maximum file size | 50MB (configurable for self-hosted) |
-| Encrypted PDFs    | Not supported                       |
+| Limitation              | Value                               |
+| ----------------------- | ----------------------------------- |
+| Supported format        | PDF only                            |
+| Maximum file size       | 50MB (configurable for self-hosted) |
+| Encrypted PDFs          | Not supported                       |
+| Password-protected PDFs | Not supported                       |
 
 <Callout type="warn">
   Documenso does not support password-protected or encrypted PDF files. Remove encryption before
@@ -22,9 +22,9 @@ Before uploading, be aware of these constraints:
 
 ## Upload Methods
 
-You can upload documents in two ways:
-
 ![Documents dashboard](/document-signing/documenso-documents-dashboard.webp)
+
+You can upload documents in two ways:
 
 ### Drag and Drop
 
@@ -59,46 +59,53 @@ All files in the same upload become part of the same envelope and share the same
 When you upload a document:
 
 1. **Processing** - Documenso validates the PDF and extracts page information
-2. **Draft created** - A new document is created in Draft status
+2. **Draft created** - A new document is created in `Draft` status
 3. **Editor opens** - You're taken to the document editor to add recipients and fields
 
 ![Document editor overview](/document-signing/editor-overview.webp)
 
-The document remains in Draft status until you send it. You can close the editor and return later - draft documents are saved automatically.
+The document remains in `Draft` status until you send it. You can close the editor and return later - draft documents are saved automatically.
 
 ## Troubleshooting
 
-### "File is larger than 50MB"
+<Accordions type="multiple">
+  <Accordion title="File is larger than 50MB">
+    Reduce the file size before uploading:
 
-Reduce the file size before uploading:
+    - Compress images within the PDF
+    - Remove unnecessary pages
+    - Use a PDF compression tool
 
-- Compress images within the PDF
-- Remove unnecessary pages
-- Use a PDF compression tool
+  </Accordion>
 
-### "Only PDF files are allowed"
+<Accordion title="Only PDF files are allowed">
+  Convert your document to PDF before uploading. Most applications (Word, Google Docs, etc.) can
+  export to PDF format.
+</Accordion>
 
-Convert your document to PDF before uploading. Most applications (Word, Google Docs, etc.) can export to PDF format.
+<Accordion title="You cannot upload encrypted PDFs">
+  The PDF is password-protected or encrypted. Open it in a PDF reader, remove the security settings,
+  and save a new copy.
+</Accordion>
 
-### "You cannot upload encrypted PDFs"
+  <Accordion title="You have reached your document limit">
+    Your plan has a monthly document limit. Options:
 
-The PDF is password-protected or encrypted. Open it in a PDF reader, remove the security settings, and save a new copy.
+    - Wait until your limit resets next month
+    - Upgrade to a higher plan
+    - Delete unused draft documents (this does not restore quota)
 
-### "You have reached your document limit"
+  </Accordion>
 
-Your plan has a monthly document limit. Options:
+  <Accordion title="Upload fails with no error message">
+    Check that:
 
-- Wait until your limit resets next month
-- Upgrade to a higher plan
-- Delete unused draft documents (this does not restore quota)
+    - Your internet connection is stable
+    - The file is a valid PDF (try opening it in a PDF reader)
+    - The file is not corrupted
 
-### Upload fails with no error message
-
-Check that:
-
-- Your internet connection is stable
-- The file is a valid PDF (try opening it in a PDF reader)
-- The file is not corrupted
+  </Accordion>
+</Accordions>
 
 ---
 
