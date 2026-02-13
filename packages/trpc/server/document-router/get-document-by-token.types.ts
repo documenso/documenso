@@ -7,7 +7,12 @@ export const ZGetDocumentByTokenRequestSchema = z.object({
 });
 
 export const ZGetDocumentByTokenResponseSchema = z.object({
-  documentData: DocumentDataSchema,
+  documentData: DocumentDataSchema.pick({
+    id: true,
+    type: true,
+    data: true,
+    initialData: true,
+  }),
 });
 
 export type TGetDocumentByTokenRequest = z.infer<typeof ZGetDocumentByTokenRequestSchema>;

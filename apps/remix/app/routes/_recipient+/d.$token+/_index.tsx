@@ -198,7 +198,7 @@ const DirectSigningPageV1 = ({ data }: { data: Awaited<ReturnType<typeof handleV
               {template.title}
             </h1>
 
-            <div className="text-muted-foreground mb-8 mt-2.5 flex items-center gap-x-2">
+            <div className="mb-8 mt-2.5 flex items-center gap-x-2 text-muted-foreground">
               <UsersIcon className="h-4 w-4" />
               <p className="text-muted-foreground/80">
                 <Plural value={template.recipients.length} one="# recipient" other="# recipients" />
@@ -246,7 +246,7 @@ const DirectSigningPageV2 = ({ data }: { data: Awaited<ReturnType<typeof handleV
         recipient={recipient}
         user={user}
       >
-        <EnvelopeRenderProvider envelope={envelope} token={recipient.token}>
+        <EnvelopeRenderProvider version="current" envelope={envelope} token={recipient.token}>
           <DocumentSigningPageViewV2 />
         </EnvelopeRenderProvider>
       </DocumentSigningAuthProvider>
