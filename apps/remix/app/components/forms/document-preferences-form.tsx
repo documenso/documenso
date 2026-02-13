@@ -3,7 +3,7 @@ import { msg, t } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { TeamGlobalSettings } from '@prisma/client';
-import { DocumentVisibility, OrganisationType } from '@prisma/client';
+import { DocumentVisibility, OrganisationType, type RecipientRole } from '@prisma/client';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -17,14 +17,19 @@ import {
   isValidLanguageCode,
 } from '@documenso/lib/constants/i18n';
 import { TIME_ZONES } from '@documenso/lib/constants/time-zones';
+import type { TDefaultRecipients } from '@documenso/lib/types/default-recipients';
+import { ZDefaultRecipientsSchema } from '@documenso/lib/types/default-recipients';
 import {
   type TDocumentMetaDateFormat,
   ZDocumentMetaTimezoneSchema,
 } from '@documenso/lib/types/document-meta';
 import { isPersonalLayout } from '@documenso/lib/utils/organisations';
+import { recipientAbbreviation } from '@documenso/lib/utils/recipient-formatter';
 import { extractTeamSignatureSettings } from '@documenso/lib/utils/teams';
 import { DocumentSignatureSettingsTooltip } from '@documenso/ui/components/document/document-signature-settings-tooltip';
+import { RecipientRoleSelect } from '@documenso/ui/components/recipient/recipient-role-select';
 import { Alert } from '@documenso/ui/primitives/alert';
+import { AvatarWithText } from '@documenso/ui/primitives/avatar';
 import { Button } from '@documenso/ui/primitives/button';
 import { Combobox } from '@documenso/ui/primitives/combobox';
 import {
@@ -45,6 +50,10 @@ import {
   SelectValue,
 } from '@documenso/ui/primitives/select';
 
+import { useOptionalCurrentTeam } from '~/providers/team';
+
+import { DefaultRecipientsMultiSelectCombobox } from '../general/default-recipients-multiselect-combobox';
+
 /**
  * Can't infer this from the schema since we need to keep the schema inside the component to allow
  * it to be dynamic.
@@ -58,6 +67,7 @@ export type TDocumentPreferencesFormSchema = {
   includeSigningCertificate: boolean | null;
   includeAuditLog: boolean | null;
   signatureTypes: DocumentSignatureType[];
+  defaultRecipients: TDefaultRecipients | null;
   delegateDocumentOwnership: boolean | null;
   aiFeaturesEnabled: boolean | null;
 };
@@ -74,6 +84,7 @@ type SettingsSubset = Pick<
   | 'typedSignatureEnabled'
   | 'uploadSignatureEnabled'
   | 'drawSignatureEnabled'
+  | 'defaultRecipients'
   | 'delegateDocumentOwnership'
   | 'aiFeaturesEnabled'
 >;
@@ -94,6 +105,7 @@ export const DocumentPreferencesForm = ({
   const { _ } = useLingui();
   const { user, organisations } = useSession();
   const currentOrganisation = useCurrentOrganisation();
+  const optionalTeam = useOptionalCurrentTeam();
 
   const isPersonalLayoutMode = isPersonalLayout(organisations);
   const isPersonalOrganisation = currentOrganisation.type === OrganisationType.PERSONAL;
@@ -111,6 +123,7 @@ export const DocumentPreferencesForm = ({
     signatureTypes: z.array(z.nativeEnum(DocumentSignatureType)).min(canInherit ? 0 : 1, {
       message: msg`At least one signature type must be enabled`.id,
     }),
+    defaultRecipients: ZDefaultRecipientsSchema.nullable(),
     delegateDocumentOwnership: z.boolean().nullable(),
     aiFeaturesEnabled: z.boolean().nullable(),
   });
@@ -128,6 +141,9 @@ export const DocumentPreferencesForm = ({
       includeSigningCertificate: settings.includeSigningCertificate,
       includeAuditLog: settings.includeAuditLog,
       signatureTypes: extractTeamSignatureSettings({ ...settings }),
+      defaultRecipients: settings.defaultRecipients
+        ? ZDefaultRecipientsSchema.parse(settings.defaultRecipients)
+        : null,
       delegateDocumentOwnership: settings.delegateDocumentOwnership,
       aiFeaturesEnabled: settings.aiFeaturesEnabled,
     },
@@ -517,6 +533,94 @@ export const DocumentPreferencesForm = ({
                 </FormDescription>
               </FormItem>
             )}
+          />
+
+          <FormField
+            control={form.control}
+            name="defaultRecipients"
+            render={({ field }) => {
+              const recipients = field.value ?? [];
+
+              return (
+                <FormItem className="flex-1">
+                  <FormLabel>
+                    <Trans>Default Recipients</Trans>
+                  </FormLabel>
+
+                  {canInherit && (
+                    <Select
+                      value={field.value === null ? '-1' : '0'}
+                      onValueChange={(value) => field.onChange(value === '-1' ? null : [])}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={'-1'}>
+                          <Trans>Inherit from organisation</Trans>
+                        </SelectItem>
+                        <SelectItem value={'0'}>
+                          <Trans>Override organisation settings</Trans>
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+
+                  {(field.value !== null || !canInherit) && (
+                    <div className="space-y-4">
+                      <DefaultRecipientsMultiSelectCombobox
+                        listValues={recipients}
+                        onChange={field.onChange}
+                        organisationId={!canInherit ? currentOrganisation.id : undefined}
+                        teamId={canInherit ? optionalTeam?.id : undefined}
+                      />
+
+                      {recipients.map((recipient, index) => {
+                        return (
+                          <div
+                            key={recipient.email}
+                            className="flex items-center justify-between gap-3 rounded-lg border p-3"
+                          >
+                            <AvatarWithText
+                              avatarFallback={recipientAbbreviation(recipient)}
+                              primaryText={
+                                <span className="text-sm font-medium">
+                                  {recipient.name || recipient.email}
+                                </span>
+                              }
+                              secondaryText={
+                                recipient.name ? (
+                                  <span className="text-xs text-muted-foreground">
+                                    {recipient.email}
+                                  </span>
+                                ) : undefined
+                              }
+                              className="flex-1"
+                            />
+                            <div className="flex items-center gap-2">
+                              <RecipientRoleSelect
+                                value={recipient.role}
+                                onValueChange={(role: RecipientRole) => {
+                                  field.onChange(
+                                    recipients.map((recipient, idx) =>
+                                      idx === index ? { ...recipient, role } : recipient,
+                                    ),
+                                  );
+                                }}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <FormDescription>
+                    <Trans>Recipients that will be automatically added to new documents.</Trans>
+                  </FormDescription>
+                </FormItem>
+              );
+            }}
           />
 
           <FormField

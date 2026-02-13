@@ -6,6 +6,7 @@ import { DateTime } from 'luxon';
 import { Link, redirect } from 'react-router';
 
 import { unsafeGetEntireEnvelope } from '@documenso/lib/server-only/admin/get-entire-document';
+import { mapSecondaryIdToDocumentId } from '@documenso/lib/utils/envelope';
 import { trpc } from '@documenso/trpc/react';
 import {
   Accordion,
@@ -26,6 +27,7 @@ import { useToast } from '@documenso/ui/primitives/use-toast';
 import { AdminDocumentDeleteDialog } from '~/components/dialogs/admin-document-delete-dialog';
 import { DocumentStatus } from '~/components/general/document/document-status';
 import { AdminDocumentJobsTable } from '~/components/tables/admin-document-jobs-table';
+import { AdminDocumentLogsTable } from '~/components/tables/admin-document-logs-table';
 import { AdminDocumentRecipientItemTable } from '~/components/tables/admin-document-recipient-item-table';
 
 import type { Route } from './+types/documents.$id';
@@ -87,6 +89,10 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       </div>
 
       <div className="mt-4 text-sm text-muted-foreground">
+        <div>
+          <Trans>Document ID</Trans>: {mapSecondaryIdToDocumentId(envelope.secondaryId)}
+        </div>
+
         <div>
           <Trans>Created on</Trans>: {i18n.date(envelope.createdAt, DateTime.DATETIME_MED)}
         </div>
@@ -156,6 +162,9 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
                   <Badge size="small" variant="neutral">
                     {recipient.email}
                   </Badge>
+                  <Badge size="small" variant="secondary">
+                    {recipient.role}
+                  </Badge>
                 </div>
               </AccordionTrigger>
 
@@ -172,6 +181,22 @@ export default function AdminDocumentDetailsPage({ loaderData }: Route.Component
       <div className="mt-4">
         <AdminDocumentJobsTable envelopeId={envelope.id} />
       </div>
+
+      <hr className="my-4" />
+
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="audit-logs" className="rounded-lg border">
+          <AccordionTrigger className="px-4">
+            <h2 className="text-lg font-semibold">
+              <Trans>Audit Logs</Trans>
+            </h2>
+          </AccordionTrigger>
+
+          <AccordionContent className="border-t px-4 pt-4">
+            <AdminDocumentLogsTable envelopeId={envelope.id} />
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
       <hr className="my-4" />
 

@@ -1,6 +1,7 @@
 import type { Passkey } from '@prisma/client';
 import { generateAuthenticationOptions } from '@simplewebauthn/server';
-import type { AuthenticatorTransportFuture } from '@simplewebauthn/types';
+import type { AuthenticatorTransportFuture } from '@simplewebauthn/server';
+import { isoBase64URL } from '@simplewebauthn/server/helpers';
 import { DateTime } from 'luxon';
 
 import { prisma } from '@documenso/prisma';
@@ -53,8 +54,7 @@ export const createPasskeyAuthenticationOptions = async ({
     allowCredentials: preferredPasskey
       ? [
           {
-            id: preferredPasskey.credentialId,
-            type: 'public-key',
+            id: isoBase64URL.fromBuffer(preferredPasskey.credentialId),
             // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
             transports: preferredPasskey.transports as AuthenticatorTransportFuture[],
           },

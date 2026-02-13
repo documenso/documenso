@@ -6,14 +6,20 @@ declare global {
   }
 }
 
-type EnvironmentVariable = keyof NodeJS.ProcessEnv;
+// eslint-disable-next-line @typescript-eslint/ban-types
+type EnvKey = keyof NodeJS.ProcessEnv | (string & {});
+type EnvValue<K extends EnvKey> = K extends keyof NodeJS.ProcessEnv
+  ? NodeJS.ProcessEnv[K]
+  : string | undefined;
 
-export const env = (variable: EnvironmentVariable | (string & object)): string | undefined => {
+export const env = <K extends EnvKey>(variable: K): EnvValue<K> => {
   if (typeof window !== 'undefined' && typeof window.__ENV__ === 'object') {
-    return window.__ENV__[variable];
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    return window.__ENV__[variable as string] as EnvValue<K>;
   }
 
-  return typeof process !== 'undefined' ? process?.env?.[variable] : undefined;
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  return (typeof process !== 'undefined' ? process?.env?.[variable] : undefined) as EnvValue<K>;
 };
 
 export const createPublicEnv = () =>

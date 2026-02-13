@@ -204,6 +204,7 @@ export const generateDefaultTeamSettings = (): Omit<TeamGlobalSettings, 'id' | '
     emailReplyTo: null,
     // emailReplyToName: null,
 
+    defaultRecipients: null,
     aiFeaturesEnabled: null,
   };
 };

@@ -195,6 +195,31 @@ test.describe('Document API V2', () => {
     }) => {
       const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
 
+      // Get the recipient created during seeding.
+      const recipient = await prisma.recipient.findFirstOrThrow({
+        where: {
+          envelopeId: doc.id,
+        },
+      });
+
+      // Create a signature field for the recipient so distribution validation can run.
+      await prisma.field.create({
+        data: {
+          envelopeId: doc.id,
+          envelopeItemId: doc.envelopeItems[0].id,
+          recipientId: recipient.id,
+          type: FieldType.SIGNATURE,
+          page: 1,
+          positionX: 1,
+          positionY: 1,
+          width: 1,
+          height: 1,
+          customText: '',
+          inserted: false,
+          fieldMeta: { type: 'signature', fontSize: 14 },
+        },
+      });
+
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/distribute`, {
         headers: { Authorization: `Bearer ${tokenB}` },
         data: { documentId: mapSecondaryIdToDocumentId(doc.secondaryId) },
@@ -206,6 +231,31 @@ test.describe('Document API V2', () => {
 
     test('should allow authorized access to document distribute endpoint', async ({ request }) => {
       const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
+
+      // Get the recipient created during seeding.
+      const recipient = await prisma.recipient.findFirstOrThrow({
+        where: {
+          envelopeId: doc.id,
+        },
+      });
+
+      // Create a signature field for the recipient so distribution validation can run.
+      await prisma.field.create({
+        data: {
+          envelopeId: doc.id,
+          envelopeItemId: doc.envelopeItems[0].id,
+          recipientId: recipient.id,
+          type: FieldType.SIGNATURE,
+          page: 1,
+          positionX: 1,
+          positionY: 1,
+          width: 1,
+          height: 1,
+          customText: '',
+          inserted: false,
+          fieldMeta: { type: 'signature', fontSize: 14 },
+        },
+      });
 
       const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/document/distribute`, {
         headers: { Authorization: `Bearer ${tokenA}` },
@@ -3678,6 +3728,26 @@ test.describe('Document API V2', () => {
           internalVersion: 2,
         });
 
+        const [recipient] = doc.recipients;
+
+        // add signing field for recipient (fieldMeta required for v2 envelopes)
+        await prisma.field.create({
+          data: {
+            page: 1,
+            type: FieldType.SIGNATURE,
+            inserted: false,
+            customText: '',
+            positionX: 1,
+            positionY: 1,
+            width: 1,
+            height: 1,
+            envelopeId: doc.id,
+            envelopeItemId: doc.envelopeItems[0].id,
+            recipientId: recipient.id,
+            fieldMeta: { type: 'signature', fontSize: 14 },
+          },
+        });
+
         const payload: TUseEnvelopePayload = {
           envelopeId: doc.id,
           distributeDocument: true,
@@ -3740,6 +3810,31 @@ test.describe('Document API V2', () => {
         request,
       }) => {
         const doc = await seedDraftDocument(userA, teamA.id, ['test@example.com']);
+
+        // Get the recipient created during seeding.
+        const recipient = await prisma.recipient.findFirstOrThrow({
+          where: {
+            envelopeId: doc.id,
+          },
+        });
+
+        // Create a signature field for the recipient so distribution validation can pass.
+        await prisma.field.create({
+          data: {
+            envelopeId: doc.id,
+            envelopeItemId: doc.envelopeItems[0].id,
+            recipientId: recipient.id,
+            type: FieldType.SIGNATURE,
+            page: 1,
+            positionX: 1,
+            positionY: 1,
+            width: 1,
+            height: 1,
+            customText: '',
+            inserted: false,
+            fieldMeta: { type: 'signature', fontSize: 14 },
+          },
+        });
 
         const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/distribute`, {
           headers: { Authorization: `Bearer ${tokenA}` },
@@ -4629,252 +4724,6 @@ test.describe('Document API V2', () => {
             ],
           },
         });
-
-        expect(res.ok()).toBeTruthy();
-        expect(res.status()).toBe(200);
-      });
-    });
-
-    test.describe('Envelope item delete endpoint', () => {
-      test('should block unauthorized access to envelope item delete endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({
-          where: { envelopeId: doc.id },
-        });
-
-        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/item/delete`, {
-          headers: { Authorization: `Bearer ${tokenB}` },
-          data: {
-            envelopeId: doc.id,
-            envelopeItemId: envelopeItem.id,
-          },
-        });
-
-        expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(404);
-      });
-
-      test('should allow authorized access to envelope item delete endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const envelopeItem = await prisma.envelopeItem.findFirstOrThrow({
-          where: { envelopeId: doc.id },
-        });
-
-        const res = await request.post(`${WEBAPP_BASE_URL}/api/v2-beta/envelope/item/delete`, {
-          headers: { Authorization: `Bearer ${tokenA}` },
-          data: {
-            envelopeId: doc.id,
-            envelopeItemId: envelopeItem.id,
-          },
-        });
-
-        expect(res.ok()).toBeTruthy();
-        expect(res.status()).toBe(200);
-      });
-    });
-
-    test.describe('Envelope attachment find endpoint', () => {
-      test('should block unauthorized access to envelope attachment find endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const res = await request.get(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`,
-          {
-            headers: { Authorization: `Bearer ${tokenB}` },
-          },
-        );
-
-        expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(404);
-      });
-
-      test('should allow authorized access to envelope attachment find endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const res = await request.get(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment?envelopeId=${doc.id}`,
-          {
-            headers: { Authorization: `Bearer ${tokenA}` },
-          },
-        );
-
-        expect(res.ok()).toBeTruthy();
-        expect(res.status()).toBe(200);
-      });
-    });
-
-    test.describe('Envelope attachment create endpoint', () => {
-      test('should block unauthorized access to envelope attachment create endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/create`,
-          {
-            headers: { Authorization: `Bearer ${tokenB}` },
-            data: {
-              envelopeId: doc.id,
-              data: {
-                label: 'Test Attachment',
-                data: 'https://example.com/file.pdf',
-              },
-            },
-          },
-        );
-
-        expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(404);
-      });
-
-      test('should allow authorized access to envelope attachment create endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/create`,
-          {
-            headers: { Authorization: `Bearer ${tokenA}` },
-            data: {
-              envelopeId: doc.id,
-              data: {
-                label: 'Test Attachment',
-                data: 'https://example.com/file.pdf',
-              },
-            },
-          },
-        );
-
-        expect(res.ok()).toBeTruthy();
-        expect(res.status()).toBe(200);
-      });
-    });
-
-    test.describe('Envelope attachment update endpoint', () => {
-      test('should block unauthorized access to envelope attachment update endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const attachment = await prisma.envelopeAttachment.create({
-          data: {
-            envelopeId: doc.id,
-            type: 'link',
-            label: 'Original Label',
-            data: 'https://example.com/original.pdf',
-          },
-        });
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/update`,
-          {
-            headers: { Authorization: `Bearer ${tokenB}` },
-            data: {
-              id: attachment.id,
-              data: {
-                label: 'Updated Label',
-                data: 'https://example.com/updated.pdf',
-              },
-            },
-          },
-        );
-
-        expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(404);
-      });
-
-      test('should allow authorized access to envelope attachment update endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const attachment = await prisma.envelopeAttachment.create({
-          data: {
-            envelopeId: doc.id,
-            type: 'link',
-            label: 'Original Label',
-            data: 'https://example.com/original.pdf',
-          },
-        });
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/update`,
-          {
-            headers: { Authorization: `Bearer ${tokenA}` },
-            data: {
-              id: attachment.id,
-              data: {
-                label: 'Updated Label',
-                data: 'https://example.com/updated.pdf',
-              },
-            },
-          },
-        );
-
-        expect(res.ok()).toBeTruthy();
-        expect(res.status()).toBe(200);
-      });
-    });
-
-    test.describe('Envelope attachment delete endpoint', () => {
-      test('should block unauthorized access to envelope attachment delete endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const attachment = await prisma.envelopeAttachment.create({
-          data: {
-            envelopeId: doc.id,
-            type: 'link',
-            label: 'Test Attachment',
-            data: 'https://example.com/file.pdf',
-          },
-        });
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/delete`,
-          {
-            headers: { Authorization: `Bearer ${tokenB}` },
-            data: { id: attachment.id },
-          },
-        );
-
-        expect(res.ok()).toBeFalsy();
-        expect(res.status()).toBe(404);
-      });
-
-      test('should allow authorized access to envelope attachment delete endpoint', async ({
-        request,
-      }) => {
-        const doc = await seedBlankDocument(userA, teamA.id);
-
-        const attachment = await prisma.envelopeAttachment.create({
-          data: {
-            envelopeId: doc.id,
-            type: 'link',
-            label: 'Test Attachment',
-            data: 'https://example.com/file.pdf',
-          },
-        });
-
-        const res = await request.post(
-          `${WEBAPP_BASE_URL}/api/v2-beta/envelope/attachment/delete`,
-          {
-            headers: { Authorization: `Bearer ${tokenA}` },
-            data: { id: attachment.id },
-          },
-        );
 
         expect(res.ok()).toBeTruthy();
         expect(res.status()).toBe(200);
