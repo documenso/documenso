@@ -93,7 +93,7 @@ export const getEmailContext = async (
     emailContext = await handleTeamEmailContext(source.teamId);
   }
 
-  const emailLanguage = meta?.language || emailContext.settings.documentLanguage;
+  const emailLanguage = (meta?.language && meta.language.trim() !== '') ? meta.language : emailContext.settings.documentLanguage;
 
   // Immediate return for internal emails.
   if (options.emailType === 'INTERNAL') {
