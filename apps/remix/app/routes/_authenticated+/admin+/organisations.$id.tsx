@@ -107,7 +107,11 @@ export default function OrganisationGroupSettingsPage({
         cell: ({ row }) => (
           <div className="flex items-center gap-2">
             <Link to={`/admin/users/${row.original.user.id}`}>{row.original.user.name}</Link>
-            {row.original.user.id === organisation?.ownerUserId && <Badge>Owner</Badge>}
+            {row.original.user.id === organisation?.ownerUserId && (
+              <Badge>
+                <Trans>Owner</Trans>
+              </Badge>
+            )}
           </div>
         ),
       },
