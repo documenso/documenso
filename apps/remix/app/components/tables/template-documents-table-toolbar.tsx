@@ -25,9 +25,11 @@ export const TemplateDocumentsTableToolbar = () => {
 
   const query = searchParams.get('query') ?? '';
   const period = searchParams.get('period') ?? '';
+  const statusParam = searchParams.get('status');
+  const sourceParam = searchParams.get('source');
 
-  const selectedStatusValues = parseToStringArray(searchParams.get('status'));
-  const selectedSourceValues = parseToStringArray(searchParams.get('source'));
+  const selectedStatusValues = useMemo(() => parseToStringArray(statusParam), [statusParam]);
+  const selectedSourceValues = useMemo(() => parseToStringArray(sourceParam), [sourceParam]);
 
   const [searchTerm, setSearchTerm] = useState(query);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
@@ -45,8 +47,11 @@ export const TemplateDocumentsTableToolbar = () => {
       return;
     }
 
-    updateSearchParams({ query: debouncedSearchTerm || undefined, page: undefined });
-  }, [debouncedSearchTerm, query, searchTerm]);
+    updateSearchParams(
+      { query: debouncedSearchTerm || undefined, page: undefined },
+      { replace: true },
+    );
+  }, [debouncedSearchTerm, query, searchTerm, updateSearchParams]);
 
   const statusOptions = useMemo<DataTableFacetedFilterOption[]>(
     () => [
@@ -131,7 +136,7 @@ export const TemplateDocumentsTableToolbar = () => {
             className="absolute inset-y-0 end-0 flex w-9 items-center justify-center text-muted-foreground hover:text-foreground"
             onClick={() => {
               setSearchTerm('');
-              updateSearchParams({ query: undefined, page: undefined });
+              updateSearchParams({ query: undefined, page: undefined }, { replace: true });
             }}
           >
             <XIcon className="h-4 w-4" />
@@ -145,10 +150,13 @@ export const TemplateDocumentsTableToolbar = () => {
         selectedValues={selectedStatusValues}
         showSearch={false}
         onSelectedValuesChange={(values) => {
-          updateSearchParams({
-            status: toCommaSeparatedSearchParam(values),
-            page: undefined,
-          });
+          updateSearchParams(
+            {
+              status: toCommaSeparatedSearchParam(values),
+              page: undefined,
+            },
+            { replace: true },
+          );
         }}
       />
 
@@ -158,10 +166,13 @@ export const TemplateDocumentsTableToolbar = () => {
         selectedValues={selectedSourceValues}
         showSearch={false}
         onSelectedValuesChange={(values) => {
-          updateSearchParams({
-            source: toCommaSeparatedSearchParam(values),
-            page: undefined,
-          });
+          updateSearchParams(
+            {
+              source: toCommaSeparatedSearchParam(values),
+              page: undefined,
+            },
+            { replace: true },
+          );
         }}
       />
 
@@ -174,10 +185,13 @@ export const TemplateDocumentsTableToolbar = () => {
         onSelectedValuesChange={(values) => {
           const nextPeriod = values[0];
 
-          updateSearchParams({
-            period: nextPeriod ?? undefined,
-            page: undefined,
-          });
+          updateSearchParams(
+            {
+              period: nextPeriod ?? undefined,
+              page: undefined,
+            },
+            { replace: true },
+          );
         }}
       />
 

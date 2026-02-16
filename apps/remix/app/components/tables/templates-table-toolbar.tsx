@@ -22,7 +22,9 @@ export const TemplatesTableToolbar = () => {
   const updateSearchParams = useUpdateSearchParams();
 
   const query = searchParams.get('query') ?? '';
-  const selectedTypeValues = parseToStringArray(searchParams.get('type'));
+  const typeParam = searchParams.get('type');
+
+  const selectedTypeValues = useMemo(() => parseToStringArray(typeParam), [typeParam]);
 
   const [searchTerm, setSearchTerm] = useState(query);
   const debouncedSearchTerm = useDebouncedValue(searchTerm, 500);
@@ -40,8 +42,11 @@ export const TemplatesTableToolbar = () => {
       return;
     }
 
-    updateSearchParams({ query: debouncedSearchTerm || undefined, page: undefined });
-  }, [debouncedSearchTerm, query, searchTerm]);
+    updateSearchParams(
+      { query: debouncedSearchTerm || undefined, page: undefined },
+      { replace: true },
+    );
+  }, [debouncedSearchTerm, query, searchTerm, updateSearchParams]);
 
   const typeOptions = useMemo<DataTableFacetedFilterOption[]>(
     () => [
@@ -91,7 +96,7 @@ export const TemplatesTableToolbar = () => {
             className="absolute inset-y-0 end-0 flex w-9 items-center justify-center text-muted-foreground hover:text-foreground"
             onClick={() => {
               setSearchTerm('');
-              updateSearchParams({ query: undefined, page: undefined });
+              updateSearchParams({ query: undefined, page: undefined }, { replace: true });
             }}
           >
             <XIcon className="h-4 w-4" />
@@ -105,10 +110,13 @@ export const TemplatesTableToolbar = () => {
         selectedValues={selectedTypeValues}
         showSearch={false}
         onSelectedValuesChange={(values) => {
-          updateSearchParams({
-            type: toCommaSeparatedSearchParam(values),
-            page: undefined,
-          });
+          updateSearchParams(
+            {
+              type: toCommaSeparatedSearchParam(values),
+              page: undefined,
+            },
+            { replace: true },
+          );
         }}
       />
 

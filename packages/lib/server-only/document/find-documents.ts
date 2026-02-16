@@ -16,6 +16,7 @@ export type PeriodSelectorValue = '' | 'all' | '7d' | '14d' | '30d';
 export type FindDocumentsOptions = {
   userId: number;
   teamId?: number;
+  team?: Awaited<ReturnType<typeof getTeamById>>;
   templateId?: number;
   source?: DocumentSource | DocumentSource[];
   status?: ExtendedDocumentStatus | ExtendedDocumentStatus[];
@@ -34,6 +35,7 @@ export type FindDocumentsOptions = {
 export const findDocuments = async ({
   userId,
   teamId,
+  team: preloadedTeam,
   templateId,
   source,
   status,
@@ -45,25 +47,19 @@ export const findDocuments = async ({
   query = '',
   folderId,
 }: FindDocumentsOptions) => {
-  const user = await prisma.user.findFirstOrThrow({
-    where: {
-      id: userId,
-    },
-    select: {
-      id: true,
-      email: true,
-      name: true,
-    },
-  });
-
-  let team = null;
-
-  if (teamId !== undefined) {
-    team = await getTeamById({
-      userId,
-      teamId,
-    });
-  }
+  const [user, team] = await Promise.all([
+    prisma.user.findFirstOrThrow({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+      },
+    }),
+    preloadedTeam ?? (teamId !== undefined ? getTeamById({ userId, teamId }) : null),
+  ]);
 
   const orderByColumn = orderBy?.column ?? 'createdAt';
   const orderByDirection = orderBy?.direction ?? 'desc';

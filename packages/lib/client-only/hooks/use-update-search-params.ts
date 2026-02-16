@@ -1,3 +1,5 @@
+import { useCallback, useRef } from 'react';
+
 import type { NavigateOptions } from 'react-router';
 import { useSearchParams } from 'react-router';
 
@@ -7,20 +9,29 @@ type UpdateSearchParamsOptions = Pick<NavigateOptions, 'preventScrollReset' | 'r
 export const useUpdateSearchParams = (defaultOptions: UpdateSearchParamsOptions = {}) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
-  return (params: SearchParamValues, options?: UpdateSearchParamsOptions) => {
-    const nextSearchParams = new URLSearchParams(searchParams?.toString() ?? '');
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
 
-    Object.entries(params).forEach(([key, value]) => {
-      if (value === undefined || value === null) {
-        nextSearchParams.delete(key);
-      } else {
-        nextSearchParams.set(key, String(value));
-      }
-    });
+  const defaultOptionsRef = useRef(defaultOptions);
+  defaultOptionsRef.current = defaultOptions;
 
-    setSearchParams(nextSearchParams, {
-      ...defaultOptions,
-      ...options,
-    });
-  };
+  return useCallback(
+    (params: SearchParamValues, options?: UpdateSearchParamsOptions) => {
+      const nextSearchParams = new URLSearchParams(searchParamsRef.current?.toString() ?? '');
+
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+          nextSearchParams.delete(key);
+        } else {
+          nextSearchParams.set(key, String(value));
+        }
+      });
+
+      setSearchParams(nextSearchParams, {
+        ...defaultOptionsRef.current,
+        ...options,
+      });
+    },
+    [setSearchParams],
+  );
 };

@@ -56,8 +56,11 @@ export const TemplatePageViewDocumentsTable = ({
 
   const team = useCurrentTeam();
 
-  const parsedSearchParams = ZDocumentSearchParamsSchema.parse(
-    Object.fromEntries(searchParams ?? []),
+  const searchParamsString = searchParams.toString();
+
+  const parsedSearchParams = useMemo(
+    () => ZDocumentSearchParamsSchema.parse(Object.fromEntries(searchParams)),
+    [searchParamsString],
   );
 
   const { data, isLoading, isLoadingError } = trpc.document.findDocumentsInternal.useQuery(
@@ -174,7 +177,7 @@ export const TemplatePageViewDocumentsTable = ({
         ),
       },
     ] satisfies DataTableColumnDef<(typeof results)['data'][number]>[];
-  }, []);
+  }, [_, i18n, team?.url]);
 
   return (
     <div className="space-y-4">
