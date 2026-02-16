@@ -248,6 +248,11 @@ msgstr "{0}을(를) 업로드할 수 없습니다:"
 msgid "{0} direct signing templates"
 msgstr "{0} 직접 서명 템플릿"
 
+#. placeholder {0}: t(FRIENDLY_FIELD_TYPE[field.type])
+#: packages/ui/components/document/envelope-recipient-field-tooltip.tsx
+msgid "{0} field"
+msgstr ""
+
 #. placeholder {0}: team.name
 #. placeholder {1}: envelope.title
 #: packages/lib/jobs/definitions/emails/send-signing-email.handler.ts
@@ -740,6 +745,10 @@ msgstr "2FA"
 #: apps/remix/app/components/dialogs/admin-user-reset-two-factor-dialog.tsx
 msgid "2FA Reset"
 msgstr "2단계 인증 재설정"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "2FA token"
+msgstr ""
 
 #: apps/remix/app/components/forms/token.tsx
 msgid "3 months"
@@ -1417,6 +1426,10 @@ msgstr "모든 수신자가 서명했습니다. 문서를 처리 중이며 곧 �
 msgid "All recipients will be notified"
 msgstr "모든 수신자에게 알림이 전송됩니다"
 
+#: apps/remix/app/components/general/app-nav-mobile.tsx
+msgid "All rights reserved."
+msgstr ""
+
 #: packages/email/template-components/template-document-cancel.tsx
 msgid "All signatures have been voided."
 msgstr "모든 서명이 무효화되었습니다."
@@ -2031,6 +2044,10 @@ msgstr "인증 필요"
 msgid "Authenticator app"
 msgstr "인증 앱"
 
+#: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
+msgid "Automatically sign fields"
+msgstr ""
+
 #: apps/remix/app/components/forms/avatar-image.tsx
 msgid "Avatar"
 msgstr "아바타"
@@ -2280,6 +2297,7 @@ msgstr ""
 #: apps/remix/app/components/forms/2fa/view-recovery-codes-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
@@ -3048,6 +3066,7 @@ msgid "Created"
 msgstr "생성일"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
+#: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
@@ -4174,6 +4193,7 @@ msgstr "전자 서명 고지"
 
 #: apps/remix/app/components/dialogs/ai-field-detection-dialog.tsx
 #: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-add-dialog.tsx
 #: apps/remix/app/components/dialogs/team-email-update-dialog.tsx
 #: apps/remix/app/components/dialogs/template-use-dialog.tsx
@@ -4211,6 +4231,7 @@ msgstr "전자 서명 고지"
 #: packages/ui/primitives/document-flow/add-fields.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
 #: packages/ui/primitives/document-flow/add-signers.tsx
+#: packages/ui/primitives/document-flow/add-subject.tsx
 #: packages/ui/primitives/document-flow/types.ts
 #: packages/ui/primitives/template-flow/add-template-fields.tsx
 #: packages/ui/primitives/template-flow/add-template-placeholder-recipients.tsx
@@ -5131,6 +5152,11 @@ msgstr "그룹"
 msgid "Having an assistant as the last signer means they will be unable to take any action as there are no subsequent signers to assist."
 msgstr "보조자가 마지막 서명자인 경우, 이후 서명자가 없기 때문에 아무 작업도 수행할 수 없습니다."
 
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Height:"
+msgstr ""
+
 #: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
 msgid "Help complete the document for other signers."
 msgstr "다른 서명자들을 대신해 문서를 완료하도록 도와주세요."
@@ -5212,6 +5238,8 @@ msgstr "숨기기"
 #: apps/remix/app/components/dialogs/folder-move-dialog.tsx
 #: apps/remix/app/components/general/folder/folder-grid.tsx
 #: apps/remix/app/components/general/generic-error-layout.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/documents.folders._index.tsx
+#: apps/remix/app/routes/_authenticated+/t.$teamUrl+/templates.folders._index.tsx
 msgid "Home"
 msgstr "홈"
 
@@ -5755,6 +5783,7 @@ msgstr "문서 로딩 중..."
 msgid "Loading suggestions..."
 msgstr "제안 불러오는 중..."
 
+#: apps/remix/app/components/embed/embed-client-loading.tsx
 #: apps/remix/app/components/general/default-recipients-multiselect-combobox.tsx
 #: apps/remix/app/components/general/document/document-page-view-recent-activity.tsx
 msgid "Loading..."
@@ -6109,6 +6138,8 @@ msgstr "여러 접근 방식을 선택할 수 있습니다."
 msgid "My Folder"
 msgstr "내 폴더"
 
+#: apps/remix/app/components/tables/admin-document-logs-table.tsx
+#: apps/remix/app/components/tables/document-logs-table.tsx
 #: apps/remix/app/components/tables/internal-audit-log-table.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/certificate.tsx
 #: packages/lib/server-only/pdf/render-audit-logs.ts
@@ -6325,6 +6356,10 @@ msgstr "서명 필드를 찾을 수 없습니다."
 msgid "No Stripe customer attached"
 msgstr "연결된 Stripe 고객이 없습니다."
 
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
+msgid "No subscription found"
+msgstr ""
+
 #: packages/ui/components/recipient/recipient-autocomplete-input.tsx
 msgid "No suggestions found"
 msgstr "제안을 찾을 수 없습니다"
@@ -6336,6 +6371,10 @@ msgstr "팀 그룹이 없습니다."
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl._index.tsx
 msgid "No teams yet"
 msgstr "아직 팀이 없습니다."
+
+#: apps/remix/app/components/general/webhook-multiselect-combobox.tsx
+msgid "No triggers available"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
 msgid "No valid direct templates found"
@@ -6355,11 +6394,13 @@ msgstr "값이 없습니다."
 msgid "No worries, it happens! Enter your email and we'll email you a special link to reset your password."
 msgstr "걱정하지 마세요. 이메일을 입력하시면 비밀번호를 재설정할 수 있는 특별 링크를 보내드립니다."
 
+#: apps/remix/app/components/dialogs/envelope-distribute-dialog.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-advanced-settings.tsx
 #: apps/remix/app/components/forms/editor/editor-field-number-form.tsx
 #: apps/remix/app/components/tables/admin-claims-table.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
 #: packages/lib/constants/document.ts
+#: packages/ui/primitives/document-flow/add-subject.tsx
 msgid "None"
 msgstr "없음"
 
@@ -6506,6 +6547,7 @@ msgid "Or continue with"
 msgstr "또는 다음으로 계속"
 
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
+#: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/user-billing-organisations-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_unauthenticated+/organisation.sso.confirmation.$token.tsx
@@ -6658,6 +6700,7 @@ msgstr "조직 설정 재정의"
 #: apps/remix/app/components/tables/organisation-members-table.tsx
 #: apps/remix/app/components/tables/user-organisations-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/documents._index.tsx
+#: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_authenticated+/dashboard.tsx
 #: apps/remix/app/routes/_internal+/[__htmltopdf]+/audit-log.tsx
@@ -6688,6 +6731,7 @@ msgstr "유료"
 
 #: apps/remix/app/components/forms/signin.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-dialog.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 msgid "Passkey"
 msgstr "패스키"
 
@@ -7077,6 +7121,25 @@ msgstr "계속하려면 문서를 업로드하세요"
 #: apps/remix/app/components/forms/branding-preferences-form.tsx
 msgid "Please upload a logo"
 msgstr "로고를 업로드해 주세요."
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Pos X:"
+msgstr ""
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Pos Y:"
+msgstr ""
+
+#: apps/remix/app/components/embed/embed-direct-template-client-page.tsx
+#: apps/remix/app/components/embed/embed-document-signing-page-v1.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-mobile-widget.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-page-view-v2.tsx
+#: apps/remix/app/routes/embed+/v1+/multisign+/_index.tsx
+#: apps/remix/app/routes/embed+/v1+/multisign+/_index.tsx
+msgid "Powered by"
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Pre-formatted CSV template with example data."
@@ -7754,6 +7817,7 @@ msgstr "오른쪽"
 #: apps/remix/app/components/dialogs/template-direct-link-dialog.tsx
 #: apps/remix/app/components/embed/authoring/configure-document-recipients.tsx
 #: apps/remix/app/components/tables/admin-organisations-table.tsx
+#: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-groups-table.tsx
 #: apps/remix/app/components/tables/organisation-member-invites-table.tsx
 #: apps/remix/app/components/tables/organisation-members-table.tsx
@@ -8246,6 +8310,7 @@ msgstr "공개 프로필에 템플릿을 표시해, 사용자가 빠르게 서�
 
 #: apps/remix/app/components/dialogs/sign-field-signature-dialog.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auto-sign.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-complete-dialog.tsx
@@ -8848,6 +8913,7 @@ msgstr "시스템 요구 사항"
 msgid "System Theme"
 msgstr "시스템 테마"
 
+#: apps/remix/app/components/tables/admin-user-teams-table.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
 #: apps/remix/app/components/tables/organisation-teams-table.tsx
 #: apps/remix/app/routes/_authenticated+/admin+/organisations.$id.tsx
@@ -8937,6 +9003,10 @@ msgstr "팀 구성원"
 msgid "Team members have been added."
 msgstr "팀 구성원이 추가되었습니다."
 
+#: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
+msgid "Team Memberships"
+msgstr ""
+
 #: apps/remix/app/components/dialogs/team-create-dialog.tsx
 #: apps/remix/app/components/forms/team-update-form.tsx
 #: apps/remix/app/components/tables/organisation-insights-table.tsx
@@ -8996,6 +9066,10 @@ msgstr "팀은 작업을 조직하고 다른 사람과 협업하는 데 도움�
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.groups.$id.tsx
 msgid "Teams that this organisation group is currently assigned to"
 msgstr "이 조직 그룹이 현재 할당된 팀"
+
+#: apps/remix/app/routes/_authenticated+/admin+/users.$id.tsx
+msgid "Teams that this user is a member of and their roles."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/organisation-member-invite-dialog.tsx
 #: apps/remix/app/components/dialogs/public-profile-template-manage-dialog.tsx
@@ -9310,6 +9384,12 @@ msgstr "다음 서명자에게는 서명 필드가 없습니다:"
 #: packages/email/templates/team-delete.tsx
 msgid "The following team has been deleted. You will no longer be able to access this team and its documents"
 msgstr "다음 팀이 삭제되었습니다. 더 이상 이 팀과 그 문서에 접근할 수 없습니다."
+
+#. placeholder {0}: form.watch('name')
+#. placeholder {1}: form.watch('email')
+#: apps/remix/app/components/dialogs/assistant-confirmation-dialog.tsx
+msgid "The next recipient to sign this document will be <0>{0}</0> (<1>{1}</1>)."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings.sso.tsx
 msgid "The OpenID discovery endpoint URL for your provider"
@@ -9830,25 +9910,48 @@ msgstr "제목"
 msgid "Title cannot be empty"
 msgstr "제목은 비워 둘 수 없습니다."
 
-#. placeholder {0}: actionVerb.toLowerCase()
-#. placeholder {1}: actionTarget.toLowerCase()
-#. placeholder {2}: recipient.email
-#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
-msgid "To {0} this {1}, you need to be logged in as <0>{2}</0>"
-msgstr "이 {1}을(를) {0}하려면 <0>{2}</0>(으)로 로그인해야 합니다"
-
-#. placeholder {0}: actionVerb.toLowerCase()
-#. placeholder {1}: actionTarget.toLowerCase()
-#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
-msgid "To {0} this {1}, you need to be logged in."
-msgstr "이 {1}을(를) {0}하려면 로그인해야 합니다."
-
 #: apps/remix/app/routes/_unauthenticated+/organisation.invite.$token.tsx
 msgid "To accept this invitation you must create an account."
 msgstr "이 초대를 수락하려면 계정을 생성해야 합니다."
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
 msgid "To add members to this team, you must first add them to the organisation."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To approve this document, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To approve this document, you need to be logged in."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To approve this field, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To approve this field, you need to be logged in."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To assist with this document, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To assist with this document, you need to be logged in."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To assist with this field, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To assist with this field, you need to be logged in."
 msgstr ""
 
 #: apps/remix/app/components/dialogs/team-member-create-dialog.tsx
@@ -9898,6 +10001,24 @@ msgstr "이 문서를 열람 완료로 표시하려면 로그인해야 합니다
 msgid "To proceed further, please set at least one value for the {0} field."
 msgstr "계속 진행하려면 {0} 필드에 최소 한 개 이상의 값을 설정해야 합니다."
 
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To sign this document, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To sign this document, you need to be logged in."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To sign this field, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To sign this field, you need to be logged in."
+msgstr ""
+
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "To use our electronic signature service, you must have access to:"
 msgstr "전자 서명 서비스를 사용하려면 다음에 접근할 수 있어야 합니다:"
@@ -9905,6 +10026,26 @@ msgstr "전자 서명 서비스를 사용하려면 다음에 접근할 수 있�
 #: apps/remix/app/components/embed/embed-authentication-required.tsx
 msgid "To view this document you need to be signed into your account, please sign in to continue."
 msgstr "이 문서를 보려면 계정에 로그인해야 합니다. 계속하려면 로그인해 주세요."
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To view this document, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To view this document, you need to be logged in."
+msgstr ""
+
+#. placeholder {0}: recipient.email
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To view this field, you need to be logged in as <0>{0}</0>"
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-account.tsx
+msgid "To view this field, you need to be logged in."
+msgstr ""
 
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.public-profile.tsx
 msgid "Toggle the switch to hide your profile from the public."
@@ -10136,6 +10277,7 @@ msgid "Unable to sign in"
 msgstr "로그인할 수 없습니다"
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 #: apps/remix/app/routes/_authenticated+/o.$orgUrl.settings._layout.tsx
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings._layout.tsx
@@ -11074,6 +11216,7 @@ msgid "We were unable to update your email preferences at this time, please try 
 msgstr "현재 이메일 기본 설정을 업데이트할 수 없습니다. 잠시 후 다시 시도해 주세요."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
 #: apps/remix/app/components/general/document-signing/document-signing-auth-password.tsx
 msgid "We were unable to verify your details. Please try again or contact support"
 msgstr "정보를 확인할 수 없습니다. 다시 시도하시거나 지원팀에 문의해 주세요."
@@ -11242,6 +11385,11 @@ msgstr "화이트라벨, 무제한 구성원 등"
 #: apps/remix/app/components/dialogs/document-resend-dialog.tsx
 msgid "Who do you want to remind?"
 msgstr "누구에게 리마인더를 보내시겠습니까?"
+
+#: apps/remix/app/components/general/envelope-editor/envelope-editor-fields-page.tsx
+#: packages/ui/primitives/document-flow/field-item.tsx
+msgid "Width:"
+msgstr ""
 
 #: apps/remix/app/routes/_unauthenticated+/articles.signature-disclosure.tsx
 msgid "Withdrawing Consent"
@@ -11787,8 +11935,78 @@ msgid "You need to be logged in to view this page."
 msgstr "이 페이지를 보려면 로그인해야 합니다."
 
 #: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to approve this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to approve this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to assist with this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to assist with this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
 msgid "You need to setup 2FA to mark this document as viewed."
 msgstr "이 문서를 열람 처리하려면 2단계 인증을 설정해야 합니다."
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to sign this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to sign this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to view this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-2fa.tsx
+msgid "You need to setup 2FA to view this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to approve this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to approve this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to assist with this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to assist with this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to mark this document as viewed."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to sign this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to sign this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to view this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "You need to setup a passkey to view this field."
+msgstr ""
 
 #: packages/lib/utils/document-audit-logs.ts
 msgid "You opened the document"
@@ -11926,6 +12144,43 @@ msgstr "브랜드 웹사이트 URL"
 #: apps/remix/app/routes/_authenticated+/t.$teamUrl+/settings.branding.tsx
 msgid "Your branding preferences have been updated"
 msgstr "브랜딩 환경설정이 업데이트되었습니다"
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to approve this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to approve this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to assist with this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to assist with this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to mark this document as viewed."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to sign this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to sign this field."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to view this document."
+msgstr ""
+
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+#: apps/remix/app/components/general/document-signing/document-signing-auth-passkey.tsx
+msgid "Your browser does not support passkeys, which is required to view this field."
+msgstr ""
 
 #: apps/remix/app/components/dialogs/template-bulk-send-dialog.tsx
 msgid "Your bulk send has been initiated. You will receive an email notification upon completion."
