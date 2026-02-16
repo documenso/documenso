@@ -796,6 +796,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
           title: body.title,
         },
         attachments: body.attachments,
+        formValues: body.formValues,
         requestMetadata: metadata,
       });
 
@@ -1041,12 +1042,7 @@ export const ApiContractV1Implementation = tsr.router(ApiContractV1, {
         },
       };
     } catch (err) {
-      return {
-        status: 500,
-        body: {
-          message: 'An error has occured while sending the document for signing',
-        },
-      };
+      return AppError.toRestAPIError(err);
     }
   }),
 

@@ -35,6 +35,7 @@ import { parseMessageDescriptor } from '@documenso/lib/utils/i18n';
 import {
   canRecipientBeModified,
   canRecipientFieldsBeModified,
+  getRecipientsWithMissingFields,
 } from '@documenso/lib/utils/recipients';
 
 import { FieldToolTip } from '../../components/field/field-tooltip';
@@ -555,15 +556,11 @@ export const AddFieldsFormPartial = ({
   };
 
   const handleGoNextClick = () => {
-    const everySignerHasSignature = recipientsByRole.SIGNER.every((signer) =>
-      localFields.some(
-        (field) =>
-          (field.type === FieldType.SIGNATURE || field.type === FieldType.FREE_SIGNATURE) &&
-          field.signerEmail === signer.email,
-      ),
-    );
+    // localFields already have recipientId set correctly (see field creation at line 338)
+    // Using the existing recipientId is important for handling duplicate email recipients
+    const recipientsMissingFields = getRecipientsWithMissingFields(recipients, localFields);
 
-    if (!everySignerHasSignature) {
+    if (recipientsMissingFields.length > 0) {
       setIsMissingSignatureDialogVisible(true);
       return;
     }
@@ -756,7 +753,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Contact className="h-4 w-4" />
-                            Initials
+                            <Trans>Initials</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -906,7 +903,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <Disc className="h-4 w-4" />
-                            Radio
+                            <Trans>Radio</Trans>
                           </p>
                         </CardContent>
                       </Card>
@@ -931,8 +928,7 @@ export const AddFieldsFormPartial = ({
                             )}
                           >
                             <CheckSquare className="h-4 w-4" />
-                            {/* Not translated on purpose. */}
-                            Checkbox
+                            <Trans>Checkbox</Trans>
                           </p>
                         </CardContent>
                       </Card>

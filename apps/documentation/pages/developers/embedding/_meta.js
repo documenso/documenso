@@ -7,5 +7,4 @@ export default {
   preact: 'Preact Integration',
   angular: 'Angular Integration',
   'css-variables': 'CSS Variables',
-  authoring: 'Authoring',
 };

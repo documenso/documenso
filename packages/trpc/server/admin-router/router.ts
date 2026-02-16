@@ -12,11 +12,13 @@ import { findDocumentAuditLogsRoute } from './find-document-audit-logs';
 import { findDocumentJobsRoute } from './find-document-jobs';
 import { findDocumentsRoute } from './find-documents';
 import { findSubscriptionClaimsRoute } from './find-subscription-claims';
+import { findUserTeamsRoute } from './find-user-teams';
 import { getAdminOrganisationRoute } from './get-admin-organisation';
 import { getUserRoute } from './get-user';
 import { promoteMemberToOwnerRoute } from './promote-member-to-owner';
 import { resealDocumentRoute } from './reseal-document';
 import { resetTwoFactorRoute } from './reset-two-factor-authentication';
+import { resyncLicenseRoute } from './resync-license';
 import { updateAdminOrganisationRoute } from './update-admin-organisation';
 import { updateOrganisationMemberRoleRoute } from './update-organisation-member-role';
 import { updateRecipientRoute } from './update-recipient';
@@ -44,6 +46,9 @@ export const adminRouter = router({
   stripe: {
     createCustomer: createStripeCustomerRoute,
   },
+  license: {
+    resync: resyncLicenseRoute,
+  },
   user: {
     get: getUserRoute,
     update: updateUserRoute,
@@ -51,6 +56,7 @@ export const adminRouter = router({
     enable: enableUserRoute,
     disable: disableUserRoute,
     resetTwoFactor: resetTwoFactorRoute,
+    findTeams: findUserTeamsRoute,
   },
   document: {
     find: findDocumentsRoute,

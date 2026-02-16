@@ -4,13 +4,14 @@ import { msg } from '@lingui/core/macro';
 import { useLingui } from '@lingui/react';
 import { Trans } from '@lingui/react/macro';
 import type { DocumentMeta, EnvelopeItem } from '@prisma/client';
-import { type Field, FieldType, RecipientRole, SigningStatus } from '@prisma/client';
+import { type Field, RecipientRole, SigningStatus } from '@prisma/client';
 import { LucideChevronDown, LucideChevronUp } from 'lucide-react';
 
 import { useThrottleFn } from '@documenso/lib/client-only/hooks/use-throttle-fn';
 import { PDF_VIEWER_PAGE_SELECTOR } from '@documenso/lib/constants/pdf-viewer';
 import { isFieldUnsignedAndRequired } from '@documenso/lib/utils/advanced-fields-helpers';
 import { validateFieldsInserted } from '@documenso/lib/utils/fields';
+import { isSignatureFieldType } from '@documenso/prisma/guards/is-signature-field';
 import type { RecipientWithFields } from '@documenso/prisma/types/recipient-with-fields';
 import { trpc } from '@documenso/trpc/react';
 import {
@@ -115,7 +116,7 @@ export const EmbedSignDocumentV1ClientPage = ({
     [fields],
   );
 
-  const hasSignatureField = fields.some((field) => field.type === FieldType.SIGNATURE);
+  const hasSignatureField = fields.some((field) => isSignatureFieldType(field.type));
 
   const signatureValid = !hasSignatureField || (signature && signature.trim() !== '');
 
@@ -509,7 +510,9 @@ export const EmbedSignDocumentV1ClientPage = ({
 
         {!hidePoweredBy && (
           <div className="fixed bottom-0 left-0 z-40 rounded-tr bg-primary px-2 py-1 text-xs font-medium text-primary-foreground opacity-60 hover:opacity-100">
-            <span>Powered by</span>
+            <span>
+              <Trans>Powered by</Trans>
+            </span>
             <BrandingLogo className="ml-2 inline-block h-[14px]" />
           </div>
         )}

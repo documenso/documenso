@@ -434,15 +434,31 @@ export default function EnvelopeEditorFieldsPageRenderer() {
       renderFieldOnLayer(field);
     });
 
+    // Reconcile selection state with live field nodes after flush/sync updates.
+    const liveSelectedFieldGroups = selectedKonvaFieldGroups.filter((fieldGroup) => {
+      if (!fieldGroup.getStage() || !fieldGroup.getParent()) {
+        return false;
+      }
+
+      return localPageFields.some((field) => field.formId === fieldGroup.id());
+    });
+
+    if (liveSelectedFieldGroups.length !== selectedKonvaFieldGroups.length) {
+      setSelectedFields(liveSelectedFieldGroups);
+    }
+
     // Rerender the transformer
     interactiveTransformer.current?.forceUpdate();
 
     pageLayer.current.batchDraw();
-  }, [localPageFields]);
+  }, [localPageFields, selectedKonvaFieldGroups]);
 
   const setSelectedFields = (nodes: Konva.Node[]) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const fieldGroups = nodes.filter((node) => node.hasName('field-group')) as Konva.Group[];
+    const fieldGroups = nodes.filter(
+      (node) =>
+        node.hasName('field-group') && Boolean(node.getStage()) && Boolean(node.getParent()),
+    ) as Konva.Group[];
 
     interactiveTransformer.current?.nodes(fieldGroups);
     setSelectedKonvaFieldGroups(fieldGroups);
@@ -674,6 +690,10 @@ const FieldActionButtons = ({
       selectedFieldFormId.includes(field.formId),
     );
 
+    if (fields.length === 0) {
+      return null;
+    }
+
     const recipient = envelope.recipients.find(
       (recipient) => recipient.id === fields[0].recipientId,
     );
@@ -689,7 +709,7 @@ const FieldActionButtons = ({
     }
 
     return null;
-  }, [editorFields.localFields]);
+  }, [editorFields.localFields, envelope.recipients, selectedFieldFormId]);
 
   return (
     <div className="flex flex-col items-center" {...props}>

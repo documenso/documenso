@@ -10,7 +10,10 @@ import { tsRestHonoApp } from '@documenso/api/hono';
 import { auth } from '@documenso/auth/server';
 import { API_V2_BETA_URL, API_V2_URL } from '@documenso/lib/constants/app';
 import { jobsClient } from '@documenso/lib/jobs/client';
+import { LicenseClient } from '@documenso/lib/server-only/license/license-client';
 import { TelemetryClient } from '@documenso/lib/server-only/telemetry/telemetry-client';
+import { migrateDeletedAccountServiceAccount } from '@documenso/lib/server-only/user/service-accounts/deleted-account';
+import { migrateLegacyServiceAccount } from '@documenso/lib/server-only/user/service-accounts/legacy-service-account';
 import { getIpAddress } from '@documenso/lib/universal/get-ip-address';
 import { env } from '@documenso/lib/utils/env';
 import { logger } from '@documenso/lib/utils/logger';
@@ -139,5 +142,11 @@ app.use(`${API_V2_BETA_URL}/*`, async (c) =>
 if (env('NODE_ENV') !== 'development') {
   void TelemetryClient.start();
 }
+
+// Start license client to verify license on startup.
+void LicenseClient.start();
+
+void migrateDeletedAccountServiceAccount();
+void migrateLegacyServiceAccount();
 
 export default app;
